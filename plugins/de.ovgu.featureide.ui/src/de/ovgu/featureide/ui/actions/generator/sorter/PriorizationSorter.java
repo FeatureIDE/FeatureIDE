@@ -18,39 +18,35 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator;
+package de.ovgu.featureide.ui.actions.generator.sorter;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WE_SHOULDNT_GET_HERE_COMMA___HERE_IS_WRONG;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
  * Sorts configurations before they are generated based on their difference. 
  * 
  * @author Mustafa Alhajjaj
- * @author Marcus Pinnecke
  */
 public class PriorizationSorter extends AbstractConfigurationSorter {
 	private final List<List<String>> allconfigs = new ArrayList<List<String>>();
 	private final List<List<String>> allsortedconfigs = new ArrayList<List<String>>();
 	HashMap<String,Double> configsDistancesResult = new HashMap<String,Double>();
 
-	//	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 	private IFeatureModel featureModel;
 
 	public PriorizationSorter(IFeatureModel featureModel) {
@@ -62,11 +58,11 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	private int configurationCounter = 1;
 
 	@Override
-	protected int sort(final IProgressMonitor monitor) {
+	protected int sort(final WorkMonitor monitor) {
 		if (configurations.isEmpty()) {
 			return 0;
 		}
-		final List<List<String>> configs = new LinkedList<List<String>>();
+		final List<List<String>> configs = new ArrayList<List<String>>();
 		for (final BuilderConfiguration c : configurations) {
 			configs.add(new ArrayList<String>(c.getSelectedFeatureNames()));
 		}
@@ -87,23 +83,21 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		return new BuilderConfiguration(configuration, i);
 	}
 
-	protected List<List<String>> sortConfigs(List<List<String>> configs, IProgressMonitor monitor) {
-//		LOGGER.logInfo(START_SORTING_CONFIGURATIONS_BY_DIFFERENCE);
-//		final long time = System.currentTimeMillis();
-		monitor.beginTask(SORT_CONFIGURATIONS , configs.size());
-	
+	protected List<List<String>> sortConfigs(List<List<String>> configs, WorkMonitor monitor) {
 		// bring the first product with maximum number of optional feature.\
+		System.err.println("START sort");
 		allconfigs.addAll(configs);
 		
-		configsDistancesResult=getconfigsDistanceMap(allconfigs);
+		System.err.println("getconfigsDistanceMap");
+		configsDistancesResult=getconfigsDistanceMap(allconfigs, monitor);
+		System.err.println("allyes");
 		allyesconfig();
-		monitor.worked(1);
-			while (!allconfigs.isEmpty()) {
+		while (!allconfigs.isEmpty()) {
+			if (monitor.checkCancel()) {
+				break;
+			}
 			selectConfig();
-			monitor.worked(1);
 		}
-		
-//		LOGGER.logInfo(System.currentTimeMillis() - time + MS_TO_SORT_ALL_CONFIGS);
 		return allsortedconfigs;
 	}
 	
@@ -111,34 +105,25 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	public int getBufferSize() {
 		return allconfigs.size() + configurations.size();
 	}
-
 	
-	private HashMap<String,Double> getconfigsDistanceMap(List<List<String>> allConfig)
-	{
-		configsDistancesResult = new HashMap<String,Double>();
-		String mapKey ;
-		for(int i =0; i< allConfig.size() ; i++)
-		{
-
-			for (int j = i+1 ; j < allConfig.size() ; j++ )
-			{
-
+	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, WorkMonitor monitor) {
+		configsDistancesResult = new HashMap<String, Double>();
+		String mapKey;
+		for (int i = 0; i < allConfig.size(); i++) {
+			if (monitor.checkCancel()) {
+				break;
+			}
+			for (int j = i + 1; j < allConfig.size(); j++) {
 				int xHashCode = allConfig.get(i).hashCode();
 				int yHashCode = allConfig.get(j).hashCode();
-				
+
 				mapKey = xHashCode + EMPTY___ + yHashCode;
 
-				if(configsDistancesResult.get(mapKey) == null) // not added before
-				{
-					configsDistancesResult.put(mapKey, clacDistance(allConfig.get(i),allConfig.get(j)));
+				if (configsDistancesResult.get(mapKey) == null) {// not added before
+					configsDistancesResult.put(mapKey, clacDistance(allConfig.get(i), allConfig.get(j)));
 				}
-
 			}
-
-
 		}
-
-	
 		return configsDistancesResult;
 	}
 	
@@ -206,13 +191,11 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 			}
 		}
 	
-//		LOGGER.logInfo("Distance: " + distance);
 		allsortedconfigs.add(allconfigs.get(index));
 		return allconfigs.remove(index);
 	}
 
 	private double clacDistance(List<String> x, List<String> y) {
-//		
 		Collection<String> similar = new HashSet<String>(x);
 		Collection<String> different = new HashSet<String>();
 		
@@ -226,7 +209,6 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		double d=different.size();
 		double t=concreteFeatures.size();
 		
-		//return (similar.size() + (concreteFeatures.size() - (similar.size() + different.size()))) / (double)concreteFeatures.size();
 		return (s+(t-(s+d)))/t;
 	}
 

@@ -18,36 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job;
+package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import org.eclipse.core.runtime.jobs.Job;
+import org.prop4j.analyses.PairWiseConfigurationGenerator;
+import org.prop4j.analyses.RandomConfigurationGenerator;
+import org.prop4j.solver.SatInstance;
+
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
- * Job that wraps the functionality of a {@link LongRunningMethod}.
+ * Creates random configurations.
  * 
- * @author Sebastian Krieter
+ * @see RandomConfigurationGenerator
+ * 
+ * @author Jens Meinicke
  */
-public class LongRunningJob<T> extends AStoppableJob implements IStoppableJob {
+public class RandConfigurationGenerator extends MASKConfigurationGenerator {
 
-	private final LongRunningMethod<T> method;
-	private T methodResult = null;
-
-	public LongRunningJob(String name, LongRunningMethod<T> method) {
-		super(name, Job.LONG);
-		this.method = method;
+	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
+		super(builder, featureModel, featureProject);
 	}
-
-	protected boolean work() throws Exception {
-		methodResult = method.execute(workMonitor);
-		return true;
+	
+	@Override
+	protected PairWiseConfigurationGenerator getGenerator(SatInstance solver, int solutionCount) {
+		return new RandomConfigurationGenerator(solver, solutionCount);
 	}
-
-	public T getResults() {
-		return methodResult;
-	}
-
-	public Class<?> getImplementationClass() {
-		return method.getClass();
-	}
-
 }

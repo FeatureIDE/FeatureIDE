@@ -18,9 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator;
-
-import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_CONFIGURATIONS;
+package de.ovgu.featureide.ui.actions.generator.sorter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,16 +30,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
  * Sorts Configurations by interactions they cover.
  * 
  * @author Jens Meinicke
- * @author Marcus Pinnecke
  */
 public class InteractionSorter extends AbstractConfigurationSorter {
 	
@@ -53,8 +50,6 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 
 	private final  boolean skippConfigurations;
 	
-//	private final Set<Interaction> allCoveredInteractions = new HashSet<Interaction>();
-
 	public InteractionSorter(final int t, final IFeatureModel featureModel, final boolean skippConfigurations) {
 		super(featureModel);
 		super.sorted = false;
@@ -67,21 +62,20 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 	 * @return number of configurations
 	 */
 	@Override
-	public int sort(final IProgressMonitor monitor) {
-		monitor.beginTask(SORT_CONFIGURATIONS , configurations.size() * 2);
+	public int sort(final WorkMonitor monitor) {
 		for (final BuilderConfiguration c : configurations) {
-			if (monitor.isCanceled()) {
+			if (monitor.checkCancel()) {
 				configurations.clear();
 				return 0;
 			}
 			interactions.put(c, new HashSet<Interaction>(concreteFeatures.size() * (10 ^ t)));
 			getInteractions(interactions.get(c), c.getSelectedFeatureNames(), new ArrayList<String>(0), new ArrayList<String>(0), 1, null);
-			monitor.worked(1);
+			monitor.worked();
 		}
 		
 		final LinkedList<BuilderConfiguration> sorted = new LinkedList<BuilderConfiguration>();
 		while (!interactions.isEmpty()) {
-			if (monitor.isCanceled()) {
+			if (monitor.checkCancel()) {
 				configurations.clear();
 				return 0;
 			}
@@ -95,7 +89,6 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 					sorted.addAll(interactions.keySet());
 				}
 				interactions.clear();
-				monitor.worked(interactions.size());
 				break;
 			}
 			sorted.add(mostCovering);
@@ -103,7 +96,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 			for (final Set<Interaction> interaction : interactions.values()) {
 				interaction.removeAll(coveredInteractions);
 			}
-			monitor.worked(1);
+			monitor.worked();
 		}
 		configurations = sorted;
 		return configurations.size();
@@ -153,7 +146,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 		boolean marker = lastFeature == null;
 		for (final String feature : concreteFeatures) {
 			if (!marker && feature.equals(lastFeature)) {
-				// skipp all features until the feature of the last iteration is found
+				// skip all features until the feature of the last iteration is found
 				marker = true;
 				continue;
 			}

@@ -51,7 +51,12 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 		
 		for (int i = 0; i < maxValue; i++) {
-			handleNewConfig(solver.findModel(), satInstance);
+			if (monitor.checkCancel()) {
+				break;
+			}
+			if (handleNewConfig(solver.findModel(), satInstance)) {
+				break;
+			}
 			solver.shuffleOrder();
 		}
 
@@ -70,6 +75,9 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 		
 		config.time = System.nanoTime() - time;
 		q.offer(config);
+		synchronized (tempConfigurationList) {
+			tempConfigurationList.add(config);
+		}
 		time = System.nanoTime();
 		
 		try {

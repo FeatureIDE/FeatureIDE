@@ -21,9 +21,6 @@
 package de.ovgu.featureide.ui.actions.generator;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_IN_CONFIGURATION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.GENARATOR_NR_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATE_PRODUCTS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GENERATOR_NR_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WILL_BE_RESTARTED_;
@@ -40,10 +37,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaModelException;
@@ -63,7 +57,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  */
 @SuppressWarnings(RESTRICTION)
-public class Generator extends Job implements IConfigurationBuilderBasics {
+public class Generator extends Thread implements IConfigurationBuilderBasics {
 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 
@@ -80,7 +74,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	/**
 	 * The number of this job.
 	 */
-	private int nr;
+	public int nr;
 
 	@CheckForNull
 	private JavaCompiler compiler;
@@ -95,7 +89,6 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	 * @param builder The {@link ConfigurationBuilder} containing the {@link Generator}
 	 */
 	public Generator(int nr, ConfigurationBuilder builder) {
-		super(nr == 0 ? GENERATOR : GENARATOR_NR_ + nr);
 		this.nr = nr;
 		this.builder = builder;
 		if (!builder.createNewProjects) {
@@ -109,33 +102,26 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			}
 		}
 	}
-
+	
 	/**
 	 * Generates the configurations of CongfigurationBuilder.configurations
-	 * 
-	 * @param monitor
 	 */
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
+	public void run() {
 		try {
-			monitor.setTaskName(GENERATE_PRODUCTS);
 			while (true) {
 				synchronized (this) {
-					if (builder.cancelGeneratorJobs || monitor.isCanceled()) {
+					if (builder.cancelGeneratorJobs) {
 						builder.generatorJobs.remove(this);
-						return Status.OK_STATUS;
+						return;
 					}
 					if (builder.sorter.getBufferSize() == 0) {
-						monitor.subTask("(Waiting)");
-						while (builder.sorter.getBufferSize() == 0 || !builder.sorter.sorted) {
+						while (builder.sorter.getBufferSize() == 0 || !builder.sorter.isSorted()) {
 							/** the job waits for a new configuration to build **/
 							try {
-								wait(1000);
+								Thread.sleep(1000);
 								if ((builder.sorter.getBufferSize() == 0 && builder.finish) || builder.cancelGeneratorJobs) {
-									return Status.OK_STATUS;
-								}
-								if (monitor.isCanceled()) {
-									return Status.OK_STATUS;
+									return;
 								}
 							} catch (InterruptedException e) {
 								UIPlugin.getDefault().logError(e);
@@ -143,54 +129,45 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 						}
 					}
 				}
-				monitor.subTask("(Build)");
-				System.out.println("Generator.run()" + builder.getClass());
 				configuration = builder.getConfiguration();
 				if (configuration == null) {
 					continue;
 				}
-				System.out.println("Generator.run()2");
 				String name = configuration.getName();
-				switch (builder.buildType) {
-				case ALL_CURRENT:
-					if (builder.createNewProjects) {
-						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_CONFIGURATION + name, configuration);
-					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
+				if (builder.createNewProjects) {
+					final String separator;
+					switch (builder.buildType) {
+					case ALL_CURRENT:
+						separator = SEPARATOR_CONFIGURATION;
+						break;
+					case ALL_VALID:
+						separator = SEPARATOR_CONFIGURATION;
+						break;
+					case INTEGRATION:
+						separator = SEPARATOR_INTEGRATION;
+						break;
+					case RANDOM:
+						separator = SEPARATOR_CONFIGURATION;
+						break;
+					case T_WISE:
+						separator = SEPARATOR_CONFIGURATION;
+						break;
+					default:
+						throw new RuntimeException(builder.buildType + " not supported");
 					}
-					break;
-				case INTEGRATION:
-					if (builder.createNewProjects) {
-						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_INTEGRATION + name, configuration);
-					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
-					}
-					break;
-				case ALL_VALID:
-					if (builder.createNewProjects) {
-						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, configuration);
-					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
-					}
-					break;
-				case T_WISE:
-					if (builder.createNewProjects) {
-						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_T_WISE + name, configuration);
-					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
-					}
-					break;
+					buildConfiguration(builder.featureProject.getProjectName() + separator + name, configuration);
+				} else {
+					builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
 				}
+				
 				if (compiler != null) {
-					monitor.subTask("(Compile)");
 					compiler.compile(configuration);
 					if (builder.runTests) {
-						monitor.subTask("(Test)");
 						testRunner.runTests(configuration);
 					}
 				}
 
-				builder.builtConfigurations++;
+				builder.builtConfiguration();
 			}
 		} catch (Exception e) {
 			UIPlugin.getDefault().logError(ERROR_IN_CONFIGURATION + configuration, e);
@@ -202,9 +179,8 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			builder.createNewGenerator(nr);
 		} finally {
 			builder.generatorJobs.remove(this);
-			monitor.done();
 		}
-		return Status.OK_STATUS;
+		return;
 	}
 
 	/**
@@ -353,4 +329,5 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 
 		newProject.setDescription(newDescription, null);
 	}
+
 }

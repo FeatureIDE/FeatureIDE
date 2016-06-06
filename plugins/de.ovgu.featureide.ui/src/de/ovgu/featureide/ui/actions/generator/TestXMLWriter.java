@@ -35,7 +35,12 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
+/**
+ * 
+ * Generates the xml input file for the JUnit view.
+ * 
+ * @author Jens Meinicke
+ */
 public class TestXMLWriter implements XMLCoverage {
 
 	private TestResults testResults;

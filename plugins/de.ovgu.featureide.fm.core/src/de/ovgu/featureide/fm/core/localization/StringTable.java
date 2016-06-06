@@ -652,12 +652,15 @@ public class StringTable {
 	public static final String REDUNDANT_CAST_TO = "redundant cast to";
 	public static final String HAS_BEEN_DEPRECATED = "has been deprecated";
 	public static final String T_WISE_CONFIGURATIONS = "T-wise configurations";
+	public static final String RANDOM_CONFIGURATIONS = "Random configurations";
 	public static final String ALL_CURRENT_CONFIGURATIONS = "All current configurations";
 	public static final String ALL_VALID_CONFIGURATIONS = "All valid configurations";
 	public static final String INTERACTIONS = "Interactions";
-	public static final String DIFFERENCE = "Difference";
+	public static final String DISSIMILARITY = "Dissimilarity";
 	public static final String CHVATAL = "Chvatal";
 	public static final String CASA = "CASA";
+	public static final String ICPL = "ICPL";
+	public static final String MASK = "MASK";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";
 	public static final String COMPILER = "Compiler";
 	public static final String SYMBOL = "symbol";
@@ -727,8 +730,7 @@ public class StringTable {
 	public static final String PROJECT_BASED__ = "Project based - ";
 	public static final String CALCULATE = "Calculate ";
 	public static final String REFRESH_STATISTICS_VIEW = "Refreshing statistics view";
-	public static final String CHOOSE_WISELY = "choose wisely";
-	public static final String EXPORT_STATISTICS_INTO_CSV = "Export statistics into CSV file";
+	public static final String EXPORT_STATISTICS_INTO_CSV = "Export Statistics Into CSV File";
 	public static final String SHOW_ERRORDIALOG = "show errordialog";
 	public static final String OK = "OK";
 	public static final String DATA_WAS_SUCCESSFULLY_EXPORTED_ = "Data was successfully exported.";
