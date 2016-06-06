@@ -29,17 +29,28 @@ import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
+import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
+ *  @brief Converter using conjunctive normal form.
  * 
  * @author Alexander Knueppel
  */
 public class CNFConverter extends NNFConverter {
+	/**
+	 * Constructor
+	 */
+	public CNFConverter() {
+		super();
+		//continues number + level
+		naming.put(Or.class, "Clause%d");
+		topName = "SubtreeCNF";
+	}
+	
 	/**
 	 * Creates cnf and returns a list of clauses
 	 */
