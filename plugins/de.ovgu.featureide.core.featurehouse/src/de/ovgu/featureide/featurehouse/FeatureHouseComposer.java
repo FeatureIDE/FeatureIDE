@@ -310,18 +310,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 						LOGGER.logError(e);
 					}
 				}
-				IFile conf = featureProject.getCurrentConfiguration();
-				if (conf != null) {
-					String configName = conf.getName();
-					sourcefolder = sourcefolder.getFolder(configName.substring(0, configName.indexOf('.')));
-					if (!sourcefolder.exists()) {
-						try {
-							sourcefolder.create(true, true, null);
-						} catch (CoreException e) {
-							LOGGER.logError(e);
-						}
-					}
-				}
 			}
 		}
 	}
