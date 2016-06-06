@@ -21,12 +21,18 @@
 package de.ovgu.featureide.fm.core.conversion;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
 
 import org.junit.Test;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.NodeWriter;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
@@ -37,7 +43,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
+import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+//import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * TODO description
@@ -61,25 +72,29 @@ public class TComplexConstraintConverter {
 		IFeature A = factory.createFeature(fm, "A");
 		IFeature B = factory.createFeature(fm, "B");
 		IFeature C = factory.createFeature(fm, "C");
+		//IFeature D = factory.createFeature(fm, "D");
 		
 		A.getStructure().setMandatory(false);
 		B.getStructure().setMandatory(false);
 		C.getStructure().setMandatory(false);
+		//D.getStructure().setMandatory(false);
 		
 		fm.getStructure().getRoot().addChild(A.getStructure());
 		fm.getStructure().getRoot().addChild(B.getStructure());
 		fm.getStructure().getRoot().addChild(C.getStructure());
-		
+		//fm.getStructure().getRoot().addChild(D.getStructure());
 		fm.getStructure().getRoot().setAnd();
 		
 		Node n1 = new Or(A, B);
 		Node n2 = new Or(B, C);
+		//Node n3 = new Implies(new And(new Or(A,B), D), new Not(C));
 		
 		IConstraint c1 = factory.createConstraint(fm, n1);
 		IConstraint c2 = factory.createConstraint(fm, n2);
-		
+		//IConstraint c3 = factory.createConstraint(fm, n3);
 	    fm.addConstraint(c1);
 		fm.addConstraint(c2);
+		//fm.addConstraint(c3);
 	}
 	
 	/*
@@ -108,14 +123,6 @@ public class TComplexConstraintConverter {
 		assertTrue(result);
 	}
 	
-	/**
-	 * @param result
-	 */
-	private void assertTrue(boolean result) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	/*
 	 * Check whether our converter recognizes simple constraints.
 	 */
@@ -140,9 +147,20 @@ public class TComplexConstraintConverter {
 	 * Conversion should preserve semantics.
 	 */
 	@Test
-	public void testConversion() throws UnsupportedModelException {
+	public void testNNFConversion() throws UnsupportedModelException {
 		ComplexConstraintConverter converter = new ComplexConstraintConverter();
-		IFeatureModel resultFM = converter.convert(fm, null);
+		IFeatureModel resultFM = converter.convert(fm, new NNFConverter());
+		
+		assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));	
+	}
+	
+	/*
+	 * Conversion should preserve semantics.
+	 */
+	@Test
+	public void testCNFConversion() throws UnsupportedModelException {
+		ComplexConstraintConverter converter = new ComplexConstraintConverter();
+		IFeatureModel resultFM = converter.convert(fm, new CNFConverter());
 		
 		assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));	
 	}
