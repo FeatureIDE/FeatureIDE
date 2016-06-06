@@ -839,7 +839,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath, 
 				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
 				CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, contract,
-				CmdLineInterpreter.INPUT_OPTION_CREATE_CONFIG_OUTPUT_DIR, "false"};
+				CmdLineInterpreter.INPUT_OPTION_NO_CONFIG_OUTPUT_DIR};
 	}
 
 	private String getContractParameter() {
