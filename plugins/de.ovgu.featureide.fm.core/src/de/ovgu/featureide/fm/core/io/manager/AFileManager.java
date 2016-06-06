@@ -117,7 +117,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 		final IPath rootLocation = root.getLocation();
 		if (absolutePath2.matchingFirstSegments(rootLocation) != rootLocation.segmentCount()) {
 			try {
-				IFile[] filesOfLocation = root.findFilesForLocationURI(URI.create("file:/" + absolutePath2.toString()));
+				IFile[] filesOfLocation = root.findFilesForLocationURI(URI.create("file:/" + absolutePath2.toString().replace(" ", "%20")));
 				absolutePath2 = filesOfLocation[0].getFullPath().makeRelativeTo(rootLocation);
 			} catch (IndexOutOfBoundsException e) {
 				FMCorePlugin.getDefault().logError(e);

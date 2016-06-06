@@ -18,15 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator;
+package de.ovgu.featureide.ui.actions.generator.sorter;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
  * Sorts configurations.<br>
@@ -50,13 +50,13 @@ public class AbstractConfigurationSorter {
 		concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);// TODO move to implementations
 	}
 	
-	public int sortConfigurations(final IProgressMonitor monitor) {
+	public int sortConfigurations(final WorkMonitor monitor) {
 		int numberOfConfigurations = sort(monitor);
 		sorted = true;
 		return numberOfConfigurations;
 	}
 	
-	protected int sort(final IProgressMonitor monitor) {
+	protected int sort(final WorkMonitor monitor) {
 		return configurations.size();
 	}
 
@@ -73,5 +73,9 @@ public class AbstractConfigurationSorter {
 	
 	public int getBufferSize() {
 		return configurations.size();
+	}
+	
+	public boolean isSorted() {
+		return sorted;
 	}
 }

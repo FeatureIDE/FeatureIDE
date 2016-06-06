@@ -62,7 +62,6 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
-
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -70,7 +69,6 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -142,8 +140,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
-
-	private boolean useFuji = false;
 
 	private FSTGenComposer composer;
 
@@ -225,7 +221,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public boolean initialize(IFeatureProject project) {
 		boolean supSuccess = super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
-		useFuji = usesFuji();
 		createBuildStructure();
 		return supSuccess && fhModelBuilder != null;
 	}
@@ -356,7 +351,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		/*
 		 * Run fuji parallel to the build process.
 		 */
-		// TODO: save useFuji persistently
 		fuji(signatureSetter);
 
 		createBuildFolder(config);
@@ -668,7 +662,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * Starts type checking with fuji in a background job.
 	 */
 	private void fuji(final SignatureSetter signatureSetter) {
-		if (!useFuji) {
+		if (!usesFuji()) {
 			return;
 		}
 		if (fuji != null) {
@@ -1201,7 +1195,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private void setProperty(QualifiedName qname, boolean value) {
 		try {
 			featureProject.getProject().setPersistentProperty(qname, value ? TRUE : FALSE);
-			useFuji = value;
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
