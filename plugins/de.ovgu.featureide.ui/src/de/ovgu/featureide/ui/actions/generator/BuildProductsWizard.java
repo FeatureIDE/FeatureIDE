@@ -25,6 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PRODUCTS
 import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -37,7 +39,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * A Wizard to create T-Wise configurations with SPLCATool. 
+ * A Wizard to create configurations with the {@link ConfigurationBuilder}. 
  * 
  * @author Jens Meinicke
  */
@@ -58,8 +60,9 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		setGenerate(page.getBuildTypeText(page.getGeneration()));
 		setOrder(page.getSelectedOrder());
 		setTest(page.getTest());
+		setMax(page.getMax());
 		new ConfigurationBuilder(featureProject, page.getGeneration(),
-				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest());
+				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest(), page.getMax());
 		
 		return true;
 	}
@@ -67,10 +70,11 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	@Override
 	public void addPages() {
 		setWindowTitle(BUILD_PRODUCTS);
-		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getOrder(), getTest());
+		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, 
+				getAlgorithm(), getT(), getOrder(), getTest(), getMax());
 		addPage(page);
 	}
-
+	
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 	}
@@ -87,6 +91,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		String algorithm = tWise.split("[|]")[0];
 		if (!(algorithm.equals(ICPL) ||
 			  algorithm.equals(CASA) ||
+			  algorithm.equals(MASK) ||
 			  algorithm.equals(CHVATAL))) {
 			// return the default algorithm if the algorithm was saved wrong
 			return ICPL;
@@ -186,6 +191,24 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	private static void setTest(boolean test) {
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TEST, test + "");
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	private String getMax() {
+		String returnValue = "";
+		try {
+			returnValue = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(MAX);
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return returnValue != null ? returnValue : "";
+	}
+	
+	private void setMax(int max) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(MAX, max + "");
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

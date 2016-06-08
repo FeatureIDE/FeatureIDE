@@ -31,9 +31,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_AL
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_PRODUKT_BASED_STRATEGY_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINE_THE_T_FOR_T_WISE_SAMPLING_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.DIFFERENCE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DISSIMILARITY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INTERACTIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RANDOM_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.T_WISE_CONFIGURATIONS;
 
@@ -104,8 +107,11 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private final String generate;
 	private final String order;
 	private boolean test;
+	private Text textField;
+	private Label labelMax;
+	private String maxConfs;
 
-	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, String order, boolean test) {
+	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, String order, boolean test, String maxConfs) {
 		super(project);
 		this.project = featureProject;
 		this.buildProjects = buildProjects;
@@ -114,6 +120,10 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		this.t = t;
 		this.order = order;
 		this.test = test;
+		if (maxConfs.equals(Integer.MAX_VALUE + "")) {
+			maxConfs = "";
+		}	
+		this.maxConfs = maxConfs;
 		setDescription(BUILD_PRODUCTS_FOR_PROJECT + featureProject.getProjectName() + ".");
 	}
 
@@ -121,9 +131,11 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	public void createControl(Composite parent) {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		Composite composite = new Composite(parent, SWT.NULL);
+		
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
-		layout.verticalSpacing = 7;
+		layout.verticalSpacing = 5;
+		layout.horizontalSpacing = 7;
 		composite.setLayout(layout);
 		final Label labelGenerate = new Label(composite, SWT.NULL);
 		labelGenerate.setText(LABEL_GENERATE);
@@ -158,18 +170,29 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			comboOrder.add(getOrderText(order));
 		}
 		comboOrder.setText(order);
-//		comboOrder.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS) || 
-//				comboGenerate.getText().equals(ALL_CURRENT_CONFIGURATIONS));
 
 		labelT = new Label(composite, SWT.NULL);
 		labelT.setText(LABEL_INTERACTIONS + "10");
 		labelT.setToolTipText(TOOL_TIP_T);
 		scale = new Scale(composite, SWT.HORIZONTAL);
+		scale.setMaximum(5);
 		scale.setIncrement(1);
 		scale.setPageIncrement(1);
 		scale.setSelection(t);
 		setScale();
 
+		labelMax = new Label(composite, SWT.NULL);
+		labelMax.setText("Max Configurations:");
+		final String maxToolTip = "Set the maximal number of configs to generate, or empty to create all.";
+		labelMax.setToolTipText(maxToolTip);
+		textField = new Text(composite, SWT.BORDER);
+		textField.setToolTipText(maxToolTip);
+		final GridData gridData = new GridData();
+		gridData.widthHint = 100;
+		textField.setLayoutData(gridData);
+		textField.setText(maxConfs);
+		
+		
 		final Label labelTest = new Label(composite, SWT.NULL);
 		labelTest.setText(LABEL_TEST);
 		labelTest.setToolTipText(TOOL_TIP_TEST);
@@ -195,8 +218,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		switch (order) {
 		case DEFAULT:
 			return DEFAULT;
-		case DIFFERENCE:
-			return DIFFERENCE;
+		case DISSIMILARITY:
+			return DISSIMILARITY;
 		case INTERACTION:
 			return INTERACTIONS;
 		default:
@@ -215,6 +238,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			return CHVATAL;
 		case ICPL:
 			return ICPL;
+		case MASK: 
+			return MASK;
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for TWise: " + tWise);
 			break;
@@ -231,6 +256,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			return ALL_VALID_CONFIGURATIONS;
 		case T_WISE:
 			return T_WISE_CONFIGURATIONS;
+		case RANDOM:
+			return RANDOM_CONFIGURATIONS;
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for BuildType: " + type);
 			break;
@@ -244,26 +271,33 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		-t t_wise -a ICPL 	 -fm <feature_model> -s <strength, 1-3> (-startFrom <covering array>) (-onlyOnes) (-noAllZeros) [Inexact: (-sizelimit <rows>) (-limit <coverage limit>)] (for 3-wise, -eights <1-8>)
 		-t t_wise -a CASA 	 -fm <feature_model> -s <strength, 1-6>
 		 **/
-
-		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS) || comboOrder.getText().equals(INTERACTIONS)) {
+		int lastSelection = scale.getSelection();
+		scale.setMinimum(1);
+		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
 			scale.setEnabled(true);
+			String selection = comboAlgorithm.getText();
+			if (!comboAlgorithm.isEnabled()) {
+				scale.setMaximum(3);
+			} else if (selection.equals(CHVATAL)) {
+				scale.setMaximum(CHVATAL_MAX);
+			} else if (selection.equals(ICPL)) {
+				scale.setMaximum(ICPL_MAX);
+			} else if (selection.equals(CASA)) {
+				scale.setMaximum(CASA_MAX);
+			} else if (selection.equals(MASK)) {
+				scale.setMaximum(MASK_MAX);
+				scale.setMinimum(MASK_MAX);
+				scale.setSelection(MASK_MAX);
+				scale.setEnabled(false);
+				labelT.setText(LABEL_INTERACTIONS + "2");
+			}
+		} else if (comboOrder.getText().equals(INTERACTIONS)) {
+			scale.setEnabled(true);
+			scale.setMaximum(5);
 		} else {
 			scale.setEnabled(false);
 		}
-
-		String selection = comboAlgorithm.getText();
-		int lastSelection = scale.getSelection();
-		scale.setMinimum(1);
-		if (!comboAlgorithm.isEnabled()) {
-			scale.setMaximum(3);
-		} else if (selection.equals(CHVATAL)) {
-			scale.setMaximum(CHVATAL_MAX);
-		} else if (selection.equals(ICPL)) {
-			scale.setMaximum(ICPL_MAX);
-		} else if (selection.equals(CASA)) {
-			scale.setMaximum(CASA_MAX);
-		}
-
+			
 		if (lastSelection > scale.getMaximum()) {
 			scale.setSelection(scale.getMaximum());
 			labelT.setText(LABEL_INTERACTIONS + scale.getMaximum());
@@ -272,18 +306,45 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 	private void dialogChanged() {
 		setPageComplete(false);
-		// check
 		int perspectiveValue = scale.getSelection();
 		labelT.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
 
+		if (!checkMaxConfigurationsEntry()) {
+			return;
+		}
+		setErrorMessage(null);
 		setPageComplete(true);
+	}
 
+	private boolean checkMaxConfigurationsEntry() {
+		try {
+			if (textField.getText().isEmpty()) {
+				return true;
+			}
+			int value = Integer.parseInt(textField.getText());
+			if (value == 0) {
+				setErrorMessage("Number of configurations must be larger than 0 or empty to create all configuraitons.");
+				return false;
+			}
+		} catch (NumberFormatException e) {
+			long longValue = 0;
+			try {
+				longValue = Long.parseLong(textField.getText());
+			} catch (NumberFormatException e2) {
+				setErrorMessage("NumberFormatException: " + e.getMessage());
+				return false;	
+			}
+			setErrorMessage("Number of configurations " + longValue + " is too large.");
+			return false;
+		}
+		return true;
 	}
 
 	private void addListeners() {
 		comboAlgorithm.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setScale();
+				dialogChanged();
 			}
 		});
 
@@ -291,6 +352,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			public void handleEvent(Event event) {
 				int selection = scale.getSelection();
 				labelT.setText(LABEL_INTERACTIONS + selection);
+				dialogChanged();
 			}
 		});
 
@@ -298,11 +360,9 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			public void modifyText(ModifyEvent e) {
 				final String text = comboGenerate.getText();
 				final boolean tWise = text.equals(T_WISE_CONFIGURATIONS);
-//				final boolean allCurrent = text.equals(ALL_CURRENT_CONFIGURATIONS); 
 				comboAlgorithm.setEnabled(tWise);
-//				comboOrder.setEnabled(tWise || allCurrent);
-
 				setScale();
+				dialogChanged();
 
 			}
 		});
@@ -310,6 +370,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		comboOrder.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setScale();
+				dialogChanged();
 			}
 		});
 		
@@ -318,6 +379,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				buttonTest.setEnabled(!buttonBuildProject.getSelection());
+				dialogChanged();
 			}
 			
 			@Override
@@ -326,6 +388,12 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			}
 		});
 		
+		textField.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
 
 	}
 
@@ -355,12 +423,15 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
 			return BuildType.T_WISE;
 		}
+		if (comboGenerate.getText().equals(RANDOM_CONFIGURATIONS)) {
+			return BuildType.RANDOM;
+		}
 		return null;
 	}
 
 	public BuildOrder getOrder() {
-		if (comboOrder.getText().equals(DIFFERENCE)) {
-			return BuildOrder.DIFFERENCE;
+		if (comboOrder.getText().equals(DISSIMILARITY)) {
+			return BuildOrder.DISSIMILARITY;
 		}
 		if (comboOrder.getText().equals(INTERACTIONS)) {
 			return BuildOrder.INTERACTION;
@@ -375,4 +446,16 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	public boolean getTest() {
 		return buttonTest.getSelection();
 	}
+	
+	public int getMax() {
+		try {
+			if (textField.getText().isEmpty()) {
+				return Integer.MAX_VALUE;
+			}
+			return Math.max(0, Integer.parseInt(textField.getText()));
+		} catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+	
 }

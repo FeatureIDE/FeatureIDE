@@ -23,6 +23,7 @@ package org.prop4j.analyses;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -178,6 +179,9 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 
 	@Override
 	public List<List<String>> execute(WorkMonitor monitor) throws Exception {
+		if (maxNumber <= 0) {
+			return Collections.emptyList();
+		}
 		time = System.nanoTime();
 		synchronized (tempConfigurationList) {
 			tempConfigurationList.clear();
@@ -217,34 +221,28 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 		orgBackbone = solver.getAssignment();
 
+		// allyes
 		handleNewConfig(solutions.get(0), satInstance, featuresUsedOrg);
+		if (maxNumber == 1) {
+			return getConfigurations();
+		}
+		// allno
 		handleNewConfig(solutions.get(1), satInstance, featuresUsedOrg);
-		System.out.println("----");
 
 		final int[] varStatus = new int[2];
 
 		while (count <= maxNumber) {
+			if (monitor.checkCancel()) {
+				break;
+			}
 			final boolean[] featuresUsed = Arrays.copyOf(featuresUsedOrg, featuresUsedOrg.length);
 
 			countLoops = featureIndexArray.length;
-//			if (count <= 40) {
-//			for (FeatureIndex featureIndex : featureIndexArray) {
-//				featureIndex.setPriority(Math.random());
-//			}
 			int prio = 0;
 			for (FeatureIndex featureIndex : featureIndexArray) {
 				featureIndex.setPriority(prio++);
 			}
-				Arrays.sort(featureIndexArray);
-//			} else {
-//				final Random rnd = new Random();
-//				for (int i = featureIndexArray.length - 1; i >= 0; i--) {
-//					final int index = rnd.nextInt(i + 1);
-//					final FeatureIndex a = featureIndexArray[index];
-//					featureIndexArray[index] = featureIndexArray[i];
-//					featureIndexArray[i] = a;
-//				}
-//			}
+			Arrays.sort(featureIndexArray);
 
 			for (int x = 1, end = featureIndexArray.length; x < end; x++) {
 				final FeatureIndex featureIndexA = featureIndexArray[x];
@@ -295,18 +293,6 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 			}
 			orgBackbone.shrinkTo(numberOfFixedFeatures);
 		}
-		System.out.println("Done!");
-
-//		System.out.println("-- Proof --");
-//		clearTempConfigurations();
-//		Arrays.fill(combinations2, (byte) 0);
-//		addInvalidCombinations();
-//		count = 1;
-//		for (Configuration config : finalConfigurationList) {
-//			addCombinationsFromModel(config.getModel());
-//			printStatisticNumbers(config);
-//		}
-
 		return getConfigurations();
 	}
 

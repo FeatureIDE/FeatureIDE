@@ -48,9 +48,9 @@ import de.ovgu.featureide.core.CorePlugin;
  */
 public interface IConfigurationBuilderBasics {
 	
-	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION};
-	enum BuildOrder {DEFAULT, DIFFERENCE, INTERACTION};
-	enum TWise {ICPL, CHVATAL, CASA}
+	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION, RANDOM};
+	enum BuildOrder {DEFAULT, DISSIMILARITY, INTERACTION};
+	enum TWise {ICPL, CHVATAL, CASA, MASK}
 	
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
 	QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
@@ -63,6 +63,8 @@ public interface IConfigurationBuilderBasics {
 			IConfigurationBuilderBasics.class.getName() + "#Order");
 	QualifiedName TEST = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Test", 
 			IConfigurationBuilderBasics.class.getName() + "#Test");
+	QualifiedName MAX = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#MaxConf", 
+			IConfigurationBuilderBasics.class.getName() + "#MaxConf");
 	String TRUE = "true";
 	String FALSE = "false";
 	
@@ -74,6 +76,7 @@ public interface IConfigurationBuilderBasics {
 	String JOB_TITLE = BUILD_ALL_VALID_CONFIGURATIONS;
 	String JOB_TITLE_CURRENT = BUILD_ALL_CURRENT_CONFIGURATIONS;
 	String JOB_TITLE_T_WISE = "Build t-wise configurations";
+	String JOB_TITLE_RANDOM = "Build random configurations";
 	String JOB_TITLE_MODULE = BUILD_INTEGRATION_CONFIGURATIONS;
 	
 	String JOB_TITLE_COUNT_CONFIGURATIONS = COUNT_CONFIGURATIONS;
@@ -95,6 +98,7 @@ public interface IConfigurationBuilderBasics {
 	String SEPARATOR_VARIANT = "_v.";
 	String SEPARATOR_CONFIGURATION = "_c.";
 	String SEPARATOR_T_WISE = "_t.";
+	String SEPARATOR_RANDOM = "_r.";
 	String SEPARATOR_INTEGRATION = "_i.";
 	
 	/**
@@ -103,5 +107,5 @@ public interface IConfigurationBuilderBasics {
 	int CHVATAL_MAX = 4;
 	int ICPL_MAX = 3;
 	int CASA_MAX = 6;
-	String ICPL = "ICPL (fastest)";
+	int MASK_MAX = 2;
 }
