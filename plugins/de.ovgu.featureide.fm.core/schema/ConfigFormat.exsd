@@ -3,10 +3,10 @@
 <schema targetNamespace="de.ovgu.featureide.fm.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="de.ovgu.featureide.fm.core" id="fmFactories" name="FMFactory"/>
+         <meta.schema plugin="de.ovgu.featureide.fm.core" id="configFormats" name="ConfigFormat"/>
       </appInfo>
       <documentation>
-         Add factories to create customized feature models, features, and constraints.
+         [Enter description of this extension point.]
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="fmFactory" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="configFormat" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,7 +47,7 @@
       </complexType>
    </element>
 
-   <element name="fmFactory">
+   <element name="configFormat">
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -69,7 +69,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":de.ovgu.featureide.fm.core.base.IFeatureModelFactory"/>
+                  <meta.attribute kind="java" basedOn=":de.ovgu.featureide.fm.core.io.IConfigurationFormat"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -81,12 +81,36 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         2.8.0
+         [Enter the first release in which this extension point appears.]
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="apiinfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
 
 
 </schema>

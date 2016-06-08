@@ -18,28 +18,26 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers;
-
-import org.eclipse.swt.widgets.FileDialog;
-
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+package de.ovgu.featureide.fm.core;
 
 /**
- * Reads a feature model given in DIMACS format.
+ * Handles extensions via native Java.
  * 
  * @author Sebastian Krieter
  */
-public class ImportDIMACSHandler extends AbstractImportHandler {
+public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
+
+	private final T[] extensionArray;
+	
+	@SafeVarargs
+	public CoreExtensionLoader(T... extensions) {
+		this.extensionArray = extensions;
+	}
 	@Override
-	protected IFeatureModelFormat setModelReader() {
-		return new DIMACSFormat();
+	public void loadProviders(ExtensionManager<T> extensionManager) {
+		for (T extension : extensionArray) {
+			extensionManager.addExtension(extension);
+		}
 	}
 
-	@Override
-	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.dimacs" });
-		fileDialog.setFilterNames(new String[] { "DIMACS" });
-	}
 }

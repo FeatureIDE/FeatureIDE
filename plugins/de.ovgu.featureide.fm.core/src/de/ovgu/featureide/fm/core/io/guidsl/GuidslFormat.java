@@ -18,58 +18,53 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
+package de.ovgu.featureide.fm.core.io.guidsl;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.io.StringReader;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * Reads / Writes a feature order file.
+ * Reads / Writes feature models in the Guidsl format.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
+public class GuidslFormat implements IFeatureModelFormat {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + FeatureOrderFormat.class.getSimpleName();
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + GuidslFormat.class.getSimpleName();
 	
+
 	@Override
-	public ProblemList read(IFeatureModel object, CharSequence source) {
-		String[] lines = source.toString().split("[\n|\r]+");
-		object.setFeatureOrderList(Arrays.asList(lines));
-		return new ProblemList();
+	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
+		final ProblemList problemList = new ProblemList();
+		final GuidslReader guidslReader = new GuidslReader(featureModel);
+		try {
+			guidslReader.parseInputStream(new StringReader(source.toString()));
+		} catch (UnsupportedModelException e) {
+			problemList.add(new Problem(e, e.lineNumber));
+		}
+		problemList.addAll(guidslReader.getWarnings());
+		return problemList;
 	}
 
 	@Override
-	public String write(IFeatureModel object) {
-		final String newLine = System.getProperty("line.separator");
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append(((object.isFeatureOrderUserDefined()) ? "true" : "false") + newLine);
-
-		Collection<String> list = object.getFeatureOrderList();
-		if (list.isEmpty()) {
-			list = FeatureUtils.extractConcreteFeaturesAsStringList(object);
-		}
-
-		for (String featureName : list) {
-			sb.append(featureName);
-			sb.append(newLine);
-		}
-
-		return sb.toString();
+	public String write(IFeatureModel featureModel) {
+		return new GuidslWriter(featureModel).writeToString();
 	}
 
 	@Override
 	public String getSuffix() {
-		return "order";
+		return "guidsl";
 	}
 
 	@Override
-	public FeatureOrderFormat getInstance() {
+	public IPersistentFormat<IFeatureModel> getInstance() {
 		return this;
 	}
 
@@ -87,5 +82,5 @@ public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 	public String getId() {
 		return ID;
 	}
-
+	
 }

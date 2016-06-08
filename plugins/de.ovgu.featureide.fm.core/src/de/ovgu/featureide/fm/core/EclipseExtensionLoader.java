@@ -18,53 +18,56 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core;
+package de.ovgu.featureide.fm.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Platform;
 
 /**
- * Handles FeatureIDE extensions.
+ * Handles extensions via Eclipse framework.
  * 
+ * @author Sebastian Krieter
  * @author Tom Brosch
  */
-public abstract class ExtensionPointManager<T extends de.ovgu.featureide.core.IExtension> {
-
+public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
+	
+	protected final Class<T> classObject;
 	protected final String pluginID;
+	protected final String extensionID;
 	protected final String extensionPointID;
 
-	protected ExtensionPointManager(String pluginID, String extensionPointID) {
+	public EclipseExtensionLoader(String pluginID, String extensionPointID, String extensionID, Class<T> classObject) {
 		this.pluginID = pluginID;
 		this.extensionPointID = extensionPointID;
+		this.extensionID = extensionID;
+		this.classObject = classObject;
 	}
 
-	private List<T> cachedProviders = null;
-
-	private void loadProviders() {
-		if (cachedProviders != null)
-			return;
-		cachedProviders = new ArrayList<T>();
-		IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
+	@Override
+	public void loadProviders(ExtensionManager<T> extensionManager) {
+		final IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
 		for (IExtension extension : extensions) {
-			IConfigurationElement[] configurationElements = extension.getConfigurationElements();
+			final IConfigurationElement[] configurationElements = extension.getConfigurationElements();
 			for (IConfigurationElement configurationElement : configurationElements) {
-				T proxy = parseExtension(configurationElement);
-				if (proxy != null) {
-					cachedProviders.add(proxy);
+				final T extensionInstance = parseExtension(configurationElement);
+				if (extensionInstance != null) {
+					extensionManager.addExtension(extensionInstance);
 				}
 			}
 		}
 	}
 
-	protected abstract T parseExtension(IConfigurationElement configurationElement);
-
-	protected List<T> getProviders() {
-		loadProviders();
-		return Collections.unmodifiableList(cachedProviders);
+	protected T parseExtension(IConfigurationElement configurationElement) {
+		if (extensionID.equals(configurationElement.getName())) {
+			try {
+				return classObject.cast(configurationElement.createExecutableExtension("class"));
+			} catch (CoreException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
+		return null;
 	}
+
 }

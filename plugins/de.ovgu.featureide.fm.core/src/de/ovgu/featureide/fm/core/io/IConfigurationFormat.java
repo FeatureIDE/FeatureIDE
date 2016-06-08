@@ -18,28 +18,19 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers;
+package de.ovgu.featureide.fm.core.io;
 
-import org.eclipse.swt.widgets.FileDialog;
-
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
- * Reads a feature model given in DIMACS format.
+ * Format for {@link Configuration configurations}.
  * 
  * @author Sebastian Krieter
  */
-public class ImportDIMACSHandler extends AbstractImportHandler {
-	@Override
-	protected IFeatureModelFormat setModelReader() {
-		return new DIMACSFormat();
-	}
+public interface IConfigurationFormat extends IPersistentFormat<Configuration> {
 
-	@Override
-	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.dimacs" });
-		fileDialog.setFilterNames(new String[] { "DIMACS" });
-	}
+	public static String extensionPointID = "ConfigFormat";
+
+	public static String extensionID = "configFormat";
+
 }

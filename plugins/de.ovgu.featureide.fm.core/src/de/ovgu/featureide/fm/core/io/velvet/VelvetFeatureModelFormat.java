@@ -32,7 +32,6 @@ import static java.lang.String.format;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,11 +63,13 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -76,25 +77,29 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
 import de.ovgu.featureide.fm.core.constraint.ReferenceType;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
+ * Reads / Writes feature models in the Velvet format.
+ * 
  * @author Sebastian Krieter
  * @author Matthias Strauss
- * @author Marcus Pinnecke (Feature Interface)
  * @author Reimar Schroeter
  */
-public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel> {
+public class VelvetFeatureModelFormat implements IFeatureModelFormat {
+
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + VelvetFeatureModelFormat.class.getSimpleName();
 
 	protected File featureModelFile;
 
@@ -111,8 +116,13 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 	//private final HashSet<String> usedVariables = new HashSet<String>();
 
 	@Override
-	public String getFactoryID() {
-		return ExtendedFeatureModelFactory.ID;
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
 	}
 
 	@Override
@@ -272,9 +282,11 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 		sb.append(NEWLINE);
 	}
 
+	// TODO fix write for inherited feature models
 	private void writeNewDefined(IFeatureStructure child2, int depth) {
-		if (child2 instanceof ExtendedFeature) {
-			final ExtendedFeature extFeature = (ExtendedFeature) child2;
+		final IFeature feature = child2.getFeature();
+		if (feature instanceof ExtendedFeature) {
+			final ExtendedFeature extFeature = (ExtendedFeature) feature;
 
 			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE || extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
 				if (usedVariables.add(extFeature.getExternalModelName())) {
@@ -297,6 +309,8 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 						sb.append(NEWLINE);
 					}
 				}
+			} else if (extFeature.getType() == ExtendedFeature.TYPE_INTERN) {
+				writeFeature(child2, 1);
 			}
 		}
 		for (IFeatureStructure child : child2.getChildren()) {
@@ -312,6 +326,7 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 
 	@Override
 	public ProblemList read(IFeatureModel object, CharSequence source) {
+		final ProblemList problemList = new ProblemList();
 		extFeatureModel = (ExtendedFeatureModel) object;
 		if (extFeatureModel != null) {
 			featureModelFile = extFeatureModel.getSourceFile();
@@ -321,9 +336,9 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 		try {
 			parseInputStream(inputstr);
 		} catch (UnsupportedModelException e) {
-			e.printStackTrace();
+			problemList.add(new Problem(e, e.lineNumber));
 		}
-		return new ProblemList();
+		return problemList;
 	}
 
 	private static class ConstraintNode {
@@ -363,20 +378,17 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
-		if (modelType != ModelIOFactory.TYPE_UNKNOWN) {
-			final IFeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
-			final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
-			try {
-				reader.readFromFile(file);
-				return fm;
-			} catch (FileNotFoundException e) {
-				FMCorePlugin.getDefault().logError(e);
-			} catch (UnsupportedModelException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
+		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(file.getName());
+		final IFeatureModelFactory fmFactory;
+		try {
+			fmFactory = FMFactoryManager.getFactory(file.getAbsolutePath(), format);
+		} catch (NoSuchExtensionException e) {
+			FMCorePlugin.getDefault().logError(e);
+			return null;
 		}
-		return null;
+		final IFeatureModel fm = fmFactory.createFeatureModel();
+		FileHandler.<IFeatureModel> load(file.toPath(), fm, format);
+		return fm;
 	}
 
 	private boolean checkExternalModelFile(Tree curNode) {
@@ -488,6 +500,7 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 			if (root == null) {
 				throw new UnsupportedModelException("Error while parsing model!", 0);
 			}
+
 			init();
 
 			checkTree(root);
@@ -495,7 +508,9 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 			parseAttributeConstraints();
 		} catch (final RecognitionException e) {
 			FMCorePlugin.getDefault().logError(e);
-			throw new UnsupportedModelException(e.getMessage(), e.line);
+			UnsupportedModelException unsupportedModelException = new UnsupportedModelException(e.getMessage(), e.line);
+			unsupportedModelException.addSuppressed(e);
+			throw unsupportedModelException;
 		}
 
 		// Update the FeatureModel in Editor
@@ -761,8 +776,8 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 					}
 
 					for (final FeatureAttribute<Integer> attr : attributes) {
-						weightedTerms.add(createTerm(attr.getValue(), relationOperator != null, minus, new Reference(attr.getFeatureName(),
-								ReferenceType.FEATURE, attributeName)));
+						weightedTerms.add(createTerm(attr.getValue(), relationOperator != null, minus,
+								new Reference(attr.getFeatureName(), ReferenceType.FEATURE, attributeName)));
 					}
 
 					break;
@@ -1258,9 +1273,8 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 		if (modelMarkerHandler != null) {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
-		FMCorePlugin.getDefault().logWarning(
-				message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \""
-						+ curNode.getText() + "\")");
+		FMCorePlugin.getDefault().logWarning(message + " (at line " + curNode.getLine()
+				+ ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \"" + curNode.getText() + "\")");
 	}
 
 	private Tree checkTree(Tree root) throws RecognitionException {
@@ -1294,6 +1308,11 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 	@Override
 	public VelvetFeatureModelFormat getInstance() {
 		return new VelvetFeatureModelFormat();
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

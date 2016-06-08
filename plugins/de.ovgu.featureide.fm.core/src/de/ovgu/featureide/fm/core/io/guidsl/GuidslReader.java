@@ -29,6 +29,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNSUPPORTED_TYPE_IN_GUIDSL_GRAMMAR;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -124,6 +125,24 @@ public class GuidslReader extends AbstractFeatureModelReader {
 
 	@Override
 	public void parseInputStream(InputStream inputStream)
+	throws UnsupportedModelException {
+
+		warnings.clear();
+		try {
+			synchronized (lock) {
+				Parser myParser = Parser.getInstance(inputStream);
+				Model root = (Model) myParser.parseAll();
+				readModelData(root);
+			}
+			featureModel.handleModelDataLoaded();
+		}
+		catch (ParseException e) {
+			int line = e.currentToken.next.beginLine;
+			throw new UnsupportedModelException(e.getMessage(), line);
+		}
+	}
+	
+	public void parseInputStream(Reader inputStream)
 	throws UnsupportedModelException {
 
 		warnings.clear();

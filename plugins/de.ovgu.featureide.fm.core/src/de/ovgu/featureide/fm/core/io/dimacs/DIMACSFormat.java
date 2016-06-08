@@ -22,10 +22,11 @@ package de.ovgu.featureide.fm.core.io.dimacs;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -33,33 +34,37 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.job.ConsoleProgressMonitor;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
- * Parses feature models in the DIMACS CNF format.
+ * Reads / Writes feature models in the DIMACS CNF format.
  * 
  * @author Sebastian Krieter
  */
-public class DIMACSReader extends AbstractFeatureModelReader {
-
-	private String[] names = null;
-
-	public DIMACSReader(final IFeatureModel featureModel) {
-		setFeatureModel(featureModel);
-	}
+public class DIMACSFormat implements IFeatureModelFormat {
 	
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
+
 	@Override
-	protected void parseInputStream(InputStream inputStream) throws UnsupportedModelException {
+	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
+		final ProblemList problemList = new ProblemList();
 		final LinkedList<String> sb = new LinkedList<>();
-		try (BufferedReader r = new BufferedReader(new InputStreamReader(inputStream))) {
+
+		String[] names = null;
+		int lineNumber = 0;
+		try (BufferedReader r = new BufferedReader(new StringReader(source.toString()))) {
 			String str = null;
 			while ((str = r.readLine()) != null) {
 				if (!str.isEmpty()) {
@@ -69,10 +74,11 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 						names = new String[Integer.parseInt(startLine[2]) + 1];
 					}
 				}
+				lineNumber++;
 			}
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);
-			return;
+			problemList.add(new Problem(e, lineNumber));
 		}
 		final IFeature rootFeature = FMFactoryManager.getFactory().createFeature(featureModel, ""); 
 				
@@ -94,9 +100,9 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 
 		final ArrayList<String> abstractNames = new ArrayList<>();
 		for (int i = 1; i < names.length; i++) {
-			final String name = getName(i);
-			if (names[i] == null) {
-				abstractNames.add(name);
+			final String name = names[i];
+			if (name == null) {
+				abstractNames.add("__Abstract__" + i);
 			} else {
 				final IFeature feature = FMFactoryManager.getFactory().createFeature(featureModel, name); 
 				featureModel.addFeature(feature);
@@ -110,8 +116,8 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 			final String[] clauseLine = sb.removeFirst().split("\\s");
 			for (int i = 0; i < clauseLine.length - 1; i++) {
 				final int varIndex = Integer.parseInt(clauseLine[i]);
-				final String name = getName(Math.abs(varIndex));
-				clauseParts.add(new Literal(name, varIndex > 0));
+				String name = names[Math.abs(varIndex)];
+				clauseParts.add(new Literal(name != null ? name : "__Abstract__" + Math.abs(varIndex), varIndex > 0));
 			}
 			final Literal[] array = clauseParts.toArray(new Literal[0]);
 			final Or propNode = new Or(array);
@@ -125,12 +131,95 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 		for (Node clause : cnf.getChildren()) {
 			featureModel.addConstraint(FMFactoryManager.getFactory().createConstraint(featureModel, clause));
 		}
-		System.out.println("Done!");
+		return problemList;
 	}
 
-	private String getName(int varIndex) {
-		String name = names[varIndex];
-		return name != null ? name : "__Abstract__" + varIndex;
+	@Override
+	public String write(IFeatureModel featureModel) {
+		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
+
+		StringBuilder string = new StringBuilder();
+		Map<String, Integer> featureMap = new HashMap<String, Integer>();
+		int i = 1;
+		for (CharSequence name : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
+			featureMap.put(name.toString(), i);
+			string.append("c ");
+			string.append(i);
+			string.append(' ');
+			string.append(name.toString());
+			string.append(System.lineSeparator());
+			i++;
+		}
+		string.append("p cnf ");
+		string.append(featureModel.getNumberOfFeatures());
+		string.append(' ');
+		string.append(nodes.getChildren().length - 3);
+		string.append("\r\n");
+
+		for (Node and : nodes.getChildren()) {
+			if (and instanceof Literal) {
+				if (and.toString().equals("True") || and.toString().equals("-False")) {
+					continue;
+				}
+				if (((Literal) and).positive) {
+					string.append(featureMap.get(and.toString()));
+				} else {
+					string.append('-');
+					string.append(featureMap.get(((Literal) and).var.toString()));
+				}
+				string.append(' ');
+			} else {
+				boolean skip = false;
+				for (Node literal : and.getChildren()) {
+					if (literal.toString().equals("True") || literal.toString().equals("-False")) {
+						skip = true;
+						break;
+					}
+				}
+				if (skip) {
+					continue;
+				}
+
+				for (Node literal : and.getChildren()) {
+					if (((Literal) literal).positive) {
+						string.append(featureMap.get(literal.toString()));
+					} else {
+						string.append('-');
+						string.append(featureMap.get(((Literal) literal).var.toString()));
+					}
+					string.append(' ');
+				}
+			}
+			string.append("0");
+			string.append(System.lineSeparator());
+		}
+
+		return string.toString();
+	}
+
+	@Override
+	public String getSuffix() {
+		return "dimacs";
+	}
+
+	@Override
+	public IPersistentFormat<IFeatureModel> getInstance() {
+		return this;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	@Override
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
 	}
 
 }

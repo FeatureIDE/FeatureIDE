@@ -20,9 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
 
 /**
@@ -34,7 +33,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  */
 public class ImportSXFMHandler extends AbstractImportHandler {
 	@Override
-	protected IFeatureModelReader setModelReader(IFeatureModel fm) {
-		return new SXFMReader(fm);
+	protected IFeatureModelFormat setModelReader() {
+		return new SXFMFormat();
 	}
 }
