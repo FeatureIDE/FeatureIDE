@@ -58,6 +58,9 @@ public class ComplexConstraintConverter {
 	 * @return true if node is a simple constraint. False otherwise.
 	 */
 	public static boolean isSimple(Node node) {
+		if(node.getContainedFeatures().size() == 1)
+			return false;
+		
 		Node cnf = node.toCNF();
 		if(cnf.getChildren().length == 1 && cnf.getContainedFeatures().size() == 2) {
 			Node clause = cnf.getChildren()[0];
@@ -88,8 +91,9 @@ public class ComplexConstraintConverter {
 	public static boolean isPseudoComplex(Node node) {
 		Node cnf = node.toCNF();
 		
-		if(cnf instanceof Or)
+		if(cnf instanceof Or || cnf instanceof Literal)
 			return isSimple(node);
+		
 		
 		boolean result = true;
 		for(Node child : cnf.getChildren()) {
@@ -148,7 +152,8 @@ public class ComplexConstraintConverter {
 		fm = model.clone();
 				
 		//Basic cleaning
-		prepare();
+		if(!prepare())
+			return fm;
 		
 		//Identify trivial refactorings
 		refactorPseudoComplexConstraints();
@@ -192,7 +197,7 @@ public class ComplexConstraintConverter {
 	 * Removes tautologies and redundant constraints.
 	 * If the feature model is a void model or unsatisfiable then a simple contradicting feature model will be created.
 	 */
-	protected void prepare() {
+	protected boolean prepare() {
 		FeatureModelAnalyzer analyzer = fm.getAnalyser();
 		
 		analyzer.calculateFeatures = true;
@@ -216,13 +221,14 @@ public class ComplexConstraintConverter {
 				voidModel.addConstraint(factory.createConstraint(fm, new Implies(root, new Not(root))));
 				fm = voidModel;
 				toRemove.clear();
-				return;
+				return false;
 			}
 		}
 	
 		for (IConstraint c : toRemove) {
 			fm.removeConstraint(c);
 		}
+		return true;
 	}
 	
 	/**
