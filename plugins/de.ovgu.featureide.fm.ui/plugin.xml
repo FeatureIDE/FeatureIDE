@@ -308,15 +308,26 @@
 					</reference>
 				</visibleWhen>
 			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator7"
+					visible="true">
+			</separator>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
-					icon="icons/FeatureIconSmall.ico"
+					icon="icons/import_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.EliminateComplexConstraints"
-					label="Eliminate complex constraints"
+					label="Product-equivalent model with simple constraints"
+					style="push">
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.EliminateComplexConstraints"
+					label="Export model to FaMa format (basic)"
 					style="push">
 			</command>
 			<separator
-					name="de.ovgu.featureide.fm.ui.separator2"
+					name="de.ovgu.featureide.fm.ui.separator9"
 					visible="true">
 			</separator>
 			<command
