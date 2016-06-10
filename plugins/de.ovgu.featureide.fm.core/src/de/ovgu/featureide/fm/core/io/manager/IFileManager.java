@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IResourceChangeListener;
-
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.io.Problem;
 
@@ -32,7 +30,7 @@ import de.ovgu.featureide.fm.core.io.Problem;
  * 
  * @author Sebastian Krieter
  */
-public interface IFileManager extends IEventManager, IResourceChangeListener {
+public interface IFileManager extends IEventManager {
 
 	String getAbsolutePath();
 

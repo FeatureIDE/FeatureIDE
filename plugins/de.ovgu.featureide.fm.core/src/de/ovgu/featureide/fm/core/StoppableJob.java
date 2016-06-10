@@ -25,8 +25,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
-
 /**
  * This internal job can be canceled.<br>
  * Cancel can cause invalid program states. 
@@ -65,7 +63,7 @@ public abstract class StoppableJob extends Job {
 				try {
 					execute(monitor);
 				} catch (Exception e){
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 				}
 			}
 			
@@ -81,7 +79,7 @@ public abstract class StoppableJob extends Job {
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return Status.OK_STATUS; 
 	}

@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.SatCalcThread;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * For evaluation purposes.
@@ -61,7 +61,7 @@ public class SatConfChanger implements IConfigurationChanger {
 
 	public class UpdateMethod implements LongRunningMethod<List<String>> {
 		@Override
-		public List<String> execute(WorkMonitor monitor) {
+		public List<String> execute(IMonitor monitor) {
 			if (newValue == Variable.UNDEFINED) {
 				return Collections.emptyList();
 			}

@@ -26,7 +26,7 @@ import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * 
@@ -58,7 +58,7 @@ public class SimpleSatSolver extends SatSolver {
 		try {
 			satisfiable = solver.isSatisfiable(backbone);
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		if (satisfiable) {
 			model = solver.model();
@@ -91,7 +91,7 @@ public class SimpleSatSolver extends SatSolver {
 						return (byte) Math.signum(x);
 					}
 				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 					backbone.pop();
 				}
 			}

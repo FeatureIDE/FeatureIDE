@@ -18,45 +18,22 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
+package de.ovgu.featureide.fm.core.job;
 
 /**
  * 
  * @author Sebastian Krieter
  */
-public class IFileWriterWrapper<T> extends AbstractObjectWriter<T> {
+public interface IRunner<T> extends IJob<T> {
 
-	private AbstractObjectWriter<T> writer;
+	int getCancelingTimeout();
 
-	public IFileWriterWrapper(AbstractObjectWriter<T> writer) {
-		this.writer = writer;
-		setObject(writer.getObject());
-	}
+	boolean isStoppable();
 
-	public void writeToFile(File file) {
-		writer.writeToFile(file);
-	}
+	void setCancelingTimeout(int cancelingTimeout);
 
-	@Override
-	public String writeToString() {
-		return writer.writeToString();
-	}
+	void setStoppable(boolean stoppable);
+	
+	LongRunningMethod<T> getMethod();
 
-	public void writeToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeToString().getBytes(
-				Charset.availableCharsets().get("UTF-8")));
-		if (file.exists()) {
-			file.setContents(source, false, true, null);
-		} else {
-			file.create(source, false, null);
-		}
-	}
 }

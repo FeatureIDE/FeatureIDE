@@ -18,13 +18,40 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
+package de.ovgu.featureide.fm.core;
 
 /**
- * Represents the format of a feature model file.
  * 
  * @author Sebastian Krieter
  */
-public enum IOType {
-	UNKNOWN, XML_FIDE, VELVET, VELVET_IMPORT;
+public class JavaLogger implements ILogger {
+
+	public void logInfo(String message) {
+		System.out.println("INFO: " + message);
+	}
+
+	public void logWarning(String message) {
+		System.out.println("WARNING: " + message);
+	}
+
+	@Override
+	public void logError(String message) {
+		System.err.println("ERROR: " + message);
+	}
+
+	public void logError(String message, Throwable exception) {
+		System.err.println("ERROR: " + message);
+		exception.printStackTrace(System.err);
+	}
+
+	public void logError(Throwable exception) {
+		if (exception != null) {
+			exception.printStackTrace(System.err);
+		}
+	}
+
+	public void reportBug(int ticket) {
+		logWarning("This is a bug. Please report it. See Ticket #" + ticket + ".");
+	}
+
 }

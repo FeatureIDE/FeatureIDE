@@ -25,7 +25,7 @@ import java.util.Arrays;
 import de.ovgu.featureide.fm.core.conf.AFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 public class DFSThread extends AWorkerThread<String> {
 
@@ -42,7 +42,7 @@ public class DFSThread extends AWorkerThread<String> {
 	private final byte[] visited;
 	private final SharedObjects sharedObjects;
 
-	public DFSThread(MatrixFeatureGraph featureGraph, WorkMonitor workMonitor) {
+	public DFSThread(MatrixFeatureGraph featureGraph, IMonitor workMonitor) {
 		super(workMonitor);
 		sharedObjects = new SharedObjects(featureGraph);
 		visited = new byte[featureGraph.getFeatureArray().length];

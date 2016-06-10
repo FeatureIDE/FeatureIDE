@@ -29,7 +29,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
-import de.ovgu.featureide.fm.core.io.FMConverter;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.fm.ui.wizards.FeatureModelConversionWizard;
@@ -48,9 +53,19 @@ public class FeatureModelConversionHandler extends ASelectionHandler {
 			wizard.init(null, selection);
 			final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 			if (dialog.open() == Dialog.OK) {
+				final IFeatureModelFormat inputFormat = wizard.getInputFormat();
+				final IFeatureModelFormat outputFormat = wizard.getOutputFormat();
+				if (inputFormat == null || outputFormat == null) {
+					return false;
+				}
 				final Path projectPath = Paths.get(next.getProject().getLocationURI());
-				FMConverter.convert(Paths.get(next.getLocationURI()), projectPath.resolve(wizard.getOutputFolder()), wizard.getInputFormat(),
-						wizard.getOutputFormat());
+				try {
+					IFeatureModel fm = FMFactoryManager.getFactory(inputFormat).createFeatureModel();
+					FileHandler.convert(Paths.get(next.getLocationURI()), projectPath.resolve(wizard.getOutputFolder()), fm, inputFormat, outputFormat);
+				} catch (NoSuchExtensionException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+				
 			}
 		}
 		return true;

@@ -34,7 +34,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -100,9 +100,9 @@ public abstract class Generator {
 		try {
 			valid = fm.getAnalyser().isValid();
 			if (!valid)
-				FMCorePlugin.getDefault().logInfo("Feature model not valid!");
+				Logger.logInfo("Feature model not valid!");
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		Object[] names = fm.getRenamingsManager().getOldFeatureNames().toArray();
 		int k = 0;
@@ -132,10 +132,10 @@ public abstract class Generator {
 				}
 				else {
 					fm.getConstraints().remove(new Constraint(fm, node));
-					FMCorePlugin.getDefault().logInfo("F\t" + ++k + "\t" + node);
+					Logger.logInfo("F\t" + ++k + "\t" + node);
 				}
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 				fm.addConstraint(new Constraint(fm, node));
 			}
 		}		
@@ -318,7 +318,7 @@ public abstract class Generator {
 		try {
 			valid = originalFM.getAnalyser().isValid();
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		IFeatureModel fm = originalFM.clone(null);
 		Random random = new Random(id);
@@ -418,7 +418,7 @@ public abstract class Generator {
 					i--;
 				}
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 		}
 		return fm;

@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_FEATURE_NAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
@@ -276,7 +275,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else if (feat.getStructure().isAlternative()) {
 				fnod = doc.createElement(ALT);
 			} else {
-				fnod = doc.createElement(UNKNOWN);//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
+				fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
 			final String description = feat.getProperty().getDescription();
 			if (description != null) {
@@ -521,9 +520,10 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (object.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
-			if (!object.getFMComposerExtension().isValidFeatureName(name)) {
-				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
-			}
+			// TODO Consider feature name validity in all readers
+//			if (!object.getFMComposerExtension().isValidFeatureName(name)) {
+//				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
+//			}
 			final IFeature f = FMFactoryManager.getFactory().createFeature(object, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {

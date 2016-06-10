@@ -25,25 +25,25 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.prop4j.Literal;
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds atomic sets.
  * 
  * @author Sebastian Krieter
  */
-public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>> {
+public class AtomicSetAnalysis extends AbstractAnalysis<List<List<Literal>>> {
 
-	public AtomicSetAnalysis(ISolverProvider solver) {
+	public AtomicSetAnalysis(ISatSolver solver) {
 		super(solver);
 	}
 
 	@Override
-	public List<List<Literal>> execute(WorkMonitor monitor) throws Exception {
+	public List<List<Literal>> execute(IMonitor monitor) throws Exception {
 		final List<int[]> solutions = new ArrayList<>();
 		final List<List<Literal>> result = new ArrayList<>();
 
@@ -66,18 +66,19 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
-					solver.getAssignment().push(-varX);
+					solver.assignmentPush(-varX);
 					switch (solver.sat()) {
 					case FALSE:
 						done[i] = 2;
-						solver.getAssignment().pop().unsafePush(varX);
+						solver.assignmentPop();
+						solver.assignmentPush(varX);
 						setList.add(solver.getSatInstance().getLiteral(varX));
 						break;
 					case TIMEOUT:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						model2 = solver.getModel();
 						SatInstance.updateModel(model1Copy, model2);
 						solutions.add(model2);
@@ -96,7 +97,7 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 					int[] xModel0 = Arrays.copyOf(model1, model1.length);
 
 					final int mx0 = xModel0[i];
-					solver.getAssignment().push(mx0);
+					solver.assignmentPush(mx0);
 
 					setList = new ArrayList<>();
 					setList.add(solver.getSatInstance().getLiteral(mx0));
@@ -113,7 +114,7 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 								}
 							}
 							
-							solver.getAssignment().push(-my0);
+							solver.assignmentPush(-my0);
 
 							switch (solver.sat()) {
 							case FALSE:
@@ -128,11 +129,12 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 								updateSolver(c++);
 								break;
 							}
-							solver.getAssignment().pop();
+							solver.assignmentPop();
 						}
 					}
 
-					solver.getAssignment().pop().unsafePush(-mx0);
+					solver.assignmentPop();
+					solver.assignmentPush(-mx0);
 
 					switch (solver.sat()) {
 					case FALSE:
@@ -151,7 +153,7 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 						if (done[j] == 1) {
 							final int my0 = xModel0[j];
 							if (my0 != 0) {
-								solver.getAssignment().push(-my0);
+								solver.assignmentPush(-my0);
 
 								switch (solver.sat()) {
 								case FALSE:
@@ -169,14 +171,14 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 									updateSolver(c++);
 									break;
 								}
-								solver.getAssignment().pop();
+								solver.assignmentPop();
 							} else {
 								done[j] = 0;
 							}
 						}
 					}
 
-					solver.getAssignment().pop();
+					solver.assignmentPop();
 					result.add(setList);
 				}
 			}

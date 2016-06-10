@@ -57,6 +57,8 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
@@ -64,7 +66,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  */
 @SuppressWarnings(RESTRICTION)
-public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments> {
+public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments> implements LongRunningMethod<Boolean> {
 
 	public static class Arguments extends JobArguments {
 		private final IProject externalProject;
@@ -81,7 +83,6 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 
 	protected MPLRenameExternalJob(Arguments arguments) {
 		super(RENAMING_PACKAGES, arguments);
-		setPriority(BUILD);
 		javaProject = new JavaProject(arguments.externalProject, null);
 	}
 	
@@ -159,15 +160,15 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 	private final JavaProject javaProject;
 	
 	@Override
-	protected boolean work() {
-		formerSourcePathIndex = getJavaBuildPathEntry(javaProject);
-		formerSourcePath = setJavaBuildPath(javaProject, arguments.srcPath, formerSourcePathIndex);
+	public Boolean execute(IMonitor workMonitor) throws Exception {
+		try {
+			this.workMonitor = workMonitor;
+			formerSourcePathIndex = getJavaBuildPathEntry(javaProject);
+			formerSourcePath = setJavaBuildPath(javaProject, arguments.srcPath, formerSourcePathIndex);
+		} finally {
+			resetJavaBuildPath(javaProject, formerSourcePath, formerSourcePathIndex);
+		}
 		return renameProject();
-	}
-
-	@Override
-	protected void finalWork(boolean success) {
-		resetJavaBuildPath(javaProject, formerSourcePath, formerSourcePathIndex);
 	}
 
 	private boolean renameProject() {
@@ -222,7 +223,7 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 		}
 
 		try {
-			arguments.externalProject.refreshLocal(IResource.DEPTH_INFINITE, workMonitor.getMonitor());
+			arguments.externalProject.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 		}
@@ -280,4 +281,5 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 		}
 		return true;
 	}
+
 }

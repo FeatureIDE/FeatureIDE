@@ -64,11 +64,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Prints a feature model in SPLConqueror format.
@@ -78,16 +81,11 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class ConquererFMWriter extends AbstractFeatureModelWriter {
+public class ConquererFMWriter implements IFeatureModelFormat {
+
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + ConquererFMWriter.class.getSimpleName();
 	
-	/**
-	 * Creates a new writer and sets the feature model to write out.
-	 * 
-	 * @param featureModel the structure to write
-	 */
-	public ConquererFMWriter(IFeatureModel featureModel) {
-		setFeatureModel(featureModel);
-	}
+	private IFeatureModel featureModel;
 	
 	private Map<String,Set<String>> require, exclude;
 	
@@ -98,13 +96,13 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 	private void createXmlDoc(Document doc) {
         Element plm = doc.createElement("plm");
     	doc.appendChild(plm);
-		plm.setAttribute("name", object.getStructure().getRoot().getFeature().getName());
+		plm.setAttribute("name", featureModel.getStructure().getRoot().getFeature().getName());
 		plm.setAttribute("canReuseInstance", "true");
 		
 		require = new HashMap<String, Set<String>>();
 		exclude = new HashMap<String, Set<String>>();
     	final List<Node> furtherNodes = new LinkedList<Node>();
-		final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(object.getConstraints()));
+		final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
     	Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);
     	Node node = new And(nodeArray);
     	if (node.getChildren().length > 0) {
@@ -147,7 +145,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	}
 
     	initializeIDs();
-       	generateSubtree(doc, plm, object.getStructure().getRoot().getFeature());
+       	generateSubtree(doc, plm, featureModel.getStructure().getRoot().getFeature());
     	
     	plm.appendChild(doc.createElement("properties"));
 
@@ -312,12 +310,13 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 				line = reader.readLine();
 			}
     	} catch (IOException e) {
-    		FMCorePlugin.getDefault().logError(e);
+    		Logger.logError(e);
 		}
     	return result.toString();
     }
     
-    public String writeToString() {
+    public String writeToString(IFeatureModel featureModel) {
+    	this.featureModel = featureModel;
     	//Create Empty DOM Document
     	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -329,7 +328,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		try {
 		    db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
-			FMCorePlugin.getDefault().logError(pce);
+			Logger.logError(pce);
 		}
 		Document doc = db.newDocument();
 		//Create the Xml Representation
@@ -340,9 +339,9 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		try {
 			transfo = TransformerFactory.newInstance().newTransformer();
 		} catch (TransformerConfigurationException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		} catch (TransformerFactoryConfigurationError e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -352,7 +351,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		try {
 			transfo.transform(source, result);
 		} catch (TransformerException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		
 		return prettyPrint(result.getWriter().toString()); 
@@ -362,7 +361,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     
     private void initializeIDs() {
     	ids = new HashMap<String, Integer>();
-    	initializeIDs(object.getStructure().getRoot().getFeature());
+    	initializeIDs(featureModel.getStructure().getRoot().getFeature());
     }
     
     private void initializeIDs(IFeature feature) {
@@ -379,5 +378,40 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	ids.put(feature, id);
     	return id.toString();
     }
+
+	@Override
+	public ProblemList read(IFeatureModel object, CharSequence source) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String write(IFeatureModel object) {
+		return writeToString(object);
+	}
+
+	@Override
+	public String getSuffix() {
+		return "xml";
+	}
+
+	@Override
+	public IPersistentFormat<IFeatureModel> getInstance() {
+		return new ConquererFMWriter();
+	}
+
+	@Override
+	public boolean supportsRead() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
+	}
     
 }

@@ -30,20 +30,20 @@ import java.util.LinkedList;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.analyses.ImplicationSetsAnalysis.Relationship;
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Creates a complete implication graph.
  * 
  * @author Sebastian Krieter
  */
-public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relationship, Relationship>> {
+public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationship, Relationship>> {
 
-	public ImplicationSetsAnalysis(ISolverProvider solver) {
+	public ImplicationSetsAnalysis(ISatSolver solver) {
 		super(solver);
 	}
 
@@ -125,7 +125,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 	private final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 	@Override
-	public HashMap<Relationship, Relationship> execute(WorkMonitor monitor) throws Exception {
+	public HashMap<Relationship, Relationship> execute(IMonitor monitor) throws Exception {
 		relationSet.clear();
 		parentStack.clear();
 		solutions.clear();
@@ -149,18 +149,19 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
-					solver.getAssignment().push(-varX);
+					solver.assignmentPush(-varX);
 					//					solver.shuffleOrder();
 					switch (solver.sat()) {
 					case FALSE:
 						core[i] = (byte) (varX > 0 ? 1 : -1);
-						solver.getAssignment().pop().unsafePush(varX);
+						solver.assignmentPop();
+						solver.assignmentPush(varX);
 						break;
 					case TIMEOUT:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						model2 = getModel(solutions);
 						SatInstance.updateModel(model1Copy, model2);
 						solver.shuffleOrder();
@@ -326,7 +327,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 
 			int c = 0;
 
-			solver.getAssignment().push(mx1);
+			solver.assignmentPush(mx1);
 			final int rowIndex = i * numVariables;
 
 			inner1: for (int j = i + 1; j < xModel1.length; j++) {
@@ -344,7 +345,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 						}
 					}
 
-					solver.getAssignment().push(-my1);
+					solver.assignmentPush(-my1);
 					solver.setSelectionStrategy((c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
 					switch (solver.sat()) {
@@ -353,12 +354,13 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 							addRelation(mx0, my1);
 						}
 						parentStack.push(my1);
-						solver.getAssignment().pop().pop();
+						solver.assignmentPop();
+						solver.assignmentPop();
 						testVariable();
-						solver.getAssignment().push(mx1);
+						solver.assignmentPush(mx1);
 						break;
 					case TIMEOUT:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						break;
 					case TRUE:
 						final int[] model = solver.getModel();
@@ -366,13 +368,13 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 							solutions.add(model);
 						}
 						solver.shuffleOrder();
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 //						combinations[rowIndex + j] &= ~BIT_CHECK;
 						break;
 					}
 				}
 			}
-			solver.getAssignment().pop();
+			solver.assignmentPop();
 		}
 		parentStack.pop();
 	}

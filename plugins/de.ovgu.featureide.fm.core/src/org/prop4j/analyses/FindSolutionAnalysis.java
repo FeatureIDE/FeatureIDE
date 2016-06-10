@@ -24,7 +24,7 @@ import org.prop4j.solver.ISolverProvider;
 import org.sat4j.specs.IProblem;
 import org.sat4j.tools.ModelIterator;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds a solution.
@@ -37,7 +37,7 @@ public class FindSolutionAnalysis extends SingleThreadAnalysis<String> {
 		super(solver);
 	}
 
-	public String execute(WorkMonitor monitor) throws Exception {
+	public String execute(IMonitor monitor) throws Exception {
 		StringBuilder out = new StringBuilder();
 		IProblem problem = new ModelIterator(solver.getSolver());
 		if (!problem.isSatisfiable())

@@ -22,13 +22,13 @@ package org.prop4j.analyses;
 
 import java.util.List;
 
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds certain solutions of propositional formulas.
@@ -39,21 +39,19 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 
 	private final int maxValue;
 	
-	public RandomConfigurationGenerator(ISolverProvider solver, int maxValue) {
+	public RandomConfigurationGenerator(ISatSolver solver, int maxValue) {
 		super(solver, 0);
 		this.maxValue = maxValue;
 	}
 
 	@Override
-	public List<List<String>> execute(WorkMonitor monitor) throws Exception {
+	public List<List<String>> execute(IMonitor monitor) throws Exception {
 		time = System.nanoTime();
 		final SatInstance satInstance = solver.getSatInstance();
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 		
 		for (int i = 0; i < maxValue; i++) {
-			if (monitor.checkCancel()) {
-				break;
-			}
+			monitor.checkCancel();
 			if (handleNewConfig(solver.findModel(), satInstance)) {
 				break;
 			}

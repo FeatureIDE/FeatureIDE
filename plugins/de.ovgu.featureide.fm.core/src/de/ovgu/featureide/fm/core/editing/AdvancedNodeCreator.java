@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
@@ -310,7 +310,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	@Override
-	public Node execute(WorkMonitor monitor) throws Exception {
+	public Node execute(IMonitor monitor) throws Exception {
 		return createNodes();
 	}
 

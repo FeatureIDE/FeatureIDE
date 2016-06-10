@@ -20,76 +20,42 @@
  */
 package org.prop4j.solver;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
-import org.sat4j.minisat.core.Heap;
-import org.sat4j.minisat.core.IOrder;
-import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 import org.sat4j.minisat.core.Solver;
 import org.sat4j.minisat.orders.NegativeLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.PositiveLiteralSelectionStrategy;
+import org.sat4j.minisat.orders.RSATPhaseSelectionStrategy;
 import org.sat4j.minisat.orders.RandomLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
+import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds certain solutions of propositional formulas.
  * 
  * @author Sebastian Krieter
  */
-public class BasicSolver implements Cloneable {
-
-	public static enum SatResult {
-		TRUE, FALSE, TIMEOUT
-	}
-
-	public static enum SelectionStrategy {
-		ORG, POSITIVE, NEGATIVE, RANDOM
-	}
-
-	private class VarOrderHeap2 extends VarOrderHeap {
-
-		private static final long serialVersionUID = 1L;
-
-		public VarOrderHeap2(IPhaseSelectionStrategy strategy) {
-			super(strategy);
-		}
-
-		@Override
-		public void init() {
-			int nlength = this.lits.nVars() + 1;
-			if (this.activity == null || this.activity.length < nlength) {
-				this.activity = new double[nlength];
-			}
-			this.phaseStrategy.init(nlength);
-			this.activity[0] = -1;
-			this.heap = new Heap(this.activity);
-			this.heap.setBounds(nlength);
-			nlength--;
-			for (int i = 0; i < nlength; i++) {
-				final int x = order[i];
-				this.activity[x] = 0.0;
-				if (this.lits.belongsToPool(x)) {
-					this.heap.insert(x);
-				}
-			}
-		}
-	}
+public class BasicSolver implements ISatSolver {
 
 	protected final SatInstance satInstance;
 	protected final Solver<?> solver;
-	protected final IOrder orgSolverOrder;
 	protected final int[] order;
 	protected final VecInt assignment;
-
-	protected boolean keepHot = false;
+	protected final List<int[]> solutionList = new ArrayList<int[]>();
+	private ArrayList<IConstr> constraints = new ArrayList<>();
 
 	public BasicSolver(Node cnf, List<IFeature> featureList) {
 		this(new SatInstance(cnf, featureList));
@@ -97,28 +63,46 @@ public class BasicSolver implements Cloneable {
 
 	public BasicSolver(SatInstance satInstance) {
 		this.satInstance = satInstance;
-		this.order = new int[satInstance.intToVar.length - 1];
-		this.assignment = new VecInt();
+		final int numberOfVariables = satInstance.getNumberOfVariables();
+		this.order = new int[numberOfVariables];
+		fixOrder();
+		this.assignment = new VecInt(numberOfVariables);
 		solver = initSolver();
-		orgSolverOrder = solver.getOrder();
 	}
 
 	public BasicSolver(BasicSolver oldSolver) {
 		this.satInstance = oldSolver.satInstance;
 		this.order = new int[satInstance.intToVar.length - 1];
+		fixOrder();
 		this.assignment = new VecInt(0);
 		oldSolver.assignment.copyTo(this.assignment);
 		solver = initSolver();
-		orgSolverOrder = solver.getOrder();
 	}
 
-	private Solver<?> initSolver() {
-		fixOrder();
+	protected Solver<?> initSolver() {
 		Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
 		solver.setTimeoutMs(1000);
-		solver.setDBSimplificationAllowed(true);
+		solver.setDBSimplificationAllowed(false);
 		solver.setVerbose(false);
-		satInstance.initSolver(solver);
+		
+		solver.newVar(satInstance.getNumberOfVariables());
+		final Node[] cnfChildren = satInstance.getCnf().getChildren();
+		solver.setExpectedNumberOfClauses(cnfChildren.length);
+		try {
+			for (Node node : cnfChildren) {
+				final Node[] children = node.getChildren();
+				final int[] clause = new int[children.length];
+				for (int i = 0; i < children.length; i++) {
+					final Literal literal = (Literal) children[i];
+					clause[i] = satInstance.getSignedVariable(literal);
+				}
+				IConstr constraint = solver.addClause(new VecInt(clause));
+				constraints.add(constraint);
+			}
+		} catch (ContradictionException e) {
+			Logger.logError(e);
+		}
+		
 		return solver;
 	}
 
@@ -126,8 +110,26 @@ public class BasicSolver implements Cloneable {
 		return sat() == SatResult.TRUE ? solver.model() : null;
 	}
 
-	public IVecInt getAssignment() {
-		return assignment;
+	public IVecInt getAssignmentCopy() {
+		final VecInt copy = new VecInt(0);
+		assignment.copyTo(copy);
+		return copy;
+	}
+
+	public void assignmentPop() {
+		assignment.pop();
+	}
+
+	public void assignmentPush(int x) {
+		assignment.push(x);
+	}
+
+	public void assignmentClear(int size) {
+		assignment.shrinkTo(size);
+	}
+
+	public void ensure(int size) {
+		assignment.ensure(size);
 	}
 
 	public List<String> getAssignmentString() {
@@ -148,20 +150,16 @@ public class BasicSolver implements Cloneable {
 
 	public SatResult sat() {
 		try {
-			return (solver.isSatisfiable(assignment, false)) ? SatResult.TRUE : SatResult.FALSE;
+			if (solver.isSatisfiable(assignment, false)) {
+				solutionList.add(solver.model());
+				return SatResult.TRUE;
+			} else {
+				return SatResult.FALSE;
+			}
 		} catch (TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
-	}
-
-	public boolean isKeepHot() {
-		return keepHot;
-	}
-
-	public void setKeepHot(boolean keepHot) {
-		this.keepHot = keepHot;
-		solver.setKeepSolverHot(keepHot);
 	}
 
 	public void setOrder(List<IFeature> orderList) {
@@ -174,31 +172,16 @@ public class BasicSolver implements Cloneable {
 	public void setSelectionStrategy(SelectionStrategy strategy) {
 		switch (strategy) {
 		case NEGATIVE:
-			final VarOrderHeap2 negativeHeap = new VarOrderHeap2(new NegativeLiteralSelectionStrategy());
-			solver.setOrder(negativeHeap);
-			if (keepHot) {
-				negativeHeap.init();
-			}
+			solver.setOrder(new VarOrderHeap2(new NegativeLiteralSelectionStrategy(), order));
 			break;
 		case ORG:
-			solver.setOrder(orgSolverOrder);
-			if (keepHot) {
-				orgSolverOrder.init();
-			}
+			solver.setOrder(new VarOrderHeap(new RSATPhaseSelectionStrategy()));
 			break;
 		case POSITIVE:
-			final VarOrderHeap2 positiveHeap = new VarOrderHeap2(new PositiveLiteralSelectionStrategy());
-			solver.setOrder(positiveHeap);
-			if (keepHot) {
-				positiveHeap.init();
-			}
+			solver.setOrder(new VarOrderHeap2(new PositiveLiteralSelectionStrategy(), order));
 			break;
 		case RANDOM:
-			final VarOrderHeap2 randomHeap = new VarOrderHeap2(new RandomLiteralSelectionStrategy());
-			solver.setOrder(randomHeap);
-			if (keepHot) {
-				randomHeap.init();
-			}
+			solver.setOrder(new VarOrderHeap2(new RandomLiteralSelectionStrategy(), order));
 			break;
 		default:
 			break;
@@ -223,6 +206,66 @@ public class BasicSolver implements Cloneable {
 
 	public BasicSolver clone() {
 		return new BasicSolver(this);
+	}
+
+	@Override
+	public void checkAllVariables(int length, Tester t, IMonitor workMonitor) {
+		for (int i = 0; i < length; i++) {
+			final int varX = t.getNextVariable(i);
+			if (varX != 0) {
+				assignment.push(varX);
+				try {
+					if (solver.isSatisfiable(assignment, false)) {
+						solutionList.add(solver.model());
+						shuffleOrder();
+						assignment.pop();
+					} else {
+						assignment.pop().unsafePush(-varX);
+						workMonitor.invoke(-varX);
+					}
+				} catch (final TimeoutException e) {
+					e.printStackTrace();
+					assignment.pop();
+				}
+				workMonitor.step();
+			}
+		}
+	}
+	
+	@Override
+	public void checkAllVariables(int length, Tester t) {
+		for (int i = 0; i < length; i++) {
+			final int varX = t.getNextVariable(i);
+			if (varX != 0) {
+				assignment.push(varX);
+				try {
+					if (solver.isSatisfiable(assignment, false)) {
+						solutionList.add(solver.model());
+						shuffleOrder();
+						assignment.pop();
+					} else {
+						assignment.pop().unsafePush(-varX);
+					}
+				} catch (final TimeoutException e) {
+					e.printStackTrace();
+					assignment.pop();
+				}
+			}
+		}
+	}
+
+	@Override
+	public int getNumberOfSolutions() {
+		return solutionList.size();
+	}
+
+	@Override
+	public List<int[]> getSolutions() {
+		return solutionList;
+	}
+
+	public IConstr getConstraint(int i) {
+		return constraints.get(i);
 	}
 
 }

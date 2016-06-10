@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Represents a configuration and provides operations for the configuration process.
@@ -258,10 +258,10 @@ public class ConfigurationFG extends Configuration {
 		return LongRunningWrapper.runMethod(propagator.isValidNoHidden());
 	}
 
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, IMonitor workMonitor) {
 	}
 
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, IMonitor workMonitor) {
 	}
 
 	/**

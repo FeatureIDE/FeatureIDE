@@ -30,13 +30,15 @@ import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * 
  * @author Sebastian Krieter
  */
-public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments> {
+public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments> implements LongRunningMethod<Boolean> {
 	
 	public static class Arguments extends JobArguments {
 		private final IFolder srcFolder;
@@ -51,11 +53,11 @@ public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments
 	
 	protected MPLCopyExternalJob(Arguments arguments) {
 		super(COPYING_SOURCE_FILES, arguments);
-		setPriority(BUILD);
 	}
-	
+
 	@Override
-	protected boolean work() {
+	public Boolean execute(IMonitor workMonitor) throws Exception {
+		this.workMonitor = workMonitor;
 		IPath destPath = arguments.destFolder.getFullPath();
 		
 		try {
@@ -64,7 +66,7 @@ public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments
 				IResource srcMember = srcMembers[i];
 				IPath px = destPath.append(srcMember.getName());
 				if (!px.toFile().exists()) {
-					srcMember.move(px, true, workMonitor.getMonitor());
+					srcMember.move(px, true, null);
 				}
 			}
 		} catch (CoreException e) {

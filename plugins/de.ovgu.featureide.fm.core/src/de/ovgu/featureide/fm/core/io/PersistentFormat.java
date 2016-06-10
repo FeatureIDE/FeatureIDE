@@ -18,26 +18,48 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.mpl.io.writer;
-
-import org.eclipse.core.resources.IFile;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+package de.ovgu.featureide.fm.core.io;
 
 /**
- * Writes a {@link IFeatureModel} to a xml file.
+ * Default implementation of {@link IPersistentFormat}.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureModelWriter extends AbstractWriter {
+public class PersistentFormat<T> implements IPersistentFormat<T> {
 
-	public FeatureModelWriter() {
-		super(null);
+	@Override
+	public String getId() {
+		return "";
 	}
-	
-	public void writeModel(IFeatureModel fm, IFile saveFile) {
-		writeToFile(saveFile, new XmlFeatureModelWriter(fm).writeToString());
+
+	@Override
+	public ProblemList read(T object, CharSequence source) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String write(T object) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getSuffix() {
+		return "";
+	}
+
+	@Override
+	public IPersistentFormat<T> getInstance() {
+		return this;
+	}
+
+	@Override
+	public boolean supportsRead() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return false;
 	}
 
 }

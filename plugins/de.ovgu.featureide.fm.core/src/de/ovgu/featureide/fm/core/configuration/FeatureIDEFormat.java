@@ -98,7 +98,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 							break;
 						}
 					} catch (NumberFormatException e) {
-						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber));
+						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber, e));
 					}
 
 					final String name = renamingsManager.getNewName(line.substring(2));
@@ -111,7 +111,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 							configuration.setManual(feature, manual);
 							configuration.setAutomatic(feature, automatic);
 						} catch (SelectionNotPossibleException e) {
-							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber));
+							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber, e));
 						}
 					}
 				}

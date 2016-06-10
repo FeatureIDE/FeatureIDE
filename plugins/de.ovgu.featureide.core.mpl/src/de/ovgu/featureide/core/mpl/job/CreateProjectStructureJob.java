@@ -21,6 +21,9 @@
 package de.ovgu.featureide.core.mpl.job;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOADING_PROJECT_SIGNATURE;
+
+import org.eclipse.core.resources.IProject;
+
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
@@ -29,6 +32,8 @@ import de.ovgu.featureide.core.signature.base.AClassCreator;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
@@ -36,28 +41,31 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjectStructureJob.Arguments> {
+public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjectStructureJob.Arguments> implements LongRunningMethod<Boolean> {
 	
 	public static class Arguments extends JobArguments {
 		private final IFilter<AbstractSignature> filter;
 		private final ProjectStructure projectSig;
+		private final IProject project;
 		
-		public Arguments(ProjectStructure projectSig, IFilter<AbstractSignature> filter) {
+		public Arguments(ProjectStructure projectSig, IFilter<AbstractSignature> filter, IProject project) {
 			super(Arguments.class);
 			this.filter = filter;
 			this.projectSig = projectSig;
+			this.project = project;
 		}
 	}
 
 	protected CreateProjectStructureJob(Arguments arguments) {
 		super(LOADING_PROJECT_SIGNATURE, arguments);
 	}
-	
+
 	@Override
-	protected boolean work() {
-		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+	public Boolean execute(IMonitor workMonitor) throws Exception {
+		this.workMonitor = workMonitor;
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(arguments.project);
 		if (interfaceProject == null) {
-			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			MPLPlugin.getDefault().logWarning(arguments.project.getName() + " is no Interface Project!");
 			return false;
 		}
 		SignatureIterator it = interfaceProject.getProjectSignatures().iterator();

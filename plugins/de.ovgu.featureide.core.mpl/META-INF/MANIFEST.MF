@@ -18,8 +18,6 @@ Import-Package: org.eclipse.jdt.core.refactoring,
  org.eclipse.jdt.internal.core
 Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.builder,
- de.ovgu.featureide.core.mpl.io.reader,
- de.ovgu.featureide.core.mpl.io.writer,
  de.ovgu.featureide.core.mpl.job,
  de.ovgu.featureide.core.mpl.signature,
  de.ovgu.featureide.core.mpl.signature.filter,

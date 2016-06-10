@@ -36,6 +36,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+
 /**
  * 
  * @author Sebastian Krieter
@@ -80,10 +83,15 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 		toFormatCombo = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 		toFormatCombo.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		fromFormatCombo.add("SXFM");
-		toFormatCombo.add("FeatureIDE XML");
-		fromFormatCombo.select(0);
-		toFormatCombo.select(0);
+		for (IFeatureModelFormat format : FMFormatManager.getInstance().getExtensions()) {
+			fromFormatCombo.add(format.getId());
+			toFormatCombo.add(format.getId());
+		}
+
+		if (fromFormatCombo.getItems().length > 0) {
+			fromFormatCombo.select(0);
+			toFormatCombo.select(0);
+		}
 
 		//Path Group
 		final Group pathGroup = new Group(container, SWT.NONE);
@@ -127,8 +135,10 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 	@Override
 	protected void putData() {
 		abstractWizard.putData(WizardConstants.KEY_OUT_FOLDER, outputPath.getText());
-		abstractWizard.putData(WizardConstants.KEY_OUT_INPUTFORMAT, fromFormatCombo.getSelectionIndex());
-		abstractWizard.putData(WizardConstants.KEY_OUT_OUTPUTFORMAT, toFormatCombo.getSelectionIndex());
+		int selectionIndex = fromFormatCombo.getSelectionIndex();
+		abstractWizard.putData(WizardConstants.KEY_OUT_INPUTFORMAT, selectionIndex >= 0 ? fromFormatCombo.getItem(selectionIndex) : null);
+		selectionIndex = toFormatCombo.getSelectionIndex();
+		abstractWizard.putData(WizardConstants.KEY_OUT_OUTPUTFORMAT, selectionIndex >= 0 ? toFormatCombo.getItem(selectionIndex) : null);
 	}
 
 }

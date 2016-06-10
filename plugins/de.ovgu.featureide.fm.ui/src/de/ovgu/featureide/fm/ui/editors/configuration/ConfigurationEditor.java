@@ -224,7 +224,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			}
 		}
 
-		featureModelManager = FeatureModelManager.getInstance(res);
+		featureModelManager = FeatureModelManager.getInstance(Paths.get(res.getLocationURI()));
 		invalidFeatureModel = featureModelManager.getLastProblems().containsError();
 		if (invalidFeatureModel) {
 			return;
@@ -269,10 +269,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public void loadPropagator() {
 		if (!configurationManager.editObject().getPropagator().isLoaded()) {
 			final Display currentDisplay = Display.getCurrent();
-			LongRunningJob<Void> configJob = LongRunningWrapper.createJob("Load Propagator", configurationManager.editObject().getPropagator().load());
+			LongRunningJob<Void> configJob = new LongRunningJob<>("Load Propagator", configurationManager.editObject().getPropagator().load());
 			configJob.addJobFinishedListener(new JobFinishListener() {
 				@Override
-				public void jobFinished(IJob finishedJob, boolean success) {
+				public void jobFinished(IJob<?> finishedJob) {
 					autoSelectFeatures = true;
 					currentDisplay.asyncExec(new Runnable() {
 						@Override

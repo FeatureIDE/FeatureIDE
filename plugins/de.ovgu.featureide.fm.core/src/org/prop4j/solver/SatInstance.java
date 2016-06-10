@@ -27,22 +27,17 @@ import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.sat4j.core.VecInt;
-import org.sat4j.minisat.core.Solver;
-import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-
 /**
  * Represents an instance of a satisfiability problem in CNF.</br>
- * Use a {@link ISolverProvider solver provider} or the {@link #getSolver()} method
+ * Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()} method
  * to get a {@link BasicSolver solver} for this problem.
  * 
  * @author Sebastian Krieter
  */
-public class SatInstance implements ISolverProvider {
+public class SatInstance {
 
 	public static void updateModel(final int[] model1, int[] model2) {
 		for (int i = 0; i < model1.length; i++) {
@@ -81,25 +76,6 @@ public class SatInstance implements ISolverProvider {
 		}
 	}
 
-	protected void initSolver(Solver<?> solver) {
-		solver.newVar(varToInt.size());
-		final Node[] cnfChildren = cnf.getChildren();
-		solver.setExpectedNumberOfClauses(cnfChildren.length);
-		try {
-			for (Node node : cnfChildren) {
-				final Node[] children = node.getChildren();
-				final int[] clause = new int[children.length];
-				for (int i = 0; i < children.length; i++) {
-					final Literal literal = (Literal) children[i];
-					clause[i] = literal.positive ? varToInt.get(literal.var) : -varToInt.get(literal.var);
-				}
-				solver.addClause(new VecInt(clause));
-			}
-		} catch (ContradictionException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
-
 	public List<String> convertToString(int[] model) {
 		final List<String> resultList = new ArrayList<>();
 		for (int var : model) {
@@ -133,11 +109,6 @@ public class SatInstance implements ISolverProvider {
 
 	public int getSignedVariable(Literal l) {
 		return l.positive ? varToInt.get(l.var) : -varToInt.get(l.var);
-	}
-
-	@Override
-	public BasicSolver getSolver() {
-		return new BasicSolver(this);
 	}
 
 	public int getVariable(Literal l) {

@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public interface IJob {
+public interface IJob<T> {
 
 	public enum JobStatus {
 		/**
@@ -71,6 +71,8 @@ public interface IJob {
 	 * @see JobStatus
 	 */
 	JobStatus getStatus();
+
+	T getResults();
 
 	/**
 	 * Adds a {@link JobFinishListener} to this job.

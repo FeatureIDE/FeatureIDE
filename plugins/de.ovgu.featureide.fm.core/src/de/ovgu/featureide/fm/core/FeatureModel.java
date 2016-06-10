@@ -93,15 +93,15 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 
 	@Override
 	public FMComposerManager getFMComposerManager(final IProject project) {
-		return model.getFMComposerManager(project);
+		return (FMComposerManager) FMComposerManager.getFMComposerExtension(null);
 	}
 
 	public IFMComposerExtension initFMComposerExtension(final IProject project) {
-		return model.initFMComposerExtension(project);
+		return FMComposerManager.getFMComposerExtension(null);
 	}
 
 	public IFMComposerExtension getFMComposerExtension() {
-		return model.getFMComposerExtension();
+		return FMComposerManager.getFMComposerExtension(null);
 	}
 
 	@Override

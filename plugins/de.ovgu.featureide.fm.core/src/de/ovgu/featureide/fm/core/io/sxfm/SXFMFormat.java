@@ -40,9 +40,9 @@ public class SXFMFormat implements IFeatureModelFormat {
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
-		final SXFMReader guidslReader = new SXFMReader(featureModel);
+		final SXFMReader guidslReader = new SXFMReader();
 		try {
-			guidslReader.parseInputStream(source.toString());
+			guidslReader.parseInputStream(featureModel, source.toString());
 		} catch (UnsupportedModelException e) {
 			problemList.add(new Problem(e, e.lineNumber));
 		}
@@ -52,7 +52,7 @@ public class SXFMFormat implements IFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		return new SXFMWriter(featureModel).writeToString();
+		return new SXFMWriter().writeToString(featureModel);
 	}
 
 	@Override

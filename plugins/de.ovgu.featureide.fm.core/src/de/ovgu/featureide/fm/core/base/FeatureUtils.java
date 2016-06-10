@@ -36,7 +36,6 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.prop4j.SatSolver;
@@ -44,13 +43,11 @@ import org.prop4j.SatSolver;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.IFeatureModelLayout;
 import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.Operator;
@@ -538,8 +535,6 @@ public final class FeatureUtils {
 
 	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
-		requireNonNull(feature);
-		
 		if (feature != null) {
 			IFeatureStructure parent = feature.getStructure().getParent();
 			if (parent != null) { 
@@ -799,26 +794,6 @@ public final class FeatureUtils {
 	public static final ColorschemeTable getColorschemeTable(IFeatureModel featureModel) {
 //		return featureModel.getGraphicRepresenation().getColorschemeTable();
 		return null;
-	}
-
-	public static final FMComposerManager getFMComposerManager(IFeatureModel featureModel, final IProject project) {
-		requireNonNull(featureModel);
-		requireNonNull(project);
-		
-		return featureModel.getFMComposerManager(project);
-	}
-
-	public static final IFMComposerExtension initFMComposerExtension(IFeatureModel featureModel, final IProject project) {
-		requireNonNull(featureModel);
-		requireNonNull(project);
-		
-		return featureModel.initFMComposerExtension(project);
-	}
-
-	public static final IFMComposerExtension getFMComposerExtension(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getFMComposerExtension();
 	}
 
 	public static final RenamingsManager getRenamingsManager(IFeatureModel featureModel) {

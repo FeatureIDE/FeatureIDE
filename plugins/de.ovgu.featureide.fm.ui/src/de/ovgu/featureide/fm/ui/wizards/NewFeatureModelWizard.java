@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.ui.wizards;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
 
+import java.nio.file.Paths;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -42,10 +44,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
@@ -77,7 +79,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 			if (!foundParent) {
 				final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
 				featureModel.createDefaultValues("");
-				new XmlFeatureModelWriter(featureModel).writeToFile(fullFilePath.toFile());
+				FeatureModelManager.writeToFile(featureModel, Paths.get(fullFilePath.toOSString()));
 			}
 		}
 		assert (fullFilePath.toFile().exists()) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
@@ -115,13 +117,10 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
 			final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
 			featureModel.createDefaultValues("");
-			featureModel.initFMComposerExtension(file.getProject());
-			try {
-				new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(file);
-				file.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
+			FMComposerManager.getFMComposerExtension(file.getProject());
+			
+			FeatureModelManager.writeToFile(featureModel, Paths.get(file.getLocationURI()));
+
 			open(file);
 			return true;
 		}

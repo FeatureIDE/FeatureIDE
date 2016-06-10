@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IMarker;
-
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 
 /**

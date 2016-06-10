@@ -28,6 +28,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
 import java.beans.PropertyChangeEvent;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -440,7 +441,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		super.setInput(input);
 		
 		boolean hasInstance = FileManagerMap.hasInstance(markerHandler.getModelFile().getLocation().toString());
-		fmManager = FeatureModelManager.getInstance(markerHandler.getModelFile());
+		fmManager = FeatureModelManager.getInstance(Paths.get(markerHandler.getModelFile().getLocationURI()));
 		if (hasInstance) {
 			fmManager.read();
 		}

@@ -32,7 +32,7 @@ import org.prop4j.SatSolver;
 import org.prop4j.SatSolver.ValueType;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Updates a configuration by using a feature graph.
@@ -62,7 +62,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		@Override
-		public Void execute(WorkMonitor monitor) {
+		public Void execute(IMonitor monitor) {
 			final UpdateHelper updateHelper = new UpdateHelper();
 			for (int index = 0; index < featureGraph.getSize(); index++) {
 				if (variableConfiguration.getVariable(index).getValue() != Variable.UNDEFINED) {
@@ -97,7 +97,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	// TODO implement
 	public class Resolve implements LongRunningMethod<Void> {
 		@Override
-		public Void execute(WorkMonitor workMonitor) throws Exception {
+		public Void execute(IMonitor workMonitor) throws Exception {
 			return null;
 		}
 	}
@@ -108,11 +108,11 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class CanBeValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean execute(WorkMonitor monitor) {
+		public Boolean execute(IMonitor monitor) {
 			try {
 				return sat(getCurrentLiterals(true));
 			} catch (Exception e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 				return false;
 			}
 		}
@@ -120,7 +120,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class CountSolutionsMethod implements LongRunningMethod<Long> {
 		@Override
-		public Long execute(WorkMonitor monitor) {
+		public Long execute(IMonitor monitor) {
 			return new SatSolver(node, 1000, false).countSolutions(getCurrentLiterals(true));
 		}
 	}
@@ -133,7 +133,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		@Override
-		public LinkedList<List<String>> execute(WorkMonitor monitor) throws TimeoutException {
+		public LinkedList<List<String>> execute(IMonitor monitor) throws TimeoutException {
 			SatSolver satSolver3 = new SatSolver(node, 1000, false);
 			return satSolver3.getSolutionFeatures(getCurrentLiterals(true), max);
 		}
@@ -141,11 +141,11 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class IsValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean execute(WorkMonitor monitor) {
+		public Boolean execute(IMonitor monitor) {
 			try {
 				return sat(getCurrentLiterals(false));
 			} catch (Exception e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 				return false;
 			}
 		}
@@ -153,14 +153,14 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class LeadToValidConfiguration implements LongRunningMethod<Void> {
 		@Override
-		public Void execute(WorkMonitor monitor) {
+		public Void execute(IMonitor monitor) {
 			return null;
 		}
 	}
 
 	public class LoadMethod implements LongRunningMethod<Void> {
 		@Override
-		public Void execute(WorkMonitor monitor) {
+		public Void execute(IMonitor monitor) {
 			if (!isLoaded()) {
 				lastComputedValues = new byte[variableConfiguration.size()];
 				int i = 0;
@@ -184,7 +184,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		@Override
-		public Void execute(WorkMonitor monitor) {
+		public Void execute(IMonitor monitor) {
 			if (satSolver1 == null) {
 				satSolver1 = new SatSolver(node, 1000, false);
 			}
@@ -208,7 +208,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class UpdateMethod implements LongRunningMethod<List<String>> {
 		@Override
-		public List<String> execute(WorkMonitor monitor) {
+		public List<String> execute(IMonitor monitor) {
 			final byte[] featureToCompute = new byte[variableConfiguration.size()];
 			boolean undefined = false;
 			final List<Literal> knownLiterals = new ArrayList<>();
@@ -408,7 +408,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class UpdateNextMethod implements LongRunningMethod<Void> {
 		@Override
-		public Void execute(WorkMonitor monitor) {
+		public Void execute(IMonitor monitor) {
 			final UpdateHelper updateHelper = new UpdateHelper();
 			for (int index = 0; index < lastComputedValues.length; index++) {
 				final int newValue = variableConfiguration.getVariable(index).getValue();
@@ -472,7 +472,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					}
 				}
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 
 			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
@@ -486,7 +486,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					setNewValue(featureID, Variable.FALSE, false);
 				}
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 
 			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
@@ -500,7 +500,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					setNewValue(featureID, Variable.TRUE, false);
 				}
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 
 			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;

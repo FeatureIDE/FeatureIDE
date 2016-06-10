@@ -106,7 +106,7 @@ public abstract class Preferences {
 		try {
 			preferences.flush();
 		} catch (BackingStoreException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 }

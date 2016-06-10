@@ -36,6 +36,7 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.filter.base,
  de.ovgu.featureide.fm.core.functional,
  de.ovgu.featureide.fm.core.io;uses:="de.ovgu.featureide.fm.core.model,org.eclipse.core.resources",
+ de.ovgu.featureide.fm.core.io.cnf,
  de.ovgu.featureide.fm.core.io.dimacs,
  de.ovgu.featureide.fm.core.io.guidsl;uses:="org.prop4j,featureide.fm.core.model,org.eclipse.core.resources",
  de.ovgu.featureide.fm.core.io.manager,
@@ -44,6 +45,7 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.io.velvet,
  de.ovgu.featureide.fm.core.io.xml,
  de.ovgu.featureide.fm.core.job,
+ de.ovgu.featureide.fm.core.job.monitor,
  de.ovgu.featureide.fm.core.job.util,
  de.ovgu.featureide.fm.core.localization,
  guidsl,
@@ -84,5 +86,6 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
-Import-Package: org.eclipse.swt.graphics
+Import-Package: de.ovgu.featureide.fm.core,
+ org.eclipse.swt.graphics
 

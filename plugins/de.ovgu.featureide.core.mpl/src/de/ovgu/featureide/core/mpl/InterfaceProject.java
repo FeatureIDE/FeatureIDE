@@ -34,10 +34,9 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -108,7 +107,7 @@ public class InterfaceProject {
 		this.featureProject = featureProject;
 		
 		if (projectReference != null) {
-			final Path featureModelPath = Paths.get(projectReference.getFile(IOConstants.FILENAME_MODEL).getLocationURI());
+			final Path featureModelPath = Paths.get(projectReference.getFile("model.xml").getLocationURI());
 			featureModel = FMFactoryManager.getFactory().createFeatureModel();
 			FileHandler.load(featureModelPath, featureModel, FeatureModelManager.getFormat(featureModelPath.getFileName().toString()));
 		} else {

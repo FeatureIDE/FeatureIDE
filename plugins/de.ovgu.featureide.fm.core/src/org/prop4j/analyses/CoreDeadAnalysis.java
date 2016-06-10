@@ -22,24 +22,48 @@ package org.prop4j.analyses;
 
 import java.util.List;
 
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
+import org.prop4j.solver.ISatSolver.Tester;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
  * 
  * @author Sebastian Krieter
  */
-public class CoreDeadAnalysis extends SingleThreadAnalysis<List<String>> {
+public class CoreDeadAnalysis extends AbstractAnalysis<List<String>> {
 
-	public CoreDeadAnalysis(ISolverProvider solver) {
+	public CoreDeadAnalysis(ISatSolver solver) {
 		super(solver);
 	}
 
-	public List<String> execute(WorkMonitor monitor) throws Exception {
+	public class SolutionTester implements Tester {
+		@Override
+		public int getNextVariable(int index) {
+			final int size = solver.getNumberOfSolutions();
+			final List<int[]> solutions = solver.getSolutions();
+			if (size > 0) {
+				final int[] firstSolution = solutions.get(0);
+				final int mx = firstSolution[index];
+				for (int i = 1; i < size; i++) {
+					if ((mx != solutions.get(i)[index])) {
+						return 0;
+					}
+				}
+				return -mx;
+			}
+			return 0;
+		}
+	}
+
+	public List<String> execute(IMonitor monitor) throws Exception {
+		analyze();
+		return solver.getAssignmentString();
+	}
+
+	public void analyze() throws InterruptedException {
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findModel();
 		solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
@@ -50,29 +74,9 @@ public class CoreDeadAnalysis extends SingleThreadAnalysis<List<String>> {
 			if (model1.length - countNegative(model1) < countNegative(model2)) {
 				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 			}
-			SatInstance.updateModel(model1, model2);
-			for (int i = 0; i < model1.length; i++) {
-				final int varX = model1[i];
-				if (varX != 0) {
-					solver.getAssignment().push(-varX);
-					switch (solver.sat()) {
-					case FALSE:
-						solver.getAssignment().pop().unsafePush(varX);
-						break;
-					case TIMEOUT:
-						solver.getAssignment().pop();
-						break;
-					case TRUE:
-						solver.getAssignment().pop();
-						SatInstance.updateModel(model1, solver.getModel());
-						solver.shuffleOrder();
-						break;
-					}
-				}
-			}
-		}
 
-		return solver.getAssignmentString();
+			solver.checkAllVariables(model1.length, new SolutionTester());
+		}
 	}
 
 	private static int countNegative(int[] model) {

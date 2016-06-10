@@ -38,7 +38,9 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 
 /**
  * Creates configurations where false optional features are unused.
@@ -57,14 +59,13 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				if (project != null) {
-					WorkMonitor monitor2 = new WorkMonitor();
-					monitor2.setMonitor(monitor);
-					monitor2.begin("Cover unused features");
-					monitor2.createSubTask("collect unused features");
+					IMonitor monitor2 = new ProgressMonitor("Cover unused features", monitor);
+					monitor2.setRemainingWork(2);
+					IMonitor subTask = monitor2.subTask("Collect unused features", 1);
 					final Collection<String> unusedFeatures = project.getFalseOptionalConfigurationFeatures();
-					monitor2.createSubTask("create configurations");
-					monitor2.setMaxAbsoluteWork(unusedFeatures.size());
-					createConfigurations(unusedFeatures, monitor2, false);
+					subTask.step();
+					subTask.done();
+					createConfigurations(unusedFeatures, monitor2.subTask("Create configurations", 1), false);
 					monitor2.done();
 				}
 				return Status.OK_STATUS;
@@ -73,7 +74,8 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		job.schedule();
 	}
 
-	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final WorkMonitor monitor, boolean collect) {
+	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
+		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
 		Configuration configuration = new Configuration(featureModel, false);
@@ -109,6 +111,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 	 */
 	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
 		this.featureModel = fm;
-		return createConfigurations(falseOptionalFeatures, new WorkMonitor(), true);
+		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
 	}
+
 }

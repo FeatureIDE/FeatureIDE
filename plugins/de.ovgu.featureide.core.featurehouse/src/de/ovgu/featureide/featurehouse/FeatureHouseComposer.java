@@ -84,7 +84,10 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import fuji.CompilerWarningException;
 import fuji.Composition;
 import fuji.CompositionErrorException;
@@ -151,7 +154,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	private ICompositionErrorListener compositionErrorListener = createCompositionErrorListener();
-	private AStoppableJob fuji;
+	private IJob<?> fuji;
 
 	/**
 	 * @return
@@ -645,9 +648,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				FMCorePlugin.getDefault().logError(e);
 			}
 		}
-		fuji = new AStoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
+		final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 			@Override
-			protected boolean work() throws Exception {
+			public Boolean execute(IMonitor workMonitor) throws Exception {
 				try {
 					final Program ast = runFuji(featureProject);
 					signatureSetter.setFujiParameters(featureProject, ast);
@@ -658,7 +661,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 			}
 		};
-		fuji.addJobFinishedListener(signatureSetter);
+		fuji = LongRunningWrapper.getRunner(job, "Type checking " + featureProject.getProjectName() + " with fuji");
 		fuji.schedule();
 	}
 

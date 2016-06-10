@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
-import java.io.StringReader;
-
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -43,9 +41,9 @@ public class GuidslFormat implements IFeatureModelFormat {
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
-		final GuidslReader guidslReader = new GuidslReader(featureModel);
+		final GuidslReader guidslReader = new GuidslReader();
 		try {
-			guidslReader.parseInputStream(new StringReader(source.toString()));
+			guidslReader.parseInputStream(featureModel, source.toString());
 		} catch (UnsupportedModelException e) {
 			problemList.add(new Problem(e, e.lineNumber));
 		}
@@ -55,12 +53,12 @@ public class GuidslFormat implements IFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		return new GuidslWriter(featureModel).writeToString();
+		return new GuidslWriter().writeToString(featureModel);
 	}
 
 	@Override
 	public String getSuffix() {
-		return "guidsl";
+		return "m";
 	}
 
 	@Override

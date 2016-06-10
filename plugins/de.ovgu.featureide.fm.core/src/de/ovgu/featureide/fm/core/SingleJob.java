@@ -49,7 +49,7 @@ public abstract class SingleJob extends Job {
 				try {
 					execute(monitor);
 				} catch (Exception e){
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 				}
 			}
 			

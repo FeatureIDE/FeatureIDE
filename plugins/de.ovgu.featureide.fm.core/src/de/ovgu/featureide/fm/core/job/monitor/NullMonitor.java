@@ -16,32 +16,62 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://featureide.cs.ovgu.de/ for further information.
+ * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mpl.io.reader;
+package de.ovgu.featureide.fm.core.job.monitor;
 
-import java.util.LinkedList;
-
-import org.eclipse.core.resources.IFile;
+import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
- * Reads a list of feature names.
+ * Control object for {@link IJob}s.
+ * Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureListReader extends AbstractLineReader<LinkedList<String>> {
-	public FeatureListReader(IFile file) {
-		super(file);
-	}
-	
+public final class NullMonitor extends AMonitor {
+
+	private boolean cancel = false;
+
 	@Override
-	protected boolean prepareRead() {
-		infoObj = new LinkedList<String>();
-		return true;
+	public void cancel() {
+		cancel = true;
 	}
-	
+
 	@Override
-	protected boolean readLine(String line) {
-		return infoObj.add(line);
+	public void done() {
 	}
+
+	@Override
+	public void checkCancel() throws MethodCancelException {
+		if (cancel) {
+			throw new MethodCancelException();
+		}
+	}
+
+	@Override
+	public IMonitor subTask(int size) {
+		return this;
+	}
+
+	@Override
+	public void worked() {
+	}
+
+	@Override
+	public void setRemainingWork(int work) {
+	}
+
+	@Override
+	public void setTaskName(String name) {
+	}
+
+	@Override
+	public IMonitor subTask(String name, int size) {
+		return this;
+	}
+
+	@Override
+	public void setTaskNameSuffix(String suffix) {
+	}
+
 }

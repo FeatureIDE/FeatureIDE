@@ -23,8 +23,9 @@ package de.ovgu.featureide.ui.handlers;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.conf.CreateFeatureGraphJob;
-import de.ovgu.featureide.fm.core.job.IProjectJob;
+import de.ovgu.featureide.fm.core.conf.CreateAndSaveFeatureGraphJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
@@ -40,16 +41,13 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 	@Override
 	protected void endAction() {
 		final JobSequence global = new JobSequence();
+		global.setIgnorePreviousJobFail(true);
 		for (IFeatureProject project : projectList) {
-			final JobSequence j = new JobSequence();
-			final IProjectJob newJob = new CreateFeatureGraphJob.Arguments(project.getFeatureModel()).createJob();
-			newJob.setProject(project.getProject());
-			j.addJob(newJob);
-			j.setIgnorePreviousJobFail(false);
-			global.addJob(j);
+			final LongRunningMethod<?> newJob = new CreateAndSaveFeatureGraphJob(project.getFeatureModel(), project.getProject().getLocation().append("model.fg").toOSString());
+			global.addJob(newJob);
 		}
 		projectList.clear();
-		global.schedule();
+		LongRunningWrapper.getRunner(global).schedule();
 	}
 
 }

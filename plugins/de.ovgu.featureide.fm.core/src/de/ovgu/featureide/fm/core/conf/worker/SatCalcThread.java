@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.conf.IConfigurationChanger;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * TODO description
@@ -58,7 +58,7 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 	private final SharedObjects sharedObjects;
 
 	public SatCalcThread(IFeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
-		super(new WorkMonitor());
+		super(new NullMonitor());
 		this.sharedObjects = new SharedObjects(featureGraph, variableConfiguration, fmNode);
 		this.solver = new SimpleSatSolver(fmNode, 1000);
 	}

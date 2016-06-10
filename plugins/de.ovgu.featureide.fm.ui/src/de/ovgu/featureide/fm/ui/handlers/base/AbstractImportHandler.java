@@ -136,10 +136,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	}
 
 	/**
-	 * Returns an instance of IFeatureModelReader.
-	 * 
-	 * @param fm
-	 *            the feature model to initialize the IFeatureModelReader
+	 * Returns an instance of {@link IFeatureModelFormat}.
 	 */
 	protected abstract IFeatureModelFormat setModelReader();
 }

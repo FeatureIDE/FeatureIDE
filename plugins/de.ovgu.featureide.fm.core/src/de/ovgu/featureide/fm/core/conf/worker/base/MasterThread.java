@@ -25,15 +25,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.job.AWorkMonitor;
-import de.ovgu.featureide.fm.core.job.SyncWorkMonitor;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.SyncMonitor;
 
 final class MasterThread<T> {
 
 	final ConcurrentLinkedQueue<T> objects = new ConcurrentLinkedQueue<>();
-	final AWorkMonitor workMonitor;
+	final IMonitor workMonitor;
 
 	private final AWorkerThread<T> factory;
 
@@ -41,9 +41,9 @@ final class MasterThread<T> {
 	private List<AWorkerThread<T>> workers = Collections.emptyList();
 	private int initialized = 0;
 
-	MasterThread(AWorkerThread<T> factory, WorkMonitor workMonitor) {
+	MasterThread(AWorkerThread<T> factory, IMonitor workMonitor) {
 		this.factory = factory;
-		this.workMonitor = (workMonitor != null) ? new SyncWorkMonitor(workMonitor) : new WorkMonitor();
+		this.workMonitor = (workMonitor != null) ? new SyncMonitor(workMonitor) : new NullMonitor();
 	}
 
 	private void init(int numberOfThreads) {
@@ -84,7 +84,7 @@ final class MasterThread<T> {
 				thread.join();
 			}
 		} catch (InterruptedException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			stop();
 		}
 	}

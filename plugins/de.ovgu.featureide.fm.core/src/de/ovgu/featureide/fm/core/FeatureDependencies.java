@@ -101,7 +101,7 @@ public class FeatureDependencies {
 						    maybe.get(feature).add(current_feature);
 						}
 				    } catch (TimeoutException e) {
-				    	FMCorePlugin.getDefault().logError(e);
+				    	Logger.logError(e);
 				    }
 				}
 		    }
@@ -131,7 +131,7 @@ public class FeatureDependencies {
     			}
     		}
     	} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
     	return impliedFeatures;
     }
@@ -149,7 +149,7 @@ public class FeatureDependencies {
 		try {
 			return nodeImpliesFeature(nodeSel, B.getName(), true);
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return false;
 	}

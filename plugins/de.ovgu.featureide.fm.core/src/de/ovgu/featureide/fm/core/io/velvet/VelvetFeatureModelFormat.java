@@ -65,6 +65,7 @@ import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -383,7 +384,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		try {
 			fmFactory = FMFactoryManager.getFactory(file.getAbsolutePath(), format);
 		} catch (NoSuchExtensionException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return null;
 		}
 		final IFeatureModel fm = fmFactory.createFeatureModel();
@@ -490,7 +491,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		try {
 			antlrInputStream = new ANTLRInputStream(inputStream);
 		} catch (final IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			throw new UnsupportedModelException("Error while reading model!", 0);
 		}
 		final VelvetParser parser = new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
@@ -507,7 +508,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			parseModel(root);
 			parseAttributeConstraints();
 		} catch (final RecognitionException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			UnsupportedModelException unsupportedModelException = new UnsupportedModelException(e.getMessage(), e.line);
 			unsupportedModelException.addSuppressed(e);
 			throw unsupportedModelException;
@@ -634,7 +635,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 					return null;
 				}
 			} else {
-				FMCorePlugin.getDefault().logWarning(format("Project %s is not accessible.", name));
+				Logger.logWarning(format("Project %s is not accessible.", name));
 			}
 		}
 
@@ -697,7 +698,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 			return file.getProject();
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return null;
 		}
 	}
@@ -1273,7 +1274,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		if (modelMarkerHandler != null) {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
-		FMCorePlugin.getDefault().logWarning(message + " (at line " + curNode.getLine()
+		Logger.logWarning(message + " (at line " + curNode.getLine()
 				+ ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \"" + curNode.getText() + "\")");
 	}
 

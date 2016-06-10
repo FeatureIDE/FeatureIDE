@@ -18,40 +18,27 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.statistics.ui.helper.jobs;
+package de.ovgu.featureide.fm.core.job;
 
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
-import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * A internal job for the statistics view.
  * 
- * @author Dominik Hamann
+ * @author Sebastian Krieter
  */
-public abstract class StoppableTreeJob extends AStoppableJob  implements ITreeJob {
+class Executer<T> {
 
-	public StoppableTreeJob(String name, Parent calculated) {
-		super(name);
-		this.calculated = calculated;
+	protected final LongRunningMethod<T> method;
+
+	public Executer(LongRunningMethod<T> method) {
+		this.method = method;
 	}
 
-	protected Parent calculated;
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.statistics.ui.helper.ITreeJob#getCalculated()
-	 */
-	@Override
-	public Parent getCalculated() {
-		return calculated;
+	public void cancel() {
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.statistics.ui.helper.ITreeJob#setCalculated()
-	 */
-	@Override
-	public void setCalculated(Parent calculated) {
-	this.calculated = calculated;
+	public T execute(IMonitor monitor) throws Exception {
+		return method.execute(monitor);
 	}
-
-
 
 }

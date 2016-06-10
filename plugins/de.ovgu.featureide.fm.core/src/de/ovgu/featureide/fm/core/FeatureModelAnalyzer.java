@@ -41,9 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.CheckForNull;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.prop4j.And;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
@@ -66,6 +63,8 @@ import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
  * the corresponding methods in {@link IFeatureModel}
@@ -127,8 +126,7 @@ public class FeatureModelAnalyzer {
 	 */
 	private boolean cancel = false;
 
-	@CheckForNull
-	private IProgressMonitor monitor;
+	private IMonitor monitor = new NullMonitor();
 
 	private FeatureDependencies dependencies;
 	
@@ -237,7 +235,7 @@ public class FeatureModelAnalyzer {
 		try {
 			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return false;
 		}
 	}
@@ -541,9 +539,9 @@ public class FeatureModelAnalyzer {
 	 * Hashing might be fast for locating features, but creating a HashSet is costly 
 	 * So LinkedLists are much faster because the number of feature in the set is usually small (e.g. dead features)
 	 */
-	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
+	public HashMap<Object, Object> analyzeFeatureModel(IMonitor monitor) {
 		resetAttributeFlags();
-		this.monitor = monitor;
+		this.monitor = monitor == null ? new NullMonitor() : monitor;
 		if (calculateConstraints) {
 			beginTask(fm.getConstraintCount() + 2);
 		} else {
@@ -565,9 +563,8 @@ public class FeatureModelAnalyzer {
 	}
 
 	private void beginTask(int totalWork) {
-		if (monitor != null) {
-			monitor.beginTask(ANALYZE, totalWork);
-		}
+		monitor.setTaskName(ANALYZE);
+		monitor.setRemainingWork(totalWork);
 	}
 
 	public void updateConstraints(HashMap<Object, Object> oldAttributes,
@@ -599,7 +596,7 @@ public class FeatureModelAnalyzer {
 									ConstraintAttribute.VOID_MODEL, false);
 						}
 					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 					// contradiction?
 					SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
@@ -612,13 +609,11 @@ public class FeatureModelAnalyzer {
 									ConstraintAttribute.UNSATISFIABLE, false);
 						}
 					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 
 				}
-				if (monitor != null) {
-					monitor.done();
-				}
+				monitor.done();
 				return;
 			}
 			
@@ -649,7 +644,7 @@ public class FeatureModelAnalyzer {
 								continue;
 							}
 						} catch (TimeoutException e) {
-							FMCorePlugin.getDefault().logError(e);
+							Logger.logError(e);
 						}
 					}
 					
@@ -721,24 +716,21 @@ public class FeatureModelAnalyzer {
 
 			}
 		} catch (ConcurrentModificationException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 	
 	private boolean canceled() {
-		return cancel || (monitor != null ? monitor.isCanceled() : false);
+		monitor.checkCancel();
+		return cancel;
 	}
 
 	private void worked(int workDone) {
-		if (monitor != null) {
-			monitor.worked(workDone);
-		}
+		monitor.step();
 	}
 	
 	private void setSubTask(String name) {
-		if (monitor != null) {
-			monitor.subTask(name);
-		}
+		monitor.setTaskNameSuffix(name);
 	}
 
 	private void findRedundantConstraints(IFeatureModel clone, IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object,Object> oldAttributes) {
@@ -771,7 +763,7 @@ public class FeatureModelAnalyzer {
 			cachedValidity = isValid();
 		} catch (TimeoutException e) {
 			cachedValidity = true;
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		
 		try {
@@ -794,7 +786,7 @@ public class FeatureModelAnalyzer {
 			}
 			
 		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 
 		try {
@@ -804,7 +796,7 @@ public class FeatureModelAnalyzer {
 				worked(1);
 			}
 		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		calculateHidden(changedAttributes);
 	}

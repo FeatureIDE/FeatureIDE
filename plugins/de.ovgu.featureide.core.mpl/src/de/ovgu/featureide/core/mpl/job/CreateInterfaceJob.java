@@ -22,10 +22,12 @@ package de.ovgu.featureide.core.mpl.job;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATED_INTERFACE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_INTERFACE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_CREATING_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INTERFACES;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -33,8 +35,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -51,13 +51,14 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
-
-import org.eclipse.core.resources.IFile;
 
 /**
  * Create mpl interfaces.
@@ -91,58 +92,37 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 	}
 
 	@Override
-	public IFeatureModel execute(WorkMonitor monitor) throws Exception {
-		return createInterface(arguments.featuremodel, arguments.featureNames);
+	public IFeatureModel execute(IMonitor workMonitor) throws Exception {
+		newInterfaceModel = createInterface(arguments.featuremodel, arguments.featureNames, workMonitor);
+		return newInterfaceModel;
 	}
 
-	@Override
-	protected boolean work() {
-		newInterfaceModel = createInterface(arguments.featuremodel, arguments.featureNames);
-
-		if (project == null) {
-			return true;
-		}
-
+	private boolean write() {
 		String projectName = arguments.projectName;
 		String interfaceName = "I" + projectName;
 		newInterfaceModel.getStructure().getRoot().getFeature().setName(interfaceName);
 
-		XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(newInterfaceModel);
-		String interfaceContent = modelWriter.writeToString();
-
 		try {
-			// create interface
-			IFolder mplFolder = project.getFolder(INTERFACES);
-			if (!mplFolder.exists()) {
-				mplFolder.create(true, true, null);
-			}
-
-			IFile interfaceFile = mplFolder.getFile(interfaceName + ".xml");
-
-			// TODO: warning for existing interface file
-			if (!interfaceFile.exists()) {
-				ByteArrayInputStream interfaceContentStream = new ByteArrayInputStream(interfaceContent.getBytes());
-				interfaceFile.create(interfaceContentStream, true, null);
-				interfaceContentStream.close();
-			} else {
-				ByteArrayInputStream interfaceContentStream = new ByteArrayInputStream(interfaceContent.getBytes());
-				interfaceFile.setContents(interfaceContentStream, true, false, null);
-				interfaceContentStream.close();
-			}
-		} catch (CoreException | IOException e) {
-			e.printStackTrace();
+			FileSystem.mkDir(Paths.get(INTERFACES));
+		} catch (IOException e) {
+			MPLPlugin.getDefault().logError(e);
 		}
+		final ProblemList problems = FileHandler.save(Paths.get(INTERFACES + File.pathSeparator + interfaceName + ".xml"), newInterfaceModel, new XmlFeatureModelFormat());
+		if (problems.containsError()) {
+			CorePlugin.getDefault().logError(ERROR_WHILE_CREATING_FEATURE_MODEL + "\n" + problems.getErrors().toString(), new Exception());
+		}
+		
 		MPLPlugin.getDefault().logInfo(CREATED_INTERFACE_);
 		return true;
 	}
 
-	private IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
+	private IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames, IMonitor workMonitor) {
 		// Calculate Constraints
 		IFeatureModel m = orgFeatureModel.clone();
 		for (IFeature feat : m.getFeatures()) {
 			feat.getStructure().setAbstract(!selectedFeatureNames.contains(feat.getName()));
 		}
-		workMonitor.setMaxAbsoluteWork(3);
+		workMonitor.setRemainingWork(3);
 		ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(m));
 		removeFeatures.removeAll(selectedFeatureNames);
 		Node cnf = null;
@@ -204,7 +184,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 
 		if (cnf instanceof And) {
 			final Node[] children = cnf.getChildren();
-			workMonitor.setMaxAbsoluteWork(children.length + 2);
+			workMonitor.setRemainingWork(children.length + 2);
 
 			final SatSolver modelSatSolver = new SatSolver(AdvancedNodeCreator.createCNF(m), 1000, false);
 			workMonitor.worked();

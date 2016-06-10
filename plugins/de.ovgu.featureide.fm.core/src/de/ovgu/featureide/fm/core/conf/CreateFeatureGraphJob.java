@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.conf;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -53,7 +52,7 @@ import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arguments> implements LongRunningMethod<IFeatureGraph> {
@@ -79,12 +78,12 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 	}
 
 	@Override
-	public IFeatureGraph execute(WorkMonitor monitor) throws Exception {
-		return createFeatureGraph();
+	public IFeatureGraph execute(IMonitor workMonitor) throws Exception {
+		return createFeatureGraph(workMonitor);
 	}
 
-	private IFeatureGraph createFeatureGraph() {
-		workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getNumberOfFeatures()) + 1);
+	protected IFeatureGraph createFeatureGraph(IMonitor workMonitor) {
+		workMonitor.setRemainingWork((2 * arguments.featureModel.getNumberOfFeatures()) + 1);
 
 		final CalcFixedThread calcThread = new CalcFixedThread(AdvancedNodeCreator.createCNF(arguments.featureModel), workMonitor);
 		calcThread.addObjects(arguments.featureModel.getFeatureTable().keySet());
@@ -108,7 +107,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 		processedParents.clear();
 
-		workMonitor.setMaxAbsoluteWork(arguments.featureModel.getNumberOfFeatures() + features.size() + 1);
+		workMonitor.setRemainingWork(arguments.featureModel.getNumberOfFeatures() + features.size() + 1);
 
 		featureGraph = new MatrixFeatureGraph(arguments.featureModel, features, coreFeatures, deadFeatures);
 
@@ -243,12 +242,10 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		return featureGraph;
 	}
 
-	@Override
-	protected boolean work() throws Exception {
+	protected boolean work(Path path, IMonitor workMonitor) throws Exception {
 		final FeatureGraphFormat format = new FeatureGraphFormat();
-		final Path path = Paths.get(project.getFile("model." + format.getSuffix()).getLocationURI());
 		if (!FileHandler.load(path, featureGraph, format).containsError()) {
-			createFeatureGraph();
+			createFeatureGraph(workMonitor);
 			FileHandler.save(path, featureGraph, format);
 		}
 		return true;
