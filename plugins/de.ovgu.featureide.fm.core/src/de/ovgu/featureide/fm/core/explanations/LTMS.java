@@ -79,6 +79,11 @@ public class LTMS {
 	private ArrayList<Literal> featuresRedundantConstr = null; // the feature from the redundant constraint
 
 	/**
+	 * Weight strings which occur in every generated explanation for a defect while searching for the shortest explanation.
+	 */
+	HashMap<String, Integer> weightedExplanations = new HashMap<String, Integer>();
+
+	/**
 	 * Constructor is used if redundant constraints are explained.
 	 * 
 	 * @param oldModel the model without the redundant constraint
@@ -129,6 +134,11 @@ public class LTMS {
 				String tmpReason = explainVariable(l);
 				addToReasonListOptionally(tmpReason);
 			}
+			// remember first explanation strings in order to weight them later according their occurrences 
+			for (String tmp : reason) {
+				weightedExplanations.put(tmp, 1);
+				weightExpl(reason, weightedExplanations, 1);
+			}
 			return reason;
 		}
 		// if we are here, propagated values via BCP lead to a false clause
@@ -159,6 +169,11 @@ public class LTMS {
 			for (Literal l : literalList) {
 				String tmpReason = explainVariable(l);
 				addToReasonListOptionally(tmpReason);
+			}
+			// remember first explanation strings in order to weight them later according their occurrences 
+			for (String tmp : reason) {
+				weightedExplanations.put(tmp, 1);
+				weightExpl(reason, weightedExplanations, 1);
 			}
 			return reason;
 		}
@@ -191,6 +206,11 @@ public class LTMS {
 				String tmpReason = explainVariable(l);
 				addToReasonListOptionally(tmpReason);
 			}
+			// remember first explanation strings in order to weight them later according their occurrences 
+			for (String tmp : reason) {
+				weightedExplanations.put(tmp, 1);
+				weightExpl(reason, weightedExplanations, 1);
+			}
 			return reason;
 		}
 		findOpenClauses(deads, clauses);
@@ -209,9 +229,6 @@ public class LTMS {
 	 * @return String the shortest explanation
 	 */
 	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
-
-		//Weight strings which occur in every generated explanation for a defect while searching for the shortest explanation.
-		HashMap<String, Integer> weightedExplanations = new HashMap<String, Integer>();
 		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
 		int allExpl = 1; // remember number of explanations
 
@@ -222,8 +239,8 @@ public class LTMS {
 		while (!stackOpenClause.isEmpty()) { // generate explanations until stack with unit open clauses is empty
 
 			// restore preconditions to start BCP algorithm again
-			allExpl++;
 			reason.clear();
+			violatedClause = null;
 			setTruthValToUnknown(clauses);
 
 			switch (mode) {
@@ -249,17 +266,20 @@ public class LTMS {
 				return shortestExpl;
 			}
 			BCP(clauses); // generate new explanation with remaining clauses in stack 
+			if (!reason.isEmpty()) {
+				allExpl++;
 
-			// remember how often a certain string occurred in several explanations for the same defect
-			for (String tmp : reason) {
-				if (weightedExplanations.containsKey(tmp)) {
-					weightedExplanations.put(tmp, weightedExplanations.get(tmp) + 1);
-				} else {
-					weightedExplanations.put(tmp, 1);
+				// remember how often a certain string occurred in several explanations for the same defect
+				for (String tmp : reason) {
+					if (weightedExplanations.containsKey(tmp)) {
+						weightedExplanations.put(tmp, weightedExplanations.get(tmp) + 1);
+					} else {
+						weightedExplanations.put(tmp, 1);
+					}
 				}
-			}
-			if (!reason.isEmpty() && reason.size() < shortestExpl.size()) { //remember only shortest explanation
-				shortestExpl = (List<String>) ((ArrayList<String>) reason).clone();
+				if (reason.size() < shortestExpl.size()) { //remember only shortest explanation
+					shortestExpl = (List<String>) ((ArrayList<String>) reason).clone();
+				}
 			}
 		}
 		// if we are here, shortest explanation is found
@@ -297,9 +317,9 @@ public class LTMS {
 			String explMap = it2.next();
 			for (ListIterator<String> itr = shortest.listIterator(); itr.hasNext();) {
 				String explShortest = (String) itr.next(); // A => B
-				if (explMap.equals(explShortest)) {	
+				if (explMap.equals(explShortest)) {
 					int cntOccur = weighted.get(explMap);
-					itr.set(explShortest + "$" + cntOccur+"/"+cntAllExpl);
+					itr.set(explShortest + "$" + cntOccur + "/" + cntAllExpl);
 					break;
 				}
 			}
