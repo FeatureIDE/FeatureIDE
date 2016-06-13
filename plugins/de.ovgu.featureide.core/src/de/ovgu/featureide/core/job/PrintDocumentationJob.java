@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.job;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
@@ -220,8 +221,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		final HashSet<String> packageSet = new HashSet<String>();
 		final LinkedList<String> classList = new LinkedList<String>();
 		final ProjectStructure structure = new ProjectStructure(it);
-		final String docOutput = folderPath + "\\doc\\";
-		final String srcOutput = folderPath + "\\src\\";
+		final String docOutput = folderPath + File.separator + "doc" + File.separator;
+		final String srcOutput = folderPath + File.separator + "src" + File.separator;
 		
 		workMonitor.setMaxAbsoluteWork(structure.getClasses().size() + 2);
 		
