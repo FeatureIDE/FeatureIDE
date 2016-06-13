@@ -22,6 +22,7 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
 
 /**
  * 
@@ -41,6 +42,15 @@ public class FSTModelForPP extends FSTModel {
 
 	public void setExtendedFst(FSTModel extendedFst) {
 		this.extendedFst = extendedFst;
+	}
+	
+	@Override
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.FSTModel#getProjectSignatures()
+	 */
+	public ProjectSignatures getProjectSignatures() {
+	
+		return extendedFst.getProjectSignatures();
 	}
 
 }
