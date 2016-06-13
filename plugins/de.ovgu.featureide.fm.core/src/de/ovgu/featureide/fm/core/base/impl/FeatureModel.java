@@ -530,7 +530,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public void setConstraint(int index, Constraint constraint) {
+	public void setConstraint(int index, IConstraint constraint) {
 		constraints.set(index, constraint);
 	}
 
