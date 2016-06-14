@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.job;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
@@ -53,6 +54,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -147,7 +149,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			int i = 1;
 			for (SelectableFeature feature : conf.getFeatures()) {
 				Selection selection = feature.getSelection();
-				nodes[i++] = selection == Selection.UNDEFINED ? new Literal("true") : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue) : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
 			}
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
@@ -220,8 +222,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		final HashSet<String> packageSet = new HashSet<String>();
 		final LinkedList<String> classList = new LinkedList<String>();
 		final ProjectStructure structure = new ProjectStructure(it);
-		final String docOutput = folderPath + "\\doc\\";
-		final String srcOutput = folderPath + "\\src\\";
+		final String docOutput = folderPath + File.separator + "doc" + File.separator;
+		final String srcOutput = folderPath + File.separator + "src" + File.separator;
 		
 		workMonitor.setMaxAbsoluteWork(structure.getClasses().size() + 2);
 		

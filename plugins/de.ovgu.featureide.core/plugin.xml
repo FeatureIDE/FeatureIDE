@@ -13,7 +13,6 @@
             value="true">
       </persistent>
    </extension>
-   <extension-point id="composers" name="Composers" schema="schema/composers.exsd"/>
    <extension-point id="wizard" name="Wizard" schema="schema/wizard.exsd"/>
    <extension
          id="contractMarker"

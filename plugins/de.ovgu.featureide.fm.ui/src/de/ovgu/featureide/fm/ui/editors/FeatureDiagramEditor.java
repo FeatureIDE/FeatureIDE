@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -822,7 +823,22 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case CONSTRAINT_ADD:			
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
+			reload();
+			featureModelEditor.setPageModified(true);
+			analyzeFeatureModel();
+			break;
 		case MODEL_DATA_CHANGED:
+			// clear registry
+			final Map<?, ?> registry = getEditPartRegistry();
+			for (IGraphicalFeature f: graphicalFeatureModel.getFeatures()) {
+				registry.remove(f);
+				registry.remove(f.getSourceConnection());
+			}
+			for (IGraphicalConstraint f: graphicalFeatureModel.getConstraints()) {
+				registry.remove(f);
+			}
+			graphicalFeatureModel.init();
+			setContents(graphicalFeatureModel);
 			reload();
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();

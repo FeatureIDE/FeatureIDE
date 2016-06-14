@@ -54,10 +54,12 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -329,11 +331,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			if (!folder.exists()) {
 				folder.create(true, true, null);
 			}
-			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
+			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
 			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
 			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
-		} catch (CoreException e) {
+		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}

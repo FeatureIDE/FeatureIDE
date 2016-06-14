@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.io;
 import java.util.Arrays;
 import java.util.Collection;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
@@ -32,6 +33,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Sebastian Krieter
  */
 public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
+	
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + FeatureOrderFormat.class.getSimpleName();
 	
 	@Override
 	public ProblemList read(IFeatureModel object, CharSequence source) {
@@ -71,8 +74,18 @@ public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 	}
 
 	@Override
-	public String getFactoryID() {
-		return null;
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

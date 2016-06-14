@@ -141,16 +141,16 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 						separator = SEPARATOR_CONFIGURATION;
 						break;
 					case ALL_VALID:
-						separator = SEPARATOR_CONFIGURATION;
+						separator = SEPARATOR_VARIANT;
 						break;
 					case INTEGRATION:
 						separator = SEPARATOR_INTEGRATION;
 						break;
 					case RANDOM:
-						separator = SEPARATOR_CONFIGURATION;
+						separator = SEPARATOR_RANDOM;
 						break;
 					case T_WISE:
-						separator = SEPARATOR_CONFIGURATION;
+						separator = SEPARATOR_T_WISE;
 						break;
 					default:
 						throw new RuntimeException(builder.buildType + " not supported");

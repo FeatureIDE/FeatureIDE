@@ -67,16 +67,16 @@ public class ConstraintFilter implements IFilter<IConstrainedObject> {
 				for (int i = 0; i < andChildren.length; i++) {
 					final Node andChild = andChildren[i];
 					if (andChild instanceof Or) {
-						if (!checkOr(andChild)) {
-							return false;
+						if (checkOr(andChild)) {
+							return true;
 						}
 					} else {
-						if (solver.isSatisfiable(andChild)) {
-							return false;
+						if (!solver.isSatisfiable(andChild)) {
+							return true;
 						}
 					}
 				}
-				return true;
+				return false;
 			}
 		} catch (TimeoutException e) {
 			CorePlugin.getDefault().logError(e);

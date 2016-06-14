@@ -47,12 +47,30 @@ public class ProblemList extends ArrayList<Problem> {
 	 * @return {@code true} if the list contains a problem with severity at the given minimum level or above, {@code false} otherwise.
 	 */
 	public boolean checkSeverity(Severity minimumLevel) {
-		for (Problem modelWarning : this) {
-			if (modelWarning.severity.getLevel() >= minimumLevel.getLevel()) {
+		for (Problem problem : this) {
+			if (problem.severity.getLevel() >= minimumLevel.getLevel()) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public ProblemList getErrors() {
+		return getProblemType(Severity.ERROR.getLevel());
+	}
+
+	public ProblemList getWarnings() {
+		return getProblemType(Severity.WARNING.getLevel());
+	}
+
+	public ProblemList getProblemType(int level) {
+		final ProblemList problemList = new ProblemList();
+		for (Problem problem : this) {
+			if (problem.severity.getLevel() == level) {
+				problemList.add(problem);
+			}
+		}
+		return problemList;
 	}
 
 	public boolean containsError() {
