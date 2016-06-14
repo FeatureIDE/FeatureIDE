@@ -29,6 +29,7 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -61,12 +62,14 @@ public class FalseOptional {
 		Node withoutTrueClauses = eliminateTrueClauses(node);
 		Node[] clauses = withoutTrueClauses.getChildren();
 
-		for (IFeature falsopt : falseOptionals) {
-			Literal falseOptional = new Literal(falsopt.getName());
+		for (IFeature falseopt : falseOptionals) {
+			IFeature parentFalseOpt = FeatureUtils.getParent(falseopt);
+			Literal falseOptional = new Literal(falseopt.getName());
+			Literal parent = new Literal(parentFalseOpt.getName());
 			explList.add("\nFeature " + falseOptional + " is false-optional, because:");
 			LTMS ltms = new LTMS(model);
 
-			List<String> tmpExplList  = ltms.explainFalseOpsFeature(clauses, falseOptional);
+			List<String> tmpExplList  = ltms.explainFalseOpsFeature(clauses, falseOptional, parent);
 			if (tmpExplList.isEmpty()){
 				explList.add("No explanation possible");
 			}

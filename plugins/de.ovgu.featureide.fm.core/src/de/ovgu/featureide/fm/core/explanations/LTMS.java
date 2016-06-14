@@ -153,14 +153,18 @@ public class LTMS {
 	 * 
 	 * @param clauses the clauses of the conjunctive normal form of the feature model
 	 * @param falseoptional the literal-feature which is false-optional
+	 * @param parent the literal-parent of the false optional feature
 	 * @return String an explanation why the feature is false-optional
 	 */
-	public List<String> explainFalseOpsFeature(Node[] clauses, Literal falseoptional) {
+	public List<String> explainFalseOpsFeature(Node[] clauses, Literal falseoptional, Literal parent) {
 		ArrayList<Literal> falsopts = new ArrayList<Literal>();
-		falsopts.add(falseoptional); // add all false optional features to list
+		falsopts.add(parent); 
+		falsopts.add(falseoptional); 
 		reason.clear();
 		setTruthValToUnknown(clauses);
-		valueMap.get(falseoptional.var).value = 0;
+		valueMap.get(parent.var).value = 1; // set parent of false optional feature to true
+		valueMap.get(parent.var).premise = true;
+		valueMap.get(falseoptional.var).value = 0; // set false optional feature to false
 		valueMap.get(falseoptional.var).premise = true;
 
 		// if initial truth values lead to a false clause, explain immediately
