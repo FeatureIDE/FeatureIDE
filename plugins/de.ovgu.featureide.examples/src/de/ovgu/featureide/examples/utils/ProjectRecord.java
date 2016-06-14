@@ -53,7 +53,7 @@ import de.ovgu.featureide.core.CorePlugin;
  */
 public class ProjectRecord implements Serializable {
 	private static final long serialVersionUID = 7680436510104564244L;
-	private String projectDescriptionPath;
+	private String projectDescriptionRelativePath;
 	private Collection<ProjectRecord> subProjects;
 	private String projectName;
 	private transient IProjectDescription projectDescription;
@@ -79,18 +79,17 @@ public class ProjectRecord implements Serializable {
 	}
 
 	/**
-	 * Create a record for a project based on the info in the file.
+	 * Create a record for a project based on the info given in the file.
 	 * 
 	 * @param file
 	 */
-	public ProjectRecord(File file) {
-		IPath p = new Path(file.getPath());
-		projectDescriptionPath = p.toString();
-		projectName = file.getParentFile().getName();
+	public ProjectRecord(String projectDescriptionRelativePath, String name) {
+		projectName = name;
+		this.projectDescriptionRelativePath = projectDescriptionRelativePath;
 	}
 
 	public void init() {
-		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionPath).openConnection().getInputStream()) {
+		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection().getInputStream()) {
 			projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
@@ -119,7 +118,7 @@ public class ProjectRecord implements Serializable {
 	 * @return
 	 */
 	public String getRelativeLocation() {
-		return new Path(projectDescriptionPath).removeFirstSegments(1).removeLastSegments(1).toString();
+		return new Path(projectDescriptionRelativePath).removeFirstSegments(1).removeLastSegments(1).toString();
 	}
 
 	public boolean hasSubProjects() {
@@ -208,7 +207,7 @@ public class ProjectRecord implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return projectName.hashCode();
+		return projectName.hashCode() + projectDescriptionRelativePath.hashCode();
 	}
 
 	@Override
@@ -227,7 +226,7 @@ public class ProjectRecord implements Serializable {
 	 * @return
 	 */
 	public String getIndexPath() {
-		return projectDescriptionPath.replace(".project", "index.s");
+		return projectDescriptionRelativePath.replace(".project", "index.s");
 	}
 
 	/**

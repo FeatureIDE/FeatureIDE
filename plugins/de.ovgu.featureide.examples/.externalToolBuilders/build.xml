@@ -10,7 +10,7 @@
 					<include name="/**/*.jar" />
 				</fileset>
 			</classpath>
-			<arg value="${basedir}/.."/>
+			<arg value="${basedir}"/>
 		</java>
 	</target>
 </project>

@@ -75,11 +75,14 @@ public class CreateMetaInformation {
 
 	private final static FilenameFilter projectfilter = new ProjectFilter();
 
+	private static File pluginRoot;
+
 	public static void main(String[] args) {
-		final File directory = new File(args[0] + "/" + ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
+		pluginRoot = new File(args[0]).getParentFile();
+		final File exampleDir = new File(pluginRoot, ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
 		Collection<ProjectRecord> files = new ArrayList<ProjectRecord>();
 
-		collectProjects(files, directory, null);
+		collectProjects(files, exampleDir, null);
 
 		for (ProjectRecord projectRecord : files) {
 			if (projectRecord.isNewVersion()) {
@@ -87,25 +90,27 @@ public class CreateMetaInformation {
 			}
 		}
 
-		Collection<ProjectRecord> oldFiles = readFile(new File("./projects.s"), Collection.class);
-		if (oldFiles != null && files != null && oldFiles.hashCode() != files.hashCode()) {
-			try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File("./projects.s")))) {
+		Collection<ProjectRecord> oldFiles = readFile(new File(pluginRoot, "projects.s"), Collection.class);
+		if (oldFiles == null || (files != null && oldFiles.hashCode() != files.hashCode())) {
+			try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(pluginRoot, "projects.s")))) {
 				obj.writeObject(files);
-			} catch (IOException e){
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Changed project list:");
-			if (new ArrayList<>(oldFiles).addAll(files)) {
-				for (ProjectRecord projectRecord : files) {
-					if (!oldFiles.contains(projectRecord)) {
-						System.out.printf("New Project: %s \n", projectRecord.getProjectName());
+			System.out.println("Changed project list...");
+			if (oldFiles != null) {
+				if (new ArrayList<>(oldFiles).addAll(files)) {
+					for (ProjectRecord projectRecord : files) {
+						if (!oldFiles.contains(projectRecord)) {
+							System.out.printf("New Project: %s \n", projectRecord.getProjectName());
+						}
 					}
 				}
-			}
-			if (new ArrayList<>(files).addAll(oldFiles)) {
-				for (ProjectRecord projectRecord : oldFiles) {
-					if (!files.contains(projectRecord)) {
-						System.out.printf("Removed Project: %s \n", projectRecord.getProjectName());
+				if (new ArrayList<>(files).addAll(oldFiles)) {
+					for (ProjectRecord projectRecord : oldFiles) {
+						if (!files.contains(projectRecord)) {
+							System.out.printf("Removed Project: %s \n", projectRecord.getProjectName());
+						}
 					}
 				}
 			}
@@ -143,7 +148,8 @@ public class CreateMetaInformation {
 			IPath p = new Path(file.getPath());
 			p = p.removeFirstSegments(1);
 			if (file.isFile() && IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getName())) {
-				newProject = new ProjectRecord(file);
+				newProject = new ProjectRecord(new Path(file.getPath()).makeRelativeTo(new Path(CreateMetaInformation.pluginRoot.getPath())).toString(),
+						file.getParentFile().getName());
 				newProject.setIsNewVersion(createIndex(file));
 
 				projects.add(newProject);
