@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -148,7 +149,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			int i = 1;
 			for (SelectableFeature feature : conf.getFeatures()) {
 				Selection selection = feature.getSelection();
-				nodes[i++] = selection == Selection.UNDEFINED ? new Literal("true") : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue) : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
 			}
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));

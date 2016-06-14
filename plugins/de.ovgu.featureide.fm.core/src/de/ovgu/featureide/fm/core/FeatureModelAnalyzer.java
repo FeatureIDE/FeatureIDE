@@ -378,14 +378,14 @@ public class FeatureModelAnalyzer {
 	}
 
 	public Node conjunct(final Collection<IFeature> b) {
-		return new And(map(b, new IFunction<IFeature, Literal>() {
+		return new And(new And(Functional.toList(map(b, new IFunction<IFeature, Literal>() {
 
 			@Override
 			public Literal invoke(IFeature t) {
 				return new Literal(NodeCreator.getVariable(t, fm));
 			}
 
-		}), fm);
+		}))), fm);
 	}
 	
 	
