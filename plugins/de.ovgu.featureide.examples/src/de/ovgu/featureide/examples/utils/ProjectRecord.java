@@ -62,6 +62,21 @@ public class ProjectRecord implements Serializable {
 	private transient String error = "";
 	private transient boolean hasWarnings = false;
 	private transient boolean hasErrors = false;
+	private transient boolean newVersion = false;
+
+	/**
+	 * @return the newVersion
+	 */
+	public boolean isNewVersion() {
+		return newVersion;
+	}
+
+	/**
+	 * @param newVersion the newVersion to set
+	 */
+	public void setIsNewVersion(boolean newVersion) {
+		this.newVersion = newVersion;
+	}
 
 	/**
 	 * Create a record for a project based on the info in the file.
@@ -82,7 +97,6 @@ public class ProjectRecord implements Serializable {
 		}
 		
 		projectName = projectDescription.getName();
-
 
 		comment = new CommentParser(projectDescription.getComment());
 

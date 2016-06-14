@@ -21,10 +21,12 @@
 package de.ovgu.featureide.examples.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,15 +53,15 @@ public class CreateMetaInformation {
 	 * The filter to not return specific files...
 	 */
 	private static class NameFilter implements FilenameFilter {
-		final static Set<String> names = new HashSet<String>(Arrays.asList( ".svn", ".git", ".gitignore", ".metadata", "index.s", "bin"));
+		final static Set<String> names = new HashSet<String>(Arrays.asList(".svn", ".git", ".gitignore", ".metadata", "index.s", "bin"));
 
 		public boolean accept(File dir, String name) {
 			return !names.contains(name);
 		}
 	};
-	
+
 	private final static FilenameFilter filter = new NameFilter();
-	
+
 	/**
 	 * The filter to not return specific files...
 	 */
@@ -70,22 +72,43 @@ public class CreateMetaInformation {
 			return !names.contains(name);
 		}
 	};
-	
+
 	private final static FilenameFilter projectfilter = new ProjectFilter();
 
 	public static void main(String[] args) {
-		final File directory = new File(args[0]+ "/" + ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
+		final File directory = new File(args[0] + "/" + ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
 		Collection<ProjectRecord> files = new ArrayList<ProjectRecord>();
+
 		collectProjects(files, directory, null);
+
 		for (ProjectRecord projectRecord : files) {
-			System.out.println(projectRecord.getProjectName());
+			if (projectRecord.isNewVersion()) {
+				System.out.printf("New index file for project %s was created \n", projectRecord.getProjectName());
+			}
 		}
-		try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File("./projects.s")))) {
-			obj.writeObject(files);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+		Collection<ProjectRecord> oldFiles = readFile(new File("./projects.s"), Collection.class);
+		if (oldFiles != null && files != null && oldFiles.hashCode() != files.hashCode()) {
+			try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File("./projects.s")))) {
+				obj.writeObject(files);
+			} catch (IOException e){
+				e.printStackTrace();
+			}
+			System.out.println("Changed project list:");
+			if (new ArrayList<>(oldFiles).addAll(files)) {
+				for (ProjectRecord projectRecord : files) {
+					if (!oldFiles.contains(projectRecord)) {
+						System.out.printf("New Project: %s \n", projectRecord.getProjectName());
+					}
+				}
+			}
+			if (new ArrayList<>(files).addAll(oldFiles)) {
+				for (ProjectRecord projectRecord : oldFiles) {
+					if (!files.contains(projectRecord)) {
+						System.out.printf("Removed Project: %s \n", projectRecord.getProjectName());
+					}
+				}
+			}
 		}
 	}
 
@@ -121,7 +144,8 @@ public class CreateMetaInformation {
 			p = p.removeFirstSegments(1);
 			if (file.isFile() && IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getName())) {
 				newProject = new ProjectRecord(file);
-				createIndex(file);
+				newProject.setIsNewVersion(createIndex(file));
+
 				projects.add(newProject);
 			}
 		}
@@ -168,21 +192,51 @@ public class CreateMetaInformation {
 					path = path.removeFirstSegments(segmentsToRemove);
 					list.add(path.toString());
 				}
+
 			}
+
 		}
 	}
 
-	private static void createIndex(File projectFile) {
+	/**
+	 * 
+	 * @param projectFile
+	 * @return
+	 */
+	private static boolean createIndex(File projectFile) {
 		File projectDir = projectFile.getParentFile();
 		List<String> listOfFiles = new ArrayList<>();
+		List<String> listOfFilesOld = null;
 		createIndex(projectDir, listOfFiles, new Path(projectDir.getPath()).segmentCount());
-		try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(projectDir, "index.s")))) {
-			obj.writeObject(listOfFiles);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+
+		listOfFilesOld = readFile(new File(projectDir, "index.s"), List.class);
+
+		if ((listOfFilesOld == null) || listOfFilesOld.hashCode() != listOfFiles.hashCode()) {
+			if (listOfFilesOld == null || (listOfFilesOld != null && !listOfFiles.equals(listOfFilesOld))) {
+
+				try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(projectDir, "index.s")))) {
+					obj.writeObject(listOfFiles);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private static <T> T readFile(File fileToRead, Class<T> classType) {
+		if (!fileToRead.exists()) {
+			return null;
+		}
+		try (ObjectInputStream obj = new ObjectInputStream(new FileInputStream(fileToRead))) {
+			return classType.cast(obj.readObject());
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 }
