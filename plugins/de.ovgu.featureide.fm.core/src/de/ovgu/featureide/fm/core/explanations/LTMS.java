@@ -134,11 +134,16 @@ public class LTMS {
 				String tmpReason = explainVariable(l);
 				addToReasonListOptionally(tmpReason);
 			}
-			// remember first explanation strings in order to weight them later according their occurrences 
+			//weight explanation strings according their occurrences 
 			for (String tmp : reason) {
-				Redundancy.getWeighted().put(tmp, 1);
-				Redundancy.setCntExpl(); // increase counter of explanations by 1
+				if (Redundancy.getWeighted().containsKey(tmp)) {
+					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+				} else {
+					Redundancy.getWeighted().put(tmp, 1);
+				}
+				Redundancy.setCntExpl(); // increase counter of explanations by 1				
 			}
+
 			return reason;
 		}
 		// if we are here, propagated values via BCP lead to a false clause
@@ -290,6 +295,7 @@ public class LTMS {
 			}
 			BCP(clauses); // generate new explanation with remaining clauses in stack 
 			if (!reason.isEmpty()) {
+
 				allExpl++;
 				Redundancy.setCntExpl();
 
@@ -302,7 +308,7 @@ public class LTMS {
 							weightedExplanations.put(tmp, 1);
 						}
 					}
-				} else { 	// remember explanation parts for different truth values of feat. from redundant constraint
+				} else { // remember explanation parts for different truth values of feat. from redundant constraint
 					for (String tmp : reason) {
 						if (Redundancy.getWeighted().containsKey(tmp)) {
 							Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
@@ -324,7 +330,7 @@ public class LTMS {
 	}
 
 	/**
-	 * Processes the shortest explanation and marks every part of an explanation according to its occurrence. 
+	 * Processes the shortest explanation and marks every part of an explanation according to its occurrence.
 	 * Explanation parts which occur most often possess a high probability to cause the defect to explain.
 	 * 
 	 * @param shortest the shortest explanation

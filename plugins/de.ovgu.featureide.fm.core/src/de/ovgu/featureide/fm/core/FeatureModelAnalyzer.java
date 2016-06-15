@@ -765,7 +765,7 @@ public class FeatureModelAnalyzer {
 
 			Redundancy redundancy = new Redundancy();
 			List<String> expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
-
+			
 			redundantExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
 			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
 				changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
