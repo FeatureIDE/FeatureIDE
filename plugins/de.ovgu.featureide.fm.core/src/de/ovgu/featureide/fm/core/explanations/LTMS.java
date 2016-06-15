@@ -136,8 +136,8 @@ public class LTMS {
 			}
 			// remember first explanation strings in order to weight them later according their occurrences 
 			for (String tmp : reason) {
-				weightedExplanations.put(tmp, 1);
-				weightExpl(reason, weightedExplanations, 1);
+				Redundancy.getWeighted().put(tmp, 1);
+				Redundancy.setCntExpl(); // increase counter of explanations by 1
 			}
 			return reason;
 		}
@@ -158,8 +158,8 @@ public class LTMS {
 	 */
 	public List<String> explainFalseOpsFeature(Node[] clauses, Literal falseoptional, Literal parent) {
 		ArrayList<Literal> falsopts = new ArrayList<Literal>();
-		falsopts.add(parent); 
-		falsopts.add(falseoptional); 
+		falsopts.add(parent);
+		falsopts.add(falseoptional);
 		reason.clear();
 		setTruthValToUnknown(clauses);
 		valueMap.get(parent.var).value = 1; // set parent of false optional feature to true
@@ -234,11 +234,30 @@ public class LTMS {
 	 */
 	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
 		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
-		int allExpl = 1; // remember number of explanations
+		int allExpl = 1;
 
-		// remember first explanation strings in order to weight them later according their occurrences 
-		for (String tmp : shortestExpl) {
-			weightedExplanations.put(tmp, 1);
+		// count number of explanations outside this class due to different truth values for features from redundant constraint
+		if (Redundancy.getCntExpl() == 0) {
+			Redundancy.setCntExpl();
+		}
+
+		// remember first explanation parts in order to weight them later according their occurrences 
+		if (mode != ExplanationMode.Redundancy) {
+			for (String tmp : shortestExpl) {
+				weightedExplanations.put(tmp, 1);
+			}
+		} else { // only increase counter of explanations if we are here due to further truth values for feat. from redundant constraint 
+			if (Redundancy.getCntExpl() != 1) {
+				Redundancy.setCntExpl();
+			}
+			// remember explanation parts for different truth values of feat. from redundant constraint
+			for (String tmp : shortestExpl) {
+				if (Redundancy.getWeighted().containsKey(tmp)) {
+					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+				} else {
+					Redundancy.getWeighted().put(tmp, 1);
+				}
+			}
 		}
 		while (!stackOpenClause.isEmpty()) { // generate explanations until stack with unit open clauses is empty
 
@@ -272,13 +291,24 @@ public class LTMS {
 			BCP(clauses); // generate new explanation with remaining clauses in stack 
 			if (!reason.isEmpty()) {
 				allExpl++;
+				Redundancy.setCntExpl();
 
 				// remember how often a certain string occurred in several explanations for the same defect
-				for (String tmp : reason) {
-					if (weightedExplanations.containsKey(tmp)) {
-						weightedExplanations.put(tmp, weightedExplanations.get(tmp) + 1);
-					} else {
-						weightedExplanations.put(tmp, 1);
+				if (mode != ExplanationMode.Redundancy) {
+					for (String tmp : reason) {
+						if (weightedExplanations.containsKey(tmp)) {
+							weightedExplanations.put(tmp, weightedExplanations.get(tmp) + 1);
+						} else {
+							weightedExplanations.put(tmp, 1);
+						}
+					}
+				} else { 	// remember explanation parts for different truth values of feat. from redundant constraint
+					for (String tmp : reason) {
+						if (Redundancy.getWeighted().containsKey(tmp)) {
+							Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+						} else {
+							Redundancy.getWeighted().put(tmp, 1);
+						}
 					}
 				}
 				if (reason.size() < shortestExpl.size()) { //remember only shortest explanation
@@ -287,35 +317,37 @@ public class LTMS {
 			}
 		}
 		// if we are here, shortest explanation is found
-		weightExpl(shortestExpl, weightedExplanations, allExpl); // mark explanations parts within final explanation
+		if (mode != ExplanationMode.Redundancy) {
+			weightExpl(shortestExpl, weightedExplanations, allExpl); // mark explanations parts within final explanation
+		} // shortest explanation for redundant constraint is marked within class Redundancy
 		return shortestExpl;
 	}
 
 	/**
-	 * Processes the shortest explanation and marks parts of an explanation which occur in every
-	 * explanation (intersection) or are most common ones. Such explanation parts possess a high probability
-	 * to trigger the defect to explain.
+	 * Processes the shortest explanation and marks every part of an explanation according to its occurrence. 
+	 * Explanation parts which occur most often possess a high probability to cause the defect to explain.
 	 * 
 	 * @param shortest the shortest explanation
 	 * @param weighted the explanation parts to mark
 	 * @param cnt the number of explanations
 	 * @return the shortest explanation with marked explanation parts that occur most often
 	 */
-	public List<String> weightExpl(List<String> shortest, HashMap<String, Integer> weighted, int cntAllExpl) {
+	public static List<String> weightExpl(List<String> shortest, HashMap<String, Integer> weighted, int cntAllExpl) {
 
 		// remove all explanation parts which are not part of the shortest explanation
-		Iterator<String> it = weighted.keySet().iterator();
-		while (it.hasNext()) {
-			String expl = it.next();
-			if (!shortest.contains(expl)) {
-				it.remove();
-			}
-		}
+		/*	Iterator<String> it = weighted.keySet().iterator();
+			while (it.hasNext()) {
+				String expl = it.next();
+				if (!shortest.contains(expl)) {
+					it.remove();
+				}
+			}*/
 		// get max number of occurences
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		for (String key : weighted.keySet()) {
 			list.add(weighted.get(key));
 		}
+		// weight explanation parts which exist in weighted map and in shortest explanation
 		Iterator<String> it2 = weighted.keySet().iterator();
 		while (it2.hasNext()) {
 			String explMap = it2.next();

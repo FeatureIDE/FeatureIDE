@@ -58,9 +58,20 @@ public class Redundancy {
 	 * The list which contains a literal of a respective feature from the redundant constraint.
 	 */
 	private ArrayList<Literal> featRedundantConstr = null;
+	
+	/**
+	 * Weight strings which occur in every generated explanation for a redundant constraint while searching for the shortest explanation.
+	 */
+	private static HashMap<String, Integer> weightedExplRedundancy = new HashMap<String, Integer>();
+	
+	/**
+	 * Count explanations for one redundant constraint.
+	 */
+	private static int cntExpl = 1;
 
 	/**
 	 * Checks whether a string is contained in a list of strings.
+	 * 
 	 * @param list the list with all strings
 	 * @param str String to check its occurrence in the list
 	 * @param del delimiter  
@@ -92,6 +103,9 @@ public class Redundancy {
 		setNewModel(newModel);
 		featRedundantConstr = getLiterals(redundantConstraint.getNode());
 		featRedundantConstr = new ArrayList<Literal>(new LinkedHashSet<Literal>(featRedundantConstr)); // remove duplicates from list
+		weightedExplRedundancy.clear();
+		cntExpl = 0;
+		
 		List<String> explList = new ArrayList<>();
 		explList.add("\nConstraint is redundant, because:");
 		Node node = NodeCreator.createNodes(oldModel, true).toCNF();
@@ -124,6 +138,7 @@ public class Redundancy {
 				explList.add(s);
 			}
 		}
+		LTMS.weightExpl(explList,weightedExplRedundancy,cntExpl);
 		return explList;
 	}
 
@@ -143,6 +158,33 @@ public class Redundancy {
 	 */
 	public static IFeatureModel getNewModel() {
 		return newModel;
+	}
+	
+	/**
+	 * Gets map which contains all explanation parts and their occurrence in all explanations
+	 * 
+	 * @return map with weighted explanation parst
+	 */
+	public static HashMap<String, Integer> getWeighted() {
+		return weightedExplRedundancy;
+	}
+	
+	/**
+	 * Gets the number of all explanations for one redundant constraint.
+	 * 
+	 * @return number of all explanations
+	 */
+	public static int getCntExpl() {
+		return cntExpl;
+	}
+	
+	/**
+	 * Increments the number of all explanations for one redundant constraint.
+	 * 
+	 * @return incremental count of explanations
+	 */
+	public static int setCntExpl() {
+		return cntExpl++;
 	}
 
 	/**
