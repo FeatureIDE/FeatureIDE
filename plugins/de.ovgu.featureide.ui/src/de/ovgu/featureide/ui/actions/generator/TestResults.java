@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Representation of all test runs.
@@ -59,7 +58,7 @@ public class TestResults {
 		}
 		tests++;
 		if (!testResults.containsKey(klass)) {
-			testResults.put(klass, new ConcurrentHashMap<String, Set<Test>>());
+			testResults.put(klass, new TreeMap<String, Set<Test>>());
 		}
 		
 		Map<String, Set<Test>> klassTest = testResults.get(klass);
