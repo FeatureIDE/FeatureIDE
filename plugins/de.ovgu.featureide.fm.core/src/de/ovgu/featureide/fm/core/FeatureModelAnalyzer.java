@@ -656,7 +656,7 @@ public class FeatureModelAnalyzer {
 					}
 
 					if (calculateRedundantConstraints) {
-						findRedundantConstraints(clone, constraint, changedAttributes, oldAttributes);
+						findRedundantConstraints(clone, null, constraint, changedAttributes, oldAttributes);
 						if (changedAttributes.containsKey(constraint)) {
 							worked(1);
 						}
@@ -707,7 +707,7 @@ public class FeatureModelAnalyzer {
 					FalseOptional falseOpts = new FalseOptional();
 					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
 					List<String> expl = falseOpts.explain(clone, constraint.getFalseOptional());
-					
+
 					falseOptExpl.put(constrInd, expl);
 				}
 
@@ -723,7 +723,7 @@ public class FeatureModelAnalyzer {
 						DeadFeatures deadF = new DeadFeatures();
 						int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
 						List<String> expl = deadF.explain(clone, constraint, constraint.getDeadFeatures());
-						
+
 						deadFExpl.put(constrInd, expl);
 					}
 				} else {
@@ -756,19 +756,28 @@ public class FeatureModelAnalyzer {
 		}
 	}
 
-	private void findRedundantConstraints(IFeatureModel clone, IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object, Object> oldAttributes) {
+	public void findRedundantConstraints(IFeatureModel clone, IFeatureModel newModel, IConstraint constraint, Map<Object, Object> changedAttributes,
+		Map<Object, Object> oldAttributes) {
 		IFeatureModel oldModel = clone.clone(null);
 		clone.addConstraint(constraint);
+		
 		ModelComparator comparator = new ModelComparator(500);
 		Comparison comparison = comparator.compare(clone, oldModel);
 		if (comparison == Comparison.REFACTORING) {
 
 			Redundancy redundancy = new Redundancy();
-			List<String> expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
-			
-			redundantExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
-			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
-				changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
+
+			if (newModel == null) {
+				List<String> expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
+				redundantExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
+			} else { // if we are here, we generate an explanation for implicit constraints of a subtree feature model 
+				List<String> expl = redundancy.explain(oldModel, newModel, constraint);
+				redundantExpl.put(FeatureUtils.getConstraintIndex(newModel, constraint), expl);
+			}
+			if (oldAttributes != null && changedAttributes != null) {
+				if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
+					changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
+				}
 			}
 			constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT, false);
 		}
@@ -943,9 +952,12 @@ public class FeatureModelAnalyzer {
 		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000);
 		for (IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure = feature.getStructure();
-			final IFeature parent = FeatureUtils.getParent(feature);
-			if (!structure.isMandatory() && parent != null && solver.impliedValue(new Literal(parent.getName()), new Literal(feature.getName()))) {
-				falseOptionalFeatures.add(feature);
+
+			if (!FeatureUtils.getRoot(fm).toString().equals(feature.toString())) { // this might be indeed the case within the analysis for subtree dependencies
+				final IFeature parent = FeatureUtils.getParent(feature);
+				if (!structure.isMandatory() && parent != null && solver.impliedValue(new Literal(parent.getName()), new Literal(feature.getName()))) {
+					falseOptionalFeatures.add(feature);
+				}
 			}
 		}
 		return falseOptionalFeatures;
