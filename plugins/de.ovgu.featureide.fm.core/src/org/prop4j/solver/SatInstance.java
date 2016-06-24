@@ -20,6 +20,7 @@
  */
 package org.prop4j.solver;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,7 +43,9 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * 
  * @author Sebastian Krieter
  */
-public class SatInstance implements ISolverProvider {
+public class SatInstance implements ISolverProvider, Serializable {
+
+	private static final long serialVersionUID = 5698037305716648285L;
 
 	public static void updateModel(final int[] model1, int[] model2) {
 		for (int i = 0; i < model1.length; i++) {

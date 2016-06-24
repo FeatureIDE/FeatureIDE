@@ -21,47 +21,39 @@
 package de.ovgu.featureide.fm.core.conf;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
-public interface IFeatureGraph extends Serializable {
+import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 
-//	void implies(String implyFeature, String impliedFeature);
+public interface IFeatureGraph3 extends Serializable {
 
-//	void implies(String implyFeature, String impliedFeature, int negation);
+	void implies(String implyFeature, String impliedFeature);
 
-//	void setEdge(String from, String to, byte edgeType);
+	void implies(String implyFeature, String impliedFeature, int negation);
+
+	void setEdge(String from, String to, byte edgeType);
 
 	boolean setEdge(int from, int to, byte edgeType);
 
 	byte getEdge(int fromIndex, int toIndex);
-	
-//	byte getEdge(String fromIndex, String toIndex);
 
 	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
 
-//	byte getValue(String from, String to, boolean fromSelected);
-//
-//	int getFeatureIndex(String featureName);
+	int getFeatureIndex(String featureName);
 
 	int getSize();
 
-//	ArrayList<LinkedList<Expression>> getExpListAr();
+	ArrayList<LinkedList<Expression>> getExpListAr();
 
-//	int countNeighbors(String from, boolean selected, boolean subtractReal);
+	int countNeighbors(String from, boolean selected, boolean subtractReal);
 
-//	String[] getFeatureArray();
-//
-//	String[] getCoreFeatures();
-//
-//	String[] getDeadFeatures();
+	String[] getFeatureArray();
+
+	String[] getCoreFeatures();
+
+	String[] getDeadFeatures();
 	
 	void copyValues(IFeatureGraph otherGraph);
-
-	/**
-	 * @param fromIndex
-	 * @param toIndex
-	 * @param fromSelected
-	 * @return
-	 */
-	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
 
 }

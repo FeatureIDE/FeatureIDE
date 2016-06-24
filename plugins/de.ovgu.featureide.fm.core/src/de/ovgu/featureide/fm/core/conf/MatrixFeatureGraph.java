@@ -21,9 +21,9 @@
 package de.ovgu.featureide.fm.core.conf;
 
 import java.util.Arrays;
-import java.util.Collection;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import org.prop4j.solver.SatInstance;
+
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 public class MatrixFeatureGraph extends AFeatureGraph {
@@ -32,14 +32,21 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 
 	private byte[] adjMatrix;
 
-	public MatrixFeatureGraph(IFeatureModel featureModel, Collection<IFeature> variantfeatures, Collection<IFeature> coreFeatures, Collection<IFeature> deadFeatures) {
-		super(featureModel, variantfeatures, coreFeatures, deadFeatures);
+	public MatrixFeatureGraph(SatInstance satInstance, int[] index) {
+		super(satInstance, index);
 		adjMatrix = new byte[size * size];
+		featureArray = new Object[size];
+		for (int i = 0; i < featureArray.length; i++) {
+			featureArray[i] = new Object();
+		}
 	}
 	
-	public MatrixFeatureGraph(IFeatureModel featureModel) {
-		super(featureModel);
-		adjMatrix = new byte[size * size];
+	/**
+	 * @param object
+	 */
+	public MatrixFeatureGraph(IFeatureModel object) {
+		super();
+		featureArray = new Object[size];
 	}
 
 	@Override
@@ -48,6 +55,9 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 		final MatrixFeatureGraph matrixGraph = (MatrixFeatureGraph) otherGraph;
 		adjMatrix = Arrays.copyOf(matrixGraph.adjMatrix, matrixGraph.adjMatrix.length);
 	}
+	
+
+	private final Object[] featureArray;
 
 	@Override
 	public boolean setEdge(int from, int to, byte edgeType) {
@@ -132,25 +142,36 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 		final int index = (fromIndex * size) + toIndex;
 		return (byte) (((fromSelected ? (adjMatrix[index] >>> 4) : adjMatrix[index])) & 0x0000000f);
 	}
-
+	
 	@Override
-	public int countNeighbors(String from, boolean selected, boolean strongConnectionsOnly) {
-		Integer integer = featureMap.get(from);
-		if (integer == null) {
+	public byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected) {
+		final int internalFrom = index[fromIndex];
+		final int internalTo = index[toIndex];
+		if (internalFrom < 0 || internalTo < 0) {
 			return -1;
 		}
-		final int fromIndex = integer;
-
-		final byte countEdge = selected ? (strongConnectionsOnly ? (EDGE_10 | EDGE_11) : MASK_0_CLEAR) : (strongConnectionsOnly ? (EDGE_00 | EDGE_01) : MASK_1_CLEAR);
-
-		int count = 0;
-		for (int i = (fromIndex * size), end = i + size; i < end; i++) {
-			if (isEdge(adjMatrix[i], countEdge)) {
-				count++;
-			}
-		}
-
-		return count;
+		final int index = (internalFrom * size) + internalTo;
+		return (byte) (((fromSelected ? (adjMatrix[index] >>> 4) : adjMatrix[index])) & 0x0000000f);
 	}
+
+//	@Override
+//	public int countNeighbors(String from, boolean selected, boolean strongConnectionsOnly) {
+//		Integer integer = featureMap.get(from);
+//		if (integer == null) {
+//			return -1;
+//		}
+//		final int fromIndex = integer;
+//
+//		final byte countEdge = selected ? (strongConnectionsOnly ? (EDGE_10 | EDGE_11) : MASK_0_CLEAR) : (strongConnectionsOnly ? (EDGE_00 | EDGE_01) : MASK_1_CLEAR);
+//
+//		int count = 0;
+//		for (int i = (fromIndex * size), end = i + size; i < end; i++) {
+//			if (isEdge(adjMatrix[i], countEdge)) {
+//				count++;
+//			}
+//		}
+//
+//		return count;
+//	}
 
 }
