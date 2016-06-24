@@ -43,9 +43,9 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * 
  * @author Jens Meinicke
  */
-public class MASKConfigurationGenerator extends AConfigurationGenerator {
+public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 
-	public MASKConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
+	public IncLingConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
 	}
 
