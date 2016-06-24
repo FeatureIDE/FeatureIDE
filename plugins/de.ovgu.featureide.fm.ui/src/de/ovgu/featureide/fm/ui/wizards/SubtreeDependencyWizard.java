@@ -32,22 +32,22 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	/**
 	 * The subtree feature model which potentially contains implicit constraints.
 	 */
-	IFeatureModel subtreeFM; 
+	IFeatureModel subtreeFm; 
 	
 	/**
 	 * The origin feature model which contains the subtree feature model.
 	 */
 	IFeatureModel oldFm;
-	
+		
 	public SubtreeDependencyWizard(String title, IFeatureModel fm, IFeatureModel oldModel) {
 		super(title);
-		subtreeFM = fm;
+		subtreeFm = fm;
 		oldFm = oldModel;
 	}
 
 	@Override
 	public void addPages() {
-		addPage(new SubtreeDependencyPage(subtreeFM, oldFm));
+		addPage(new SubtreeDependencyPage(subtreeFm, oldFm));
 	}
 	
 	@Override

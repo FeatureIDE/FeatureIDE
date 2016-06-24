@@ -55,7 +55,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 * The origin feature model which contains the subtree feature model
 	 */
 	private final IFeatureModel oldFm; 
-	
+		
 	private static final String LABEL = CALCULATE_DEPENDENCY;
 
 	public CalculateDependencyOperation(IFeatureModel featureModel, IFeature selectedFeature) {

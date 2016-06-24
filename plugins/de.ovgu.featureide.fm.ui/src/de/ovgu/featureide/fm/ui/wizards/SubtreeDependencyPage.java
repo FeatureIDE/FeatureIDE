@@ -38,8 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * A wizard page to show implicit constraints of a subtree feature model. Enables automated analysis
@@ -89,8 +88,8 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 
 	/**
 	 * Inserts the subtree model into a container within a wizard page.
-	 * Enables automated analysis for the subtree model and explains implicit constraints 
-	 * using the underlying original feature model. 
+	 * Enables automated analysis for the subtree model and explains implicit constraints
+	 * using the underlying original feature model.
 	 * 
 	 * @param comp the Composite which contains the subtree model
 	 */
@@ -105,22 +104,18 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		subtreeModel.addListener(diagramEditor);
 		diagramEditor.initEditorView();
 
-		GraphicalFeatureModel graphicalFM = new GraphicalFeatureModel(subtreeModel);
-		graphicalFM.init();
+		analyzer.analyzeFeatureModel(null); // analyze the subtree model
+		explainImplicitConstraints(analyzer, diagramEditor.getGraphicalFeatureModel()); // explain implicit, i.e. redundant, constraints
 		diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 
-		analyzer.analyzeFeatureModel(null); // analyze the subtree model
-
-		explainImplicitConstraints(analyzer, graphicalFM); // explain implicit, i.e. redundant, constraints
-		
 		diagramEditor.internRefresh(true);
-		graphicalFM.redrawDiagram();
+		diagramEditor.getGraphicalFeatureModel().redrawDiagram();
 	}
 
 	/**
-	 * Resets the properties of a feature model, i.e. the status of features, 
-	 * the attribute of constraints and maps which store explanation. 
-	 * Else, this might influence the analysis of a subtree model which origins from 
+	 * Resets the properties of a feature model, i.e. the status of features,
+	 * the attribute of constraints and maps which store explanation.
+	 * Else, this might influence the analysis of a subtree model which origins from
 	 * the origin feature model keeping old properties.
 	 * 
 	 * @param analyzer the feature model analyzer for the subtree model
@@ -145,18 +140,21 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * @param analyzer the feature model analyzer for the subtree model
 	 * @param graphicalFeatModel the graphical feature model of the subtree feature model
 	 */
-	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, GraphicalFeatureModel graphicalFeatModel) {
+	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
 
 		// collect implicit constraints of the subtree model
 		List<IConstraint> implicitConstraints = getImplicitConstraints();
 
-		// iterate implicit constraints, generate explanations and set the respective tool tip  
+		// iterate implicit constraints and generate explanations 
 		for (IConstraint redundantC : implicitConstraints) {
 			analyzer.findRedundantConstraints(oldFm, subtreeModel, redundantC, null, null);
 			oldFm.removeConstraint(redundantC);
-			IGraphicalConstraint graphicalC = graphicalFeatModel.getGraphicalConstraint(redundantC);
-			ConstraintFigure constrFigure = new ConstraintFigure(graphicalC);
-			constrFigure.setConstraintProperties();
+
+			// remember for all respective graphical constraints that they are implicit (needed for tool tip later) 
+			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {
+				if (gc.getObject().getNode().toCNF().equals(redundantC.getNode().toCNF()))
+					gc.setConstraintImplicit(true);
+			}
 		}
 	}
 

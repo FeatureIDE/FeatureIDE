@@ -112,6 +112,10 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private void init() {
 		setText(getConstraintText(constraint.getObject()));
 		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
+
+		if (constraint.isImplicit() == true) {
+			setBorder(FMPropertyManager.getImplicitConstraintBorder(constraint.isImplicit()));
+		} 
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
 
@@ -219,8 +223,8 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	}
 
 	/**
-	 * Color explanation parts according to their occurrences in all explanations for a defect constraint. 
-	 * If expl. part occured once, it is colored black. If it occurred in every explanation, it is colored red. 
+	 * Color explanation parts according to their occurrences in all explanations for a defect constraint.
+	 * If expl. part occured once, it is colored black. If it occurred in every explanation, it is colored red.
 	 * For all other cases, a color gradient is used.
 	 * 
 	 * @param panel the panel to pass for a tool tip
@@ -247,24 +251,22 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 					}
 				}
 				//check validity
-				if (allExpl<1 || occur<1 || occur > allExpl)
-				{
-					System.out.println("inconsistent suffix: "+occur +"/"+allExpl+", use defaults 1/1");
+				if (allExpl < 1 || occur < 1 || occur > allExpl) {
+					System.out.println("inconsistent suffix: " + occur + "/" + allExpl + ", use defaults 1/1");
 					occur = 1;
 					allExpl = 1;
 				}
 				//if we are here, occur and allExpl are both >=1 and occur <= allExpl - consistent!
-				Label tmp = new Label(text + " (" + occur + "/" + allExpl +")");
-				if (allExpl == 1) { 
+				Label tmp = new Label(text + " (" + occur + "/" + allExpl + ")");
+				if (allExpl == 1) {
 					tmp.setForegroundColor(GUIBasics.createColor(255, 0, 0));
-				}
-				else{ //allExp > 1, can divide through allExpl - 1 
+				} else { //allExp > 1, can divide through allExpl - 1 
 					if (occur == 1)
-					tmp.setForegroundColor(GUIBasics.createColor(0, 0, 0)); // black for explanation part which occurs once
+						tmp.setForegroundColor(GUIBasics.createColor(0, 0, 0)); // black for explanation part which occurs once
 
-				// color gradient for remaining explanations
+					// color gradient for remaining explanations
 					else {
-						int confidence = (int)(255.0 * (occur-1.0) / (allExpl- 1.0) +0.5);
+						int confidence = (int) (255.0 * (occur - 1.0) / (allExpl - 1.0) + 0.5);
 						tmp.setForegroundColor(GUIBasics.createColor(confidence, 0, 0));
 					}
 				}

@@ -33,8 +33,12 @@ public interface IGraphicalConstraint extends IGraphicalElement {
 	IConstraint getObject();
 
 	boolean isFeatureSelected();
+	
+	boolean isImplicit();
 
 	void setFeatureSelected(boolean selected);
+	
+	void setConstraintImplicit(boolean selected);
 
 	IGraphicalConstraint clone();
 }

@@ -57,17 +57,21 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected Node propNode;
 	boolean featureSelected;
+	boolean isImplicit;
+
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
 		this.propNode = oldConstraint.propNode;
 		this.featureSelected = oldConstraint.featureSelected;
+		this.isImplicit = oldConstraint.isImplicit;
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
 		this.propNode = propNode;
 		this.featureSelected = false;
+		this.isImplicit = false;
 	}
 
 	@Override
