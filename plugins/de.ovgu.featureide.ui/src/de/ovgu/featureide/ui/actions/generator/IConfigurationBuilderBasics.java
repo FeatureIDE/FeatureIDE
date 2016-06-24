@@ -57,6 +57,8 @@ public interface IConfigurationBuilderBasics {
 			IConfigurationBuilderBasics.class.getName() + "#CreateNewProject");
 	QualifiedName T_WISE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Wise", 
 			IConfigurationBuilderBasics.class.getName() + "#T-Wise");
+	QualifiedName T_INTERACTION = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Order", 
+			IConfigurationBuilderBasics.class.getName() + "#T-Order");
 	QualifiedName GENERATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Generate", 
 			IConfigurationBuilderBasics.class.getName() + "#Generate");
 	QualifiedName ORDER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Order", 

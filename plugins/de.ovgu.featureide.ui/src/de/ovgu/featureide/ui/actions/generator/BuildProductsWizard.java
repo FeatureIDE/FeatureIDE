@@ -57,6 +57,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	public boolean performFinish() {
 		toggleState = page.getToggleState();
 		setTWise(page.getAlgorithm(), page.getT());
+		setTOrder(page.getTInteraction());
 		setGenerate(page.getBuildTypeText(page.getGeneration()));
 		setOrder(page.getSelectedOrder());
 		setTest(page.getTest());
@@ -71,7 +72,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	public void addPages() {
 		setWindowTitle(BUILD_PRODUCTS);
 		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, 
-				getAlgorithm(), getT(), getOrder(), getTest(), getMax());
+				getAlgorithm(), getT(), getT_Interaction(), getOrder(), getTest(), getMax());
 		addPage(page);
 	}
 	
@@ -117,6 +118,23 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return null;
+	}
+	
+	
+	/**
+	 * Gets the toggle state from persistent properties
+	 */
+	protected static int getT_Interaction() {
+		try {
+			final String generate = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(T_INTERACTION);
+			if (generate == null) {
+				return 2;
+			}
+			return Integer.parseInt(generate);
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return 2;
 	}
 
 	/**
@@ -209,6 +227,14 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	private void setMax(int max) {
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(MAX, max + "");
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	private void setTOrder(int t) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(T_INTERACTION, t + "");
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
