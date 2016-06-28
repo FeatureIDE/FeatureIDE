@@ -96,7 +96,8 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	public static final String PROPERTY_MANAGER_CLASS = "PropertyManager";
 	public static final String PROPERTY_MANAGER_PACKAGE = "properties";
 	public static final String GET_PROPERTY_METHOD = "getProperty";
-	public static final String[] COMPOSITION_MECHANISMS = new String[] { RUN_CONFIGURATION, PROPERTIES };
+	//the first entry represents the default composition mechanism
+	public static final String[] COMPOSITION_MECHANISMS = new String[] { PROPERTIES, RUN_CONFIGURATION};
 	
 	// TODO this must not be static
 	static ArrayList<FeatureLocation> featureLocs = new ArrayList<FeatureLocation>();
