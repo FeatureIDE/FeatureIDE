@@ -37,6 +37,8 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.Panel;
+import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -55,6 +57,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.SourceAnchor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.TargetAnchor;
@@ -128,7 +131,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		IFeature feature = this.feature.getObject();
-
+		List<String> explanation = new ArrayList<String>();
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
 			// only color if the active profile is not the default profile
@@ -176,6 +179,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 						toolTip.append(DEAD);
 						analyser.setAttributeFlag(Attribute.Dead, true);
+						explanation = FeatureModelAnalyzer.deadFeatureExpl.get(feature); // get explanation for false optional feature
 					}
 					break;
 				case FALSE_OPTIONAL:
@@ -183,6 +187,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
 					toolTip.append(FALSE_OPTIONAL);
 					analyser.setAttributeFlag(Attribute.FalseOptional, true);
+					explanation = FeatureModelAnalyzer.falseOptFeatureExpl.get(feature); // get explanation for false optional feature
 					break;
 				case INDETERMINATE_HIDDEN:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
@@ -238,8 +243,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
 		}
-
-		setToolTip(toolTipContent);
+		Panel panel = new Panel();
+		panel.setLayoutManager(new ToolbarLayout(false));
+		
+		if (explanation.isEmpty()) {
+			setToolTip(toolTipContent);
+		} else {
+			setToolTip(toolTipContent, panel, explanation);
+		}
 	}
 
 	private void appendCustomProperties(Figure toolTipContent) {
@@ -270,6 +281,67 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			toolTipContent.add(propertiesInfo);
 			toolTipContent.add(properties);
 		}
+	}
+
+	/**
+	 * Color explanation parts according to their occurrences in all explanations for a defect feature.
+	 * If expl. part occured once, it is colored black. If it occurred in every explanation, it is colored red.
+	 * For all other cases, a color gradient is used.
+	 * 
+	 * @param the origin content of a feature tool tip, i.e. feature name and respective constraints
+	 * @param panel the panel to pass for a tool tip
+	 * @param expl the explanation within a tool tip
+	 */
+	private void setToolTip(Figure content, Panel panel, List<String> expl) {
+		for (String s : expl) {
+			if (s.contains("$")) {
+				int lastChar = s.lastIndexOf("$");
+				String text = s.substring(0, lastChar); // pure explanation without delimiter and count of explanation part
+				int occur = 1; //if non-negative, intersection, number of all occurences of expl. part
+				int allExpl = 1; // number of all explanations
+				if (lastChar < s.length() - 1) {
+					String suffix = s.substring(lastChar + 1, s.length()); // 2 (occur) /3 (allExpl)
+					String[] l = suffix.split("/");
+					if (l.length == 2) {
+						try {
+							occur = Integer.parseInt(l[0]);
+							allExpl = Integer.parseInt(l[1]);
+
+						} catch (NumberFormatException e) {
+							System.out.println(e);
+						}
+					}
+				}
+				//check validity
+				if (allExpl < 1 || occur < 1 || occur > allExpl) {
+					System.out.println("inconsistent suffix: " + occur + "/" + allExpl + ", use defaults 1/1");
+					occur = 1;
+					allExpl = 1;
+				}
+				//if we are here, occur and allExpl are both >=1 and occur <= allExpl - consistent!
+				Label tmp = new Label(text + " (" + occur + "/" + allExpl + ")");
+				if (allExpl == 1) {
+					tmp.setForegroundColor(GUIBasics.createColor(255, 0, 0));
+				} else { //allExp > 1, can divide through allExpl - 1 
+					if (occur == 1)
+						tmp.setForegroundColor(GUIBasics.createColor(0, 0, 0)); // black for explanation part which occurs once
+
+					// color gradient for remaining explanations
+					else {
+						int confidence = (int) (255.0 * (occur - 1.0) / (allExpl - 1.0) + 0.5);
+						tmp.setForegroundColor(GUIBasics.createColor(confidence, 0, 0));
+					}
+				}
+				tmp.setFont(DEFAULT_FONT);
+				panel.add(tmp);
+			} else { // if we are here, we process the header of an explanation, i.e. feature x is dead, because
+				Label tmp = new Label(s);
+				tmp.setFont(DEFAULT_FONT_BOLD);
+				panel.add(tmp);
+			}
+		}
+		panel.add(content);
+		setToolTip(panel);
 	}
 
 	public ConnectionAnchor getSourceAnchor() {

@@ -21,13 +21,11 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -49,18 +47,17 @@ public class DeadFeatures {
 	 * Explains dead features using boolean constraint propagation. Sets initial truth value assumptions of dead features to true
 	 * and propagates them until a violation in a clause occurs.
 	 * 
-	 * @param newModel the model with the new constraint which leads to a dead feature
-	 * @param deadFeatures a list of dead features
+	 * @param featuremodel the model with the new constraint which leads to a dead feature
+	 * @param deadFeature a dead features
 	 * @param c the constraint which leads to a dead feature
-	 * @return String an explanation why the feature(s) is dead
+	 * @return String an explanation why the feature is dead
 	 */
-	public List<String> explain(IFeatureModel newModel, IConstraint c, Collection<IFeature> deadFeatures) {
+	public List<String> explain(IFeatureModel featuremodel, IFeature deadFeature) {
 		List<String> explList = new ArrayList<>();
-		setNewModel(newModel);
+		setFeatureModel(featuremodel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
 		
-		for (IFeature deadFeature : deadFeatures) {
 			Literal	deadF = new Literal(deadFeature.getName());
 			explList.add("\nFeature " + deadF + " is dead, because:");
 			LTMS ltms = new LTMS(model);
@@ -76,7 +73,6 @@ public class DeadFeatures {
 					explList.add(tmp);
 				}
 			}
-		}
 		return explList;
 	}
 	
@@ -85,16 +81,7 @@ public class DeadFeatures {
 	 * 
 	 * @param model the model with the new constraint
 	 */
-	private void setNewModel(IFeatureModel newModel) {
+	public static void setFeatureModel(IFeatureModel newModel) {
 		model = newModel;
-	}
-
-	/**
-	 * Gets the model with the new constraint. Used for tooltips to get the correct constraint index.
-	 * 
-	 * @return the model with the new constraint
-	 */
-	public static IFeatureModel getNewModel() {
-		return model;
 	}
 }

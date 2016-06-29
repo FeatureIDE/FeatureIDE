@@ -147,12 +147,12 @@ public class Redundancy {
 	 * 
 	 * @param model the model with the new constraint
 	 */
-	private void setNewModel(IFeatureModel model) {
+	public static void setNewModel(IFeatureModel model) {
 		newModel = model;
 	}
 
 	/**
-	 * Gets the model with the new constraint. Used for tooltips to get the correct constraint index.
+	 * Gets the model with the new constraint. Used for tool tips to get the correct constraint index.
 	 * 
 	 * @return the model with the new constraint
 	 */
@@ -163,7 +163,7 @@ public class Redundancy {
 	/**
 	 * Gets map which contains all explanation parts and their occurrence in all explanations
 	 * 
-	 * @return map with weighted explanation parst
+	 * @return map with weighted explanation parts
 	 */
 	public static HashMap<String, Integer> getWeighted() {
 		return weightedExplRedundancy;

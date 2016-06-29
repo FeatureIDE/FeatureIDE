@@ -25,9 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
@@ -45,10 +43,7 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.DeadFeatures;
-import de.ovgu.featureide.fm.core.explanations.FalseOptional;
 import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
@@ -85,11 +80,11 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 	private final Label label = new Label();
 
-	private IGraphicalConstraint constraint;
+	private IGraphicalConstraint graphicalConstraint;
 
 	public ConstraintFigure(IGraphicalConstraint constraint) {
 		super();
-		this.constraint = constraint;
+		this.graphicalConstraint = constraint;
 		setLayoutManager(new FreeformLayout());
 
 		label.setForegroundColor(CONSTRAINT_FOREGROUND);
@@ -110,11 +105,11 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	}
 
 	private void init() {
-		setText(getConstraintText(constraint.getObject()));
-		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
+		setText(getConstraintText(graphicalConstraint.getObject()));
+		setBorder(FMPropertyManager.getConstraintBorder(graphicalConstraint.isFeatureSelected()));
 
-		if (constraint.isImplicit() == true) {
-			setBorder(FMPropertyManager.getImplicitConstraintBorder(constraint.isImplicit()));
+		if (graphicalConstraint.isImplicit() == true) {
+			setBorder(FMPropertyManager.getImplicitConstraintBorder(graphicalConstraint.isImplicit()));
 		} 
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
@@ -125,7 +120,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public void setConstraintProperties() {
 		init();
 
-		IConstraint constraint = this.constraint.getObject();
+		IConstraint constraint = this.graphicalConstraint.getObject();
 
 		ConstraintAttribute constraintAttribute = constraint.getConstraintAttribute();
 		if (constraintAttribute == ConstraintAttribute.NORMAL) {
@@ -155,7 +150,18 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			IFeatureModel model = Redundancy.getNewModel();
 			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
 			// set tooltip with explanation for redundant constraint
-			List<String> explanation = FeatureModelAnalyzer.redundantExpl.get(constraintIndex);
+			List<String> explanation = FeatureModelAnalyzer.redundantConstrExpl.get(constraintIndex);
+			
+			// replace "redundant" with "transitive" in explanation if constraint represents an implicit dependency
+			if (graphicalConstraint.isImplicit()) {
+				for (int i = 0; i < explanation.size(); i++) {
+					if (explanation.get(i).contains("redundant")) {
+						String newStr = explanation.get(i).replace("redundant", "transitive");
+						explanation.set(i, newStr);
+						break;
+					} 
+				}
+			}
 			Panel panel = new Panel();
 			panel.setLayoutManager(new ToolbarLayout(false));
 			panel.add(new Label(REDUNDANCE));
@@ -163,7 +169,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 
-		StringBuilder toolTip = new StringBuilder();
+/*		StringBuilder toolTip = new StringBuilder();
 		if (!constraint.getDeadFeatures().isEmpty()) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			toolTip.append(DEAD_FEATURE);
@@ -180,7 +186,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			// set tooltip with explanation for dead feature
 			IFeatureModel model = DeadFeatures.getNewModel();
 			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
-			List<String> explanation = FeatureModelAnalyzer.deadFExpl.get(constraintIndex);
+			List<String> explanation = FeatureModelAnalyzer.deadFeatureExpl.get(constraintIndex);
 
 			Panel panel = new Panel();
 			panel.setLayoutManager(new ToolbarLayout(false));
@@ -219,7 +225,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			panel.add(new Label(toolTip.toString()));
 			setToolTip(panel, explanation);
 			return;
-		}
+		}*/
 	}
 
 	/**

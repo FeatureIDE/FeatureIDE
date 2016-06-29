@@ -100,14 +100,14 @@ public class FeatureModelAnalyzer {
 
 	private IFeatureModel fm;
 
-	//for tooltip: remember explanation for redundant constraint. Key = constraintIndex, Value = explanation
-	public static HashMap<Integer, List<String>> redundantExpl = new HashMap<Integer, List<String>>();
+	//for tool tip: remember explanation for redundant constraint. Key = constraintIndex, Value = explanation
+	public static HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<Integer, List<String>>();
 
-	//for tooltip: remember explanation for constraint which leads to dead feature. Key = constraintIndex, Value = explanation
-	public static HashMap<Integer, List<String>> deadFExpl = new HashMap<Integer, List<String>>();
+	// for tool tip: remember explanation for a dead feature. Key = Feature, Value = explanation 
+	public static HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<IFeature, List<String>>();
 
-	//for tooltip: remember explanation for constraint which leads to false optional feature. Key = constraintIndex, Value = explanation
-	public static HashMap<Integer, List<String>> falseOptExpl = new HashMap<Integer, List<String>>();
+	//for tool tip: remember explanation for a false optional feature. Key = Feature, Value = explanation
+	public static HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<IFeature, List<String>>();
 
 	/**
 	 * Defines whether features should be included into calculations.
@@ -581,7 +581,7 @@ public class FeatureModelAnalyzer {
 		SatSolver solver = new SatSolver(NodeCreator.createNodes(clone), 1000);
 
 		Collection<IFeature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
-		Collection<IFeature> fmFalseOptionals = getCachedFalseOptionalFeatures();
+		Collection<IFeature> fmFalseOptionals = getCachedFalseOptionalFeatures();	
 
 		try {
 			if (!cachedValidity) {
@@ -703,12 +703,14 @@ public class FeatureModelAnalyzer {
 				} else if (constraint.setFalseOptionalFeatures(clone, fmFalseOptionals)) {
 					constraint.setConstraintAttribute(ConstraintAttribute.FALSE_OPTIONAL, false);
 					changedAttributes.put(constraint, ConstraintAttribute.FALSE_OPTIONAL);
-
+					
+					// explain false optional features of constraint
 					FalseOptional falseOpts = new FalseOptional();
-					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-					List<String> expl = falseOpts.explain(clone, constraint.getFalseOptional());
-
-					falseOptExpl.put(constrInd, expl);
+					Collection<IFeature> foFeatures = constraint.getFalseOptional();
+					for (IFeature feature : foFeatures) {
+						List<String> expl = falseOpts.explain(clone, feature);
+						falseOptFeatureExpl.put(feature, expl);
+					}
 				}
 
 				if (!fmDeadFeatures.isEmpty()) {
@@ -719,12 +721,14 @@ public class FeatureModelAnalyzer {
 						constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
 						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
 
-						// generate explanation for the dead feature
+						// explain dead features of constraint
 						DeadFeatures deadF = new DeadFeatures();
-						int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-						List<String> expl = deadF.explain(clone, constraint, constraint.getDeadFeatures());
+						Collection<IFeature> deadfeatures = constraint.getDeadFeatures();
+						for (IFeature feature : deadfeatures) {
+						List<String> expl = deadF.explain(clone, feature);
+						deadFeatureExpl.put(feature, expl);
+						}
 
-						deadFExpl.put(constrInd, expl);
 					}
 				} else {
 					constraint.setDeadFeatures(Collections.<IFeature> emptyList());
@@ -757,23 +761,25 @@ public class FeatureModelAnalyzer {
 	}
 
 	public void findRedundantConstraints(IFeatureModel clone, IFeatureModel newModel, IConstraint constraint, Map<Object, Object> changedAttributes,
-		Map<Object, Object> oldAttributes) {
+			Map<Object, Object> oldAttributes) {
 		IFeatureModel oldModel = clone.clone(null);
 		clone.addConstraint(constraint);
-		
+
 		ModelComparator comparator = new ModelComparator(500);
 		Comparison comparison = comparator.compare(clone, oldModel);
 		if (comparison == Comparison.REFACTORING) {
 
+			// explain redundant constraint, differentiate between redundancy within a feature model 
+			// and redundancy in a sliced feature model
 			Redundancy redundancy = new Redundancy();
-
 			if (newModel == null) {
 				List<String> expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
-				redundantExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
-			} else { // if we are here, we generate an explanation for implicit constraints of a subtree feature model 
+				redundantConstrExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
+			} else { // if we are here, we generate an explanation for implicit constraints of a sliced feature model 
 				List<String> expl = redundancy.explain(oldModel, newModel, constraint);
-				redundantExpl.put(FeatureUtils.getConstraintIndex(newModel, constraint), expl);
+				redundantConstrExpl.put(FeatureUtils.getConstraintIndex(newModel, constraint), expl);
 			}
+			
 			if (oldAttributes != null && changedAttributes != null) {
 				if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
 					changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);

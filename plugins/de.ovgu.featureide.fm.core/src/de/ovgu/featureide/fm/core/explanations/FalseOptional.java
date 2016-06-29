@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,20 +50,19 @@ public class FalseOptional {
 	 * Explains false optional features using boolean constraint propagation. Sets initial truth value assumptions of false optional
 	 * features to false and propagate them until a violation in any clause occurs.
 	 * 
-	 * @param newModel the model with the new constraint which leads to a false optional feature
-	 * @param falsOptionals a list of false optional features
-	 * @return String an explanation why the feature(s) is false optional
+	 * @param featuremodel the model with the new constraint which leads to a false optional feature
+	 * @param foFeature the false optional feature
+	 * @return String an explanation why the feature is false optional
 	 */
-	public List<String> explain(IFeatureModel newModel, Collection<IFeature> falseOptionals) {
+	public List<String> explain(IFeatureModel featuremodel, IFeature foFeature) {
 		List<String> explList = new ArrayList<>();
-		setNewModel(newModel);
+		setFeatureModel(featuremodel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node withoutTrueClauses = eliminateTrueClauses(node);
 		Node[] clauses = withoutTrueClauses.getChildren();
 
-		for (IFeature falseopt : falseOptionals) {
-			IFeature parentFalseOpt = FeatureUtils.getParent(falseopt);
-			Literal falseOptional = new Literal(falseopt.getName());
+			IFeature parentFalseOpt = FeatureUtils.getParent(foFeature);
+			Literal falseOptional = new Literal(foFeature.getName());
 			Literal parent = new Literal(parentFalseOpt.getName());
 			explList.add("\nFeature " + falseOptional + " is false-optional, because:");
 			LTMS ltms = new LTMS(model);
@@ -78,7 +76,6 @@ public class FalseOptional {
 					explList.add(tmp);
 				}
 			}
-		}
 		return explList;
 	}
 
@@ -103,16 +100,7 @@ public class FalseOptional {
 	 * 
 	 * @param model the model with the new constraint
 	 */
-	private void setNewModel(IFeatureModel newModel) {
-		model = newModel;
-	}
-
-	/**
-	 * Gets the model with the new constraint. Used for tooltips to get the correct constraint index.
-	 * 
-	 * @return the model with the new constraint
-	 */
-	public static IFeatureModel getNewModel() {
-		return model;
+	public static void setFeatureModel(IFeatureModel fm) {
+		model = fm;
 	}
 }

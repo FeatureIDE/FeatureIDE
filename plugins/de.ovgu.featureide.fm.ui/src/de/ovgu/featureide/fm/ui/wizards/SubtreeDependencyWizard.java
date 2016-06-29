@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.Redundancy;
 
 /**
  * A wizard to show a subtree feature model and its implicit dependencies.
@@ -28,17 +30,17 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author "Ananieva Sofia"
  */
 public class SubtreeDependencyWizard extends AbstractWizard {
-	
+
 	/**
 	 * The subtree feature model which potentially contains implicit constraints.
 	 */
-	IFeatureModel subtreeFm; 
-	
+	IFeatureModel subtreeFm;
+
 	/**
 	 * The origin feature model which contains the subtree feature model.
 	 */
 	IFeatureModel oldFm;
-		
+
 	public SubtreeDependencyWizard(String title, IFeatureModel fm, IFeatureModel oldModel) {
 		super(title);
 		subtreeFm = fm;
@@ -49,12 +51,17 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	public void addPages() {
 		addPage(new SubtreeDependencyPage(subtreeFm, oldFm));
 	}
-	
+
 	@Override
 	public boolean performFinish() {
+		// reset model to the origin one so that constraint index is consistent when closing page
+		Redundancy.setNewModel(oldFm);
+		
+		// clear maps which hold explanations for defect constraints and features
+		FeatureModelAnalyzer.deadFeatureExpl.clear();
+		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
+		FeatureModelAnalyzer.redundantConstrExpl.clear();
 		return true;
 	}
-	
-	
 
 }

@@ -96,7 +96,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		// feature model slicing and replacing root with the selected feature
 		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, featureModel, subtreeFeatures);
 		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
-		IFeatureModel slicedModel = slice.createInterface(oldFm, subtreeFeatures);
+		IFeatureModel slicedModel = slice.createInterface(oldFm, subtreeFeatures).clone();
 		FeatureUtils.replaceRoot(slicedModel,subtreeRoot);
 		
 		// Instantiating a wizard page, removing the help button and opening a wizard dialog

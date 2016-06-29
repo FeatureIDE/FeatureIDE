@@ -853,6 +853,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
                 break;
             case CONSTRAINT_ADD:			
             case CONSTRAINT_DELETE:
+            case DEPENDENCY_CALCULATED:	
             case STRUCTURE_CHANGED:
             case MODEL_DATA_CHANGED:
                 reload();

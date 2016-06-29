@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Stack;
 
-//import org.eclipse.swt.graphics.Color;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
@@ -237,24 +236,20 @@ public class LTMS {
 	 * @param map the map which stores the initial values for features from the redundant constraint
 	 * @return String the shortest explanation
 	 */
+	@SuppressWarnings ("unchecked")
 	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
 		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
 		int allExpl = 1;
 
 		// count number of explanations outside this class due to different truth values for features from redundant constraint
-		if (Redundancy.getCntExpl() == 0) {
-			Redundancy.setCntExpl();
-		}
+		Redundancy.setCntExpl();
 
 		// remember first explanation parts in order to weight them later according their occurrences 
 		if (mode != ExplanationMode.Redundancy) {
 			for (String tmp : shortestExpl) {
 				weightedExplanations.put(tmp, 1);
 			}
-		} else { // only increase counter of explanations if we are here due to further truth values for feat. from redundant constraint 
-			if (Redundancy.getCntExpl() != 1) {
-				Redundancy.setCntExpl();
-			}
+		} else {
 			// remember explanation parts for different truth values of feat. from redundant constraint
 			for (String tmp : shortestExpl) {
 				if (Redundancy.getWeighted().containsKey(tmp)) {
@@ -264,7 +259,7 @@ public class LTMS {
 				}
 			}
 		}
-		while (!stackOpenClause.isEmpty()) { // generate explanations until stack with unit open clauses is empty
+		while (!stackOpenClause.isEmpty()) { 
 
 			// restore preconditions to start BCP algorithm again
 			reason.clear();
@@ -348,6 +343,7 @@ public class LTMS {
 					it.remove();
 				}
 			}*/
+		
 		// get max number of occurences
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		for (String key : weighted.keySet()) {
@@ -672,23 +668,23 @@ public class LTMS {
 
 				// if parent is alternative, explain alternative relationship between all children
 				if (parent.getStructure().isAlternative()) {
-					s += f.getName() + " alternative child of " + parentName;
+					s += f.getName() + " is alternative child of " + parentName;
 				}
 				// if parent is or, explain or relationship between all children
 				else if (parent.getStructure().isOr()) {
-					s += f.getName() + " or child of " + parentName;
+					s += f.getName() + " is or child of " + parentName;
 				} else { // if parent is not "alt" or "or", then feature is mandatory or optional child
-					s = featureName + (FeatureUtils.isMandatory(f) ? " mandatory" : "") + " child of " + parent;
+					s = featureName + (FeatureUtils.isMandatory(f) ? " is mandatory" : " is") + " child of " + parent;
 				}
 			}
 		}
 		//if attribute is root, print "ROOT" as explanation only
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Root) {
-			s = "ROOT " + l.var.toString();
+			s = l.var.toString() + " is ROOT";
 		}
 		// if attribute is CONSTRAINT, print origin constraint as explanation only
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Constraint) {
-			s = "Constraint " + (FeatureUtils.getConstraint(model, l.getSourceIndex())).toString();
+			s = (FeatureUtils.getConstraint(model, l.getSourceIndex())).toString() + " is Constraint";
 		}
 		return s;
 	}

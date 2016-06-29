@@ -57,7 +57,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * The origin feature model which contains the subtree feature model.
 	 */
 	private static IFeatureModel oldFm;
-
+	
 	/**
 	 * Remember explanation for redundant constraint. Key = constraintIndex, Value = explanation.
 	 * Used as tool tip for redundant constraint.
@@ -96,7 +96,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	private void setFMtoPage(Composite comp) {
 
 		FeatureModelAnalyzer analyzer = new FeatureModelAnalyzer(subtreeModel);
-		resetFeatureModelProperties(analyzer); // reset all properties to normal status
+		resetExplanations(analyzer); // reset all properties to normal status
 
 		FeatureModelEditor modeleditor = new FeatureModelEditor();
 		modeleditor.setFeatureModel(subtreeModel);
@@ -120,17 +120,17 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * 
 	 * @param analyzer the feature model analyzer for the subtree model
 	 */
-	private void resetFeatureModelProperties(FeatureModelAnalyzer analyzer) {
-		analyzer.deadFExpl.clear();
-		analyzer.falseOptExpl.clear();
-		analyzer.redundantExpl.clear();
+	private void resetExplanations(FeatureModelAnalyzer analyzer) {
+		FeatureModelAnalyzer.deadFeatureExpl.clear();
+		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
+		FeatureModelAnalyzer.redundantConstrExpl.clear();
 
-		for (IFeature feature : subtreeModel.getFeatures()) {
-			feature.getProperty().setFeatureStatus(FeatureStatus.NORMAL);
-		}
-		for (IConstraint constraint : subtreeModel.getConstraints()) {
-			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
-		}
+//		for (IFeature feature : subtreeModel.getFeatures()) {
+//			feature.getProperty().setFeatureStatus(FeatureStatus.NORMAL);
+//		}
+//		for (IConstraint constraint : subtreeModel.getConstraints()) {
+//			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
+//		}
 	}
 
 	/**
@@ -141,7 +141,6 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * @param graphicalFeatModel the graphical feature model of the subtree feature model
 	 */
 	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
-
 		// collect implicit constraints of the subtree model
 		List<IConstraint> implicitConstraints = getImplicitConstraints();
 
