@@ -29,7 +29,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_PRODUKT_BASED_STRATEGY_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINE_THE_T_FOR_T_WISE_SAMPLING_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DISSIMILARITY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_;
@@ -77,14 +76,15 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String LABEL_ALGORITHM = "&Algorithm:";
 	private static final String LABEL_ORDER = "&Order:";
 	private static final String LABEL_TEST = "&Run JUnit tests:";
-	private static final String LABEL_INTERACTIONS = "&Interactions: t=";
+	private static final String LABEL_INTERACTIONS = "&Interactions: T=";
 	private static final String LABEL_CREATE_NEW_PROJECTS = "&Create new projects:";
 
 	private static final String TOOL_TIP_GENERATE = DEFINES_THE_PRODUKT_BASED_STRATEGY_;
 	private static final String TOOL_TIP_T_WISE = DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_;
 	private static final String TOOL_TIP_ORDER = DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_;
 	private static final String TOOL_TIP_TEST = SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
-	private static final String TOOL_TIP_T = DEFINE_THE_T_FOR_T_WISE_SAMPLING_;
+	private static final String TOOL_TIP_T = "Define the T for T-wise sampling.";
+	private static final String TOOL_TIP_T_ORDER = "Define the T for odering by interactions.";
 	private static final String TOOL_TIP_PROJECT = DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
 
 	@CheckForNull
@@ -97,7 +97,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private Scale scaleTWise;
 	private Scale scaleInteraction;
 	private Label labelTWise;
-	private Label labelInteraction;
+	private Label labelOrderInteraction;
 
 	private boolean buildProjects;
 
@@ -156,7 +156,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		GridData gd_Fill_H = new GridData(GridData.FILL_HORIZONTAL);
 		GridData gd_LeftColumnInsideGroup = new GridData();
 		GridData gd_LeftColumn = new GridData();
-//		gd_LeftColumn.widthHint = gd_LeftColumnInsideGroup.widthHint + 3;
 
 		Group groupDeriveConf = new Group(container, SWT.SHADOW_ETCHED_IN);
 		groupDeriveConf.setText("Derive configurations");
@@ -207,62 +206,62 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		scaleTWise.setPageIncrement(1);
 		scaleTWise.setSelection(t);
 		setScaleTWise();
-
-		Group groupCustomize = new Group(container, SWT.SHADOW_ETCHED_IN);
-		groupCustomize.setText("Customize generated configurations");
-		groupLayout = new GridLayout();
-		groupLayout.numColumns = 2;
-		groupLayout.verticalSpacing = 5;
-		groupCustomize.setLayout(groupLayout);
-		gridDataGroup = new GridData();
-		gridDataGroup.grabExcessHorizontalSpace = true;
-		gridDataGroup.horizontalAlignment = GridData.FILL;
-		groupCustomize.setLayoutData(gridDataGroup);
-
-		Label labelOrder = new Label(groupCustomize, SWT.NULL);
-		labelOrder.setText(LABEL_ORDER);
-		labelOrder.setToolTipText(TOOL_TIP_ORDER);
-		labelOrder.setLayoutData(gd_LeftColumnInsideGroup);
-		labels.add(labelOrder);
-		comboOrder = new Combo(groupCustomize, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-		comboOrder.setLayoutData(gd_Fill_H);
-		for (BuildOrder order : BuildOrder.values()) {
-			comboOrder.add(getOrderText(order));
-		}
-		comboOrder.setText(order);
-
-		labelMax = new Label(groupCustomize, SWT.NULL);
+		
+		labelMax = new Label(groupDeriveConf, SWT.NULL);
 		labelMax.setText("Max Configurations:");
 		final String maxToolTip = "Set the maximal number of configs to generate, or empty to create all.";
 		labelMax.setToolTipText(maxToolTip);
 		labels.add(labelMax);
-		textField = new Text(groupCustomize, SWT.BORDER);
+		textField = new Text(groupDeriveConf, SWT.BORDER);
 		textField.setToolTipText(maxToolTip);
 		final GridData gridDataWidth = new GridData();
 		gridDataWidth.widthHint = 100;
 		textField.setLayoutData(gridDataWidth);
 		textField.setText(maxConfs);
 
-		labelInteraction = new Label(groupCustomize, SWT.NULL);
-		labelInteraction.setText(LABEL_INTERACTIONS + "10");
-		labelInteraction.setToolTipText(TOOL_TIP_T);
-		labels.add(labelInteraction);
-		scaleInteraction = new Scale(groupCustomize, SWT.HORIZONTAL);
+		Group groupOrder = new Group(container, SWT.SHADOW_ETCHED_IN);
+		groupOrder.setText("Order configurations");
+		groupLayout = new GridLayout();
+		groupLayout.numColumns = 2;
+		groupLayout.verticalSpacing = 5;
+		groupOrder.setLayout(groupLayout);
+		gridDataGroup = new GridData();
+		gridDataGroup.grabExcessHorizontalSpace = true;
+		gridDataGroup.horizontalAlignment = GridData.FILL;
+		groupOrder.setLayoutData(gridDataGroup);
+
+		Label labelOrder = new Label(groupOrder, SWT.NULL);
+		labelOrder.setText(LABEL_ORDER);
+		labelOrder.setToolTipText(TOOL_TIP_ORDER);
+		labelOrder.setLayoutData(gd_LeftColumnInsideGroup);
+		labels.add(labelOrder);
+		comboOrder = new Combo(groupOrder, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		comboOrder.setLayoutData(gd_Fill_H);
+		for (BuildOrder order : BuildOrder.values()) {
+			comboOrder.add(getOrderText(order));
+		}
+		comboOrder.setText(order);
+
+		labelOrderInteraction = new Label(groupOrder, SWT.NULL);
+		labelOrderInteraction.setText(LABEL_INTERACTIONS + "1");
+		labelOrderInteraction.setToolTipText(TOOL_TIP_T_ORDER);
+		labels.add(labelOrderInteraction);
+		scaleInteraction = new Scale(groupOrder, SWT.HORIZONTAL);
 		scaleInteraction.setMaximum(5);
 		scaleInteraction.setIncrement(1);
 		scaleInteraction.setPageIncrement(1);
 		scaleInteraction.setSelection(t_Interaction);
 		setScaleInteraction();
 
-		final Label labelProject = new Label(groupCustomize, SWT.NULL);
+		Composite jUnitContainer = new Composite(container, SWT.NONE);
+		final Label labelProject = new Label(jUnitContainer, SWT.NULL);
 		labelProject.setText(LABEL_CREATE_NEW_PROJECTS);
 		labelProject.setToolTipText(TOOL_TIP_PROJECT);
 		labels.add(labelProject);
-		buttonBuildProject = new Button(groupCustomize, SWT.CHECK);
+		buttonBuildProject = new Button(jUnitContainer, SWT.CHECK);
 		buttonBuildProject.setLayoutData(gd_Fill_H);
 		buttonBuildProject.setSelection(buildProjects);
 
-		Composite jUnitContainer = new Composite(container, SWT.NONE);
 		groupLayout = new GridLayout();
 		groupLayout.numColumns = 2;
 		groupLayout.verticalSpacing = 5;
@@ -363,7 +362,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 		if (lastSelection > scaleInteraction.getMaximum()) {
 			scaleInteraction.setSelection(scaleInteraction.getMaximum());
-			labelInteraction.setText(LABEL_INTERACTIONS + scaleInteraction.getMaximum());
+			labelOrderInteraction.setText(LABEL_INTERACTIONS + scaleInteraction.getMaximum());
 		}
 	}
 
@@ -411,7 +410,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		int perspectiveValue = scaleTWise.getSelection();
 		labelTWise.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
 		perspectiveValue = scaleInteraction.getSelection();
-		labelInteraction.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
+		labelOrderInteraction.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
 
 		if (!checkMaxConfigurationsEntry()) {
 			return;
@@ -463,7 +462,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		scaleInteraction.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				int selection = scaleInteraction.getSelection();
-				labelInteraction.setText(LABEL_INTERACTIONS + selection);
+				labelOrderInteraction.setText(LABEL_INTERACTIONS + selection);
 				dialogChanged();
 			}
 		});

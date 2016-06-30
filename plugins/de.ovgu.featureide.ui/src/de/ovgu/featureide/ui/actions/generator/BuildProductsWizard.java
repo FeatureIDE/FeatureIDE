@@ -25,8 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PRODUCTS
 import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -63,7 +63,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		setTest(page.getTest());
 		setMax(page.getMax());
 		new ConfigurationBuilder(featureProject, page.getGeneration(),
-				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest(), page.getMax());
+				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest(), page.getMax(), page.getTInteraction());
 		
 		return true;
 	}
