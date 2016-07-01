@@ -35,7 +35,7 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * 
  * @author Jens Meinicke
  */
-public class RandConfigurationGenerator extends MASKConfigurationGenerator {
+public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
 
 	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);

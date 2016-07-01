@@ -50,7 +50,7 @@ public interface IConfigurationBuilderBasics {
 	
 	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION, RANDOM};
 	enum BuildOrder {DEFAULT, DISSIMILARITY, INTERACTION};
-	enum TWise {ICPL, CHVATAL, CASA, MASK}
+	enum TWise {ICPL, CHVATAL, CASA, INCLING}
 	
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
 	QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 

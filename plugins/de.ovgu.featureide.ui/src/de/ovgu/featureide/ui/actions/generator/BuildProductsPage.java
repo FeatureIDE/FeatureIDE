@@ -33,8 +33,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DEFNIES_WHETHE
 import static de.ovgu.featureide.fm.core.localization.StringTable.DISSIMILARITY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INCLING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INTERACTIONS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RANDOM_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.T_WISE_CONFIGURATIONS;
@@ -323,8 +323,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			return CHVATAL;
 		case ICPL:
 			return ICPL;
-		case MASK:
-			return MASK;
+		case INCLING: 
+			return INCLING;
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for TWise: " + tWise);
 			break;
@@ -388,7 +388,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				scaleTWise.setMaximum(ICPL_MAX);
 			} else if (selection.equals(CASA)) {
 				scaleTWise.setMaximum(CASA_MAX);
-			} else if (selection.equals(MASK)) {
+			} else if (selection.equals(INCLING)) {
 				scaleTWise.setMaximum(MASK_MAX);
 				scaleTWise.setMinimum(MASK_MAX);
 				scaleTWise.setSelection(MASK_MAX);

@@ -659,7 +659,7 @@ public class StringTable {
 	public static final String CHVATAL = "Chvatal";
 	public static final String CASA = "CASA";
 	public static final String ICPL = "ICPL";
-	public static final String MASK = "MASK";
+	public static final String INCLING = "IncLing";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";
 	public static final String COMPILER = "Compiler";
 	public static final String SYMBOL = "symbol";
