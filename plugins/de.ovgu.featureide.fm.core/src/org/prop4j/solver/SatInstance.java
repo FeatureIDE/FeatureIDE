@@ -23,7 +23,9 @@ package org.prop4j.solver;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.prop4j.Literal;
@@ -69,7 +71,7 @@ public class SatInstance implements ISolverProvider, Serializable {
 	protected final Object[] intToVar;
 	protected final Node cnf;
 
-	public SatInstance(Node root, List<?> featureList) {
+	public SatInstance(Node root, Collection<?> featureList) {
 		this.intToVar = new Object[featureList.size() + 1];
 		this.cnf = root;
 
@@ -82,6 +84,21 @@ public class SatInstance implements ISolverProvider, Serializable {
 			varToInt.put(name, ++index);
 			intToVar[index] = name;
 		}
+	}
+	
+	public SatInstance(Node root) {
+		this(root, getFeatures(root));
+	}
+
+	private static Collection<Object> getFeatures(Node root) {
+		final Collection<Object> featureList = new HashSet<>();
+		for (Node clause : root.getChildren()) {
+			final Node[] literals = clause.getChildren();
+			for (Node literal : literals) {
+				featureList.add(((Literal)literal).var);
+			}
+		}
+		return featureList;
 	}
 
 	protected void initSolver(Solver<?> solver) {

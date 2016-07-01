@@ -41,7 +41,6 @@ public class ConditionallyCoreDeadAnalysisFG extends ConditionallyCoreDeadAnalys
 	public ConditionallyCoreDeadAnalysisFG(ISolverProvider solver, IFeatureGraph featureGraph) {
 		super(solver);
 		this.featureGraph = featureGraph;
-		resetFixedFeatures();
 	}
 
 	public int[] execute(WorkMonitor monitor) throws Exception {
@@ -75,7 +74,7 @@ public class ConditionallyCoreDeadAnalysisFG extends ConditionallyCoreDeadAnalys
 			final VecInt v = new VecInt();
 			for (int i = 0; i < newCount; i++) {
 				int var = fixedVariables[i];
-				travers(model1, v, var);
+				traverse(model1, v, var);
 			}
 
 			sat(model1, v);
@@ -94,7 +93,7 @@ public class ConditionallyCoreDeadAnalysisFG extends ConditionallyCoreDeadAnalys
 				switch (solver.sat()) {
 				case FALSE:
 					solver.getAssignment().pop().unsafePush(varX);
-					travers2(v, varX);
+					traverse2(v, varX);
 					break;
 				case TIMEOUT:
 					throw new RuntimeException();
@@ -108,7 +107,7 @@ public class ConditionallyCoreDeadAnalysisFG extends ConditionallyCoreDeadAnalys
 		}
 	}
 
-	private void travers(int[] model1, VecInt v, int var) {
+	private void traverse(int[] model1, VecInt v, int var) {
 		final boolean fromSelected = var > 0;
 
 		for (int j = 0; j < model1.length; j++) {
@@ -138,7 +137,7 @@ public class ConditionallyCoreDeadAnalysisFG extends ConditionallyCoreDeadAnalys
 		}
 	}
 
-	private void travers2(VecInt v, int var) {
+	private void traverse2(VecInt v, int var) {
 		final boolean fromSelected = var > 0;
 
 		for (int i = v.size() - 1; i >= 0; i--) {
