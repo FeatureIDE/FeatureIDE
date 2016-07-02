@@ -232,6 +232,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
         setKeyHandler(editorKeyHandler);
     }
     
+    // constructor for read-only feature model (currently used for sliced sub feature model)
     public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container, IFeatureModel fm) {
         super();
         this.featureModelEditor = featureModelEditor;
@@ -245,7 +246,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
         
         createControl(container);
         initializeGraphicalViewer();
-        setEditDomain(new DefaultEditDomain(featureModelEditor));
         
         zoomManager = rootEditPart.getZoomManager();
         zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
@@ -254,7 +254,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
         editorKeyHandler = new FeatureDiagramEditorKeyHandler(this, graphicalFeatureModel);
         setKeyHandler(editorKeyHandler);
     }
-    private void initializeGraphicalViewer() {
+    
+    public void initializeGraphicalViewer() {
         getControl().addControlListener(new ControlListener() {
             
             @Override

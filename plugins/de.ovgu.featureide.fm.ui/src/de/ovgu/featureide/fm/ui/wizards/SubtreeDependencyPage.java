@@ -29,11 +29,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -63,7 +60,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * Used as tool tip for redundant constraint.
 	 */
 	public static HashMap<Integer, List<String>> redundantExpl = new HashMap<Integer, List<String>>();
-
+	
 	public SubtreeDependencyPage(IFeatureModel fm, IFeatureModel oldModel) {
 		super("Subtree Dependencies");
 		setTitle("Subtree Dependencies");
@@ -82,7 +79,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 		setControl(container);
-		setFMtoPage(container);
+		insertFeatureModel(container);		
 		setPageComplete(true);
 	}
 
@@ -93,7 +90,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * 
 	 * @param comp the Composite which contains the subtree model
 	 */
-	private void setFMtoPage(Composite comp) {
+	private void insertFeatureModel(Composite comp) {
 
 		FeatureModelAnalyzer analyzer = new FeatureModelAnalyzer(subtreeModel);
 		resetExplanations(analyzer); // reset all properties to normal status
@@ -102,7 +99,6 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		modeleditor.setFeatureModel(subtreeModel);
 		FeatureDiagramEditor diagramEditor = new FeatureDiagramEditor(modeleditor, comp, subtreeModel);
 		subtreeModel.addListener(diagramEditor);
-		diagramEditor.initEditorView();
 
 		analyzer.analyzeFeatureModel(null); // analyze the subtree model
 		explainImplicitConstraints(analyzer, diagramEditor.getGraphicalFeatureModel()); // explain implicit, i.e. redundant, constraints
@@ -111,26 +107,17 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		diagramEditor.internRefresh(true);
 		diagramEditor.getGraphicalFeatureModel().redrawDiagram();
 	}
+	
 
 	/**
-	 * Resets the properties of a feature model, i.e. the status of features,
-	 * the attribute of constraints and maps which store explanation.
-	 * Else, this might influence the analysis of a subtree model which origins from
-	 * the origin feature model keeping old properties.
+	 * Clears maps which held explanations for the underlying feature model.
 	 * 
-	 * @param analyzer the feature model analyzer for the subtree model
+	 * @param analyzer the feature model analyzer for the sub feature model
 	 */
 	private void resetExplanations(FeatureModelAnalyzer analyzer) {
 		FeatureModelAnalyzer.deadFeatureExpl.clear();
 		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
 		FeatureModelAnalyzer.redundantConstrExpl.clear();
-
-//		for (IFeature feature : subtreeModel.getFeatures()) {
-//			feature.getProperty().setFeatureStatus(FeatureStatus.NORMAL);
-//		}
-//		for (IConstraint constraint : subtreeModel.getConstraints()) {
-//			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
-//		}
 	}
 
 	/**

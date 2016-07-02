@@ -52,11 +52,12 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 		addPage(new SubtreeDependencyPage(subtreeFm, oldFm));
 	}
 
+
 	@Override
 	public boolean performFinish() {
 		// reset model to the origin one so that constraint index is consistent when closing page
 		Redundancy.setNewModel(oldFm);
-		
+
 		// clear maps which hold explanations for defect constraints and features
 		FeatureModelAnalyzer.deadFeatureExpl.clear();
 		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
