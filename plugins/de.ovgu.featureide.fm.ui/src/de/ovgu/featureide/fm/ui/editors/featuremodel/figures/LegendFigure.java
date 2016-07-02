@@ -103,7 +103,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String UNSATISFIABLE_CONST_TOOLTIP = "Unsatisfiable Constraint\n\nThis constraint cannot become true";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
 	private static final String MODEL_CONST_TOOLTIP = CONSTRAINT_MAKES_THE_MODEL_VOID_;
-	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This transitive constraint is an implicit dependency of this feature-model.";
+	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
 
 
 	private static final int ABSTRACT = 0;
@@ -357,7 +357,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	
 	private void createRowImplicitConst(int row) {
 		createSymbol(row, IMPLICIT, false, IMPLICIT_TOOLTIP);
-		Label labelIndetHidden = createLabel(row, "implicit constraint", FMPropertyManager.getFeatureForgroundColor(), IMPLICIT_TOOLTIP);
+		Label labelIndetHidden = createLabel(row, language.getImplicitConst(), FMPropertyManager.getFeatureForgroundColor(), IMPLICIT_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
