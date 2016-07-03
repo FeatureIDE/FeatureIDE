@@ -25,34 +25,49 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Redundancy;
 
 /**
- * A wizard to show a subtree feature model and its implicit dependencies.
+ * A wizard to show a sub feature model and its implicit dependencies. The sub feature model is read-only
+ * and not persistent.
  * 
  * @author "Ananieva Sofia"
  */
 public class SubtreeDependencyWizard extends AbstractWizard {
 
 	/**
-	 * The subtree feature model which potentially contains implicit constraints.
+	 * The sub feature model which contains implicit constraints if there are any.
 	 */
-	IFeatureModel subtreeFm;
+	IFeatureModel subFm;
 
 	/**
-	 * The origin feature model which contains the subtree feature model.
+	 * The origin feature model which contains the sub feature model.
 	 */
 	IFeatureModel oldFm;
 
-	public SubtreeDependencyWizard(String title, IFeatureModel fm, IFeatureModel oldModel) {
+	/**
+	 * Constructor. 
+	 * 
+	 * @param title The title of the wizard page
+	 * @param newModel the sub feature model 
+	 * @param oldModel the origin feature model
+	 */
+	public SubtreeDependencyWizard(String title, IFeatureModel newModel, IFeatureModel oldModel) {
 		super(title);
-		subtreeFm = fm;
+		subFm = newModel;
 		oldFm = oldModel;
 	}
 
+	/**
+	 * Adds a page to a wizard.
+	 */
 	@Override
 	public void addPages() {
-		addPage(new SubtreeDependencyPage(subtreeFm, oldFm));
+		addPage(new SubtreeDependencyPage(subFm, oldFm));
 	}
 
 
+	/**
+	 * Performs finishing actions when closing the wizard, i.e. set model to analyze back to origin feature model
+	 * and clear maps which hold explanations for anomalies.
+	 */
 	@Override
 	public boolean performFinish() {
 		// reset model to the origin one so that constraint index is consistent when closing page

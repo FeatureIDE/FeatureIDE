@@ -210,20 +210,35 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
     private FeatureModelAnalyzer analyzer;
     
     final FeatureDiagramEditorKeyHandler editorKeyHandler;
-    
-    public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container) {
+
+    /**
+     * Constructor. Handles editable and read-only feature models. 
+     * 
+     * @param featureModelEditor the FeatureModelEditor
+     * @param container Composite which contains the feature model
+     * @param fm The feature model
+     * @param isEditable True, if feature model is editable. False, if feature model is read-only 
+     */
+    private FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container, IFeatureModel fm, boolean isEditable) {
         super();
         this.featureModelEditor = featureModelEditor;
-        graphicalFeatureModel = new GraphicalFeatureModel(featureModelEditor.fmManager.editObject());
+        graphicalFeatureModel = new GraphicalFeatureModel(fm);
         graphicalFeatureModel.init();
-        extraPath = FileManagerMap.constructExtraPath(featureModelEditor.fmManager.getAbsolutePath(), format);
-        FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
-        featureModelEditor.fmManager.addListener(this);
         
+        if (featureModelEditor.fmManager != null) { // read-only feature model is currently only a view on the editable feature model and not persistent
+	        extraPath = FileManagerMap.constructExtraPath(featureModelEditor.fmManager.getAbsolutePath(), format);
+	        FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
+	        featureModelEditor.fmManager.addListener(this);
+	    }
+        else {
+        	extraPath = "";
+        }
         createControl(container);
         initializeGraphicalViewer();
-        setEditDomain(new DefaultEditDomain(featureModelEditor));
-        
+
+        if (isEditable) {
+            setEditDomain(new DefaultEditDomain(featureModelEditor));        	
+        }        
         zoomManager = rootEditPart.getZoomManager();
         zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
         FeatureUIHelper.setZoomManager(zoomManager);
@@ -231,28 +246,27 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
         editorKeyHandler = new FeatureDiagramEditorKeyHandler(this, graphicalFeatureModel);
         setKeyHandler(editorKeyHandler);
     }
+
     
-    // constructor for read-only feature model (currently used for sliced sub feature model)
+    /**
+     * Constructor. Used for an editable feature model.
+     * 
+     * @param featureModelEditor the FeatureModelEditor
+     * @param container Composite which contains the feature model
+     */
+    public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container) {
+        this(featureModelEditor, container, featureModelEditor.fmManager.editObject(), true); 
+    }
+    
+    /**
+     * Constructor. Used for a read-only feature model when calculating implicit dependencies.
+     * 
+     * @param featureModelEditor the FeatureModelEditor
+     * @param container Composite which contains the faeture model
+     * @param fm The feature model 
+     */
     public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container, IFeatureModel fm) {
-        super();
-        this.featureModelEditor = featureModelEditor;
-        graphicalFeatureModel = new GraphicalFeatureModel(fm);
-        graphicalFeatureModel.init();
-        if (featureModelEditor.fmManager != null) {
-        		extraPath = FileManagerMap.constructExtraPath(featureModelEditor.fmManager.getAbsolutePath(), format);
-        		FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
-        		featureModelEditor.fmManager.addListener(this);
-        } else extraPath = "";
-        
-        createControl(container);
-        initializeGraphicalViewer();
-        
-        zoomManager = rootEditPart.getZoomManager();
-        zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
-        FeatureUIHelper.setZoomManager(zoomManager);
-        
-        editorKeyHandler = new FeatureDiagramEditorKeyHandler(this, graphicalFeatureModel);
-        setKeyHandler(editorKeyHandler);
+        this(featureModelEditor, container, fm, false); 
     }
     
     public void initializeGraphicalViewer() {
