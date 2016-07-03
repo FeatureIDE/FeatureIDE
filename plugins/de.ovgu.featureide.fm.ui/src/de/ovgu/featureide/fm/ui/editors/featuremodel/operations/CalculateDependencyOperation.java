@@ -40,24 +40,30 @@ import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
 
 
 /**
- * Option which uses feature model slicing to calculate dependencies of a subtree feature model.
+ * Option which uses feature model slicing to calculate dependencies of a sub feature model.
  * 
  * @author "Ananieva Sofia"
  */
 public class CalculateDependencyOperation extends AbstractFeatureModelOperation {
 
 	/**
-	 * The selected root of the subtree feature model
+	 * The selected root of the sub feature model.
 	 */
 	private final IFeature subtreeRoot; 
 	
 	/**
-	 * The origin feature model which contains the subtree feature model
+	 * The origin feature model which contains the sub feature model.
 	 */
 	private final IFeatureModel oldFm; 
 		
 	private static final String LABEL = CALCULATE_DEPENDENCY;
 
+	/**
+	 * Constructor. 
+	 * 
+	 * @param featureModel The origin feature model
+	 * @param selectedFeature The selected feature which is root of the sub feature model
+	 */
 	public CalculateDependencyOperation(IFeatureModel featureModel, IFeature selectedFeature) {
 		super(featureModel, LABEL);
 		subtreeRoot = selectedFeature;
@@ -65,11 +71,11 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	}
 
 	/**
-	 * Collects all features of the subtree feature model.
+	 * Collects all features of the sub feature model.
 	 * 
 	 * @param featureModel the origin feature model to collect the features from
-	 * @param root the root of the subtree feature model
-	 * @return List of all features from the subtree feature model
+	 * @param root the root of the sub feature model
+	 * @return List of all features from the sub feature model
 	 */
 	private ArrayList<String> getSubtreeFeatures(IFeature root) {
 		ArrayList<String> res = new ArrayList<String>();
@@ -87,14 +93,14 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 
 	/**
 	 * Executes operation by calling feature model slicing and replacing the new root with the selected
-	 * feature. A wizard page presents the subtree feature model and implicit constraints. 
+	 * feature. A wizard page presents the sub feature model and implicit constraints. 
 	 */
 	@Override
 	protected FeatureIDEEvent operation() {
 		ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
 		
 		// feature model slicing and replacing root with the selected feature
-		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, featureModel, subtreeFeatures);
+		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, oldFm, subtreeFeatures);
 		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
 		IFeatureModel slicedModel = slice.createInterface(oldFm, subtreeFeatures).clone();
 		FeatureUtils.replaceRoot(slicedModel,subtreeRoot);
@@ -104,9 +110,9 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		TrayDialog.setDialogHelpAvailable(false);
 		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		dialog.open();
-
 		return new FeatureIDEEvent(oldFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);
 	}
+	
 
 	/**
 	 * Enables redo/undo operation.

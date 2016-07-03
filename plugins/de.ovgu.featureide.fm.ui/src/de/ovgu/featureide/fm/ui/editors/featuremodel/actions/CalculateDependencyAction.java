@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -43,18 +44,32 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CalculateDependencyOperation;
 
 /**
- * Action to select a feature as root of a subtree.
+ * Action to calculate implicit dependencies of a sub feature model after selecting a feature 
+ * and choosing to "calculate implicit dependencies". This feature will be the root of the new
+ * sub feature model. 
  * 
  * @author "Ananieva Sofia"
  */
 public class CalculateDependencyAction extends Action {
 	
+	/**
+	 * The ID which is used to return the respective action after a context menu selection.
+	 */
 	public static final String ID = "de.ovgu.featureide.calculatedependency";
 	
+	/**
+	 * The underlying feature model.
+	 */
 	private final IFeatureModel featureModel;
 	
+	/**
+	 * The selected feature which will be used as new root.
+	 */
 	private LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 	
+	/**
+	 * The listener which remembers the selection and checks whether it is valid. 
+	 */
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -62,6 +77,12 @@ public class CalculateDependencyAction extends Action {
 		}
 	};
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param viewer 
+	 * @param featureModel The feature model
+	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {
 		super(CALCULATE_DEPENDENCY);
 		this.featureModel = featureModel;
@@ -75,7 +96,7 @@ public class CalculateDependencyAction extends Action {
 	}
 	
 	/**
-	 * Performs the operation of calculating subtree dependencies. The selected feature is root of the subtree feature mode.
+	 * Performs the operation of calculating sub feature model dependencies. The selected feature is root of the new sub feature mode.
 	 */
 	@Override
 	public void run() {
@@ -91,7 +112,7 @@ public class CalculateDependencyAction extends Action {
 	}
 
 	/**
-	 * Checks if selection is valid, i.e. selection is not empty and a feature from the feature model tree.
+	 * Checks if selection is valid, i.e. selection is not empty, not root and a feature from the feature model tree.
 	 * 
 	 * @param selection the selected feature from the feature model tree
 	 * @return true if valid selection, else false
@@ -100,6 +121,11 @@ public class CalculateDependencyAction extends Action {
 		// check empty selection (i.e. ModelEditPart is selected)
 		if (selection.size() == 1 && (selection.getFirstElement() instanceof ModelEditPart))
 			return false;
+		
+		// permit selection to be root of the origin feature model
+		if (selection.getFirstElement().toString().contains(FeatureUtils.getRoot(featureModel).toString())) {
+			return false;
+		}
 
 		selectedFeatures.clear();
 		Iterator<?> iter = selection.iterator();
