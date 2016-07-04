@@ -33,12 +33,42 @@ import org.prop4j.Node;
  */
 public class Bookkeeping {
 
-	public Object name; //name of literal, same as key in hashmap
-	public int value; //0,1,-1
-	public Node reason; //human-understandable formula of a clause
-	public ArrayList<Literal> antecedents; //literal name which is key in bookkeeping hashmap
+	/**
+	 * The name of a literal.
+	 */
+	public Object name; 
+	
+	/**
+	 * A truth value.
+	 * 0 represents a false truth value, 1 represents a true truth value. 
+	 * If value is -1, the truth value is yet unknown.
+	 */
+	public int value; 
+	
+	/**
+	 * The reason for a derived truth value, represented by a node (which is clause in CNF).
+	 */
+	public Node reason; 
+	
+	/**
+	 * Literals whose value was referenced when deriving a new truth value.
+	 */
+	public ArrayList<Literal> antecedents; 
+	
+	/**
+	 * Literals whose truth values are initially set (not derived) are a premise.
+	 */
 	public boolean premise = false; 
 
+	/**
+	 * The value for a respective key in a hash map.
+	 * 
+	 * @param n The name of the literal which is key in hash map
+	 * @param v The value of the literal
+	 * @param r The reason for the derived truth value of the literal
+	 * @param a The antecedents of the literal
+	 * @param p Boolean flag whether the literal is a premise
+	 */
 	public Bookkeeping(Object n, int v, Node r, ArrayList<Literal> a, boolean p) {
 		name = n;
 		value = v;

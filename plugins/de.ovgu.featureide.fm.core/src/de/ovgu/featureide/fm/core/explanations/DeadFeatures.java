@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * The class deadFeatures generates explanations for dead features. It uses a logic truth maintenance system (LTMS)
- * and its boolean constraint propagation (BCP).
+ * and boolean constraint propagation (BCP) which functions as an inference engine of the LTMS.
  * 
  * @author "Ananieva Sofia"
  */
@@ -47,10 +47,9 @@ public class DeadFeatures {
 	 * Explains dead features using boolean constraint propagation. Sets initial truth value assumptions of dead features to true
 	 * and propagates them until a violation in a clause occurs.
 	 * 
-	 * @param featuremodel the model with the new constraint which leads to a dead feature
-	 * @param deadFeature a dead features
-	 * @param c the constraint which leads to a dead feature
-	 * @return String an explanation why the feature is dead
+	 * @param featuremodel The model with the new constraint which leads to a dead feature
+	 * @param deadFeature A dead features
+	 * @return explList An explanation why the feature is dead
 	 */
 	public List<String> explain(IFeatureModel featuremodel, IFeature deadFeature) {
 		List<String> explList = new ArrayList<>();
@@ -79,7 +78,7 @@ public class DeadFeatures {
 	/**
 	 * Sets the model with the new constraint which lead to a dead feature.
 	 * 
-	 * @param model the model with the new constraint
+	 * @param model The model with the new constraint
 	 */
 	public static void setFeatureModel(IFeatureModel newModel) {
 		model = newModel;

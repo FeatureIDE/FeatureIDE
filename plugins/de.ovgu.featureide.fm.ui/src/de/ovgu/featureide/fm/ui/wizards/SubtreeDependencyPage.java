@@ -79,7 +79,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * Creates a control for the dialog page. Integrates the sub feature model and uses FillLayout to
 	 * fill all available space.
 	 * 
-	 * @param parent the Composite which contains the feature model
+	 * @param parent A composite which contains the feature model
 	 */
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
@@ -94,7 +94,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * Enables automated analysis for the sub feature model and explains implicit constraints
 	 * using the origin feature model.
 	 * 
-	 * @param comp The composite which contains the sub feature model
+	 * @param comp A composite which contains the sub feature model
 	 */
 	private void insertFeatureModel(Composite comp) {
 
@@ -116,9 +116,9 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	
 
 	/**
-	 * Clears maps which held explanations for the origin feature model.
+	 * Clears maps which hold explanations for the origin feature model.
 	 * 
-	 * @param analyzer the feature model analyzer for the sub feature model
+	 * @param analyzer The feature model analyzer for the sub feature model
 	 */
 	private void resetExplanations(FeatureModelAnalyzer analyzer) {
 		FeatureModelAnalyzer.deadFeatureExpl.clear();
@@ -130,8 +130,8 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * Checks if implicit constraints are redundant (must be) and explains them.
 	 * Sets the tool tip with explanations.
 	 * 
-	 * @param analyzer the feature model analyzer for the sub feature model
-	 * @param graphicalFeatModel the graphical feature model of the sub feature model
+	 * @param analyzer The feature model analyzer for the sub feature model
+	 * @param graphicalFeatModel The graphical feature model of the sub feature model
 	 */
 	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
 		// collect implicit constraints of the sub feature model
@@ -155,7 +155,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * origin model and the sub feature model and collecting constraints which are only present
 	 * in the sub feature model but not in the origin one.
 	 * 
-	 * @return List which contains implicit constraints for the subtree feature model
+	 * @return result A list which contains implicit constraints for the subtree feature model
 	 */
 	private List<IConstraint> getImplicitConstraints() {
 		List<IConstraint> newConstraints = subtreeModel.getConstraints();

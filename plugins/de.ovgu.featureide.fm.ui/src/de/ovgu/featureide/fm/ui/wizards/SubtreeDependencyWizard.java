@@ -46,8 +46,8 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	 * Constructor. 
 	 * 
 	 * @param title The title of the wizard page
-	 * @param newModel the sub feature model 
-	 * @param oldModel the origin feature model
+	 * @param newModel The sub feature model 
+	 * @param oldModel The origin feature model
 	 */
 	public SubtreeDependencyWizard(String title, IFeatureModel newModel, IFeatureModel oldModel) {
 		super(title);

@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * The class LTMS (logic truth maintenance system) uses BCP for managing logical implications. By recording proofs
- * for implications, explanations can be constructed.
+ * for implications, explanations can be constructed. BCP expects two parameters: initial truth values (premises) and a CNF. 
  * 
  * @author "Ananieva Sofia"
  */
@@ -53,7 +53,7 @@ public class LTMS {
 	};
 
 	/**
-	 * The model to explain the defect from. Used to retrieve a feature from a respective literal.
+	 * The model to explain the defect from.
 	 */
 	private IFeatureModel model;
 	/**
@@ -69,7 +69,7 @@ public class LTMS {
 	 */
 	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>();
 	/**
-	 * The clause which is violated (all terms are bound to false).
+	 * The clause which is violated (the truth values of all literals are bound to false).
 	 */
 	private Node violatedClause;
 	/**
@@ -83,12 +83,12 @@ public class LTMS {
 	HashMap<String, Integer> weightedExplanations = new HashMap<String, Integer>();
 
 	/**
-	 * Constructor is used if redundant constraints are explained.
+	 * Constructor. Used to explain a redundant constraint. 
 	 * 
-	 * @param oldModel the model without the redundant constraint
-	 * @param map the valueMap which contains all literals from the conjunctive normal form and is which used
+	 * @param oldModel The model without the redundant constraint
+	 * @param map The valueMap which contains all literals from the conjunctive normal form and is which used
 	 *            for bookkeeping (stores the name, reason, antecedents, premise and truth value of a literal)
-	 * @param features the features from the redundant constraint
+	 * @param features The features from the redundant constraint
 	 */
 	public LTMS(IFeatureModel oldModel, HashMap<Object, Bookkeeping> map, ArrayList<Literal> features) {
 		this(oldModel);
@@ -97,19 +97,19 @@ public class LTMS {
 	}
 
 	/**
-	 * Constructor is used if dead or false-optional features are explained.
+	 * Constructor. Used to explain dead or false-optional features.
 	 * 
-	 * @param newModel the model with the constraint which leads to dead feature(s)
-	 * @param map the valueMap which is used for bookkeeping
+	 * @param newModel The model with the constraint which leads to dead feature(s)
+	 * @param map The valueMap which is used for bookkeeping
 	 */
 	public LTMS(IFeatureModel newModel) {
 		model = newModel;
 	}
 
 	/**
-	 * Add explanation parts to member "reason" if not empty and unique.
+	 * Adds explanation part to the complete explanation (reason) if it is unique and not empty.
 	 * 
-	 * @param s the explanation string to add to reason
+	 * @param s The string to add to a reason
 	 */
 	private void addToReasonListOptionally(String s) {
 		if (!s.isEmpty() && !reason.contains(s)) {
@@ -120,8 +120,8 @@ public class LTMS {
 	/**
 	 * Explains why a constraint is redundant. As soon as a clause gets violated, an explanation is generated.
 	 * 
-	 * @param clauses the clauses of the conjunctive normal form of the feature model
-	 * @return String an explanation for the redundant constraint
+	 * @param clauses The clauses of the conjunctive normal form of the feature model
+	 * @return reason An explanation for the redundant constraint
 	 * @throws IOException
 	 */
 	public List<String> explainRedundantConstraint(Node[] clauses, HashMap<Object, Integer> map) {
@@ -152,13 +152,13 @@ public class LTMS {
 	}
 
 	/**
-	 * Explains why a feature if false optional. Sets value assignment of false-optional feature to false and propagate this value
-	 * until a violation in any occurs.
+	 * Explains why a feature is false optional. Sets the truth value of false-optional feature to false and the
+	 * truth value of its parent to true. Propagates this value until a violation in any occurs.
 	 * 
-	 * @param clauses the clauses of the conjunctive normal form of the feature model
-	 * @param falseoptional the literal-feature which is false-optional
-	 * @param parent the literal-parent of the false optional feature
-	 * @return String an explanation why the feature is false-optional
+	 * @param clauses The clauses of the conjunctive normal form of the feature model
+	 * @param falseoptional The literal-feature which is false-optional
+	 * @param parent The literal-parent of the false optional feature
+	 * @return reason An explanation why the feature is false-optional
 	 */
 	public List<String> explainFalseOpsFeature(Node[] clauses, Literal falseoptional, Literal parent) {
 		ArrayList<Literal> falsopts = new ArrayList<Literal>();
@@ -186,18 +186,18 @@ public class LTMS {
 			return reason;
 		}
 		// if we are here, propagated values via BCP lead to a false clause
-		findOpenClauses(falsopts, clauses); // find unit open clauses depending on initial truth values 
-		BCP(clauses); // propagate values and find further unit open clauses
+		findOpenClauses(falsopts, clauses); // find unit-open clauses depending on initial truth values 
+		BCP(clauses); // propagate values and find further unit-open clauses
 		return shortestExpl(clauses, null, falseoptional, ExplanationMode.FalseOptionalFeature);
 	}
 
 	/**
-	 * Explains why a feature is dead. As soon as a violation in any clause occurs, an explanation is generated.
+	 * Explains why a feature is dead. As soon as a violation occurs in a clause after truth value propagation,
+	 * an explanation is generated.
 	 * 
-	 * @param clauses the clauses of the conjunctive normal form of the feature model
-	 * @param deadF the dead feature
-	 * @param cond true if feature might be conditionally dead, else false
-	 * @return String an explanation why the feature is dead
+	 * @param clauses The clauses of the conjunctive normal form of the feature model
+	 * @param deadF The dead feature
+	 * @return reason An explanation why the feature is dead
 	 */
 	public List<String> explainDeadFeature(Node[] clauses, Literal deadF) {
 		ArrayList<Literal> deads = new ArrayList<Literal>();
@@ -228,13 +228,13 @@ public class LTMS {
 
 	/**
 	 * Generate all possible explanations and choose the shortest one. The length of an explanation
-	 * is measured by the amount of lines it consists of. Every line represents a relationship within the
-	 * feature model tree topology or a cross-tree constraint.
+	 * is measured by the amount of lines (parts) it consists of. Every part represents a relationship within 
+	 * the feature model tree topology or a cross-tree constraint.
 	 * 
-	 * @param expl the first generated explanation
-	 * @param clauses the clauses of the conjunctive normal form
-	 * @param map the map which stores the initial values for features from the redundant constraint
-	 * @return String the shortest explanation
+	 * @param expl The first generated explanation
+	 * @param clauses The clauses of the conjunctive normal form
+	 * @param map The map which stores the initial values for features from the redundant constraint
+	 * @return shortestExpl The shortest possible explanation which we can find (they might be shorter ones)
 	 */
 	@SuppressWarnings ("unchecked")
 	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
@@ -317,23 +317,25 @@ public class LTMS {
 				}
 			}
 		}
-		// if we are here, shortest explanation is found
+		// if we are here, shortest explanation has been found
 		if (mode != ExplanationMode.Redundancy) {
-			weightExpl(shortestExpl, weightedExplanations, allExpl); // mark explanations parts within final explanation
-		} // shortest explanation for redundant constraint is marked within class Redundancy
+			weightExpl(shortestExpl, weightedExplanations, allExpl); // weight explanations parts within final explanation
+		} 
+		// the shortest explanation for a redundant constraint is weighted within class Redundancy since a final explanation
+		// consists of explanation parts which arise from different truth values which lead to an invalid redundant constraint.
 		return shortestExpl;
 	}
 
 	/**
-	 * Processes the shortest explanation and marks every part of an explanation according to its occurrence.
+	 * Processes the shortest explanation and weights every part of this explanation according to its occurrence.
 	 * Explanation parts which occur most often possess a high probability to cause the defect to explain.
 	 * 
-	 * @param shortest the shortest explanation
-	 * @param weighted the explanation parts to mark
-	 * @param cnt the number of explanations
-	 * @return the shortest explanation with marked explanation parts that occur most often
+	 * @param shortestExpl The shortest explanation
+	 * @param weightedParts The explanation parts to weight
+	 * @param cnt The number of explanations
+	 * @return shortest The shortest explanation with weighted explanation parts that occur most often
 	 */
-	public static List<String> weightExpl(List<String> shortest, HashMap<String, Integer> weighted, int cntAllExpl) {
+	public static List<String> weightExpl(List<String> shortestExpl, HashMap<String, Integer> weightedParts, int cntAllExpl) {
 
 		// remove all explanation parts which are not part of the shortest explanation
 		/*	Iterator<String> it = weighted.keySet().iterator();
@@ -344,39 +346,39 @@ public class LTMS {
 				}
 			}*/
 		
-		// get max number of occurences
+		// get max number of occurrences
 		ArrayList<Integer> list = new ArrayList<Integer>();
-		for (String key : weighted.keySet()) {
-			list.add(weighted.get(key));
+		for (String key : weightedParts.keySet()) {
+			list.add(weightedParts.get(key));
 		}
 		// weight explanation parts which exist in weighted map and in shortest explanation
-		Iterator<String> it2 = weighted.keySet().iterator();
+		Iterator<String> it2 = weightedParts.keySet().iterator();
 		while (it2.hasNext()) {
 			String explMap = it2.next();
-			for (ListIterator<String> itr = shortest.listIterator(); itr.hasNext();) {
+			for (ListIterator<String> itr = shortestExpl.listIterator(); itr.hasNext();) {
 				String explShortest = (String) itr.next(); // A => B
 				if (explMap.equals(explShortest)) {
-					int cntOccur = weighted.get(explMap);
+					int cntOccur = weightedParts.get(explMap);
 					itr.set(explShortest + "$" + cntOccur + "/" + cntAllExpl);
 					break;
 				}
 			}
 		}
-		return shortest;
+		return shortestExpl;
 	}
 
 	/**
-	 * Finds unit open clauses depending on the initial truth value assumptions of
+	 * Finds unit-open clauses depending on the initial truth value assumptions of
 	 * the features from the redundant constraint and pushes them to stack.
 	 * 
-	 * @param literal the literal from the redundant constraint whose value is initially set
-	 * @param allClauses clauses of the conjunctive normal form
+	 * @param literal The literal from the redundant constraint whose value is initially set
+	 * @param allClauses All clauses of the conjunctive normal form
 	 */
 	private void findOpenClauses(ArrayList<Literal> literals, Node[] allClauses) {
 		for (Literal l : literals) {
 			boolean negated = (valueMap.get(l.var).value == 0);
 			for (Node cnfclause : allClauses) {
-				if (!hasNegTerm(!negated, l, cnfclause)) {
+				if (!hasNegLiteral(!negated, l, cnfclause)) {
 					continue;
 				}
 				if (isUnitOpen(cnfclause) != null && !stackOpenClause.contains(cnfclause)) {
@@ -388,11 +390,11 @@ public class LTMS {
 	}
 
 	/**
-	 * Sets the value of a literal depending on its negation in the unit open clause. Finds new unit open
+	 * Sets the value of a literal depending on its negation in the unit-open clause. Finds new unit-open
 	 * clauses and pushes them to stack.
 	 * 
-	 * @param literal the literal whose value is set using boolean constraint propagation
-	 * @param negated true, if the literal is negated in the open clause. Else, false
+	 * @param literal The literal whose value is set using boolean constraint propagation
+	 * @param negated True, if the literal is negated in the open clause. Else, false
 	 * @return true, if the value of a literal is set without violating a clause. Else, return false
 	 */
 	private boolean setValue(Literal literal, boolean negated, Node[] allClauses) {
@@ -402,10 +404,10 @@ public class LTMS {
 
 		// for each clause in all clauses of the cnf that contains not this-literal
 		for (Node cnfclause : allClauses) {
-			if (!hasNegTerm(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
+			if (!hasNegLiteral(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
 				continue;
 			}
-			// if we are here, we may have found a unit open clause
+			// if we are here, we may have found a unit-open clause
 			if (isUnitOpen(cnfclause) != null) {
 				stackOpenClause.push(cnfclause);
 				continue;
@@ -419,13 +421,13 @@ public class LTMS {
 	}
 
 	/**
-	 * Checks if a clause is violated (all terms are false).
+	 * Checks if a clause is violated (all truth values of literals are false).
 	 * 
-	 * @param clause the clause to check
+	 * @param clause The clause to check
 	 * @return true, if the clause is violated. Else, return false
 	 */
 	private boolean isViolated(Node clause) {
-		// truth values of all terms must be false
+		// truth values of all literals must be false
 		ArrayList<Literal> literals = getLiterals(clause);
 		for (Literal lit : literals) {
 			if (evaluateValue(lit) == 0) {
@@ -441,9 +443,9 @@ public class LTMS {
 	}
 
 	/**
-	 * Checks if a single clause in the conjunctive normal form is violated (all terms are false).
+	 * Checks if a single clause in the conjunctive normal form is violated.
 	 * 
-	 * @param n the clauses to check
+	 * @param n The clauses to check
 	 * @return true, if the clause is violated. Else, return false
 	 */
 	private boolean isViolated(Node[] n) {
@@ -451,7 +453,7 @@ public class LTMS {
 			if (!isViolated(cnfclause)) {
 				continue;
 			}
-			return true; // clause is violated, all terms are 0
+			return true; // clause is violated, all literals are 0
 		}
 		return false; // clause is not violated
 	}
@@ -459,12 +461,12 @@ public class LTMS {
 	/**
 	 * Checks if a clause contains a not-literal.
 	 * 
-	 * @param neg representation of the opposite sign of a literal
-	 * @param l the literal
-	 * @param node a clause which may contain a not-literal
-	 * @return true, if a clause contains not-literal. Else, return false
+	 * @param neg A representation of the opposite sign of a literal
+	 * @param l The literal
+	 * @param node A clause which may contain a not-literal
+	 * @return true, if a clause contains not-literal. Else, return false.
 	 */
-	private boolean hasNegTerm(boolean neg, Literal l, Node node) {
+	private boolean hasNegLiteral(boolean neg, Literal l, Node node) {
 		ArrayList<Literal> literals = getLiterals(node);
 		for (Literal lit : literals) {
 			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) {
@@ -479,41 +481,41 @@ public class LTMS {
 	}
 
 	/**
-	 * Checks if a clause is unit open. In a unit open clause, all terms are false except
-	 * for one term whose truth value is unknown.
+	 * Checks if a clause is unit-open. In a unit-open clause, the truth values of all literals 
+	 * are false except for one literal whose truth value is unknown.
 	 * 
-	 * @param clause the clause to check if it is unit open
-	 * @return the literal whose value is unknown
+	 * @param clause The clause to check if it is unit-open
+	 * @return openLiteral The literal whose value is unknown
 	 */
 	private Literal isUnitOpen(Node clause) {
-		Literal openTerm = null;
+		Literal openLiteral = null;
 		ArrayList<Literal> literals = getLiterals(clause);
 		for (Literal lit : literals) {
 			switch (evaluateValue(lit)) {
 			case 0: { // do nothing
 				break;
 			}
-			case 1: { //can't be open because term is true and therefore the clause
+			case 1: { //can't be open because truth value of literal is true and therefore the clause
 				return null;
 			}
-			case -1: { // -1: is unit open
-				if (openTerm == null) {
-					openTerm = lit; //remember first open term
+			case -1: { // -1: is unit-open
+				if (openLiteral == null) {
+					openLiteral = lit; //remember first open literal
 					break;
 				}
-				return null; // more than one term unknown - can't be open
+				return null; // truth value of more than one literal is unknown - can't be unit-open
 			}
 			}
 		}
-		// if we get this far, this is a unit open clause or a unsatisfied clause, else, null is returned
-		return openTerm;
+		// if we get this far, this is a unit-open clause or a unsatisfied clause, else, null is returned
+		return openLiteral;
 	}
 
 	/**
-	 * Checks if a term is true, false or unknown.
+	 * Checks if the truth value of a literal is true, false or unknown.
 	 * 
 	 * @param l the literal to evaluate the truth value for.
-	 * @return Integer the Integer which represents the truth value of a term
+	 * @return value An int which represents the truth value of a literal
 	 */
 	private int evaluateValue(Literal l) {
 		if (!l.positive) {
@@ -523,13 +525,13 @@ public class LTMS {
 	}
 
 	/**
-	 * Returns the truth value of a variable: true (1), false (0) or unknown (-1).
+	 * Returns the truth value of a literal: true (1), false (0) or unknown (-1).
 	 * 
-	 * @param v the variable to evaluate the truth value for
-	 * @return Integer which represents the truth value of a variable
+	 * @param v the literal to evaluate the truth value for
+	 * @return an int which represents the truth value of a literal
 	 */
-	private int negate(int v) {
-		switch (v) {
+	private int negate(int l) {
+		switch (l) {
 		case 1: {
 			return 0;
 		}
@@ -540,16 +542,15 @@ public class LTMS {
 			return -1;
 		}
 		}
-		Util.fatalError((String) ("Unknown value: " + v));
+		Util.fatalError((String) ("Unknown value: " + l));
 		return -3; // will never get here
 	}
 
 	/**
-	 * Sets the reason and the antecedents (antecedents: all terms, which are in the same clause as this
-	 * literal and are false)
+	 * Sets the reason and antecedents for a literal's truth value.
 	 * 
-	 * @param l the literal to set its reason and antecedents
-	 * @param clause the clause of the literal
+	 * @param l The literal to set its reason and antecedents
+	 * @param clause The clause of the literal
 	 */
 	private void justify(Literal l, Node clause) {
 		valueMap.get(l.var).reason = clause;
@@ -566,13 +567,13 @@ public class LTMS {
 	}
 
 	/**
-	 * Core of the logic truth maintenance system. The BCP algorithm maintains a stack of unit open clauses.
+	 * Core of the logic truth maintenance system. The BCP algorithm maintains a stack of unit-open clauses.
 	 * Changes the unknown assignment of a literals truth value to true and sets its reason and antecedents. Finds
-	 * new unit open clauses and pushes them to stack. Whenever it encounters a violated clause, it signals a
+	 * new unit-open clauses and pushes them to stack. Whenever it encounters a violated clause, it signals a
 	 * contradiction.
 	 * 
-	 * @param cnfclauses the clauses of the conjunctive normal form of a feature model
-	 * @return true, if all unit open clauses have been processed and no violated clause have been encountered
+	 * @param cnfclauses The clauses of the conjunctive normal form of a feature model
+	 * @return true, if all unit-open clauses have been processed and no violated clause have been encountered. Else, return false.
 	 */
 	private boolean BCP(Node[] cnfclauses) {
 		while (!stackOpenClause.empty()) {
@@ -582,7 +583,7 @@ public class LTMS {
 				continue;
 			}
 			justify(l, openclause); //set reason and antecedents explanation
-			if (setValue(l, !l.positive, cnfclauses)) { // set propagated value and push unit open clauses to stack
+			if (setValue(l, !l.positive, cnfclauses)) { // set propagated value and push unit-open clauses to stack
 				continue;
 			}
 
@@ -607,8 +608,7 @@ public class LTMS {
 	 * Returns an explanation why a variable has its truth value by iterating its antecedents
 	 * and collecting their reasons. Only called to explain the BCP stack, not the violated clause.
 	 * 
-	 * @param l the literal to explain
-	 * @return a string to explain a variables truth value
+	 * @param l The literal to explain
 	 */
 	private void explainValue(Literal l) {
 		ArrayList<Literal> allAntencedents = new ArrayList<Literal>();
@@ -633,8 +633,8 @@ public class LTMS {
 	/**
 	 * Forms a union of all antecedents.
 	 * 
-	 * @param l the literal whose antecedents shall be collected
-	 * @param antecedents a list which is used to collect the antecedents.
+	 * @param l The literal whose antecedents shall be collected
+	 * @param antecedents A list which is used to collect the antecedents.
 	 */
 	private void collectAntecedents(Literal l, ArrayList<Literal> antecedents) {
 		if (valueMap.get(l.var).antecedents == null) {
@@ -652,8 +652,8 @@ public class LTMS {
 	 * Explains a truth value of a literal. Uses an enumeration to choose between explaining a
 	 * relationship to parent or a cross-tree constraint.
 	 * 
-	 * @param l the literal to explain
-	 * @return String with explanation for the literal
+	 * @param l The literal to explain
+	 * @return s An explanation for the literal
 	 */
 	private String explainVariable(Literal l) {
 		String s = "";
@@ -692,7 +692,7 @@ public class LTMS {
 	/**
 	 * Sets the truth value of every literal in the conjunctive normal form to -1 (unknown)
 	 * 
-	 * @param clausesFromCNF clauses of the conjunctive normal form
+	 * @param clausesFromCNF The clauses of the conjunctive normal form
 	 */
 	private void setTruthValToUnknown(Node[] clausesFromCNF) {
 		for (int j = 0; j < clausesFromCNF.length; j++) { // for all clauses of the cnf 
@@ -716,8 +716,8 @@ public class LTMS {
 	/**
 	 * Returns a list which contains the literals of a given node.
 	 * 
-	 * @param node the node which contains the literals
-	 * @return a list which contains the literals
+	 * @param node The node which contains the literals
+	 * @return res A list which contains the literals
 	 */
 	private ArrayList<Literal> getLiterals(Node node) {
 		ArrayList<Literal> res = new ArrayList<Literal>();
@@ -735,11 +735,11 @@ public class LTMS {
 	}
 
 	/**
-	 * Returns a literal from a node.
+	 * Returns a certain literal from a node.
 	 * 
-	 * @param node the node which contains the literal
-	 * @param l the literal with the same name as the literal to return
-	 * @return the specified literal
+	 * @param node The node which contains the literal
+	 * @param l The literal with the same name as the literal to return
+	 * @return res The specified literal
 	 */
 	private Literal getLiteralFromMap(Node node, Literal l) {
 		Literal res = null;

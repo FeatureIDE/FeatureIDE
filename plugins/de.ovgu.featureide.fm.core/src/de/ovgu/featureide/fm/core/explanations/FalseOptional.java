@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * The class FalseOptional generates explanations for false optional features. It uses a logic truth maintenance system (LTMS)
- * and its boolean constraint propagation (BCP).
+ * and boolean constraint propagation (BCP) which functions as an inference engine of the LTMS.
  * 
  * @author "Ananieva Sofia"
  */
@@ -50,9 +50,9 @@ public class FalseOptional {
 	 * Explains false optional features using boolean constraint propagation. Sets initial truth value assumptions of false optional
 	 * features to false and propagate them until a violation in any clause occurs.
 	 * 
-	 * @param featuremodel the model with the new constraint which leads to a false optional feature
-	 * @param foFeature the false optional feature
-	 * @return String an explanation why the feature is false optional
+	 * @param featuremodel The model with the new constraint which leads to a false optional feature
+	 * @param foFeature The false optional feature
+	 * @return explList An explanation why the feature is false optional
 	 */
 	public List<String> explain(IFeatureModel featuremodel, IFeature foFeature) {
 		List<String> explList = new ArrayList<>();
@@ -84,8 +84,8 @@ public class FalseOptional {
 	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
 	 * they are true and don't change the semantic of a formula.
 	 * 
-	 * @param node the formula node to remove true clauses from
-	 * @return formula node without true clauses
+	 * @param node The node to remove true clauses from
+	 * @return updatedNodes A node without true clauses
 	 */
 	private Node eliminateTrueClauses(Node node) {
 		LinkedList<Node> updatedNodes = new LinkedList<Node>();
@@ -98,7 +98,7 @@ public class FalseOptional {
 	/**
 	 * Sets the model with the new constraint which lead to a dead feature.
 	 * 
-	 * @param model the model with the new constraint
+	 * @param model The model with the new constraint
 	 */
 	public static void setFeatureModel(IFeatureModel fm) {
 		model = fm;

@@ -75,7 +75,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 * 
 	 * @param featureModel the origin feature model to collect the features from
 	 * @param root the root of the sub feature model
-	 * @return List of all features from the sub feature model
+	 * @return res A list of all features from the sub feature model
 	 */
 	private ArrayList<String> getSubtreeFeatures(IFeature root) {
 		ArrayList<String> res = new ArrayList<String>();

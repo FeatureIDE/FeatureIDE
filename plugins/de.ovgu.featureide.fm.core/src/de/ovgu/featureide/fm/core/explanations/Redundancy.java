@@ -36,14 +36,15 @@ import org.prop4j.Node;
 
 /**
  * The class Redundancy generates explanations for redundant constraints. It uses a logic truth maintenance system (LTMS)
- * and its boolean constraint propagation (BCP).
+ * and boolean constraint propagation (BCP) which functions as an inference engine of the LTMS.
  * 
  * @author "Ananieva Sofia"
  */
 public class Redundancy {
 
 	/**
-	 * The hashMap for bookkeeping of reasons and antecedents for literals. Key = literal.var, value = class Bookkeeping
+	 * A hash map for storing truth values, reasons and antecedents per literal. 
+	 * Key = literal.var, value = class Bookkeeping
 	 */
 	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>();
 	/**
@@ -60,7 +61,7 @@ public class Redundancy {
 	private ArrayList<Literal> featRedundantConstr = null;
 	
 	/**
-	 * Weight strings which occur in every generated explanation for a redundant constraint while searching for the shortest explanation.
+	 * A hash map for storing the number of occurrences of explanation parts.
 	 */
 	private static HashMap<String, Integer> weightedExplRedundancy = new HashMap<String, Integer>();
 	
@@ -70,12 +71,12 @@ public class Redundancy {
 	private static int cntExpl = 1;
 
 	/**
-	 * Checks whether a string is contained in a list of strings.
+	 * Checks whether a string contains a delimiter and removes the delimiter.
 	 * 
 	 * @param list the list with all strings
 	 * @param str String to check its occurrence in the list
 	 * @param del delimiter  
-	 * @return
+	 * @return true, if the string contains a delimiter, else false 
 	 */
 	static boolean containsIgnoreSuffix(List<String> list, String str, String del) {
 		for (String s : list) {
@@ -95,8 +96,8 @@ public class Redundancy {
 	 * which lead to a false formula of the redundant constraint and propagates this values until a violation
 	 * in a clause occurs.
 	 * 
-	 * @param oldModel the feature model without the redundant constraint
-	 * @param redundantConstraint the redundant constraint
+	 * @param oldModel The feature model without the redundant constraint
+	 * @param redundantConstraint The redundant constraint
 	 */
 	public List<String> explain(IFeatureModel oldModel, IFeatureModel newModel, IConstraint redundantConstraint) {
 		model = oldModel; // the model without the redundant constraint
@@ -110,7 +111,9 @@ public class Redundancy {
 		explList.add("\nConstraint is redundant, because:");
 		Node node = NodeCreator.createNodes(oldModel, true).toCNF();
 		Node redundantConstr = redundantConstraint.getNode().toCNF();
-		ArrayList<HashMap<Object, Integer>> values = getFeatureValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr); // arraylist of hashmaps with values for false cnf
+		
+		//remember all truth values which lead to an invalid CNF
+		ArrayList<HashMap<Object, Integer>> values = getFeatureValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr); 
 		Node[] clauses = node.getChildren();
 
 		List<String> reasons = new ArrayList<String>(); // collect all explanations into array without duplicates
@@ -119,7 +122,7 @@ public class Redundancy {
 			setTruthValueToUnknown(clauses); //(re)set all literal values to -1
 
 			for (Literal l : featRedundantConstr) {
-				valueMap.get(l.var).value = map.get(l.var);// get literal from origin map and set its value according to false cnf
+				valueMap.get(l.var).value = map.get(l.var);// get literal from origin map and set its value according to invalid CNF
 				valueMap.get(l.var).premise = true;
 			}
 			LTMS ltms = new LTMS(model, valueMap, featRedundantConstr);
@@ -145,7 +148,7 @@ public class Redundancy {
 	/**
 	 * Sets the model with the new redundant constraint.
 	 * 
-	 * @param model the model with the new constraint
+	 * @param Feature model The model with the new constraint
 	 */
 	public static void setNewModel(IFeatureModel model) {
 		newModel = model;
@@ -154,16 +157,16 @@ public class Redundancy {
 	/**
 	 * Gets the model with the new constraint. Used for tool tips to get the correct constraint index.
 	 * 
-	 * @return the model with the new constraint
+	 * @return newModel The model with the new constraint
 	 */
 	public static IFeatureModel getNewModel() {
 		return newModel;
 	}
 	
 	/**
-	 * Gets map which contains all explanation parts and their occurrence in all explanations
+	 * Gets map which contains all explanation parts and their occurrence in all explanations.
 	 * 
-	 * @return map with weighted explanation parts
+	 * @return weightedExplRedundancy The map with weighted explanation parts
 	 */
 	public static HashMap<String, Integer> getWeighted() {
 		return weightedExplRedundancy;
@@ -172,7 +175,7 @@ public class Redundancy {
 	/**
 	 * Gets the number of all explanations for one redundant constraint.
 	 * 
-	 * @return number of all explanations
+	 * @return cntExpl The number of all explanations
 	 */
 	public static int getCntExpl() {
 		return cntExpl;
@@ -181,17 +184,17 @@ public class Redundancy {
 	/**
 	 * Increments the number of all explanations for one redundant constraint.
 	 * 
-	 * @return incremental count of explanations
+	 * @return cntExpl An incremented count of explanations
 	 */
 	public static int setCntExpl() {
 		return cntExpl++;
 	}
 
 	/**
-	 * Returns a list which contains the literals of a given node.
+	 * Returns a list which contains literals of a given node.
 	 * 
 	 * @param node the node which contains the literals
-	 * @return a list which contains the literals
+	 * @return res An array list which contains literals of a given node
 	 */
 	private ArrayList<Literal> getLiterals(Node node) {
 		ArrayList<Literal> res = new ArrayList<Literal>();
@@ -237,7 +240,7 @@ public class Redundancy {
 	 * @param n the number of variables
 	 * @param cnf the clauses of the redundant constraint in conjunctive normal form
 	 * @param literals the literals from the redundant constraint
-	 * @return a list which contains a mapping between a variable and its value assignment
+	 * @return res A list which contains a mapping between a variable and its truth value 
 	 */
 	private ArrayList<HashMap<Object, Integer>> getFeatureValues(int n, Node cnf, ArrayList<Literal> literals) {
 		HashMap<Object, Integer> map = new HashMap<Object, Integer>();
@@ -261,7 +264,7 @@ public class Redundancy {
 					if (isFalseClause(clause, map)) { // check if every literal in clause is false
 						res.add(map);
 						map = new HashMap<Object, Integer>();
-						break; // if one clause is false, cnf is false
+						break; // if one clause is invalid, the CNF is invalid
 					}
 				}
 			} else if (n == 1) { // special case: explain constraint redundant which contains only one literal
@@ -273,21 +276,21 @@ public class Redundancy {
 	}
 
 	/**
-	 * Checks if all terms in a clause have a false value assignment. If this is the case, the tested value
+	 * Checks if all literals in a clause have a false value assignment. If this is the case, the tested value
 	 * assignment leads to a false conjunctive normal form.
 	 * 
 	 * @param clause the clause of check if it is false
 	 * @param map a map which contains a mapping between a variable and its value assignment
-	 * @return true, if all terms in a clause have a false value assignment. Else, return false
+	 * @return true, if all literals in a clause have a false value assignment. Else, return false
 	 */
 	private boolean isFalseClause(Node clause, HashMap<Object, Integer> map) {
 		ArrayList<Literal> literals = getLiterals(clause);
 		for (Literal lit : literals) {
-			if (!lit.positive && map.get(lit.var).equals(0)) { // literal is 1, cnf cannot be false
+			if (!lit.positive && map.get(lit.var).equals(0)) { // literal is 1, CNF cannot be false
 				return false;
 			}
 
-			if (lit.positive && map.get(lit.var).equals(1)) { //// literal is 1, cnf cannot be false
+			if (lit.positive && map.get(lit.var).equals(1)) { //// literal is 1, CNF cannot be false
 				return false;
 			}
 		}
