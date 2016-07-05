@@ -78,7 +78,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	protected final FeatureModelAnalyzer analyser;
-	protected final List<IConstraint> constraints = new LinkedList<>();
+	protected final List<IConstraint> constraints = new ArrayList<>();
 	
 	/**
 	 * A list containing the feature names in their specified order will be

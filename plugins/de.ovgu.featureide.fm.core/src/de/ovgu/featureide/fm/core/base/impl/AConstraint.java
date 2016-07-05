@@ -172,4 +172,9 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		this.propNode = node;
 	}
 
+	@Override
+	public String toString() {
+		return "AConstraint [propNode=" + propNode + "]";
+	}
+
 }
