@@ -56,9 +56,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependencyAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
@@ -83,6 +85,7 @@ public class FmOutlinePageContextMenu {
 	private FeatureModelEditor fTextEditor;
 	private TreeViewer viewer;
 	private IFeatureModel fInput;
+	private IGraphicalFeatureModel graphicalFM;
 
 	private HiddenAction hAction;
 	private MandatoryAction mAction;
@@ -90,6 +93,7 @@ public class FmOutlinePageContextMenu {
 	private DeleteAction dAction;
 	private DeleteAllAction dAAction;
 	private RenameAction reAction;
+	private CalculateDependencyAction cdAction;
 	private CreateCompoundAction cAction;
 	private CreateLayerAction clAction;
 	private CreateConstraintAction ccAction;
@@ -144,6 +148,7 @@ public class FmOutlinePageContextMenu {
 		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
 		dAction = new DeleteAction(viewer, fInput);
 		dAAction = new DeleteAllAction(viewer, fInput);
+		cdAction = new CalculateDependencyAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
 		ecAction = new EditConstraintAction(viewer, fInput);
 		cAction = new CreateCompoundAction(viewer, fInput);

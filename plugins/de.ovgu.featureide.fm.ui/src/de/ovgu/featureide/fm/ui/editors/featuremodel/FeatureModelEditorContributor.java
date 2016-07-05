@@ -34,6 +34,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependencyAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
@@ -47,7 +48,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
  */
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
-	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, DeleteAction.ID, MandatoryAction.ID, AndAction.ID,
+	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, CalculateDependencyAction.ID, DeleteAction.ID, MandatoryAction.ID, AndAction.ID,
 			OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
 			//ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
 			//ActionFactory.PASTE.getId(),

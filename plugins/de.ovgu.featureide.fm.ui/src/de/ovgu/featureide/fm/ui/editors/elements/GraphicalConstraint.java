@@ -51,7 +51,6 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	public GraphicalConstraint(GraphicalConstraint constraint) {
 		featureSelected = constraint.featureSelected;
-//		isImplicit = constraint.isImplicit;
 		correspondingConstraint = constraint.correspondingConstraint;
 		graphicalFeatureModel = constraint.graphicalFeatureModel;
 		location = constraint.location;

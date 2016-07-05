@@ -71,7 +71,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 
 	private IFeatureModel newInterfaceModel = null;
 
-	protected SliceFeatureModelJob(Arguments arguments) {
+	public SliceFeatureModelJob(Arguments arguments) {
 		super("Slice Feature Model", arguments);
 	}
 
@@ -103,7 +103,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		return true;
 	}
 
-	private IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
+	public IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
 		// Calculate Constraints
 		IFeatureModel m = orgFeatureModel.clone();
 		for (IFeature feat : m.getFeatures()) {

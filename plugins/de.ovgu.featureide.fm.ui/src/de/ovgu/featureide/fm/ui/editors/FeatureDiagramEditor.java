@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -246,7 +247,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
         editorKeyHandler = new FeatureDiagramEditorKeyHandler(this, graphicalFeatureModel);
         setKeyHandler(editorKeyHandler);
     }
-
     
     /**
      * Constructor. Used for an editable feature model.
@@ -624,83 +624,75 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
         internRefresh(true);
     }
     
-    public void analyzeFeatureModel() {
-        if (getFeatureModel() == null || getFeatureModel().getStructure().getRoot() == null || getContents() == null) {
-            return;
-        }
-        if (waiting) {
-            return;
-        }
-        waiting = true;
-        final boolean runAnalysis = featureModelEditor.getFeatureModel().getAnalyser().runCalculationAutomatically
-        && featureModelEditor.getFeatureModel().getAnalyser().calculateFeatures;
-        /**
-         * This extra job is necessary, else the UI will stop.
-         */
-        Job waiter = new Job("Analyze feature model (waiting)") {
-            
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                
-                try {
-                    if (analyzeJob != null && analyzer != null) {
-                        // waiting for analyzing job to finish
-                        analyzer.cancel(true);
-                        analyzeJob.join();
-                    }
-                } catch (InterruptedException e) {
-                    FMUIPlugin.getDefault().logError(e);
-                } finally {
-                    // avoid a dead lock
-                    if (analyzer != null) {
-                        analyzer.cancel(false);
-                    }
-                    waiting = false;
-                }
-                analyzeJob = new AStoppableJob(ANALYZE_FEATURE_MODEL) {
-                    @Override
-                    protected boolean work() throws Exception {
-                        if (waiting) {
-                            return true;
-                        }
-                        
-                        if (!runAnalysis) {
-                            UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
-                                
-                                @Override
-                                public IStatus runInUIThread(IProgressMonitor monitor) {
-                                    for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
-                                        if (f.getProperty().getFeatureStatus() != FeatureStatus.NORMAL) {
-                                            f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, true);
-                                        }
-                                    }
-                                    for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
-                                        c.setConstraintAttribute(ConstraintAttribute.NORMAL, true);
-                                    }
-                                    getContents().refresh();
-                                    return Status.OK_STATUS;
-                                }
-                                
-                            };
-                            refreshGraphics.setPriority(Job.SHORT);
-                            refreshGraphics.schedule();
-                            return true;
-                        }
-                        
-                        analyzer = getFeatureModel().getAnalyser();
-                        final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(new NullProgressMonitor());
-                        refreshGraphics(changedAttributes);
-                        return true;
-                    }
-                };
-                analyzeJob.setPriority(Job.LONG);
-                analyzeJob.schedule();
-                return Status.OK_STATUS;
-            }
-        };
-        waiter.setPriority(Job.DECORATE);
-        waiter.schedule();
-    }
+	public void analyzeFeatureModel() {
+		if (getFeatureModel() == null || getFeatureModel().getStructure().getRoot() == null || getContents() == null) {
+			return;
+		}
+		if (waiting) {
+			return;
+		}
+		waiting = true;
+		final boolean runAnalysis = featureModelEditor.getFeatureModel().getAnalyser().runCalculationAutomatically
+				&& featureModelEditor.getFeatureModel().getAnalyser().calculateFeatures;
+		/**
+		 * This extra job is necessary, else the UI will stop.
+		 */
+		Job waiter = new Job("Analyze feature model (waiting)") {
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+
+				try {
+					if (analyzeJob != null && analyzer != null) {
+						// waiting for analyzing job to finish
+						analyzer.cancel(true);
+						analyzeJob.join();
+					}
+				} catch (InterruptedException e) {
+					FMUIPlugin.getDefault().logError(e);
+				} finally {
+					// avoid a dead lock
+					if (analyzer != null) {
+						analyzer.cancel(false);
+					}
+					waiting = false;
+				}
+				analyzeJob = new AStoppableJob(ANALYZE_FEATURE_MODEL) {
+					@Override
+					protected boolean work() throws Exception {
+						if (waiting) {
+							return true;
+						}
+						
+						// TODO could be combined with analysis results
+						for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
+							f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
+						}
+						for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+							c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
+						}
+						refreshGraphics(null);
+
+						if (!runAnalysis) {
+							return true;
+						}
+
+						analyzer = getFeatureModel().getAnalyser();
+						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(new NullProgressMonitor());
+						refreshGraphics(changedAttributes);
+						return true;
+					}
+				};
+				analyzeJob.setPriority(Job.LONG);
+				analyzeJob.schedule();
+				return Status.OK_STATUS;
+			}
+		};
+		waiter.setPriority(Job.DECORATE);
+		waiter.schedule();
+	}
+	
+	int count = 5;
     
     /**
      * Refreshes the colors of the feature model.
@@ -709,41 +701,41 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
      *            Result of analyis to only refresh special features, or null if
      *            all features should be refreshed.
      */
-    private void refreshGraphics(final HashMap<Object, Object> changedAttributes) {
-        UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
-            
-            @Override
-            public IStatus runInUIThread(IProgressMonitor monitor) {
-                if (changedAttributes == null) {
-                    for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
-                        f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
-                        graphicalFeatureModel.getGraphicalFeature(f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
-                    }
-                    for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
-                        c.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
-                        graphicalFeatureModel.getGraphicalConstraint(c).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
-                    }
-                } else {
-                    for (Object f : changedAttributes.keySet()) {
-                        if (f instanceof IFeature) {
-                            ((IFeature) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
-                            graphicalFeatureModel.getGraphicalFeature((IFeature) f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
-                        } else if (f instanceof IConstraint) {
-                            ((IConstraint) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
-                            graphicalFeatureModel.getGraphicalConstraint((IConstraint)f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
-                        }
-                    }
-                }
-                
-                // call refresh to redraw legend
-                getContents().refresh();
-                return Status.OK_STATUS;
-            }
-            
-        };
-        refreshGraphics.setPriority(Job.SHORT);
-        refreshGraphics.schedule();
-    }
+	private void refreshGraphics(final HashMap<Object, Object> changedAttributes) {
+		UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				if (changedAttributes == null) {
+					for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
+						f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
+						graphicalFeatureModel.getGraphicalFeature(f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+					}
+					for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+						c.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
+						graphicalFeatureModel.getGraphicalConstraint(c).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+					}
+				} else {
+					for (Object f : changedAttributes.keySet()) {
+						if (f instanceof IFeature) {
+							((IFeature) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+							graphicalFeatureModel.getGraphicalFeature((IFeature) f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+						} else if (f instanceof IConstraint) {
+							((IConstraint) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
+							graphicalFeatureModel.getGraphicalConstraint((IConstraint)f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+						}
+					}
+				}
+
+				// call refresh to redraw legend
+				getContents().refresh();
+				return Status.OK_STATUS;
+			}
+
+		};
+		refreshGraphics.setPriority(Job.SHORT);
+		refreshGraphics.schedule();
+	}
     
     public void setLayout() {
         
@@ -1031,5 +1023,4 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
     public IGraphicalFeatureModel getGraphicalFeatureModel() {
         return graphicalFeatureModel;
     }
-    
 }
