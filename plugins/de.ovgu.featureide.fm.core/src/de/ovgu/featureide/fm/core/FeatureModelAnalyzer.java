@@ -775,6 +775,16 @@ public class FeatureModelAnalyzer {
 		}
 		
 		try {
+			if (cachedValidity) {
+				setSubTask(GET_FALSE_OPTIONAL_FEATURES_);
+				getFalseOptionalFeature(oldAttributes, changedAttributes);
+				worked(1);
+			}
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		
+		try {
 			if (canceled()) {
 				return;
 			}
@@ -797,15 +807,6 @@ public class FeatureModelAnalyzer {
 			FMCorePlugin.getDefault().logError(e);
 		}
 
-		try {
-			if (cachedValidity) {
-				setSubTask(GET_FALSE_OPTIONAL_FEATURES_);
-				getFalseOptionalFeature(oldAttributes, changedAttributes);
-				worked(1);
-			}
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
 		calculateHidden(changedAttributes);
 	}
 
