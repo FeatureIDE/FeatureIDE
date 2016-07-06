@@ -53,12 +53,18 @@ public class DeadFeatures {
 	 */
 	public List<String> explain(IFeatureModel featuremodel, IFeature deadFeature) {
 		List<String> explList = new ArrayList<>();
+		String property = ""; 
+		if (deadFeature.getStructure().isConcrete()) {
+			property = "Concrete ";
+		} else if (deadFeature.getStructure().isAbstract()) {
+			property = "Abtract ";
+		}
 		setFeatureModel(featuremodel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
 		
 			Literal	deadF = new Literal(deadFeature.getName());
-			explList.add("\nFeature " + deadF + " is dead, because:");
+			explList.add("\n"+property + "Feature " + deadF + " is dead, because:");
 			LTMS ltms = new LTMS(model);
 
 			// generate explanation which stops after first violation with "used" clauses in stack

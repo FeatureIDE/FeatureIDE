@@ -140,11 +140,11 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 			} else {
 				if (feature.getStructure().isConcrete()) {
-					toolTip.append(CONCRETE);
+				//	toolTip.append(CONCRETE);
 					analyser.setAttributeFlag(Attribute.Concrete, true);
 				} else {
 					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					toolTip.append(ABSTRACT);
+				//	toolTip.append(ABSTRACT);
 					analyser.setAttributeFlag(Attribute.Abstract, true);
 				}
 			}
@@ -155,11 +155,11 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				toolTip.append(VOID);
 			} else {
 				if (feature.getStructure().isConcrete()) {
-					toolTip.append(CONCRETE);
+//					toolTip.append(CONCRETE);
 					analyser.setAttributeFlag(Attribute.Concrete, true);
 				} else {
 					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					toolTip.append(ABSTRACT);
+//					toolTip.append(ABSTRACT);
 					analyser.setAttributeFlag(Attribute.Abstract, true);
 				}
 
@@ -170,14 +170,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 					analyser.setAttributeFlag(Attribute.Hidden, true);
 				}
 
-				toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
+//				toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
 
 				switch (feature.getProperty().getFeatureStatus()) {
 				case DEAD:
 					if (analyser.valid()) {
 						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-						toolTip.append(DEAD);
+//						toolTip.append(DEAD);
 						analyser.setAttributeFlag(Attribute.Dead, true);
 						explanation = FeatureModelAnalyzer.deadFeatureExpl.get(feature); // get explanation for false optional feature
 					}
@@ -185,7 +185,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				case FALSE_OPTIONAL:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
 					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-					toolTip.append(FALSE_OPTIONAL);
+//					toolTip.append(FALSE_OPTIONAL);
 					analyser.setAttributeFlag(Attribute.FalseOptional, true);
 					explanation = FeatureModelAnalyzer.falseOptFeatureExpl.get(feature); // get explanation for false optional feature
 					break;
@@ -225,17 +225,17 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
 		if (!contraints.isEmpty()) {
-			toolTip.append("\n\nConstraints:\n");
+			toolTip.append("\nConstraints:\n");
 			toolTip.append(contraints);
 		}
 
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(gl);
-		Label featureName = new Label(feature.getName());
-		featureName.setFont(DEFAULT_FONT_BOLD);
+//		Label featureName = new Label(feature.getName());
+//		featureName.setFont(DEFAULT_FONT_BOLD);
 		Label furtherInfos = new Label(toolTip.toString());
 		furtherInfos.setFont(DEFAULT_FONT);
-		toolTipContent.add(featureName);
+//		toolTipContent.add(featureName);
 		toolTipContent.add(furtherInfos);
 		appendCustomProperties(toolTipContent);
 
@@ -246,11 +246,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 		
-		if (explanation.isEmpty()) {
+		// only set explanation if not null or empty
+		if (explanation == null){
+			setToolTip(toolTipContent);
+		} else if (explanation.isEmpty()) {
 			setToolTip(toolTipContent);
 		} else {
 			setToolTip(toolTipContent, panel, explanation);
-		}
+			}
 	}
 
 	private void appendCustomProperties(Figure toolTipContent) {

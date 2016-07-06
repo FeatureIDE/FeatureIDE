@@ -123,9 +123,9 @@ public class CalculateDependencyAction extends Action {
 			return false;
 		
 		// permit selection to be root of the origin feature model
-		if (selection.getFirstElement().toString().contains(FeatureUtils.getRoot(featureModel).toString())) {
-			return false;
-		}
+//		if (selection.getFirstElement().toString().contains(FeatureUtils.getRoot(featureModel).toString())) {
+//			return false;
+//		}
 
 		selectedFeatures.clear();
 		Iterator<?> iter = selection.iterator();

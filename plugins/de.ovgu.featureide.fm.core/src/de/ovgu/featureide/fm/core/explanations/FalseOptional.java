@@ -56,6 +56,12 @@ public class FalseOptional {
 	 */
 	public List<String> explain(IFeatureModel featuremodel, IFeature foFeature) {
 		List<String> explList = new ArrayList<>();
+		String property = ""; 
+		if (foFeature.getStructure().isConcrete()) {
+			property = "Concrete ";
+		} else if (foFeature.getStructure().isAbstract()) {
+			property = "Abtract ";
+		}
 		setFeatureModel(featuremodel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node withoutTrueClauses = eliminateTrueClauses(node);
@@ -64,7 +70,7 @@ public class FalseOptional {
 			IFeature parentFalseOpt = FeatureUtils.getParent(foFeature);
 			Literal falseOptional = new Literal(foFeature.getName());
 			Literal parent = new Literal(parentFalseOpt.getName());
-			explList.add("\nFeature " + falseOptional + " is false-optional, because:");
+			explList.add("\n"+property + "Feature " + falseOptional + " is false-optional, because:");
 			LTMS ltms = new LTMS(model);
 
 			List<String> tmpExplList  = ltms.explainFalseOpsFeature(clauses, falseOptional, parent);
