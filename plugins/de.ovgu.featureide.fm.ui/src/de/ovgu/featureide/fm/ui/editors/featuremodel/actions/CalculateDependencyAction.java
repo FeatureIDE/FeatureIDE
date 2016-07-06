@@ -44,31 +44,31 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CalculateDependencyOperation;
 
 /**
- * Action to calculate implicit dependencies of a sub feature model after selecting a feature 
+ * Action to calculate implicit dependencies of a sub feature model after selecting a feature
  * and choosing to "calculate implicit dependencies". This feature will be the root of the new
- * sub feature model. 
+ * sub feature model.
  * 
  * @author "Ananieva Sofia"
  */
 public class CalculateDependencyAction extends Action {
-	
+
 	/**
 	 * The ID which is used to return the respective action after a context menu selection.
 	 */
 	public static final String ID = "de.ovgu.featureide.calculatedependency";
-	
+
 	/**
 	 * The underlying feature model.
 	 */
 	private final IFeatureModel featureModel;
-	
+
 	/**
 	 * The selected feature which will be used as new root.
 	 */
 	private LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
-	
+
 	/**
-	 * The listener which remembers the selection and checks whether it is valid. 
+	 * The listener which remembers the selection and checks whether it is valid.
 	 */
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -80,13 +80,13 @@ public class CalculateDependencyAction extends Action {
 	/**
 	 * Constructor.
 	 * 
-	 * @param viewer 
+	 * @param viewer
 	 * @param featureModel The feature model
 	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {
 		super(CALCULATE_DEPENDENCY);
 		this.featureModel = featureModel;
-		
+
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -94,7 +94,7 @@ public class CalculateDependencyAction extends Action {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 		}
 	}
-	
+
 	/**
 	 * Performs the operation of calculating sub feature model dependencies. The selected feature is root of the new sub feature mode.
 	 */
@@ -103,7 +103,7 @@ public class CalculateDependencyAction extends Action {
 		if (selectedFeatures.size() != 1)
 			throw new RuntimeException("Calculate dependencies for multiple selected features is not supported.");
 		CalculateDependencyOperation op = new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
-		
+
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute((IUndoableOperation) op, null, null);
 		} catch (ExecutionException e) {
@@ -121,11 +121,6 @@ public class CalculateDependencyAction extends Action {
 		// check empty selection (i.e. ModelEditPart is selected)
 		if (selection.size() == 1 && (selection.getFirstElement() instanceof ModelEditPart))
 			return false;
-		
-		// permit selection to be root of the origin feature model
-//		if (selection.getFirstElement().toString().contains(FeatureUtils.getRoot(featureModel).toString())) {
-//			return false;
-//		}
 
 		selectedFeatures.clear();
 		Iterator<?> iter = selection.iterator();
@@ -139,9 +134,19 @@ public class CalculateDependencyAction extends Action {
 				feature = ((FeatureEditPart) editPart).getFeature().getObject();
 			else
 				feature = (IFeature) editPart;
-			
+
 			selectedFeatures.add(feature);
 		}
-		return !selectedFeatures.isEmpty();
+
+		boolean res = !selectedFeatures.isEmpty();
+
+		// permit selection to be root of the origin feature model
+		if (res) {
+			String s = selectedFeatures.getFirst().toString();
+			if (s.equals(FeatureUtils.getRoot(featureModel).toString())) {
+				return false;
+			}
+		}
+		return res;
 	}
 }

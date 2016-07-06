@@ -41,7 +41,7 @@ public class DeadFeatures {
 	/**
 	 * The model after a change (with a constraint that makes a feature dead).
 	 */
-	private static IFeatureModel model; 
+	private static IFeatureModel model;
 
 	/**
 	 * Explains dead features using boolean constraint propagation. Sets initial truth value assumptions of dead features to true
@@ -53,7 +53,7 @@ public class DeadFeatures {
 	 */
 	public List<String> explain(IFeatureModel featuremodel, IFeature deadFeature) {
 		List<String> explList = new ArrayList<>();
-		String property = ""; 
+		String property = "";
 		if (deadFeature.getStructure().isConcrete()) {
 			property = "Concrete ";
 		} else if (deadFeature.getStructure().isAbstract()) {
@@ -62,25 +62,24 @@ public class DeadFeatures {
 		setFeatureModel(featuremodel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
-		
-			Literal	deadF = new Literal(deadFeature.getName());
-			explList.add("\n"+property + "Feature " + deadF + " is dead, because:");
-			LTMS ltms = new LTMS(model);
 
-			// generate explanation which stops after first violation with "used" clauses in stack
-			List<String> tmpExplList = ltms.explainDeadFeature(clauses, deadF);
+		Literal deadF = new Literal(deadFeature.getName());
+		explList.add("\n" + property + "Feature " + deadF + " is dead, because:");
+		LTMS ltms = new LTMS(model);
 
-			if (tmpExplList.isEmpty()){
-				explList.add("No explanation possible");
+		// generate explanation which stops after first violation with "used" clauses in stack
+		List<String> tmpExplList = ltms.explainDeadFeature(clauses, deadF);
+
+		if (tmpExplList.isEmpty()) {
+			explList.add("No explanation possible");
+		} else {
+			for (String tmp : tmpExplList) {
+				explList.add(tmp);
 			}
-			else{	
-				for (String tmp : tmpExplList) {
-					explList.add(tmp);
-				}
-			}
+		}
 		return explList;
 	}
-	
+
 	/**
 	 * Sets the model with the new constraint which lead to a dead feature.
 	 * 

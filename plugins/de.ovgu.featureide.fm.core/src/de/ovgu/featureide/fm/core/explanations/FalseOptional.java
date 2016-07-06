@@ -56,7 +56,7 @@ public class FalseOptional {
 	 */
 	public List<String> explain(IFeatureModel featuremodel, IFeature foFeature) {
 		List<String> explList = new ArrayList<>();
-		String property = ""; 
+		String property = "";
 		if (foFeature.getStructure().isConcrete()) {
 			property = "Concrete ";
 		} else if (foFeature.getStructure().isAbstract()) {
@@ -67,21 +67,20 @@ public class FalseOptional {
 		Node withoutTrueClauses = eliminateTrueClauses(node);
 		Node[] clauses = withoutTrueClauses.getChildren();
 
-			IFeature parentFalseOpt = FeatureUtils.getParent(foFeature);
-			Literal falseOptional = new Literal(foFeature.getName());
-			Literal parent = new Literal(parentFalseOpt.getName());
-			explList.add("\n"+property + "Feature " + falseOptional + " is false-optional, because:");
-			LTMS ltms = new LTMS(model);
+		IFeature parentFalseOpt = FeatureUtils.getParent(foFeature);
+		Literal falseOptional = new Literal(foFeature.getName());
+		Literal parent = new Literal(parentFalseOpt.getName());
+		explList.add("\n" + property + "Feature " + falseOptional + " is false-optional, because:");
+		LTMS ltms = new LTMS(model);
 
-			List<String> tmpExplList  = ltms.explainFalseOpsFeature(clauses, falseOptional, parent);
-			if (tmpExplList.isEmpty()){
-				explList.add("No explanation possible");
+		List<String> tmpExplList = ltms.explainFalseOpsFeature(clauses, falseOptional, parent);
+		if (tmpExplList.isEmpty()) {
+			explList.add("No explanation possible");
+		} else {
+			for (String tmp : tmpExplList) {
+				explList.add(tmp);
 			}
-			else{	
-				for (String tmp : tmpExplList) {
-					explList.add(tmp);
-				}
-			}
+		}
 		return explList;
 	}
 
