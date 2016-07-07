@@ -114,7 +114,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		}
 		assert (featureProject != null) : "Invalid project given";
 		IStatus stat;
-		if ((stat = isComposable()) == Status.OK_STATUS) {
+		if ((stat = isComposable()) != Status.OK_STATUS) {
 			for (IStatus child : stat.getChildren()) {
 				featureProject.createBuilderMarker(featureProject.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
 			}

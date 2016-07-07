@@ -34,10 +34,6 @@ import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
-import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ModelFileIdMap;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -915,6 +911,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @param index index of the constraint to replace
 	 * @param constraint constraint to be stored at the specified position
 	 */
-	void setConstraint(int index, Constraint constraint);
+	void setConstraint(int index, IConstraint constraint);
 
 }

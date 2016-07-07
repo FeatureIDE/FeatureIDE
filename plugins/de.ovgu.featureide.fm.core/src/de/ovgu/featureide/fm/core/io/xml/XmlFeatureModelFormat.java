@@ -50,30 +50,38 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
-import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 
 /**
- * Parses a FeatureModel from XML
+ * Reads / Writes a feature model in the FeatureIDE XML format
  * 
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
  */
-public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> {
+public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
+	
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + XmlFeatureModelFormat.class.getSimpleName();
 
 	@Override
-	public String getFactoryID() {
-		return DefaultFeatureModelFactory.ID;
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
 	}
 
 	@Override
@@ -588,6 +596,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> {
 	@Override
 	public XmlFeatureModelFormat getInstance() {
 		return new XmlFeatureModelFormat();
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

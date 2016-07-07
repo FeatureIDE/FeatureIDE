@@ -29,8 +29,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -58,24 +56,6 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * @author Sebastian Krieter
  */
 public abstract class AFileManager<T> implements IFileManager, IEventManager, IResourceChangeListener {
-
-	@CheckForNull
-	protected final static <R> IPersistentFormat<R> getFormat(String fileName, IFormatType<R>[] formatTypes) {
-		if (fileName != null && !fileName.isEmpty()) {
-			final String ext = fileName.substring(fileName.lastIndexOf('.') + 1);
-			for (IFormatType<R> type : formatTypes) {
-				if (ext.equals(type.getSuffix())) {
-					try {
-						return type.getFormat().newInstance();
-					} catch (InstantiationException | IllegalAccessException e) {
-						FMCorePlugin.getDefault().logError(e);
-						throw new RuntimeException();
-					}
-				}
-			}
-		}
-		return null;
-	}
 
 	private final IEventManager eventManager = new DefaultEventManager();
 

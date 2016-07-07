@@ -281,9 +281,12 @@ public class ExtendedFeatureModel extends FeatureModel {
 		if (feature != null) {
 			return feature;
 		}
-		return null;
-		// TODO MPL: Search for possible right feature
-//		return super.getFeature(parentModel + "." + name);
+		
+		if(name.toString().contains(".")){
+			return super.getFeature(this.getStructure().getRoot().getFeature().getName() + "." + name);
+		}else{
+			return null;
+		}
 	}
 	
 	public boolean isInterface() {
