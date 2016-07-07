@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.fama.FAMAWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 //import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -161,6 +162,19 @@ public class TComplexConstraintConverter {
 	public void testCNFConversion() throws UnsupportedModelException {
 		ComplexConstraintConverter converter = new ComplexConstraintConverter();
 		IFeatureModel resultFM = converter.convert(fm, new CNFConverter());
+		
+		assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));	
+	}
+	
+	@Test
+	public void testFAMAExport() throws UnsupportedModelException {
+		ComplexConstraintConverter converter = new ComplexConstraintConverter();
+	
+		IFeatureModel resultFM = converter.convert(fm, new CNFConverter(), ComplexConstraintConverter.Option.COHERENT);
+		
+		FAMAWriter writer = new FAMAWriter();
+		writer.setFeatureModel(resultFM);
+		writer.writeToFile(new File("test.fm"));
 		
 		assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));	
 	}
