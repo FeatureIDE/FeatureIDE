@@ -256,6 +256,11 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	}
 
 	@Override
+	public boolean hasDeadFeatures() {
+		return existsFeatureWithStatus(FeatureStatus.DEAD);
+	}
+
+	@Override
 	public boolean hasUnsatisfiableConstraints() {
 		return existsConstraintWithAttribute(ConstraintAttribute.UNSATISFIABLE);
 	}

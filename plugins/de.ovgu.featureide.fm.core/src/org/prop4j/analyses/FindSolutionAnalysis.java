@@ -20,9 +20,7 @@
  */
 package org.prop4j.analyses;
 
-import org.prop4j.solver.ISolverProvider;
-import org.sat4j.specs.IProblem;
-import org.sat4j.tools.ModelIterator;
+import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -31,25 +29,14 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class FindSolutionAnalysis extends SingleThreadAnalysis<String> {
+public class FindSolutionAnalysis extends SingleThreadAnalysis<int[]> {
 
-	public FindSolutionAnalysis(ISolverProvider solver) {
-		super(solver);
+	public FindSolutionAnalysis(SatInstance satInstance) {
+		super(satInstance);
 	}
 
-	public String execute(WorkMonitor monitor) throws Exception {
-		StringBuilder out = new StringBuilder();
-		IProblem problem = new ModelIterator(solver.getSolver());
-		if (!problem.isSatisfiable())
-			return null;
-		final int[] model = problem.model();
-
-		for (int var : model) {
-			if (var > 0) {
-				out.append(solver.getSatInstance().getVariableObject(var) + "\n");
-			}
-		}
-		return out.toString();
+	public int[] analyze(WorkMonitor monitor) throws Exception {
+		return solver.findModel();
 	}
 
 }

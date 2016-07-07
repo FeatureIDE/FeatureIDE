@@ -167,6 +167,12 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		collection.removeAll(falseOptionalFeatures);
 		return !falseOptionalFeatures.isEmpty();
 	}
+
+	@Override
+	public void setFalseOptionalFeatures(Iterable<IFeature> foFeatures) {
+		falseOptionalFeatures.clear();
+		this.falseOptionalFeatures.addAll(Functional.toList(foFeatures));
+	}
 	
 	public void setNode(Node node) {
 		this.propNode = node;

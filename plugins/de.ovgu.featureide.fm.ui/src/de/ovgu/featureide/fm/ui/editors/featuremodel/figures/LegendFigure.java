@@ -34,9 +34,9 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -146,18 +146,19 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModel();
 		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
 
-		mandatory = featureModel.getStructure().hasMandatoryFeatures();
-		optional = featureModel.getStructure().hasOptionalFeatures();
-		alternative = featureModel.getStructure().hasAlternativeGroup();
-		or = featureModel.getStructure().hasOrGroup();
-		_abstract = featureModel.getStructure().hasAbstract();
-		concrete = featureModel.getStructure().hasConcrete();
-		hidden = featureModel.getStructure().hasHidden();
-		dead = analyser.getAttributeFlag(Attribute.Dead);
+		final IFeatureModelStructure fmStructure = featureModel.getStructure();
+		mandatory = fmStructure.hasMandatoryFeatures();
+		optional = fmStructure.hasOptionalFeatures();
+		alternative = fmStructure.hasAlternativeGroup();
+		or = fmStructure.hasOrGroup();
+		_abstract = fmStructure.hasAbstract();
+		concrete = fmStructure.hasConcrete();
+		hidden = fmStructure.hasHidden();
+		dead = fmStructure.hasDeadFeatures();
 		
 		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
-		falseoptional = featureModel.getStructure().hasFalseOptionalFeatures();
-		indetHidden = featureModel.getStructure().hasIndetHidden();
+		falseoptional = fmStructure.hasFalseOptionalFeatures();
+		indetHidden = fmStructure.hasIndetHidden();
 
 		unsatisfiableConst = analyser.calculateConstraints && FeatureUtils.hasUnsatisfiableConst(featureModel);
 		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);

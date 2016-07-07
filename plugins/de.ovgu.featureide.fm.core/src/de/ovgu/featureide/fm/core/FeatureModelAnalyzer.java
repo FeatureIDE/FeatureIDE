@@ -22,18 +22,13 @@ package de.ovgu.featureide.fm.core;
 
 import static de.ovgu.featureide.fm.core.functional.Functional.map;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_INDETRMINATE_HIDDEN_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FIND_REDUNDANT_CONSTRAINTS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.GET_DEAD_FEATURES_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.GET_FALSE_OPTIONAL_FEATURES_;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -52,7 +47,7 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
-import org.sat4j.specs.IConstr;
+import org.prop4j.analyses.FeatureModelAnalysis;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -62,11 +57,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
  * the corresponding methods in {@link IFeatureModel}
@@ -84,18 +79,14 @@ public class FeatureModelAnalyzer {
 		IndetHidden, UnsatisfiableConst, TautologyConst, 
 		VoidModelConst, RedundantConst
 	}
-	
 
-	private final boolean[] attributeFlags = new boolean[Attribute.values().length];
-	
 	private static final String TRUE = "True";
 
 	private static final String FALSE = "False";
 
 	private List<IFeature> cachedDeadFeatures = Collections.emptyList();
 	private List<IFeature> cachedCoreFeatures = Collections.emptyList();
-	
-	private final Collection<IFeature> chachedFalseOptionalFeatures = new LinkedList<>();
+	private List<IFeature> cachedFalseOptionalFeatures = Collections.emptyList();
 	
 	private boolean cachedValidity = true;
 	
@@ -132,10 +123,6 @@ public class FeatureModelAnalyzer {
 	private IProgressMonitor monitor;
 
 	private FeatureDependencies dependencies;
-	
-	public Collection<IFeature> getCachedFalseOptionalFeatures() {
-		return chachedFalseOptionalFeatures;
-	}
 
 	/**
 	 * Returns the value calculated during the last call of
@@ -543,26 +530,19 @@ public class FeatureModelAnalyzer {
 	 * So LinkedLists are much faster because the number of feature in the set is usually small (e.g. dead features)
 	 */
 	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
-		resetAttributeFlags();
-		this.monitor = monitor;
-		if (calculateConstraints) {
-			beginTask(fm.getConstraintCount() + 2);
-		} else {
-			beginTask(2);
-		}
-		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
-		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
-
-		// put root always in so it will be refreshed (void/non-void)
-		changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
-		if (calculateFeatures) {
-			updateFeatures(oldAttributes, changedAttributes);
-		}
-		if (!canceled() && calculateConstraints) {
-			updateConstraints(oldAttributes, changedAttributes);
-		}
-		// put root always in so it will be refreshed (void/non-void)
-		return changedAttributes;
+		final WorkMonitor workMonitor = new WorkMonitor();
+		workMonitor.setMonitor(monitor);
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
+		analysis.setCalculateFeatures(calculateFeatures);
+		analysis.setCalculateConstraints(calculateConstraints);
+		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
+		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
+		final HashMap<Object, Object> newAttributes = LongRunningWrapper.runMethod(analysis, workMonitor);
+		cachedValidity = analysis.isValid();
+		cachedCoreFeatures = analysis.getCoreFeatures();
+		cachedDeadFeatures = analysis.getDeadFeatures();
+		cachedFalseOptionalFeatures = analysis.getFalseOptionalFeatures();
+		return newAttributes;
 	}
 
 	private void beginTask(int totalWork) {
@@ -571,190 +551,14 @@ public class FeatureModelAnalyzer {
 		}
 	}
 
-	public void updateConstraints(HashMap<Object, Object> oldAttributes,
-			HashMap<Object, Object> changedAttributes) {
-		IFeatureModel clone = fm.clone(null);
-		clone.setConstraints(new LinkedList<IConstraint>());
-		SatSolver solver = new SatSolver(NodeCreator.createNodes(clone), 1000);
-	
-		Collection<IFeature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
-		Collection<IFeature> fmFalseOptionals = getCachedFalseOptionalFeatures();
-		try {
-			final List<IConstraint> constraints = fm.getConstraints();
-			if (!cachedValidity) { 
-				// case: invalid model
-				boolean contraintFound = false;
-				for (IConstraint constraint : constraints) {
-					if (canceled()) {
-						return;
-					}
-					
-					clone.addConstraint(constraint);
-					try {
-						if (!contraintFound && !clone.getAnalyser().isValid()) {
-							if (oldAttributes.get(constraint) != ConstraintAttribute.VOID_MODEL) {
-								changedAttributes.put(constraint,
-										ConstraintAttribute.VOID_MODEL);
-							}
-							contraintFound = true;
-							constraint.setConstraintAttribute(
-									ConstraintAttribute.VOID_MODEL, false);
-						}
-					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
-					}
-					// contradiction?
-					SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
-					try {
-						if (!satsolverUS.isSatisfiable()) {
-							if (oldAttributes.get(constraint) != ConstraintAttribute.UNSATISFIABLE) {
-								changedAttributes.put(constraint, ConstraintAttribute.UNSATISFIABLE);
-							}
-							constraint.setConstraintAttribute(
-									ConstraintAttribute.UNSATISFIABLE, false);
-						}
-					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
-					}
-
-				}
-				if (monitor != null) {
-					monitor.done();
-				}
-				return;
-			}
-
-			clone.setConstraints(new LinkedList<IConstraint>());
-			
-			// Default case
-			/**
-			 * Algorithm description:
-			 * Start from a model without constraints;
-			 * Add one constraint after another;
-			 * Add the NEW introduces errors/warnings to the constraint;
-			 */
-			if (calculateRedundantConstraints || calculateTautologyConstraints) {
-				setSubTask(FIND_REDUNDANT_CONSTRAINTS);
-				
-				final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(clone);
-				nodeCreator.setCnfType(CNFType.Regular);
-				nodeCreator.setIncludeBooleanValues(true);
-				nodeCreator.setModelType(ModelType.OnlyStructure);
-				final SatSolver redundantSat = new SatSolver(nodeCreator.createNodes(), 1000);
-				redundantSat.setDBSimplificationAllowed(false);
-				
-				final List<List<IConstr>> constraintMarkers = new ArrayList<>();
-				for (IConstraint constraint : constraints) {
-					constraintMarkers.add(redundantSat.addTempConstraint(constraint.getNode().toCNF()));
-				}
-				redundantSat.isSatisfiable();
-				
-				/** Remove redundant constraints for further analysis **/
-				int i = -1;
-				for (IConstraint constraint : constraints) {
-					i++;
-					if (canceled()) {
-						return;
-					}
-					if (calculateTautologyConstraints) {
-						// tautology
-						SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
-						try {
-							if (!satsolverTAU.isSatisfiable()) {
-								if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
-									changedAttributes.put(constraint, ConstraintAttribute.TAUTOLOGY);
-								}
-								constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY, false);
-								worked(1);
-								continue;
-							}
-						} catch (TimeoutException e) {
-							FMCorePlugin.getDefault().logError(e);
-						}
-					}
-					
-					if (calculateRedundantConstraints) {
-						boolean atLeastOneRemoved = false;
-						for (IConstr cm : constraintMarkers.get(i)) {
-							if (cm != null) {
-								atLeastOneRemoved = true;
-								redundantSat.removeConstraint(cm);
-							}
-						}
-						if (atLeastOneRemoved) {
-							clone.addConstraint(constraint);
-							findRedundantConstraints(redundantSat, constraint, changedAttributes, oldAttributes);
-						} else {
-							setConstraintAttribute(constraint, changedAttributes, oldAttributes, ConstraintAttribute.REDUNDANT);
-						}
-						if (changedAttributes.containsKey(constraint)) {						
-							worked(1);
-						}
-					}
-					
-				}
-				clone = fm.clone(null);
-				clone.setConstraints(new LinkedList<IConstraint>());
-			}
-			/** Look for dead and false optional features **/
-			for (IConstraint constraint : constraints) {
-				if (canceled()) {
-					return;
-				}
-				
-				if (changedAttributes.get(constraint) == ConstraintAttribute.TAUTOLOGY) {
-					continue;
-				}
-				if (changedAttributes.get(constraint) == ConstraintAttribute.REDUNDANT) {
-					continue;
-				}
-				
-				constraint.setContainedFeatures();
-				if (fmFalseOptionals.isEmpty() && fmDeadFeatures.isEmpty()) {
-					if (constraint.getConstraintAttribute() != ConstraintAttribute.NORMAL) {
-						constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
-						changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
-					}
-					constraint.setDeadFeatures(Functional.getEmptyIterable(IFeature.class));
-					constraint.getFalseOptional().clear();
-					continue;
-				}
-				
-				worked(1);
-				setSubTask(constraint.toString());
-				clone.addConstraint(constraint);
-				oldAttributes.put(constraint, constraint.getConstraintAttribute());
-				constraint.setContainedFeatures();
-				
-				// if the constraint leads to false optional features it is added to
-				// changedAttributes in order to refresh graphics later
-				if (fmFalseOptionals.isEmpty()) {
-					constraint.getFalseOptional().clear();
-				} else if (constraint.setFalseOptionalFeatures(clone, fmFalseOptionals)) {
-					constraint.setConstraintAttribute(ConstraintAttribute.FALSE_OPTIONAL, false);
-					changedAttributes.put(constraint, ConstraintAttribute.FALSE_OPTIONAL);
-				}
-				
-				if (!fmDeadFeatures.isEmpty()) {
-					Collection<IFeature> deadFeatures = Functional.toList(constraint.getDeadFeatures(solver, clone, fmDeadFeatures));
-					if (!deadFeatures.isEmpty()) {
-						fmDeadFeatures.removeAll(deadFeatures);
-						constraint.setDeadFeatures(deadFeatures);
-						constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
-						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
-					}
-				} else {
-					constraint.setDeadFeatures(Collections.<IFeature>emptyList());
-				}
-				if (!changedAttributes.containsKey(constraint)) {
-					constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
-					changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
-				}
-
-			}
-		} catch (TimeoutException | ConcurrentModificationException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
+	public void updateConstraints() {
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
+		analysis.setCalculateFeatures(false);
+		analysis.setCalculateConstraints(true);
+		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
+		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
+		analysis.updateConstraints();
+		cachedValidity = analysis.isValid();
 	}
 	
 	private boolean canceled() {
@@ -773,92 +577,15 @@ public class FeatureModelAnalyzer {
 		}
 	}
 
-	private void findRedundantConstraints(SatSolver sat, IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object,Object> oldAttributes) {			
-		final Node constraintNode = constraint.getNode().toCNF();
-		
-		boolean redundant = true;
-		if (constraintNode instanceof And) {
-			final Node[] clauses = constraintNode.getChildren();
-			for (int i = 0; i < clauses.length; i++) {
-				if (!sat.isImplied(clauses[i].getChildren())) {
-					redundant = false;
-					break;
-				}
-			}
-		} else if (constraintNode instanceof Or) {
-			redundant = sat.isImplied(constraintNode.getChildren());
-		} else {
-			redundant = sat.isImplied((Literal) constraintNode);
-		}
-		
-		if (redundant) {
-			setConstraintAttribute(constraint, changedAttributes, oldAttributes, ConstraintAttribute.REDUNDANT);
-		} else {
-			sat.addClauses(constraintNode);
-		}
-	}
-
-	private void setConstraintAttribute(IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object, Object> oldAttributes, ConstraintAttribute constraintAttribute) {
-		if (oldAttributes.get(constraint) != constraintAttribute) {
-			changedAttributes.put(constraint, constraintAttribute);
-		}
-		constraint.setConstraintAttribute(constraintAttribute, false);
-	}
-
-	public void updateFeatures(Map<Object, Object> oldAttributes,
-			Map<Object, Object> changedAttributes) {
-		setSubTask(ANALYZE_FEATURES_);
-		for (IFeature bone : fm.getFeatures()) {
-			oldAttributes.put(bone, bone.getProperty().getFeatureStatus());
-			
-			if (bone.getProperty().getFeatureStatus() != FeatureStatus.NORMAL) {
-				changedAttributes.put(bone, FeatureStatus.FALSE_OPTIONAL);
-			}
-			bone.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
-			FeatureUtils.setRelevantConstraints(bone);
-		}
-
-		try {
-			cachedValidity = isValid();
-		} catch (TimeoutException e) {
-			cachedValidity = true;
-			FMCorePlugin.getDefault().logError(e);
-		}
-		
-		try {
-			if (cachedValidity) {
-				setSubTask(GET_FALSE_OPTIONAL_FEATURES_);
-				getFalseOptionalFeature(oldAttributes, changedAttributes);
-				worked(1);
-			}
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		
-		try {
-			if (canceled()) {
-				return;
-			}
-			/**
-			 * here the saved dead features at the feature model are calculated and set
-			 */
-			setSubTask(GET_DEAD_FEATURES_);
-			for (IFeature deadFeature : getDeadFeatures()) {
-				if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
-					changedAttributes.put(deadFeature, FeatureStatus.DEAD);
-				}
-				deadFeature.getProperty().setFeatureStatus(FeatureStatus.DEAD, false);
-			}
-			worked(1);
-			if (canceled()) {
-				return;
-			}
-			
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-
-		calculateHidden(changedAttributes);
+	public void updateFeatures() {		
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
+		analysis.setCalculateFeatures(true);
+		analysis.setCalculateConstraints(false);
+		analysis.updateFeatures();
+		cachedValidity = analysis.isValid();
+		cachedCoreFeatures = analysis.getCoreFeatures();
+		cachedDeadFeatures = analysis.getDeadFeatures();
+		cachedFalseOptionalFeatures = analysis.getFalseOptionalFeatures();
 	}
 
 	/**
@@ -955,16 +682,6 @@ public class FeatureModelAnalyzer {
 		return hiddenFeatures;
 	}
 
-	private void getFalseOptionalFeature(Map<Object, Object> oldAttributes,
-			Map<Object, Object> changedAttributes) {
-		chachedFalseOptionalFeatures.clear();
-		for (IFeature f : getFalseOptionalFeatures()) {
-			changedAttributes.put(f,FeatureStatus.FALSE_OPTIONAL);
-			f.getProperty().setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
-			chachedFalseOptionalFeatures.add(f);
-		}
-	}
-
 	public List<IFeature> getFalseOptionalFeatures() {
 		return getFalseOptionalFeatures(fm.getFeatures());
 	}
@@ -1028,16 +745,8 @@ public class FeatureModelAnalyzer {
 		return Collections.unmodifiableList(cachedCoreFeatures);
 	}
 
-	public boolean getAttributeFlag(Attribute attribute) {
-		return attributeFlags[attribute.ordinal()];
-	}
-	
-	public void setAttributeFlag(Attribute attribute, boolean flag) {
-		attributeFlags[attribute.ordinal()] = flag;
-	}
-	
-	public void resetAttributeFlags() {
-		Arrays.fill(attributeFlags, false);
+	public Collection<IFeature> getCachedFalseOptionalFeatures() {
+		return Collections.unmodifiableList(cachedFalseOptionalFeatures);
 	}
 
 }
