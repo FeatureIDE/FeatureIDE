@@ -33,6 +33,7 @@ import org.eclipse.ui.INewWizard;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.conversion.CNFConverter;
+import de.ovgu.featureide.fm.core.conversion.CombinedConverter;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
@@ -46,7 +47,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class EliminateConstraintsWizard extends AbstractWizard implements INewWizard {	
 	protected static enum ConversionMethod {
-		NNF, CNF, /*TSEITIN,*/ BEST;
+		NNF, CNF, /*TSEITIN,*/ COMBINED;
 	}
 
 	private EliminateConstraintsPage page;
@@ -92,8 +93,9 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 		case CNF:
 			return new CNFConverter();
 		case NNF:
-		default:
 			return new NNFConverter();
+		default:
+			return new CombinedConverter();
 		}
 	}
 	

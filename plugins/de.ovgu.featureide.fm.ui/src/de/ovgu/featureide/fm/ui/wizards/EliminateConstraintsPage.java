@@ -107,7 +107,7 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		methodCombo.add(COMBO_NNF_LABEL);
 		methodCombo.add(COMBO_CNF_LABEL);
 		methodCombo.setText(COMBO_COMB_LABEL);
-		selectedMethod = ConversionMethod.NNF;
+		selectedMethod = ConversionMethod.COMBINED;
 		
 		if(trivial)
 			methodCombo.setEnabled(false);
@@ -162,7 +162,7 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		// Add listeners
 		methodCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				ConversionMethod[] methods = new ConversionMethod[]{ConversionMethod.NNF, ConversionMethod.CNF, ConversionMethod.BEST};
+				ConversionMethod[] methods = new ConversionMethod[]{ConversionMethod.COMBINED, ConversionMethod.NNF, ConversionMethod.CNF};
 				int selection = methodCombo.getSelectionIndex();
 				selectedMethod = methods[selection];
 				boolean useCNF = selection < 2;
