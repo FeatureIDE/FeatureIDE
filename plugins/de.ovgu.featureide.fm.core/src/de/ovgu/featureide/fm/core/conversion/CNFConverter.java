@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- *  @brief Converter using conjunctive normal form.
+ * @brief Converter using conjunctive normal form.
  * 
  * @author Alexander Knueppel
  */
@@ -65,6 +65,7 @@ public class CNFConverter extends NNFConverter {
 		} else {
 			clauses.add(cnf);
 		}
+		
 		return clauses;
 	}
 }

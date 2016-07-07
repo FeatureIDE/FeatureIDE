@@ -28,6 +28,7 @@ import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.NodeReader;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
@@ -36,34 +37,69 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- *  @brief Converter using conjunctive normal form.
+ *  @brief Converter using cnf and nnf.
  * 
  * @author Alexander Knueppel
  */
-public class BestConverter implements IConverterStrategy {
+public class CombinedConverter implements IConverterStrategy {
+	private List<IConverterStrategy> strategies = new LinkedList<IConverterStrategy>(); 
+	private IConverterStrategy bestStrategy = new NNFConverter();
 	
-	List<IConverterStrategy> strategies = new LinkedList<IConverterStrategy>(); 
-	IConverterStrategy bestStrategy = null;
-	private int estimatedCosts(List<Node> preprocessed) {
-		return 0;
+	private double w_f = 1.0; // weight for features
+	private double w_c = 1.0; // weight for simple constraints
+	
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private double estimatedCosts(Node node) {
+		double costs = w_f;
+		
+		if(!(node instanceof And) && !(node instanceof Or)) {
+			return w_f + w_c;
+		}
+		
+		for(Node child : node.getChildren()) {
+			costs += estimatedCosts(child);
+		}
+		return costs;
 	}
 	
-	public BestConverter() {
+	/**
+	 * 
+	 * @param preprocessed
+	 * @return
+	 */
+	private double estimatedCosts(List<Node> preprocessed) {
+		double costs = w_f; // costs for top-feature
+		for(Node node : preprocessed) {
+			// recognize simple constraints
+			if(ComplexConstraintConverter.isSimple(node)) {
+				costs += w_c; continue;
+			}
+			costs += estimatedCosts(node);
+		}
+		//System.out.println(costs);
+		return costs;
+	}
+	
+	public CombinedConverter() {
 		strategies.add(new NNFConverter());
 		strategies.add(new CNFConverter());
 	}
+	
 	@Override
 	public List<Node> preprocess(IConstraint constraint) {
 		List<Node> result = new LinkedList<Node>();
 	
-		int costs = Integer.MAX_VALUE;
+		double costs = Double.MAX_VALUE;
 		for(IConverterStrategy strat : strategies) {
 			List<Node> preprocessed = strat.preprocess(constraint);
-			int cost = 0;
+			double cost = 0;
 			if((cost = estimatedCosts(preprocessed)) < costs) {
 				result = preprocessed;
 				costs = cost;
-				bestStrategy = strat;
 			}
 		}		
 		return result;
@@ -71,6 +107,8 @@ public class BestConverter implements IConverterStrategy {
 	
 	@Override
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
+		// CNF and NNF have the same creation process... 
+		// This here might be fixed in the future to work for other strategies as well.
 		return bestStrategy.convert(fm, nodes, preserve);
 	}
 }
