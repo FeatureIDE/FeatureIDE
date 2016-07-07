@@ -49,32 +49,42 @@ import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard.ConversionMet
  */
 public class EliminateConstraintsPage extends AbstractWizardPage {
 
-	private static final String METHOD_LABEL = "Method:";
-	private static final String METHOD_TOOLTIP = "Which method to use when converting to a product-equivalent model without complex constraints.";
+	private static final String METHOD_LABEL = "Refactoring Method:";
+	private static final String METHOD_TOOLTIP = "Which method to use when refactoring to a product-equivalent model without complex constraints.";
 	
 	private static final String COMBO_CNF_LABEL = "Conjunctive Normal Form (CNF)";
 	private static final String COMBO_NNF_LABEL = "Negation Normal Form (NNF)";
-	private static final String COMBO_BEST_LABEL = "Best method for each constraint (slowest)";
+	private static final String COMBO_COMB_LABEL = "Combined Method";
 	
 	private static final String PRESERVE_CONFIGS_LABEL = "Preserve configurations:";
 	private static final String PRESERVE_CONFIGS_TOOLTIP = "Whether to preserve the exact number of configurations. May result in large number of additional features and constraints.";
 	
+	private static final String REDUNDANT_LABEL = "Remove redundant constraints:";
+	private static final String REDUNDANT_TOOLTIP = "Whether to remove redundant and tautological constraints. Requires SAT-analysis and "
+												  + "and can therefore be time consuming.";
+	
 	private IFile inputModelFile;
 	private Combo methodCombo;
 	
+	private boolean trivial;
+	private String fileExtension;
+	
 	protected Text fileName;
+	protected String path;
 	protected ConversionMethod selectedMethod;
 	protected boolean preserveConfigurations = false;
-	
+	protected boolean removeRedundancy = false;
 	protected Combo fromFormatCombo;
 	protected Combo toFormatCombo;
 	/**
 	 * @param name
 	 */
-	protected EliminateConstraintsPage(IFile file, String name) {
+	protected EliminateConstraintsPage(IFile file, String name, boolean trivial, String fileExtension) {
 		super(name);
 		// TODO Auto-generated constructor stub
 		inputModelFile = file;
+		this.trivial = trivial;
+		this.fileExtension = fileExtension;
 	}
 
 	/* (non-Javadoc)
@@ -93,11 +103,14 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		
 		methodCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		methodCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		methodCombo.add(COMBO_COMB_LABEL);
 		methodCombo.add(COMBO_NNF_LABEL);
 		methodCombo.add(COMBO_CNF_LABEL);
-		methodCombo.add(COMBO_BEST_LABEL);
-		methodCombo.setText(COMBO_NNF_LABEL);
+		methodCombo.setText(COMBO_COMB_LABEL);
 		selectedMethod = ConversionMethod.NNF;
+		
+		if(trivial)
+			methodCombo.setEnabled(false);
 
 		Label fileNameLabel = new Label(composite, SWT.NULL);
 		fileNameLabel.setText("File name:");
@@ -106,13 +119,28 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		fileComposite.setLayout(new GridLayout(2, false));
 		fileComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		
-		fileName = new Text(fileComposite, SWT.BORDER | SWT.SINGLE);
-		String modelName = inputModelFile.getLocation().removeFileExtension().toOSString();
-		fileName.setText(modelName + "-simple-constraints.xml");	
-		fileName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-		
-		Button browseButton = new Button(fileComposite, SWT.NONE);
-		browseButton.setText("Browse...");
+		if(inputModelFile != null) {
+			fileName = new Text(fileComposite, SWT.BORDER | SWT.SINGLE);
+			String modelName = inputModelFile.getLocation().removeFileExtension().toOSString();
+			fileName.setText(modelName + "-simple-constraints."+fileExtension);	
+			path = fileName.getText();
+			fileName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+			Button browseButton = new Button(fileComposite, SWT.NONE);
+			browseButton.setText("Browse...");
+			
+			browseButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+				public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+					String selectedPath = openFileDialog();
+					if (selectedPath != null) {
+						fileName.setText(selectedPath);
+						IPath path = new Path(selectedPath);
+						if (path.getFileExtension() == null) {
+							fileName.setText(selectedPath + "." + fileExtension);
+						}
+					}
+				}
+			});
+		}
 		
 		final Label preserveConfigsLabel = new Label(composite, SWT.NULL);
 		preserveConfigsLabel.setText(PRESERVE_CONFIGS_LABEL);
@@ -120,6 +148,16 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		final Button preserveConfigsButton = new Button(composite, SWT.CHECK);
 		preserveConfigsButton.setToolTipText(PRESERVE_CONFIGS_TOOLTIP);
 		preserveConfigsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		final Label redundantLabel = new Label(composite, SWT.NULL);
+		redundantLabel.setText(REDUNDANT_LABEL);
+		redundantLabel.setToolTipText(REDUNDANT_TOOLTIP);
+		final Button redundantButton = new Button(composite, SWT.CHECK);
+		redundantButton.setToolTipText(REDUNDANT_TOOLTIP);
+		redundantButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		if(trivial)
+			preserveConfigsButton.setEnabled(false);
 		
 		// Add listeners
 		methodCombo.addModifyListener(new ModifyListener() {
@@ -135,28 +173,26 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		
 		fileName.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				checkFileName();
+				if(checkFileName())
+					path = fileName.getText();
 			}
 		});
-		
-		browseButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				String selectedPath = openFileDialog();
-				if (selectedPath != null) {
-					fileName.setText(selectedPath);
-					IPath path = new Path(selectedPath);
-					if (path.getFileExtension() == null) {
-						fileName.setText(selectedPath + ".xml");
-					}
-				}
-			}
-		});
-		
 		
 		preserveConfigsButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				preserveConfigurations = preserveConfigsButton.getSelection();
+				removeRedundancy = redundantButton.getSelection();
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		
+		redundantButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				removeRedundancy = redundantButton.getSelection();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -167,28 +203,30 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		checkFileName();
 	}
 	
-	protected void checkFileName() {
+	protected boolean checkFileName() {
 		String text = fileName.getText();
 		IPath path = new Path(text);
 		if (path.isEmpty()) {
 			updateErrorMessage("File name must be specified.");
-			return;
+			return false;
 		}
 		if (!path.isValidPath(text)) {
 			updateErrorMessage(text + " is no valid path.");
-			return;
+			return false;
 		}
 		String fileExtension = path.getFileExtension();
-		if (fileExtension == null || !fileExtension.equals("xml")) {
-			updateErrorMessage("Exported model file must have xml as file extension.");
-			return;
+		if (fileExtension == null || !fileExtension.equals(fileExtension)) {
+			updateErrorMessage("Exported model file must have "+fileExtension+" as file extension.");
+			return false;
 		}
-		if (path.toFile().exists()) {
-			updateStatusMessage("Selected file already exists. File will be overwritten.");
-			return;
-		}
+//		if (path.toFile().exists()) {
+//			updateStatusMessage("Selected file already exists. File will be overwritten.");
+//			return false;
+//		}
 		updateErrorMessage(null);
-		updateStatusMessage(null);
+		//updateStatusMessage(null);
+		
+		return true;
 	}
 	
 	private void updateErrorMessage(String message) {
@@ -196,17 +234,17 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		setPageComplete(message == null);
 	}
 	
-	private void updateStatusMessage(String message) {
-		setMessage(message);
-		setPageComplete(true);
-	}
+//	private void updateStatusMessage(String message) {
+//		setMessage(message);
+//		setPageComplete(true);
+//	}
 	
 	private String openFileDialog() {
 		FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getShell(), SWT.MULTI);
 
 		fileDialog.setFileName("simple-constraints.xml");
-		fileDialog.setFilterExtensions(new String[] { "*.xml" });
+		fileDialog.setFilterExtensions(new String[] { "*."+fileExtension });
 		fileDialog.setOverwrite(true);
 		fileDialog.setFilterPath(inputModelFile.getProject().getLocation().toOSString());
 		return fileDialog.open();

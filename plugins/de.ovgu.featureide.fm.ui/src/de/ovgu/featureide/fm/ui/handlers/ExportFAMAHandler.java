@@ -20,89 +20,64 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING_FEATURE_DEPENDENCIES;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
-import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
-import de.ovgu.featureide.fm.core.conversion.CNFConverter;
-import de.ovgu.featureide.fm.core.io.FMConverter;
+import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.fama.FAMAWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
-import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
-import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
-import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsPage;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard;
-import de.ovgu.featureide.fm.ui.wizards.FeatureModelConversionWizard;
-import de.ovgu.featureide.fm.ui.wizards.FeatureModelSlicingWizard;
-import de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizardPage;
-import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 
 /**
- * TODO description
+ * Exports feature model to FAMA format.
  * 
- * @author Alexander
+ * @author Alexander Knueppel
  */
-public class EliminateComplexConstraintsHandler extends AFileHandler {
-	
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.handlers.base.AFileHandler#singleAction(org.eclipse.core.resources.IFile)
-	 */
+public class ExportFAMAHandler extends AFileHandler {
+
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel featureModel = readModel(file);
-
+		final IFeatureModel fm = readModel(file);
+		
 		IConverterStrategy strategy = new NNFConverter();
 		ComplexConstraintConverter converter = new ComplexConstraintConverter();
 		String path = "";
-		
-		boolean trivial = ComplexConstraintConverter.trivialRefactoring(featureModel);
+		boolean trivial = ComplexConstraintConverter.trivialRefactoring(fm);
+
+		if (!trivial
+				&& !MessageDialog.openQuestion(new Shell(), "Warning!",
+						"Complex constraints of current feature model cannot be transformed trivially! Proceed? (Feature model will become bigger.)")) {
+			return;
+		}
 		
 		int pseudo = 0, strict = 0;
-		for(IConstraint c : featureModel.getConstraints()) {
+		for(IConstraint c : fm.getConstraints()) {
 			if(ComplexConstraintConverter.isSimple(c.getNode())) {
 			}
 			else if(ComplexConstraintConverter.isPseudoComplex(c.getNode()))
@@ -112,12 +87,9 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 			}
 		}
 		
-		//count number of constraints
-		//set file extension
-		final EliminateConstraintsWizard wizard = new EliminateConstraintsWizard(file, "Complex-constraints elimination", trivial, pseudo, strict, "xml");
+		final EliminateConstraintsWizard wizard = new EliminateConstraintsWizard(file, "Complex-constraints elimination", trivial, pseudo, strict, "fm");
 		
 		List<Option> options = new ArrayList<Option>();
-		
 		if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
 			strategy = wizard.getStrategy();
 			if(wizard.preserveConfigurations())
@@ -129,11 +101,13 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 					"Selected file already exists. File will be overwritten.")) {
 				return;
 			}
+			
 		}
 		
-		IFeatureModel result = converter.convert(featureModel, strategy, options.toArray(new Option[options.size()]));
-
-		final FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(result));
+		IFeatureModel result = converter.convert(fm, strategy,  options.toArray(new Option[options.size()]));
+		final FAMAWriter fmWriter = new FAMAWriter();
+		fmWriter.setFeatureModel(result);
+		
 		try {
 			fmWriter.writeToFile(new File(path));
 			file.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -141,21 +115,14 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//return fmWriter;
 	}
-	
-	private void openFileInEditor(IFile outputFile) throws PartInitException {
-		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		final IEditorInput editorInput = new FileEditorInput(outputFile);
-		final IEditorReference[] refs = page.getEditorReferences();
-		for (int i = 0; i < refs.length; i++) {
-			if (refs[i].getEditorInput().equals(editorInput)) {
-				page.closeEditor(refs[i].getEditor(false), false);
-				break;
-			}
 
-		}
-		IDE.openEditor(page, outputFile);
-	}
+//	@Override
+//	protected void configureFileDialog(FileDialog fileDialog) {
+//		super.configureFileDialog(fileDialog);
+//		fileDialog.setFileName("model.fm");
+//	}
 	/**
 	 * reads the featureModel from file
 	 * 
@@ -177,5 +144,4 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 		}
 		return fm;
 	}
-
 }

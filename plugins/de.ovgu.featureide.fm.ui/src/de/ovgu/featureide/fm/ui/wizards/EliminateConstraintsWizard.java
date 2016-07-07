@@ -52,20 +52,38 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 	private EliminateConstraintsPage page;
 	private ConversionMethod method;
 	private IFile inputModelFile;
+	private String path;
+	private boolean trivial;
+	private int pseudocomplex;
+	private int strictcomplex;
+	private String fileExtension;
 	/**
 	 * @param title
 	 */
-	public EliminateConstraintsWizard(IFile file, String title) {
+	public EliminateConstraintsWizard(IFile file, String title, boolean trivial, int pseudocomplex, int strictcomplex, String fileExtension) {
 		super(title);
 		// TODO Auto-generated constructor stub
 		inputModelFile = file;
+		this.trivial = trivial;
+		this.pseudocomplex = pseudocomplex;
+		this.strictcomplex = strictcomplex;
+		this.fileExtension = fileExtension;
 	}
 	
 	@Override
 	public void addPages() {
 		setWindowTitle("Export Product-Equivalent Model Without Complex Constraints");
-		page = new EliminateConstraintsPage(inputModelFile, "Export feature model to a product-equivalent model "
-				+ "including only simple requires and excludes constraints.");
+		page = new EliminateConstraintsPage(inputModelFile, "Complex constraints elimination", trivial, fileExtension);
+		
+		if(strictcomplex == 0) {
+			page.setTitle("No Strict-Complex Constraints found");
+			page.setDescription("Number of pseudo-complex constraints: " + pseudocomplex);
+		} else {
+			page.setTitle("Strict-Complex Constraints found");
+			page.setDescription("Number of strict-complex constraints: " + strictcomplex + "\n"
+					+ "Number of pseudo-complex constraints: " + pseudocomplex);
+		}
+		
 		addPage(page);
 	}
 	
@@ -79,7 +97,15 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 		}
 	}
 	
+	public String getPath() {
+		return page.path;
+	}
+	
 	public boolean preserveConfigurations() {
 		return page.preserveConfigurations;
+	}
+	
+	public boolean removeRedundancy() {
+		return page.removeRedundancy;
 	}
 }
