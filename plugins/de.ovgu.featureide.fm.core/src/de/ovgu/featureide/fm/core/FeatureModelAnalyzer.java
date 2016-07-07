@@ -52,6 +52,7 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
+import org.sat4j.specs.IConstr;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -61,8 +62,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.Comparison;
-import de.ovgu.featureide.fm.core.editing.ModelComparator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
@@ -579,10 +580,11 @@ public class FeatureModelAnalyzer {
 		Collection<IFeature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
 		Collection<IFeature> fmFalseOptionals = getCachedFalseOptionalFeatures();
 		try {
+			final List<IConstraint> constraints = fm.getConstraints();
 			if (!cachedValidity) { 
 				// case: invalid model
 				boolean contraintFound = false;
-				for (IConstraint constraint : fm.getConstraints()) {
+				for (IConstraint constraint : constraints) {
 					if (canceled()) {
 						return;
 					}
@@ -621,6 +623,8 @@ public class FeatureModelAnalyzer {
 				}
 				return;
 			}
+
+			clone.setConstraints(new LinkedList<IConstraint>());
 			
 			// Default case
 			/**
@@ -631,8 +635,24 @@ public class FeatureModelAnalyzer {
 			 */
 			if (calculateRedundantConstraints || calculateTautologyConstraints) {
 				setSubTask(FIND_REDUNDANT_CONSTRAINTS);
+				
+				final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(clone);
+				nodeCreator.setCnfType(CNFType.Regular);
+				nodeCreator.setIncludeBooleanValues(true);
+				nodeCreator.setModelType(ModelType.OnlyStructure);
+				final SatSolver redundantSat = new SatSolver(nodeCreator.createNodes(), 1000);
+				redundantSat.setDBSimplificationAllowed(false);
+				
+				final List<List<IConstr>> constraintMarkers = new ArrayList<>();
+				for (IConstraint constraint : constraints) {
+					constraintMarkers.add(redundantSat.addTempConstraint(constraint.getNode().toCNF()));
+				}
+				redundantSat.isSatisfiable();
+				
 				/** Remove redundant constraints for further analysis **/
-				for (IConstraint constraint : fm.getConstraints()) {
+				int i = -1;
+				for (IConstraint constraint : constraints) {
+					i++;
 					if (canceled()) {
 						return;
 					}
@@ -654,10 +674,22 @@ public class FeatureModelAnalyzer {
 					}
 					
 					if (calculateRedundantConstraints) {
-						findRedundantConstraints(clone, constraint, changedAttributes, oldAttributes);
+						boolean atLeastOneRemoved = false;
+						for (IConstr cm : constraintMarkers.get(i)) {
+							if (cm != null) {
+								atLeastOneRemoved = true;
+								redundantSat.removeConstraint(cm);
+							}
+						}
+						if (atLeastOneRemoved) {
+							clone.addConstraint(constraint);
+							findRedundantConstraints(redundantSat, constraint, changedAttributes, oldAttributes);
+						} else {
+							setConstraintAttribute(constraint, changedAttributes, oldAttributes, ConstraintAttribute.REDUNDANT);
+						}
 						if (changedAttributes.containsKey(constraint)) {						
 							worked(1);
-						}	
+						}
 					}
 					
 				}
@@ -665,7 +697,7 @@ public class FeatureModelAnalyzer {
 				clone.setConstraints(new LinkedList<IConstraint>());
 			}
 			/** Look for dead and false optional features **/
-			for (IConstraint constraint : fm.getConstraints()) {
+			for (IConstraint constraint : constraints) {
 				if (canceled()) {
 					return;
 				}
@@ -720,7 +752,7 @@ public class FeatureModelAnalyzer {
 				}
 
 			}
-		} catch (ConcurrentModificationException e) {
+		} catch (TimeoutException | ConcurrentModificationException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -741,17 +773,36 @@ public class FeatureModelAnalyzer {
 		}
 	}
 
-	private void findRedundantConstraints(IFeatureModel clone, IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object,Object> oldAttributes) {
-		IFeatureModel oldModel = clone.clone(null);
-		clone.addConstraint(constraint);
-		ModelComparator comparator = new ModelComparator(500);
-		Comparison comparison = comparator.compare(clone, oldModel);
-		if (comparison == Comparison.REFACTORING) {
-			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
-				changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
+	private void findRedundantConstraints(SatSolver sat, IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object,Object> oldAttributes) {			
+		final Node constraintNode = constraint.getNode().toCNF();
+		
+		boolean redundant = true;
+		if (constraintNode instanceof And) {
+			final Node[] clauses = constraintNode.getChildren();
+			for (int i = 0; i < clauses.length; i++) {
+				if (!sat.isImplied(clauses[i].getChildren())) {
+					redundant = false;
+					break;
+				}
 			}
-			constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT, false);
+		} else if (constraintNode instanceof Or) {
+			redundant = sat.isImplied(constraintNode.getChildren());
+		} else {
+			redundant = sat.isImplied((Literal) constraintNode);
 		}
+		
+		if (redundant) {
+			setConstraintAttribute(constraint, changedAttributes, oldAttributes, ConstraintAttribute.REDUNDANT);
+		} else {
+			sat.addClauses(constraintNode);
+		}
+	}
+
+	private void setConstraintAttribute(IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object, Object> oldAttributes, ConstraintAttribute constraintAttribute) {
+		if (oldAttributes.get(constraint) != constraintAttribute) {
+			changedAttributes.put(constraint, constraintAttribute);
+		}
+		constraint.setConstraintAttribute(constraintAttribute, false);
 	}
 
 	public void updateFeatures(Map<Object, Object> oldAttributes,
@@ -771,6 +822,16 @@ public class FeatureModelAnalyzer {
 			cachedValidity = isValid();
 		} catch (TimeoutException e) {
 			cachedValidity = true;
+			FMCorePlugin.getDefault().logError(e);
+		}
+		
+		try {
+			if (cachedValidity) {
+				setSubTask(GET_FALSE_OPTIONAL_FEATURES_);
+				getFalseOptionalFeature(oldAttributes, changedAttributes);
+				worked(1);
+			}
+		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		
@@ -797,15 +858,6 @@ public class FeatureModelAnalyzer {
 			FMCorePlugin.getDefault().logError(e);
 		}
 
-		try {
-			if (cachedValidity) {
-				setSubTask(GET_FALSE_OPTIONAL_FEATURES_);
-				getFalseOptionalFeature(oldAttributes, changedAttributes);
-				worked(1);
-			}
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
 		calculateHidden(changedAttributes);
 	}
 
@@ -924,8 +976,8 @@ public class FeatureModelAnalyzer {
 		for (IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure = feature.getStructure();
 			final IFeature parent = FeatureUtils.getParent(feature);
-			if (!structure.isMandatory() && parent != null && solver.impliedValue(
-					new Literal(parent.getName()),
+			if (!structure.isMandatory() && parent != null && solver.isImplied(
+					new Literal(parent.getName(), false),
 					new Literal(feature.getName()))) {
 				falseOptionalFeatures.add(feature);
 			}

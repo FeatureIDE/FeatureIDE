@@ -617,27 +617,17 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						if (waiting) {
 							return true;
 						}
+						
+						// TODO could be combined with analysis results
+						for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
+							f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
+						}
+						for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+							c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
+						}
+						refreshGraphics(null);
 
 						if (!runAnalysis) {
-							UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
-
-								@Override
-								public IStatus runInUIThread(IProgressMonitor monitor) {
-									for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
-										if (f.getProperty().getFeatureStatus() != FeatureStatus.NORMAL) {
-											f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, true);
-										}
-									}
-									for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
-										c.setConstraintAttribute(ConstraintAttribute.NORMAL, true);
-									}
-									getContents().refresh();
-									return Status.OK_STATUS;
-								}
-
-							};
-							refreshGraphics.setPriority(Job.SHORT);
-							refreshGraphics.schedule();
 							return true;
 						}
 
@@ -655,6 +645,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 	}
+	
+	int count = 5;
 
 	/**
 	 * Refreshes the colors of the feature model.
