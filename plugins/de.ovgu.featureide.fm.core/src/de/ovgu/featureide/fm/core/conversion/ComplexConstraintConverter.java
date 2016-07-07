@@ -20,21 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.conversion;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.And;
-import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -49,9 +46,11 @@ public class ComplexConstraintConverter {
 	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
 	/* Working feature model */
 	protected IFeatureModel fm;
-	/* Preserve number of configurations */
-	protected boolean preserveConfigurations;
 	
+	public enum Option {
+        COHERENT, REMOVE_RDUNDANCY
+    }
+		
 	/**
 	 * Checks whether a given node is either a requires- or an excludes-constraint.
 	 * @param node
@@ -129,16 +128,12 @@ public class ComplexConstraintConverter {
 		return ComplexConstraintConverter.trivialRefactoring(nodes);
 	}
 	
-	public void enablePreserveConfigurations(boolean enable) {
-		preserveConfigurations = enable;
-	}
-	
 	/**
 	 * Eliminates complex constraints according to a given strategy.
 	 * @param fm
 	 * @return
 	 */
-	public IFeatureModel convert(IFeatureModel model, IConverterStrategy converter) {
+	public IFeatureModel convert(IFeatureModel model, IConverterStrategy converter, Option... options) {
 		//check if model is valid
 		if(model == null) {
 			throw new IllegalArgumentException("Invalid feature model.");
@@ -148,29 +143,52 @@ public class ComplexConstraintConverter {
 			throw new IllegalArgumentException("Invalid converter.");
 		}
 		
+		boolean coherent = false;
+		boolean removeRedundncy = false;
+		
+		for(Option o : options) {
+			if(o.equals(Option.COHERENT)) 
+				coherent = true;
+			if(o.equals(Option.REMOVE_RDUNDANCY)) 
+				removeRedundncy = true;
+		}
+		
 		//Work with a clone
 		fm = model.clone();
-				
+		
 		//Basic cleaning
-		if(!prepare())
+		if(removeRedundncy && !prepare())
 			return fm;
 		
 		//Identify trivial refactorings
 		refactorPseudoComplexConstraints();
-		
+
 		//Get list of complex clauses and remove them from the model
 		List<IConstraint> complexConstraints = pruneComplexConstraints();
-		
+
 		//Minimize constraints
-		List<Node> minComplexNodes = new LinkedList<Node>();
+		List<Node> minComplexNodes = new ArrayList<Node>();
 		for(IConstraint c : complexConstraints) {			
 			List<Node> nodes = converter.preprocess(c);
 			
 			for(Node node : nodes) {
 				Node minNode = minimize(node);
+
 				if(ComplexConstraintConverter.isSimple(minNode)) {
 					fm.addConstraint(factory.createConstraint(fm, minNode));
-				} else {
+				} 
+				else if(minNode instanceof And) {
+					List<Node> conj = new LinkedList<Node>();
+					for(Node sub : minNode.getChildren()) {
+						if(ComplexConstraintConverter.isSimple(sub)) {
+							fm.addConstraint(factory.createConstraint(fm, sub));
+						} else {
+							conj.add(sub);
+						}
+						minComplexNodes.add(new And(conj.toArray()));
+					}
+				} 
+			else {
 					minComplexNodes.add(minNode);	
 				}
 			}
@@ -180,7 +198,8 @@ public class ComplexConstraintConverter {
 			return fm;
 		}
 		
-		return converter.convert(fm, minComplexNodes, preserveConfigurations);
+		IFeatureModel res = converter.convert(fm, minComplexNodes, coherent);
+		return res;
 	}
 	
 	/**
@@ -213,18 +232,9 @@ public class ComplexConstraintConverter {
 			
 			if (attribute == ConstraintAttribute.REDUNDANT || attribute == ConstraintAttribute.TAUTOLOGY) {
 				toRemove.add(c);
-			} else if (attribute == ConstraintAttribute.VOID_MODEL || attribute == ConstraintAttribute.UNSATISFIABLE ) {
-				IFeatureModel voidModel = factory.createFeatureModel();
-				IFeature root = factory.createFeature(fm, "root");
-				root.getStructure().setAbstract(true);
-				voidModel.getStructure().setRoot(root.getStructure());
-				voidModel.addConstraint(factory.createConstraint(fm, new Implies(root, new Not(root))));
-				fm = voidModel;
-				toRemove.clear();
-				return false;
-			}
+			} 
 		}
-	
+
 		for (IConstraint c : toRemove) {
 			fm.removeConstraint(c);
 		}
