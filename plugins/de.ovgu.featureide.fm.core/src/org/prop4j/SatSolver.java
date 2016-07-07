@@ -40,6 +40,7 @@ import org.sat4j.minisat.orders.NegativeLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.PositiveLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
@@ -138,7 +139,7 @@ public class SatSolver {
 		}
 	}
 
-	protected void addClause(Node node) throws ContradictionException {
+	protected IConstr addClause(Node node) throws ContradictionException {
 		try {
 			if (node instanceof Or) {
 				int[] clause = new int[node.children.length];
@@ -146,10 +147,10 @@ public class SatSolver {
 				for (Node child : node.getChildren()) {
 					clause[i++] = getIntOfLiteral(child);
 				}
-				solver.addClause(new VecInt(clause));
+				return solver.addClause(new VecInt(clause));
 			} else {
 				int literal = getIntOfLiteral(node);
-				solver.addClause(new VecInt(new int[] { literal }));
+				return solver.addClause(new VecInt(new int[] { literal }));
 			}
 		} catch (ClassCastException e) {
 			throw new RuntimeException(EXPRESSION_IS_NOT_IN_CNF, e);
@@ -223,12 +224,38 @@ public class SatSolver {
 		}
 		return Collections.emptyList();
 	}
-
-	public boolean impliedValue(Literal leftNode, Literal rightNode) {
+	
+	public void setDBSimplificationAllowed(boolean allowed) {
+		solver.setDBSimplificationAllowed(allowed);
+	}
+	
+	public void removeConstraint(IConstr constr) {
+		solver.removeConstr(constr);
+	}
+	
+	public List<IConstr> addTempConstraint(Node constraint) {
+		List<IConstr> result = new LinkedList<>();
+		try {
+			if (constraint instanceof And) {
+				for (Node node : constraint.getChildren()) {
+					result.add(addClause(node));
+				}
+			} else {
+				result.add(addClause(constraint));
+			}
+		} catch (ContradictionException e) {
+			contradiction = true;
+		}
+		return result;
+	}
+	
+	public boolean isImplied(Literal... or) {
 		if (!contradiction) {
 			final IVecInt backbone = new VecInt();
-			backbone.push(varToInt.get(leftNode.var));
-			backbone.push(-varToInt.get(rightNode.var));
+			for (int i = 0; i < or.length; i++) {
+				final Literal node = or[i];
+				backbone.push(node.positive ? -varToInt.get(node.var) : varToInt.get(node.var));
+			}
 			try {
 				return !solver.isSatisfiable(backbone);
 			} catch (TimeoutException e) {
@@ -236,6 +263,10 @@ public class SatSolver {
 			}
 		}
 		return false;
+	}
+
+	public boolean isImplied(Node[] or) {
+		return isImplied(Arrays.copyOf(or, or.length, Literal[].class));
 	}
 
 	public List<List<Literal>> atomicSets() {

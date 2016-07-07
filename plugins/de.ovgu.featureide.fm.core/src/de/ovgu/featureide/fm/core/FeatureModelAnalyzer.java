@@ -987,7 +987,7 @@ public class FeatureModelAnalyzer {
 
 			if (!FeatureUtils.getRoot(fm).toString().equals(feature.toString())) { // this might be indeed the case within the analysis for subtree dependencies
 				final IFeature parent = FeatureUtils.getParent(feature);
-				if (!structure.isMandatory() && parent != null && solver.impliedValue(new Literal(parent.getName()), new Literal(feature.getName()))) {
+				if (!structure.isMandatory() && parent != null && solver.isImplied(new Literal(parent.getName(), false), new Literal(feature.getName()))) {
 					falseOptionalFeatures.add(feature);
 				}
 			}
