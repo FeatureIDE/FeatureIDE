@@ -74,6 +74,11 @@ public class RingList<T> implements Iterable<T> {
 				count++;
 				return t;
 			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
 		};
 	}
 
