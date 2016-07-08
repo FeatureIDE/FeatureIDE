@@ -870,6 +870,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case LEGEND_LAYOUT_CHANGED:
 			legendLayoutAction.refresh();
+			internRefresh(false);
 			break;
 		case HIDDEN_CHANGED:
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature)event.getSource()).getStructure())) {
