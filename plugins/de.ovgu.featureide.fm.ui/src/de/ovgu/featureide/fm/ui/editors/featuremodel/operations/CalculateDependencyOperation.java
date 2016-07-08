@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_DEPENDENCY;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -33,11 +34,11 @@ import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob.Arguments;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
-
 
 /**
  * Option which uses feature model slicing to calculate dependencies of a sub feature model.
@@ -49,17 +50,17 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	/**
 	 * The selected root of the sub feature model.
 	 */
-	private final IFeature subtreeRoot; 
-	
+	private final IFeature subtreeRoot;
+
 	/**
 	 * The origin feature model which contains the sub feature model.
 	 */
-	private final IFeatureModel oldFm; 
-		
+	private final IFeatureModel oldFm;
+
 	private static final String LABEL = CALCULATE_DEPENDENCY;
 
 	/**
-	 * Constructor. 
+	 * Constructor.
 	 * 
 	 * @param featureModel The origin feature model
 	 * @param selectedFeature The selected feature which is root of the sub feature model
@@ -88,31 +89,45 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 				res.addAll(getSubtreeFeatures(f));
 			}
 		}
-		return res; 
+		return res;
 	}
 
 	/**
 	 * Executes operation by calling feature model slicing and replacing the new root with the selected
-	 * feature. A wizard page presents the sub feature model and implicit constraints. 
+	 * feature. A wizard page presents the sub feature model and implicit constraints.
 	 */
 	@Override
 	protected FeatureIDEEvent operation() {
 		ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
-		
+
 		// feature model slicing and replacing root with the selected feature
 		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, oldFm, subtreeFeatures);
 		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
 		IFeatureModel slicedModel = slice.createInterface(oldFm, subtreeFeatures).clone();
-		FeatureUtils.replaceRoot(slicedModel,subtreeRoot);
-		
+		FeatureUtils.replaceRoot(slicedModel, subtreeRoot);
+
 		// Instantiating a wizard page, removing the help button and opening a wizard dialog
 		final AbstractWizard wizard = new SubtreeDependencyWizard("Subtree Dependencies", slicedModel, oldFm);
 		TrayDialog.setDialogHelpAvailable(false);
 		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		dialog.open();
+		resetExplanations();
 		return new FeatureIDEEvent(oldFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);
 	}
-	
+
+	/**
+	 * Performs finishing actions when closing the wizard, i.e. set model to analyze back to origin feature model
+	 * and clear maps which hold explanations for anomalies.
+	 */
+	private void resetExplanations() {
+		// reset model to the origin one so that constraint index is consistent when closing page
+		Redundancy.setNewModel(oldFm);
+
+		// clear maps which hold explanations for defect constraints and features
+		FeatureModelAnalyzer.deadFeatureExpl.clear();
+		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
+		FeatureModelAnalyzer.redundantConstrExpl.clear();
+	}
 
 	/**
 	 * Enables redo/undo operation.

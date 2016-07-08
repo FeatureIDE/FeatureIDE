@@ -65,18 +65,10 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 
 
 	/**
-	 * Performs finishing actions when closing the wizard, i.e. set model to analyze back to origin feature model
-	 * and clear maps which hold explanations for anomalies.
+	 * Performs finishing actions when closing the wizard.
 	 */
 	@Override
 	public boolean performFinish() {
-		// reset model to the origin one so that constraint index is consistent when closing page
-		Redundancy.setNewModel(oldFm);
-
-		// clear maps which hold explanations for defect constraints and features
-		FeatureModelAnalyzer.deadFeatureExpl.clear();
-		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
-		FeatureModelAnalyzer.redundantConstrExpl.clear();
 		return true;
 	}
 

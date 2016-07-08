@@ -99,7 +99,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	private void insertFeatureModel(Composite comp) {
 
 		FeatureModelAnalyzer analyzer = new FeatureModelAnalyzer(subtreeModel);
-		resetExplanations(analyzer); // reset all properties to normal status
+		resetExplanations(); // reset all properties to normal status
 
 		FeatureModelEditor modeleditor = new FeatureModelEditor();
 		modeleditor.setFeatureModel(subtreeModel);
@@ -120,7 +120,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * 
 	 * @param analyzer The feature model analyzer for the sub feature model
 	 */
-	private void resetExplanations(FeatureModelAnalyzer analyzer) {
+	private void resetExplanations() {
 		FeatureModelAnalyzer.deadFeatureExpl.clear();
 		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
 		FeatureModelAnalyzer.redundantConstrExpl.clear();
