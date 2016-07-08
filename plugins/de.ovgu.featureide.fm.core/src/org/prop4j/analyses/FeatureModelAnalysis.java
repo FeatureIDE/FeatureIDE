@@ -234,6 +234,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		for (IConstraint constraint : constraints) {
 			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 			constraint.setContainedFeatures();
+			constraint.setFalseOptionalFeatures(Collections.<IFeature>emptyList());
+			constraint.setDeadFeatures(Collections.<IFeature>emptyList());
 		}
 
 		if (!calculateFeatures) {
