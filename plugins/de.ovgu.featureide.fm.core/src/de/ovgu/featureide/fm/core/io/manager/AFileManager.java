@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFileManager<T> implements IFileManager, IEventManager, IResourceChangeListener {
+public abstract class AFileManager<T> implements IFileManager, IResourceChangeListener {
 
 	private final IEventManager eventManager = new DefaultEventManager();
 

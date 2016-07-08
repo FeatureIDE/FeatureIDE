@@ -257,6 +257,7 @@ public class FeatureModelAnalyzer {
 	 *         otherwise
 	 * @throws TimeoutException
 	 */
+	@Deprecated
 	public boolean areMutualExclusive(Collection<IFeature> context,
 			Collection<Set<IFeature>> featureSets) throws TimeoutException {
 		if ((featureSets == null) || (featureSets.size() < 2))
@@ -321,6 +322,7 @@ public class FeatureModelAnalyzer {
 	 *         code-fragment may be missing || false, otherwise
 	 * @throws TimeoutException
 	 */
+	@Deprecated
 	public boolean mayBeMissing(Collection<IFeature> context,
 			Collection<Set<IFeature>> featureSets) throws TimeoutException {
 		if ((featureSets == null) || featureSets.isEmpty())
@@ -356,6 +358,7 @@ public class FeatureModelAnalyzer {
 	 * @return true if there exists such a set of features || false, otherwise
 	 * @throws TimeoutException
 	 */
+	@Deprecated
 	public boolean exists(Collection<IFeature> features) throws TimeoutException {
 		if ((features == null) || (features.isEmpty()))
 			return true;
@@ -365,6 +368,7 @@ public class FeatureModelAnalyzer {
 		return new SatSolver(finalFormula, 1000).isSatisfiable();
 	}
 
+	@Deprecated
 	public Node conjunct(final Collection<IFeature> b) {
 		return new And(new And(Functional.toList(map(b, new IFunction<IFeature, Literal>() {
 
@@ -375,8 +379,8 @@ public class FeatureModelAnalyzer {
 
 		}))), fm);
 	}
-	
-	
+
+	@Deprecated
 	public Node disjunct(Collection<IFeature> b) {
 		Iterator<IFeature> iterator = b.iterator();
 		Node result = new Literal(NodeCreator.getVariable(iterator.next(), fm));
@@ -399,6 +403,7 @@ public class FeatureModelAnalyzer {
 	 *            a list of feature names for which
 	 * @return a list of features that is common to all variants
 	 */
+	@Deprecated
 	public Collection<String> commonFeatures(long timeout, Object... selectedFeatures) {
 		Node formula = NodeCreator.createNodes(fm);
 		if (selectedFeatures.length > 0) {
