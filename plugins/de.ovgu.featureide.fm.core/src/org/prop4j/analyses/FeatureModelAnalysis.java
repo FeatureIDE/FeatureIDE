@@ -168,11 +168,15 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	@Override
 	public HashMap<Object, Object> execute(WorkMonitor monitor) throws Exception {
 		this.monitor = monitor;
-		if (calculateConstraints) {
-			monitor.setMaxAbsoluteWork(fm.getConstraints().size() + 2);
-		} else {
-			monitor.setMaxAbsoluteWork(2);
+		int work = 0;
+		if (calculateFeatures) {
+			work += 5;
+			if (calculateConstraints) {
+				work += 2 * (fm.getConstraints().size() + 1);
+			}
 		}
+		monitor.setMaxAbsoluteWork(work);
+
 		changedAttributes.clear();
 
 		deadFeatures.clear();
@@ -205,25 +209,22 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			feature.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
 			FeatureUtils.setRelevantConstraints(feature);
 		}
+		monitor.step();
 
 		nodeCreator.setModelType(ModelType.All);
 		final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 
 		checkValidity(si);
-
 		monitor.step();
 
 		if (valid) {
 			checkFeatureFalseOptional(features, si);
-
 			monitor.step();
 
 			checkFeatureDead(si);
-
 			monitor.step();
 
 			checkFeatureHidden(features);
-
 			monitor.step();
 		}
 	}
@@ -262,6 +263,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 		final List<IFeature> deadList = new LinkedList<>(deadFeatures);
 		final List<IFeature> foList = new LinkedList<>(falseOptionalFeatures);
+		monitor.step();
 
 		for (IConstraint constraint : constraints) {
 			modSat.addClauses(makeRegular(constraint.getNode()));
@@ -282,6 +284,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					}
 				}
 			}
+			monitor.step();
 		}
 	}
 
@@ -299,6 +302,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 				constraintMarkers.add(redundantSat.addClauses(cnf));
 			}
+			monitor.step();
 
 			int i = -1;
 			for (IConstraint constraint : constraints) {
@@ -333,12 +337,14 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 						}
 					}
 				}
+				monitor.step();
 			}
 		} else if (calculateTautologyConstraints) {
 			for (IConstraint constraint : constraints) {
 				if (checkConstraintTautology(constraint.getNode())) {
 					setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
 				}
+				monitor.step();
 			}
 		}
 	}
@@ -351,6 +357,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator.setModelType(ModelType.OnlyStructure);
 		final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 		final ModifiableSolver unsat = new ModifiableSolver(si);
+		monitor.step();
+		monitor.step();
 
 		for (IConstraint constraint : constraints) {
 			Node cnf = makeRegular(constraint.getNode());
@@ -381,6 +389,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
 				}
 			}
+			monitor.step();
+			monitor.step();
 		}
 	}
 

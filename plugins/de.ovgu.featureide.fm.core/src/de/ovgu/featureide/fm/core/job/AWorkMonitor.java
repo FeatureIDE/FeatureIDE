@@ -105,7 +105,7 @@ public abstract class AWorkMonitor {
 	public abstract void invoke(Object t);
 
 	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new Functional.NullConsumer<Object>();
+		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new Functional.NullConsumer<>();
 	}
 
 	/**
@@ -114,7 +114,7 @@ public abstract class AWorkMonitor {
 	 * @param maxAbsoluteWork the absolute amount of work this job has to do
 	 */
 	public final void setMaxAbsoluteWork(int maxAbsoluteWork) {
-		this.maxAbsoluteWork = maxAbsoluteWork;
+		this.maxAbsoluteWork = maxAbsoluteWork > 0 ? maxAbsoluteWork : 1;
 	}
 
 	public final void setMonitor(IProgressMonitor monitor) {
