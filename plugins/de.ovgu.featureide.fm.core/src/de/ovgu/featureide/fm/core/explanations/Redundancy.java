@@ -43,7 +43,7 @@ import org.prop4j.Node;
 public class Redundancy {
 
 	/**
-	 * A hash map for storing truth values, reasons and antecedents per literal. 
+	 * A hash map for storing truth values, reasons and antecedents per literal.
 	 * Key = literal.var, value = class Bookkeeping
 	 */
 	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>();
@@ -59,12 +59,12 @@ public class Redundancy {
 	 * The list which contains a literal of a respective feature from the redundant constraint.
 	 */
 	private ArrayList<Literal> featRedundantConstr = null;
-	
+
 	/**
 	 * A hash map for storing the number of occurrences of explanation parts.
 	 */
 	private static HashMap<String, Integer> weightedExplRedundancy = new HashMap<String, Integer>();
-	
+
 	/**
 	 * Count explanations for one redundant constraint.
 	 */
@@ -75,22 +75,24 @@ public class Redundancy {
 	 * 
 	 * @param list the list with all strings
 	 * @param str String to check its occurrence in the list
-	 * @param del delimiter  
-	 * @return true, if the string contains a delimiter, else false 
+	 * @param del delimiter
+	 * @return true, if the string contains a delimiter, else false
 	 */
 	static boolean containsIgnoreSuffix(List<String> list, String str, String del) {
 		for (String s : list) {
 			int index1 = s.lastIndexOf(del);
-			if (index1 >= 0) s = s.substring(0, index1);
-			int index2 = str.lastIndexOf(del);  
-			if (index2 >= 0) str = str.substring(0, index2);
-			if (s.equals(str))	{
+			if (index1 >= 0)
+				s = s.substring(0, index1);
+			int index2 = str.lastIndexOf(del);
+			if (index2 >= 0)
+				str = str.substring(0, index2);
+			if (s.equals(str)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Explains why a constraint is redundant. Assumes values for features of the redundant constraint
 	 * which lead to a false formula of the redundant constraint and propagates this values until a violation
@@ -106,14 +108,14 @@ public class Redundancy {
 		featRedundantConstr = new ArrayList<Literal>(new LinkedHashSet<Literal>(featRedundantConstr)); // remove duplicates from list
 		weightedExplRedundancy.clear();
 		cntExpl = 0;
-		
+
 		List<String> explList = new ArrayList<>();
 		explList.add("\nConstraint is redundant, because:");
 		Node node = NodeCreator.createNodes(oldModel, true).toCNF();
 		Node redundantConstr = redundantConstraint.getNode().toCNF();
-		
+
 		//remember all truth values which lead to an invalid CNF
-		ArrayList<HashMap<Object, Integer>> values = getFeatureValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr); 
+		ArrayList<HashMap<Object, Integer>> values = getFeatureValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr);
 		Node[] clauses = node.getChildren();
 
 		List<String> reasons = new ArrayList<String>(); // collect all explanations into array without duplicates
@@ -129,7 +131,7 @@ public class Redundancy {
 			List<String> tmpExplList = ltms.explainRedundantConstraint(clauses, map);
 
 			for (String s : tmpExplList) {
-				if (!containsIgnoreSuffix(reasons, s, "$")) {	
+				if (!containsIgnoreSuffix(reasons, s, "$")) {
 					reasons.add(s);
 				}
 			}
@@ -141,7 +143,7 @@ public class Redundancy {
 				explList.add(s);
 			}
 		}
-		LTMS.weightExpl(explList,weightedExplRedundancy,cntExpl);
+		LTMS.weightExpl(explList, weightedExplRedundancy, cntExpl);
 		return explList;
 	}
 
@@ -162,7 +164,7 @@ public class Redundancy {
 	public static IFeatureModel getNewModel() {
 		return newModel;
 	}
-	
+
 	/**
 	 * Gets map which contains all explanation parts and their occurrence in all explanations.
 	 * 
@@ -171,7 +173,7 @@ public class Redundancy {
 	public static HashMap<String, Integer> getWeighted() {
 		return weightedExplRedundancy;
 	}
-	
+
 	/**
 	 * Gets the number of all explanations for one redundant constraint.
 	 * 
@@ -180,7 +182,7 @@ public class Redundancy {
 	public static int getCntExpl() {
 		return cntExpl;
 	}
-	
+
 	/**
 	 * Increments the number of all explanations for one redundant constraint.
 	 * 
@@ -240,12 +242,35 @@ public class Redundancy {
 	 * @param n the number of variables
 	 * @param cnf the clauses of the redundant constraint in conjunctive normal form
 	 * @param literals the literals from the redundant constraint
-	 * @return res A list which contains a mapping between a variable and its truth value 
+	 * @return res A list which contains a mapping between a variable and its truth value
 	 */
 	private ArrayList<HashMap<Object, Integer>> getFeatureValues(int n, Node cnf, ArrayList<Literal> literals) {
 		HashMap<Object, Integer> map = new HashMap<Object, Integer>();
 		ArrayList<HashMap<Object, Integer>> res = new ArrayList<HashMap<Object, Integer>>();
 
+		// handle case if CNF consists only of one literal
+		if (n == 1) {
+			if (cnf instanceof Literal) {
+				Literal l = (Literal) cnf;
+				if (l.positive) {
+					map.put(l.var, 0);
+				} else {
+					map.put(l.var, 1);
+				}
+				res.add(map);
+			} else {
+				Literal l = getLiterals(cnf).get(0);
+				if (l.positive) {
+					map.put(l.var, 0);
+				} else {
+					map.put(l.var, 1);
+				}
+				res.add(map);
+			}
+			return res;
+		}
+
+		// handle case if CNF consists of more than one literal
 		for (int i = 0; i != (1 << n); i++) {
 			String binaryRep = Integer.toBinaryString(i);
 			while (binaryRep.length() != n) {
