@@ -70,7 +70,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	public SubtreeDependencyPage(IFeatureModel fm, IFeatureModel oldModel) {
 		super("Sub Feature Model Dependencies");
 		setTitle("Sub Feature Model Dependencies");
-		setDescription("Here you see implicit sub feature model dependencies if there are any.");
+		setDescription("Here you see implicit dependencies of the selected feature model, if there are any.");
 		subtreeModel = fm;
 		oldFm = oldModel;
 	}

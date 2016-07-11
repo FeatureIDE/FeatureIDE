@@ -860,9 +860,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
                 break;
             case CONSTRAINT_ADD:			
             case CONSTRAINT_DELETE:
-            case DEPENDENCY_CALCULATED:	
-                featureModelEditor.setPageModified(false);
-                break;
             case STRUCTURE_CHANGED:
             case MODEL_DATA_CHANGED:
                 reload();
@@ -922,6 +919,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
                 } else {
                     FMUIPlugin.getDefault().logWarning(event + " contains wrong source type: " + event.getSource());
                 }
+                break;
+            case DEPENDENCY_CALCULATED:	
+                featureModelEditor.setPageModified(false);
                 break;
             default:
                 FMUIPlugin.getDefault().logWarning(prop + " not handled!");
