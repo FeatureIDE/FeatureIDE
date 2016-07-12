@@ -40,18 +40,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.IClasspathAttribute;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.prop4j.Node;
@@ -62,7 +53,6 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
-
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -70,7 +60,6 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -142,8 +131,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
-
-	private boolean useFuji = false;
 
 	private FSTGenComposer composer;
 
@@ -225,7 +212,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public boolean initialize(IFeatureProject project) {
 		boolean supSuccess = super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
-		useFuji = usesFuji();
 		createBuildStructure();
 		return supSuccess && fhModelBuilder != null;
 	}
@@ -324,20 +310,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 						LOGGER.logError(e);
 					}
 				}
-				IFile conf = featureProject.getCurrentConfiguration();
-				if (conf != null) {
-					String configName = conf.getName();
-					sourcefolder = sourcefolder.getFolder(configName.substring(0, configName.indexOf('.')));
-					if (!sourcefolder.exists()) {
-						try {
-							sourcefolder.create(true, true, null);
-						} catch (CoreException e) {
-							LOGGER.logError(e);
-						}
-						callCompiler();
-					}
-					// setJavaBuildPath(conf.getName().split("[.]")[0]);
-				}
 			}
 		}
 	}
@@ -356,11 +328,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		/*
 		 * Run fuji parallel to the build process.
 		 */
-		// TODO: save useFuji persistently
 		fuji(signatureSetter);
-
-		createBuildFolder(config);
-		setJavaBuildPath(config.getName().split("[.]")[0]);
 
 		if (buildMetaProduct()) {
 			if (IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML.equals(featureProject.getMetaProductGeneration())) {
@@ -387,8 +355,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		signatureSetter.setFstModel(featureProject.getFSTModel());
 
 		checkContractComposition();
-
-		callCompiler();
 	}
 
 	private void checkContractComposition() {
@@ -668,7 +634,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * Starts type checking with fuji in a background job.
 	 */
 	private void fuji(final SignatureSetter signatureSetter) {
-		if (!useFuji) {
+		if (!usesFuji()) {
 			return;
 		}
 		if (fuji != null) {
@@ -820,70 +786,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Creates the folder at the source path named the configuration.
-	 * 
-	 * @param config
-	 */
-	private void createBuildFolder(IFile config) {
-		IFolder buildFolder = featureProject.getBuildFolder().getFolder(config.getName().split("[.]")[0]);
-		if (!buildFolder.exists()) {
-			try {
-				buildFolder.create(true, true, null);
-				buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
-				LOGGER.logError(e);
-			}
-		}
-	}
-
-	/**
-	 * Sets the Java build path to the folder at the build folder, named like
-	 * the current configuration.
-	 * 
-	 * @param buildPath
-	 *            The name of the current configuration
-	 */
-	private void setJavaBuildPath(String buildPath) {
-		try {
-			JavaProject javaProject = new JavaProject(featureProject.getProject(), null);
-			IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
-
-			int i = 0;
-			for (IClasspathEntry e : classpathEntrys) {
-				if (e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-					IPath path = featureProject.getBuildFolder().getFolder(buildPath).getFullPath();
-
-					/** return if nothing has to be changed **/
-					if (e.getPath().equals(path)) {
-						return;
-					}
-
-					/** change the actual source entry to the new build path **/
-					ClasspathEntry changedEntry = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), path, e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null,
-							e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
-					classpathEntrys[i] = changedEntry;
-					javaProject.setRawClasspath(classpathEntrys, null);
-					return;
-				}
-				i++;
-			}
-
-			/**
-			 * case: there is no source entry at the class path add the source
-			 * entry to the classpath
-			 **/
-			IFolder folder = featureProject.getBuildFolder().getFolder(buildPath);
-			ClasspathEntry sourceEntry = new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, folder.getFullPath(), new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
-			IClasspathEntry[] newEntrys = new IClasspathEntry[classpathEntrys.length + 1];
-			System.arraycopy(classpathEntrys, 0, newEntrys, 0, classpathEntrys.length);
-			newEntrys[newEntrys.length - 1] = sourceEntry;
-			javaProject.setRawClasspath(newEntrys, null);
-		} catch (JavaModelException e) {
-			LOGGER.logError(e);
-		}
-	}
-
-	/**
 	 * Builds the fst model.
 	 * 
 	 * @param configPath
@@ -932,8 +834,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @return
 	 */
 	private String[] getArguments(final String configPath, final String basePath, final String outputPath, String contract) {
-		return new String[] { CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath, CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath, CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
-				CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, contract };
+		return new String[] { 
+				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath, 
+				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath, 
+				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
+				CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, contract,
+				CmdLineInterpreter.INPUT_OPTION_NO_CONFIG_OUTPUT_DIR};
 	}
 
 	private String getContractParameter() {
@@ -956,67 +862,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			return CONTRACT_COMPOSITION_METHOD_BASED;
 		}
 		return CONTRACT_COMPOSITION_NONE;
-	}
-
-	/**
-	 * This job calls the compiler by touching the .classpath file of the
-	 * project.<br>
-	 * This is necessary after calling <code>setAsCurrentConfiguration</code>.
-	 */
-	private void callCompiler() {
-		Job job = new Job("Call compiler") {
-			protected IStatus run(IProgressMonitor monitor) {
-				IFile iClasspathFile = featureProject.getProject().getFile(".classpath");
-				if (iClasspathFile.exists()) {
-					try {
-						iClasspathFile.touch(monitor);
-						iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, monitor);
-					} catch (CoreException e) {
-						LOGGER.logError(e);
-					}
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setPriority(Job.DECORATE);
-		job.schedule();
-
-	}
-
-	/**
-	 * For <code>FeatureHouse<code> a clean does not remove the folder,
-	 * named like the current configuration at the build folder, 
-	 * to prevent build path errors.
-	 * 
-	 * @return always <code>false</code>
-	 */
-	@Override
-	public boolean clean() {
-		if (featureProject == null || featureProject.getBuildFolder() == null) {
-			return false;
-		}
-		IFile config = featureProject.getCurrentConfiguration();
-		if (config == null) {
-			return false;
-		}
-		try {
-			for (IResource featureFolder : featureProject.getBuildFolder().members()) {
-				if (featureFolder.getName().equals(config.getName().split("[.]")[0])) {
-					if (featureFolder instanceof IFolder) {
-						for (IResource res : ((IFolder) featureFolder).members()) {
-							res.delete(true, null);
-						}
-					} else {
-						featureFolder.delete(true, null);
-					}
-				} else {
-					featureFolder.delete(true, null);
-				}
-			}
-		} catch (CoreException e) {
-			LOGGER.logError(e);
-		}
-		return false;
 	}
 
 	public static final LinkedHashSet<String> EXTENSIONS = createExtensions();
@@ -1135,13 +980,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
-		String folderName = folder.getName();
-		super.buildConfiguration(folder, configuration, folderName);
-		IFile configurationFile = folder.getFile(folderName + '.' + getConfigurationExtension());
-		FSTGenComposer composer = new FSTGenComposer(false);
+		super.buildConfiguration(folder, configuration, congurationName);
+		final IFile configurationFile = folder.getFile(congurationName + '.' + getConfigurationExtension());
+		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
-		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getParent().getLocation().toOSString(), getContractParameter()));
+		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
 		if (errorPropagation != null && errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, because the
@@ -1156,13 +1000,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		}
 		fhModelBuilder.buildModel(composer.getFstnodes(), false);
-		if (!configurationFile.getName().startsWith(congurationName)) {
-			try {
-				configurationFile.move(((IFolder) configurationFile.getParent()).getFile(congurationName + '.' + getConfigurationExtension()).getFullPath(), true, null);
-			} catch (CoreException e) {
-				LOGGER.logError(e);
-			}
-		}
 	}
 
 	/**
@@ -1186,7 +1023,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
 		if (destination == null) {
-			super.copyNotComposedFiles(config, featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]));
+			super.copyNotComposedFiles(config, featureProject.getBuildFolder());
 		} else {
 			// case: build into an external project
 			super.copyNotComposedFiles(config, destination);
@@ -1201,7 +1038,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private void setProperty(QualifiedName qname, boolean value) {
 		try {
 			featureProject.getProject().setPersistentProperty(qname, value ? TRUE : FALSE);
-			useFuji = value;
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

@@ -150,8 +150,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private final FeatureModelManager featureModelManager;
 
-//	private FeatureModelReaderIFileWrapper modelReader;
-
 	private FSTModel fstModel;
 
 	/**

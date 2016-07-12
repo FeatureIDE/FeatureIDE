@@ -73,10 +73,10 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	@Override
 	public void setLocation(final Point p) {
 		if (this instanceof LegendRelationDecoration) {
-			super.setLocation(p.translate((-getBounds().width >> 1) + 1, -getBounds().height >> 1));
+			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
 		}else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
-			super.setLocation(p.translate((-getBounds().width >> 1), (-getBounds().height >> 1)));
+			super.setLocation(p.translate((-getBounds().width >> 1), 0));
 		}
 	}
 
@@ -97,9 +97,8 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		double minAngle = Double.MAX_VALUE;
 		double maxAngle = Double.MIN_VALUE;
 
-		final Rectangle r = new Rectangle(getBounds()).shrink(1,  1);
-
-		final Point center = getBounds().getCenter();
+		final Rectangle r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1,  1);
+		final Point center = getBounds().getTop();
 		if (this instanceof LegendRelationDecoration) {
 			maxAngle = calculateAngle(center, getFeatureLocation());
 			minAngle = calculateAngle(center, referencePoint);

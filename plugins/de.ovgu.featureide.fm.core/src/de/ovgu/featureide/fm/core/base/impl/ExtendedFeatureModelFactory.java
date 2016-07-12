@@ -27,6 +27,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 
 /**
+ * Factory for {@link IFeatureModel feature models} used in multi product lines.
+ * 
  * @author Sebastian Krieter
  */
 public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
@@ -37,7 +39,7 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 		return new ExtendedFeatureModelFactory();
 	}
 
-	private ExtendedFeatureModelFactory() {
+	public ExtendedFeatureModelFactory() {
 	}
 
 	@Override

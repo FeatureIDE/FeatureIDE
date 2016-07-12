@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -616,27 +617,17 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						if (waiting) {
 							return true;
 						}
+						
+						// TODO could be combined with analysis results
+						for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
+							f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
+						}
+						for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+							c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
+						}
+						refreshGraphics(null);
 
 						if (!runAnalysis) {
-							UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
-
-								@Override
-								public IStatus runInUIThread(IProgressMonitor monitor) {
-									for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
-										if (f.getProperty().getFeatureStatus() != FeatureStatus.NORMAL) {
-											f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, true);
-										}
-									}
-									for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
-										c.setConstraintAttribute(ConstraintAttribute.NORMAL, true);
-									}
-									getContents().refresh();
-									return Status.OK_STATUS;
-								}
-
-							};
-							refreshGraphics.setPriority(Job.SHORT);
-							refreshGraphics.schedule();
 							return true;
 						}
 
@@ -654,6 +645,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 	}
+	
+	int count = 5;
 
 	/**
 	 * Refreshes the colors of the feature model.
@@ -822,7 +815,22 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case CONSTRAINT_ADD:			
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
+			reload();
+			featureModelEditor.setPageModified(true);
+			analyzeFeatureModel();
+			break;
 		case MODEL_DATA_CHANGED:
+			// clear registry
+			final Map<?, ?> registry = getEditPartRegistry();
+			for (IGraphicalFeature f: graphicalFeatureModel.getFeatures()) {
+				registry.remove(f);
+				registry.remove(f.getSourceConnection());
+			}
+			for (IGraphicalConstraint f: graphicalFeatureModel.getConstraints()) {
+				registry.remove(f);
+			}
+			graphicalFeatureModel.init();
+			setContents(graphicalFeatureModel);
 			reload();
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
@@ -862,6 +870,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case LEGEND_LAYOUT_CHANGED:
 			legendLayoutAction.refresh();
+			internRefresh(false);
 			break;
 		case HIDDEN_CHANGED:
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature)event.getSource()).getStructure())) {

@@ -90,7 +90,7 @@ public class FeatureModelClassGenerator {
 			return;
 		}	
 		printModel();
-		IFolder FMFolder = featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]).getFolder("FM");
+		IFolder FMFolder = featureProject.getBuildFolder().getFolder("FM");
 		try {
 			FMFolder.create(true, true, null);
 			saveToFile(FMFolder.getFile("FeatureModel.java"));

@@ -51,15 +51,15 @@ public class Problem {
 	public final int line;
 
 	public Problem(Throwable throwable) {
-		this.message = throwable.getMessage();
-		this.line = 0;
-		this.severity = Severity.ERROR;
+		this(throwable.getMessage(), 0, Severity.ERROR);
+	}
+
+	public Problem(Throwable throwable, int line) {
+		this(throwable.getMessage(), line, Severity.ERROR);
 	}
 
 	public Problem(String message, int line) {
-		this.message = message;
-		this.line = line;
-		this.severity = Severity.WARNING;
+		this(message, line, Severity.WARNING);
 	}
 
 	public Problem(String message, int line, Severity severity) {

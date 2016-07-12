@@ -492,7 +492,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		menuItem.addArmListener(new ArmListener() {
 			@Override
 			public void widgetArmed(ArmEvent e) {
-				newToolTip(menu.getShell(), toolTipText, true);
+				final Point cursorLocation = menu.getShell().getDisplay().getCursorLocation();
+				newToolTip(menu.getShell(), toolTipText, true, cursorLocation.x + 20, cursorLocation.y + 10);
 			}
 		});
 		menuItem.addSelectionListener(new SelectionListener() {
@@ -625,13 +626,21 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			case UNSELECTED:
 				set(feature, (select) ? Selection.SELECTED : Selection.UNDEFINED);
 				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
-					item.setExpanded(select);
+					if (select) {
+						expandSingleChildren(item);
+					} else {
+						item.setExpanded(false);
+					}
 				}
 				break;
 			case UNDEFINED:
 				set(feature, (select) ? Selection.SELECTED : Selection.UNSELECTED);
 				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
-					item.setExpanded(select);
+					if (select) {
+						expandSingleChildren(item);
+					} else {
+						item.setExpanded(false);
+					}
 				}
 				break;
 			default:
@@ -653,6 +662,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 			//	updateInfoLabel();
+		}
+	}
+
+	private void expandSingleChildren(TreeItem item) {
+		SelectableFeature feature = (SelectableFeature) item.getData();
+		if (feature.getSelection() != Selection.UNSELECTED) {
+			item.setExpanded(true);
+			if (feature.getChildren().length == 1) {
+				expandSingleChildren(item.getItem(0));
+			}
 		}
 	}
 
@@ -1145,17 +1164,18 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 			if (sb.length() > 0) {
 				tipItem = item;
-				newToolTip(tree.getShell(), sb, false);
+				final Rectangle bounds = item.getBounds();
+				final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12,bounds.y));
+				newToolTip(tree.getShell(), sb, false, displayPoint.x,displayPoint.y);
 			}
 		}
 	}
 
-	private void newToolTip(Shell shell, CharSequence toolTipText, boolean autoHide) {
+	private void newToolTip(Shell shell, CharSequence toolTipText, boolean autoHide, int x, int y) {
 		disposeTooltip();
 		toolTip = new ToolTip(shell, SWT.NONE);
 		toolTip.setMessage(toolTipText.toString());
-		final Point cursorLocation = toolTip.getDisplay().getCursorLocation();
-		toolTip.setLocation(cursorLocation.x, cursorLocation.y + 20);
+		toolTip.setLocation(x, y);
 		toolTip.setAutoHide(autoHide);
 		toolTip.setVisible(true);
 	}
