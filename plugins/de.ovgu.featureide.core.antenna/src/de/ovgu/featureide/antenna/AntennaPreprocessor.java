@@ -169,6 +169,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 							if (sourceFile == null) {
 								AntennaCorePlugin.getDefault()
 										.logWarning("Source file for " + file + " not found for project " + featureProject.getProjectName());
+								continue;
 							}
 							if (!hasMarker(m, sourceFile)) {
 								IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
@@ -291,7 +292,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					// run antenna preprocessor
 					changed = preprocessor.preprocess(lines, ((IFile) res).getCharset());
 				} catch (PPException e) {
-					featureProject.createBuilderMarker(res, e.getMessage().replace("Line #" + e.getLineNumber() + " :", "Antenna:"), e.getLineNumber() + 1,
+					final int lineNumber = e.getLineNumber();
+					featureProject.createBuilderMarker(res, e.getMessage().replace("Line #" + lineNumber + " :", "Antenna:"), Math.max(lineNumber, 0) + 1,
 							IMarker.SEVERITY_ERROR);
 					AntennaCorePlugin.getDefault().logError(e);
 				}
