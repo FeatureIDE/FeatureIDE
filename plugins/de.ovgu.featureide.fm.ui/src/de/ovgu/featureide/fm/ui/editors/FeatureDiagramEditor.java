@@ -729,6 +729,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
+		System.out.println(event);
+		System.out.println(prop);
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
 			IFeature oldParent = (IFeature) event.getOldValue();
@@ -795,6 +797,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case ATTRIBUTE_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature)event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
+			legendLayoutAction.refresh();
+			internRefresh(false);
 			break;
 		case LOCATION_CHANGED:
 			internRefresh(true);
