@@ -22,23 +22,29 @@ package de.ovgu.featureide.examples.utils;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.core.CorePlugin;
 
@@ -46,10 +52,6 @@ import de.ovgu.featureide.core.CorePlugin;
  * Handles metadata of a project that is represented in the ExmampleWizard
  * 
  * @author Reimar Schroeter
- */
-/**
- * Class declared public only for test suite.
- * 
  */
 public class ProjectRecord implements Serializable {
 	private static final long serialVersionUID = 7680436510104564244L;
@@ -62,41 +64,75 @@ public class ProjectRecord implements Serializable {
 	private transient String error = "";
 	private transient boolean hasWarnings = false;
 	private transient boolean hasErrors = false;
-	private transient boolean newVersion = false;
-
-	/**
-	 * @return the newVersion
-	 */
-	public boolean isNewVersion() {
-		return newVersion;
-	}
-
-	/**
-	 * @param newVersion the newVersion to set
-	 */
-	public void setIsNewVersion(boolean newVersion) {
-		this.newVersion = newVersion;
-	}
+	private transient boolean updated = false;
+	private transient Collection<TreeItem> contentProviderItems;
+	private static transient int nextGlobalItemID = 0;
 
 	/**
 	 * Create a record for a project based on the info given in the file.
 	 * 
 	 * @param file
 	 */
-	public ProjectRecord(String projectDescriptionRelativePath, String name) {
-		projectName = name;
+	public ProjectRecord(String projectDescriptionRelativePath, String projectName) {
+		this.projectName = projectName;
 		this.projectDescriptionRelativePath = projectDescriptionRelativePath;
 	}
 
+	public Collection<TreeItem> getTreeItems() {
+		return contentProviderItems;
+	}
+
+	public class TreeItem {
+		private transient int id = 0;
+		private transient IContentProvider contProv;
+
+		public TreeItem(IContentProvider contProv, int id) {
+			this.contProv = contProv;
+			this.id = id;
+		}
+
+		@Override
+		public int hashCode() {
+			return projectName.hashCode() + projectDescriptionRelativePath.hashCode() + id;
+		}
+
+		public ProjectRecord getRecord() {
+			return ProjectRecord.this;
+		}
+
+		@Override
+		public String toString() {
+			return getProjectName();
+		}
+
+		public IContentProvider getProvider() {
+			return contProv;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return getProjectName();
+	}
+
+	public TreeItem createNewTreeItem(IContentProvider prov) {
+		if (contentProviderItems == null) {
+			contentProviderItems = new ArrayList<TreeItem>();
+		}
+		TreeItem ti = new TreeItem(prov, nextGlobalItemID++);
+		contentProviderItems.add(ti);
+		return ti;
+	}
+
 	public void init() {
-		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection().getInputStream()) {
+		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection()
+				.getInputStream()) {
 			projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}
-		
-		projectName = projectDescription.getName();
 
+		projectName = projectDescription.getName();
 		comment = new CommentParser(projectDescription.getComment());
 
 		performAlreadyExistsCheck();
@@ -107,18 +143,38 @@ public class ProjectRecord implements Serializable {
 		}
 	}
 
-	/**
-	 * @param subProjects
-	 */
-	public void setSubProjects(Collection<ProjectRecord> subProjects) {
-		this.subProjects = subProjects;
+	private void performAlreadyExistsCheck() {
+		if (isProjectInWorkspace(getProjectName())) {
+			error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
+			hasErrors = true;
+		}
 	}
 
-	/**
-	 * @return
-	 */
-	public String getRelativeLocation() {
-		return new Path(projectDescriptionRelativePath).removeFirstSegments(1).removeLastSegments(1).toString();
+	private void performRequirementCheck() {
+		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
+
+		if (status.isOK()) {
+			status = CorePlugin.getDefault().isComposable(projectDescription);
+		}
+
+		if (!status.isOK()) {
+			warning = status.getMessage();
+			if (status instanceof MultiStatus) {
+				MultiStatus multi = (MultiStatus) status;
+				if (multi.getChildren().length > 0) {
+					warning += " (";
+					for (int j = 0; j < multi.getChildren().length - 1; j++) {
+						warning += multi.getChildren()[j].getMessage() + " ;";
+					}
+					warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
+				}
+			}
+			hasWarnings = true;
+		}
+	}
+
+	public void setSubProjects(Collection<ProjectRecord> subProjects) {
+		this.subProjects = subProjects;
 	}
 
 	public boolean hasSubProjects() {
@@ -164,36 +220,6 @@ public class ProjectRecord implements Serializable {
 		return error;
 	}
 
-	private void performAlreadyExistsCheck() {
-		if (isProjectInWorkspace(getProjectName())) {
-			error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
-			hasErrors = true;
-		}
-	}
-
-	private void performRequirementCheck() {
-		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
-
-		if (status.isOK()) {
-			status = CorePlugin.getDefault().isComposable(projectDescription);
-		}
-
-		if (!status.isOK()) {
-			warning = status.getMessage();
-			if (status instanceof MultiStatus) {
-				MultiStatus multi = (MultiStatus) status;
-				if (multi.getChildren().length > 0) {
-					warning += " (";
-					for (int j = 0; j < multi.getChildren().length - 1; j++) {
-						warning += multi.getChildren()[j].getMessage() + " ;";
-					}
-					warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
-				}
-			}
-			hasWarnings = true;
-		}
-	}
-
 	/**
 	 * Gets the label to be used when rendering this project record in the
 	 * UI.
@@ -213,20 +239,6 @@ public class ProjectRecord implements Serializable {
 	@Override
 	public boolean equals(Object arg) {
 		return (arg instanceof ProjectRecord) && ((ProjectRecord) arg).projectName.equals(this.projectName);
-	}
-
-	/**
-	 * @return the projectDescription
-	 */
-	public IProjectDescription getProjectDescription() {
-		return projectDescription;
-	}
-
-	/**
-	 * @return
-	 */
-	public String getIndexPath() {
-		return projectDescriptionRelativePath.replace(".project", "index.s");
 	}
 
 	/**
@@ -270,5 +282,61 @@ public class ProjectRecord implements Serializable {
 		in.defaultReadObject();
 		warning = "";
 		error = "";
+	}
+
+	public String getRelativePath() {
+		return new Path(projectDescriptionRelativePath).removeFirstSegments(1).removeLastSegments(1).toString();
+	}
+
+	public String getIndexDocumentPath() {
+		return projectDescriptionRelativePath.replace(".project", "index.s");
+	}
+
+	public String getInformationDocumentPath() {
+		return projectDescriptionRelativePath.replace(".project", "projectInformation.xml");
+	}
+
+	/**
+	 * @return the projectDescription
+	 */
+	public IProjectDescription getProjectDescription() {
+		return projectDescription;
+	}
+
+	public Document getInformationDocument() {
+		InputStream inputStream = null;
+		try {
+			inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
+		} catch (Exception e1) {
+			return null;
+		}
+
+		try {
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(inputStream);
+			return doc;
+		} catch (IOException | ParserConfigurationException | SAXException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public void resetItems() {
+		contentProviderItems = new ArrayList<TreeItem>();
+	}
+
+	/**
+	 * @return the updated
+	 */
+	public boolean updated() {
+		return updated;
+	}
+
+	/**
+	 * @param updated the newVersion to set
+	 */
+	public void setUpdated(boolean updated) {
+		this.updated = updated;
 	}
 }

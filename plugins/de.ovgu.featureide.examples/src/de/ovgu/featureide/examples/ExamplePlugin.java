@@ -37,6 +37,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
 	private static ExamplePlugin plugin;
 
 	public static final String FeatureIDE_EXAMPLE_DIR = "featureide_examples";//$NON-NLS-1$
+	public static final String FeatureIDE_EXAMPLE_INDEX = "projects.s";//$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.plugin.AbstractUIPlugin#getID()

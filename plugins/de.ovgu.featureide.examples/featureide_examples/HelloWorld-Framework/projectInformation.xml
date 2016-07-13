@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<exampleWizard>
+	<contentProvider name="Composer">
+		<path>Framework</path>
+	</contentProvider>
+	<contentProvider name="Concepts">
+		<path>Framework and Plugins</path>
+	</contentProvider>
+	<contentProvider name="Languages">
+		<path>Java</path>
+	</contentProvider>
+</exampleWizard>
