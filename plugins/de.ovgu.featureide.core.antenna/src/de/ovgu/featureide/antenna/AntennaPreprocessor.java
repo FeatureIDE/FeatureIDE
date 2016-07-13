@@ -88,7 +88,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	private AntennaModelBuilder antennaModelBuilder;
 
 	/** pattern for replacing preprocessor commands like "//#if" */
-	static final Pattern replaceCommandPattern = Pattern.compile(".*//\\s*\\#(.+?)\\s");
+	static final Pattern replaceCommandPattern = Pattern.compile("//\\s*\\#(.+?)\\s");
 
 	public AntennaPreprocessor() {
 		super(ANTENNA);
@@ -330,54 +330,46 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 		// count of if, ifelse and else to remove after processing of else from stack
 		ifelseCountStack = new Stack<Integer>();
-		
-		// patterns for conditions etc.
-		Pattern patternCondition = Pattern.compile("//\\s*\\#(ifdef|ifndef|condition|elifdef|elifndef|if|else|elif)");
-		Pattern patternIf = Pattern.compile("//\\s*\\#(ifdef|ifndef|condition|if)");
-		Pattern patternElse = Pattern.compile("//\\s*\\#(elifdef|elifndef|else|elif)");
 
 		// go line for line
 		for (int j = 0; j < lines.size(); ++j) {
 			String line = lines.get(j);
-			
-			
-			
+
 			// if line is preprocessor directive
-				if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|elifdef|elifndef|if|else|elif")) {
-					
-					// if e1, elseif e2, ..., elseif en  ==  if -e1 && -e2 && ... && en
-					// if e1, elseif e2, ..., else  ==  if -e1 && -e2 && ...
-					if (containsPreprocessorDirective(line, "elifdef|elifndef|else|elif")) {
-						if (!expressionStack.isEmpty()) {
-							Node lastElement = new Not(expressionStack.pop().clone());
-							expressionStack.push(lastElement);
-						}
-					} else if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|if")) {
-						ifelseCountStack.push(0);
+			if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|elifdef|elifndef|if|else|elif")) {
+
+				// if e1, elseif e2, ..., elseif en  ==  if -e1 && -e2 && ... && en
+				// if e1, elseif e2, ..., else  ==  if -e1 && -e2 && ...
+				if (containsPreprocessorDirective(line, "elifdef|elifndef|else|elif")) {
+					if (!expressionStack.isEmpty()) {
+						Node lastElement = new Not(expressionStack.pop().clone());
+						expressionStack.push(lastElement);
 					}
-
-					if (!ifelseCountStack.empty() && !containsPreprocessorDirective(line, "else")) {
-						ifelseCountStack.push(ifelseCountStack.pop() + 1);
-					}
-
-					setMarkersContradictionalFeatures(line, res, j + 1);
-
-					setMarkersNotConcreteFeatures(line, res, j + 1);
-				} else if (containsPreprocessorDirective(line, "endif")) {
-					while (!ifelseCountStack.empty()) {
-						if (ifelseCountStack.peek() == 0)
-							break;
-
-						if (!expressionStack.isEmpty())
-							expressionStack.pop();
-
-						ifelseCountStack.push(ifelseCountStack.pop() - 1);
-					}
-
-					if (!ifelseCountStack.empty())
-						ifelseCountStack.pop();
+				} else if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|if")) {
+					ifelseCountStack.push(0);
 				}
 
+				if (!ifelseCountStack.empty() && !containsPreprocessorDirective(line, "else")) {
+					ifelseCountStack.push(ifelseCountStack.pop() + 1);
+				}
+
+				setMarkersContradictionalFeatures(line, res, j + 1);
+
+				setMarkersNotConcreteFeatures(line, res, j + 1);
+			} else if (containsPreprocessorDirective(line, "endif")) {
+				while (!ifelseCountStack.empty()) {
+					if (ifelseCountStack.peek() == 0)
+						break;
+
+					if (!expressionStack.isEmpty())
+						expressionStack.pop();
+
+					ifelseCountStack.push(ifelseCountStack.pop() - 1);
+				}
+
+				if (!ifelseCountStack.empty())
+					ifelseCountStack.pop();
+			}
 		}
 	}
 
@@ -461,15 +453,16 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 		}
 	}
-	
+
 	/**
-	 * Checks whether the text contains the specified directive or not 
+	 * Checks whether the text contains the specified directive or not
+	 * 
 	 * @param text text to check
 	 * @param directives directives splitted by |
 	 * @return true - if the specified directive is contained
 	 */
 	protected static boolean containsPreprocessorDirective(String text, String directives) {
-		return Pattern.compile("//\\s*\\#("+directives+")").matcher(text).find();
+		return Pattern.compile("//\\s*\\#(" + directives + ")").matcher(text).find();
 	}
 
 	@Override
