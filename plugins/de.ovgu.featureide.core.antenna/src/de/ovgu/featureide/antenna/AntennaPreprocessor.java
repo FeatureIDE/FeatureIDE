@@ -38,6 +38,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
@@ -77,6 +78,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Christoph Giesel
  * @author Marcus Kamieth
  * @author Marcus Pinnecke (Feature Interface)
+ * @author Christopher Sontag
  */
 public class AntennaPreprocessor extends PPComposerExtensionClass {
 
@@ -86,7 +88,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	private AntennaModelBuilder antennaModelBuilder;
 
 	/** pattern for replacing preprocessor commands like "//#if" */
-	static final Pattern replaceCommandPattern = Pattern.compile("//#(.+?)\\s");
+	static final Pattern replaceCommandPattern = Pattern.compile(".*//\\s*\\#(.+?)\\s");
 
 	public AntennaPreprocessor() {
 		super(ANTENNA);
@@ -328,35 +330,40 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 		// count of if, ifelse and else to remove after processing of else from stack
 		ifelseCountStack = new Stack<Integer>();
+		
+		// patterns for conditions etc.
+		Pattern patternCondition = Pattern.compile("//\\s*\\#(ifdef|ifndef|condition|elifdef|elifndef|if|else|elif)");
+		Pattern patternIf = Pattern.compile("//\\s*\\#(ifdef|ifndef|condition|if)");
+		Pattern patternElse = Pattern.compile("//\\s*\\#(elifdef|elifndef|else|elif)");
 
 		// go line for line
 		for (int j = 0; j < lines.size(); ++j) {
 			String line = lines.get(j);
-
+			
+			
+			
 			// if line is preprocessor directive
-			if (line.contains("//#")) {
-				if (line.contains("//#if ") || line.contains("//#elif ") || line.contains("//#condition ") || line.contains("//#ifdef ")
-						|| line.contains("//#ifndef ") || line.contains("//#elifdef ") || line.contains("//#elifndef ") || line.contains("//#else")) {
-
+				if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|elifdef|elifndef|if|else|elif")) {
+					
 					// if e1, elseif e2, ..., elseif en  ==  if -e1 && -e2 && ... && en
 					// if e1, elseif e2, ..., else  ==  if -e1 && -e2 && ...
-					if (line.contains("//#elif ") || line.contains("//#elifdef ") || line.contains("//#elifndef ") || line.contains("//#else")) {
+					if (containsPreprocessorDirective(line, "elifdef|elifndef|else|elif")) {
 						if (!expressionStack.isEmpty()) {
 							Node lastElement = new Not(expressionStack.pop().clone());
 							expressionStack.push(lastElement);
 						}
-					} else if (line.contains("//#if ") || line.contains("//#ifdef ") || line.contains("//#ifndef ") || line.contains("//#condition ")) {
+					} else if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|if")) {
 						ifelseCountStack.push(0);
 					}
 
-					if (!ifelseCountStack.empty() && !line.contains("//#else")) {
+					if (!ifelseCountStack.empty() && !containsPreprocessorDirective(line, "else")) {
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 					}
 
 					setMarkersContradictionalFeatures(line, res, j + 1);
 
 					setMarkersNotConcreteFeatures(line, res, j + 1);
-				} else if (line.contains("//#endif")) {
+				} else if (containsPreprocessorDirective(line, "endif")) {
 					while (!ifelseCountStack.empty()) {
 						if (ifelseCountStack.peek() == 0)
 							break;
@@ -370,7 +377,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					if (!ifelseCountStack.empty())
 						ifelseCountStack.pop();
 				}
-			}
+
 		}
 	}
 
@@ -390,7 +397,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @param lineNumber line number of given line
 	 */
 	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber) {
-		if (line.contains("//#else")) {
+		if (containsPreprocessorDirective(line, "else")) {
 			if (!expressionStack.isEmpty()) {
 				Node[] nestedExpressions = new Node[expressionStack.size()];
 				nestedExpressions = expressionStack.toArray(nestedExpressions);
@@ -403,8 +410,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			return;
 		}
 
-		boolean conditionIsSet = line.contains("//#condition ");
-		boolean negative = line.contains("//#ifndef ") || line.contains("//#elifndef ");
+		boolean conditionIsSet = containsPreprocessorDirective(line, "condition");
+		boolean negative = containsPreprocessorDirective(line, "ifndef|elifndef");
 
 		// remove "//#if ", "//ifdef", ...
 		line = replaceCommandPattern.matcher(line).replaceAll("");
@@ -445,14 +452,24 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @param lineNumber line number of given line
 	 */
 	private void setMarkersNotConcreteFeatures(String line, IFile res, int lineNumber) {
-		String[] splitted = line.split(AntennaModelBuilder.OPERATORS, 0);
+		String[] splitted = line.replaceAll("\\s+#", "#").split(AntennaModelBuilder.OPERATORS, 0);
 
 		for (int i = 0; i < splitted.length; ++i) {
 			final String linePart = splitted[i];
-			if (!linePart.isEmpty() && !linePart.contains("//#")) {
+			if (!linePart.isEmpty() && !containsPreprocessorDirective(linePart, ".*")) {
 				setMarkersOnNotExistingOrAbstractFeature(linePart, lineNumber, res);
 			}
 		}
+	}
+	
+	/**
+	 * Checks whether the text contains the specified directive or not 
+	 * @param text text to check
+	 * @param directives directives splitted by |
+	 * @return true - if the specified directive is contained
+	 */
+	protected static boolean containsPreprocessorDirective(String text, String directives) {
+		return Pattern.compile("//\\s*\\#("+directives+")").matcher(text).find();
 	}
 
 	@Override
@@ -679,10 +696,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 */
 	// TODO use regex
 	private boolean isAnnotation(String line) {
-		if (line.trim().startsWith("//#")) {
-			return true;
-		}
-		if (line.trim().startsWith("//@")) {
+		if (line.matches(".*//\\s*(\\#|\\@).*")) {
 			return true;
 		}
 		return false;
