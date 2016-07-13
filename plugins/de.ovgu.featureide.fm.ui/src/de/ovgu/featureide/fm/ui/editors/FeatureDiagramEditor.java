@@ -729,8 +729,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
-		System.out.println(event);
-		System.out.println(prop);
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
 			IFeature oldParent = (IFeature) event.getOldValue();
