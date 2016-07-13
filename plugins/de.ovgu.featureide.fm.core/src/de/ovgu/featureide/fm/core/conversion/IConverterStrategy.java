@@ -18,31 +18,34 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
+package de.ovgu.featureide.fm.core.conversion;
 
+import java.util.List;
+
+import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * Default reader to be extended for each feature model format.
+ * Interface for a conversion strategy.
  * 
- * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
- * 
- * @deprecated Use {@link IPersistentFormat} instead
- * 
- * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Alexander Knueppel
  */
-@Deprecated
-public abstract class AbstractFeatureModelWriter extends AbstractObjectWriter<IFeatureModel> implements IFeatureModelWriter {
-
-	@Override
-	public IFeatureModel getFeatureModel() {
-		return getObject();
-	}
-
-	@Override
-	public void setFeatureModel(IFeatureModel featureModel) {
-		setObject(featureModel);
-	}
-
+public interface IConverterStrategy {
+	/**
+	 * Converts a feature model with complex constraints to a feature model with only requires- and excludes-constraints.
+	 * @param fm Original feature model
+	 * @param nodes List of (complex) formulas
+	 * @param preserve States whether configuration semantics should be preserved (same number of configurations in original and converted model)
+	 * @return Converted feature model
+	 */
+	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve);
+	
+	/**
+	 * Should strive to simplify a complex constraint.
+	 * @param constraint
+	 * @return A list of nodes; some of them might be simple constraints
+	 */
+	public List<Node> preprocess(IConstraint constraint);
 }

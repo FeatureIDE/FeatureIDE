@@ -31,7 +31,6 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.analyses.ImplicationSetsAnalysis.Relationship;
 import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -43,8 +42,8 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  */
 public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relationship, Relationship>> {
 
-	public ImplicationSetsAnalysis(ISolverProvider solver) {
-		super(solver);
+	public ImplicationSetsAnalysis(SatInstance satInstance) {
+		super(satInstance);
 	}
 
 	public static class Relationship implements Comparable<Relationship> {
@@ -125,19 +124,19 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 	private final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 	@Override
-	public HashMap<Relationship, Relationship> execute(WorkMonitor monitor) throws Exception {
+	public HashMap<Relationship, Relationship> analyze(WorkMonitor monitor) throws Exception {
 		relationSet.clear();
 		parentStack.clear();
 		solutions.clear();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		solver.sat();
+		solver.isSatisfiable();
 		int[] model1 = getModel(solutions);
 
 		// satisfiable?
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			solver.sat();
+			solver.isSatisfiable();
 			int[] model2 = getModel(solutions);
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
@@ -151,7 +150,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 				if (varX != 0) {
 					solver.getAssignment().push(-varX);
 					//					solver.shuffleOrder();
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						core[i] = (byte) (varX > 0 ? 1 : -1);
 						solver.getAssignment().pop().unsafePush(varX);
@@ -347,7 +346,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 					solver.getAssignment().push(-my1);
 					solver.setSelectionStrategy((c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						for (int mx0 : parentStack) {
 							addRelation(mx0, my1);

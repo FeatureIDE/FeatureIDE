@@ -20,12 +20,14 @@
  */
 package org.prop4j.analyses;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.prop4j.solver.BasicSolver;
 import org.prop4j.solver.BasicSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
+import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -33,71 +35,73 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class CoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
+public class ImplicationAnalysis extends SingleThreadAnalysis<List<int[]>> {
 
-	private int[] features;
+	private List<int[]> pairs;
 
-	public CoreDeadAnalysis(SatInstance satInstance) {
-		this(satInstance, null);
-	}
-
-	public CoreDeadAnalysis(SatInstance satInstance, int[] features) {
+	public ImplicationAnalysis(SatInstance satInstance, List<int[]> pairs) {
 		super(satInstance);
-		this.setFeatures(features);
+		this.pairs = pairs;
 	}
 
-	public CoreDeadAnalysis(BasicSolver solver, int[] features) {
+	public ImplicationAnalysis(BasicSolver solver, List<int[]> pairs) {
 		super(solver);
-		this.setFeatures(features);
+		this.pairs = pairs;
 	}
 
-	public int[] analyze(WorkMonitor monitor) throws Exception {
+	public List<int[]> analyze(WorkMonitor monitor) throws Exception {
+		final List<int[]> resultList = new ArrayList<>();
+
+		if (pairs == null) {
+			return resultList;
+		}
+
+		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), MAX_SOLUTION_BUFFER));
+
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findModel();
 
 		if (model1 != null) {
+			solutionList.add(model1);
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 			int[] model2 = solver.findModel();
+			solutionList.add(model2);
 
 			// if there are more negative than positive literals
 			if (model1.length - countNegative(model1) < countNegative(model2)) {
 				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 			}
 
-			if (features != null) {
-				final int[] model3 = new int[model1.length];
-				for (int i = 0; i < features.length; i++) {
-					final int index = features[i] - 1;
-					if (index >= 0) {
-						model3[index] = model1[index];
+			pairLoop: for (int[] pair : pairs) {
+				solutionLoop: for (int[] is : solutionList) {
+					for (int i : pair) {
+						if (is[Math.abs(i) - 1] == i) {
+							continue solutionLoop;
+						}
 					}
+					continue pairLoop;
 				}
-				model1 = model3;
-			}
-			SatInstance.updateModel(model1, model2);
-			for (int i = 0; i < model1.length; i++) {
-				final int varX = model1[i];
-				if (varX != 0) {
-					solver.getAssignment().push(-varX);
-					switch (solver.isSatisfiable()) {
-					case FALSE:
-						solver.getAssignment().pop().unsafePush(varX);
-						monitor.invoke(varX);
-						break;
-					case TIMEOUT:
-						solver.getAssignment().pop();
-						break;
-					case TRUE:
-						solver.getAssignment().pop();
-						SatInstance.updateModel(model1, solver.getModel());
-						solver.shuffleOrder();
-						break;
-					}
+				for (int i : pair) {
+					solver.getAssignment().push(-i);
+				}
+				switch (solver.isSatisfiable()) {
+				case FALSE:
+					resultList.add(pair);
+					break;
+				case TIMEOUT:
+					break;
+				case TRUE:
+					solutionList.add(solver.getModel());
+					solver.shuffleOrder();
+					break;
+				}
+				for (int i = 0; i < pair.length; i++) {
+					solver.getAssignment().pop();
 				}
 			}
 		}
 
-		return Arrays.copyOf(solver.getAssignment().toArray(), solver.getAssignment().size());
+		return resultList;
 	}
 
 	private static int countNegative(int[] model) {
@@ -106,14 +110,6 @@ public class CoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
 			count += model[i] >>> (Integer.SIZE - 1);
 		}
 		return count;
-	}
-
-	public int[] getFeatures() {
-		return features;
-	}
-
-	public void setFeatures(int[] features) {
-		this.features = features;
 	}
 
 }

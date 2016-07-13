@@ -124,9 +124,9 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		Redundancy.setNewModel(oldFm);
 
 		// clear maps which hold explanations for defect constraints and features
-		FeatureModelAnalyzer.deadFeatureExpl.clear();
-		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
-		FeatureModelAnalyzer.redundantConstrExpl.clear();
+		oldFm.getAnalyser().deadFeatureExpl.clear();
+		oldFm.getAnalyser().falseOptFeatureExpl.clear();
+		oldFm.getAnalyser().redundantConstrExpl.clear();
 	}
 
 	/**

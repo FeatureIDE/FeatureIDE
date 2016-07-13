@@ -18,31 +18,54 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
+package de.ovgu.featureide.fm.core.conversion;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.prop4j.And;
+import org.prop4j.Implies;
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.Not;
+import org.prop4j.Or;
+
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * Default reader to be extended for each feature model format.
+ * @brief Converter using conjunctive normal form.
  * 
- * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
- * 
- * @deprecated Use {@link IPersistentFormat} instead
- * 
- * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Alexander Knueppel
  */
-@Deprecated
-public abstract class AbstractFeatureModelWriter extends AbstractObjectWriter<IFeatureModel> implements IFeatureModelWriter {
-
-	@Override
-	public IFeatureModel getFeatureModel() {
-		return getObject();
+public class CNFConverter extends NNFConverter {
+	/**
+	 * Constructor
+	 */
+	public CNFConverter() {
+		super();
+		//continues number + level
+		naming.put(Or.class, "Clause%d");
+		topName = "SubtreeCNF";
 	}
-
+	
+	/**
+	 * Creates cnf and returns a list of clauses
+	 */
 	@Override
-	public void setFeatureModel(IFeatureModel featureModel) {
-		setObject(featureModel);
+	public List<Node> preprocess(IConstraint constraint) {
+		List<Node> clauses = new LinkedList<Node>();
+		
+		Node cnf = constraint.getNode().toCNF();
+		
+		if(cnf instanceof And) {
+			clauses.addAll(Arrays.asList(cnf.getChildren()));
+		} else {
+			clauses.add(cnf);
+		}
+		
+		return clauses;
 	}
-
 }

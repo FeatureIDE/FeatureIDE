@@ -45,7 +45,6 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -146,11 +145,9 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			} else {
 				if (feature.getStructure().isConcrete()) {
 					toolTip.append(CONCRETE);
-					analyser.setAttributeFlag(Attribute.Concrete, true);
 				} else {
 					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
 					toolTip.append(ABSTRACT);
-					analyser.setAttributeFlag(Attribute.Abstract, true);
 				}
 			}
 		} else {
@@ -160,15 +157,13 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				toolTip.append(VOID);
 			} else {
 				if (feature.getStructure().isConcrete()) {
-					analyser.setAttributeFlag(Attribute.Concrete, true);
 					if (!hasExpl) {
 						toolTip.append(CONCRETE);
 					}
 				} else {
 					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					analyser.setAttributeFlag(Attribute.Abstract, true);
 					if (!hasExpl) {
-					toolTip.append(ABSTRACT);
+						toolTip.append(ABSTRACT);
 					}
 				}
 
@@ -176,7 +171,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 					setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
 					label.setForegroundColor(HIDDEN_FOREGROUND);
 					toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
-					analyser.setAttributeFlag(Attribute.Hidden, true);
 				}
 
 				if (!hasExpl) {
@@ -188,23 +182,20 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 					if (analyser.valid()) {
 						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-						//						toolTip.append(DEAD);
-						analyser.setAttributeFlag(Attribute.Dead, true);
-						explanation = FeatureModelAnalyzer.deadFeatureExpl.get(feature); // get explanation for false optional feature
+						explanation = analyser.deadFeatureExpl.get(feature); // get explanation for false optional feature
+						toolTip.append(DEAD);
 					}
 					break;
 				case FALSE_OPTIONAL:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
 					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-					//					toolTip.append(FALSE_OPTIONAL);
-					analyser.setAttributeFlag(Attribute.FalseOptional, true);
-					explanation = FeatureModelAnalyzer.falseOptFeatureExpl.get(feature); // get explanation for false optional feature
+					explanation = analyser.falseOptFeatureExpl.get(feature); // get explanation for false optional feature
+					toolTip.append(FALSE_OPTIONAL);
 					break;
 				case INDETERMINATE_HIDDEN:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
 					setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
 					toolTip.append(INDETERMINATE_HIDDEN);
-					analyser.setAttributeFlag(Attribute.IndetHidden, true);
 					break;
 				default:
 					break;

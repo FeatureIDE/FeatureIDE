@@ -97,9 +97,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * @param comp A composite which contains the sub feature model
 	 */
 	private void insertFeatureModel(Composite comp) {
-
 		FeatureModelAnalyzer analyzer = new FeatureModelAnalyzer(subtreeModel);
-		resetExplanations(); // reset all properties to normal status
 
 		FeatureModelEditor modeleditor = new FeatureModelEditor();
 		modeleditor.setFeatureModel(subtreeModel);
@@ -112,18 +110,6 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 
 		diagramEditor.internRefresh(true);
 		diagramEditor.getGraphicalFeatureModel().redrawDiagram();
-	}
-	
-
-	/**
-	 * Clears maps which hold explanations for the origin feature model.
-	 * 
-	 * @param analyzer The feature model analyzer for the sub feature model
-	 */
-	private void resetExplanations() {
-		FeatureModelAnalyzer.deadFeatureExpl.clear();
-		FeatureModelAnalyzer.falseOptFeatureExpl.clear();
-		FeatureModelAnalyzer.redundantConstrExpl.clear();
 	}
 
 	/**
@@ -139,7 +125,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 
 		// iterate implicit constraints and generate explanations 
 		for (IConstraint redundantC : implicitConstraints) {
-			analyzer.findRedundantConstraints(oldFm, subtreeModel, redundantC, null, null);
+			oldFm.getAnalyser().findRedundantConstraints(oldFm, subtreeModel, redundantC, null, null);
 			oldFm.removeConstraint(redundantC);
 
 			// remember for all respective graphical constraints that they are implicit (needed for tool tip later) 
