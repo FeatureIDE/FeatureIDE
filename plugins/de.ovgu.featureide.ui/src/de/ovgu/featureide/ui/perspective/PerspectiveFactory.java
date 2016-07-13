@@ -31,6 +31,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
 import de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.projectExplorer.*;
 import de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
@@ -43,38 +44,40 @@ import de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard;
  * 
  * @author Christian Becker
  * @author Thomas Thuem
+ * @author Christopher Sontag
  */
 public class PerspectiveFactory implements IPerspectiveFactory {
-	
+
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureIDEperspective";
-	
+
 	@SuppressWarnings(DEPRECATION)
 	public void createInitialLayout(IPageLayout layout) {
 		String editorArea = layout.getEditorArea();
-		
+
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureIDEFileWizard.ID);
 		layout.addNewWizardShortcut(NewConfigurationFileWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureModelWizard.ID);
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder");
-		
+
 		IFolderLayout left = layout.createFolder(LEFT, IPageLayout.LEFT, (float) 0.23, editorArea);
 		IFolderLayout down = layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea);
 		IFolderLayout right = layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
-		
+
 		down.addView(CollaborationView.ID);
 		down.addView(FeatureModelEditView.ID);
 		down.addView(FeatureStatisticsView.ID);
-		
+
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");
-		
+
 		right.addView(Outline.ID);
 		right.addView(IPageLayout.ID_OUTLINE);
-		
+
+		left.addView("org.eclipse.ui.navigator.ProjectExplorer");
 		left.addView("org.eclipse.jdt.ui.PackageExplorer");
-		
+
 		layout.addShowViewShortcut(FeatureStatisticsView.ID);
 		layout.addShowViewShortcut(FeatureModelEditView.ID);
 		layout.addShowViewShortcut(CollaborationView.ID);
