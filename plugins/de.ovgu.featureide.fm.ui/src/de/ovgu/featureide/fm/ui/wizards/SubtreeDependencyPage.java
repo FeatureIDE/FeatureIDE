@@ -97,7 +97,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * @param comp A composite which contains the sub feature model
 	 */
 	private void insertFeatureModel(Composite comp) {
-		FeatureModelAnalyzer analyzer = new FeatureModelAnalyzer(subtreeModel);
+		FeatureModelAnalyzer analyzer = subtreeModel.getAnalyser();
 
 		FeatureModelEditor modeleditor = new FeatureModelEditor();
 		modeleditor.setFeatureModel(subtreeModel);

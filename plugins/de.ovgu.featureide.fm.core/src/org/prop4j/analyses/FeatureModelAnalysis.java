@@ -132,6 +132,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator = new AdvancedNodeCreator(fm);
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
+		nodeCreator.setUseOldNames(false);
 	}
 
 	public boolean isCalculateConstraints() {
@@ -505,6 +506,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			FalseOptional falseOpts = new FalseOptional();
 			List<String> expl = falseOpts.explain(fm, feature);
 			falseOptFeatureExpl.put(feature, expl);
+
 		}
 	}
 
@@ -621,7 +623,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		}
 		return regularCNFNode;
 	}
-
+	
 	private void setFeatureAttribute(IFeature feature, FeatureStatus featureAttribute) {
 		changedAttributes.put(feature, featureAttribute);
 		feature.getProperty().setFeatureStatus(featureAttribute, false);
