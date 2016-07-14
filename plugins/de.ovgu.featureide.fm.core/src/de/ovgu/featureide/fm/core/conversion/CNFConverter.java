@@ -25,15 +25,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.And;
-import org.prop4j.Implies;
-import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * @brief Converter using conjunctive normal form.
