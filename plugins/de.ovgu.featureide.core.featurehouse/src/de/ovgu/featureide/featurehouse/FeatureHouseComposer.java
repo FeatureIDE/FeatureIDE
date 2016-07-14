@@ -40,9 +40,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.prop4j.Node;
@@ -97,7 +102,7 @@ import fuji.SyntacticErrorException;
  * Composes files using FeatureHouse.
  * 
  * @author Tom Brosch
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Jens Meinicke
  */
 // TODO set "Composition errors" like *.png could not be composed with *.png
 @SuppressWarnings("restriction")
@@ -153,9 +158,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private ICompositionErrorListener compositionErrorListener = createCompositionErrorListener();
 	private AStoppableJob fuji;
 
-	/**
-	 * @return
-	 */
 	private ICompositionErrorListener createCompositionErrorListener() {
 		return new ICompositionErrorListener() {
 
@@ -213,9 +215,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		boolean supSuccess = super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
 		createBuildStructure();
+		checkJavaBuildPath();
 		return supSuccess && fhModelBuilder != null;
 	}
-
+	
 	/**
 	 * Creates an error marker to the last error file.
 	 * 
@@ -311,6 +314,54 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 					}
 				}
 			}
+		}
+	}
+	
+	/**
+	 * Checks whether the java build path is equal to the defined build path of the FeatureIDE project.<br>
+	 * Only necessary for FeatureHouse projects with the old build structure.
+	 */
+	private void checkJavaBuildPath() {
+		try {
+			final JavaProject javaProject = new JavaProject(featureProject.getProject(), null);
+			final IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
+
+			int index = 0;
+			for (IClasspathEntry e : classpathEntrys) {
+				if (e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					IPath path = featureProject.getBuildFolder().getFullPath();
+
+					/** return if nothing has to be changed **/
+					if (e.getPath().equals(path)) {
+						return;
+					}
+					
+					if (!path.isPrefixOf(e.getPath())) {
+						continue;
+					}
+
+					/** change the actual source entry to the new build path **/
+					ClasspathEntry changedEntry = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), path, e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null,
+							e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+					classpathEntrys[index] = changedEntry;
+					javaProject.setRawClasspath(classpathEntrys, null);
+					return;
+				}
+				index++;
+			}
+
+			/**
+			 * case: there is no source entry at the class path add the source
+			 * entry to the classpath
+			 **/
+			IFolder folder = featureProject.getBuildFolder();
+			ClasspathEntry sourceEntry = new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, folder.getFullPath(), new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
+			IClasspathEntry[] newEntrys = new IClasspathEntry[classpathEntrys.length + 1];
+			System.arraycopy(classpathEntrys, 0, newEntrys, 0, classpathEntrys.length);
+			newEntrys[newEntrys.length - 1] = sourceEntry;
+			javaProject.setRawClasspath(newEntrys, null);
+		} catch (JavaModelException e) {
+			LOGGER.logError(e);
 		}
 	}
 
