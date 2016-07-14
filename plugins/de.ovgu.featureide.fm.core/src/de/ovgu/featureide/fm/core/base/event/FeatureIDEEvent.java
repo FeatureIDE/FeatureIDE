@@ -90,6 +90,10 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_NAME_CHANGED,
 		/**
+		 * All features changed their name representation
+		 */
+		ALL_FEATURES_CHANGED_NAME_TYPE,
+		/**
 		 * A color was changed
 		 */
 		COLOR_CHANGED,
