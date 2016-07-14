@@ -405,7 +405,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			final int var = solution2[i];
 			final IFeature feature = fm.getFeature((String) si.getVariableObject(var));
 			if (var < 0) {
-				changedAttributes.put(feature, FeatureStatus.DEAD);
+				setFeatureAttribute(feature, FeatureStatus.DEAD);
 				deadFeatures.add(feature);
 			} else {
 				coreFeatures.add(feature);
@@ -445,8 +445,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		falseOptionalFeatures.clear();
 		for (int[] pair : solution3) {
 			final IFeature feature = fm.getFeature((CharSequence) si.getVariableObject(pair[1]));
-			changedAttributes.put(feature, FeatureStatus.FALSE_OPTIONAL);
-			feature.getProperty().setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
+			setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
 			falseOptionalFeatures.add(feature);
 		}
 	}
@@ -537,8 +536,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				}
 
 				if (!noHidden) {
-					changedAttributes.put(feature, FeatureStatus.INDETERMINATE_HIDDEN);
-					feature.getProperty().setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+					setFeatureAttribute(feature, FeatureStatus.INDETERMINATE_HIDDEN);
 				}
 			}
 		}
@@ -564,6 +562,11 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			regularCNFNode = new And(new Or(regularCNFNode));
 		}
 		return regularCNFNode;
+	}
+	
+	private void setFeatureAttribute(IFeature feature, FeatureStatus featureAttribute) {
+		changedAttributes.put(feature, featureAttribute);
+		feature.getProperty().setFeatureStatus(featureAttribute, false);
 	}
 
 	private void setConstraintAttribute(IConstraint constraint, ConstraintAttribute constraintAttribute) {
