@@ -41,6 +41,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -142,7 +143,8 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			int constraintIndex = FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint);
 			// set tooltip with explanation for redundant constraint
-			List<String> explanation = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraintIndex);
+			List<String> explanation = FeatureModelAnalyzer.redundantConstrExpl.get(constraintIndex);
+	//		List<String> explanation = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraintIndex);
 			explanation = explanation != null ? explanation : Collections.<String>emptyList();
 
 			// replace "redundant" with "transitive" in explanation if constraint represents an implicit dependency
