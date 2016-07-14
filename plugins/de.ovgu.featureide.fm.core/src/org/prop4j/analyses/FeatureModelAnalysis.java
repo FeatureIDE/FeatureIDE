@@ -71,21 +71,21 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, Object>> {
-	
+
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint. 
+	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
 	public HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
 
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint. 
+	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
 	public HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
 
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint. 
+	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
 	public HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
@@ -255,8 +255,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		for (IConstraint constraint : constraints) {
 			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 			constraint.setContainedFeatures();
-			constraint.setFalseOptionalFeatures(Collections.<IFeature>emptyList());
-			constraint.setDeadFeatures(Collections.<IFeature>emptyList());
+			constraint.setFalseOptionalFeatures(Collections.<IFeature> emptyList());
+			constraint.setDeadFeatures(Collections.<IFeature> emptyList());
 		}
 
 		if (!calculateFeatures) {
@@ -297,14 +297,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					constraint.setDeadFeatures(newDeadFeature);
 					deadList.retainAll(newDeadFeature);
 					setConstraintAttribute(constraint, ConstraintAttribute.DEAD);
-					
-					// explain dead features of constraint and remember explanation in map
-					DeadFeatures deadF = new DeadFeatures();
-					Collection<IFeature> deadfeatures = constraint.getDeadFeatures();
-					for (IFeature feature : deadfeatures) {
-					List<String> expl = deadF.explain(fm, feature);
-					deadFeatureExpl.put(feature, expl);
-					}
 				}
 				final List<IFeature> newFOFeature = checkFeatureFalseOptional2(modSat, foList);
 				if (!newFOFeature.isEmpty()) {
@@ -312,7 +304,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					foList.retainAll(newFOFeature);
 					if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
 						setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
-						
+
 						// explain false optional features of constraint and remember explanation in map
 						FalseOptional falseOpts = new FalseOptional();
 						Collection<IFeature> foFeatures = constraint.getFalseOptional();
@@ -328,9 +320,9 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	}
 
 	/**
-	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint 
-	 * implies the model with the new constraint and the other way round. If this is the case, both models are 
-	 * equivalent and the constraint is redundant.  
+	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint
+	 * implies the model with the new constraint and the other way round. If this is the case, both models are
+	 * equivalent and the constraint is redundant.
 	 * If a redundant constraint has been detected, it is explained.
 	 * 
 	 * @param constraint The constraint to check whether it is redundant
@@ -383,7 +375,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 							setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
 						} else {
 							setConstraintAttribute(constraint, ConstraintAttribute.REDUNDANT);
-							
+
 							/*
 							 * Explain redundant constraint. Differentiate between redundancy within a feature model 
 							 * and redundancy in a sliced sub feature model when calculating implicit dependencies
@@ -460,8 +452,14 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			final int var = solution2[i];
 			final IFeature feature = fm.getFeature((String) si.getVariableObject(var));
 			if (var < 0) {
-				changedAttributes.put(feature, FeatureStatus.DEAD);
+				setFeatureAttribute(feature, FeatureStatus.DEAD);
 				deadFeatures.add(feature);
+
+				// explain dead features and remember explanation in map
+				DeadFeatures deadF = new DeadFeatures();
+				List<String> expl = deadF.explain(fm, feature);
+				deadFeatureExpl.put(feature, expl);
+
 			} else {
 				coreFeatures.add(feature);
 			}
@@ -500,9 +498,13 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		falseOptionalFeatures.clear();
 		for (int[] pair : solution3) {
 			final IFeature feature = fm.getFeature((CharSequence) si.getVariableObject(pair[1]));
-			changedAttributes.put(feature, FeatureStatus.FALSE_OPTIONAL);
-			feature.getProperty().setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
-			falseOptionalFeatures.add(feature);			
+			setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
+			falseOptionalFeatures.add(feature);
+
+			// explain false optional features and remember explanation in map
+			FalseOptional falseOpts = new FalseOptional();
+			List<String> expl = falseOpts.explain(fm, feature);
+			falseOptFeatureExpl.put(feature, expl);
 		}
 	}
 
@@ -592,8 +594,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				}
 
 				if (!noHidden) {
-					changedAttributes.put(feature, FeatureStatus.INDETERMINATE_HIDDEN);
-					feature.getProperty().setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+					setFeatureAttribute(feature, FeatureStatus.INDETERMINATE_HIDDEN);
 				}
 			}
 		}
@@ -619,6 +620,11 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			regularCNFNode = new And(new Or(regularCNFNode));
 		}
 		return regularCNFNode;
+	}
+
+	private void setFeatureAttribute(IFeature feature, FeatureStatus featureAttribute) {
+		changedAttributes.put(feature, featureAttribute);
+		feature.getProperty().setFeatureStatus(featureAttribute, false);
 	}
 
 	private void setConstraintAttribute(IConstraint constraint, ConstraintAttribute constraintAttribute) {

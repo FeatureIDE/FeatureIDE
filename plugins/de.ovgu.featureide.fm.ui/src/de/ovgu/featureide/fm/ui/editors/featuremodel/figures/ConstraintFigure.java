@@ -162,46 +162,46 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			panel.add(new Label(REDUNDANCE));
 			setToolTip(panel, explanation);
 			return;
-		case DEAD:
-		case FALSE_OPTIONAL:
-			final StringBuilder toolTip = new StringBuilder();
-			if (!constraint.getDeadFeatures().isEmpty()) {
-				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-				toolTip.append(DEAD_FEATURE);
-				ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
-				for (IFeature dead : constraint.getDeadFeatures()) {
-					deadFeatures.add(dead.toString());
-				}
-				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
-
-				for (String dead : deadFeatures) {
-					toolTip.append("\n   ");
-					toolTip.append(dead);
-				}
-				setToolTip(new Label(toolTip.toString()));
-			}
-
-			if (!constraint.getFalseOptional().isEmpty()) {
-				if (constraint.getDeadFeatures().isEmpty()) {
-					setBackgroundColor(FMPropertyManager.getWarningColor());
-				} else {
-					toolTip.append("\n\n");
-				}
-
-				ArrayList<String> falseOptionalFeatures = new ArrayList<String>();
-				for (IFeature feature : constraint.getFalseOptional()) {
-					falseOptionalFeatures.add(feature.toString());
-				}
-				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
-
-				toolTip.append(FALSE_OPTIONAL);
-				for (String feature : falseOptionalFeatures) {
-					toolTip.append("\n   ");
-					toolTip.append(feature);
-				}
-				setToolTip(new Label(toolTip.toString()));
-			}
-			break;
+//		case DEAD:
+//		case FALSE_OPTIONAL:
+//			final StringBuilder toolTip = new StringBuilder();
+//			if (!constraint.getDeadFeatures().isEmpty()) {
+//				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+//				toolTip.append(DEAD_FEATURE);
+//				ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
+//				for (IFeature dead : constraint.getDeadFeatures()) {
+//					deadFeatures.add(dead.toString());
+//				}
+//				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
+//
+//				for (String dead : deadFeatures) {
+//					toolTip.append("\n   ");
+//					toolTip.append(dead);
+//				}
+//				setToolTip(new Label(toolTip.toString()));
+//			}
+//
+//			if (!constraint.getFalseOptional().isEmpty()) {
+//				if (constraint.getDeadFeatures().isEmpty()) {
+//					setBackgroundColor(FMPropertyManager.getWarningColor());
+//				} else {
+//					toolTip.append("\n\n");
+//				}
+//
+//				ArrayList<String> falseOptionalFeatures = new ArrayList<String>();
+//				for (IFeature feature : constraint.getFalseOptional()) {
+//					falseOptionalFeatures.add(feature.toString());
+//				}
+//				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
+//
+//				toolTip.append(FALSE_OPTIONAL);
+//				for (String feature : falseOptionalFeatures) {
+//					toolTip.append("\n   ");
+//					toolTip.append(feature);
+//				}
+//				setToolTip(new Label(toolTip.toString()));
+//			}
+//			break;
 		default:
 			break;
 		}
