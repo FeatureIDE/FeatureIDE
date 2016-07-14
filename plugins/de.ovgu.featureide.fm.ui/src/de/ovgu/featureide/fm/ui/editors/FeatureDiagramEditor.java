@@ -77,7 +77,6 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.Features;
-import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -207,7 +206,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private boolean waiting = false;
 
 	private FeatureModelAnalyzer analyzer;
-	
+
 	final FeatureDiagramEditorKeyHandler editorKeyHandler;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container) {
@@ -345,8 +344,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		autoLayoutConstraintAction = new AutoLayoutConstraintAction(this, graphicalFeatureModel);
 
 		setNameType = new ArrayList<NameTypeSelectionAction>(2);
-		setNameType.add(new NameTypeSelectionAction(this, featureModel, 0));
-		setNameType.add(new NameTypeSelectionAction(this, featureModel, 1));
+		setNameType.add(new NameTypeSelectionAction(graphicalFeatureModel, 0, 1));
+		setNameType.add(new NameTypeSelectionAction(graphicalFeatureModel, 1, 0));
 
 	}
 
@@ -410,7 +409,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			nameType.setEnabled(true);
 		}
 
-		final NameTypeSelectionAction curNameType = setNameType.get(Preferences.getDefaultFeatureNameScheme());
+		NameTypeSelectionAction curNameType = null;
+		if(graphicalFeatureModel.getLayout().showShortNames()){
+			curNameType = setNameType.get(1);
+		}else{
+			curNameType = setNameType.get(0);
+		}
 		curNameType.setChecked(true);
 		curNameType.setEnabled(false);
 
@@ -645,7 +649,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 	}
-	
+
 	int count = 5;
 
 	/**
@@ -676,7 +680,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 							graphicalFeatureModel.getGraphicalFeature((IFeature) f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 						} else if (f instanceof IConstraint) {
 							((IConstraint) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
-							graphicalFeatureModel.getGraphicalConstraint((IConstraint)f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+							graphicalFeatureModel.getGraphicalConstraint((IConstraint) f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 						}
 					}
 				}
@@ -729,8 +733,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
-		System.out.println(event);
-		System.out.println(prop);
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
 			IFeature oldParent = (IFeature) event.getOldValue();
@@ -760,14 +762,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				newEditPart.activate();
 				select(newEditPart);
 				// open the renaming command
-				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFeatureFigure()), getFeatureModel()).show();
+				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFeatureFigure()), getFeatureModel())
+						.show();
 			} else {
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
 			analyzeFeatureModel();
 			break;
 		case FEATURE_NAME_CHANGED:
-			final String newValue = (String)event.getNewValue();
+			final String newValue = (String) event.getNewValue();
 			final IFeature feature = graphicalFeatureModel.getFeatureModel().getFeature(newValue);
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.update(event);
@@ -782,20 +785,28 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			reload();
 			featureModelEditor.setPageModified(true);
 			break;
+		case ALL_FEATURES_CHANGED_NAME_TYPE:
+			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+				f.update(FeatureIDEEvent.getDefault(EventType.FEATURE_NAME_CHANGED));
+			}
+			internRefresh(true);
+			reload();
+			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			break;
 		case MANDATORY_CHANGED:
-			FeatureUIHelper.getGraphicalFeature((IFeature)event.getSource(), graphicalFeatureModel).update(event);
+			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
 		case GROUP_TYPE_CHANGED:
-			for (IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature)event.getSource(), graphicalFeatureModel)) {
+			for (IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) event.getSource(), graphicalFeatureModel)) {
 				f.update(event);
 			}
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
 		case ATTRIBUTE_CHANGED:
-			FeatureUIHelper.getGraphicalFeature((IFeature)event.getSource(), graphicalFeatureModel).update(event);
+			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
 			legendLayoutAction.refresh();
 			internRefresh(false);
@@ -816,7 +827,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
-		case CONSTRAINT_ADD:			
+		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
 			reload();
@@ -826,11 +837,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			final Map<?, ?> registry = getEditPartRegistry();
-			for (IGraphicalFeature f: graphicalFeatureModel.getFeatures()) {
+			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
 				registry.remove(f);
 				registry.remove(f.getSourceConnection());
 			}
-			for (IGraphicalConstraint f: graphicalFeatureModel.getConstraints()) {
+			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
 				registry.remove(f);
 			}
 			graphicalFeatureModel.init();
@@ -856,11 +867,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
-			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			reload();
-			featureModelEditor.setPageModified(true);
+			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
 			break;
 		case REDRAW_DIAGRAM:
 			getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
@@ -869,7 +880,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
-//			 legendAction.refresh();
+			//			 legendAction.refresh();
 			legendLayoutAction.refresh();
 			break;
 		case LEGEND_LAYOUT_CHANGED:
@@ -877,7 +888,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			internRefresh(false);
 			break;
 		case HIDDEN_CHANGED:
-			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature)event.getSource()).getStructure())) {
+			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
 			internRefresh(true);
@@ -886,7 +897,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
-				final List<IGraphicalFeature> features = (List<IGraphicalFeature>) event.getSource(); 
+				final List<IGraphicalFeature> features = (List<IGraphicalFeature>) event.getSource();
 				for (IGraphicalFeature gf : features) {
 					gf.update(FeatureIDEEvent.getDefault(EventType.COLOR_CHANGED));
 				}
@@ -903,14 +914,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			page.propertyChange(event);
 		}
 	}
-	
+
 	private void refreshAll() {
 		refresh(graphicalFeatureModel.getFeatures(), true);
 	}
-	
+
 	private void refresh(Collection<IGraphicalFeature> features, boolean checkModification) {
-		for (IGraphicalFeature f: features) {
-			if (!checkModification) { 
+		for (IGraphicalFeature f : features) {
+			if (!checkModification) {
 				FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(f);
 				editPart.refresh();
 			}

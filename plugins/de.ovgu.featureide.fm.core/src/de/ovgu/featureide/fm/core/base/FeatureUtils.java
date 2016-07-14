@@ -730,6 +730,7 @@ public final class FeatureUtils {
 		return feature.toString();
 	}
 
+	@Deprecated
 	public static final String getDisplayName(IFeature feature) {
 		requireNonNull(feature);
 		

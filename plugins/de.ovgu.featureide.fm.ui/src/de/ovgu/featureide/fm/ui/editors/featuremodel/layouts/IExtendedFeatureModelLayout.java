@@ -20,31 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import org.eclipse.draw2d.geometry.Point;
-
-public interface IFeatureModelLayout {
-
-	public void setLegendAutoLayout(boolean b);
-
-	public boolean hasLegendAutoLayout();
-
-	public boolean showHiddenFeatures();
-
-	public void showHiddenFeatures(boolean b);
-
-	public boolean verticalLayout();
-
-	public void verticalLayout(boolean b);
-
-	public Point getLegendPos();
-
-	public void setLegendPos(int x, int y);
-
-	public void setLayout(int newLayoutAlgorithm);
-
-	public int getLayoutAlgorithm();
-
-	public boolean hasFeaturesAutoLayout();
-	
-	public FeatureModelLayout clone();
+public interface IExtendedFeatureModelLayout extends IFeatureModelLayout{
+	public boolean showShortNames();
+	public void setShowShortNames(boolean b);
 }
+
