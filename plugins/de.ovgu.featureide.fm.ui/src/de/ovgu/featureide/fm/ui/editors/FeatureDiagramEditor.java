@@ -841,6 +841,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case ATTRIBUTE_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
+			legendLayoutAction.refresh();
+			internRefresh(false);
 			break;
 		case LOCATION_CHANGED:
 			internRefresh(true);
