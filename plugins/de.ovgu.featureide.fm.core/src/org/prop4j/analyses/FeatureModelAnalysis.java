@@ -33,8 +33,8 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.prop4j.solver.BasicSolver.SatResult;
 import org.prop4j.solver.BasicSolver;
+import org.prop4j.solver.BasicSolver.SatResult;
 import org.prop4j.solver.ModifiableSolver;
 import org.prop4j.solver.SatInstance;
 import org.sat4j.specs.ContradictionException;
@@ -111,6 +111,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator = new AdvancedNodeCreator(fm);
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
+		nodeCreator.setUseOldNames(false);
 	}
 
 	public boolean isCalculateConstraints() {
