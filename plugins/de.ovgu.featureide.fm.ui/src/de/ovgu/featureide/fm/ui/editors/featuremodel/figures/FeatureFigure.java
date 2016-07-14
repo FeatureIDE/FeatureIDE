@@ -183,14 +183,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 						explanation = analyser.deadFeatureExpl.get(feature); // get explanation for false optional feature
-						toolTip.append(DEAD);
+					//	toolTip.append(DEAD);
 					}
 					break;
 				case FALSE_OPTIONAL:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
 					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
 					explanation = analyser.falseOptFeatureExpl.get(feature); // get explanation for false optional feature
-					toolTip.append(FALSE_OPTIONAL);
+			//		toolTip.append(FALSE_OPTIONAL);
 					break;
 				case INDETERMINATE_HIDDEN:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
