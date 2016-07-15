@@ -48,6 +48,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.prop4j.analyses.FeatureModelAnalysis;
+import org.prop4j.analyses.SubModelRedundantAnalysis;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -57,14 +58,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.Comparison;
-import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
+
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
  * the corresponding methods in {@link IFeatureModel}
@@ -75,25 +75,24 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelAnalyzer {
-	
+
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint. 
+	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
 	public HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
 
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint. 
+	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
 	public HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
 
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint. 
+	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
 	public HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
-
 
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
@@ -223,8 +222,8 @@ public class FeatureModelAnalyzer {
 		Node featureModel = NodeCreator.createNodes(fm.clone(null));
 		boolean notValid = true;
 		for (IFeature f : b) {
-			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone(null)))), new Literal(NodeCreator.getVariable(a,
-					fm.clone(null))));
+			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone(null)))),
+					new Literal(NodeCreator.getVariable(a, fm.clone(null))));
 			notValid &= !new SatSolver(node, 1000).isSatisfiable();
 		}
 		return notValid;
@@ -397,7 +396,6 @@ public class FeatureModelAnalyzer {
 		}))), fm);
 	}
 
-
 	@Deprecated
 	public Node disjunct(Collection<IFeature> b) {
 		Iterator<IFeature> iterator = b.iterator();
@@ -569,51 +567,31 @@ public class FeatureModelAnalyzer {
 		redundantConstrExpl = analysis.redundantConstrExpl;
 		return newAttributes;
 	}
-	
+
 	/**
-	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint 
-	 * implies the model with the new constraint and the other way round. If this is the case, both models are 
-	 * equivalent and the constraint is redundant.  
+	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint
+	 * implies the model with the new constraint and the other way round. If this is the case, both models are
+	 * equivalent and the constraint is redundant.
 	 * If a redundant constraint has been detected, it is explained.
 	 * 
-	 * @param clone The feature model with redundant constraint
 	 * @param subModel The sub feature model which represents a sliced feature model of the origin
-	 * feature model (clone). The sub feature model additionally comprises implicit dependencies 
-	 * (transitive constraints). An explanation for this model is generated using the origin 
-	 * feature model (clone).
-	 * @param constraint The constraint to check whether it is redundant
-	 * @param changedAttributes The changed attributes of a constraint, e.g. REDUNDANT
-	 * @param oldAttributes the old attributes of a constraint, e.g. NORMAL
+	 *            feature model. The sub feature model additionally comprises implicit dependencies
+	 *            (transitive constraints). An explanation for this model is generated using the origin
+	 *            feature model.
+	 * @param constraints The constraints to check
+	 * @return a list of redundant constraints
 	 */
-	public void findRedundantConstraints(IFeatureModel clone, IFeatureModel subModel, IConstraint constraint, Map<Object, Object> changedAttributes,
-			Map<Object, Object> oldAttributes) {
-		IFeatureModel oldModel = clone.clone(null);
-		clone.addConstraint(constraint);
+	public List<IConstraint> findRedundantConstraints(IFeatureModel subModel, List<IConstraint> constraints) {
+		final SubModelRedundantAnalysis analysis = new SubModelRedundantAnalysis(fm, constraints);
+		final List<IConstraint> redundantConstraints = LongRunningWrapper.runMethod(analysis, null);
 
-		ModelComparator comparator = new ModelComparator(500);
-		Comparison comparison = comparator.compare(clone, oldModel);
-		if (comparison == Comparison.REFACTORING) {
-
-			/*
-			 * Explain redundant constraint. Differentiate between redundancy within a feature model 
-			 * and redundancy in a sliced sub feature model when calculating implicit dependencies
-			 */
-			Redundancy redundancy = new Redundancy();
-			if (subModel == null) {
-				List<String> expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
-				redundantConstrExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
-			} else { // if we are here, we generate an explanation for implicit constraints of a sliced feature model 
-				List<String> expl = redundancy.explain(oldModel, subModel, constraint);
-				subModel.getAnalyser().redundantConstrExpl.put(FeatureUtils.getConstraintIndex(subModel, constraint), expl);
-			}
-			
-			if (oldAttributes != null && changedAttributes != null) {
-				if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
-					changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
-				}
-			}
+		for (IConstraint constraint : redundantConstraints) {
+			final Redundancy redundancy = new Redundancy();
+			List<String> expl = redundancy.explain(fm, subModel, constraint);
+			subModel.getAnalyser().redundantConstrExpl.put(FeatureUtils.getConstraintIndex(subModel, constraint), expl);
 			constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT, false);
 		}
+		return redundantConstraints;
 	}
 
 	private void beginTask(int totalWork) {
@@ -648,8 +626,7 @@ public class FeatureModelAnalyzer {
 		}
 	}
 
-
-	public void updateFeatures() {		
+	public void updateFeatures() {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(true);
 		analysis.setCalculateConstraints(false);

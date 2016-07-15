@@ -54,15 +54,15 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * The origin feature model which contains the sub feature model.
 	 */
 	private static IFeatureModel oldFm;
-	
+
 	/**
 	 * Remember explanation for redundant constraint. Key = constraintIndex, Value = explanation.
 	 * Used as tool tip for redundant constraint.
 	 */
 	public static HashMap<Integer, List<String>> redundantExpl = new HashMap<Integer, List<String>>();
-	
+
 	/**
-	 * Constructor. 
+	 * Constructor.
 	 * 
 	 * @param fm The sub feature model
 	 * @param oldModel The origin feature model
@@ -85,7 +85,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 		setControl(container);
-		insertFeatureModel(container);		
+		insertFeatureModel(container);
 		setPageComplete(true);
 	}
 
@@ -120,14 +120,9 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * @param graphicalFeatModel The graphical feature model of the sub feature model
 	 */
 	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
-		// collect implicit constraints of the sub feature model
-		List<IConstraint> implicitConstraints = getImplicitConstraints();
-
 		// iterate implicit constraints and generate explanations 
-		for (IConstraint redundantC : implicitConstraints) {
-			oldFm.getAnalyser().findRedundantConstraints(oldFm, subtreeModel, redundantC, null, null);
-			oldFm.removeConstraint(redundantC);
-
+		final List<IConstraint> redundantConstraints = oldFm.getAnalyser().findRedundantConstraints(subtreeModel, getImplicitConstraints());
+		for (IConstraint redundantC : redundantConstraints) {
 			// remember for all respective graphical constraints that they are implicit (needed for tool tip later) 
 			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {
 				if (gc.getObject().getNode().toCNF().equals(redundantC.getNode().toCNF()))

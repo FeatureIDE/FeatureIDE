@@ -267,7 +267,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		try {
 			if (valid) {
 				checkConstraintRedundant(constraints);
-				checkConstraintDeadAndFalseOptiona(constraints);
+				checkConstraintDeadAndFalseOptional(constraints);
 			} else {
 				checkConstraintUnsatisfiable(constraints);
 			}
@@ -280,7 +280,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		return LongRunningWrapper.runMethod(new FindSolutionAnalysis(new SatInstance(constraintNode))) == null;
 	}
 
-	private void checkConstraintDeadAndFalseOptiona(final List<IConstraint> constraints) throws ContradictionException {
+	private void checkConstraintDeadAndFalseOptional(final List<IConstraint> constraints) throws ContradictionException {
 		nodeCreator.setModelType(ModelType.OnlyStructure);
 		final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 		final BasicSolver modSat = new BasicSolver(si);
@@ -319,7 +319,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			monitor.step();
 		}
 	}
-
+	
 	/**
 	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint
 	 * implies the model with the new constraint and the other way round. If this is the case, both models are
@@ -384,7 +384,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 							Redundancy redundancy = new Redundancy();
 							List<String> expl = redundancy.explain(clone, fm, constraint); //store explanation for redundant constraint
 							redundantConstrExpl.put(FeatureUtils.getConstraintIndex(fm, constraint), expl);
-
 						}
 					}
 				}
