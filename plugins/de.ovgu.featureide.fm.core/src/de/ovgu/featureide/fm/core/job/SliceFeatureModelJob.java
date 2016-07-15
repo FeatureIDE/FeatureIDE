@@ -37,6 +37,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -60,12 +61,14 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		private final IFeatureModel featuremodel;
 		private final Collection<String> featureNames;
 		private final Path modelFile;
+		private final boolean considerConstraints;
 
-		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames) {
+		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
 			super(Arguments.class);
 			this.modelFile = modelFile;
 			this.featuremodel = featuremodel;
 			this.featureNames = featureNames;
+			this.considerConstraints = considerConstraints;
 		}
 	}
 
@@ -159,6 +162,26 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		}
 		m.setFeatureTable(featureTable);
 		m.getStructure().setRoot(nroot.getStructure());
+
+		if (arguments.considerConstraints) {
+			final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
+			for (IConstraint constaint : orgFeatureModel.getConstraints()) {
+				final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
+				boolean containsAllfeatures = !containedFeatures.isEmpty();
+				for (IFeature feature : containedFeatures) {
+					if (!selectedFeatureNames.contains(feature.getName())) {
+						containsAllfeatures = false;
+						break;
+					}
+				}
+				if (containsAllfeatures) {
+					innerConstraintList.add(constaint);
+				}
+			}
+			for (IConstraint constraint : innerConstraintList) {
+				m.addConstraint(constraint.clone(m));
+			}
+		}
 
 		if (cnf instanceof And) {
 			final Node[] children = cnf.getChildren();
