@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHandler {
 
-	private static final String MODEL_MARKER = FMCorePlugin.PLUGIN_ID + ".featureModelMarker";
+	private static final String MODEL_MARKER = PluginID.PLUGIN_ID + ".featureModelMarker";
 
 	private final T modelFile;
 

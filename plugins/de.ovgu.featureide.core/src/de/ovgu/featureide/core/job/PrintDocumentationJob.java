@@ -63,7 +63,6 @@ import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -73,7 +72,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments> implements LongRunningMethod<Boolean> {
+public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments, Boolean> {
 	
 	public static class Arguments extends JobArguments {
 		private final String foldername, featureName;

@@ -51,11 +51,10 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
-public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arguments> implements LongRunningMethod<IFeatureGraph> {
+public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arguments, IFeatureGraph> {
 
 	public static class Arguments extends JobArguments {
 		private final IFeatureModel featureModel;

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class GuidslFormat implements IFeatureModelFormat {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + GuidslFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GuidslFormat.class.getSimpleName();
 	
 
 	@Override

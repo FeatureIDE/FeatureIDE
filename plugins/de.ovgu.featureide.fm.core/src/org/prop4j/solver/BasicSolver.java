@@ -41,7 +41,7 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 
@@ -78,7 +78,7 @@ public class BasicSolver implements ISatSolver {
 		try {
 			addVariables();
 		} catch (ContradictionException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			throw new RuntimeException();
 		}
 	}

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 
 /**

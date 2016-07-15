@@ -57,7 +57,6 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -66,7 +65,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  */
 @SuppressWarnings(RESTRICTION)
-public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments> implements LongRunningMethod<Boolean> {
+public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments, Boolean> {
 
 	public static class Arguments extends JobArguments {
 		private final IProject externalProject;

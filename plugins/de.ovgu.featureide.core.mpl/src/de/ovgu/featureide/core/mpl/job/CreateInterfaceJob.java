@@ -56,7 +56,6 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -66,7 +65,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> implements LongRunningMethod<IFeatureModel> {
+public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments, IFeatureModel> {
 
 	public static class Arguments extends JobArguments {
 		private final IFeatureModel featuremodel;

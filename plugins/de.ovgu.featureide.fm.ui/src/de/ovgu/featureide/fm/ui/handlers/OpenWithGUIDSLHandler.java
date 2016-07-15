@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.internal.util.BundleUtility;
 import org.osgi.framework.Bundle;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
@@ -59,8 +59,8 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 	@Override
 	protected void singleAction(IFile modelfile) {
 		try {
-			String jakarta = getFileFromPlugin(FMCorePlugin.PLUGIN_ID, "lib/jakarta.jar");
-			String guidsl = getFileFromPlugin(FMCorePlugin.PLUGIN_ID, "lib/guidsl.jar");
+			String jakarta = getFileFromPlugin(PluginID.PLUGIN_ID, "lib/jakarta.jar");
+			String guidsl = getFileFromPlugin(PluginID.PLUGIN_ID, "lib/guidsl.jar");
 			String command = "java -cp \"" + jakarta + "\"";
 			command += " -jar \"" + guidsl + "\"";
 

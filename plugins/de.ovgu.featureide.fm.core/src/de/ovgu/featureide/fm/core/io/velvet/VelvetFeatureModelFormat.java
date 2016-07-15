@@ -64,9 +64,9 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -101,7 +101,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
  */
 public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	public static boolean IS_USED_AS_API = false;
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + VelvetFeatureModelFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + VelvetFeatureModelFormat.class.getSimpleName();
 
 	protected File featureModelFile;
 

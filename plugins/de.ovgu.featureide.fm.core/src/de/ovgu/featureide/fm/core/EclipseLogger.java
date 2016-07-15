@@ -96,7 +96,7 @@ public class EclipseLogger implements ILogger {
 	 */
 	private void log(int severity, String message, Throwable exception) {
 		if (FMCorePlugin.getDefault().isDebugging()) {
-			FMCorePlugin.getDefault().getLog().log(new Status(severity, FMCorePlugin.PLUGIN_ID, message, exception));
+			FMCorePlugin.getDefault().getLog().log(new Status(severity, PluginID.PLUGIN_ID, message, exception));
 		}
 	}
 

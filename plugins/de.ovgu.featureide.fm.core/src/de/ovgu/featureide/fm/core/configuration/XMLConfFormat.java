@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
 
 	@Override

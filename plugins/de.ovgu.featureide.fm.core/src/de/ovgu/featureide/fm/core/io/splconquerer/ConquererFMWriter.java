@@ -63,8 +63,8 @@ import org.prop4j.Or;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -83,7 +83,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class ConquererFMWriter implements IFeatureModelFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + ConquererFMWriter.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + ConquererFMWriter.class.getSimpleName();
 	
 	private IFeatureModel featureModel;
 	

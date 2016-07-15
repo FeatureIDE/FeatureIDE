@@ -63,7 +63,7 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments> implements LongRunningMethod<Boolean> {
+public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments, Boolean> {
 
 	public static class Arguments extends JobArguments {
 

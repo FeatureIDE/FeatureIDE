@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Arguments> implements LongRunningMethod<IFeatureModel> {
+public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Arguments, IFeatureModel> {
 
 	public static class Arguments extends JobArguments {
 		private final IFeatureModel featuremodel;

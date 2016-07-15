@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
+
 /**
  * This internal job can be canceled.<br>
  * Cancel can cause invalid program states. 

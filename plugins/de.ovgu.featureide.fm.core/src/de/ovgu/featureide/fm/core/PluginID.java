@@ -18,31 +18,18 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job;
-
-
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
+package de.ovgu.featureide.fm.core;
 
 /**
- * This class implements support for Eclipse jobs.
- * The {@link JobArguments} object should be extended to add constructor 
- * parameters, and can be used to conveniently start several {@link AProjectJob}s.
+ * Holds the plugin ID.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AProjectJob<T extends JobArguments, R> implements LongRunningMethod<R> {
+public final class PluginID {
 
-	protected final T arguments;
-	
-	protected IMonitor workMonitor;
-	
-	protected AProjectJob(T arguments) {
-		this.arguments = arguments;
-	}
-	
-	protected AProjectJob(String name, T arguments) {
-		this.arguments = arguments;
+	public static String PLUGIN_ID = "de.ovgu.featureide.fm.core";
+
+	private PluginID() {
 	}
 
 }

@@ -27,8 +27,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 
 /**
@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
  */
 public class FeatureGraphFormat implements IFeatureGraphFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fg." + FeatureGraphFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + FeatureGraphFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureGraph object, CharSequence source) {

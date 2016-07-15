@@ -32,7 +32,6 @@ import de.ovgu.featureide.core.signature.base.AClassCreator;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -41,7 +40,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjectStructureJob.Arguments> implements LongRunningMethod<Boolean> {
+public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjectStructureJob.Arguments, Boolean> {
 	
 	public static class Arguments extends JobArguments {
 		private final IFilter<AbstractSignature> filter;

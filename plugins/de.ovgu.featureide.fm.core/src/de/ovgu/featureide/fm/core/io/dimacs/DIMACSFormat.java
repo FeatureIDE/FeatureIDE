@@ -33,7 +33,7 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public class DIMACSFormat implements IFeatureModelFormat {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {

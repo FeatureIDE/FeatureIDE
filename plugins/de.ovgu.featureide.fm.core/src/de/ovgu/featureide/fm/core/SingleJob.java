@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.jobs.Job;
  */
 public abstract class SingleJob extends Job {
 
-	private static final FMCorePlugin LOGGER = FMCorePlugin.getDefault();
 	private boolean running = false;
 	
 	public SingleJob(String name) {
@@ -73,7 +72,7 @@ public abstract class SingleJob extends Job {
 			thread.start();
 			thread.join();
 		} catch (InterruptedException e) {
-			LOGGER.logError(e);
+			Logger.logError(e);
 		} finally {
 			running = false;
 		}

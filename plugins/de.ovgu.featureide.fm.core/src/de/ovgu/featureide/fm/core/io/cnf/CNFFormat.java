@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.io.cnf;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class CNFFormat implements IFeatureModelFormat {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + CNFFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + CNFFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {

@@ -124,7 +124,7 @@ public class FMComposerManager implements IFMComposerExtension {
 			return;
 		}
 
-		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMCorePlugin.PLUGIN_ID + ".FMComposer");
+		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(PluginID.PLUGIN_ID + ".FMComposer");
 		try {
 			for (IConfigurationElement e : config) {
 				if (e.getAttribute("composer").equals(composerId)) {

@@ -34,7 +34,7 @@ import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.FeatureUtilsLegacy;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Soenke Holthusen
  * @author Marcus Pinnecke (Feature Interface) * 
  */
+@SuppressWarnings("deprecation")
 public class FeatureDependencies {
     private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected then Y is selected in every valid configuration."
 	    + "\n"
@@ -200,7 +201,7 @@ public class FeatureDependencies {
      */
     @Deprecated
     public Set<Feature> always(Feature feature) {
-    	return Functional.toSet(Functional.map(always.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
+    	return Functional.toSet(Functional.map(always.get(FeatureUtilsLegacy.convert(feature)), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
     }
 
     /**
@@ -217,7 +218,7 @@ public class FeatureDependencies {
      */
     @Deprecated
     public Set<Feature> never(Feature feature) {
-    	return Functional.toSet(Functional.map(never.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
+    	return Functional.toSet(Functional.map(never.get(FeatureUtilsLegacy.convert(feature)), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
     }
     
     /**
@@ -234,7 +235,7 @@ public class FeatureDependencies {
      */
     @Deprecated
     public Set<Feature> maybe(Feature feature) {
-    	return Functional.toSet(Functional.map(maybe.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
+    	return Functional.toSet(Functional.map(maybe.get(FeatureUtilsLegacy.convert(feature)), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
     }
 
     public String toString() {

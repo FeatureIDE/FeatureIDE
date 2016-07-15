@@ -66,13 +66,11 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
  */
 public class FMCorePlugin extends AbstractCorePlugin {
 
-	public static final String PLUGIN_ID = "de.ovgu.featureide.fm.core";
-
 	private static FMCorePlugin plugin;
 
 	@Override
 	public String getID() {
-		return PLUGIN_ID;
+		return PluginID.PLUGIN_ID;
 	}
 
 	public void start(BundleContext context) throws Exception {
@@ -82,9 +80,9 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		FileSystem.INSTANCE = new EclipseFileSystem();
 		LongRunningWrapper.INSTANCE = new LongRunningEclipse();
 		
-		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(FMCorePlugin.PLUGIN_ID, IFeatureModelFactory.extensionPointID, IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
-		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(FMCorePlugin.PLUGIN_ID, IFeatureModelFormat.extensionPointID, IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
-		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(FMCorePlugin.PLUGIN_ID, IConfigurationFormat.extensionPointID, IConfigurationFormat.extensionID, IConfigurationFormat.class));
+		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID, IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
+		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID, IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
+		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID, IConfigurationFormat.extensionID, IConfigurationFormat.class));
 
 //		ConfigFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
 //		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));

@@ -28,8 +28,8 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
@@ -119,7 +119,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		} catch (Exception e) {
 			status = JobStatus.FAILED;
 			Logger.logError(e);
-			return new Status(Status.ERROR, FMCorePlugin.PLUGIN_ID, "FAILED", e);
+			return new Status(Status.ERROR, PluginID.PLUGIN_ID, "FAILED", e);
 		} finally {
 			finalWork();
 			workMonitor.done();

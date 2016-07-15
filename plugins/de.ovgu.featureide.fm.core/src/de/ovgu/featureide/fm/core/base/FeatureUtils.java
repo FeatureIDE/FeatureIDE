@@ -43,8 +43,6 @@ import org.prop4j.SatSolver;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
@@ -58,74 +56,34 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 
 /**
- * TODO descriptions Marcus
+ * Several convenience methods for handling feature models, features and constraints.
  * 
  * @author Marcus Pinnecke
  */
 public final class FeatureUtils {
-	
-	private FeatureUtils() {}
+
+	public static final IFunction<CharSequence, String> CHARSQUENCE_TO_STRING = new IFunction<CharSequence, String>() {
+
+		@Override
+		public String invoke(CharSequence t) {
+			requireNonNull(t);
+
+			return t.toString();
+		}
+
+	};
 
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 
-	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
-		@Override
-		public String invoke(IFeature t) {
-			return t.getName();
-		}
-	};
-	
-	public static final void requireNonNull(Object object) {
-		// TODO check unnecessary null checks, may cuase defect itself
-		// or move to constructors
-//		java.util.Objects.requireNonNull(object, StringTable.PARAMETER_IS_EXPECTED_TO_BE_NON_NULL);
-	}
-
-	public static final de.ovgu.featureide.fm.core.Constraint convert(IConstraint c) {
-		requireNonNull(c);
-		
-		return new de.ovgu.featureide.fm.core.Constraint(c);
-	}
-
-	public static final IConstraint convert(de.ovgu.featureide.fm.core.Constraint c) {
-		requireNonNull(c);
-		
-		return c.constraint;
-	}
-
-	public static final de.ovgu.featureide.fm.core.FeatureModel convert(IFeatureModel fm) {
-		requireNonNull(fm);
-		
-		return new de.ovgu.featureide.fm.core.FeatureModel(fm);
-	}
-
-	@SuppressWarnings("deprecation")
-	public static final de.ovgu.featureide.fm.core.Feature convert(IFeature f) {
-		requireNonNull(f);
-		
-		return new de.ovgu.featureide.fm.core.Feature(f);
-	}
-
-	public static final IFeature convert(de.ovgu.featureide.fm.core.Feature f) {
-		requireNonNull(f);
-		
-		return f.feature;
-	}
-
-	public static final IFeatureModel convert(de.ovgu.featureide.fm.core.FeatureModel fm) {
-		requireNonNull(fm);
-		
-		return fm.model;
-	}
-
-	public static final IFunction<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new IFunction<IFeatureStructure, IFeature>() {
+	public static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE = new IFunction<IConstraint, Node>() {
 
 		@Override
-		public IFeature invoke(IFeatureStructure t) {
+		public Node invoke(IConstraint t) {
 			requireNonNull(t);
-			
-			return t.getFeature();
+
+			return t.getNode();
 		}
+
 	};
 
 	public static final IFunction<IFeature, IFeatureStructure> FEATURE_TO_STRUCTURE = new IFunction<IFeature, IFeatureStructure>() {
@@ -133,72 +91,211 @@ public final class FeatureUtils {
 		@Override
 		public IFeatureStructure invoke(IFeature t) {
 			requireNonNull(t);
-			
+
 			return t.getStructure();
 		}
 	};
 
-	public static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE = new IFunction<IConstraint, Node>() {
-
+	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
 		@Override
-		public Node invoke(IConstraint t) {
-			requireNonNull(t);
-			
-			return t.getNode();
+		public String invoke(IFeature t) {
+			return t.getName();
 		}
-
 	};
 
-	public static final IFunction<CharSequence, String> CHARSQUENCE_TO_STRING = new IFunction<CharSequence, String>() {
+	public static final IFunction<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new IFunction<IFeatureStructure, IFeature>() {
 
 		@Override
-		public String invoke(CharSequence t) {
+		public IFeature invoke(IFeatureStructure t) {
 			requireNonNull(t);
-			
-			return t.toString();
+
+			return t.getFeature();
 		}
-
 	};
 
-	public static final IFunction<IFeature, Feature> IFEATURE_TO_FEATURE = new IFunction<IFeature, Feature>() {
+	public static final void addAnnotation(IFeatureModel featureModel, CharSequence annotation) {
+		requireNonNull(featureModel);
+		requireNonNull(annotation);
 
-		@Override
-		public Feature invoke(IFeature t) {
-			requireNonNull(t);
-			
-			return convert(t);
-		};
-	};
+		featureModel.getProperty().addAnnotation(annotation);
+	}
 
-	public static final IFunction<de.ovgu.featureide.fm.core.Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT = new IFunction<de.ovgu.featureide.fm.core.Constraint, IConstraint>() {
+	public static final void addChild(IFeature feature, IFeature newChild) {
+		requireNonNull(feature);
+		requireNonNull(newChild);
 
-		@Override
-		public IConstraint invoke(de.ovgu.featureide.fm.core.Constraint t) {
-			requireNonNull(t);
-			
-			return convert(t);
-		};
-	};
+		feature.getStructure().addChild(newChild.getStructure());
+	}
 
-	public static final IFunction<Feature, IFeature> FEATURE_TO_IFEATURE = new IFunction<Feature, IFeature>() {
+	public static final void addChildAtPosition(IFeature feature, int index, IFeature newChild) {
+		requireNonNull(feature);
+		requireNonNull(newChild);
 
-		@Override
-		public IFeature invoke(Feature t) {
-			requireNonNull(t);
-			
-			return convert(t);
-		};
-	};
+		feature.getStructure().addChildAtPosition(index, newChild.getStructure());
+	}
 
-	public static final IFunction<IConstraint, de.ovgu.featureide.fm.core.Constraint> ICONSTRAINT_TO_CONSTRANT = new IFunction<IConstraint, de.ovgu.featureide.fm.core.Constraint>() {
+	public static final void addComment(IFeatureModel featureModel, CharSequence comment) {
+		requireNonNull(featureModel);
+		requireNonNull(comment);
 
-		@Override
-		public de.ovgu.featureide.fm.core.Constraint invoke(IConstraint t) {
-			requireNonNull(t);
-			
-			return convert(t);
-		};
-	};
+		featureModel.getProperty().addComment(comment);
+	}
+
+	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint) {
+		requireNonNull(featureModel);
+		requireNonNull(constraint);
+
+		featureModel.addConstraint(constraint);
+	}
+
+	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint, int index) {
+		requireNonNull(featureModel);
+		requireNonNull(constraint);
+
+		featureModel.addConstraint(constraint, index);
+	}
+
+	public static final boolean addFeature(IFeatureModel featureModel, IFeature feature) {
+		requireNonNull(featureModel);
+		requireNonNull(feature);
+
+		return featureModel.addFeature(feature);
+	}
+
+	public static final void addListener(IConstraint constraint, PropertyChangeListener listener) {
+		//		constraint.addListener(listener);
+	}
+
+	public static final void addListener(IFeature feature, PropertyChangeListener listener) {
+		//		feature.addListener(listener);
+	}
+
+	public static final void addListener(IFeatureModel featureModel, PropertyChangeListener listener) {
+		//		featureModel.addListener(listener);
+	}
+
+	public static final void addPropositionalNode(IFeatureModel featureModel, Node node) {
+		requireNonNull(featureModel);
+		requireNonNull(node);
+
+		featureModel.addConstraint(new Constraint(featureModel, node));
+	}
+
+	public static final void addPropositionalNode(IFeatureModel featureModel, Node node, int index) {
+		requireNonNull(featureModel);
+		requireNonNull(node);
+
+		featureModel.addConstraint(new Constraint(featureModel, node), index);
+	}
+
+	public static final void addTargetConnection(IFeature feature, FeatureConnection connection) {
+		//		feature.getStructure().addTargetConnection(connection);
+	}
+
+	public static final void changeToAlternative(IFeature feature) {
+		requireNonNull(feature);
+
+		feature.getStructure().changeToAlternative();
+	}
+
+	public static final void changeToAnd(IFeature feature) {
+		requireNonNull(feature);
+
+		feature.getStructure().changeToAnd();
+	}
+
+	public static final void changeToOr(IFeature feature) {
+		requireNonNull(feature);
+
+		feature.getStructure().changeToOr();
+	}
+
+	public static final IFeature clone(IFeature feature) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	public static final IFeature clone(IFeature feature, IFeatureModel featureModel, boolean complete) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	public static final IFeatureModel clone(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.clone();
+	}
+
+	public static Iterable<IFeature> convertToFeatureIteration(List<IFeatureStructure> list) {
+		requireNonNull(list);
+
+		return Functional.map(list, STRUCTURE_TO_FEATURE);
+	}
+
+	public static List<IFeature> convertToFeatureList(List<IFeatureStructure> list) {
+		requireNonNull(list);
+
+		return Functional.toList(Functional.map(list, STRUCTURE_TO_FEATURE));
+	}
+
+	public static Iterable<IFeatureStructure> convertToFeatureStructureList(List<IFeature> list) {
+		requireNonNull(list);
+
+		return Functional.map(list, FEATURE_TO_STRUCTURE);
+	}
+
+	public static final FeatureModelAnalyzer createAnalyser(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getAnalyser();
+	}
+
+	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {
+		requireNonNull(featureModel);
+		requireNonNull(projectName);
+
+		featureModel.createDefaultValues(projectName);
+	}
+
+	public static final boolean deleteFeature(IFeatureModel featureModel, IFeature feature) {
+		requireNonNull(featureModel);
+		requireNonNull(feature);
+
+		return featureModel.deleteFeature(feature);
+	}
+
+	public static final void deleteFeatureFromTable(IFeatureModel featureModel, IFeature feature) {
+		requireNonNull(featureModel);
+		requireNonNull(feature);
+
+		featureModel.deleteFeatureFromTable(feature);
+	}
+
+	public static final boolean equals(IConstraint constraint, Object obj) {
+		requireNonNull(constraint);
+		requireNonNull(obj);
+
+		return constraint.equals(obj);
+	}
+
+	public static final boolean equals(IFeatureModel featureModel, Object obj) {
+		requireNonNull(featureModel);
+		requireNonNull(obj);
+
+		return featureModel.equals(obj);
+	}
+
+	/**
+	 * Extracts all concrete features from a feature model by calling {@link #extractConcreteFeatures(Iterable)} on <code>model.getFeatures()</code>.
+	 * 
+	 * @since 3.0
+	 * @param model A feature model
+	 * @author Marcus Pinnecke
+	 * @return An iterable object that yields all concrete features of <b>features</b>
+	 */
+	public static Iterable<IFeature> extractConcreteFeatures(final IFeatureModel model) {
+		requireNonNull(model);
+
+		return extractConcreteFeatures(model.getFeatures());
+	}
 
 	/**
 	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable
@@ -218,22 +315,8 @@ public final class FeatureUtils {
 	 */
 	public static Iterable<IFeature> extractConcreteFeatures(final Iterable<IFeature> features) {
 		requireNonNull(features);
-		
-		return filter(features, CONCRETE_FEATURE_FILTER);
-	}
 
-	/**
-	 * Extracts all concrete features from a feature model by calling {@link #extractConcreteFeatures(Iterable)} on <code>model.getFeatures()</code>.
-	 * 
-	 * @since 3.0
-	 * @param model A feature model
-	 * @author Marcus Pinnecke
-	 * @return An iterable object that yields all concrete features of <b>features</b>
-	 */
-	public static Iterable<IFeature> extractConcreteFeatures(final IFeatureModel model) {
-		requireNonNull(model);
-		
-		return extractConcreteFeatures(model.getFeatures());
+		return filter(features, CONCRETE_FEATURE_FILTER);
 	}
 
 	/**
@@ -248,751 +331,116 @@ public final class FeatureUtils {
 	 */
 	public static List<String> extractConcreteFeaturesAsStringList(IFeatureModel model) {
 		requireNonNull(model);
-		
+
 		return new ArrayList<String>(Functional.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures())));
 	}
 
 	public static Iterable<String> extractFeatureNames(Collection<IFeature> features) {
 		requireNonNull(features);
-		
+
 		return Functional.map(features, GET_FEATURE_NAME);
 	}
 
 	public static Iterable<String> extractFeatureNames(Iterable<IFeature> features) {
 		requireNonNull(features);
-		
+
 		return Functional.map(features, GET_FEATURE_NAME);
 	}
 
-	public static Iterable<IFeature> convertToFeatureIteration(List<IFeatureStructure> list) {
-		requireNonNull(list);
-		
-		return Functional.map(list, STRUCTURE_TO_FEATURE);
-	}
-
-	public static List<IFeature> convertToFeatureList(List<IFeatureStructure> list) {
-		requireNonNull(list);
-		
-		return Functional.toList(Functional.map(list, STRUCTURE_TO_FEATURE));
-	}
-
-	public static Iterable<IFeatureStructure> convertToFeatureStructureList(List<IFeature> list) {
-		requireNonNull(list);
-		
-		return Functional.map(list, FEATURE_TO_STRUCTURE);
-	}
-
-	public static Iterable<Node> getPropositionalNodes(Iterable<IConstraint> constraints) {
-		requireNonNull(constraints);
-		
-		return Functional.toList(Functional.map(constraints, CONSTRAINT_TO_NODE));
-	}
-
-	public static final String getRelevantConstraintsString(IFeature feature) {
-		requireNonNull(feature);
-		
-		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
-	}
-	
-	public static String getRelevantConstraintsString(IFeature feature, Collection<IConstraint> constraints) {
-		requireNonNull(feature);
-		requireNonNull(constraints);
-		
-		StringBuilder relevant = new StringBuilder();
-		for (IConstraint constraint : constraints) {
-			for (IFeature f : constraint.getContainedFeatures()) {
-				if (f != null && f.getName().equals(feature.getName())) {
-					relevant.append((relevant.length() == 0 ? " " : "\n ") + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
-					break;
-				}
-			}
-		}
-		return relevant.toString();
-	}
-
-	public static void replacePropNode(IFeatureModel featureModel, int index, Node propNode) {
-		requireNonNull(featureModel);
-		requireNonNull(propNode);
-		
-		featureModel.setConstraint(index, new Constraint(featureModel, propNode));
-	}
-
-	public static void setRelevantConstraints(IFeature bone) {
-		requireNonNull(bone);
-		
-		List<Constraint> constraintList = new LinkedList<Constraint>();
-		for (IConstraint constraint : bone.getFeatureModel().getConstraints()) {
-			for (IFeature f : constraint.getContainedFeatures()) {
-				if (f.getName().equals(bone.getName())) {
-					constraintList.add((Constraint) constraint.clone(bone.getFeatureModel()));
-					break;
-				}
-			}
-		}
-		bone.getStructure().setRelevantConstraints(Functional.toList(Functional.map(constraintList, new IFunction<Constraint, IConstraint>() {
-
-			@Override
-			public IConstraint invoke(Constraint t) {
-				return t;
-			}
-
-		})));
-	}
-
-	public CharSequence createValidJavaIdentifierFromString(CharSequence s) {
-		requireNonNull(s);
-		
-		StringBuilder stringBuilder = new StringBuilder();
-		int i = 0;
-		for (; i < s.length(); i++) {
-			if (Character.isJavaIdentifierStart(s.charAt(i))) {
-				stringBuilder.append(s.charAt(i));
-				i++;
-				break;
-			}
-		}
-		for (; i < s.length(); i++) {
-			if (Character.isJavaIdentifierPart(s.charAt(i))) {
-				stringBuilder.append(s.charAt(i));
-			}
-		}
-		return stringBuilder.toString();
-	}
-
-	public static final String getDescription(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getProperty().getDescription();
-	}
-
-	public static final void setDescription(IFeature feature, CharSequence description) {
-		requireNonNull(feature);
-		requireNonNull(description);
-		
-		feature.getProperty().setDescription(description);
-	}
-
-	public static final void setNewLocation(IFeature feature, FMPoint newLocation) {
-//		feature.getGraphicRepresenation().setLocation(newLocation);
-	}
-
-	public static final FMPoint getLocation(IFeature feature) {
-//		return feature.getGraphicRepresenation().getLocation();
-		return null;
-	}
-
-	public static final boolean isAnd(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isAnd();
-	}
-
-	public static final boolean isOr(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isOr();
-	}
-
-	public static final boolean isAlternative(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isAlternative();
-	}
-
-	public static final void changeToAnd(IFeature feature) {
-		requireNonNull(feature);
-		
-		feature.getStructure().changeToAnd();
-	}
-
-	public static final void changeToOr(IFeature feature) {
-		requireNonNull(feature);
-		
-		feature.getStructure().changeToOr();
-	}
-
-	public static final void changeToAlternative(IFeature feature) {
-		requireNonNull(feature);
-		
-		feature.getStructure().changeToAlternative();
-	}
-
-	public static final void setAND(IFeature feature, boolean and) {
-		requireNonNull(feature);
-		
-		feature.getStructure().setAND(and);
-	}
-
-	public static final boolean isMandatorySet(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isMandatorySet();
-	}
-
-	public static final boolean isMandatory(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isMandatory();
-	}
-
-	public static final void setMandatory(IFeature feature, boolean mandatory) {
-		requireNonNull(feature);
-		
-		feature.getStructure().setMandatory(mandatory);
-	}
-
-	public static final boolean isHidden(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isHidden();
-	}
-
-	public static final void setHidden(IFeature feature, boolean hid) {
-		requireNonNull(feature);
-		
-		feature.getStructure().setHidden(hid);
-	}
-
-	public static final boolean isConstraintSelected(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getProperty().isConstraintSelected();
-	}
-
-	public static final void setConstraintSelected(IFeature feature, boolean selection) {
-		requireNonNull(feature);
-		
-		feature.getProperty().selectConstraint(selection);
-	}
-
-	public static final void setAbstract(IFeature feature, boolean value) {
-		requireNonNull(feature);
-		
-		feature.getStructure().setAbstract(value);
-	}
-
-	public static final Collection<IConstraint> getRelevantConstraints(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().getRelevantConstraints();
-	}
-
-	public static final FeatureStatus getFeatureStatus(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getProperty().getFeatureStatus();
-	}
-
-	public static final IFeatureModel getFeatureModel(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getFeatureModel();
-	}
-
-	public static final void setFeatureStatus(IFeature feature, FeatureStatus stat, boolean fire) {
-		requireNonNull(feature);
-		requireNonNull(stat);
-		
-		feature.getProperty().setFeatureStatus(stat, fire);
-	}
-
-	public static final boolean isMultiple(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isMultiple();
-	}
-
-	public static final void setMultiple(IFeature feature, boolean multiple) {
-		requireNonNull(feature);
-		
-		feature.getStructure().setMultiple(multiple);
-	}
-
-	public static final String getName(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getName();
-	}
-
-	public static final void setName(IFeature feature, String name) {
-		requireNonNull(feature);
-		
-		feature.setName(name);
-	}
-
-	public static final boolean hasInlineRule(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().hasInlineRule();
-	}
-
-	public static final void setParent(IFeature feature, IFeature newParent) {
-		requireNonNull(feature);
-		requireNonNull(newParent);
-		
-		feature.getStructure().setParent(newParent.getStructure());
-	}
-
-	@CheckForNull
-	public static final IFeature getParent(IFeature feature) {
-		if (feature != null) {
-			IFeatureStructure parent = feature.getStructure().getParent();
-			if (parent != null) { 
-				return parent.getFeature();
-			}
-		}
-		return null;
-	}
-
-	public static final boolean isRoot(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isRoot();
-	}
-
-	public static final Iterable<IFeature> getChildren(IFeature feature) {
-		requireNonNull(feature);
-		
-		return Functional.map(feature.getStructure().getChildren(), STRUCTURE_TO_FEATURE);
-	}
-
-	public static final void setChildren(IFeature feature, Iterable<IFeature> children) {
-		requireNonNull(children);
-		
-		feature.getStructure().setChildren(Functional.toList(Functional.map(children, FEATURE_TO_STRUCTURE)));
-	}
-
-	public static final boolean hasChildren(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().hasChildren();
-	}
-
-	public static final void addChild(IFeature feature, IFeature newChild) {
-		requireNonNull(feature);
-		requireNonNull(newChild);
-		
-		feature.getStructure().addChild(newChild.getStructure());
-	}
-
-	public static final void addChildAtPosition(IFeature feature, int index, IFeature newChild) {
-		requireNonNull(feature);
-		requireNonNull(newChild);
-		
-		feature.getStructure().addChildAtPosition(index, newChild.getStructure());
-	}
-
-	public static final void replaceChild(IFeature feature, IFeature oldChild, IFeature newChild) {
-		requireNonNull(feature);
-		requireNonNull(oldChild);
-		requireNonNull(newChild);
-		
-		feature.getStructure().replaceChild(oldChild.getStructure(), newChild.getStructure());
-	}
-
-	public static final void removeChild(IFeature feature, IFeature child) {
-		requireNonNull(feature);
-		requireNonNull(child);
-		
-		feature.getStructure().removeChild(child.getStructure());
-	}
-
-	public static final IFeature removeLastChild(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().removeLastChild().getFeature();
-	}
-
-	public static final Iterable<FeatureConnection> getSourceConnections(IFeature feature) {
-//		return feature.getStructure().getSourceConnections();
-		return null;
-	}
-
-	public static final Iterable<FeatureConnection> getTargetConnections(IFeature feature) {
-//		return feature.getStructure().getTargetConnections();
-		return null;
-	}
-
-	public static final void addTargetConnection(IFeature feature, FeatureConnection connection) {
-//		feature.getStructure().addTargetConnection(connection);
-	}
-
-	public static final boolean removeTargetConnection(IFeature feature, FeatureConnection connection) {
-//		return feature.getStructure().removeTargetConnection(connection);
-		return false;
-	}
-
-	public static final void addListener(IFeature feature, PropertyChangeListener listener) {
-//		feature.addListener(listener);
-	}
-
-	public static final void removeListener(IFeature feature, PropertyChangeListener listener) {
-//		feature.removeListener(listener);
-	}
-
-	public static final boolean isAncestorOf(IFeature feature, IFeature next) {
-		requireNonNull(feature);
-		requireNonNull(next);
-		
-		return feature.getStructure().isAncestorOf(next.getStructure());
-	}
-
-	public static final boolean isFirstChild(IFeature feature, IFeature child) {
-		requireNonNull(feature);
-		requireNonNull(child);
-		
-		return feature.getStructure().isFirstChild(child.getStructure());
-	}
-
-	public static final int getChildrenCount(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().getChildrenCount();
-	}
-
-	public static final IFeature getFirstChild(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().getFirstChild().getFeature();
-	}
-
-	public static final IFeature getLastChild(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().getLastChild().getFeature();
-	}
-
-	public static final boolean isAbstract(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isAbstract();
-	}
-
-	public static final boolean isConcrete(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isConcrete();
-	}
-
-	public static final boolean isANDPossible(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().isANDPossible();
+	public static final void fire(IConstraint constraint, PropertyChangeEvent event) {
+		//		constraint.fireEvent(event);
 	}
 
 	public static final void fire(IFeature feature, PropertyChangeEvent event) {
 		requireNonNull(feature);
 		requireNonNull(event);
-		
-//		feature.fireEvent(event);
-	}
 
-	public static final IFeature clone(IFeature feature) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	public static final IFeature clone(IFeature feature, IFeatureModel featureModel, boolean complete) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	public static final void setAnd(IFeature feature) {
-		requireNonNull(feature);
-		
-		feature.getStructure().setAnd();
-	}
-
-	public static final void setOr(IFeature feature) {
-		requireNonNull(feature);
-		
-		feature.getStructure().setOr();
-	}
-
-	public static final void setAlternative(IFeature feature) {
-		requireNonNull(feature);
-		
-		feature.getStructure().setAlternative();
-	}
-
-	public static final boolean hasHiddenParent(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getStructure().hasHiddenParent();
-	}
-
-	public static final String toString(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.toString();
-	}
-
-	@Deprecated
-	public static final String getDisplayName(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.getProperty().getDisplayName();
-	}
-
-	public static final void propertyChange(IFeature feature, PropertyChangeEvent event) {
-		requireNonNull(feature);
-		requireNonNull(event);
-		
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	public static final String toString(IFeature feature, boolean writeMarks) {
-		requireNonNull(feature);
-		
-		if (writeMarks) {
-			final String featureName = feature.getName();
-			if (featureName.contains(" ") || Operator.isOperatorName(featureName)) {
-				return "\"" + feature.getName() + "\"";
-			}
-			return feature.getName();
-		} else {
-			return feature.toString();
-		}
-	}
-
-	public static final ColorList getColorList(IFeature feature) {
-//		return feature.getGraphicRepresenation().getColorList();
-		return null;
-	}
-	
-	public static final int hashCode(IFeature feature) {
-		requireNonNull(feature);
-		
-		return feature.hashCode();
-	}
-
-	public static final int hashCode(IConstraint constraint) {
-		requireNonNull(constraint);
-		
-		return constraint.hashCode();
-	}
-
-	public static final GraphicItem getItemType(IFeature feature) {
-//		return feature.getGraphicRepresenation().getItemType();
-		return null;
-	}
-
-	public static final FeatureModelAnalyzer createAnalyser(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getAnalyser();
+		//		feature.fireEvent(event);
 	}
 
 	public static final FeatureModelAnalyzer getAnalyser(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
-		
+
 		return featureModel.getAnalyser();
 	}
 
-	public static final IFeatureModelLayout getLayout(IFeatureModel featureModel) {
-//		return featureModel.getLayout();
+	public static final List<String> getAnnotations(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return Functional.toList(featureModel.getProperty().getAnnotations());
+	}
+
+	public static int getChildIndex(IFeature feature, IFeature child) {
+		requireNonNull(feature);
+		requireNonNull(child);
+
+		return feature.getStructure().getChildIndex(child.getStructure());
+	}
+
+	public static final Iterable<IFeature> getChildren(IFeature feature) {
+		requireNonNull(feature);
+
+		return Functional.map(feature.getStructure().getChildren(), STRUCTURE_TO_FEATURE);
+	}
+
+	public static final int getChildrenCount(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().getChildrenCount();
+	}
+
+	public static final ColorList getColorList(IFeature feature) {
+		//		return feature.getGraphicRepresenation().getColorList();
 		return null;
 	}
 
 	public static final ColorschemeTable getColorschemeTable(IFeatureModel featureModel) {
-//		return featureModel.getGraphicRepresenation().getColorschemeTable();
+		//		return featureModel.getGraphicRepresenation().getColorschemeTable();
 		return null;
 	}
 
-	public static final RenamingsManager getRenamingsManager(IFeatureModel featureModel) {
+	public static final List<String> getComments(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
-		
-		return featureModel.getRenamingsManager();
-	}
 
-	public static final void reset(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		featureModel.reset();
-	}
-
-	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {
-		requireNonNull(featureModel);
-		requireNonNull(projectName);
-		
-		featureModel.createDefaultValues(projectName);
-	}
-
-	public static final void setRoot(IFeatureModel featureModel, IFeature root) {
-		requireNonNull(featureModel);
-		requireNonNull(root);
-		
-		featureModel.getStructure().setRoot(root.getStructure());
-	}
-
-	public static final IFeature getRoot(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		IFeatureStructure root = featureModel.getStructure().getRoot();
-		if (root != null) {
-			return root.getFeature();
-		}
-		return null;
-	}
-
-	public static final void setFeatureTable(IFeatureModel featureModel, final Hashtable<String, IFeature> featureTable) {
-		requireNonNull(featureModel);
-		requireNonNull(featureTable);
-		
-		featureModel.setFeatureTable(featureTable);
-	}
-
-	public static final boolean addFeature(IFeatureModel featureModel, IFeature feature) {
-		requireNonNull(featureModel);
-		requireNonNull(feature);
-		
-		return featureModel.addFeature(feature);
-	}
-
-	public static final Collection<IFeature> getFeatures(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return Functional.toList(featureModel.getFeatures());
-	}
-
-	public static final IFeature getFeature(IFeatureModel featureModel, CharSequence name) {
-		requireNonNull(featureModel);
-		requireNonNull(name);
-		
-		return featureModel.getFeature(name.toString());
-	}
-
-	@Nonnull
-	public static final Collection<IFeature> getConcreteFeatures(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel));
+		return Functional.toList(featureModel.getProperty().getComments());
 	}
 
 	@Nonnull
 	public static final Iterable<String> getConcreteFeatureNames(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
-		
+
 		return FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
 	}
 
-	public static final Collection<IFeature> getFeaturesPreorder(IFeatureModel featureModel) {
+	@Nonnull
+	public static final Collection<IFeature> getConcreteFeatures(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().getFeaturesPreorder();
-	}
 
-	public static final List<String> getFeatureNamesPreorder(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getStructure().getFeaturesPreorder()));
-	}
-
-	@Deprecated
-	public static final boolean isConcrete(IFeatureModel featureModel, CharSequence featureName) {
-		requireNonNull(featureModel);
-		requireNonNull(featureName);
-		
-		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureModel))
-			if (feature.getName().equals(featureName))
-				return true;
-		return false;
-	}
-
-	public static final Map<String, IFeature> getFeatureTable(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getFeatureTable();
-	}
-
-	public static final Set<String> getFeatureNames(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return Functional.toSet(FeatureUtils.extractFeatureNames(Functional.toList(featureModel.getFeatures())));
-	}
-
-	public static final int getNumberOfFeatures(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getNumberOfFeatures();
-	}
-
-	public static final void deleteFeatureFromTable(IFeatureModel featureModel, IFeature feature) {
-		requireNonNull(featureModel);
-		requireNonNull(feature);
-		
-		featureModel.deleteFeatureFromTable(feature);
-	}
-
-	public static final boolean deleteFeature(IFeatureModel featureModel, IFeature feature) {
-		requireNonNull(featureModel);
-		requireNonNull(feature);
-		
-		return featureModel.deleteFeature(feature);
-	}
-
-	public static final void replaceRoot(IFeatureModel featureModel, IFeature feature) {
-		requireNonNull(featureModel);
-		requireNonNull(feature);
-		
-		featureModel.getStructure().replaceRoot(feature.getStructure());
-	}
-
-	public static final void setConstraints(IFeatureModel featureModel, final Iterable<IConstraint> constraints) {
-		requireNonNull(featureModel);
-		requireNonNull(constraints);
-		
-		featureModel.setConstraints(constraints);
-	}
-
-	public static final void addPropositionalNode(IFeatureModel featureModel, Node node) {
-		requireNonNull(featureModel);
-		requireNonNull(node);
-		
-		featureModel.addConstraint(new Constraint(featureModel, node));
-	}
-
-	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint) {
-		requireNonNull(featureModel);
-		requireNonNull(constraint);
-		
-		featureModel.addConstraint(constraint);
-	}
-
-	public static final void addPropositionalNode(IFeatureModel featureModel, Node node, int index) {
-		requireNonNull(featureModel);
-		requireNonNull(node);
-		
-		featureModel.addConstraint(new Constraint(featureModel, node), index);
-	}
-
-	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint, int index) {
-		requireNonNull(featureModel);
-		requireNonNull(constraint);
-		
-		featureModel.addConstraint(constraint, index);
-	}
-
-	public static final Iterable<Node> getPropositionalNodes(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return Functional.map(featureModel.getConstraints(), CONSTRAINT_TO_NODE);
+		return Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel));
 	}
 
 	public static final Node getConstraint(IFeatureModel featureModel, int index) {
 		requireNonNull(featureModel);
-		
+
 		return Functional.toList(getPropositionalNodes(featureModel)).get(index);
 	}
 
-	public static final List<IConstraint> getConstraints(IFeatureModel featureModel) {
+	public static final ConstraintAttribute getConstraintAttribute(IConstraint constraint) {
+		requireNonNull(constraint);
+
+		return constraint.getConstraintAttribute();
+	}
+
+	public static final int getConstraintCount(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
-		
-		return featureModel.getConstraints();
+
+		return featureModel.getConstraintCount();
 	}
 
 	public static final int getConstraintIndex(IFeatureModel featureModel, IConstraint constraint) {
 		requireNonNull(featureModel);
 		requireNonNull(constraint);
-		
+
 		final List<IConstraint> constraints = featureModel.getConstraints();
 		for (int i = 0; i < constraints.size(); i++)
 			if (constraints.get(i).equals(constraint))
@@ -1000,315 +448,28 @@ public final class FeatureUtils {
 		throw new NoSuchElementException();
 	}
 
-	public static final void removePropositionalNode(IFeatureModel featureModel, Node node) {
+	public static final List<IConstraint> getConstraints(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
-		requireNonNull(node);
-		
-		List<IConstraint> constraints = featureModel.getConstraints();
-		int index = -1;
-		for (int i = 0; i < constraints.size(); i++) {
-			if (constraints.get(i).getNode().equals(node)) {
-				index = i;
-				break;
-			}
-		}
-		tryRemoveConstraint(featureModel, new LinkedList<>(constraints), index);
+
+		return featureModel.getConstraints();
 	}
 
-	public static final void removeConstraint(IFeatureModel featureModel, IConstraint constraint) {
-		requireNonNull(featureModel);
+	public static final Collection<IFeature> getContainedFeatures(IConstraint constraint) {
 		requireNonNull(constraint);
-		
-		List<IConstraint> constraints = featureModel.getConstraints();
-		int index = getConstraintIndex(featureModel, constraint);
-		tryRemoveConstraint(featureModel, constraints, index);
+
+		return constraint.getContainedFeatures();
 	}
 
-	private static void tryRemoveConstraint(IFeatureModel featureModel, List<IConstraint> constraints, int index) {
-		requireNonNull(featureModel);
-		requireNonNull(constraints);
-		
-		if (index == -1 || index >= constraints.size())
-			throw new NoSuchElementException();
-		else {
-			constraints.remove(index);
-			featureModel.setConstraints(constraints);
-		}
-	}
-
-	public static final void removeConstraint(IFeatureModel featureModel, int index) {
-		requireNonNull(featureModel);
-		
-		tryRemoveConstraint(featureModel, featureModel.getConstraints(), index);
-	}
-
-	public static final int getConstraintCount(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getConstraintCount();
-	}
-
-	public static final List<String> getAnnotations(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return Functional.toList(featureModel.getProperty().getAnnotations());
-	}
-
-	public static final void addAnnotation(IFeatureModel featureModel, CharSequence annotation) {
-		requireNonNull(featureModel);
-		requireNonNull(annotation);
-		
-		featureModel.getProperty().addAnnotation(annotation);
-	}
-
-	public static final List<String> getComments(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return Functional.toList(featureModel.getProperty().getComments());
-	}
-
-	public static final void addComment(IFeatureModel featureModel, CharSequence comment) {
-		requireNonNull(featureModel);
-		requireNonNull(comment);
-		
-		featureModel.getProperty().addComment(comment);
-	}
-
-	public static final void addListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-//		featureModel.addListener(listener);
-	}
-
-	public static final void removeListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-//		featureModel.removeListener(listener);
-	}
-
-	public static final void handleModelDataLoaded(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		featureModel.handleModelDataLoaded();
-	}
-
-	public static final void handleModelDataChanged(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		featureModel.handleModelDataChanged();
-	}
-
-	public static final void handleModelLayoutChanged(IFeatureModel featureModel) {
-//		featureModel.getGraphicRepresenation().handleModelLayoutChanged();
-	}
-
-	public static final void handleLegendLayoutChanged(IFeatureModel featureModel) {
-//		featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
-	}
-
-	public static final void refreshContextMenu(IFeatureModel featureModel) {
-//		featureModel.getGraphicRepresenation().refreshContextMenu();
-	}
-
-	public static final void redrawDiagram(IFeatureModel featureModel) {
-//		featureModel.getGraphicRepresenation().redrawDiagram();
-	}
-
-	public static final IFeatureModel clone(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.clone();
-	}
-
-	public static final boolean hasMandatoryFeatures(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasMandatoryFeatures();
-	}
-
-	public static final boolean hasOptionalFeatures(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasOptionalFeatures();
-	}
-
-	public static final boolean hasAndGroup(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasAndGroup();
-	}
-
-	public static final boolean hasAlternativeGroup(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasAlternativeGroup();
-	}
-
-	public static final boolean hasOrGroup(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasOrGroup();
-	}
-
-	public static final boolean hasAbstract(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasAbstract();
-	}
-
-	public static final boolean hasConcrete(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasConcrete();
-	}
-
-	public static final int numOrGroup(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().numOrGroup();
-	}
-
-	public static final int numAlternativeGroup(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().numAlternativeGroup();
-	}
-
-	public static final boolean hasHidden(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasHidden();
-	}
-
-	public static final boolean hasIndetHidden(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasIndetHidden();
-	}
-
-	public static final boolean hasUnsatisfiableConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasUnsatisfiableConstraints();
-	}
-
-	public static final boolean hasTautologyConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasTautologyConstraints();
-	}
-
-	public static final boolean hasDeadConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasDeadConstraints();
-	}
-
-	public static final boolean hasVoidModelConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasVoidModelConstraints();
-	}
-
-	public static final boolean hasRedundantConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasRedundantConstraints();
-	}
-
-	public static final boolean hasFalseOptionalFeatures(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getStructure().hasFalseOptionalFeatures();
-	}
-
-//	public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
-//		featureModel.getUndoContext(undoContext);
-//	}
-//
-//	public static final Object getUndoContext(IFeatureModel featureModel) {
-//		return featureModel.getUndoContext();
-//	}
-
-	public static final Collection<String> getFeatureOrderList(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.getFeatureOrderList();
-	}
-
-	public static final void setFeatureOrderList(IFeatureModel featureModel, final List<String> featureOrderList) {
-		requireNonNull(featureModel);
-		requireNonNull(featureOrderList);
-		
-		featureModel.setFeatureOrderList(featureOrderList);
-	}
-
-	public static final boolean isFeatureOrderUserDefined(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.isFeatureOrderUserDefined();
-	}
-
-	public static final void setFeatureOrderUserDefined(IFeatureModel featureModel, boolean featureOrderUserDefined) {
-		requireNonNull(featureModel);
-		
-		featureModel.setFeatureOrderUserDefined(featureOrderUserDefined);
-	}
-
-//	public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
-//		return featureModel.isFeatureOrderInXML();
-//	}
-//
-//	public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-//		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
-//	}
-
-	public static final String toString(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.toString();
-	}
-
-	public static final boolean equals(IFeatureModel featureModel, Object obj) {
-		requireNonNull(featureModel);
-		requireNonNull(obj);
-		
-		return featureModel.equals(obj);
-	}
-
-	public static final int hashCode(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-		
-		return featureModel.hashCode();
-	}
-
-	public static final GraphicItem getItemType(IFeatureModel featureModel) {
-//		return featureModel.getGraphicRepresenation().getItemType();
-		return null;
-	}
-
-	public static final void setLocation(IConstraint constraint, FMPoint newLocation) {
-//		constraint.getGraphicRepresenation().setLocation(newLocation);
-	}
-
-	public static final FMPoint getLocation(IConstraint constraint) {
-//		return constraint.getGraphicRepresenation().getLocation();
-		return null;
-	}
-
-	public static final IFeatureModel getFeatureModel(IConstraint constraint) {
+	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint) {
 		requireNonNull(constraint);
-		
-		return constraint.getFeatureModel();
-	}
 
-	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
-		requireNonNull(constraint);
-		requireNonNull(fmDeadFeatures);
-		
-		return Functional.toList(constraint.getDeadFeatures(solver, fm, fmDeadFeatures));
+		return constraint.getDeadFeatures();
 	}
 
 	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
 		requireNonNull(constraint);
 		requireNonNull(fmDeadFeatures);
-		
+
 		Collection<IFeature> deadFeaturesBefore = null;
 		final Node propNode = constraint.getNode();
 		if (propNode != null) {
@@ -1329,47 +490,712 @@ public final class FeatureUtils {
 		return deadFeaturesAfter;
 	}
 
-	public static final void setConstraintAttribute(IConstraint constraint, ConstraintAttribute attri, boolean fire) {
+	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
 		requireNonNull(constraint);
-		requireNonNull(attri);
-		
-		constraint.setConstraintAttribute(attri, fire);
+		requireNonNull(fmDeadFeatures);
+
+		return Functional.toList(constraint.getDeadFeatures(solver, fm, fmDeadFeatures));
 	}
 
-	public static final ConstraintAttribute getConstraintAttribute(IConstraint constraint) {
+	public static final String getDescription(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getProperty().getDescription();
+	}
+
+	@Deprecated
+	public static final String getDisplayName(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getProperty().getDisplayName();
+	}
+
+	public static final Iterable<IFeature> getFalseOptional(IConstraint constraint) {
 		requireNonNull(constraint);
-		
-		return constraint.getConstraintAttribute();
+
+		return constraint.getFalseOptional();
+	}
+
+	public static final IFeature getFeature(IFeatureModel featureModel, CharSequence name) {
+		requireNonNull(featureModel);
+		requireNonNull(name);
+
+		return featureModel.getFeature(name.toString());
+	}
+
+	public static final IFeatureModel getFeatureModel(IConstraint constraint) {
+		requireNonNull(constraint);
+
+		return constraint.getFeatureModel();
+	}
+
+	public static final IFeatureModel getFeatureModel(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getFeatureModel();
+	}
+
+	public static final Set<String> getFeatureNames(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return Functional.toSet(FeatureUtils.extractFeatureNames(Functional.toList(featureModel.getFeatures())));
+	}
+
+	public static final List<String> getFeatureNamesPreorder(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getStructure().getFeaturesPreorder()));
+	}
+
+	public static final Collection<String> getFeatureOrderList(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getFeatureOrderList();
+	}
+
+	public static final Collection<IFeature> getFeatures(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return Functional.toList(featureModel.getFeatures());
+	}
+
+	public static final Collection<IFeature> getFeaturesPreorder(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().getFeaturesPreorder();
+	}
+
+	public static final FeatureStatus getFeatureStatus(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getProperty().getFeatureStatus();
+	}
+
+	public static final Map<String, IFeature> getFeatureTable(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getFeatureTable();
+	}
+
+	public static final IFeature getFirstChild(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().getFirstChild().getFeature();
+	}
+
+	public static final GraphicItem getItemType(IConstraint constraint) {
+		//		return constraint.getGraphicRepresenation().getItemType();
+		return null;
+	}
+
+	public static final GraphicItem getItemType(IFeature feature) {
+		//		return feature.getGraphicRepresenation().getItemType();
+		return null;
+	}
+
+	public static final GraphicItem getItemType(IFeatureModel featureModel) {
+		//		return featureModel.getGraphicRepresenation().getItemType();
+		return null;
+	}
+
+	public static final IFeature getLastChild(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().getLastChild().getFeature();
+	}
+
+	public static final IFeatureModelLayout getLayout(IFeatureModel featureModel) {
+		//		return featureModel.getLayout();
+		return null;
+	}
+
+	public static final String getName(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getName();
 	}
 
 	public static final Node getNode(IConstraint constraint) {
 		requireNonNull(constraint);
-		
+
 		return constraint.getNode();
+	}
+
+	public static final int getNumberOfFeatures(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getNumberOfFeatures();
+	}
+
+	@CheckForNull
+	public static final IFeature getParent(IFeature feature) {
+		if (feature != null) {
+			IFeatureStructure parent = feature.getStructure().getParent();
+			if (parent != null) {
+				return parent.getFeature();
+			}
+		}
+		return null;
+	}
+
+	public static final Iterable<Node> getPropositionalNodes(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return Functional.map(featureModel.getConstraints(), CONSTRAINT_TO_NODE);
+	}
+
+	public static Iterable<Node> getPropositionalNodes(Iterable<IConstraint> constraints) {
+		requireNonNull(constraints);
+
+		return Functional.toList(Functional.map(constraints, CONSTRAINT_TO_NODE));
+	}
+
+	public static final Collection<IConstraint> getRelevantConstraints(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().getRelevantConstraints();
+	}
+
+	public static final String getRelevantConstraintsString(IFeature feature) {
+		requireNonNull(feature);
+
+		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
+	}
+
+	public static String getRelevantConstraintsString(IFeature feature, Collection<IConstraint> constraints) {
+		requireNonNull(feature);
+		requireNonNull(constraints);
+
+		StringBuilder relevant = new StringBuilder();
+		for (IConstraint constraint : constraints) {
+			for (IFeature f : constraint.getContainedFeatures()) {
+				if (f != null && f.getName().equals(feature.getName())) {
+					relevant.append((relevant.length() == 0 ? " " : "\n ") + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
+					break;
+				}
+			}
+		}
+		return relevant.toString();
+	}
+
+	public static final RenamingsManager getRenamingsManager(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getRenamingsManager();
+	}
+
+	public static final IFeature getRoot(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		IFeatureStructure root = featureModel.getStructure().getRoot();
+		if (root != null) {
+			return root.getFeature();
+		}
+		return null;
+	}
+
+	public static final Iterable<FeatureConnection> getSourceConnections(IFeature feature) {
+		//		return feature.getStructure().getSourceConnections();
+		return null;
+	}
+
+	public static final Iterable<FeatureConnection> getTargetConnections(IFeature feature) {
+		//		return feature.getStructure().getTargetConnections();
+		return null;
+	}
+
+	public static final void handleLegendLayoutChanged(IFeatureModel featureModel) {
+		//		featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
+	}
+
+	public static final void handleModelDataChanged(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		featureModel.handleModelDataChanged();
+	}
+
+	public static final void handleModelDataLoaded(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		featureModel.handleModelDataLoaded();
+	}
+
+	public static final void handleModelLayoutChanged(IFeatureModel featureModel) {
+		//		featureModel.getGraphicRepresenation().handleModelLayoutChanged();
+	}
+
+	public static final boolean hasAbstract(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasAbstract();
+	}
+
+	public static final boolean hasAlternativeGroup(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasAlternativeGroup();
+	}
+
+	public static final boolean hasAndGroup(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasAndGroup();
+	}
+
+	public static final boolean hasChildren(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().hasChildren();
+	}
+
+	public static final boolean hasConcrete(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasConcrete();
+	}
+
+	public static final boolean hasDeadConst(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasDeadConstraints();
+	}
+
+	public static final boolean hasFalseOptionalFeatures(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasFalseOptionalFeatures();
+	}
+
+	public static final int hashCode(IConstraint constraint) {
+		requireNonNull(constraint);
+
+		return constraint.hashCode();
+	}
+
+	public static final int hashCode(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.hashCode();
+	}
+
+	public static final int hashCode(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.hashCode();
+	}
+
+	public static final boolean hasHidden(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasHidden();
+	}
+
+	public static final boolean hasHiddenFeatures(IConstraint constraint) {
+		requireNonNull(constraint);
+
+		return constraint.hasHiddenFeatures();
+	}
+
+	public static final boolean hasHiddenParent(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().hasHiddenParent();
+	}
+
+	public static final boolean hasIndetHidden(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasIndetHidden();
+	}
+
+	public static final boolean hasInlineRule(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().hasInlineRule();
+	}
+
+	public static final boolean hasMandatoryFeatures(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasMandatoryFeatures();
+	}
+
+	public static final boolean hasOptionalFeatures(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasOptionalFeatures();
+	}
+
+	public static final boolean hasOrGroup(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasOrGroup();
+	}
+
+	public static final boolean hasRedundantConst(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasRedundantConstraints();
+	}
+
+	public static final boolean hasTautologyConst(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasTautologyConstraints();
+	}
+
+	public static final boolean hasUnsatisfiableConst(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasUnsatisfiableConstraints();
+	}
+
+	public static final boolean hasVoidModelConst(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().hasVoidModelConstraints();
+	}
+
+	public static final boolean isAbstract(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isAbstract();
+	}
+
+	public static final boolean isAlternative(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isAlternative();
+	}
+
+	public static final boolean isAncestorOf(IFeature feature, IFeature next) {
+		requireNonNull(feature);
+		requireNonNull(next);
+
+		return feature.getStructure().isAncestorOf(next.getStructure());
+	}
+
+	public static final boolean isAnd(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isAnd();
+	}
+
+	public static final boolean isANDPossible(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isANDPossible();
+	}
+
+	public static final boolean isConcrete(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isConcrete();
+	}
+
+	@Deprecated
+	public static final boolean isConcrete(IFeatureModel featureModel, CharSequence featureName) {
+		requireNonNull(featureModel);
+		requireNonNull(featureName);
+
+		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureModel))
+			if (feature.getName().equals(featureName))
+				return true;
+		return false;
+	}
+
+	public static final boolean isConstraintSelected(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getProperty().isConstraintSelected();
+	}
+
+	public static final boolean isFeatureOrderUserDefined(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.isFeatureOrderUserDefined();
+	}
+
+	public static final boolean isFirstChild(IFeature feature, IFeature child) {
+		requireNonNull(feature);
+		requireNonNull(child);
+
+		return feature.getStructure().isFirstChild(child.getStructure());
+	}
+
+	public static final boolean isHidden(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isHidden();
+	}
+
+	public static final boolean isMandatory(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isMandatory();
+	}
+
+	public static final boolean isMandatorySet(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isMandatorySet();
+	}
+
+	public static final boolean isMultiple(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isMultiple();
+	}
+
+	public static final boolean isOr(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isOr();
+	}
+
+	public static final boolean isRoot(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().isRoot();
+	}
+
+	public static final int numAlternativeGroup(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().numAlternativeGroup();
+	}
+
+	public static final int numOrGroup(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.getStructure().numOrGroup();
+	}
+
+	public static void print(IFeature feature, StringBuilder string) {
+		requireNonNull(feature);
+		requireNonNull(string);
+
+		string.append(feature.getName());
+		string.append(", mandatory=" + FeatureUtils.isMandatory(feature));
+		final List<IFeatureStructure> struct = feature.getStructure().getChildren();
+		boolean isLeaf = struct.isEmpty();
+		if (!isLeaf) {
+			final String prop = FeatureUtils.isOr(feature) ? " or" : FeatureUtils.isAlternative(feature) ? " alt" : " and";
+			string.append(" " + prop);
+			string.append("[");
+			for (int i = 0; i < struct.size(); i++) {
+				print(struct.get(i).getFeature(), string);
+				if (i + 1 < struct.size())
+					string.append(", ");
+			}
+			string.append("]");
+		}
+	}
+
+	public static final void propertyChange(IFeature feature, PropertyChangeEvent event) {
+		requireNonNull(feature);
+		requireNonNull(event);
+
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	public static final void redrawDiagram(IFeatureModel featureModel) {
+		//		featureModel.getGraphicRepresenation().redrawDiagram();
+	}
+
+	public static final void refreshContextMenu(IFeatureModel featureModel) {
+		//		featureModel.getGraphicRepresenation().refreshContextMenu();
+	}
+
+	public static final void removeChild(IFeature feature, IFeature child) {
+		requireNonNull(feature);
+		requireNonNull(child);
+
+		feature.getStructure().removeChild(child.getStructure());
+	}
+
+	public static final void removeConstraint(IFeatureModel featureModel, IConstraint constraint) {
+		requireNonNull(featureModel);
+		requireNonNull(constraint);
+
+		List<IConstraint> constraints = featureModel.getConstraints();
+		int index = getConstraintIndex(featureModel, constraint);
+		tryRemoveConstraint(featureModel, constraints, index);
+	}
+
+	public static final void removeConstraint(IFeatureModel featureModel, int index) {
+		requireNonNull(featureModel);
+
+		tryRemoveConstraint(featureModel, featureModel.getConstraints(), index);
+	}
+
+	public static final IFeature removeLastChild(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.getStructure().removeLastChild().getFeature();
+	}
+
+	public static final void removeListener(IConstraint constraint, PropertyChangeListener listener) {
+		//		constraint.removeListener(listener);
+	}
+
+	public static final void removeListener(IFeature feature, PropertyChangeListener listener) {
+		//		feature.removeListener(listener);
+	}
+
+	public static final void removeListener(IFeatureModel featureModel, PropertyChangeListener listener) {
+		//		featureModel.removeListener(listener);
+	}
+
+	public static final void removePropositionalNode(IFeatureModel featureModel, Node node) {
+		requireNonNull(featureModel);
+		requireNonNull(node);
+
+		List<IConstraint> constraints = featureModel.getConstraints();
+		int index = -1;
+		for (int i = 0; i < constraints.size(); i++) {
+			if (constraints.get(i).getNode().equals(node)) {
+				index = i;
+				break;
+			}
+		}
+		tryRemoveConstraint(featureModel, new LinkedList<>(constraints), index);
+	}
+
+	public static final boolean removeTargetConnection(IFeature feature, FeatureConnection connection) {
+		//		return feature.getStructure().removeTargetConnection(connection);
+		return false;
+	}
+
+	public static final void replaceChild(IFeature feature, IFeature oldChild, IFeature newChild) {
+		requireNonNull(feature);
+		requireNonNull(oldChild);
+		requireNonNull(newChild);
+
+		feature.getStructure().replaceChild(oldChild.getStructure(), newChild.getStructure());
+	}
+
+	public static void replacePropNode(IFeatureModel featureModel, int index, Node propNode) {
+		requireNonNull(featureModel);
+		requireNonNull(propNode);
+
+		featureModel.setConstraint(index, new Constraint(featureModel, propNode));
+	}
+
+	public static final void replaceRoot(IFeatureModel featureModel, IFeature feature) {
+		requireNonNull(featureModel);
+		requireNonNull(feature);
+
+		featureModel.getStructure().replaceRoot(feature.getStructure());
+	}
+
+	public static final void requireNonNull(Object object) {
+		// TODO check unnecessary null checks, may cuase defect itself
+		// or move to constructors
+		//		java.util.Objects.requireNonNull(object, StringTable.PARAMETER_IS_EXPECTED_TO_BE_NON_NULL);
+	}
+
+	public static final void reset(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		featureModel.reset();
+	}
+
+	public static final void setAbstract(IFeature feature, boolean value) {
+		requireNonNull(feature);
+
+		feature.getStructure().setAbstract(value);
+	}
+
+	public static final void setAlternative(IFeature feature) {
+		requireNonNull(feature);
+
+		feature.getStructure().setAlternative();
+	}
+
+	//	public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
+	//		featureModel.getUndoContext(undoContext);
+	//	}
+	//
+	//	public static final Object getUndoContext(IFeatureModel featureModel) {
+	//		return featureModel.getUndoContext();
+	//	}
+
+	public static final void setAnd(IFeature feature) {
+		requireNonNull(feature);
+
+		feature.getStructure().setAnd();
+	}
+
+	public static void setAnd(IFeature feature, boolean and) {
+		requireNonNull(feature);
+
+		feature.getStructure().setAND(and);
+	}
+
+	public static final void setAND(IFeature feature, boolean and) {
+		requireNonNull(feature);
+
+		feature.getStructure().setAND(and);
+	}
+
+	public static final void setChildren(IFeature feature, Iterable<IFeature> children) {
+		requireNonNull(children);
+
+		feature.getStructure().setChildren(Functional.toList(Functional.map(children, FEATURE_TO_STRUCTURE)));
+	}
+
+	//	public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
+	//		return featureModel.isFeatureOrderInXML();
+	//	}
+	//
+	//	public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
+	//		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
+	//	}
+
+	public static final void setConstraintAttribute(IConstraint constraint, ConstraintAttribute attri, boolean fire) {
+		requireNonNull(constraint);
+		requireNonNull(attri);
+
+		constraint.setConstraintAttribute(attri, fire);
+	}
+
+	public static final void setConstraints(IFeatureModel featureModel, final Iterable<IConstraint> constraints) {
+		requireNonNull(featureModel);
+		requireNonNull(constraints);
+
+		featureModel.setConstraints(constraints);
+	}
+
+	public static final void setConstraintSelected(IFeature feature, boolean selection) {
+		requireNonNull(feature);
+
+		feature.getProperty().selectConstraint(selection);
 	}
 
 	public static final void setContainedFeatures(IConstraint constraint) {
 		requireNonNull(constraint);
-		
+
 		constraint.setContainedFeatures();
 	}
 
-	public static final Collection<IFeature> getContainedFeatures(IConstraint constraint) {
+	public static final void setDeadFeatures(IConstraint constraint, Collection<IFeature> deadFeatures) {
 		requireNonNull(constraint);
-		
-		return constraint.getContainedFeatures();
+		requireNonNull(deadFeatures);
+
+		constraint.setDeadFeatures(deadFeatures);
 	}
 
-	public static final boolean setFalseOptionalFeatures(IConstraint constraint, IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
-		requireNonNull(constraint);
-		requireNonNull(fmFalseOptionals);
-		
-		return constraint.setFalseOptionalFeatures(clone, fmFalseOptionals);
+	public static final void setDescription(IFeature feature, CharSequence description) {
+		requireNonNull(feature);
+		requireNonNull(description);
+
+		feature.getProperty().setDescription(description);
 	}
 
 	public static final boolean setFalseOptionalFeatures(IConstraint constraint) {
 		requireNonNull(constraint);
-		
+
 		boolean found = false;
 
 		final Collection<IFeature> falseOptionalFeatures = new ArrayList<>();
@@ -1386,99 +1212,177 @@ public final class FeatureUtils {
 		return found;
 	}
 
-	public static final Iterable<IFeature> getFalseOptional(IConstraint constraint) {
+	public static final boolean setFalseOptionalFeatures(IConstraint constraint, IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
 		requireNonNull(constraint);
-		
-		return constraint.getFalseOptional();
+		requireNonNull(fmFalseOptionals);
+
+		return constraint.setFalseOptionalFeatures(clone, fmFalseOptionals);
 	}
 
-	public static final void addListener(IConstraint constraint, PropertyChangeListener listener) {
-//		constraint.addListener(listener);
+	public static final void setFeatureOrderList(IFeatureModel featureModel, final List<String> featureOrderList) {
+		requireNonNull(featureModel);
+		requireNonNull(featureOrderList);
+
+		featureModel.setFeatureOrderList(featureOrderList);
 	}
 
-	public static final void removeListener(IConstraint constraint, PropertyChangeListener listener) {
-//		constraint.removeListener(listener);
+	public static final void setFeatureOrderUserDefined(IFeatureModel featureModel, boolean featureOrderUserDefined) {
+		requireNonNull(featureModel);
+
+		featureModel.setFeatureOrderUserDefined(featureOrderUserDefined);
 	}
 
-	public static final void fire(IConstraint constraint, PropertyChangeEvent event) {
-//		constraint.fireEvent(event);
-	}
-
-	public static final boolean equals(IConstraint constraint, Object obj) {
-		requireNonNull(constraint);
-		requireNonNull(obj);
-		
-		return constraint.equals(obj);
-	}
-
-	public static final String toString(IConstraint constraint) {
-		requireNonNull(constraint);
-		
-		return constraint.toString();
-	}
-
-	public static final boolean hasHiddenFeatures(IConstraint constraint) {
-		requireNonNull(constraint);
-		
-		return constraint.hasHiddenFeatures();
-	}
-
-	public static final void setDeadFeatures(IConstraint constraint, Collection<IFeature> deadFeatures) {
-		requireNonNull(constraint);
-		requireNonNull(deadFeatures);
-		
-		constraint.setDeadFeatures(deadFeatures);
-	}
-
-	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint) {
-		requireNonNull(constraint);
-		
-		return constraint.getDeadFeatures();
-	}
-
-	public static final GraphicItem getItemType(IConstraint constraint) {
-//		return constraint.getGraphicRepresenation().getItemType();
-		return null;
-	}
-
-	public static void setAnd(IFeature feature, boolean and) {
+	public static final void setFeatureStatus(IFeature feature, FeatureStatus stat, boolean fire) {
 		requireNonNull(feature);
-		
-		feature.getStructure().setAND(and);
+		requireNonNull(stat);
+
+		feature.getProperty().setFeatureStatus(stat, fire);
+	}
+
+	public static final void setFeatureTable(IFeatureModel featureModel, final Hashtable<String, IFeature> featureTable) {
+		requireNonNull(featureModel);
+		requireNonNull(featureTable);
+
+		featureModel.setFeatureTable(featureTable);
 	}
 
 	public static void setHiddden(IFeature feature, boolean hid) {
 		requireNonNull(feature);
-		
+
 		feature.getStructure().setHidden(hid);
 	}
 
-	public static int getChildIndex(IFeature feature, IFeature child) {
+	public static final void setHidden(IFeature feature, boolean hid) {
 		requireNonNull(feature);
-		requireNonNull(child);
-		
-		return feature.getStructure().getChildIndex(child.getStructure());
+
+		feature.getStructure().setHidden(hid);
 	}
 
-	public static void print(IFeature feature, StringBuilder string) {
+	public static final void setMandatory(IFeature feature, boolean mandatory) {
 		requireNonNull(feature);
-		requireNonNull(string);
-		
-		string.append(feature.getName());
-		string.append(", mandatory=" + FeatureUtils.isMandatory(feature));
-		final List<IFeatureStructure> struct = feature.getStructure().getChildren();
-		boolean isLeaf = struct.isEmpty();
-		if (!isLeaf) {
-			final String prop = FeatureUtils.isOr(feature) ? " or" : FeatureUtils.isAlternative(feature) ? " alt" : " and";
-			string.append(" " + prop);
-			string.append("[");
-			for (int i = 0; i < struct.size(); i++) {
-				print(struct.get(i).getFeature(), string);
-				if (i + 1 < struct.size())
-					string.append(", ");
+
+		feature.getStructure().setMandatory(mandatory);
+	}
+
+	public static final void setMultiple(IFeature feature, boolean multiple) {
+		requireNonNull(feature);
+
+		feature.getStructure().setMultiple(multiple);
+	}
+
+	public static final void setName(IFeature feature, String name) {
+		requireNonNull(feature);
+
+		feature.setName(name);
+	}
+
+	public static final void setOr(IFeature feature) {
+		requireNonNull(feature);
+
+		feature.getStructure().setOr();
+	}
+
+	public static final void setParent(IFeature feature, IFeature newParent) {
+		requireNonNull(feature);
+		requireNonNull(newParent);
+
+		feature.getStructure().setParent(newParent.getStructure());
+	}
+
+	public static void setRelevantConstraints(IFeature bone) {
+		requireNonNull(bone);
+
+		List<Constraint> constraintList = new LinkedList<Constraint>();
+		for (IConstraint constraint : bone.getFeatureModel().getConstraints()) {
+			for (IFeature f : constraint.getContainedFeatures()) {
+				if (f.getName().equals(bone.getName())) {
+					constraintList.add((Constraint) constraint.clone(bone.getFeatureModel()));
+					break;
+				}
 			}
-			string.append("]");
 		}
+		bone.getStructure().setRelevantConstraints(Functional.toList(Functional.map(constraintList, new IFunction<Constraint, IConstraint>() {
+
+			@Override
+			public IConstraint invoke(Constraint t) {
+				return t;
+			}
+
+		})));
+	}
+
+	public static final void setRoot(IFeatureModel featureModel, IFeature root) {
+		requireNonNull(featureModel);
+		requireNonNull(root);
+
+		featureModel.getStructure().setRoot(root.getStructure());
+	}
+
+	public static final String toString(IConstraint constraint) {
+		requireNonNull(constraint);
+
+		return constraint.toString();
+	}
+
+	public static final String toString(IFeature feature) {
+		requireNonNull(feature);
+
+		return feature.toString();
+	}
+
+	public static final String toString(IFeature feature, boolean writeMarks) {
+		requireNonNull(feature);
+
+		if (writeMarks) {
+			final String featureName = feature.getName();
+			if (featureName.contains(" ") || Operator.isOperatorName(featureName)) {
+				return "\"" + feature.getName() + "\"";
+			}
+			return feature.getName();
+		} else {
+			return feature.toString();
+		}
+	}
+
+	public static final String toString(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return featureModel.toString();
+	}
+
+	private static void tryRemoveConstraint(IFeatureModel featureModel, List<IConstraint> constraints, int index) {
+		requireNonNull(featureModel);
+		requireNonNull(constraints);
+
+		if (index == -1 || index >= constraints.size())
+			throw new NoSuchElementException();
+		else {
+			constraints.remove(index);
+			featureModel.setConstraints(constraints);
+		}
+	}
+
+	private FeatureUtils() {
+	}
+
+	public CharSequence createValidJavaIdentifierFromString(CharSequence s) {
+		requireNonNull(s);
+
+		StringBuilder stringBuilder = new StringBuilder();
+		int i = 0;
+		for (; i < s.length(); i++) {
+			if (Character.isJavaIdentifierStart(s.charAt(i))) {
+				stringBuilder.append(s.charAt(i));
+				i++;
+				break;
+			}
+		}
+		for (; i < s.length(); i++) {
+			if (Character.isJavaIdentifierPart(s.charAt(i))) {
+				stringBuilder.append(s.charAt(i));
+			}
+		}
+		return stringBuilder.toString();
 	}
 
 }
