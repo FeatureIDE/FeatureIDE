@@ -125,8 +125,9 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		for (IConstraint redundantC : redundantConstraints) {
 			// remember for all respective graphical constraints that they are implicit (needed for tool tip later) 
 			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {
-				if (gc.getObject().getNode().toCNF().equals(redundantC.getNode().toCNF()))
+				if (gc.getObject().getNode().toRegularCNF().equals(redundantC.getNode().toRegularCNF())) {
 					gc.setConstraintImplicit(true);
+				}
 			}
 		}
 	}
