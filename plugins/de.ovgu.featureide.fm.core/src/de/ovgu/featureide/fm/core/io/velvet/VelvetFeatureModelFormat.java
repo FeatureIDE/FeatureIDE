@@ -1003,7 +1003,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		final IFeature parentFeature = parentStack.pop();
-		parentFeature.getStructure().setAnd();
+//		parentFeature.getStructure().setAnd();
 
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
