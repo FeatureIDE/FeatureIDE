@@ -456,11 +456,8 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return GUIBasics.createLineBorder(getConstraintBorderColor(false), 0);
 	}
 	
-	public static Border getImplicitConstraintBorder(boolean implicit) {
-		if (implicit) {
-			return GUIBasics.createLineBorder(getImplicitConstraintBorderColor(true), 3);
-		}
-		return GUIBasics.createLineBorder(getConstraintBorderColor(false), 0);
+	public static Border getImplicitConstraintBorder() {
+		return GUIBasics.createLineBorder(getImplicitConstraintBorderColor(true), 3);
 	}
 
 	public static Border getHiddenFeatureBorder(boolean selected) {

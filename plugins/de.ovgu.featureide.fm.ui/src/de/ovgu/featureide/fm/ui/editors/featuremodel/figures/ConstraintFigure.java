@@ -41,7 +41,6 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -107,11 +106,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private void init() {
 		setText(getConstraintText(graphicalConstraint.getObject()));
 
-		if (graphicalConstraint.isImplicit() == true) {
-			setBorder(FMPropertyManager.getImplicitConstraintBorder(graphicalConstraint.isImplicit()));
-		} else {
-			setBorder(FMPropertyManager.getConstraintBorder(graphicalConstraint.isFeatureSelected()));
-		}
+		setBorder(FMPropertyManager.getConstraintBorder(graphicalConstraint.isFeatureSelected()));
 		setToolTip(null);
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
@@ -141,67 +136,74 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			break;
 		case REDUNDANT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			int constraintIndex = FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint);
+			List<String> explanationRedundant = constraint.getFeatureModel().getAnalyser().redundantConstrExpl
+					.get(FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint));
+			Panel panelRedundant = new Panel();
+			panelRedundant.setLayoutManager(new ToolbarLayout(false));
+			panelRedundant.add(new Label(REDUNDANCE));
+			setToolTip(panelRedundant, explanationRedundant != null ? explanationRedundant : Collections.<String> emptyList());
+			return;
+		case IMPLICIT:
+			setBackgroundColor(FMPropertyManager.getWarningColor());
+			setBorder(FMPropertyManager.getImplicitConstraintBorder());
 			// set tooltip with explanation for redundant constraint
-	//		List<String> explanation = FeatureModelAnalyzer.redundantConstrExpl.get(constraintIndex);
-			List<String> explanation = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraintIndex);
-			explanation = explanation != null ? explanation : Collections.<String>emptyList();
+			List<String> explanationImplicit = constraint.getFeatureModel().getAnalyser().redundantConstrExpl
+					.get(FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint));
+			explanationImplicit = explanationImplicit != null ? explanationImplicit : Collections.<String> emptyList();
 
 			// replace "redundant" with "transitive" in explanation if constraint represents an implicit dependency
-			if (graphicalConstraint.isImplicit()) {
-				for (int i = 0; i < explanation.size(); i++) {
-					if (explanation.get(i).contains("redundant")) {
-						String newStr = explanation.get(i).replace("redundant", "transitive");
-						explanation.set(i, newStr);
-						break;
-					}
+			for (int i = 0; i < explanationImplicit.size(); i++) {
+				if (explanationImplicit.get(i).contains("redundant")) {
+					String newStr = explanationImplicit.get(i).replace("redundant", "transitive");
+					explanationImplicit.set(i, newStr);
+					break;
 				}
 			}
-			Panel panel = new Panel();
-			panel.setLayoutManager(new ToolbarLayout(false));
-			panel.add(new Label(REDUNDANCE));
-			setToolTip(panel, explanation);
+			Panel panelImplicit = new Panel();
+			panelImplicit.setLayoutManager(new ToolbarLayout(false));
+			panelImplicit.add(new Label(REDUNDANCE));
+			setToolTip(panelImplicit, explanationImplicit);
 			return;
-//		case DEAD:
-//		case FALSE_OPTIONAL:
-//			final StringBuilder toolTip = new StringBuilder();
-//			if (!constraint.getDeadFeatures().isEmpty()) {
-//				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-//				toolTip.append(DEAD_FEATURE);
-//				ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
-//				for (IFeature dead : constraint.getDeadFeatures()) {
-//					deadFeatures.add(dead.toString());
-//				}
-//				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
-//
-//				for (String dead : deadFeatures) {
-//					toolTip.append("\n   ");
-//					toolTip.append(dead);
-//				}
-//				setToolTip(new Label(toolTip.toString()));
-//			}
-//
-//			if (!constraint.getFalseOptional().isEmpty()) {
-//				if (constraint.getDeadFeatures().isEmpty()) {
-//					setBackgroundColor(FMPropertyManager.getWarningColor());
-//				} else {
-//					toolTip.append("\n\n");
-//				}
-//
-//				ArrayList<String> falseOptionalFeatures = new ArrayList<String>();
-//				for (IFeature feature : constraint.getFalseOptional()) {
-//					falseOptionalFeatures.add(feature.toString());
-//				}
-//				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
-//
-//				toolTip.append(FALSE_OPTIONAL);
-//				for (String feature : falseOptionalFeatures) {
-//					toolTip.append("\n   ");
-//					toolTip.append(feature);
-//				}
-//				setToolTip(new Label(toolTip.toString()));
-//			}
-//			break;
+		case DEAD:
+		case FALSE_OPTIONAL:
+			final StringBuilder toolTip = new StringBuilder();
+			if (!constraint.getDeadFeatures().isEmpty()) {
+				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+				toolTip.append(DEAD_FEATURE);
+				ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
+				for (IFeature dead : constraint.getDeadFeatures()) {
+					deadFeatures.add(dead.toString());
+				}
+				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
+
+				for (String dead : deadFeatures) {
+					toolTip.append("\n   ");
+					toolTip.append(dead);
+				}
+				setToolTip(new Label(toolTip.toString()));
+			}
+
+			if (!constraint.getFalseOptional().isEmpty()) {
+				if (constraint.getDeadFeatures().isEmpty()) {
+					setBackgroundColor(FMPropertyManager.getWarningColor());
+				} else {
+					toolTip.append("\n\n");
+				}
+
+				ArrayList<String> falseOptionalFeatures = new ArrayList<String>();
+				for (IFeature feature : constraint.getFalseOptional()) {
+					falseOptionalFeatures.add(feature.toString());
+				}
+				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
+
+				toolTip.append(FALSE_OPTIONAL);
+				for (String feature : falseOptionalFeatures) {
+					toolTip.append("\n   ");
+					toolTip.append(feature);
+				}
+				setToolTip(new Label(toolTip.toString()));
+			}
+			break;
 		default:
 			break;
 		}

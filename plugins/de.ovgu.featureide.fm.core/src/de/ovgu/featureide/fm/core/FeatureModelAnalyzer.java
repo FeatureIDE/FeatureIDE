@@ -48,7 +48,6 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.prop4j.analyses.FeatureModelAnalysis;
-import org.prop4j.analyses.SubModelRedundantAnalysis;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -59,7 +58,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -566,32 +564,6 @@ public class FeatureModelAnalyzer {
 		falseOptFeatureExpl = analysis.falseOptFeatureExpl;
 		redundantConstrExpl = analysis.redundantConstrExpl;
 		return newAttributes;
-	}
-
-	/**
-	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint
-	 * implies the model with the new constraint and the other way round. If this is the case, both models are
-	 * equivalent and the constraint is redundant.
-	 * If a redundant constraint has been detected, it is explained.
-	 * 
-	 * @param subModel The sub feature model which represents a sliced feature model of the origin
-	 *            feature model. The sub feature model additionally comprises implicit dependencies
-	 *            (transitive constraints). An explanation for this model is generated using the origin
-	 *            feature model.
-	 * @param constraints The constraints to check
-	 * @return a list of redundant constraints
-	 */
-	public List<IConstraint> findRedundantConstraints(IFeatureModel subModel, List<IConstraint> constraints) {
-		final SubModelRedundantAnalysis analysis = new SubModelRedundantAnalysis(fm, constraints);
-		final List<IConstraint> redundantConstraints = LongRunningWrapper.runMethod(analysis, null);
-
-		for (IConstraint constraint : redundantConstraints) {
-			final Redundancy redundancy = new Redundancy();
-			List<String> expl = redundancy.explain(fm, subModel, constraint);
-			subModel.getAnalyser().redundantConstrExpl.put(FeatureUtils.getConstraintIndex(subModel, constraint), expl);
-			constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT, false);
-		}
-		return redundantConstraints;
 	}
 
 	private void beginTask(int totalWork) {

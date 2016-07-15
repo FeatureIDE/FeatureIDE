@@ -29,12 +29,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -48,12 +50,12 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	/**
 	 * The sub feature model which contains implicit constraints if there are any.
 	 */
-	private static IFeatureModel subtreeModel;
+	private IFeatureModel subtreeModel;
 
 	/**
 	 * The origin feature model which contains the sub feature model.
 	 */
-	private static IFeatureModel oldFm;
+	private IFeatureModel oldFm;
 
 	/**
 	 * Remember explanation for redundant constraint. Key = constraintIndex, Value = explanation.
@@ -121,14 +123,10 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 */
 	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
 		// iterate implicit constraints and generate explanations 
-		final List<IConstraint> redundantConstraints = oldFm.getAnalyser().findRedundantConstraints(subtreeModel, getImplicitConstraints());
-		for (IConstraint redundantC : redundantConstraints) {
-			// remember for all respective graphical constraints that they are implicit (needed for tool tip later) 
-			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {
-				if (gc.getObject().getNode().toRegularCNF().equals(redundantC.getNode().toRegularCNF())) {
-					gc.setConstraintImplicit(true);
-				}
-			}
+		for (IConstraint redundantC : getImplicitConstraints()) {
+			List<String> expl = new Redundancy().explain(oldFm, subtreeModel, redundantC);
+			subtreeModel.getAnalyser().redundantConstrExpl.put(FeatureUtils.getConstraintIndex(subtreeModel, redundantC), expl);
+			redundantC.setConstraintAttribute(ConstraintAttribute.IMPLICIT, false);
 		}
 	}
 
@@ -149,7 +147,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		while (it.hasNext()) {
 			IConstraint constrNew = it.next();
 			for (IConstraint constrOld : oldConstraints) {
-				if (constrOld.getNode().toCNF().equals(constrNew.getNode().toCNF())) {
+				if (constrOld.getNode().toRegularCNF().equals(constrNew.getNode().toRegularCNF())) {
 					it.remove();
 					break;
 				}
