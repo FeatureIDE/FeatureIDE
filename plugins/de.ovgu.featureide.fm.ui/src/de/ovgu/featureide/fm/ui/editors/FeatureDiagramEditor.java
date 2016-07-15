@@ -77,7 +77,6 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.Features;
-import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -387,8 +386,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		autoLayoutConstraintAction = new AutoLayoutConstraintAction(this, graphicalFeatureModel);
 
 		setNameType = new ArrayList<NameTypeSelectionAction>(2);
-		setNameType.add(new NameTypeSelectionAction(this, featureModel, 0));
-		setNameType.add(new NameTypeSelectionAction(this, featureModel, 1));
+		setNameType.add(new NameTypeSelectionAction(graphicalFeatureModel, 0, 1));
+		setNameType.add(new NameTypeSelectionAction(graphicalFeatureModel, 1, 0));
 
 	}
 
@@ -452,7 +451,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			nameType.setEnabled(true);
 		}
 
-		final NameTypeSelectionAction curNameType = setNameType.get(Preferences.getDefaultFeatureNameScheme());
+		NameTypeSelectionAction curNameType = null;
+		if(graphicalFeatureModel.getLayout().showShortNames()){
+			curNameType = setNameType.get(1);
+		}else{
+			curNameType = setNameType.get(0);
+		}
 		curNameType.setChecked(true);
 		curNameType.setEnabled(false);
 
@@ -826,6 +830,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			reload();
 			featureModelEditor.setPageModified(true);
 			break;
+		case ALL_FEATURES_CHANGED_NAME_TYPE:
+			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+				f.update(FeatureIDEEvent.getDefault(EventType.FEATURE_NAME_CHANGED));
+			}
+			internRefresh(true);
+			reload();
+			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
@@ -900,11 +912,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
-			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			reload();
-			featureModelEditor.setPageModified(true);
+			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
 			break;
 		case REDRAW_DIAGRAM:
 			getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());

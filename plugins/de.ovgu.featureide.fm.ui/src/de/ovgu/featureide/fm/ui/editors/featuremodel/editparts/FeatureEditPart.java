@@ -226,7 +226,13 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 			break;
 		case FEATURE_NAME_CHANGED:
-			getFeatureFigure().setName(getFeature().getObject().getProperty().getDisplayName());
+			String displayName = getFeature().getObject().getProperty().getDisplayName();
+			
+			if(getFeature().getGraphicalModel().getLayout().showShortNames()){
+				int lastIndexOf = displayName.lastIndexOf(".");
+				displayName = displayName.substring(++lastIndexOf);
+			}	
+			getFeatureFigure().setName(displayName);
 			getFeature().setSize(getFeatureFigure().getSize());
 			break;
 		case COLOR_CHANGED:

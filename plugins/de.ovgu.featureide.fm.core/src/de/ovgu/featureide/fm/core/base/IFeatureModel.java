@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.base;
  
 import java.io.File;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -448,7 +447,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @return an ordered list of feature names, either as a given order or in pre-order by traversing the root-feature.
 	 */
-	Collection<String> getFeatureOrderList();
+	List<String> getFeatureOrderList();
 
 	/**
 	 * Returns the a read-only iterable collection of features stored in this feature model.

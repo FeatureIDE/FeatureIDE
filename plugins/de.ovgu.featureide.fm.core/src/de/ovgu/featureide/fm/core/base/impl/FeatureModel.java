@@ -290,11 +290,11 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public Collection<String> getFeatureOrderList() {
+	public List<String> getFeatureOrderList() {
 		if (featureOrderList.isEmpty()) {
 			return Functional.toList(Functional.mapToStringList(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter())));
 		}
-		return Collections.unmodifiableCollection(featureOrderList);
+		return Collections.unmodifiableList(featureOrderList);
 	}
 
 	@Override

@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
@@ -39,17 +38,10 @@ public class ExtendedFeatureProperty extends FeatureProperty {
 		super(oldProperty, correspondingFeature);
 	}
 
+	
 	@Override
 	public String getDisplayName() {
-		final String name = correspondingFeature.getName();
-		switch (Preferences.getDefaultFeatureNameScheme()) {
-			case Preferences.SCHEME_SHORT:
-				int separatorIndex = name.lastIndexOf(".");
-				return name.substring(separatorIndex + 1);
-			case Preferences.SCHEME_LONG: 
-			default: 
-				return name;
-		}
+		return super.getDisplayName();
 	}
 
 	@Override
