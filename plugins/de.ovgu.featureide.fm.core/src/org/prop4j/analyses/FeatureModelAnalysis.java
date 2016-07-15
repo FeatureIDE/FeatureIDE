@@ -106,6 +106,10 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	 */
 	public boolean calculateRedundantConstraints = true;
 
+	public boolean calculateFOConstraints = true;
+
+	public boolean calculateDeadConstraints = true;
+
 	/**
 	 * Defines whether constraints that are tautologies should be calculated.
 	 */
@@ -183,6 +187,14 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		this.calculateTautologyConstraints = calculateTautologyConstraints;
 	}
 
+	public void setCalculateFOConstraints(boolean calculateFOConstraints) {
+		this.calculateFOConstraints = calculateFOConstraints;
+	}
+
+	public void setCalculateDeadConstraints(boolean calculateDeadConstraints) {
+		this.calculateDeadConstraints = calculateDeadConstraints;
+	}
+
 	/**
 	 * @return Hashmap: key entry is Feature/Constraint, value usually
 	 *         indicating the kind of attribute (non-Javadoc)
@@ -207,6 +219,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 		// put root always in so it will be refreshed (void/non-void)
 		changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
+		
+		valid = true;
 
 		if (calculateFeatures) {
 			if (monitor.checkCancel()) {
@@ -281,6 +295,9 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	}
 
 	private void checkConstraintDeadAndFalseOptional(final List<IConstraint> constraints) throws ContradictionException {
+		if (!calculateFOConstraints && !calculateDeadConstraints) {
+			return;
+		}
 		nodeCreator.setModelType(ModelType.OnlyStructure);
 		final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 		final BasicSolver modSat = new BasicSolver(si);
@@ -293,25 +310,30 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			modSat.addClauses(makeRegular(constraint.getNode()));
 
 			if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
-				final List<IFeature> newDeadFeature = checkFeatureDead2(modSat, deadList);
-				if (!newDeadFeature.isEmpty()) {
-					constraint.setDeadFeatures(newDeadFeature);
-					deadList.retainAll(newDeadFeature);
-					setConstraintAttribute(constraint, ConstraintAttribute.DEAD);
+				if (calculateDeadConstraints) {
+					final List<IFeature> newDeadFeature = checkFeatureDead2(modSat, deadList);
+					if (!newDeadFeature.isEmpty()) {
+						constraint.setDeadFeatures(newDeadFeature);
+						deadList.retainAll(newDeadFeature);
+						setConstraintAttribute(constraint, ConstraintAttribute.DEAD);
+					}
 				}
-				final List<IFeature> newFOFeature = checkFeatureFalseOptional2(modSat, foList);
-				if (!newFOFeature.isEmpty()) {
-					constraint.setFalseOptionalFeatures(newFOFeature);
-					foList.retainAll(newFOFeature);
-					if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
-						setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
 
-						// explain false optional features of constraint and remember explanation in map
-						FalseOptional falseOpts = new FalseOptional();
-						Collection<IFeature> foFeatures = constraint.getFalseOptional();
-						for (IFeature feature : foFeatures) {
-							List<String> expl = falseOpts.explain(fm, feature);
-							falseOptFeatureExpl.put(feature, expl);
+				if (calculateFOConstraints) {
+					final List<IFeature> newFOFeature = checkFeatureFalseOptional2(modSat, foList);
+					if (!newFOFeature.isEmpty()) {
+						constraint.setFalseOptionalFeatures(newFOFeature);
+						foList.retainAll(newFOFeature);
+						if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
+							setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
+
+							// explain false optional features of constraint and remember explanation in map
+							FalseOptional falseOpts = new FalseOptional();
+							Collection<IFeature> foFeatures = constraint.getFalseOptional();
+							for (IFeature feature : foFeatures) {
+								List<String> expl = falseOpts.explain(fm, feature);
+								falseOptFeatureExpl.put(feature, expl);
+							}
 						}
 					}
 				}
@@ -319,7 +341,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			monitor.step();
 		}
 	}
-	
+
 	/**
 	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint
 	 * implies the model with the new constraint and the other way round. If this is the case, both models are
@@ -622,7 +644,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		}
 		return regularCNFNode;
 	}
-	
+
 	private void setFeatureAttribute(IFeature feature, FeatureStatus featureAttribute) {
 		changedAttributes.put(feature, featureAttribute);
 		feature.getProperty().setFeatureStatus(featureAttribute, false);

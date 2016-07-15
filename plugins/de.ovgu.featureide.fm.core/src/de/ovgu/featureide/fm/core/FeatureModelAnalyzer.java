@@ -125,6 +125,10 @@ public class FeatureModelAnalyzer {
 	 * Defines whether constraints that are tautologies should be calculated.
 	 */
 	public boolean calculateTautologyConstraints = true;
+
+	public boolean calculateFOConstraints = true;
+
+	public boolean calculateDeadConstraints = true;
 	/**
 	 * Defines whether analysis should be performed automatically.
 	 */
@@ -555,6 +559,8 @@ public class FeatureModelAnalyzer {
 		analysis.setCalculateConstraints(calculateConstraints);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
+		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
+		analysis.setCalculateFOConstraints(calculateFOConstraints);
 		final HashMap<Object, Object> newAttributes = LongRunningWrapper.runMethod(analysis, workMonitor);
 		cachedValidity = analysis.isValid();
 		cachedCoreFeatures = analysis.getCoreFeatures();
@@ -578,6 +584,8 @@ public class FeatureModelAnalyzer {
 		analysis.setCalculateConstraints(true);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
+		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
+		analysis.setCalculateFOConstraints(calculateFOConstraints);
 		analysis.updateConstraints();
 		cachedValidity = analysis.isValid();
 	}

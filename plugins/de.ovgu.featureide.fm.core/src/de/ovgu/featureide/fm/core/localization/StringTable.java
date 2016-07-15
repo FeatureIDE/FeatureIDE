@@ -417,6 +417,7 @@ public class StringTable {
 	public static final String AUTO_LAYOUT_CONSTRAINTS = "Auto Layout Constraints";
 	public static final String AUTOMATED_CALCULATIONS = "Automated Calculations";
 	public static final String CALCULATE_CONSTRAINT_ERRORS = "Calculate Constraint Errors";
+	public static final String CALCULATE_DEAD_FO_CONSTRAINTS = "Calculate Constraint That Lead to Dead or False-Optional Features";
 	public static final String CALCULATE_FEATURES = "Calculate Features";
 	public static final String CALCULATE_REDUNDANT_CONSTRAINTS = "Calculate Redundant Constraints";
 	public static final String RUN_MANUAL_CALCULATIONS = "Run Manual Calculations";

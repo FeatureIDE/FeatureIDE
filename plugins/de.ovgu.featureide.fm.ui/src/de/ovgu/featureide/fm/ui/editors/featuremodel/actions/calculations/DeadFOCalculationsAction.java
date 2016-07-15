@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_DEAD_FO_CONSTRAINTS;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
@@ -28,33 +28,29 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * Action to specify feature model analysis.<br>
- * Only features will be analyzed and not constraints.
- * 
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class FeaturesOnlyCalculationAction extends Action {
+public class DeadFOCalculationsAction extends Action {
 
 	private final IFeatureModel featureModel;
 
-	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(CALCULATE_FEATURES);
+	public DeadFOCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
+		super(CALCULATE_DEAD_FO_CONSTRAINTS);
 		this.featureModel = featureModel;
-		setChecked(featureModel.getAnalyser().calculateFeatures);
+		setChecked(featureModel.getAnalyser().calculateDeadConstraints);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.getAnalyser().calculateFeatures) {
-			featureModel.getAnalyser().calculateFeatures = false;
-			featureModel.getAnalyser().calculateConstraints = false;
-			featureModel.getAnalyser().calculateRedundantConstraints = false;
-			featureModel.getAnalyser().calculateTautologyConstraints = false;
+		if (featureModel.getAnalyser().calculateDeadConstraints) {
 			featureModel.getAnalyser().calculateDeadConstraints = false;
 			featureModel.getAnalyser().calculateFOConstraints = false;
 		} else {
 			featureModel.getAnalyser().calculateFeatures = true;
+			featureModel.getAnalyser().calculateConstraints = true;
+			featureModel.getAnalyser().calculateDeadConstraints = true;
+			featureModel.getAnalyser().calculateFOConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}
