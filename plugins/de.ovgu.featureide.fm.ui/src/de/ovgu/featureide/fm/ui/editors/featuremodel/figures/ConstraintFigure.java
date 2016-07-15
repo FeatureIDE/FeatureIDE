@@ -143,8 +143,8 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			int constraintIndex = FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint);
 			// set tooltip with explanation for redundant constraint
-			List<String> explanation = FeatureModelAnalyzer.redundantConstrExpl.get(constraintIndex);
-	//		List<String> explanation = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraintIndex);
+	//		List<String> explanation = FeatureModelAnalyzer.redundantConstrExpl.get(constraintIndex);
+			List<String> explanation = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraintIndex);
 			explanation = explanation != null ? explanation : Collections.<String>emptyList();
 
 			// replace "redundant" with "transitive" in explanation if constraint represents an implicit dependency

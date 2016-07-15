@@ -80,19 +80,19 @@ public class FeatureModelAnalyzer {
 	 * Used for tool tip: remember explanation for redundant constraint. 
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public static HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
+	public HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
 
 	/**
 	 * Used for tool tip: remember explanation for redundant constraint. 
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public static HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
+	public HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
 
 	/**
 	 * Used for tool tip: remember explanation for redundant constraint. 
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public static HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
+	public HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
 
 
 	public static enum Attribute {
