@@ -20,11 +20,9 @@
  */
 package org.prop4j.analyses;
 
-import java.util.List;
-
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
-import org.prop4j.solver.ISatSolver.Tester;
+import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -33,50 +31,76 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class CoreDeadAnalysis extends AbstractAnalysis<List<String>> {
+public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 
 	public CoreDeadAnalysis(ISatSolver solver) {
+		this(solver, null);
+	}
+
+	private int[] features;
+
+	public CoreDeadAnalysis(SatInstance satInstance) {
+		this(satInstance, null);
+	}
+
+	public CoreDeadAnalysis(SatInstance satInstance, int[] features) {
+		super(satInstance);
+		this.setFeatures(features);
+	}
+
+	public CoreDeadAnalysis(ISatSolver solver, int[] features) {
 		super(solver);
+		this.setFeatures(features);
 	}
 
-	public class SolutionTester implements Tester {
-		@Override
-		public int getNextVariable(int index) {
-			final int size = solver.getNumberOfSolutions();
-			final List<int[]> solutions = solver.getSolutions();
-			if (size > 0) {
-				final int[] firstSolution = solutions.get(0);
-				final int mx = firstSolution[index];
-				for (int i = 1; i < size; i++) {
-					if ((mx != solutions.get(i)[index])) {
-						return 0;
-					}
-				}
-				return -mx;
-			}
-			return 0;
-		}
-	}
-
-	public List<String> execute(IMonitor monitor) throws Exception {
-		analyze();
-		return solver.getAssignmentString();
-	}
-
-	public void analyze() throws InterruptedException {
+	public int[] analyze(IMonitor monitor) throws Exception {
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findModel();
-		solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-		int[] model2 = solver.findModel();
 
 		if (model1 != null) {
+			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+			int[] model2 = solver.findModel();
+
 			// if there are more negative than positive literals
 			if (model1.length - countNegative(model1) < countNegative(model2)) {
 				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 			}
 
-			solver.checkAllVariables(model1.length, new SolutionTester());
+			if (features != null) {
+				final int[] model3 = new int[model1.length];
+				for (int i = 0; i < features.length; i++) {
+					final int index = features[i] - 1;
+					if (index >= 0) {
+						model3[index] = model1[index];
+					}
+				}
+				model1 = model3;
+			}
+
+			SatInstance.updateModel(model1, model2);
+			for (int i = 0; i < model1.length; i++) {
+				final int varX = model1[i];
+				if (varX != 0) {
+					solver.assignmentPush(-varX);
+					switch (solver.isSatisfiable()) {
+					case FALSE:
+						solver.assignmentReplaceLast(varX);
+						monitor.invoke(varX);
+						break;
+					case TIMEOUT:
+						solver.assignmentPop();
+						break;
+					case TRUE:
+						solver.assignmentPop();
+						SatInstance.updateModel(model1, solver.getModel());
+						solver.shuffleOrder();
+						break;
+					}
+				}
+			}
 		}
+
+		return solver.getAssignmentArray(0, solver.getAssignment().size());
 	}
 
 	private static int countNegative(int[] model) {
@@ -85,6 +109,14 @@ public class CoreDeadAnalysis extends AbstractAnalysis<List<String>> {
 			count += model[i] >>> (Integer.SIZE - 1);
 		}
 		return count;
+	}
+
+	public int[] getFeatures() {
+		return features;
+	}
+
+	public void setFeatures(int[] features) {
+		this.features = features;
 	}
 
 }

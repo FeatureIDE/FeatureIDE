@@ -20,7 +20,8 @@
  */
 package org.prop4j.solver;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -36,12 +37,13 @@ import org.sat4j.minisat.orders.RandomLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
+import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
  * Finds certain solutions of propositional formulas.
@@ -54,104 +56,110 @@ public class BasicSolver implements ISatSolver {
 	protected final Solver<?> solver;
 	protected final int[] order;
 	protected final VecInt assignment;
-	protected final List<int[]> solutionList = new ArrayList<int[]>();
-	private ArrayList<IConstr> constraints = new ArrayList<>();
+	protected RingList<int[]> solutionList = null;
 
-	public BasicSolver(Node cnf, List<IFeature> featureList) {
-		this(new SatInstance(cnf, featureList));
-	}
-
-	public BasicSolver(SatInstance satInstance) {
+	public BasicSolver(SatInstance satInstance) throws ContradictionException {
 		this.satInstance = satInstance;
 		final int numberOfVariables = satInstance.getNumberOfVariables();
 		this.order = new int[numberOfVariables];
-		fixOrder();
 		this.assignment = new VecInt(numberOfVariables);
+
 		solver = initSolver();
+		addVariables();
 	}
 
-	public BasicSolver(BasicSolver oldSolver) {
+	protected BasicSolver(BasicSolver oldSolver) {
 		this.satInstance = oldSolver.satInstance;
 		this.order = new int[satInstance.intToVar.length - 1];
-		fixOrder();
 		this.assignment = new VecInt(0);
 		oldSolver.assignment.copyTo(this.assignment);
+
 		solver = initSolver();
+		try {
+			addVariables();
+		} catch (ContradictionException e) {
+			FMCorePlugin.getDefault().logError(e);
+			throw new RuntimeException();
+		}
+	}
+
+	private void addVariables() throws ContradictionException {
+		solver.newVar(satInstance.getNumberOfVariables());
+		solver.setExpectedNumberOfClauses(satInstance.getCnf().getChildren().length);
+		addCNF(satInstance.getCnf().getChildren());
+		fixOrder();
+		solver.getOrder().init();
 	}
 
 	protected Solver<?> initSolver() {
-		Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
+		final Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
 		solver.setTimeoutMs(1000);
-		solver.setDBSimplificationAllowed(false);
+		solver.setDBSimplificationAllowed(true);
 		solver.setVerbose(false);
-		
-		solver.newVar(satInstance.getNumberOfVariables());
-		final Node[] cnfChildren = satInstance.getCnf().getChildren();
-		solver.setExpectedNumberOfClauses(cnfChildren.length);
-		try {
-			for (Node node : cnfChildren) {
-				final Node[] children = node.getChildren();
-				final int[] clause = new int[children.length];
-				for (int i = 0; i < children.length; i++) {
-					final Literal literal = (Literal) children[i];
-					clause[i] = satInstance.getSignedVariable(literal);
-				}
-				IConstr constraint = solver.addClause(new VecInt(clause));
-				constraints.add(constraint);
-			}
-		} catch (ContradictionException e) {
-			Logger.logError(e);
-		}
-		
 		return solver;
 	}
 
+	@Override
+	public List<IConstr> addClauses(Node constraint) throws ContradictionException {
+		return addCNF(constraint.getChildren());
+	}
+
+	protected List<IConstr> addCNF(final Node[] cnfChildren) throws ContradictionException {
+		final List<IConstr> result = new LinkedList<>();
+		for (Node node : cnfChildren) {
+			final Node[] children = node.getChildren();
+			final int[] clause = new int[children.length];
+			for (int i = 0; i < children.length; i++) {
+				final Literal literal = (Literal) children[i];
+				clause[i] = satInstance.getSignedVariable(literal);
+			}
+			result.add(solver.addClause(new VecInt(clause)));
+		}
+		return result;
+	}
+
+	@Override
 	public int[] findModel() {
-		return sat() == SatResult.TRUE ? solver.model() : null;
+		return isSatisfiable() == SatResult.TRUE ? solver.model() : null;
 	}
 
-	public IVecInt getAssignmentCopy() {
-		final VecInt copy = new VecInt(0);
-		assignment.copyTo(copy);
-		return copy;
-	}
-
+	@Override
 	public void assignmentPop() {
 		assignment.pop();
 	}
 
+	@Override
 	public void assignmentPush(int x) {
 		assignment.push(x);
 	}
 
+	@Override
 	public void assignmentClear(int size) {
 		assignment.shrinkTo(size);
 	}
 
-	public void ensure(int size) {
-		assignment.ensure(size);
-	}
-
-	public List<String> getAssignmentString() {
-		return satInstance.convertToString(assignment);
-	}
-
+	@Override
 	public int[] getModel() {
 		return solver.model();
 	}
 
+	@Override
 	public SatInstance getSatInstance() {
 		return satInstance;
 	}
 
-	public Solver<?> getSolver() {
+	@Override
+	public ISolver getInternalSolver() {
 		return solver;
 	}
 
-	public SatResult sat() {
+	@Override
+	public SatResult isSatisfiable() {
 		try {
 			if (solver.isSatisfiable(assignment, false)) {
-				solutionList.add(solver.model());
+				if (solutionList != null) {
+					solutionList.add(solver.model());
+				}
 				return SatResult.TRUE;
 			} else {
 				return SatResult.FALSE;
@@ -162,6 +170,7 @@ public class BasicSolver implements ISatSolver {
 		}
 	}
 
+	@Override
 	public void setOrder(List<IFeature> orderList) {
 		int i = -1;
 		for (IFeature feature : orderList) {
@@ -169,6 +178,7 @@ public class BasicSolver implements ISatSolver {
 		}
 	}
 
+	@Override
 	public void setSelectionStrategy(SelectionStrategy strategy) {
 		switch (strategy) {
 		case NEGATIVE:
@@ -188,6 +198,7 @@ public class BasicSolver implements ISatSolver {
 		}
 	}
 
+	@Override
 	public void shuffleOrder() {
 		final Random rnd = new Random();
 		for (int i = order.length - 1; i >= 0; i--) {
@@ -198,74 +209,49 @@ public class BasicSolver implements ISatSolver {
 		}
 	}
 
+	@Override
 	public void fixOrder() {
 		for (int i = 0; i < order.length; i++) {
 			order[i] = i + 1;
 		}
 	}
 
+	@Override
 	public BasicSolver clone() {
 		return new BasicSolver(this);
 	}
 
 	@Override
-	public void checkAllVariables(int length, Tester t, IMonitor workMonitor) {
-		for (int i = 0; i < length; i++) {
-			final int varX = t.getNextVariable(i);
-			if (varX != 0) {
-				assignment.push(varX);
-				try {
-					if (solver.isSatisfiable(assignment, false)) {
-						solutionList.add(solver.model());
-						shuffleOrder();
-						assignment.pop();
-					} else {
-						assignment.pop().unsafePush(-varX);
-						workMonitor.invoke(-varX);
-					}
-				} catch (final TimeoutException e) {
-					e.printStackTrace();
-					assignment.pop();
-				}
-				workMonitor.step();
-			}
-		}
-	}
-	
-	@Override
-	public void checkAllVariables(int length, Tester t) {
-		for (int i = 0; i < length; i++) {
-			final int varX = t.getNextVariable(i);
-			if (varX != 0) {
-				assignment.push(varX);
-				try {
-					if (solver.isSatisfiable(assignment, false)) {
-						solutionList.add(solver.model());
-						shuffleOrder();
-						assignment.pop();
-					} else {
-						assignment.pop().unsafePush(-varX);
-					}
-				} catch (final TimeoutException e) {
-					e.printStackTrace();
-					assignment.pop();
-				}
-			}
-		}
-	}
-
-	@Override
 	public int getNumberOfSolutions() {
+		if (solutionList == null) {
+			return 0;
+		}
 		return solutionList.size();
 	}
 
 	@Override
-	public List<int[]> getSolutions() {
+	public RingList<int[]> getSolutionList() {
 		return solutionList;
 	}
 
-	public IConstr getConstraint(int i) {
-		return constraints.get(i);
+	@Override
+	public void assignmentReplaceLast(int x) {
+		assignment.pop().unsafePush(x);
+	}
+
+	@Override
+	public IVecInt getAssignment() {
+		return assignment;
+	}
+
+	@Override
+	public int[] getAssignmentArray(int from, int to) {
+		return Arrays.copyOfRange(assignment.toArray(), from, to);
+	}
+
+	@Override
+	public void initSolutionList(int size) {
+		solutionList = new RingList<>(size);
 	}
 
 }

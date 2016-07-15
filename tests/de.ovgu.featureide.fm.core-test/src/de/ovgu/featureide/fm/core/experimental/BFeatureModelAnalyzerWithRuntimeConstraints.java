@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.experimental;
 
-import java.util.HashMap;
-
 import de.ovgu.featureide.common.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.runtimetest.RuntimeTest;
@@ -117,7 +115,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 * Analyzes constraints only
 	 */
 	private void BUpdateConstraints(final int i) {
-		getFM(i).getAnalyser().updateConstraints(new HashMap<Object, Object>(), new HashMap<Object, Object>());
+		getFM(i).getAnalyser().updateConstraints();
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
@@ -179,7 +177,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 * Analyzes features only
 	 */
 	private void BUpdateFeatures(final int i) {
-		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
+		getFM(i).getAnalyser().updateFeatures();
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1100)

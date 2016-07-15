@@ -34,9 +34,11 @@ import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Calculates dependencies of features
@@ -191,6 +193,15 @@ public class FeatureDependencies {
     public Set<IFeature> always(IFeature feature) {
     	return always.get(feature);
     }
+    
+    /*
+     * Don't remove this method - it is called by Fuji
+     * 
+     */
+    @Deprecated
+    public Set<Feature> always(Feature feature) {
+    	return Functional.toSet(Functional.map(always.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
+    }
 
     /**
      * @param feature
@@ -199,13 +210,31 @@ public class FeatureDependencies {
     public Set<IFeature> never(IFeature feature) {
     	return never.get(feature);
     }
-
+    
+    /*
+     * Don't remove this method - it is called by Fuji
+     * 
+     */
+    @Deprecated
+    public Set<Feature> never(Feature feature) {
+    	return Functional.toSet(Functional.map(never.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
+    }
+    
     /**
      * @param feature
      * @return
      */
     public Set<IFeature> maybe(IFeature feature) {
     	return maybe.get(feature);
+    }
+    
+    /*
+     * Don't remove this method - it is called by Fuji
+     * 
+     */
+    @Deprecated
+    public Set<Feature> maybe(Feature feature) {
+    	return Functional.toSet(Functional.map(maybe.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
     }
 
     public String toString() {

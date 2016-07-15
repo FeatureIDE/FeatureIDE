@@ -80,7 +80,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			if(mungePreprocessor.getCreateSignature()){
 				signatures = MungeSignatureBuilder.build(featureProject);
 				signatures.sort(new SignatureComparator());
-				modelOutline.setProjectSignatures(signatures);
+				model.setProjectSignatures(signatures);
 				model.setExtendedFst(modelOutline);
 			} else {
 				model.setExtendedFst(null);

@@ -21,6 +21,7 @@
 package org.prop4j.analyses;
 
 import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -35,7 +36,11 @@ public class ValidAnalysis extends AbstractAnalysis<int[]> {
 		super(solver);
 	}
 
-	public int[] execute(IMonitor monitor) throws Exception {
+	public ValidAnalysis(SatInstance satInstance) {
+		super(satInstance);
+	}
+
+	public int[] analyze(IMonitor monitor) throws Exception {
 		return solver.findModel();
 	}
 

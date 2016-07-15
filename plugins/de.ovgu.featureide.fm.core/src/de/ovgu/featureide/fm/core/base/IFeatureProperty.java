@@ -33,6 +33,7 @@ public interface IFeatureProperty {
 
 	String getDescription();
 
+	@Deprecated
 	String getDisplayName();
 
 	IFeature getFeature();
@@ -41,6 +42,7 @@ public interface IFeatureProperty {
 
 	void setDescription(CharSequence description);
 
+	@Deprecated
 	void setDisplayName(CharSequence name);
 
 	void setFeatureStatus(FeatureStatus status);

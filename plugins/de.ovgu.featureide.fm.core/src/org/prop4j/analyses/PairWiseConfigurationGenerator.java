@@ -57,7 +57,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		private int deltaCoverage;
 		private final int[] model;
 		private int totalCoverage;
-		
+
 		public long time = 0;
 
 		public Configuration(int[] model, int deltaCoverage, int totalCoverage) {
@@ -141,6 +141,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		}
 
 	}
+
 	public static final boolean VERBOSE = false;
 
 	protected static final byte BIT_00 = 1 << 0;
@@ -165,20 +166,24 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 	protected final int numVariables, maxNumber;
 	protected final Deque<Integer> parentStack = new LinkedList<>();
 	protected byte[] recArray = new byte[0];
-	protected final List<int[]> solutions = new ArrayList<>();
 
 	protected final Deque<Configuration> tempConfigurationList = new LinkedList<>();
 	public final BlockingQueue<Configuration> q = new LinkedBlockingQueue<>();
 
 	protected long time = 0;
-	public PairWiseConfigurationGenerator(ISatSolver solver, int maxNumber) {
-		super(solver);
+
+	private int[] allYesSolution;
+
+	private int[] allNoSolution;
+
+	public PairWiseConfigurationGenerator(SatInstance satInstance, int maxNumber) {
+		super(satInstance);
 		this.maxNumber = maxNumber;
 		this.numVariables = this.solver.getSatInstance().getNumberOfVariables();
 	}
 
 	@Override
-	public List<List<String>> execute(IMonitor monitor) throws Exception {
+	public List<List<String>> analyze(IMonitor monitor) throws Exception {
 		if (maxNumber <= 0) {
 			return Collections.emptyList();
 		}
@@ -187,10 +192,11 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 			tempConfigurationList.clear();
 		}
 
+		solver.initSolutionList(Math.min(solver.getSatInstance().getNumberOfVariables(), ISatSolver.MAX_SOLUTION_BUFFER));
+
 		findInvalid();
-		IVecInt orgBackbone = solver.getAssignmentCopy();
-		final SatInstance satInstance = solver.getSatInstance();
-		final int featureCount = satInstance.getNumberOfVariables();
+		IVecInt orgBackbone = solver.getAssignment();
+		final int featureCount = solver.getSatInstance().getNumberOfVariables();
 
 		System.out.println("Found all invalid!");
 
@@ -220,13 +226,12 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 
 		// allyes
-		handleNewConfig(solutions.get(0), satInstance, featuresUsedOrg);
+		handleNewConfig(allYesSolution, featuresUsedOrg);
 		if (maxNumber == 1) {
 			return getConfigurations();
 		}
 		// allno
-		handleNewConfig(solutions.get(1), satInstance, featuresUsedOrg);
-		System.out.println("----");
+		handleNewConfig(allNoSolution, featuresUsedOrg);
 
 		final int[] varStatus = new int[2];
 
@@ -285,7 +290,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 				}
 			}
 
-			if (handleNewConfig(solver.findModel(), satInstance, featuresUsedOrg)) {
+			if (handleNewConfig(solver.findModel(), featuresUsedOrg)) {
 				break;
 			}
 			solver.assignmentClear(numberOfFixedFeatures);
@@ -533,41 +538,38 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 
 	protected void findInvalid() {
 		parentStack.clear();
-		solutions.clear();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		solver.sat();
-		int[] model1 = getModel(solutions);
+		allYesSolution = solver.findModel();
+		allNoSolution = allYesSolution;
 
 		// satisfiable?
-		if (model1 != null) {
+		if (allYesSolution != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			solver.sat();
-			int[] model2 = getModel(solutions);
+			solver.isSatisfiable();
+			allNoSolution = solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
-			core = new byte[model1.length];
-			recArray = new byte[model1.length];
-			final int[] model1Copy = Arrays.copyOf(model1, model1.length);
-			SatInstance.updateModel(model1Copy, model2);
+			core = new byte[allYesSolution.length];
+			recArray = new byte[allYesSolution.length];
+			final int[] model1Copy = Arrays.copyOf(allYesSolution, allYesSolution.length);
+			SatInstance.updateModel(model1Copy, allNoSolution);
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						core[i] = (byte) (varX > 0 ? 1 : -1);
-						solver.assignmentPop();
-						solver.assignmentPush(varX);
+						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						model2 = getModel(solutions);
-						SatInstance.updateModel(model1Copy, model2);
+						SatInstance.updateModel(model1Copy, solver.getModel());
 						solver.shuffleOrder();
 						break;
 					}
@@ -639,7 +641,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 
 			do {
 				incomplete = false;
-				for (int i = 0; i < model1.length; i++) {
+				for (int i = 0; i < allYesSolution.length; i++) {
 					parentStack.add((i + 1));
 					if (testVariable2()) {
 						incomplete = true;
@@ -652,7 +654,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 			} while (incomplete);
 
 			Arrays.fill(recArray, (byte) 0);
-			for (int i = 0; i < model1.length; i++) {
+			for (int i = 0; i < allYesSolution.length; i++) {
 				parentStack.add((i + 1));
 				testVariable();
 				parentStack.add(-(i + 1));
@@ -701,8 +703,9 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 
 	protected int getLastCoverage() {
 		synchronized (tempConfigurationList) {
-			return (tempConfigurationList.isEmpty()) ? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1)
-					.getTotalCoverage()) : tempConfigurationList.getLast().getTotalCoverage();
+			return (tempConfigurationList.isEmpty())
+					? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1).getTotalCoverage())
+					: tempConfigurationList.getLast().getTotalCoverage();
 		}
 	}
 
@@ -714,7 +717,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		return model;
 	}
 
-	protected boolean handleNewConfig(int[] curModel, final SatInstance satInstance, final boolean[] featuresUsedOrg) {
+	protected boolean handleNewConfig(int[] curModel, final boolean[] featuresUsedOrg) {
 		if (curModel == null) {
 			System.out.println("Found everything!");
 			return true;
@@ -727,7 +730,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 			if (!tempConfigurationList.isEmpty() && config.isBetterThan(tempConfigurationList.getLast())) {
 				while (config.isBetterThan(tempConfigurationList.getLast()) && ((count - lesserCount) > finalCount)) {
 					final Configuration lastConfig = tempConfigurationList.removeLast();
-					solver.getSolver().removeConstr(lastConfig.getBlockingClauseConstraint());
+					solver.getInternalSolver().removeConstr(lastConfig.getBlockingClauseConstraint());
 					lesserCount++;
 				}
 			}
@@ -794,13 +797,13 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 			featureIndex.setCoveredCombinations(coveredCombinations);
 			featureIndex.setSelected(selected);
 		}
-		
+
 		config.time = System.nanoTime() - time;
 		q.offer(config);
 		time = System.nanoTime();
 
 		try {
-			config.setBlockingClauseConstraint(solver.getSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
+			config.setBlockingClauseConstraint(solver.getInternalSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
 		} catch (ContradictionException e) {
 			e.printStackTrace();
 			System.out.println("Unsatisfiable1!");
@@ -851,10 +854,9 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 
 			if (varStatus[1] == 0) {
 				solver.assignmentPush(sb);
-				switch (solver.sat()) {
+				switch (solver.isSatisfiable()) {
 				case FALSE:
-					solver.assignmentPop();
-					solver.assignmentPush(-sb);
+					solver.assignmentReplaceLast(-sb);
 					varStatus[1] = -sigB;
 					featuresUsed[b] = true;
 					printCount();
@@ -872,11 +874,10 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 				solver.assignmentPush(sa);
 			}
 
-			switch (solver.sat()) {
+			switch (solver.isSatisfiable()) {
 			case FALSE:
 				if (varStatus[1] != 0) {
-					solver.assignmentPop();
-					solver.assignmentPush(-sa);
+					solver.assignmentReplaceLast(-sa);
 					varStatus[0] = -sigA;
 					featuresUsed[a] = true;
 					printCount();
@@ -910,7 +911,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 			recArray[i] |= compareB;
 
 			int[] xModel1 = null;
-			for (int[] solution : solutions) {
+			for (int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
 					xModel1 = solution;
 					break;
@@ -930,7 +931,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 				if (core[j] == 0 && (b & BIT_CHECK) != 0 && ((positive && (b & BITS_POSITIVE_IMPLY) == 0) || (!positive && (b & BITS_NEGATIVE_IMPLY) == 0))) {
 
 					final int my1 = xModel1[j];
-					for (int[] solution : solutions) {
+					for (int[] solution : solver.getSolutionList()) {
 						final int mxI = solution[i];
 						final int myI = solution[j];
 						if ((mx1 == mxI) && (my1 != myI)) {
@@ -941,7 +942,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 					solver.assignmentPush(-my1);
 					solver.setSelectionStrategy((c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						for (int mx0 : parentStack) {
 							addRelation(mx0, my1);
@@ -956,10 +957,6 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 						solver.assignmentPop();
 						break;
 					case TRUE:
-						final int[] model = solver.getModel();
-						if (model != null) {
-							solutions.add(model);
-						}
 						solver.shuffleOrder();
 						solver.assignmentPop();
 						break;

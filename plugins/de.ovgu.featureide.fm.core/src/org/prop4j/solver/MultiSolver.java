@@ -36,11 +36,11 @@ import org.sat4j.minisat.orders.PositiveLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.RSATPhaseSelectionStrategy;
 import org.sat4j.minisat.orders.RandomLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
+import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds certain solutions of propositional formulas.
@@ -158,7 +158,7 @@ public class MultiSolver extends BasicSolver {
 				}
 			}
 		}
-		
+
 	}
 
 	protected static int NUMBER_OF_THREADS = 1;
@@ -171,7 +171,7 @@ public class MultiSolver extends BasicSolver {
 
 	private final Object orderLock = new Object();
 	private final BlockingQueue<Integer> varQueue = new LinkedBlockingQueue<>();
-	
+
 	private Semaphore semaphore;
 
 	public MultiSolver(MultiSolver oldSolver) {
@@ -184,11 +184,11 @@ public class MultiSolver extends BasicSolver {
 		}
 	}
 
-	public MultiSolver(Node cnf, List<IFeature> featureList) {
+	public MultiSolver(Node cnf, List<IFeature> featureList) throws ContradictionException {
 		this(new SatInstance(cnf, featureList));
 	}
 
-	public MultiSolver(SatInstance satInstance) {
+	public MultiSolver(SatInstance satInstance) throws ContradictionException {
 		super(satInstance);
 		solvers = new Consumer[NUMBER_OF_THREADS];
 		for (int i = 0; i < solvers.length; i++) {
@@ -214,49 +214,6 @@ public class MultiSolver extends BasicSolver {
 		}
 	}
 
-
-	@Override
-	public void checkAllVariables(int vars, Tester t, IMonitor workMonitor) {
-		final int[] indexArray = new int[vars];
-		for (int i = 0; i < indexArray.length; i++) {
-			indexArray[i] = i;
-		}
-		final Random rnd = new Random();
-		for (int i = indexArray.length - 1; i >= 0; i--) {
-			final int index = rnd.nextInt(i + 1);
-			final int a = indexArray[index];
-			indexArray[index] = indexArray[i];
-			indexArray[i] = a;
-		}
-		semaphore = new Semaphore(NUMBER_OF_THREADS);
-		for (int i = 0; i < solvers.length; i++) {
-			solvers[i].start();
-		}
-		try {
-			for (int i = 0; i < vars; i++) {
-				final int varX = t.getNextVariable(indexArray[i]);
-				if (varX != 0) {
-					semaphore.acquire();
-					varQueue.put(varX);
-				}
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			for (int i = 0; i < solvers.length; i++) {
-				solvers[i].stopComsumer();
-			}
-		}
-		try {
-			semaphore.acquire(NUMBER_OF_THREADS);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		for (int i = 0; i < solvers.length; i++) {
-			solvers[i].stopComsumer();
-		}
-	}
-
 	public MultiSolver clone() {
 		return new MultiSolver(this);
 	}
@@ -269,15 +226,7 @@ public class MultiSolver extends BasicSolver {
 		}
 	}
 
-	public IVecInt getAssignmentCopy() {
-		final VecInt copy = new VecInt(0);
-		synchronized (assignment) {
-			assignment.copyTo(copy);
-		}
-		return copy;
-	}
-
-	public SatResult sat() {
+	public SatResult isSatisfiable() {
 		try {
 			if (solver.isSatisfiable(assignment, false)) {
 				synchronized (solutionList) {
@@ -301,12 +250,12 @@ public class MultiSolver extends BasicSolver {
 			}
 		}
 	}
-	
+
 	private SelectionStrategy curSelectionStrategy = SelectionStrategy.ORG;
 
 	public void setSelectionStrategy(SelectionStrategy strategy) {
 		super.setSelectionStrategy(strategy);
-		
+
 		synchronized (orderLock) {
 			curSelectionStrategy = strategy;
 		}
@@ -322,14 +271,13 @@ public class MultiSolver extends BasicSolver {
 				order[i] = a;
 			}
 		}
-	}	
-	
+	}
+
 	@Override
 	public int getNumberOfSolutions() {
 		synchronized (solutionList) {
-			return solutionList.size();			
+			return solutionList.size();
 		}
 	}
-
 
 }

@@ -25,14 +25,14 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
  * 
- * @author Reimar Schr�ter
+ * @author Reimar Schroeter
  */
 public class FSTModelForPP extends FSTModel {
 
 	public FSTModelForPP(IFeatureProject featureProject) {
 		super(featureProject);
 	}
-	
+
 	private FSTModel extendedFst;
 
 	public FSTModel getExtendedFst() {
@@ -42,5 +42,4 @@ public class FSTModelForPP extends FSTModel {
 	public void setExtendedFst(FSTModel extendedFst) {
 		this.extendedFst = extendedFst;
 	}
-
 }

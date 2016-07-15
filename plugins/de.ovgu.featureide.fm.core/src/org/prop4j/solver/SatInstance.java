@@ -22,8 +22,11 @@ package org.prop4j.solver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -48,7 +51,7 @@ public class SatInstance {
 			}
 		}
 	}
-	
+
 	public static int[] negateModel(int[] ar) {
 		int[] nar = Arrays.copyOf(ar, ar.length);
 		for (int i = 0; i < nar.length; i++) {
@@ -61,7 +64,7 @@ public class SatInstance {
 	protected final Object[] intToVar;
 	protected final Node cnf;
 
-	public SatInstance(Node root, List<?> featureList) {
+	public SatInstance(Node root, Collection<?> featureList) {
 		this.intToVar = new Object[featureList.size() + 1];
 		this.cnf = root;
 
@@ -76,17 +79,64 @@ public class SatInstance {
 		}
 	}
 
+	public SatInstance(Node root) {
+		this(root, getDistinctVariableObjects(root));
+	}
+
+	public static Set<Object> getDistinctVariableObjects(Node cnf) {
+		final HashSet<Object> result = new HashSet<>();
+		for (Node clause : cnf.getChildren()) {
+			final Node[] literals = clause.getChildren();
+			for (int i = 0; i < literals.length; i++) {
+				result.add(((Literal) literals[i]).var);
+			}
+		}
+		return result;
+	}
+
 	public List<String> convertToString(int[] model) {
+		return convertToString(model, true, false);
+	}
+
+	public List<String> convertToString(int[] model, boolean includePositive, boolean includeNegative) {
 		final List<String> resultList = new ArrayList<>();
 		for (int var : model) {
 			if (var > 0) {
-				resultList.add(intToVar[Math.abs(var)].toString());
+				if (includePositive) {
+					resultList.add(intToVar[Math.abs(var)].toString());
+				}
+			} else {
+				if (includeNegative) {
+					resultList.add("-" + intToVar[Math.abs(var)].toString());
+				}
 			}
 		}
 		return resultList;
 	}
 
-	public List<String> convertToString(IVecInt model) {
+	public int[] convertToInt(Collection<Literal> literals) {
+		final int[] resultList = new int[literals.size()];
+		int i = 0;
+		for (Literal literal : literals) {
+			final Integer varIndex = varToInt.get(literal.var);
+			resultList[i++] = varIndex == null ? 0 : (literal.positive ? varIndex : -varIndex);
+		}
+		return resultList;
+	}
+
+	public int[] convertToInt(Literal[] literals) {
+		return convertToInt(Arrays.asList(literals));
+	}
+
+	public List<Literal> convertToLiterals(int[] model) {
+		final List<Literal> resultList = new ArrayList<>();
+		for (int var : model) {
+			resultList.add(new Literal(intToVar[Math.abs(var)], (var > 0)));
+		}
+		return resultList;
+	}
+
+	protected List<String> convertToString(IVecInt model) {
 		final List<String> resultList = new ArrayList<>(model.size());
 		final IteratorInt modelIt = model.iterator();
 		while (modelIt.hasNext()) {

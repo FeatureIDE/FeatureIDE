@@ -18,15 +18,49 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solver;
+package de.ovgu.featureide.fm.core.conversion;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.prop4j.And;
+import org.prop4j.Node;
+import org.prop4j.Or;
+
+import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
- * Returns a {@link BasicSolver}.
+ * @brief Converter using conjunctive normal form.
  * 
- * @author Sebastian Krieter
+ * @author Alexander Knueppel
  */
-public interface ISolverProvider {
+public class CNFConverter extends NNFConverter {
+	/**
+	 * Constructor
+	 */
+	public CNFConverter() {
+		super();
+		//continues number + level
+		naming.put(Or.class, "Clause%d");
+		topName = "SubtreeCNF";
+	}
 	
-	BasicSolver getSolver();
-	
+	/**
+	 * Creates cnf and returns a list of clauses
+	 */
+	@Override
+	public List<Node> preprocess(IConstraint constraint) {
+		List<Node> clauses = new LinkedList<Node>();
+		
+		Node cnf = constraint.getNode().toCNF();
+		
+		if(cnf instanceof And) {
+			clauses.addAll(Arrays.asList(cnf.getChildren()));
+		} else {
+			clauses.add(cnf);
+		}
+		
+		return clauses;
+	}
 }

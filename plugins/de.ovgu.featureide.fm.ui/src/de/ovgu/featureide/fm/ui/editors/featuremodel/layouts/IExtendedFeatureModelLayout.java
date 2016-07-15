@@ -18,38 +18,10 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses;
+package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import org.prop4j.solver.ISolverProvider;
-import org.sat4j.specs.IProblem;
-import org.sat4j.tools.ModelIterator;
-
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-
-/**
- * Finds a solution.
- * 
- * @author Sebastian Krieter
- */
-public class FindSolutionAnalysis extends SingleThreadAnalysis<String> {
-
-	public FindSolutionAnalysis(ISolverProvider solver) {
-		super(solver);
-	}
-
-	public String execute(IMonitor monitor) throws Exception {
-		StringBuilder out = new StringBuilder();
-		IProblem problem = new ModelIterator(solver.getSolver());
-		if (!problem.isSatisfiable())
-			return null;
-		final int[] model = problem.model();
-
-		for (int var : model) {
-			if (var > 0) {
-				out.append(solver.getSatInstance().getVariableObject(var) + "\n");
-			}
-		}
-		return out.toString();
-	}
-
+public interface IExtendedFeatureModelLayout extends IFeatureModelLayout{
+	public boolean showShortNames();
+	public void setShowShortNames(boolean b);
 }
+

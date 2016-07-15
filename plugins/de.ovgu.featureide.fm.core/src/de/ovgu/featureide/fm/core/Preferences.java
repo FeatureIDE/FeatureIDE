@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.LONG_NAMES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SHORT_NAMES;
-
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
@@ -41,35 +38,14 @@ public abstract class Preferences {
 		COMPLETION_OPEN_CLAUSES = 2,
 		SCHEME_LONG = 0,
 		SCHEME_SHORT = 1;
-	
-	public static String getNameTypeLabel(int layoutType){		
-		switch(layoutType){
-			case 1: 
-				return SHORT_NAMES;
-			case 0:
-			default:
-				return LONG_NAMES;
-		}	
-	}
-	
+
 	private static final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
 	
 	public static int defaultCompletion;
-	public static int defaultFeatureNameScheme;
 	
 	static {
 		String pref = preferences.get("configCompletion", Integer.toString(COMPLETION_ONE_CLICK));
 		defaultCompletion = castToInt(pref, COMPLETION_ONE_CLICK);
-		
-		pref = preferences.get("configFeatureNameScheme", Integer.toString(SCHEME_LONG));
-		defaultFeatureNameScheme = castToInt(pref, SCHEME_LONG);
-	}
-
-	/**
-	 * @return the defaultFeatureNameScheme
-	 */
-	public static int getDefaultFeatureNameScheme() {
-		return defaultFeatureNameScheme;
 	}
 
 	/**
@@ -82,11 +58,6 @@ public abstract class Preferences {
 	public static void setDefaultCompletion(int defaultCompletion) {
 		Preferences.defaultCompletion = defaultCompletion;
 		store("configCompletion", defaultCompletion);
-	}
-	
-	public static void setDefaultFeatureNameFormat(int defaultFeatureNameScheme) {
-		Preferences.defaultFeatureNameScheme = defaultFeatureNameScheme;
-		store("configFeatureNameScheme", defaultFeatureNameScheme);
 	}
 	
 	private static int castToInt(String pref, int defaultValue) {

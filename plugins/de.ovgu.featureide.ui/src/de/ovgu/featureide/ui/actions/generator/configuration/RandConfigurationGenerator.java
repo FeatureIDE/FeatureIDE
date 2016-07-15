@@ -22,7 +22,7 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import org.prop4j.analyses.PairWiseConfigurationGenerator;
 import org.prop4j.analyses.RandomConfigurationGenerator;
-import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -35,15 +35,15 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * 
  * @author Jens Meinicke
  */
-public class RandConfigurationGenerator extends MASKConfigurationGenerator {
+public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
 
 	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
 	}
 
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(ISatSolver solver, int solutionCount) {
-		return new RandomConfigurationGenerator(solver, solutionCount);
+	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
+		return new RandomConfigurationGenerator(satInstance, solutionCount);
 	}
 
 }

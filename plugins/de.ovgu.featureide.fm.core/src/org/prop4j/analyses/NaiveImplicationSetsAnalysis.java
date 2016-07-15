@@ -47,8 +47,12 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 		super(solver);
 	}
 
+	public NaiveImplicationSetsAnalysis(SatInstance satInstance) {
+		super(satInstance);
+	}
+
 	@Override
-	public HashMap<Relationship, Relationship> execute(IMonitor monitor) throws Exception {
+	public HashMap<Relationship, Relationship> analyze(IMonitor monitor) throws Exception {
 		final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
@@ -70,11 +74,10 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						done[i] = 2;
-						solver.assignmentPop();
-						solver.assignmentPush(varX);
+						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
@@ -116,7 +119,7 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 
 	private void testCombination(final HashMap<Relationship, Relationship> relationSet, final int varX, final int varY) {
 		solver.assignmentPush(-varY);
-		switch (solver.sat()) {
+		switch (solver.isSatisfiable()) {
 		case FALSE:
 			addRelation(relationSet, varX, varY);
 			break;

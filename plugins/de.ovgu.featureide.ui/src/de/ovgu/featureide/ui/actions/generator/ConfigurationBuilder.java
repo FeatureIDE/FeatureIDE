@@ -21,7 +21,7 @@
 package de.ovgu.featureide.ui.actions.generator;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COUNTING___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INCLING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
@@ -57,7 +57,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.configuration.AConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.AllConfigrationsGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.CurrentConfigurationsGenerator;
-import de.ovgu.featureide.ui.actions.generator.configuration.MASKConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.IncLingConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.ModuleConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.RandConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.SPLCAToolConfigurationGenerator;
@@ -173,6 +173,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		sorter.addConfiguration(configuration);
 	}
 
+	// TODO revise long parameter list
 	/**
 	 * Starts the build process for valid or current configurations for the
 	 * given feature project.
@@ -189,23 +190,22 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *            separate projects
 	 * @param runTests
 	 * @param max Maximal number of configurations to generate.
+	 * @param tOrder 
 	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
-	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm,
-			final int t, final BuildOrder buildOrder, boolean runTests, int max) {
-		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, runTests, null, max);
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, int max, int tOrder) {
+		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, runTests, null, max, tOrder);
 	}
 
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final String featureName) {
-		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, featureName, Integer.MAX_VALUE);
+		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, featureName, Integer.MAX_VALUE, 1);
 	}
 
 	static int id = 0;
 	IProgressMonitor globalMonitor;
-
-	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm,
-			final int t, final BuildOrder buildOrder, boolean runTests, final String featureName, final int maxConfigs) {
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, 
+			final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, final String featureName, final int maxConfigs, int tOrder) {
 		this.runTests = runTests;
 		if (maxConfigs <= 0) {
 			return;
@@ -233,7 +233,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			sorter = new PriorizationSorter(featureModel);
 			break;
 		case INTERACTION:
-			sorter = new InteractionSorter(t, featureModel, buildType == BuildType.T_WISE);
+			sorter = new InteractionSorter(tOrder, featureModel, buildType == BuildType.T_WISE);
 			break;
 		default:
 			LOGGER.logWarning("Case statement missing for: " + buildOrder);
@@ -252,8 +252,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			jobName = JOB_TITLE;
 			break;
 		case T_WISE:
-			if (algorithm.equals(MASK)) {
-				configurationBuilder = new MASKConfigurationGenerator(this, featureModel, featureProject);
+			if (algorithm.equals(INCLING)) {
+				configurationBuilder = new IncLingConfigurationGenerator(this, featureModel, featureProject);
 			} else {
 				configurationBuilder = new SPLCAToolConfigurationGenerator(this, featureModel, featureProject, algorithm, t);
 			}

@@ -20,9 +20,7 @@
  */
 package org.prop4j.analyses;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,6 +43,10 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 
 	public ImplicationSetsAnalysis(ISatSolver solver) {
 		super(solver);
+	}
+
+	public ImplicationSetsAnalysis(SatInstance satInstance) {
+		super(satInstance);
 	}
 
 	public static class Relationship implements Comparable<Relationship> {
@@ -119,26 +121,23 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 	private byte[] recArray = new byte[0];
 	private int numVariables = 0;
 
-	private final Collection<int[]> solutions = new ArrayList<>();
 	private final Deque<Integer> parentStack = new LinkedList<>();
 
 	private final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 	@Override
-	public HashMap<Relationship, Relationship> execute(IMonitor monitor) throws Exception {
+	public HashMap<Relationship, Relationship> analyze(IMonitor monitor) throws Exception {
 		relationSet.clear();
 		parentStack.clear();
-		solutions.clear();
 
+		solver.initSolutionList(Math.min(solver.getSatInstance().getNumberOfVariables(), ISatSolver.MAX_SOLUTION_BUFFER));
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		solver.sat();
-		int[] model1 = getModel(solutions);
+		int[] model1 = solver.findModel();
 
 		// satisfiable?
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			solver.sat();
-			int[] model2 = getModel(solutions);
+			int[] model2 = solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
@@ -151,19 +150,17 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
 					//					solver.shuffleOrder();
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						core[i] = (byte) (varX > 0 ? 1 : -1);
-						solver.assignmentPop();
-						solver.assignmentPush(varX);
+						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						model2 = getModel(solutions);
-						SatInstance.updateModel(model1Copy, model2);
+						SatInstance.updateModel(model1Copy, solver.getModel());
 						solver.shuffleOrder();
 						break;
 					}
@@ -171,7 +168,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 			}
 			numVariables = model1.length;
 			combinations = new byte[numVariables * numVariables];
-			
+
 			outer: for (Node clause : solver.getSatInstance().getCnf().getChildren()) {
 				final Node[] literals = clause.getChildren();
 				int childrenCount = literals.length;
@@ -211,7 +208,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 			}
 
 			boolean incomplete;
-			
+
 			do {
 				incomplete = false;
 				for (int x1 = 0; x1 < model1Copy.length; x1++) {
@@ -315,7 +312,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 			recArray[i] |= compareB;
 
 			int[] xModel1 = null;
-			for (int[] solution : solutions) {
+			for (int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
 					xModel1 = solution;
 					break;
@@ -332,12 +329,10 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 
 			inner1: for (int j = i + 1; j < xModel1.length; j++) {
 				final byte b = combinations[rowIndex + j];
-				if (core[j] == 0 
-						&& (b & BIT_CHECK) != 0 
-						&& ((positive && (b & BITS_POSITIVE_IMPLY) == 0) || (!positive && (b & BITS_NEGATIVE_IMPLY) == 0))) {
+				if (core[j] == 0 && (b & BIT_CHECK) != 0 && ((positive && (b & BITS_POSITIVE_IMPLY) == 0) || (!positive && (b & BITS_NEGATIVE_IMPLY) == 0))) {
 
 					final int my1 = xModel1[j];
-					for (int[] solution : solutions) {
+					for (int[] solution : solver.getSolutionList()) {
 						final int mxI = solution[i];
 						final int myI = solution[j];
 						if ((mx1 == mxI) && (my1 != myI)) {
@@ -348,7 +343,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 					solver.assignmentPush(-my1);
 					solver.setSelectionStrategy((c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						for (int mx0 : parentStack) {
 							addRelation(mx0, my1);
@@ -363,13 +358,9 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 						solver.assignmentPop();
 						break;
 					case TRUE:
-						final int[] model = solver.getModel();
-						if (model != null) {
-							solutions.add(model);
-						}
 						solver.shuffleOrder();
 						solver.assignmentPop();
-//						combinations[rowIndex + j] &= ~BIT_CHECK;
+						//						combinations[rowIndex + j] &= ~BIT_CHECK;
 						break;
 					}
 				}
@@ -377,14 +368,6 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationsh
 			solver.assignmentPop();
 		}
 		parentStack.pop();
-	}
-
-	private int[] getModel(final Collection<int[]> solutions) {
-		final int[] model = solver.getModel();
-		if (model != null) {
-			solutions.add(model);
-		}
-		return model;
 	}
 
 	private void addRelation(final int mx0, final int my0) {

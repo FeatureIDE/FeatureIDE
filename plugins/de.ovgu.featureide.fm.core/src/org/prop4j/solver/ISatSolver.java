@@ -22,12 +22,14 @@ package org.prop4j.solver;
 
 import java.util.List;
 
-import org.sat4j.minisat.core.Solver;
+import org.prop4j.Node;
+import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
+import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
  * Finds certain solutions of propositional formulas.
@@ -35,6 +37,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Sebastian Krieter
  */
 public interface ISatSolver extends Cloneable {
+
+	public static final int MAX_SOLUTION_BUFFER = 1000;
 
 	public static enum SatResult {
 		FALSE, TIMEOUT, TRUE
@@ -44,19 +48,13 @@ public interface ISatSolver extends Cloneable {
 		NEGATIVE, ORG, POSITIVE, RANDOM
 	}
 
-	public interface Tester {
-		int getNextVariable(int index);
-	}
-
 	void assignmentClear(int size);
 
 	void assignmentPop();
 
 	void assignmentPush(int x);
 
-	void checkAllVariables(int length, Tester t);
-
-	void checkAllVariables(int vars, Tester t, IMonitor workMonitor);
+	void assignmentReplaceLast(int x);
 
 	ISatSolver clone();
 
@@ -64,9 +62,9 @@ public interface ISatSolver extends Cloneable {
 
 	void fixOrder();
 
-	IVecInt getAssignmentCopy();
+	IVecInt getAssignment();
 
-	List<String> getAssignmentString();
+	int[] getAssignmentArray(int from, int to);
 
 	int[] getModel();
 
@@ -74,11 +72,13 @@ public interface ISatSolver extends Cloneable {
 
 	SatInstance getSatInstance();
 
-	List<int[]> getSolutions();
+	RingList<int[]> getSolutionList();
 
-	Solver<?> getSolver();
+	void initSolutionList(int size);
 
-	SatResult sat();
+	ISolver getInternalSolver();
+
+	SatResult isSatisfiable();
 
 	void setOrder(List<IFeature> orderList);
 
@@ -86,6 +86,6 @@ public interface ISatSolver extends Cloneable {
 
 	void shuffleOrder();
 
-	IConstr getConstraint(int i);
+	List<IConstr> addClauses(Node constraint) throws ContradictionException;
 
 }

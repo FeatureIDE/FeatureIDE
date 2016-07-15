@@ -26,9 +26,6 @@ import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.base.impl.AConstraint;
-import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -442,5 +439,25 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @return String representation of the constraint's propositional formula.
 	 */
 	String getDisplayName();
+
+	/**
+	 * Sets the collection of <i>false-optional</i> features caused by this constraint to the values stored
+	 * in <code>falseOptionalFeatures</code>.
+	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>affect</b> the <b>members</b> in this object.</li>
+	 * <li>does <b>not</b> affect the <b>parameter</b> <code>foFeatures</code>.</li>
+	 * <li>the parameter <code>foFeatures</code> is expected to be <b>non-null</b></li>
+	 * </ul>
+	 * 
+	 * @see #getFalseOptional()
+	 * @see Functional#getEmptyIterable(Class) Setting an empty iterable
+	 * 
+	 * @param foFeatures iterable of features which are claimed to be falseOptional
+	 */
+	void setFalseOptionalFeatures(Iterable<IFeature> foFeatures);
 
 }
