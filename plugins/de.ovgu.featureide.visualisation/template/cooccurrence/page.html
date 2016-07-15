@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html class="ocks-org do-not-copy">
+<html class="ocks-org">
 <meta charset="utf-8">
 <title>Feature Co-occurrence</title>
 <style>
@@ -260,8 +260,8 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var myjson ='JSON_CONTENT';
-
+var myjson ='{"nodes":[{"name":"Feature1","group":1},{"name":"Feature2","group":1},{"name":"Feature3","group":1},{"name":"Feature4","group":1}],"links":[{"source":1,"target":0,"value":1},{"source":2,"target":0,"value":8}]}';
+// DATA_HERE
 	var data = JSON.parse( myjson );
 //d3.json("a.json", function(a) {
   var matrix = [],
@@ -379,8 +379,8 @@ var myjson ='JSON_CONTENT';
   }
 
   var timeout = setTimeout(function() {
-    order("group");
-    d3.select("#order").property("selectedIndex", 2).node().focus();
+    order("count");
+    d3.select("#order").property("selectedIndex", 1).node().focus();
   }, 5000);
 
 

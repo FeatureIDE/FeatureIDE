@@ -34,12 +34,13 @@ var MIDDLE_COLOR = "rgb(255, 255, 255)";
       var centerX = canvas.width / 2;
       var centerY = canvas.height / 2;
 
-// var CENTRAL_FEATURE = "Feature C";
-// var FEATURE_NAMES = ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5", "Feature 6"];
-// var GIVEN = [1, 0.99, 0.66, 0.5, 0.01, 0];
-// var FORMALIZED_REQUIRES = [];
-// var FORMALIZED_EXCLUDES = [];
-DATA_HERE
+var CENTRAL_FEATURE = "FeatureC";
+var FEATURE_NAMES = ["Feature1", "Feature2", "Feature3", "Feature4", "Feature5", "Feature6"];
+var GIVEN = [1, 0.99, 0.66, 0.5, 0.01, 0];
+var FORMALIZED_REQUIRES = ["Feature1"];
+var FORMALIZED_EXCLUDES = [];
+// Override values
+// DATA_HERE
 
 var NUMBER_OF_FEATURES = FEATURE_NAMES.length;
 
@@ -183,13 +184,36 @@ var metrics = context.measureText(FEATURE_NAMES[i]);
 context.restore();
 
 // Legend
-context.translate(canvas.width - 100, canvas.height - 120);
-context.font = '11pt Calibri';
+context.translate(canvas.width - 100, canvas.height - 180);
 var LEGEND_ITEM = 15;
-context.fillStyle = 'black';
-context.fillText("Zones", 0, 0);
-
 var y = 5;
+context.fillStyle = 'black';
+context.font = '11pt Calibri';
+context.fillText("Relation types", 0, 0);
+y += LEGEND_ITEM + 5;
+context.fillText("Formalized", NODE_RADIUS * 2 + 5, y);
+
+
+	context.beginPath();
+      context.arc(NODE_RADIUS, y -NODE_RADIUS/2 , NODE_RADIUS, 0, 2 * Math.PI, false);
+      context.fillStyle = 'white';
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+      
+      context.beginPath();
+      context.arc(NODE_RADIUS, y - NODE_RADIUS/2, NODE_RADIUS - 4, 0, 2 * Math.PI, false);
+context.fillStyle = 'grey';
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+
+y += LEGEND_ITEM + 15;
+
+
+context.fillStyle = 'black';
+context.fillText("Zones", 0, y);
+ 	y += LEGEND_ITEM;
       context.beginPath();
       context.rect(0, y, LEGEND_ITEM, LEGEND_ITEM);
       context.fillStyle = REQUIRES_COLOR;

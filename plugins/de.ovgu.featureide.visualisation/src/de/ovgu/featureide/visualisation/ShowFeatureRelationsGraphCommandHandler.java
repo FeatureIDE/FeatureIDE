@@ -24,6 +24,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 
 /**
@@ -99,8 +100,8 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 	 */
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
 		
-		// Get formalized constraints
-		// TODO improve this with new cases, for example alternatives
+		// Get formalized constraints, implies and excludes
+		// TODO improve this with new cases  a -> b or c
 		List<String> formalizedRequires = new ArrayList<String>();
 		List<String> formalizedExcludes = new ArrayList<String>();
 		List<IConstraint> constraints = featureProject.getFeatureModel().getConstraints();
@@ -119,6 +120,16 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 			}
 		}
 		
+		// Check alternatives
+		IFeature fcenter = featureProject.getFeatureModel().getFeature(featureCenter);
+		IFeatureStructure parent = fcenter.getStructure().getParent();
+		if (parent!=null && parent.isAlternative()){
+			for(IFeatureStructure chi : parent.getChildren()){
+				if(!chi.getFeature().equals(fcenter)){
+					formalizedExcludes.add(chi.getFeature().getName());
+				}
+			}
+		}
 		
 		boolean[][] matrix = null;
 		List<String> featureList = (List<String>) featureProject.getFeatureModel().getFeatureOrderList();
@@ -151,9 +162,9 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		// var FORMALIZED_REQUIRES = [];
 		// var FORMALIZED_EXCLUDES = [];
 
-		StringBuffer data = new StringBuffer("var CENTRAL_FEATURE = \"");
+		StringBuffer data = new StringBuffer(" CENTRAL_FEATURE = \"");
 		data.append(featureCenter);
-		data.append("\";\n var FEATURE_NAMES = [");
+		data.append("\";\n FEATURE_NAMES = [");
 		for (String f : featureList) {
 			if(!f.equals(featureCenter)){
 				data.append("\"");
@@ -162,7 +173,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 			}
 		}
 		data.setLength(data.length() - 1); // remove last comma
-		data.append("];\n var GIVEN = [");
+		data.append("];\n GIVEN = [");
 		for (String f : featureList) {
 			if(!f.equals(featureCenter)){
 				int i = featureList.indexOf(f);
@@ -173,7 +184,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		}
 		data.setLength(data.length() - 1); // remove last comma
 		boolean atLeastOne = false;
-		data.append("];\n var FORMALIZED_REQUIRES = [");
+		data.append("];\n FORMALIZED_REQUIRES = [");
 		for (String f : formalizedRequires){
 			data.append("\"");
 			data.append(f);
@@ -184,7 +195,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		data.setLength(data.length() - 1); // remove last comma
 		}
 		atLeastOne = false;
-		data.append("];\n var FORMALIZED_EXCLUDES = [");
+		data.append("];\n FORMALIZED_EXCLUDES = [");
 		for (String f : formalizedExcludes){
 			data.append("\"");
 			data.append(f);
@@ -198,7 +209,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		
 		File fi = Utils.getFileFromPlugin("de.ovgu.featureide.visualisation", "template/featureRelations/page.html");
 		String html = Utils.getStringOfFile(fi);
-		html = html.replaceFirst("DATA_HERE", data.toString());
+		html = html.replaceFirst("// DATA_HERE", data.toString());
 
 		browser.setText(html);
 		shell.open();

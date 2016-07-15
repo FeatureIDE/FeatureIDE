@@ -87,7 +87,7 @@ public class ShowFeatureCoocurrenceCommandHandler extends ASelectionHandler {
 
 		File f = Utils.getFileFromPlugin("de.ovgu.featureide.visualisation","template/cooccurrence/page.html");
 		String html = Utils.getStringOfFile(f);
-		html = html.replaceFirst("JSON_CONTENT", json.toString());
+		html = html.replaceFirst("// DATA_HERE", " myjson ='"+json.toString() + "';");
 		
 		browser.setText(html);
 		shell.open();
