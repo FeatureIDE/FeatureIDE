@@ -90,6 +90,16 @@ public class TFeatureModelAnalyzer {
 	private IFeature FM4_F10 = FM_test_4.getFeature("J");
 	private HashMap<Object, Object> FM4_DATA = FM_test_4.getAnalyser().analyzeFeatureModel(null);
 	
+	private IFeatureModel FM_test_7 = init("test_7.xml");
+	private IFeature FM7_F1 = FM_test_7.getFeature("H");
+	private IConstraint FM7_C1 = FM_test_7.getConstraints().get(0); 
+	private HashMap<Object, Object> FM7_DATA = FM_test_7.getAnalyser().analyzeFeatureModel(null);
+	
+	private IFeatureModel FM_test_8 = init("test_8.xml");
+	private IFeature FM8_F1 = FM_test_8.getFeature("B");
+	private IFeature FM8_F2 = FM_test_8.getFeature("C");
+	private HashMap<Object, Object> FM8_DATA = FM_test_7.getAnalyser().analyzeFeatureModel(null);
+	
 	/** 
      * @return 
 	 */ 
@@ -226,6 +236,26 @@ public class TFeatureModelAnalyzer {
 	@Test
 	public void TFalseOptional_FM4_F1() {
 		assertEquals(FM4_DATA.get(FM4_F10), FeatureStatus.FALSE_OPTIONAL);
+	}
+	
+	@Test
+	public void TFalseOptional_FM7_F1() {
+		assertEquals(FM7_DATA.get(FM7_F1), FeatureStatus.FALSE_OPTIONAL);
+	}
+	
+	@Test
+	public void TRedundantConstr_FM7_C1() {
+		assertEquals(FM7_DATA.get(FM7_C1), ConstraintAttribute.REDUNDANT);
+	}
+	
+	@Test
+	public void TDead_FM8_F1() {
+		assertEquals(FM8_DATA.get(FM8_F1), FeatureStatus.DEAD);
+	}
+	
+	@Test
+	public void TDead_FM8_F2() {
+		assertEquals(FM8_DATA.get(FM8_F2), FeatureStatus.DEAD);
 	}
 	
 	@Test
