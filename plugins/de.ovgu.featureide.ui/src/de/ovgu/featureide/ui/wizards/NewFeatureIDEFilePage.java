@@ -94,7 +94,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	private static final String MESSAGE_PROJECT_SELECTED = NO_PROJECT_SELECTED;
 	private static final String MESSAGE_PROJECT_FEATUREPROJECT = SELECTED_PROJECT_IS_NOT_A_FEATUREIDE_PROJECT;
-	private static final String MESSAGE_PROJECT_COMPOSER = "Source files not allowed in feature modeling projects";
+	private static final String MESSAGE_PROJECT_COMPOSER = "Source files not allowed with this composer";
 
 	private static final String MESSAGE_FEATURE_SELECTED = NO_FEATURE_SELECTED;
 	private static final String MESSAGE_FEATURE_FOLDER = FEATURE_NAME_MUST_CORRESPOND_TO_AN_EXISTING_FOLDER;
