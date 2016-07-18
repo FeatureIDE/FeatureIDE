@@ -115,6 +115,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	 */
 	public boolean calculateTautologyConstraints = true;
 
+	public boolean calculateExplanations = true;
+
 	private final HashMap<Object, Object> changedAttributes = new HashMap<>();
 
 	private boolean valid;
@@ -195,6 +197,10 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		this.calculateDeadConstraints = calculateDeadConstraints;
 	}
 
+	public void setCalculateExplanations(boolean calculateExplanations) {
+		this.calculateExplanations = calculateExplanations;
+	}
+
 	/**
 	 * @return Hashmap: key entry is Feature/Constraint, value usually
 	 *         indicating the kind of attribute (non-Javadoc)
@@ -219,7 +225,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 		// put root always in so it will be refreshed (void/non-void)
 		changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
-		
+
 		valid = true;
 
 		if (calculateFeatures) {
@@ -327,12 +333,14 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 						if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
 							setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
 
-							// explain false optional features of constraint and remember explanation in map
-							FalseOptional falseOpts = new FalseOptional();
-							Collection<IFeature> foFeatures = constraint.getFalseOptional();
-							for (IFeature feature : foFeatures) {
-								List<String> expl = falseOpts.explain(fm, feature);
-								falseOptFeatureExpl.put(feature, expl);
+							if (calculateExplanations) {
+								// explain false optional features of constraint and remember explanation in map
+								FalseOptional falseOpts = new FalseOptional();
+								Collection<IFeature> foFeatures = constraint.getFalseOptional();
+								for (IFeature feature : foFeatures) {
+									List<String> expl = falseOpts.explain(fm, feature);
+									falseOptFeatureExpl.put(feature, expl);
+								}
 							}
 						}
 					}
@@ -399,13 +407,15 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 						} else {
 							setConstraintAttribute(constraint, ConstraintAttribute.REDUNDANT);
 
-							/*
-							 * Explain redundant constraint. Differentiate between redundancy within a feature model 
-							 * and redundancy in a sliced sub feature model when calculating implicit dependencies
-							 */
-							Redundancy redundancy = new Redundancy();
-							List<String> expl = redundancy.explain(clone, fm, constraint); //store explanation for redundant constraint
-							redundantConstrExpl.put(FeatureUtils.getConstraintIndex(fm, constraint), expl);
+							if (calculateExplanations) {
+								/*
+								 * Explain redundant constraint. Differentiate between redundancy within a feature model 
+								 * and redundancy in a sliced sub feature model when calculating implicit dependencies
+								 */
+								Redundancy redundancy = new Redundancy();
+								List<String> expl = redundancy.explain(clone, fm, constraint); //store explanation for redundant constraint
+								redundantConstrExpl.put(FeatureUtils.getConstraintIndex(fm, constraint), expl);
+							}
 						}
 					}
 				}
@@ -477,13 +487,15 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				setFeatureAttribute(feature, FeatureStatus.DEAD);
 				deadFeatures.add(feature);
 
-				// explain dead features and remember explanation in map
-				DeadFeatures deadF = new DeadFeatures();
-				List<String> expl = deadF.explain(fm, feature);
-				deadFeatureExpl.put(feature, expl);
+				if (calculateExplanations) {
+					// explain dead features and remember explanation in map
+					DeadFeatures deadF = new DeadFeatures();
+					List<String> expl = deadF.explain(fm, feature);
+					deadFeatureExpl.put(feature, expl);
 
-			} else {
-				coreFeatures.add(feature);
+				} else {
+					coreFeatures.add(feature);
+				}
 			}
 		}
 	}
@@ -523,11 +535,12 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
 			falseOptionalFeatures.add(feature);
 
-			// explain false optional features and remember explanation in map
-			FalseOptional falseOpts = new FalseOptional();
-			List<String> expl = falseOpts.explain(fm, feature);
-			falseOptFeatureExpl.put(feature, expl);
-
+			if (calculateExplanations) {
+				// explain false optional features and remember explanation in map
+				FalseOptional falseOpts = new FalseOptional();
+				List<String> expl = falseOpts.explain(fm, feature);
+				falseOptFeatureExpl.put(feature, expl);
+			}
 		}
 	}
 

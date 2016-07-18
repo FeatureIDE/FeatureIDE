@@ -582,6 +582,7 @@ public class FeatureModelAnalyzer {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(false);
 		analysis.setCalculateConstraints(true);
+		analysis.setCalculateExplanations(false);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
 		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
@@ -610,6 +611,7 @@ public class FeatureModelAnalyzer {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(true);
 		analysis.setCalculateConstraints(false);
+		analysis.setCalculateExplanations(false);
 		analysis.updateFeatures();
 		cachedValidity = analysis.isValid();
 		cachedCoreFeatures = analysis.getCoreFeatures();

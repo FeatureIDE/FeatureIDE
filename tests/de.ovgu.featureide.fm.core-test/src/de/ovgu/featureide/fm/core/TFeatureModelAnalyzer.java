@@ -98,7 +98,7 @@ public class TFeatureModelAnalyzer {
 	private IFeatureModel FM_test_8 = init("test_8.xml");
 	private IFeature FM8_F1 = FM_test_8.getFeature("B");
 	private IFeature FM8_F2 = FM_test_8.getFeature("C");
-	private HashMap<Object, Object> FM8_DATA = FM_test_7.getAnalyser().analyzeFeatureModel(null);
+	private HashMap<Object, Object> FM8_DATA = FM_test_8.getAnalyser().analyzeFeatureModel(null);
 	
 	/** 
      * @return 
