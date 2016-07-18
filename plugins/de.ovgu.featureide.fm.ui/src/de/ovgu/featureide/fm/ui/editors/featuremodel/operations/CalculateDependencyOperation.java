@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_DEPENDENCY;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -98,12 +99,20 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	@Override
 	protected FeatureIDEEvent operation() {
 		ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
-
-		// feature model slicing and replacing root with the selected feature
+		boolean isCoreFeature = false;
+		// feature model slicing 
 		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, oldFm, subtreeFeatures,true);
 		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
-		IFeatureModel slicedModel = slice.createInterface(oldFm, subtreeFeatures).clone();
+		IFeatureModel slicedModel = slice.createInterface(oldFm, subtreeFeatures).clone(); // returns new feature model
+		
+		// only replace root with selected feature if feature is core-feature
+		List<IFeature> coreFeatures = oldFm.getAnalyser().getCoreFeatures();
+		if (coreFeatures.contains(subtreeRoot)) {
+			isCoreFeature = true; 
+		}
+		if (isCoreFeature) {
 		FeatureUtils.replaceRoot(slicedModel, slicedModel.getFeature(subtreeRoot.getName()));
+		}
 
 		// Instantiating a wizard page, removing the help button and opening a wizard dialog
 		final AbstractWizard wizard = new SubtreeDependencyWizard("Subtree Dependencies", slicedModel, oldFm);
