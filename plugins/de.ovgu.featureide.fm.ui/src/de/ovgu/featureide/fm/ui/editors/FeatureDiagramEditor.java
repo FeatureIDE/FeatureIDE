@@ -881,6 +881,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
+		case MODEL_DATA_LOADED:
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			final Map<?, ?> registry = getEditPartRegistry();
@@ -908,9 +909,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				graphicalFeatureModel.getGraphicalFeature(oldParent).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 			}
 			featureModelEditor.setPageModified(true);
-			analyzeFeatureModel();
-			break;
-		case MODEL_DATA_LOADED:
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
