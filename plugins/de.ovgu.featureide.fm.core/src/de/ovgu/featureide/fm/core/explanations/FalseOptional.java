@@ -70,7 +70,7 @@ public class FalseOptional {
 		IFeature parentFalseOpt = FeatureUtils.getParent(foFeature);
 		Literal falseOptional = new Literal(foFeature.getName());
 		Literal parent = new Literal(parentFalseOpt.getName());
-		explList.add("\n" + property + "Feature " + falseOptional + " is false-optional, because:");
+		explList.add("\n " + property + "Feature " + falseOptional + " is false-optional, because: ");
 		LTMS ltms = new LTMS(model);
 
 		List<String> tmpExplList = ltms.explainFalseOpsFeature(clauses, falseOptional, parent);
@@ -78,7 +78,7 @@ public class FalseOptional {
 			explList.add("No explanation possible");
 		} else {
 			for (String tmp : tmpExplList) {
-				explList.add(tmp);
+				explList.add(" "+ tmp);
 			}
 		}
 		return explList;

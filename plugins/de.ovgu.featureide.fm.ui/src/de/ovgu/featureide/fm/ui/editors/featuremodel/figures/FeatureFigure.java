@@ -136,12 +136,16 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		IFeature feature = this.feature.getObject();
-		boolean hasExpl = false;
-		if (feature.getProperty().getFeatureStatus() == FeatureStatus.DEAD || feature.getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL) {
-			hasExpl = true;
-		}
 		List<String> explanation = new ArrayList<String>();
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
+		
+		boolean hasExpl = false;
+		if (feature.getProperty().getFeatureStatus() == FeatureStatus.DEAD || 
+				feature.getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL || 
+				feature.getStructure().isRoot() && !analyser.valid()) {
+			hasExpl = true;
+		}
+		
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
 			// only color if the active profile is not the default profile
 			FeatureColor color = FeatureColorManager.getColor(feature);
@@ -159,7 +163,8 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			if (feature.getStructure().isRoot() && !analyser.valid()) {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-				toolTip.append(VOID);
+				explanation = analyser.deadFeatureExpl.get(feature); // get explanation for void feature model
+			//	toolTip.append(VOID);
 			} else {
 				if (feature.getStructure().isConcrete()) {
 					if (!hasExpl) {
@@ -187,7 +192,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 					if (analyser.valid()) {
 						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-						explanation = analyser.deadFeatureExpl.get(feature); // get explanation for false optional feature
+						explanation = analyser.deadFeatureExpl.get(feature); // get explanation for dead feature
 					//	toolTip.append(DEAD);
 					}
 					break;

@@ -464,11 +464,17 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 					if (checkConstraintContradiction(cnf)) {
 						setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
-					} else {
+					} else { 
 						setConstraintAttribute(constraint, ConstraintAttribute.VOID_MODEL);
 					}
 				} else {
 					setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
+					if (calculateExplanations) {
+						// explain void feature model, treat root as dead feature
+						DeadFeatures deadF = new DeadFeatures();
+						List<String> expl = deadF.explain(fm, FeatureUtils.getRoot(fm), true);
+						deadFeatureExpl.put(FeatureUtils.getRoot(fm), expl);
+					}
 				}
 			}
 			monitor.step();
@@ -490,7 +496,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				if (calculateExplanations) {
 					// explain dead features and remember explanation in map
 					DeadFeatures deadF = new DeadFeatures();
-					List<String> expl = deadF.explain(fm, feature);
+					List<String> expl = deadF.explain(fm, feature, false);
 					deadFeatureExpl.put(feature, expl);
 
 				} else {

@@ -44,27 +44,36 @@ public class DeadFeatures {
 	private static IFeatureModel model;
 
 	/**
-	 * Explains dead features using boolean constraint propagation. Sets initial truth value assumptions of dead features to true
-	 * and propagates them until a violation in a clause occurs.
+	 * Explains dead features or void feature models (root is equivalent to dead feature) using boolean constraint propagation. 
+	 * Sets initial truth value assumptions of dead features to true and propagates them until a violation in a clause occurs.
 	 * 
 	 * @param featuremodel The model with the new constraint which leads to a dead feature
-	 * @param deadFeature A dead features
+	 * @param deadFeature The dead features
+	 * @param isVoidFM True, if explanation is generated for a void feature model. Else, false. 
 	 * @return explList An explanation why the feature is dead
 	 */
-	public List<String> explain(IFeatureModel featuremodel, IFeature deadFeature) {
+	public List<String> explain(IFeatureModel featuremodel, IFeature deadFeature, boolean isVoidFM) {
 		List<String> explList = new ArrayList<>();
 		String property = "";
+		
+		// add information about feature structure to explanation
 		if (deadFeature.getStructure().isConcrete()) {
 			property = "Concrete ";
 		} else if (deadFeature.getStructure().isAbstract()) {
 			property = "Abtract ";
 		}
+		
 		setFeatureModel(featuremodel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
 
+		// differentiate between dead feature or void feature model
 		Literal deadF = new Literal(deadFeature.getName());
-		explList.add("\n" + property + "Feature " + deadF + " is dead, because:");
+		if (isVoidFM) {
+			explList.add("\n Feature Model is void, because: ");
+		} else {
+		explList.add("\n " + property + "Feature " + deadF + " is dead, because: ");
+		}
 		LTMS ltms = new LTMS(model);
 
 		// generate explanation which stops after first violation with "used" clauses in stack
@@ -74,7 +83,7 @@ public class DeadFeatures {
 			explList.add("No explanation possible");
 		} else {
 			for (String tmp : tmpExplList) {
-				explList.add(tmp);
+				explList.add(" "+ tmp);
 			}
 		}
 		return explList;
