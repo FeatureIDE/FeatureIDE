@@ -332,16 +332,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 						foList.retainAll(newFOFeature);
 						if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
 							setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
-
-							if (calculateExplanations) {
-								// explain false optional features of constraint and remember explanation in map
-								FalseOptional falseOpts = new FalseOptional();
-								Collection<IFeature> foFeatures = constraint.getFalseOptional();
-								for (IFeature feature : foFeatures) {
-									List<String> expl = falseOpts.explain(fm, feature);
-									falseOptFeatureExpl.put(feature, expl);
-								}
-							}
 						}
 					}
 				}
@@ -464,22 +454,32 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 					if (checkConstraintContradiction(cnf)) {
 						setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
-					} else { 
+						if (calculateExplanations) {
+							explainVoidFM();
+						}
+					} else {
 						setConstraintAttribute(constraint, ConstraintAttribute.VOID_MODEL);
+						if (calculateExplanations) {
+							explainVoidFM();
+						}
 					}
 				} else {
 					setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
 					if (calculateExplanations) {
-						// explain void feature model, treat root as dead feature
-						DeadFeatures deadF = new DeadFeatures();
-						List<String> expl = deadF.explain(fm, FeatureUtils.getRoot(fm), true);
-						deadFeatureExpl.put(FeatureUtils.getRoot(fm), expl);
+						explainVoidFM();
 					}
 				}
 			}
 			monitor.step();
 			monitor.step();
 		}
+	}
+
+	// explain void feature model, treat root as dead feature
+	private void explainVoidFM() {
+		DeadFeatures deadF = new DeadFeatures();
+		List<String> expl = deadF.explain(fm, FeatureUtils.getRoot(fm), true);
+		deadFeatureExpl.put(FeatureUtils.getRoot(fm), expl);
 	}
 
 	private void checkFeatureDead(final SatInstance si) {
