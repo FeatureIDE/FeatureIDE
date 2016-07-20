@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_1181380493__F_C8EAC0FC7701">
+				<description>
+					
+				</description>
+				<feature name="F_536DAEEFC371">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_AD9CAB8377D4">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_E528E7186064">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_B832B166608A">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<not>
+						<var>F_536DAEEFC371</var>
+					</not>
+					<not>
+						<var>F_E528E7186064</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>F_536DAEEFC371</var>
+					</not>
+					<not>
+						<var>F_AD9CAB8377D4</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>F_E528E7186064</var>
+					</not>
+					<not>
+						<var>F_AD9CAB8377D4</var>
+					</not>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

@@ -1,0 +1,18 @@
+concept Index {
+	feature UniqueKeys{
+		constraint Index.Types.Int;
+	}
+	mandatory feature Queries{
+		someOf{
+			feature Knn;
+			feature Range;
+		}
+	}
+	mandatory feature Types{
+		oneOf{
+			feature Int;
+			feature Double;
+			feature Float;
+		}
+	}
+}

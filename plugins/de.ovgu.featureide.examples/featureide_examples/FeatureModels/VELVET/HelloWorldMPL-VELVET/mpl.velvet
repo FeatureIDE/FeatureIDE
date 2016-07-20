@@ -1,0 +1,13 @@
+import model;
+import MPL.HelloWorldInstance;
+import MPL.IHelloWorld;
+
+concept HelloWorldMPL-FH-Java : model
+	instance HelloWorldInstance hello1,
+			 HelloWorldInstance2 hello2 {
+	feature HelloWorldMPL-FH-Java.Greetings{
+		use hello1;
+		use hello2;
+	}
+	constraint HelloWorldMPL-FH-Java.Greetings.hello1.Feature.Beautiful -> HelloWorldMPL-FH-Java.Greetings.hello2.Wonderful;
+}

@@ -1,0 +1,4936 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="F_B8FB9DC8EC3B">
+				<description>
+					
+				</description>
+				<and name="F_739C654FB367">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadip
+					</description>
+					<alt mandatory="true" name="I_3017018665__F_E7824D7139A7">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+						</description>
+						<feature mandatory="true" name="I_3017018665__F_366786C8F18F">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3017018665__F_814EE2EE3789">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3017018665__F_673F683BFAB2">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3017018665__F_4CD52C09FA47">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3017018665__F_EB70596895C8">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+					</alt>
+				</and>
+				<and name="F_D27EB5AA7132">
+					<description>
+						Lorem ipsum dolor sit amet,
+					</description>
+					<alt mandatory="true" name="I_4052387336__F_4C442BE5F0AA">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+						</description>
+						<feature mandatory="true" name="I_4052387336__F_5C20AE9141B2">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4052387336__F_2D48CC3215AA">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4052387336__F_8FFBF3380CD3">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4052387336__F_997B1546F57B">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4052387336__F_7669C96188E0">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2381030355__F_F05D86D2555B">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+						</description>
+						<feature mandatory="true" name="I_2381030355__F_CEB2434F791B">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2381030355__F_1091E6431522">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2381030355__F_33E22AC7D1AD">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2381030355__F_A2E46B76DBAF">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2381030355__F_9CE3ED1FA502">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+					</alt>
+					<feature name="F_0D1DC0AF6F3C">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing e
+						</description>
+					</feature>
+					<alt mandatory="true" name="I_3099482565__F_6E6773201436">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_3099482565__F_A8086331809F">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3099482565__F_1F3034444FD8">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3099482565__F_725166CB5869">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_565643391__F_32DE8AA9390D">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_565643391__F_E98A18E1E4A1">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_565643391__F_9977385B5A84">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_565643391__F_666E4441DE3F">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_1454389481__F_DC75AA634754">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_1454389481__F_E614F2AF8213">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1454389481__F_165DE9DF2284">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1454389481__F_4DEE0051CA1A">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+				</and>
+				<and name="F_BBC2ABEE7C5A">
+					<description>
+						
+					</description>
+					<alt mandatory="true" name="I_2929702251__F_453EBA06DA15">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+						</description>
+						<feature mandatory="true" name="I_2929702251__F_E5B7F9922A37">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2929702251__F_8038022A0A7D">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2929702251__F_0CD38EA18F13">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2929702251__F_9566CEF67F96">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2929702251__F_96CE25A0036B">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_3539898544__F_7A329A5008EE">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+						</description>
+						<feature mandatory="true" name="I_3539898544__F_C7327C77AC46">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3539898544__F_FBD56AD786DE">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3539898544__F_CCD6CD3693D6">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3539898544__F_20FA5D0BEDA8">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3539898544__F_3DBB957B1587">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+					</alt>
+					<feature mandatory="true" name="F_BB4E123EB612">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+						</description>
+					</feature>
+				</and>
+				<and name="F_1CEAF2160335">
+					<description>
+						Lorem ipsum dolor sit
+					</description>
+					<alt mandatory="true" name="I_2130468174__F_BCFEAD7B3B5C">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+						</description>
+						<feature mandatory="true" name="I_2130468174__F_F365DD724D98">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2130468174__F_72C49E3737F2">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2130468174__F_2F9A3A175B3D">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2130468174__F_7FE1670E7490">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2130468174__F_2DA0EAF51903">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_43874453__F_1A6D4374932C">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+						</description>
+						<feature mandatory="true" name="I_43874453__F_D089024EC2BC">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_43874453__F_439B5450DEF0">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_43874453__F_E6642BC05404">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_43874453__F_1725EA189CBB">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_43874453__F_2DF582516125">
+							<description>
+								Lorem ipsum dolor sit a
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_1730478528__F_276916638B95">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_1730478528__F_89BF66EE5A44">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1730478528__F_D4190ABFCF2E">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1730478528__F_CCF860187B64">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_4264317050__F_791C4DE7CF24">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_4264317050__F_092F19CFEECA">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4264317050__F_0BFDDF56E605">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4264317050__F_D6C80DD327C7">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2301321452__F_230660E60343">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2301321452__F_EAD9C7B6AC28">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2301321452__F_531D921C1426">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2301321452__F_0EB084F61C77">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+				</and>
+				<and name="F_D8423B395B8D">
+					<description>
+						Lorem ipsum dolor sit
+					</description>
+					<alt mandatory="true" name="F_D429D758DA24">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita ka
+						</description>
+						<feature mandatory="true" name="F_31A3FFE6CBFF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed di
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_D62D8035088D">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2376406869__F_F85CC459A165">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2376406869__F_B63EDEC5D2D5">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2376406869__F_84E6C2D2E759">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2376406869__F_6DF044C79C4B">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_346834671__F_B02EE2BD39A0">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_346834671__F_BB14592C55CC">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_346834671__F_0C3C385089B2">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_346834671__F_56BD8A50A9F9">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_1672181369__F_8B5BB657F4AA">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_1672181369__F_1103CA36F426">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1672181369__F_52565E9DDF61">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1672181369__F_C14FFFED45CD">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+				</and>
+				<and mandatory="true" name="F_13879D47BCEA">
+					<description>
+						
+					</description>
+					<alt mandatory="true" name="I_1805754624__F_9C5E40A7BFD2">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_1805754624__F_9252565BF6DE">
+							<description>
+								Lorem ipsum dolor sit amet,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1805754624__F_AFA66EDCDDE7">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1805754624__F_CBDD6E78A823">
+							<description>
+								Lorem ipsum dolor s
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_923282208__F_F5CB232CCDBC">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_923282208__F_3F40C26233FC">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_923282208__F_EAE08A78A808">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_923282208__F_547862B34166">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_923282208__F_654FFE11C105">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_923282208__F_0D4AC30D90C4">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_923282208__F_1637C4C1BFCE">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_923282208__F_880E61B63626">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_4233427077__F_CEEE7D2721F9">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_4233427077__F_74BC797B0952">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4233427077__F_ECFF7A82B06C">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4233427077__F_2BB8BE1CF2E0">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4233427077__F_EEB438838D4D">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4233427077__F_D94E72DDB987">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4233427077__F_FA613E104290">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4233427077__F_239A7A87B3BC">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2059438635__F_9D1F4DFEB18D">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2059438635__F_E16DCEC61DB9">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2059438635__F_A799FB877912">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2059438635__F_6E679438861D">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2059438635__F_93F8E196FD2F">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2059438635__F_8EAE0628AD4C">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2059438635__F_A1AA3ED2AD7C">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2059438635__F_6AB8227FEE73">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2903375561__F_D9AF7067BD16">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2903375561__F_F507A07C0BF8">
+							<description>
+								Lorem ipsum dolor sit amet,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2903375561__F_A1DA1F0D1A67">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2903375561__F_E4877365068F">
+							<description>
+								Lorem ipsum dolor s
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_3605319150__F_283605784AC5">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_3605319150__F_AD89C94D7DC6">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3605319150__F_A96EC2295300">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3605319150__F_6E45E5D4126C">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3605319150__F_7C72552C7F1E">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3605319150__F_64859E88095A">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3605319150__F_9592806D14DB">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3605319150__F_FCD40A3E958C">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_498605643__F_4BD2CA1CCDB0">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_498605643__F_BFE1E0FDE82F">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_498605643__F_6132F6A990A6">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_498605643__F_E2AECD3C8B86">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_498605643__F_2F7C072C68E8">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_498605643__F_F3A9C46D20DC">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_498605643__F_1CF8907F2F30">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_498605643__F_EEDF1E91F55F">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2603379941__F_96DC728915F1">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2603379941__F_299CE5DC2550">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2603379941__F_E2C9B5A9D2CE">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2603379941__F_21C804084D29">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2603379941__F_AB3E1726D735">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2603379941__F_EF7B5649F13F">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2603379941__F_5B4A7B87F5FD">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2603379941__F_D80FE3075B4E">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<feature name="F_79FF6B9D1676">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam volu
+						</description>
+					</feature>
+					<alt name="F_AA1C6DA672A9">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="F_AB3790CEB0C8">
+							<description>
+								Lorem ipsum dolor sit amet, consetetu
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_7460624C0673">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_00EBFF73673A">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirm
+							</description>
+						</feature>
+					</alt>
+					<feature name="F_93DFEF483C0D">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et a
+						</description>
+					</feature>
+				</and>
+				<and name="F_F03A6DB09A0D">
+					<description>
+						
+					</description>
+					<alt mandatory="true" name="F_C352B113F1C1">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing
+						</description>
+						<feature mandatory="true" name="F_2E546A43A7DD">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_D914BF46E788">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_3313474140__F_F7F2E571E5A6">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_3313474140__F_7CF21FCC1A72">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur s
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_15784DE595FD">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_48762313BC00">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscin
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_DC26812CD342">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadips
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_D0FDE422331F">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed d
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_1C216B49EFEB">
+							<description>
+								Lorem ipsum dolor sit amet, consetet
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_E28619FB9AEF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_621E3FF5F0D4">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_99022556D038">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor in
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_53063FD3111A">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_3CE5C42E89B3">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy e
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_46389EB22262">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_4F2635A5760B">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_EEBF853B6CC8">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_997E99C4D496">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonum
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_FF66BC39A70F">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_12E23AA174EC">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_7337E0820AFB">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elit
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_5F8F6E80A44F">
+							<description>
+								Lorem ipsum dolor sit amet
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_888891CFF089">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_123D554082C3">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_6514FA0F8EBD">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_BF0CBDA33279">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_29CA0F6B6D65">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3313474140__F_39FFF437D7FC">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_4238604727__F_C39BDE8A5694">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_4238604727__F_0B494B66A680">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur s
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_29925228F79B">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_71266BC0DEF9">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscin
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_A9F3B9793004">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadips
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_AC7BAEDB77F5">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed d
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_982318D26285">
+							<description>
+								Lorem ipsum dolor sit amet, consetet
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_3CF29A172A13">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_0DF408BAB825">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_EFE58B68D287">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor in
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_61618C974E25">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_410F306E0425">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy e
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_8A2618E46340">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_79A4344D0D06">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_F4D9F960B23A">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_49D441CA5687">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonum
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_5C3EB4B54E06">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_6E6FF2CFEE00">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_ACE99F5253FD">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elit
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_7B75785B4737">
+							<description>
+								Lorem ipsum dolor sit amet
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_649C12624730">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_CC5B34CF01CF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_546CF95BBB4F">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_7E3AF64819E4">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_DA394C835D51">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4238604727__F_D731167DA087">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_1458446977__F_300CDB394A1E">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_1458446977__F_F456F527BB8C">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur s
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_7C057D1F2CF5">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_0B866071ECFA">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscin
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_FD4AD0A1586C">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadips
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_EF650969512D">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed d
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_4E600BEF2866">
+							<description>
+								Lorem ipsum dolor sit amet, consetet
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_E2A9F72317A2">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_3C377284376D">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_19F4CC6DE0DE">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor in
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_7469E2FBF2AF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_E7E487268FBF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy e
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_EE9779726495">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_7827C2ED283A">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_0C55D8F0FDB0">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_F0114E62ABA2">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonum
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_AC2E33D346F4">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_E6428E7A668D">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_F73691AEEDBC">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elit
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_30FF1BB46905">
+							<description>
+								Lorem ipsum dolor sit amet
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_A828D5C788E7">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_F370F0959B99">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_81C1A416398D">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_B4B633D5F144">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_377BFA1BCC11">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1458446977__F_96F9D1C0B79F">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_1865564522__F_2BBABFEC8CA6">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_1865564522__F_1F7C8104CBC1">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur s
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_5752E81AA7A2">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_C3764398FDE4">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscin
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_45836B9A0CE9">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadips
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_A27F91A15043">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed d
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_46753BCE0A0C">
+							<description>
+								Lorem ipsum dolor sit amet, consetet
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_3914825140F2">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_281336D8B4EE">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_8CDC77AF40E9">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor in
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_EC854EA6AB46">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_68FA48903F2A">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy e
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_2BF7D81509EF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_76352E9F18B4">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_11C4AFC2E597">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_BCFD2D20DE11">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonum
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_987AE7FA9F19">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_BB15AC7E39D6">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_C73DF5390F47">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elit
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_AD45D3829A50">
+							<description>
+								Lorem ipsum dolor sit amet
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_70CC5CA744D0">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_9BD2A7E8F989">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_B0FC31CC6AF4">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_35A68042AF61">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_9CC268803D05">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_1865564522__F_764C398CA347">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="F_F19DD66B10D4">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="F_16F3F89C59EF">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_8DB2AB3E5B2D">
+							<description>
+								Lorem ips
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_FB34AF924D1E">
+							<description>
+								Lorem ips
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="F_C90482D94B93">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirm
+						</description>
+						<feature mandatory="true" name="F_9526175F74FB">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_B1259F8F6825">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<feature name="F_C2C3D8724C49">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor s
+						</description>
+					</feature>
+					<feature name="F_FDF22DA299A9">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At
+						</description>
+					</feature>
+					<feature name="F_769BE6F921AC">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit ame
+						</description>
+					</feature>
+					<feature name="F_CA3D6C3DF95F">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadip
+						</description>
+					</feature>
+					<alt mandatory="true" name="F_EF1E73CBD824">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita
+						</description>
+						<feature mandatory="true" name="F_4AF5F45476A7">
+							<description>
+								Lorem ipsum dolor s
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_475707E9E43D">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<feature name="F_CBF0E1CC128F">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod t
+						</description>
+					</feature>
+					<feature name="F_6BFC1B074294">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At
+						</description>
+					</feature>
+					<feature name="F_481FB93979CC">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no
+						</description>
+					</feature>
+					<alt mandatory="true" name="I_807554867__F_C24230F36B90">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_807554867__F_D4144A026318">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_807554867__F_A1909F8F744F">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_807554867__F_8A1F169AF71B">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2838175369__F_284F00840C2E">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2838175369__F_E215B58F6FFE">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2838175369__F_380F446D857F">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2838175369__F_58A061749B01">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_3727437343__F_D4E603729A36">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_3727437343__F_2FA0996A85D4">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3727437343__F_6B7023113DC0">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3727437343__F_DF625DBADC16">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="F_BE7CCC976F34">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo
+						</description>
+						<feature mandatory="true" name="F_1DB1181C77FA">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_6BFC4EE41FA7">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+				</and>
+				<and mandatory="true" name="F_24A5F407DC1F">
+					<description>
+						
+					</description>
+					<alt mandatory="true" name="I_186947531__F_A46A7D51A622">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_186947531__F_EB3322F3E9F3">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_186947531__F_1025C6F67BA7">
+							<description>
+								Lorem ipsum do
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_186947531__F_DE9087371BB2">
+							<description>
+								Lorem ipsum dolor sit amet, co
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_186947531__F_DCC96C8BFBB0">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur s
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_186947531__F_F962762C33C9">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elit
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_186947531__F_BBC18863CC0C">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy ei
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_186947531__F_6001F5BAD92F">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sad
+							</description>
+						</feature>
+					</alt>
+					<or mandatory="true" name="I_4281904941__F_1AB1C841C96F">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_4281904941__F_24EB3F6AFA06">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_518BF0D3F039">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing el
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_A58F8A57E896">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadi
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_1F048AF5A372">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sa
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_60FF9548E04B">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_164C9F60F0FD">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dol
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_0022A78C49DF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_B46D45360689">
+							<description>
+								Lorem ipsum dolor sit amet, consete
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_32087EFD7C01">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_B38AE3984DAD">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_164EB4BB1C94">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing eli
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_B5B132AD0F91">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod te
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_1F8BFF57F3FB">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna al
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_19ED7352F51C">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempo
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_4281904941__F_A9625DA4D390">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipsci
+							</description>
+						</feature>
+					</or>
+					<alt mandatory="true" name="F_5F917541E8D3">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+						</description>
+						<feature mandatory="true" name="F_3AB24FAA1560">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_5B8DD55C07B1">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_659B815D2BB2">
+							<description>
+								Lorem ipsum dolor sit amet, conse
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_855176224__F_F47E49483D0B">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_855176224__F_C01DE9480ED5">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_855176224__F_A0A3B91DE33E">
+							<description>
+								Lorem ipsum do
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_855176224__F_489E510A2548">
+							<description>
+								Lorem ipsum dolor sit amet, co
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_855176224__F_F602276BBFEA">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur s
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_855176224__F_B05121F5F825">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elit
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_855176224__F_57C42505162A">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy ei
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_855176224__F_99002733FFF0">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sad
+							</description>
+						</feature>
+					</alt>
+					<or mandatory="true" name="I_2604283598__F_4C1D6BD8DB33">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2604283598__F_C99BB3CE8A81">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_7BC1834B5FCB">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing el
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_E0DA0F54C7E3">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadi
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_F52F870989BB">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sa
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_230ECE986CC6">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_C0D6BBF38AB8">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dol
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_CDF8577A0C8A">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_43309A4A3C64">
+							<description>
+								Lorem ipsum dolor sit amet, consete
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_B0F7BC5266C7">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_2C570286DA52">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_8E8CE3F8F780">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing eli
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_6ED2BEC16C01">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod te
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_DAD15CA7B137">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna al
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_BD407B5B3F1F">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempo
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2604283598__F_83B39F9ADB76">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipsci
+							</description>
+						</feature>
+					</or>
+					<alt mandatory="true" name="F_F9F3A29B14A2">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia
+						</description>
+						<feature mandatory="true" name="F_9BE58D034510">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_849485485401">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_2C3D45FD487A">
+							<description>
+								Lorem ipsum dolor sit amet, conse
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2562010902__F_74B76D7D0AC3">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2562010902__F_9F32165CBC52">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2562010902__F_BE1A480B452F">
+							<description>
+								Lorem ipsum do
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2562010902__F_3B8B62C6EFE5">
+							<description>
+								Lorem ipsum dolor sit amet, co
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2562010902__F_2F07C2DB166B">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur s
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2562010902__F_D671B108B1A0">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elit
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2562010902__F_6001AFBFB077">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy ei
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2562010902__F_B7CED6D9A198">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sad
+							</description>
+						</feature>
+					</alt>
+					<or mandatory="true" name="I_3514666687__F_17FE8CA72009">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_3514666687__F_1ACDF9517B80">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_57D506A9B116">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing el
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_8FB3D4879641">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadi
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_1EE72DDC3DDF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sa
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_3E71636458D6">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_0748B7880418">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dol
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_F9DBA3255D58">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_F040597CE634">
+							<description>
+								Lorem ipsum dolor sit amet, consete
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_B16029D326BF">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_55142E60E28E">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_00A77F8AF3CA">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing eli
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_F4E0F567CE80">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod te
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_8B61E545E148">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna al
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_59BBB12FB589">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempo
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3514666687__F_528975C378F6">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipsci
+							</description>
+						</feature>
+					</or>
+					<alt mandatory="true" name="F_1CC399F94C5E">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+						</description>
+						<feature mandatory="true" name="F_2DA63C743059">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_24275EFE273F">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_78B4C278FD5F">
+							<description>
+								Lorem ipsum dolor sit amet, conse
+							</description>
+						</feature>
+					</alt>
+					<alt mandatory="true" name="I_2708032765__F_1FDB57D4D6AE">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_2708032765__F_9FEA4ABB9AB3">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2708032765__F_5BE516E78511">
+							<description>
+								Lorem ipsum do
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2708032765__F_2738AEB082E4">
+							<description>
+								Lorem ipsum dolor sit amet, co
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2708032765__F_E721AC88B4BA">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur s
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2708032765__F_ED8B7717F9DB">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elit
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2708032765__F_8C73D713284D">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy ei
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_2708032765__F_544119D54048">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sad
+							</description>
+						</feature>
+					</alt>
+					<or mandatory="true" name="I_3045005148__F_387548A17AE4">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="I_3045005148__F_B9931182552A">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_5563E19BB919">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing el
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_E44024AD6411">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadi
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_D31F019FA7CE">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sa
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_6F8DDB210C4E">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_5511AF767E3B">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dol
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_2AF8A31029B3">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_BAEA13234DD7">
+							<description>
+								Lorem ipsum dolor sit amet, consete
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_C3DE55EDC423">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_3D5677167752">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_95F22823E689">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing eli
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_7CB97042541F">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod te
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_E95AF8BD9A1D">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna al
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_D8163486B0F9">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempo
+							</description>
+						</feature>
+						<feature mandatory="true" name="I_3045005148__F_884E74BEDB79">
+							<description>
+								Lorem ipsum dolor sit amet, consetetur sadipsci
+							</description>
+						</feature>
+					</or>
+					<alt mandatory="true" name="F_E10156E37F7C">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+						</description>
+						<feature mandatory="true" name="F_01CD9DF046C1">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_EC8DB8C38864">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="F_4E08FC312F05">
+							<description>
+								Lorem ipsum dolor sit amet, conse
+							</description>
+						</feature>
+					</alt>
+					<feature name="F_8F41D606020E">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_75FA735A1B45">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_6A0F03346047">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_FC9F4C2D2830">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_290276917F73">
+						<description>
+							Lorem ipsum dolor sit amet, consetetu
+						</description>
+					</feature>
+					<feature name="F_D8331D2E5575">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_D4C2AA87FF5C">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_D0BC446173E3">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_44C961E4E9A3">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_933DABCAF2F2">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_0BA343B38A16">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+						</description>
+					</feature>
+					<feature name="F_D52386A7CCE2">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+						</description>
+					</feature>
+					<feature name="F_78BE99948CCD">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, se
+						</description>
+					</feature>
+					<feature name="F_34676170D9AE">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipsc
+						</description>
+					</feature>
+					<feature name="F_1587476B18FF">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+						</description>
+					</feature>
+					<feature name="F_252CE0D78B05">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invi
+						</description>
+					</feature>
+					<feature name="F_A62329B1F858">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_44069C20CEEA">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_7A7F1EBFAFDC">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_8296200DE197">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_29CFF8E598E4">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_AB6415C30F38">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_0F39B09522E2">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_4C9008DF6137">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_DB18085D7E45">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_D5F49223689C">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature name="F_34066B8C5753">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadi
+						</description>
+					</feature>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>F_8F41D606020E</var>
+					<var>F_0BA343B38A16</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_75FA735A1B45</var>
+					<var>F_8F41D606020E</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_6A0F03346047</var>
+					<var>F_75FA735A1B45</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_FC9F4C2D2830</var>
+					<var>F_75FA735A1B45</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_290276917F73</var>
+					<var>F_44C961E4E9A3</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_290276917F73</var>
+					<var>F_75FA735A1B45</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_D8331D2E5575</var>
+					<var>F_44C961E4E9A3</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_D8331D2E5575</var>
+					<var>F_75FA735A1B45</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_D4C2AA87FF5C</var>
+					<var>F_8F41D606020E</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_D52386A7CCE2</var>
+					<var>F_34676170D9AE</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_78BE99948CCD</var>
+					<var>F_34676170D9AE</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_AB6415C30F38</var>
+					<var>F_DB18085D7E45</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_44069C20CEEA</var>
+					<var>F_DB18085D7E45</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_8296200DE197</var>
+					<var>F_DB18085D7E45</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_4C9008DF6137</var>
+					<var>F_DB18085D7E45</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_D5F49223689C</var>
+					<var>F_34066B8C5753</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_659B815D2BB2</var>
+					<var>F_933DABCAF2F2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_2C3D45FD487A</var>
+					<var>F_933DABCAF2F2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_78B4C278FD5F</var>
+					<var>F_933DABCAF2F2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_4E08FC312F05</var>
+					<var>F_933DABCAF2F2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_7CF21FCC1A72</var>
+					<var>I_4281904941__F_24EB3F6AFA06</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_7CF21FCC1A72</var>
+					<var>F_3AB24FAA1560</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_15784DE595FD</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_15784DE595FD</var>
+					<var>I_4281904941__F_518BF0D3F039</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_15784DE595FD</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_48762313BC00</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_48762313BC00</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_48762313BC00</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<var>I_4281904941__F_60FF9548E04B</var>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_DC26812CD342</var>
+					<var>I_186947531__F_6001F5BAD92F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_DC26812CD342</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_DC26812CD342</var>
+					<var>I_4281904941__F_518BF0D3F039</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_DC26812CD342</var>
+					<var>I_4281904941__F_A58F8A57E896</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_D0FDE422331F</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_D0FDE422331F</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_D0FDE422331F</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<var>I_4281904941__F_A58F8A57E896</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_1C216B49EFEB</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_1C216B49EFEB</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_1C216B49EFEB</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<var>I_4281904941__F_A58F8A57E896</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_E28619FB9AEF</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_E28619FB9AEF</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_E28619FB9AEF</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<var>I_4281904941__F_A58F8A57E896</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_621E3FF5F0D4</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_621E3FF5F0D4</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_621E3FF5F0D4</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<var>I_4281904941__F_A58F8A57E896</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_99022556D038</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_99022556D038</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_99022556D038</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<var>I_4281904941__F_A58F8A57E896</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_53063FD3111A</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_53063FD3111A</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_53063FD3111A</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<var>I_4281904941__F_A58F8A57E896</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_3CE5C42E89B3</var>
+					<var>I_186947531__F_BBC18863CC0C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_3CE5C42E89B3</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_3CE5C42E89B3</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_A58F8A57E896</var>
+							<var>I_4281904941__F_B46D45360689</var>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_46389EB22262</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_46389EB22262</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_46389EB22262</var>
+					<var>I_4281904941__F_518BF0D3F039</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_4F2635A5760B</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_4F2635A5760B</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_4F2635A5760B</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_60FF9548E04B</var>
+								<var>I_4281904941__F_0022A78C49DF</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_EEBF853B6CC8</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_EEBF853B6CC8</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_EEBF853B6CC8</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_60FF9548E04B</var>
+								<var>I_4281904941__F_0022A78C49DF</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_997E99C4D496</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_997E99C4D496</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_997E99C4D496</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_60FF9548E04B</var>
+								<var>I_4281904941__F_0022A78C49DF</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_FF66BC39A70F</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_FF66BC39A70F</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_FF66BC39A70F</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_164C9F60F0FD</var>
+								<var>I_4281904941__F_0022A78C49DF</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_12E23AA174EC</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_12E23AA174EC</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_12E23AA174EC</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_60FF9548E04B</var>
+								<var>I_4281904941__F_0022A78C49DF</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_7337E0820AFB</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_7337E0820AFB</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_60FF9548E04B</var>
+								<var>I_4281904941__F_0022A78C49DF</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_7337E0820AFB</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_5F8F6E80A44F</var>
+					<var>F_5B8DD55C07B1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_5F8F6E80A44F</var>
+					<var>I_186947531__F_1025C6F67BA7</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_5F8F6E80A44F</var>
+					<var>I_4281904941__F_24EB3F6AFA06</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_888891CFF089</var>
+					<var>F_659B815D2BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_888891CFF089</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_888891CFF089</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_19ED7352F51C</var>
+							<conj>
+								<var>I_4281904941__F_32087EFD7C01</var>
+								<conj>
+									<var>I_4281904941__F_164EB4BB1C94</var>
+									<var>I_4281904941__F_B5B132AD0F91</var>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_123D554082C3</var>
+					<var>F_659B815D2BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_123D554082C3</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_123D554082C3</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_A58F8A57E896</var>
+							<conj>
+								<var>I_4281904941__F_32087EFD7C01</var>
+								<conj>
+									<var>I_4281904941__F_164EB4BB1C94</var>
+									<conj>
+										<var>I_4281904941__F_B5B132AD0F91</var>
+										<var>I_4281904941__F_0022A78C49DF</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_6514FA0F8EBD</var>
+					<var>F_659B815D2BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_6514FA0F8EBD</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_6514FA0F8EBD</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_60FF9548E04B</var>
+								<conj>
+									<var>I_4281904941__F_0022A78C49DF</var>
+									<var>I_4281904941__F_32087EFD7C01</var>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_BF0CBDA33279</var>
+					<var>F_659B815D2BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_BF0CBDA33279</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_BF0CBDA33279</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_60FF9548E04B</var>
+								<conj>
+									<var>I_4281904941__F_0022A78C49DF</var>
+									<conj>
+										<var>I_4281904941__F_32087EFD7C01</var>
+										<var>I_4281904941__F_B38AE3984DAD</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_29CA0F6B6D65</var>
+					<var>F_659B815D2BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_29CA0F6B6D65</var>
+					<var>I_186947531__F_DE9087371BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_29CA0F6B6D65</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_A58F8A57E896</var>
+							<conj>
+								<var>I_4281904941__F_32087EFD7C01</var>
+								<conj>
+									<var>I_4281904941__F_164EB4BB1C94</var>
+									<conj>
+										<var>I_4281904941__F_B5B132AD0F91</var>
+										<var>I_4281904941__F_0022A78C49DF</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_39FFF437D7FC</var>
+					<var>F_659B815D2BB2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_39FFF437D7FC</var>
+					<var>I_186947531__F_F962762C33C9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_39FFF437D7FC</var>
+					<conj>
+						<var>I_4281904941__F_518BF0D3F039</var>
+						<conj>
+							<var>I_4281904941__F_1F048AF5A372</var>
+							<conj>
+								<var>I_4281904941__F_60FF9548E04B</var>
+								<conj>
+									<var>I_4281904941__F_0022A78C49DF</var>
+									<conj>
+										<var>I_4281904941__F_32087EFD7C01</var>
+										<var>I_4281904941__F_B38AE3984DAD</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_0B494B66A680</var>
+					<var>I_2604283598__F_C99BB3CE8A81</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_0B494B66A680</var>
+					<var>I_855176224__F_C01DE9480ED5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_0B494B66A680</var>
+					<var>F_9BE58D034510</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_29925228F79B</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_29925228F79B</var>
+					<var>I_2604283598__F_7BC1834B5FCB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_29925228F79B</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_71266BC0DEF9</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_71266BC0DEF9</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_71266BC0DEF9</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<var>I_2604283598__F_230ECE986CC6</var>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_A9F3B9793004</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_A9F3B9793004</var>
+					<var>I_855176224__F_99002733FFF0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_A9F3B9793004</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<var>I_2604283598__F_E0DA0F54C7E3</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_AC7BAEDB77F5</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_AC7BAEDB77F5</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_AC7BAEDB77F5</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<var>I_2604283598__F_E0DA0F54C7E3</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_982318D26285</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_982318D26285</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_982318D26285</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<var>I_2604283598__F_E0DA0F54C7E3</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_3CF29A172A13</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_3CF29A172A13</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_3CF29A172A13</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<var>I_2604283598__F_E0DA0F54C7E3</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_0DF408BAB825</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_0DF408BAB825</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_0DF408BAB825</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<var>I_2604283598__F_E0DA0F54C7E3</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_EFE58B68D287</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_EFE58B68D287</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_EFE58B68D287</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<var>I_2604283598__F_E0DA0F54C7E3</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_61618C974E25</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_61618C974E25</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_61618C974E25</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<var>I_2604283598__F_E0DA0F54C7E3</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_410F306E0425</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_410F306E0425</var>
+					<var>I_855176224__F_57C42505162A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_410F306E0425</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_E0DA0F54C7E3</var>
+							<var>I_2604283598__F_43309A4A3C64</var>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_8A2618E46340</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_8A2618E46340</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_8A2618E46340</var>
+					<var>I_2604283598__F_7BC1834B5FCB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_79A4344D0D06</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_79A4344D0D06</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_79A4344D0D06</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_230ECE986CC6</var>
+								<var>I_2604283598__F_CDF8577A0C8A</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_F4D9F960B23A</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_F4D9F960B23A</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_F4D9F960B23A</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_230ECE986CC6</var>
+								<var>I_2604283598__F_CDF8577A0C8A</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_49D441CA5687</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_49D441CA5687</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_49D441CA5687</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_230ECE986CC6</var>
+								<var>I_2604283598__F_CDF8577A0C8A</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_5C3EB4B54E06</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_5C3EB4B54E06</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_5C3EB4B54E06</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_C0D6BBF38AB8</var>
+								<var>I_2604283598__F_CDF8577A0C8A</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_6E6FF2CFEE00</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_6E6FF2CFEE00</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_6E6FF2CFEE00</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_230ECE986CC6</var>
+								<var>I_2604283598__F_CDF8577A0C8A</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_ACE99F5253FD</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_ACE99F5253FD</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_ACE99F5253FD</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_230ECE986CC6</var>
+								<var>I_2604283598__F_CDF8577A0C8A</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_7B75785B4737</var>
+					<var>F_849485485401</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_7B75785B4737</var>
+					<var>I_855176224__F_A0A3B91DE33E</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_7B75785B4737</var>
+					<var>I_2604283598__F_C99BB3CE8A81</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_649C12624730</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_649C12624730</var>
+					<var>F_2C3D45FD487A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_649C12624730</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_BD407B5B3F1F</var>
+							<conj>
+								<var>I_2604283598__F_B0F7BC5266C7</var>
+								<conj>
+									<var>I_2604283598__F_8E8CE3F8F780</var>
+									<var>I_2604283598__F_6ED2BEC16C01</var>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_CC5B34CF01CF</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_CC5B34CF01CF</var>
+					<var>F_2C3D45FD487A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_CC5B34CF01CF</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_E0DA0F54C7E3</var>
+							<conj>
+								<var>I_2604283598__F_B0F7BC5266C7</var>
+								<conj>
+									<var>I_2604283598__F_8E8CE3F8F780</var>
+									<conj>
+										<var>I_2604283598__F_6ED2BEC16C01</var>
+										<var>I_2604283598__F_CDF8577A0C8A</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_546CF95BBB4F</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_546CF95BBB4F</var>
+					<var>F_2C3D45FD487A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_546CF95BBB4F</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_230ECE986CC6</var>
+								<conj>
+									<var>I_2604283598__F_CDF8577A0C8A</var>
+									<var>I_2604283598__F_B0F7BC5266C7</var>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_7E3AF64819E4</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_7E3AF64819E4</var>
+					<var>F_2C3D45FD487A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_7E3AF64819E4</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_230ECE986CC6</var>
+								<conj>
+									<var>I_2604283598__F_CDF8577A0C8A</var>
+									<conj>
+										<var>I_2604283598__F_B0F7BC5266C7</var>
+										<var>I_2604283598__F_2C570286DA52</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_DA394C835D51</var>
+					<var>I_855176224__F_489E510A2548</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_DA394C835D51</var>
+					<var>F_2C3D45FD487A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_DA394C835D51</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_E0DA0F54C7E3</var>
+							<conj>
+								<var>I_2604283598__F_B0F7BC5266C7</var>
+								<conj>
+									<var>I_2604283598__F_8E8CE3F8F780</var>
+									<conj>
+										<var>I_2604283598__F_6ED2BEC16C01</var>
+										<var>I_2604283598__F_CDF8577A0C8A</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_D731167DA087</var>
+					<var>I_855176224__F_B05121F5F825</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_D731167DA087</var>
+					<var>F_2C3D45FD487A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_4238604727__F_D731167DA087</var>
+					<conj>
+						<var>I_2604283598__F_7BC1834B5FCB</var>
+						<conj>
+							<var>I_2604283598__F_F52F870989BB</var>
+							<conj>
+								<var>I_2604283598__F_230ECE986CC6</var>
+								<conj>
+									<var>I_2604283598__F_CDF8577A0C8A</var>
+									<conj>
+										<var>I_2604283598__F_B0F7BC5266C7</var>
+										<var>I_2604283598__F_2C570286DA52</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F456F527BB8C</var>
+					<var>F_2DA63C743059</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F456F527BB8C</var>
+					<var>I_3514666687__F_1ACDF9517B80</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F456F527BB8C</var>
+					<var>I_2562010902__F_9F32165CBC52</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7C057D1F2CF5</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7C057D1F2CF5</var>
+					<var>I_3514666687__F_57D506A9B116</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_0B866071ECFA</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_0B866071ECFA</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_0B866071ECFA</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<var>I_3514666687__F_3E71636458D6</var>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_FD4AD0A1586C</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_FD4AD0A1586C</var>
+					<var>I_2562010902__F_B7CED6D9A198</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_FD4AD0A1586C</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<var>I_3514666687__F_8FB3D4879641</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EF650969512D</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EF650969512D</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EF650969512D</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<var>I_3514666687__F_8FB3D4879641</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_4E600BEF2866</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_4E600BEF2866</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_4E600BEF2866</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<var>I_3514666687__F_8FB3D4879641</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E2A9F72317A2</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E2A9F72317A2</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E2A9F72317A2</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<var>I_3514666687__F_8FB3D4879641</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_3C377284376D</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_3C377284376D</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_3C377284376D</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<var>I_3514666687__F_8FB3D4879641</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_19F4CC6DE0DE</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_19F4CC6DE0DE</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_19F4CC6DE0DE</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<var>I_3514666687__F_8FB3D4879641</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7469E2FBF2AF</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7469E2FBF2AF</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7469E2FBF2AF</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<var>I_3514666687__F_8FB3D4879641</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E7E487268FBF</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E7E487268FBF</var>
+					<var>I_2562010902__F_6001AFBFB077</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E7E487268FBF</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_8FB3D4879641</var>
+							<var>I_3514666687__F_F040597CE634</var>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EE9779726495</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EE9779726495</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EE9779726495</var>
+					<var>I_3514666687__F_57D506A9B116</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EE9779726495</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EE9779726495</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_EE9779726495</var>
+					<var>I_3514666687__F_57D506A9B116</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7827C2ED283A</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7827C2ED283A</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7827C2ED283A</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_3E71636458D6</var>
+								<var>I_3514666687__F_F9DBA3255D58</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_0C55D8F0FDB0</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_0C55D8F0FDB0</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_0C55D8F0FDB0</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_3E71636458D6</var>
+								<var>I_3514666687__F_F9DBA3255D58</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F0114E62ABA2</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F0114E62ABA2</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F0114E62ABA2</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_3E71636458D6</var>
+								<var>I_3514666687__F_F9DBA3255D58</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_AC2E33D346F4</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_AC2E33D346F4</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_AC2E33D346F4</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_0748B7880418</var>
+								<var>I_3514666687__F_F9DBA3255D58</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E6428E7A668D</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E6428E7A668D</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_E6428E7A668D</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_3E71636458D6</var>
+								<var>I_3514666687__F_F9DBA3255D58</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F73691AEEDBC</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F73691AEEDBC</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F73691AEEDBC</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_3E71636458D6</var>
+								<var>I_3514666687__F_F9DBA3255D58</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_30FF1BB46905</var>
+					<var>F_24275EFE273F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_30FF1BB46905</var>
+					<var>I_2562010902__F_BE1A480B452F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_30FF1BB46905</var>
+					<var>I_3514666687__F_1ACDF9517B80</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_A828D5C788E7</var>
+					<var>F_78B4C278FD5F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_A828D5C788E7</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_A828D5C788E7</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_59BBB12FB589</var>
+							<conj>
+								<var>I_3514666687__F_B16029D326BF</var>
+								<conj>
+									<var>I_3514666687__F_00A77F8AF3CA</var>
+									<var>I_3514666687__F_F4E0F567CE80</var>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F370F0959B99</var>
+					<var>F_78B4C278FD5F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F370F0959B99</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_F370F0959B99</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_8FB3D4879641</var>
+							<conj>
+								<var>I_3514666687__F_B16029D326BF</var>
+								<conj>
+									<var>I_3514666687__F_00A77F8AF3CA</var>
+									<conj>
+										<var>I_3514666687__F_F4E0F567CE80</var>
+										<var>I_3514666687__F_F9DBA3255D58</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_81C1A416398D</var>
+					<var>F_78B4C278FD5F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_81C1A416398D</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_81C1A416398D</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_3E71636458D6</var>
+								<conj>
+									<var>I_3514666687__F_F9DBA3255D58</var>
+									<var>I_3514666687__F_B16029D326BF</var>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_B4B633D5F144</var>
+					<var>F_78B4C278FD5F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_B4B633D5F144</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_B4B633D5F144</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_3E71636458D6</var>
+								<conj>
+									<var>I_3514666687__F_F9DBA3255D58</var>
+									<conj>
+										<var>I_3514666687__F_B16029D326BF</var>
+										<var>I_3514666687__F_55142E60E28E</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_377BFA1BCC11</var>
+					<var>F_78B4C278FD5F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_377BFA1BCC11</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_377BFA1BCC11</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_8FB3D4879641</var>
+							<conj>
+								<var>I_3514666687__F_B16029D326BF</var>
+								<conj>
+									<var>I_3514666687__F_00A77F8AF3CA</var>
+									<conj>
+										<var>I_3514666687__F_F4E0F567CE80</var>
+										<var>I_3514666687__F_F9DBA3255D58</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_96F9D1C0B79F</var>
+					<var>F_78B4C278FD5F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_96F9D1C0B79F</var>
+					<var>I_2562010902__F_D671B108B1A0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_96F9D1C0B79F</var>
+					<conj>
+						<var>I_3514666687__F_57D506A9B116</var>
+						<conj>
+							<var>I_3514666687__F_1EE72DDC3DDF</var>
+							<conj>
+								<var>I_3514666687__F_3E71636458D6</var>
+								<conj>
+									<var>I_3514666687__F_F9DBA3255D58</var>
+									<conj>
+										<var>I_3514666687__F_B16029D326BF</var>
+										<var>I_3514666687__F_55142E60E28E</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_1F7C8104CBC1</var>
+					<var>F_01CD9DF046C1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_1F7C8104CBC1</var>
+					<var>I_3045005148__F_B9931182552A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_1F7C8104CBC1</var>
+					<var>I_2708032765__F_9FEA4ABB9AB3</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_5752E81AA7A2</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_5752E81AA7A2</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_5752E81AA7A2</var>
+					<var>I_3045005148__F_5563E19BB919</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_C3764398FDE4</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_C3764398FDE4</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_C3764398FDE4</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<var>I_3045005148__F_6F8DDB210C4E</var>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_45836B9A0CE9</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_45836B9A0CE9</var>
+					<var>I_2708032765__F_544119D54048</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_45836B9A0CE9</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<var>I_3045005148__F_E44024AD6411</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_A27F91A15043</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_A27F91A15043</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_A27F91A15043</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<var>I_3045005148__F_E44024AD6411</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_46753BCE0A0C</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_46753BCE0A0C</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_46753BCE0A0C</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<var>I_3045005148__F_E44024AD6411</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_3914825140F2</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_3914825140F2</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_3914825140F2</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<var>I_3045005148__F_E44024AD6411</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_281336D8B4EE</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_281336D8B4EE</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_281336D8B4EE</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<var>I_3045005148__F_E44024AD6411</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_8CDC77AF40E9</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_8CDC77AF40E9</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_8CDC77AF40E9</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<var>I_3045005148__F_E44024AD6411</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_EC854EA6AB46</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_EC854EA6AB46</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_EC854EA6AB46</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<var>I_3045005148__F_E44024AD6411</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_68FA48903F2A</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_68FA48903F2A</var>
+					<var>I_2708032765__F_8C73D713284D</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_68FA48903F2A</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_E44024AD6411</var>
+							<var>I_3045005148__F_BAEA13234DD7</var>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_2BF7D81509EF</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_2BF7D81509EF</var>
+					<var>I_3045005148__F_5563E19BB919</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_2BF7D81509EF</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_2BF7D81509EF</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_2BF7D81509EF</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_76352E9F18B4</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_76352E9F18B4</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_76352E9F18B4</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_6F8DDB210C4E</var>
+								<var>I_3045005148__F_2AF8A31029B3</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_11C4AFC2E597</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_11C4AFC2E597</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_11C4AFC2E597</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_6F8DDB210C4E</var>
+								<var>I_3045005148__F_2AF8A31029B3</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_BCFD2D20DE11</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_BCFD2D20DE11</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_BCFD2D20DE11</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_6F8DDB210C4E</var>
+								<var>I_3045005148__F_2AF8A31029B3</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_987AE7FA9F19</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_987AE7FA9F19</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_987AE7FA9F19</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_5511AF767E3B</var>
+								<var>I_3045005148__F_2AF8A31029B3</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_BB15AC7E39D6</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_BB15AC7E39D6</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_BB15AC7E39D6</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_6F8DDB210C4E</var>
+								<var>I_3045005148__F_2AF8A31029B3</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_C73DF5390F47</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_C73DF5390F47</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_C73DF5390F47</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_6F8DDB210C4E</var>
+								<var>I_3045005148__F_2AF8A31029B3</var>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_AD45D3829A50</var>
+					<var>F_EC8DB8C38864</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_AD45D3829A50</var>
+					<var>I_2708032765__F_5BE516E78511</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_AD45D3829A50</var>
+					<var>I_3045005148__F_B9931182552A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_70CC5CA744D0</var>
+					<var>F_4E08FC312F05</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_70CC5CA744D0</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_70CC5CA744D0</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D8163486B0F9</var>
+							<conj>
+								<var>I_3045005148__F_C3DE55EDC423</var>
+								<conj>
+									<var>I_3045005148__F_95F22823E689</var>
+									<var>I_3045005148__F_7CB97042541F</var>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_9BD2A7E8F989</var>
+					<var>F_4E08FC312F05</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_9BD2A7E8F989</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_9BD2A7E8F989</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_E44024AD6411</var>
+							<conj>
+								<var>I_3045005148__F_C3DE55EDC423</var>
+								<conj>
+									<var>I_3045005148__F_95F22823E689</var>
+									<conj>
+										<var>I_3045005148__F_7CB97042541F</var>
+										<var>I_3045005148__F_2AF8A31029B3</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_B0FC31CC6AF4</var>
+					<var>F_4E08FC312F05</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_B0FC31CC6AF4</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_B0FC31CC6AF4</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_6F8DDB210C4E</var>
+								<conj>
+									<var>I_3045005148__F_2AF8A31029B3</var>
+									<var>I_3045005148__F_C3DE55EDC423</var>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_35A68042AF61</var>
+					<var>F_4E08FC312F05</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_35A68042AF61</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_35A68042AF61</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_6F8DDB210C4E</var>
+								<conj>
+									<var>I_3045005148__F_2AF8A31029B3</var>
+									<conj>
+										<var>I_3045005148__F_C3DE55EDC423</var>
+										<var>I_3045005148__F_3D5677167752</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_9CC268803D05</var>
+					<var>F_4E08FC312F05</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_9CC268803D05</var>
+					<var>I_2708032765__F_2738AEB082E4</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_9CC268803D05</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_E44024AD6411</var>
+							<conj>
+								<var>I_3045005148__F_C3DE55EDC423</var>
+								<conj>
+									<var>I_3045005148__F_95F22823E689</var>
+									<conj>
+										<var>I_3045005148__F_7CB97042541F</var>
+										<var>I_3045005148__F_2AF8A31029B3</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_764C398CA347</var>
+					<var>F_4E08FC312F05</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_764C398CA347</var>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1865564522__F_764C398CA347</var>
+					<conj>
+						<var>I_3045005148__F_5563E19BB919</var>
+						<conj>
+							<var>I_3045005148__F_D31F019FA7CE</var>
+							<conj>
+								<var>I_3045005148__F_6F8DDB210C4E</var>
+								<conj>
+									<var>I_3045005148__F_2AF8A31029B3</var>
+									<conj>
+										<var>I_3045005148__F_C3DE55EDC423</var>
+										<var>I_3045005148__F_3D5677167752</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_3313474140__F_7CF21FCC1A72</var>
+					<var>I_186947531__F_EB3322F3E9F3</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_186947531__F_1025C6F67BA7</var>
+					<var>F_D4C2AA87FF5C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_186947531__F_DE9087371BB2</var>
+					<var>F_6A0F03346047</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_186947531__F_F962762C33C9</var>
+					<var>F_290276917F73</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_186947531__F_BBC18863CC0C</var>
+					<var>F_D8331D2E5575</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_186947531__F_6001F5BAD92F</var>
+					<var>F_FC9F4C2D2830</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_855176224__F_A0A3B91DE33E</var>
+					<var>F_D4C2AA87FF5C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_855176224__F_489E510A2548</var>
+					<var>F_6A0F03346047</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_855176224__F_B05121F5F825</var>
+					<var>F_290276917F73</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_855176224__F_57C42505162A</var>
+					<var>F_D8331D2E5575</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_855176224__F_99002733FFF0</var>
+					<var>F_FC9F4C2D2830</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2562010902__F_BE1A480B452F</var>
+					<var>F_D4C2AA87FF5C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+					<var>F_6A0F03346047</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_1458446977__F_7C057D1F2CF5</var>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2562010902__F_3B8B62C6EFE5</var>
+					<var>F_6A0F03346047</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2562010902__F_D671B108B1A0</var>
+					<var>F_290276917F73</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2562010902__F_6001AFBFB077</var>
+					<var>F_D8331D2E5575</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2562010902__F_B7CED6D9A198</var>
+					<var>F_FC9F4C2D2830</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2708032765__F_5BE516E78511</var>
+					<var>F_D4C2AA87FF5C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2708032765__F_2738AEB082E4</var>
+					<var>F_6A0F03346047</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2708032765__F_ED8B7717F9DB</var>
+					<var>F_290276917F73</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2708032765__F_8C73D713284D</var>
+					<var>F_D8331D2E5575</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>I_2708032765__F_544119D54048</var>
+					<var>F_FC9F4C2D2830</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

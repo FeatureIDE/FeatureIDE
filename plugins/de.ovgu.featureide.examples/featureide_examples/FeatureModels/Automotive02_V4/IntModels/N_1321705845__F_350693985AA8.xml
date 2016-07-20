@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_1321705845__F_350693985AA8">
+				<description>
+					
+				</description>
+				<feature name="I_3441900933__F_E0A4648BDABC">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F1455EF54A10">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="I_3491892541__F_797E2906DD02">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_99CE72143BFD">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_1CF910F453E8">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="I_2163186830__F_31B7538F7682">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F5331E3E8A45">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="I_447879168__F_FED0473AACF1">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="I_108785184__F_AEF4AFD38D98">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
