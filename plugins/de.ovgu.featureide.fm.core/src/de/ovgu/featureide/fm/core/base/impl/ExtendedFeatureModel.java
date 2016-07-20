@@ -95,6 +95,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 			return modelName + " " + varName;
 		}
 	}
+	protected final List<String> imports = new LinkedList<String>();
+	
 	protected final FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
 	protected final FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
 	protected final FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
@@ -106,7 +108,15 @@ public class ExtendedFeatureModel extends FeatureModel {
 	protected IFeatureModel mappingModel = null;
 	
 	private boolean isInterface = false;
+	
+	public List<String> getImports() {
+		return imports;
+	}
 
+	public void addImport(String imp) {
+		imports.add(imp.replace(".", "\\"));
+	}
+	
 	@Override
 	protected FeatureModelAnalyzer createAnalyser() {
 		return new ExtendedFeatureModelAnalyzer(this);
@@ -232,6 +242,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	public void reset() {
 		super.reset();
 		usedModels.clear();
+		imports.clear();
 	}
 	
 	/**
@@ -281,9 +292,12 @@ public class ExtendedFeatureModel extends FeatureModel {
 		if (feature != null) {
 			return feature;
 		}
-		return null;
-		// TODO MPL: Search for possible right feature
-//		return super.getFeature(parentModel + "." + name);
+		
+		if(name.toString().contains(".")){
+			return super.getFeature(this.getStructure().getRoot().getFeature().getName() + "." + name);
+		}else{
+			return null;
+		}
 	}
 	
 	public boolean isInterface() {

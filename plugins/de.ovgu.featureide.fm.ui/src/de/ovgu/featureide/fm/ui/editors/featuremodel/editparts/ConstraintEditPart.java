@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  */
 public class ConstraintEditPart extends AbstractGraphicalEditPart implements IEventListener {
 
-	ConstraintEditPart(Object constraint) {
+	public ConstraintEditPart(Object constraint) {
 		super();
 		setModel(constraint);
 	}
@@ -60,7 +60,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements IEv
 	}
 
 	@Override
-	protected IFigure createFigure() {
+	public IFigure createFigure() {
 		return new ConstraintFigure(getConstraintModel());
 	}
 

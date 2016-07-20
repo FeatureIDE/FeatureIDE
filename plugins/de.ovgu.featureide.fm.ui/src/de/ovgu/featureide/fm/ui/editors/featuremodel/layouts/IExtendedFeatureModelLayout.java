@@ -18,24 +18,10 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solver;
+package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-/**
- * Default implementation for {@link ISolverProvider}.
- * 
- * @author Sebastian Krieter
- */
-public class SolverProvider implements ISolverProvider {
-
-	protected final SatInstance satInstance;
-
-	public SolverProvider(SatInstance satInstance) {
-		this.satInstance = satInstance;
-	}
-
-	@Override
-	public BasicSolver getSolver() {
-		return new BasicSolver(satInstance);
-	}
-
+public interface IExtendedFeatureModelLayout extends IFeatureModelLayout{
+	public boolean showShortNames();
+	public void setShowShortNames(boolean b);
 }
+

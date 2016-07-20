@@ -20,9 +20,11 @@
  */
 package org.prop4j.solver;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
@@ -34,9 +36,12 @@ import org.sat4j.minisat.orders.NegativeLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.PositiveLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.RandomLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
+import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -91,39 +96,70 @@ public class BasicSolver implements Cloneable {
 
 	protected boolean keepHot = false;
 
-	public BasicSolver(Node cnf, List<IFeature> featureList) {
-		this(new SatInstance(cnf, featureList));
-	}
-
-	public BasicSolver(SatInstance satInstance) {
+	public BasicSolver(SatInstance satInstance) throws ContradictionException {
 		this.satInstance = satInstance;
 		this.order = new int[satInstance.intToVar.length - 1];
 		this.assignment = new VecInt();
+
 		solver = initSolver();
+		addVariables();
+
 		orgSolverOrder = solver.getOrder();
+		orgSolverOrder.init();
 	}
 
-	public BasicSolver(BasicSolver oldSolver) {
+	protected BasicSolver(BasicSolver oldSolver) {
 		this.satInstance = oldSolver.satInstance;
 		this.order = new int[satInstance.intToVar.length - 1];
 		this.assignment = new VecInt(0);
 		oldSolver.assignment.copyTo(this.assignment);
+
 		solver = initSolver();
+		try {
+			addVariables();
+		} catch (ContradictionException e) {
+			FMCorePlugin.getDefault().logError(e);
+			throw new RuntimeException();
+		}
+
 		orgSolverOrder = solver.getOrder();
 	}
 
-	private Solver<?> initSolver() {
+	private void addVariables() throws ContradictionException {
+		solver.newVar(satInstance.getNumberOfVariables());
+		solver.setExpectedNumberOfClauses(satInstance.getCnf().getChildren().length);
+		addCNF(satInstance.getCnf().getChildren());
 		fixOrder();
-		Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
+	}
+
+	protected Solver<?> initSolver() {
+		final Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
 		solver.setTimeoutMs(1000);
 		solver.setDBSimplificationAllowed(true);
 		solver.setVerbose(false);
-		satInstance.initSolver(solver);
 		return solver;
 	}
 
+	public List<IConstr> addClauses(Node constraint) throws ContradictionException {
+		return addCNF(constraint.getChildren());
+	}
+
+	protected List<IConstr> addCNF(final Node[] cnfChildren) throws ContradictionException {
+		final List<IConstr> result = new LinkedList<>();
+		for (Node node : cnfChildren) {
+			final Node[] children = node.getChildren();
+			final int[] clause = new int[children.length];
+			for (int i = 0; i < children.length; i++) {
+				final Literal literal = (Literal) children[i];
+				clause[i] = satInstance.getSignedVariable(literal);
+			}
+			result.add(solver.addClause(new VecInt(clause)));
+		}
+		return result;
+	}
+
 	public int[] findModel() {
-		return sat() == SatResult.TRUE ? solver.model() : null;
+		return isSatisfiable() == SatResult.TRUE ? solver.model() : null;
 	}
 
 	public IVecInt getAssignment() {
@@ -142,11 +178,11 @@ public class BasicSolver implements Cloneable {
 		return satInstance;
 	}
 
-	public Solver<?> getSolver() {
+	public Solver<?> getInternalSolver() {
 		return solver;
 	}
 
-	public SatResult sat() {
+	public SatResult isSatisfiable() {
 		try {
 			return (solver.isSatisfiable(assignment, false)) ? SatResult.TRUE : SatResult.FALSE;
 		} catch (TimeoutException e) {

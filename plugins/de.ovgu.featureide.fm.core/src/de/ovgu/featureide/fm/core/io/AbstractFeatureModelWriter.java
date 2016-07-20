@@ -27,9 +27,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * 
  * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
  * 
+ * @deprecated Use {@link IPersistentFormat} instead
+ * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public abstract class AbstractFeatureModelWriter extends AbstractObjectWriter<IFeatureModel> implements IFeatureModelWriter {
 
 	@Override

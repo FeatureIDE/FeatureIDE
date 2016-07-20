@@ -50,13 +50,15 @@ public interface IConfigurationBuilderBasics {
 	
 	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION, RANDOM};
 	enum BuildOrder {DEFAULT, DISSIMILARITY, INTERACTION};
-	enum TWise {ICPL, CHVATAL, CASA, MASK}
+	enum TWise {ICPL, CHVATAL, CASA, INCLING}
 	
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
 	QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
 			IConfigurationBuilderBasics.class.getName() + "#CreateNewProject");
 	QualifiedName T_WISE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Wise", 
 			IConfigurationBuilderBasics.class.getName() + "#T-Wise");
+	QualifiedName T_INTERACTION = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Order", 
+			IConfigurationBuilderBasics.class.getName() + "#T-Order");
 	QualifiedName GENERATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Generate", 
 			IConfigurationBuilderBasics.class.getName() + "#Generate");
 	QualifiedName ORDER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Order", 

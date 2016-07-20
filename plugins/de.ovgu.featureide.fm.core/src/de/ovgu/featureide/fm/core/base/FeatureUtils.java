@@ -538,8 +538,6 @@ public final class FeatureUtils {
 
 	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
-		requireNonNull(feature);
-		
 		if (feature != null) {
 			IFeatureStructure parent = feature.getStructure().getParent();
 			if (parent != null) { 
@@ -730,6 +728,7 @@ public final class FeatureUtils {
 		return feature.toString();
 	}
 
+	@Deprecated
 	public static final String getDisplayName(IFeature feature) {
 		requireNonNull(feature);
 		

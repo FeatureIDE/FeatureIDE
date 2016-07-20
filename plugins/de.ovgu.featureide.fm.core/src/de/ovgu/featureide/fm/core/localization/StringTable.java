@@ -417,6 +417,7 @@ public class StringTable {
 	public static final String AUTO_LAYOUT_CONSTRAINTS = "Auto Layout Constraints";
 	public static final String AUTOMATED_CALCULATIONS = "Automated Calculations";
 	public static final String CALCULATE_CONSTRAINT_ERRORS = "Calculate Constraint Errors";
+	public static final String CALCULATE_DEAD_FO_CONSTRAINTS = "Calculate Constraint That Lead to Dead or False-Optional Features";
 	public static final String CALCULATE_FEATURES = "Calculate Features";
 	public static final String CALCULATE_REDUNDANT_CONSTRAINTS = "Calculate Redundant Constraints";
 	public static final String RUN_MANUAL_CALCULATIONS = "Run Manual Calculations";
@@ -424,6 +425,7 @@ public class StringTable {
 	public static final String CHANGE_DESCRIPTION = "Change Description";
 	public static final String FEATURE_DESCRIPTION = "Feature Description";
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
+	public static final String CALCULATE_DEPENDENCY = "Calculate Dependencies of Sub Feature Model";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
 	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
@@ -625,7 +627,6 @@ public class StringTable {
 	public static final String DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_ = "Defines the algorithm for t-wise sampling.";
 	public static final String DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_ = "Defines how the generated produkts are ordered.";
 	public static final String SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_ = "Searches for test cases in the generated products and executes them.";
-	public static final String DEFINE_THE_T_FOR_T_WISE_SAMPLING_ = "Define the t for t-wise sampling.";
 	public static final String DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_ = "Defnies whether the products are generated into separate projects or into a folder in this project.";
 	public static final String BUILD_PRODUCTS_FOR_PROJECT = "Build products for project ";
 	public static final String ERROR_ = "-Error-";
@@ -660,7 +661,7 @@ public class StringTable {
 	public static final String CHVATAL = "Chvatal";
 	public static final String CASA = "CASA";
 	public static final String ICPL = "ICPL";
-	public static final String MASK = "MASK";
+	public static final String INCLING = "IncLing";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";
 	public static final String COMPILER = "Compiler";
 	public static final String SYMBOL = "symbol";

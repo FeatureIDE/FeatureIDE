@@ -29,21 +29,23 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_PRODUKT_BASED_STRATEGY_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINE_THE_T_FOR_T_WISE_SAMPLING_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DISSIMILARITY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INCLING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INTERACTIONS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RANDOM_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.T_WISE_CONFIGURATIONS;
+
+import java.util.ArrayList;
 
 import javax.annotation.CheckForNull;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -54,6 +56,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
@@ -73,14 +76,15 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String LABEL_ALGORITHM = "&Algorithm:";
 	private static final String LABEL_ORDER = "&Order:";
 	private static final String LABEL_TEST = "&Run JUnit tests:";
-	private static final String LABEL_INTERACTIONS = "&Interactions: t=";
+	private static final String LABEL_INTERACTIONS = "&Interactions: T=";
 	private static final String LABEL_CREATE_NEW_PROJECTS = "&Create new projects:";
 
 	private static final String TOOL_TIP_GENERATE = DEFINES_THE_PRODUKT_BASED_STRATEGY_;
 	private static final String TOOL_TIP_T_WISE = DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_;
 	private static final String TOOL_TIP_ORDER = DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_;
-	private static final String TOOL_TIP_TEST= SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
-	private static final String TOOL_TIP_T = DEFINE_THE_T_FOR_T_WISE_SAMPLING_;
+	private static final String TOOL_TIP_TEST = SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
+	private static final String TOOL_TIP_T = "Define the T for T-wise sampling.";
+	private static final String TOOL_TIP_T_ORDER = "Define the T for odering by interactions.";
 	private static final String TOOL_TIP_PROJECT = DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
 
 	@CheckForNull
@@ -90,12 +94,15 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 	private Combo comboAlgorithm;
 	private Button buttonBuildProject;
-	private Scale scale;
-	private Label labelT;
+	private Scale scaleTWise;
+	private Scale scaleInteraction;
+	private Label labelTWise;
+	private Label labelOrderInteraction;
 
 	private boolean buildProjects;
 
 	private int t;
+	private int t_Interaction;
 
 	private String algorithm;
 
@@ -111,37 +118,63 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private Label labelMax;
 	private String maxConfs;
 
-	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, String order, boolean test, String maxConfs) {
+	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, int t_Interaction,
+			String order, boolean test, String maxConfs) {
 		super(project);
 		this.project = featureProject;
 		this.buildProjects = buildProjects;
 		this.algorithm = algorithm;
 		this.generate = generate;
 		this.t = t;
+		this.t_Interaction = t_Interaction;
 		this.order = order;
 		this.test = test;
 		if (maxConfs.equals(Integer.MAX_VALUE + "")) {
 			maxConfs = "";
-		}	
+		}
 		this.maxConfs = maxConfs;
 		setDescription(BUILD_PRODUCTS_FOR_PROJECT + featureProject.getProjectName() + ".");
 	}
 
 	@Override
 	public void createControl(Composite parent) {
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		Composite composite = new Composite(parent, SWT.NULL);
-		
+		ArrayList<Label> labels = new ArrayList<Label>();
+
+		final ScrolledComposite scrlcomp = new ScrolledComposite(parent, SWT.V_SCROLL);
+		final Composite container = new Composite(scrlcomp, SWT.NONE);
+		scrlcomp.setExpandHorizontal(true);
+		scrlcomp.setContent(container);
+
 		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		layout.verticalSpacing = 5;
-		layout.horizontalSpacing = 7;
-		composite.setLayout(layout);
-		final Label labelGenerate = new Label(composite, SWT.NULL);
+		layout.numColumns = 1;
+		layout.marginBottom = 10;
+		container.setLayout(layout);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 1;
+		container.setLayoutData(gridData);
+
+		GridData gd_Fill_H = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gd_LeftColumnInsideGroup = new GridData();
+		GridData gd_LeftColumn = new GridData();
+
+		Group groupDeriveConf = new Group(container, SWT.SHADOW_ETCHED_IN);
+		groupDeriveConf.setText("Derive configurations");
+		GridLayout groupLayout = new GridLayout();
+		groupLayout.numColumns = 2;
+		groupLayout.verticalSpacing = 5;
+		groupDeriveConf.setLayout(groupLayout);
+		GridData gridDataGroup = new GridData();
+		gridDataGroup.grabExcessHorizontalSpace = true;
+		gridDataGroup.horizontalAlignment = GridData.FILL;
+		groupDeriveConf.setLayoutData(gridDataGroup);
+
+		final Label labelGenerate = new Label(groupDeriveConf, SWT.NULL);
 		labelGenerate.setText(LABEL_GENERATE);
 		labelGenerate.setToolTipText(TOOL_TIP_GENERATE);
-		comboGenerate = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-		comboGenerate.setLayoutData(gd);
+		labelGenerate.setLayoutData(gd_LeftColumnInsideGroup);
+		labels.add(labelGenerate);
+		comboGenerate = new Combo(groupDeriveConf, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		comboGenerate.setLayoutData(gd_Fill_H);
 		for (BuildType type : BuildType.values()) {
 			if (type == BuildType.INTEGRATION) {
 				continue;
@@ -150,67 +183,119 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		}
 		comboGenerate.setText(generate);
 
-		final Label labelAlgorithm = new Label(composite, SWT.NULL);
+		final Label labelAlgorithm = new Label(groupDeriveConf, SWT.NULL);
 		labelAlgorithm.setText(LABEL_ALGORITHM);
 		labelAlgorithm.setToolTipText(TOOL_TIP_T_WISE);
-		comboAlgorithm = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-		comboAlgorithm.setLayoutData(gd);
+		labelAlgorithm.setLayoutData(gd_LeftColumnInsideGroup);
+		labels.add(labelAlgorithm);
+		comboAlgorithm = new Combo(groupDeriveConf, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		comboAlgorithm.setLayoutData(gd_Fill_H);
 		for (TWise tWise : TWise.values()) {
 			comboAlgorithm.add(getTWiseText(tWise));
 		}
 		comboAlgorithm.setText(algorithm);
 		comboAlgorithm.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS));
 
-		Label labelOrder = new Label(composite, SWT.NULL);
+		labelTWise = new Label(groupDeriveConf, SWT.NULL);
+		labelTWise.setText(LABEL_INTERACTIONS + "10");
+		labelTWise.setToolTipText(TOOL_TIP_T);
+		labels.add(labelTWise);
+		scaleTWise = new Scale(groupDeriveConf, SWT.HORIZONTAL);
+		scaleTWise.setMaximum(5);
+		scaleTWise.setIncrement(1);
+		scaleTWise.setPageIncrement(1);
+		scaleTWise.setSelection(t);
+		setScaleTWise();
+		
+		labelMax = new Label(groupDeriveConf, SWT.NULL);
+		labelMax.setText("Max Configurations:");
+		final String maxToolTip = "Set the maximal number of configs to generate, or empty to create all.";
+		labelMax.setToolTipText(maxToolTip);
+		labels.add(labelMax);
+		textField = new Text(groupDeriveConf, SWT.BORDER);
+		textField.setToolTipText(maxToolTip);
+		final GridData gridDataWidth = new GridData();
+		gridDataWidth.widthHint = 100;
+		textField.setLayoutData(gridDataWidth);
+		textField.setText(maxConfs);
+
+		Group groupOrder = new Group(container, SWT.SHADOW_ETCHED_IN);
+		groupOrder.setText("Order configurations");
+		groupLayout = new GridLayout();
+		groupLayout.numColumns = 2;
+		groupLayout.verticalSpacing = 5;
+		groupOrder.setLayout(groupLayout);
+		gridDataGroup = new GridData();
+		gridDataGroup.grabExcessHorizontalSpace = true;
+		gridDataGroup.horizontalAlignment = GridData.FILL;
+		groupOrder.setLayoutData(gridDataGroup);
+
+		Label labelOrder = new Label(groupOrder, SWT.NULL);
 		labelOrder.setText(LABEL_ORDER);
 		labelOrder.setToolTipText(TOOL_TIP_ORDER);
-		comboOrder = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-		comboOrder.setLayoutData(gd);
+		labelOrder.setLayoutData(gd_LeftColumnInsideGroup);
+		labels.add(labelOrder);
+		comboOrder = new Combo(groupOrder, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		comboOrder.setLayoutData(gd_Fill_H);
 		for (BuildOrder order : BuildOrder.values()) {
 			comboOrder.add(getOrderText(order));
 		}
 		comboOrder.setText(order);
 
-		labelT = new Label(composite, SWT.NULL);
-		labelT.setText(LABEL_INTERACTIONS + "10");
-		labelT.setToolTipText(TOOL_TIP_T);
-		scale = new Scale(composite, SWT.HORIZONTAL);
-		scale.setMaximum(5);
-		scale.setIncrement(1);
-		scale.setPageIncrement(1);
-		scale.setSelection(t);
-		setScale();
+		labelOrderInteraction = new Label(groupOrder, SWT.NULL);
+		labelOrderInteraction.setText(LABEL_INTERACTIONS + "1");
+		labelOrderInteraction.setToolTipText(TOOL_TIP_T_ORDER);
+		labels.add(labelOrderInteraction);
+		scaleInteraction = new Scale(groupOrder, SWT.HORIZONTAL);
+		scaleInteraction.setMaximum(5);
+		scaleInteraction.setIncrement(1);
+		scaleInteraction.setPageIncrement(1);
+		scaleInteraction.setSelection(t_Interaction);
+		setScaleInteraction();
 
-		labelMax = new Label(composite, SWT.NULL);
-		labelMax.setText("Max Configurations:");
-		final String maxToolTip = "Set the maximal number of configs to generate, or empty to create all.";
-		labelMax.setToolTipText(maxToolTip);
-		textField = new Text(composite, SWT.BORDER);
-		textField.setToolTipText(maxToolTip);
-		final GridData gridData = new GridData();
-		gridData.widthHint = 100;
-		textField.setLayoutData(gridData);
-		textField.setText(maxConfs);
-		
-		
-		final Label labelTest = new Label(composite, SWT.NULL);
-		labelTest.setText(LABEL_TEST);
-		labelTest.setToolTipText(TOOL_TIP_TEST);
-		buttonTest = new Button(composite, SWT.CHECK);
-		buttonTest.setLayoutData(gd);
-		buttonTest.setSelection(test);
-
-		final Label labelProject = new Label(composite, SWT.NULL);
+		Composite jUnitContainer = new Composite(container, SWT.NONE);
+		final Label labelProject = new Label(jUnitContainer, SWT.NULL);
 		labelProject.setText(LABEL_CREATE_NEW_PROJECTS);
 		labelProject.setToolTipText(TOOL_TIP_PROJECT);
-		buttonBuildProject = new Button(composite, SWT.CHECK);
-		buttonBuildProject.setLayoutData(gd);
+		labels.add(labelProject);
+		buttonBuildProject = new Button(jUnitContainer, SWT.CHECK);
+		buttonBuildProject.setLayoutData(gd_Fill_H);
 		buttonBuildProject.setSelection(buildProjects);
+
+		groupLayout = new GridLayout();
+		groupLayout.numColumns = 2;
+		groupLayout.verticalSpacing = 5;
+		jUnitContainer.setLayout(groupLayout);
+		gridDataGroup = new GridData();
+		gridDataGroup.grabExcessHorizontalSpace = true;
+		gridDataGroup.horizontalAlignment = GridData.FILL;
+		jUnitContainer.setLayoutData(gridDataGroup);
+
+		Label labelTest = new Label(jUnitContainer, SWT.NULL);
+		labelTest.setText(LABEL_TEST);
+		labelTest.setToolTipText(TOOL_TIP_TEST);
+		labelTest.setLayoutData(gd_LeftColumn);
+		labels.add(labelTest);
+		buttonTest = new Button(jUnitContainer, SWT.CHECK);
+		buttonTest.setLayoutData(gridDataGroup);
+		buttonTest.setSelection(test);
+
+		container.setSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
+		int widthOfLabel = 0;
+		for (Label label : labels) {
+			if (label.getSize().x > widthOfLabel) {
+				widthOfLabel = label.getSize().x;
+			}
+		}
+		gd_LeftColumnInsideGroup.widthHint = widthOfLabel;
+		gd_LeftColumn.widthHint = gd_LeftColumnInsideGroup.widthHint + 3;
+
+		setControl(scrlcomp);
 		setPageComplete(false);
-		setControl(composite);
 		addListeners();
 		dialogChanged();
-		
+
 		buttonTest.setEnabled(!buttonBuildProject.getSelection());
 	}
 
@@ -238,8 +323,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			return CHVATAL;
 		case ICPL:
 			return ICPL;
-		case MASK: 
-			return MASK;
+		case INCLING: 
+			return INCLING;
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for TWise: " + tWise);
 			break;
@@ -265,49 +350,67 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		return ERROR_;
 	}
 
-	private void setScale() {
-		/** Help content of SPLCATool:
-		-t t_wise -a Chvatal -fm <feature_model> -s <strength, 1-4> (-startFrom <covering array>) (-limit <coverage limit>) (-sizelimit <rows>) (-onlyOnes) (-noAllZeros)
-		-t t_wise -a ICPL 	 -fm <feature_model> -s <strength, 1-3> (-startFrom <covering array>) (-onlyOnes) (-noAllZeros) [Inexact: (-sizelimit <rows>) (-limit <coverage limit>)] (for 3-wise, -eights <1-8>)
-		-t t_wise -a CASA 	 -fm <feature_model> -s <strength, 1-6>
+	private void setScaleInteraction() {
+		int lastSelection = scaleInteraction.getSelection();
+		scaleInteraction.setMinimum(1);
+		if (comboOrder.getText().equals(INTERACTIONS)) {
+			scaleInteraction.setEnabled(true);
+			scaleInteraction.setMaximum(5);
+		} else {
+			scaleInteraction.setEnabled(false);
+		}
+
+		if (lastSelection > scaleInteraction.getMaximum()) {
+			scaleInteraction.setSelection(scaleInteraction.getMaximum());
+			labelOrderInteraction.setText(LABEL_INTERACTIONS + scaleInteraction.getMaximum());
+		}
+	}
+
+	private void setScaleTWise() {
+		/**
+		 * Help content of SPLCATool:
+		 * -t t_wise -a Chvatal -fm <feature_model> -s <strength, 1-4> (-startFrom <covering array>) (-limit <coverage limit>) (-sizelimit <rows>) (-onlyOnes)
+		 * (-noAllZeros)
+		 * -t t_wise -a ICPL -fm <feature_model> -s <strength, 1-3> (-startFrom <covering array>) (-onlyOnes) (-noAllZeros) [Inexact: (-sizelimit <rows>)
+		 * (-limit <coverage limit>)] (for 3-wise, -eights <1-8>)
+		 * -t t_wise -a CASA -fm <feature_model> -s <strength, 1-6>
 		 **/
-		int lastSelection = scale.getSelection();
-		scale.setMinimum(1);
+		int lastSelection = scaleTWise.getSelection();
+		scaleTWise.setMinimum(1);
 		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
-			scale.setEnabled(true);
+			scaleTWise.setEnabled(true);
 			String selection = comboAlgorithm.getText();
 			if (!comboAlgorithm.isEnabled()) {
-				scale.setMaximum(3);
+				scaleTWise.setMaximum(3);
 			} else if (selection.equals(CHVATAL)) {
-				scale.setMaximum(CHVATAL_MAX);
+				scaleTWise.setMaximum(CHVATAL_MAX);
 			} else if (selection.equals(ICPL)) {
-				scale.setMaximum(ICPL_MAX);
+				scaleTWise.setMaximum(ICPL_MAX);
 			} else if (selection.equals(CASA)) {
-				scale.setMaximum(CASA_MAX);
-			} else if (selection.equals(MASK)) {
-				scale.setMaximum(MASK_MAX);
-				scale.setMinimum(MASK_MAX);
-				scale.setSelection(MASK_MAX);
-				scale.setEnabled(false);
-				labelT.setText(LABEL_INTERACTIONS + "2");
+				scaleTWise.setMaximum(CASA_MAX);
+			} else if (selection.equals(INCLING)) {
+				scaleTWise.setMaximum(MASK_MAX);
+				scaleTWise.setMinimum(MASK_MAX);
+				scaleTWise.setSelection(MASK_MAX);
+				scaleTWise.setEnabled(false);
+				labelTWise.setText(LABEL_INTERACTIONS + "2");
 			}
-		} else if (comboOrder.getText().equals(INTERACTIONS)) {
-			scale.setEnabled(true);
-			scale.setMaximum(5);
 		} else {
-			scale.setEnabled(false);
+			scaleTWise.setEnabled(false);
 		}
-			
-		if (lastSelection > scale.getMaximum()) {
-			scale.setSelection(scale.getMaximum());
-			labelT.setText(LABEL_INTERACTIONS + scale.getMaximum());
+
+		if (lastSelection > scaleTWise.getMaximum()) {
+			scaleTWise.setSelection(scaleTWise.getMaximum());
+			labelTWise.setText(LABEL_INTERACTIONS + scaleTWise.getMaximum());
 		}
 	}
 
 	private void dialogChanged() {
 		setPageComplete(false);
-		int perspectiveValue = scale.getSelection();
-		labelT.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
+		int perspectiveValue = scaleTWise.getSelection();
+		labelTWise.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
+		perspectiveValue = scaleInteraction.getSelection();
+		labelOrderInteraction.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
 
 		if (!checkMaxConfigurationsEntry()) {
 			return;
@@ -332,7 +435,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				longValue = Long.parseLong(textField.getText());
 			} catch (NumberFormatException e2) {
 				setErrorMessage("NumberFormatException: " + e.getMessage());
-				return false;	
+				return false;
 			}
 			setErrorMessage("Number of configurations " + longValue + " is too large.");
 			return false;
@@ -343,15 +446,23 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private void addListeners() {
 		comboAlgorithm.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				setScale();
+				setScaleTWise();
 				dialogChanged();
 			}
 		});
 
-		scale.addListener(SWT.Selection, new Listener() {
+		scaleTWise.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
-				int selection = scale.getSelection();
-				labelT.setText(LABEL_INTERACTIONS + selection);
+				int selection = scaleTWise.getSelection();
+				labelTWise.setText(LABEL_INTERACTIONS + selection);
+				dialogChanged();
+			}
+		});
+
+		scaleInteraction.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				int selection = scaleInteraction.getSelection();
+				labelOrderInteraction.setText(LABEL_INTERACTIONS + selection);
 				dialogChanged();
 			}
 		});
@@ -361,33 +472,32 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				final String text = comboGenerate.getText();
 				final boolean tWise = text.equals(T_WISE_CONFIGURATIONS);
 				comboAlgorithm.setEnabled(tWise);
-				setScale();
+				setScaleTWise();
 				dialogChanged();
-
 			}
 		});
 
 		comboOrder.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				setScale();
+				setScaleInteraction();
 				dialogChanged();
 			}
 		});
-		
+
 		buttonBuildProject.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				buttonTest.setEnabled(!buttonBuildProject.getSelection());
 				dialogChanged();
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				// nothing here
 			}
 		});
-		
+
 		textField.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
@@ -410,7 +520,11 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	}
 
 	int getT() {
-		return scale.getSelection();
+		return scaleTWise.getSelection();
+	}
+
+	int getTInteraction() {
+		return scaleInteraction.getSelection();
 	}
 
 	BuildType getGeneration() {
@@ -442,11 +556,11 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	String getSelectedOrder() {
 		return comboOrder.getText();
 	}
-	
+
 	public boolean getTest() {
 		return buttonTest.getSelection();
 	}
-	
+
 	public int getMax() {
 		try {
 			if (textField.getText().isEmpty()) {
@@ -457,5 +571,5 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			return 0;
 		}
 	}
-	
+
 }

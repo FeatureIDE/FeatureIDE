@@ -86,6 +86,7 @@ public class FeatureDragAndDropCommand extends Command {
 			if (next == null) {
 				return false;
 			}
+
 			// calculate new parent (if exists)
 			if (!calculateNewParentAndIndex(next))
 				return false;
@@ -108,6 +109,7 @@ public class FeatureDragAndDropCommand extends Command {
 		}
 		return true;
 	}
+	
 
 	@Override
 	public void execute() {

@@ -25,7 +25,6 @@ import java.util.HashMap;
 
 import org.prop4j.analyses.ImplicationSetsAnalysis.Relationship;
 import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -43,12 +42,12 @@ public class NaiveImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<R
 	private static final byte BIT_01 = 1 << 1;
 	private static final byte BIT_00 = 1 << 0;
 
-	public NaiveImplicationSetsAnalysis(ISolverProvider solver) {
-		super(solver);
+	public NaiveImplicationSetsAnalysis(SatInstance satInstance) {
+		super(satInstance);
 	}
 
 	@Override
-	public HashMap<Relationship, Relationship> execute(WorkMonitor monitor) throws Exception {
+	public HashMap<Relationship, Relationship> analyze(WorkMonitor monitor) throws Exception {
 		final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
@@ -70,7 +69,7 @@ public class NaiveImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<R
 				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.getAssignment().push(-varX);
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						done[i] = 2;
 						solver.getAssignment().pop().push(varX);
@@ -115,7 +114,7 @@ public class NaiveImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<R
 
 	private void testCombination(final HashMap<Relationship, Relationship> relationSet, final int varX, final int varY) {
 		solver.getAssignment().push(-varY);
-		switch (solver.sat()) {
+		switch (solver.isSatisfiable()) {
 		case FALSE:
 			addRelation(relationSet, varX, varY);
 			break;

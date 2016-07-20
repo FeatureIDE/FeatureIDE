@@ -37,15 +37,15 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
- * Executed the MASK pairwise sorting algorithm to create configurations.
+ * Executed the IncLing pairwise sorting algorithm to create configurations.
  * 
  * @see PairWiseConfigurationGenerator
  * 
  * @author Jens Meinicke
  */
-public class MASKConfigurationGenerator extends AConfigurationGenerator {
+public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 
-	public MASKConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
+	public IncLingConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
 	}
 

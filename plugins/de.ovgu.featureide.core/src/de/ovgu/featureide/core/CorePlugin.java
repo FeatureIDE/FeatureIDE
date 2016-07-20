@@ -23,9 +23,9 @@ package de.ovgu.featureide.core;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AND_COMPOSER_TO_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_OLD_NATURE_TO_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.COULD_NOT_SET_PERSISTANT_PROPERTY;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONF;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COULD_NOT_SET_PERSISTANT_PROPERTY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_CREATING_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION;
@@ -684,6 +684,10 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		if (signatures != null) {
 			SignatureIterator it = signatures.iterator();
+			int featureID = signatures.getFeatureID(featureName);
+			if(featureID == -1){
+				return Collections.emptyList();
+			}
 			it.addFilter(new ContextFilter(featureName, signatures));
 
 			while (it.hasNext()) {
@@ -759,7 +763,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public ProjectStructure extendedModules_getStruct(final IFeatureProject project, final String featureName) {
 		final ProjectSignatures signatures = project.getProjectSignatures();
-		if (signatures != null) {
+		if (signatures != null && signatures.getFeatureID(featureName) != -1) {
 			SignatureIterator it = signatures.iterator();
 			//TODO check
 			if (featureName != null) {

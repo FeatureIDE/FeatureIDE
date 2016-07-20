@@ -227,9 +227,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		return null;
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return fmManager.editObject();
-	}
+    public IFeatureModel getFeatureModel() {
+        if (fmManager != null) {
+            return fmManager.editObject();
+        } else {
+            return featureModel;
+        }
+    }
+	
+    public void setFeatureModel(IFeatureModel fm) {
+        featureModel = fm;
+    }
 
 	public IFile getModelFile() {
 		return markerHandler.getModelFile();

@@ -23,7 +23,6 @@ package org.prop4j.analyses;
 import java.util.List;
 
 import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
 import org.prop4j.solver.SatInstance;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
@@ -38,23 +37,22 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator {
 
 	private final int maxValue;
-	
-	public RandomConfigurationGenerator(ISolverProvider solver, int maxValue) {
-		super(solver, 0);
+
+	public RandomConfigurationGenerator(SatInstance satInstance, int maxValue) {
+		super(satInstance, 0);
 		this.maxValue = maxValue;
 	}
 
 	@Override
-	public List<List<String>> execute(WorkMonitor monitor) throws Exception {
+	public List<List<String>> analyze(WorkMonitor monitor) throws Exception {
 		time = System.nanoTime();
-		final SatInstance satInstance = solver.getSatInstance();
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
-		
+
 		for (int i = 0; i < maxValue; i++) {
 			if (monitor.checkCancel()) {
 				break;
 			}
-			if (handleNewConfig(solver.findModel(), satInstance)) {
+			if (handleNewConfig(solver.findModel())) {
 				break;
 			}
 			solver.shuffleOrder();
@@ -63,7 +61,7 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 		return getConfigurations();
 	}
 
-	private boolean handleNewConfig(int[] curModel, final SatInstance satInstance) {
+	private boolean handleNewConfig(int[] curModel) {
 		if (curModel == null) {
 			System.out.println("Found everything!");
 			return true;
@@ -72,16 +70,16 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 		final Configuration config = new Configuration(curModel, partCount - getLastCoverage(), partCount);
 
 		addCombinationsFromModel(curModel);
-		
+
 		config.time = System.nanoTime() - time;
 		q.offer(config);
 		synchronized (tempConfigurationList) {
 			tempConfigurationList.add(config);
 		}
 		time = System.nanoTime();
-		
+
 		try {
-			config.setBlockingClauseConstraint(solver.getSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
+			config.setBlockingClauseConstraint(solver.getInternalSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
 		} catch (ContradictionException e) {
 			e.printStackTrace();
 			System.out.println("Unsatisfiable1!");

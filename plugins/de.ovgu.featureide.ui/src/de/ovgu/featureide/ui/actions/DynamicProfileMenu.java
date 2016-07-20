@@ -1,6 +1,8 @@
 package de.ovgu.featureide.ui.actions;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.internal.ui.packageview.PackageFragmentRootContainer;
@@ -50,8 +52,9 @@ public class DynamicProfileMenu extends ContributionItem {
 	public DynamicProfileMenu(String id) {
 		super(id);
 	}
-	/** 
-	 * Creates dynamic menu 
+
+	/**
+	 * Creates dynamic menu
 	 */
 	@Override
 	public void fill(Menu menu, int index) {
@@ -112,6 +115,7 @@ public class DynamicProfileMenu extends ContributionItem {
 		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Color Scheme", featureModel);
 
 	}
+
 	/**
 	 * Returns selection of type IStructuredSelection
 	 */
@@ -124,7 +128,7 @@ public class DynamicProfileMenu extends ContributionItem {
 	}
 
 	/**
-	 *  Disables the profilemenu, if more than one project is selected
+	 * Disables the profilemenu, if more than one project is selected
 	 */
 	private static boolean isMultipleSelection() {
 		IStructuredSelection myselection = getIStructuredCurrentSelection();
@@ -134,7 +138,7 @@ public class DynamicProfileMenu extends ContributionItem {
 			TreePath[] treePaths = treeSelection.getPaths();
 			if (treePaths.length > 1) {
 				return true;
-				
+
 			}
 		}
 		return false;
@@ -145,7 +149,7 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * Returns selected FeatureProject
 	 */
 	private static IFeatureProject getCurrentFeatureProject() {
-		Object element = getIStructuredCurrentSelection().getFirstElement();
+		final Object element = getIStructuredCurrentSelection().getFirstElement();
 		if (element instanceof IResource) {
 			return CorePlugin.getFeatureProject((IResource) element);
 		} else if (element instanceof PackageFragmentRootContainer) {
@@ -153,9 +157,13 @@ public class DynamicProfileMenu extends ContributionItem {
 			return CorePlugin.getFeatureProject(jProject.getProject());
 		} else if (element instanceof IJavaElement) {
 			return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
-		} else {
-			throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered"); 
+		} else if (element instanceof IAdaptable) {
+			final IProject project = (IProject)((IAdaptable) element).getAdapter(IProject.class);
+			if (project != null) {
+				return CorePlugin.getFeatureProject(project);
+			}
 		}
+		throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
 	}
 
 }
