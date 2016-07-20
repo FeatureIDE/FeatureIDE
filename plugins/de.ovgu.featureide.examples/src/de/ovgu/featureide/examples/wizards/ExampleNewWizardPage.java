@@ -27,7 +27,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TYPE_FILTER_TE
 
 import java.text.CollationKey;
 import java.text.Collator;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -80,7 +79,6 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Reimar Schroeter
  */
 public class ExampleNewWizardPage extends WizardPage {
-	//	private static final String CHILD_WARNING = SELECTED_ONLY_FULLY_COMPATIBLE_PROJECTS_ + "(Manual selection for projects with warnings is still possible).";
 
 	private static final Image IMAGE_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
 	private static final Image IMAGE_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
@@ -91,34 +89,28 @@ public class ExampleNewWizardPage extends WizardPage {
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color black = new Color(null, 0, 0, 0);
 
+	private final SearchProjectFilter searchFilter = new SearchProjectFilter();
+	private final ErrorProjectFilter errorFilter = new ErrorProjectFilter();
+
+	private final ICheckStateListener checkStateList = new MyCheckStateListener();
+	private final SelectionChangedListener selChangeList = new SelectionChangedListener();
+
 	private ContainerTreeViewerWrapper wrapper;
 	private Text descBox;
-
-	private static final String FILTERTEXT = TYPE_FILTER_TEXT;
 	private StyledText searchFeatureText;
 
-	private final ExampleProjectFilter searchFilter = new ExampleProjectFilter();
-	private final ErrorFilter errorFilter = new ErrorFilter();
-
-	private ICheckStateListener checkStateList = new MyCheckStateListener();
-	private SelectionChangedListener selChangeList = new SelectionChangedListener();
-
-	abstract class ComposedViewerFilter extends ViewerFilter {
+	private abstract class ComposedViewerFilter extends ViewerFilter {
 		public boolean selectComposer(Viewer viewer, Object parentElement, Object element) {
 			ViewerFilter[] filters = ((StructuredViewer) viewer).getFilters();
 			Object[] filterRes = ((ITreeContentProvider) ((StructuredViewer) viewer).getContentProvider()).getChildren(element);
 			for (ViewerFilter viewerFilter : filters) {
 				filterRes = viewerFilter.filter(viewer, element, filterRes);
 			}
-
-			if (filterRes.length == 0) {
-				return false;
-			}
-			return true;
+			return filterRes.length != 0;
 		}
 	}
 
-	private class ExampleProjectFilter extends ComposedViewerFilter {
+	private class SearchProjectFilter extends ComposedViewerFilter {
 		private String searchText = null;
 
 		@Override
@@ -126,10 +118,8 @@ public class ExampleNewWizardPage extends WizardPage {
 			if (element instanceof ProjectRecord.TreeItem) {
 				element = ((ProjectRecord.TreeItem) element).getRecord();
 			}
-			if (searchText == null || searchText.isEmpty() || FILTERTEXT.equals(searchFeatureText.getText())) {
+			if (searchText == null || searchText.isEmpty() || TYPE_FILTER_TEXT.equals(searchFeatureText.getText())) {
 				return true;
-			} else if (element instanceof String) {
-				return selectComposer(viewer, parentElement, element);
 			} else if (element instanceof IPath) {
 				return selectComposer(viewer, parentElement, element);
 			} else if (element instanceof ProjectRecord) {
@@ -140,25 +130,19 @@ public class ExampleNewWizardPage extends WizardPage {
 		}
 	}
 
-	private class ErrorFilter extends ComposedViewerFilter {
+	private class ErrorProjectFilter extends ComposedViewerFilter {
 		private boolean isActive = false;
 
 		@Override
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
-			if (!isActive) {
-				return true;
-			}
-			if (element instanceof ProjectRecord.TreeItem) {
-				element = ((ProjectRecord.TreeItem) element).getRecord();
-			}
-			if (element instanceof ProjectRecord && (((ProjectRecord) element).hasWarnings() || ((ProjectRecord) element).hasErrors())) {
-				return false;
-			}
-			if (element instanceof String) {
-				return selectComposer(viewer, parentElement, element);
-			}
-			if (element instanceof IPath) {
-				return selectComposer(viewer, parentElement, element);
+			if (isActive) {
+				if (element instanceof ProjectRecord.TreeItem) {
+					final ProjectRecord projectRecord = ((ProjectRecord.TreeItem) element).getRecord();
+					return !projectRecord.hasWarnings() && !projectRecord.hasErrors();
+				}
+				if (element instanceof IPath) {
+					return selectComposer(viewer, parentElement, element);
+				}
 			}
 			return true;
 		}
@@ -192,8 +176,8 @@ public class ExampleNewWizardPage extends WizardPage {
 					wrapper.setChecked(item, false);
 				} else {
 					if (event instanceof ContainerTreeViewerWrapper.ParentCheckStateChangedEvent) {
-						ContainerTreeViewerWrapper.ParentCheckStateChangedEvent new_name = (ContainerTreeViewerWrapper.ParentCheckStateChangedEvent) event;
-						if (new_name.isOnlyRefresh()) {
+						ContainerTreeViewerWrapper.ParentCheckStateChangedEvent newName = (ContainerTreeViewerWrapper.ParentCheckStateChangedEvent) event;
+						if (newName.isOnlyRefresh()) {
 							wrapper.setChecked(item, event.getChecked());
 						}
 					} else {
@@ -205,11 +189,7 @@ public class ExampleNewWizardPage extends WizardPage {
 		}
 	}
 
-	class SelectionChangedListener implements ISelectionChangedListener {
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-		 */
+	private class SelectionChangedListener implements ISelectionChangedListener {
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			CheckboxTreeViewer viewer = null;
@@ -254,7 +234,7 @@ public class ExampleNewWizardPage extends WizardPage {
 									parent = contProv.getParent(parent);
 								}
 							}
-							if (!getMessage().equals("")) {
+							if (!getMessage().isEmpty()) {
 								break;
 							}
 						}
@@ -265,7 +245,7 @@ public class ExampleNewWizardPage extends WizardPage {
 	}
 
 	private class DynamicComposite extends Composite {
-		DynamicComposite(Composite parent, int style, String contentProviderName) {
+		public DynamicComposite(Composite parent, int style, String contentProviderName) {
 			super(parent, style);
 			GridLayout layout = new GridLayout();
 			this.setLayout(layout);
@@ -311,7 +291,7 @@ public class ExampleNewWizardPage extends WizardPage {
 	 * @param pageName
 	 */
 	public ExampleNewWizardPage() {
-		super("Select FeatureIDE Example(s)");
+		super("");
 		setTitle("Select FeatureIDE example(s) which you would like to explore");
 	}
 
@@ -339,7 +319,7 @@ public class ExampleNewWizardPage extends WizardPage {
 		compositeTop.setLayoutData(gridData);
 
 		searchFeatureText = new StyledText(compositeTop, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-		searchFeatureText.setText(FILTERTEXT);
+		searchFeatureText.setText(TYPE_FILTER_TEXT);
 
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.RIGHT;
@@ -353,16 +333,13 @@ public class ExampleNewWizardPage extends WizardPage {
 		item.setToolTipText("Hide all projects with errors and warnings");
 
 		item.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.getSource() instanceof ToolItem) {
-					ToolItem item = ((ToolItem) e.getSource());
-					Object[] checkedProjects = wrapper.getCheckedProjectItems(wrapper.getSelectedViewer());
-					if (item.getSelection()) {
-						errorFilter.setActive(true);
-					} else {
-						errorFilter.setActive(false);
-					}
-					//bugfix for gray state of parent
+					final Object[] checkedProjects = wrapper.getCheckedProjectItems(wrapper.getSelectedViewer());
+					errorFilter.setActive(((ToolItem) e.getSource()).getSelection());
+
+					// Hack: Fix for gray state of parent
 					wrapper.refreshAllViewers();
 					wrapper.refreshCheckOfSelectedViewer(checkedProjects);
 
@@ -415,7 +392,6 @@ public class ExampleNewWizardPage extends WizardPage {
 		searchFeatureText.setForeground(gray);
 		searchFeatureText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		searchFeatureText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				Object[] checkedProjects = wrapper.getCheckedProjectItems(wrapper.getSelectedViewer());
@@ -426,11 +402,10 @@ public class ExampleNewWizardPage extends WizardPage {
 		});
 
 		searchFeatureText.addListener(SWT.FocusOut, new Listener() {
-
 			@Override
 			public void handleEvent(Event event) {
 				if (searchFeatureText.getText().isEmpty()) {
-					searchFeatureText.setText(FILTERTEXT);
+					searchFeatureText.setText(TYPE_FILTER_TEXT);
 					searchFeatureText.setForeground(gray);
 				}
 			}
@@ -439,8 +414,7 @@ public class ExampleNewWizardPage extends WizardPage {
 			@Override
 			public void handleEvent(Event event) {
 				setMessage("");
-
-				if (FILTERTEXT.equals(searchFeatureText.getText())) {
+				if (TYPE_FILTER_TEXT.equals(searchFeatureText.getText())) {
 					searchFeatureText.setText("");
 				}
 				searchFeatureText.setForeground(black);
@@ -461,7 +435,6 @@ public class ExampleNewWizardPage extends WizardPage {
 	private void createProjectSelectionArea(final Composite workArea) {
 		CTabFolder tabFolder = new CTabFolder(workArea, SWT.BORDER);
 		tabFolder.addListener(SWT.MouseExit, new Listener() {
-
 			@Override
 			public void handleEvent(Event event) {
 				Object[] checkedProjects = wrapper.getCheckedProjects();
@@ -486,7 +459,6 @@ public class ExampleNewWizardPage extends WizardPage {
 		tabFolder.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
 
 		tabFolder.addSelectionListener(new SelectionListener() {
-
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.getSource() instanceof CTabFolder) {
@@ -501,26 +473,19 @@ public class ExampleNewWizardPage extends WizardPage {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-
 			}
 		});
 
-		CTabItem compItem = null;
-		Set<String> tabItems = new HashSet<String>(ProjectProvider.getViewersNamesForProjects());
-		if (tabItems.contains("Composer")) {
-			tabItems.remove("Composer");
-			compItem = new CTabItem(tabFolder, workArea.getStyle());
-			compItem.setText("Composer");
-			compItem.setControl(new DynamicComposite(tabFolder, SWT.MULTI, "Composer"));
-			tabFolder.setSelection(compItem);
-			;
-			wrapper.setSelectedViewer(compItem.getControl());
-		}
+		Set<String> tabItems = ProjectProvider.getViewersNamesForProjects();
 		CTabItem item = null;
 		for (String name : tabItems) {
 			item = new CTabItem(tabFolder, workArea.getStyle());
 			item.setText(name);
 			item.setControl(new DynamicComposite(tabFolder, SWT.MULTI, name));
+			if (name.equals("Composer")) {
+				tabFolder.setSelection(item);
+				wrapper.setSelectedViewer(item.getControl());
+			}
 		}
 
 		wrapper.addFilter(searchFilter);
@@ -565,4 +530,5 @@ public class ExampleNewWizardPage extends WizardPage {
 	public Object[] getCheckedProjects() {
 		return wrapper.getCheckedProjects();
 	}
+
 }

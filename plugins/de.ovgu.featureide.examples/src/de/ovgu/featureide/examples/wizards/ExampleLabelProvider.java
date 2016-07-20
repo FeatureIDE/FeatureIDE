@@ -25,51 +25,34 @@ import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.core.builder.ComposerExtensionManager;
-import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.examples.utils.ProjectRecord;
 
 /**
- * 
+ * Provides labels for the {@link DynamicContentProvider}.
  * 
  * @author Reimar Schroeter
  */
 class ExampleLabelProvider extends LabelProvider implements IColorProvider {
+
 	private static final Color YELLOW = new Color(null, 183, 187, 11);
 	private static final Color RED = new Color(null, 240, 0, 0);
 	private static final Color BLACK = new Color(null, 0, 0, 0);
 	private static final Color WHITE = new Color(null, 255, 255, 255);
 
 	public String getText(Object element) {
-		if (element instanceof String) {
-			for (IComposerExtensionBase ic : ComposerExtensionManager.getInstance().getComposers()) {
-				final String composerExtension = ic.toString();
-				if (composerExtension.substring(composerExtension.lastIndexOf(".") + 1).equals((String) element)) {
-					return ic.getName();
-				}
-			}
-			return (String) element;
-		} else if (element instanceof ProjectRecord) {
-			return ((ProjectRecord) element).getProjectLabel();
-		} else if (element instanceof ProjectRecord.TreeItem) {
+		if (element instanceof ProjectRecord.TreeItem) {
 			return ((ProjectRecord.TreeItem) element).toString();
 		} else if (element instanceof IPath) {
 			return ((IPath) element).lastSegment();
-		} else{
+		} else {
 			return "";
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-	 */
 	@Override
 	public Color getForeground(Object element) {
-		if(element instanceof ProjectRecord.TreeItem){
-			element = ((ProjectRecord.TreeItem) element).getRecord(); 
-		}
-		if (element instanceof ProjectRecord ) {
-			ProjectRecord tmpRecord = (ProjectRecord) element;
+		if (element instanceof ProjectRecord.TreeItem) {
+			ProjectRecord tmpRecord = ((ProjectRecord.TreeItem) element).getRecord();
 			if (tmpRecord.hasErrors()) {
 				return RED;
 			} else if (tmpRecord.hasWarnings()) {
@@ -79,11 +62,9 @@ class ExampleLabelProvider extends LabelProvider implements IColorProvider {
 		return BLACK;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
-	 */
 	@Override
 	public Color getBackground(Object element) {
 		return WHITE;
 	}
+
 }

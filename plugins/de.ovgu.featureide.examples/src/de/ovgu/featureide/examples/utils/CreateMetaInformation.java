@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -73,6 +72,10 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * @author Reimar Schroeter
  */
 public class CreateMetaInformation {
+
+	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
+	public static final String INDEX_FILENAME = "index.s";
+
 	private final static FilenameFilter filter = new NameFilter();
 	private final static FilenameFilter projectfilter = new ProjectFilter();
 	private static File pluginRoot;
@@ -81,9 +84,10 @@ public class CreateMetaInformation {
 	 * The filter to not return specific files...
 	 */
 	private static class NameFilter implements FilenameFilter {
-		final static Set<String> names = new HashSet<String>(
-				Arrays.asList(".svn", ".git", ".gitignore", ".metadata", "index.s", "bin", "projectInformation.xml"));
+		final static Set<String> names = new HashSet<>(
+				Arrays.asList(".svn", ".git", ".gitignore", ".metadata", INDEX_FILENAME, "bin", "projectInformation.xml"));
 
+		@Override
 		public boolean accept(File dir, String name) {
 			return !names.contains(name);
 		}
@@ -93,8 +97,9 @@ public class CreateMetaInformation {
 	 * The filter to not return specific files...
 	 */
 	private static class ProjectFilter implements FilenameFilter {
-		final static Set<String> names = new HashSet<String>(Arrays.asList("originalProject", ".svn", ".git", ".gitignore", ".metadata", "bin"));
+		final static Set<String> names = new HashSet<>(Arrays.asList("originalProject", ".svn", ".git", ".gitignore", ".metadata", "bin"));
 
+		@Override
 		public boolean accept(File dir, String name) {
 			return !names.contains(name);
 		}
@@ -155,13 +160,15 @@ public class CreateMetaInformation {
 	 * @return boolean <code>true</code> if the operation was completed.
 	 */
 	private static boolean collectProjects(Collection<ProjectRecord> projects, File directory, Set<String> directoriesVisited) {
+		// TODO Use Files.walkFileTree
 		File[] contents = directory.listFiles(projectfilter);
-		if (contents == null)
+		if (contents == null) {
 			return false;
+		}
 
 		// Initialize recursion guard for recursive symbolic links
 		if (directoriesVisited == null) {
-			directoriesVisited = new HashSet<String>();
+			directoriesVisited = new HashSet<>();
 			try {
 				directoriesVisited.add(directory.getCanonicalPath());
 			} catch (IOException exception) {
@@ -274,10 +281,6 @@ public class CreateMetaInformation {
 		System.out.println(string);
 	}
 
-	/**
-	 * @param newProject
-	 * @return
-	 */
 	private static String getComposer(ProjectRecord newProject, File file) {
 		Document doc = null;
 		try {
@@ -308,7 +311,7 @@ public class CreateMetaInformation {
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		}
-		return "fehler";
+		return "Error";
 	}
 
 	private static void createIndex(File dir, List<String> list, int segmentsToRemove) {
@@ -334,15 +337,13 @@ public class CreateMetaInformation {
 		List<String> listOfFilesOld = null;
 		createIndex(projectDir, listOfFiles, new Path(projectDir.getPath()).segmentCount());
 
-		listOfFilesOld = readFile(new File(projectDir, "index.s"), List.class);
+		listOfFilesOld = readFile(new File(projectDir, INDEX_FILENAME), List.class);
 
 		if ((listOfFilesOld == null) || listOfFilesOld.hashCode() != listOfFiles.hashCode()) {
 			if (listOfFilesOld == null || (listOfFilesOld != null && !listOfFiles.equals(listOfFilesOld))) {
 
-				try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(projectDir, "index.s")))) {
+				try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(projectDir, INDEX_FILENAME)))) {
 					obj.writeObject(listOfFiles);
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -363,4 +364,5 @@ public class CreateMetaInformation {
 		}
 		return null;
 	}
+
 }

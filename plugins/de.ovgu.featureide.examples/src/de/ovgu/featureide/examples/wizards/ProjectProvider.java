@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,13 +43,17 @@ import de.ovgu.featureide.examples.utils.ProjectRecord;
  * 
  * @author Reimar Schroeter
  */
-public abstract class ProjectProvider implements ITreeContentProvider {
+public final class ProjectProvider {
+
 	private static final Collection<ProjectRecord> projects;
 	private static final Set<String> viewerNames;
 
 	static {
 		projects = getProjects();
 		viewerNames = getViewersNamesForProjects();
+	}
+
+	private ProjectProvider() {
 	}
 
 	public static Collection<ProjectRecord> getProjects() {
@@ -96,20 +99,19 @@ public abstract class ProjectProvider implements ITreeContentProvider {
 		if (viewerNames != null) {
 			return viewerNames;
 		}
-		Set<String> viewerNames = new HashSet<String>();
+		Set<String> viewerNames = new HashSet<>();
 		Collection<ProjectRecord> projects = ProjectProvider.getProjects();
 		for (ProjectRecord projectRecord : projects) {
-			Document doc = projectRecord.getInformationDocument();
+			final Document doc = projectRecord.getInformationDocument();
 
-			if (doc == null) {
-				continue;
-			}
-			NodeList nlInterfaces = doc.getElementsByTagName("contentProvider");
-			for (int i = 0; i < nlInterfaces.getLength(); i++) {
-				if (nlInterfaces.item(i).getNodeType() == Node.ELEMENT_NODE) {
-					Element el = ((Element) nlInterfaces.item(i));
-					String attribute = el.getAttribute("name");
-					viewerNames.add(attribute);
+			if (doc != null) {
+				NodeList nlInterfaces = doc.getElementsByTagName("contentProvider");
+				for (int i = 0; i < nlInterfaces.getLength(); i++) {
+					if (nlInterfaces.item(i).getNodeType() == Node.ELEMENT_NODE) {
+						Element el = ((Element) nlInterfaces.item(i));
+						String attribute = el.getAttribute("name");
+						viewerNames.add(attribute);
+					}
 				}
 			}
 		}
@@ -122,4 +124,5 @@ public abstract class ProjectProvider implements ITreeContentProvider {
 			projectRecord.resetItems();
 		}
 	}
+
 }

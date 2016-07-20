@@ -46,6 +46,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -71,6 +72,8 @@ import de.ovgu.featureide.examples.utils.SimpleStructureProvider;
 public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQuery {
 
 	public static final String ID = ExamplePlugin.PLUGIN_ID;
+
+	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
 
 	private ExampleNewWizardPage mainPage = null;
 
@@ -168,10 +171,9 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(projectName);
 
-		URL url = null;
-		InputStream inputStream = null;
+		final InputStream inputStream;
 		try {
-			url = new URL("platform:/plugin/de.ovgu.featureide.examples/" + record.getIndexDocumentPath());
+			URL url = new URL("platform:/plugin/de.ovgu.featureide.examples/" + record.getIndexDocumentPath());
 			inputStream = url.openConnection().getInputStream();
 		} catch (IOException e) {
 			ExamplePlugin.getDefault().logError(e);
@@ -179,12 +181,9 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 		}
 
 		try (ObjectInputStream instr = new ObjectInputStream(inputStream);) {
-			Object in = instr.readObject();
-			List<String> res = (List<String>) in;
+			final List<String> res = (List<String>) instr.readObject();
 
-			ImportOperation operation = new ImportOperation(project.getFullPath(), res.get(0), new SimpleStructureProvider(record.getRelativePath()), this,
-					res);
-			operation.run(monitor);
+			new ImportOperation(project.getFullPath(), res.get(0), new SimpleStructureProvider(record.getRelativePath()), this, res).run(monitor);
 			if (record.hasSubProjects()) {
 				for (ProjectRecord sub : record.getSubProjects()) {
 					importSubProjects(sub, monitor);
@@ -222,10 +221,11 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 		location = location.append(projectPath);
 		desc.setLocation(location);
 
+		SubMonitor subMonitor = SubMonitor.convert(monitor);
 		try {
-			monitor.beginTask(CREATING_PROJECTS, 100);
-			project.create(desc, new SubProgressMonitor(monitor, 30));
-			project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 70));
+			subMonitor.beginTask(CREATING_PROJECTS, 100);
+			project.create(desc, subMonitor.newChild(30));
+			project.open(IResource.BACKGROUND_REFRESH, subMonitor.newChild(70));
 		} catch (CoreException e) {
 			throw new InvocationTargetException(e);
 		} finally {
@@ -267,5 +267,4 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 		return dialog.getReturnCode() < 0 ? CANCEL : response[dialog.getReturnCode()];
 	}
 
-	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
 }

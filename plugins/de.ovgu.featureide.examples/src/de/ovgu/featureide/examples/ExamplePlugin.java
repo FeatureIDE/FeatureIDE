@@ -54,6 +54,15 @@ public class ExamplePlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		new Thread() {
+			public void run() {
+				try {
+					ClassLoader.getSystemClassLoader().loadClass("de.ovgu.featureide.examples.wizards.ProjectProvider");
+				} catch (ClassNotFoundException e) {
+					ExamplePlugin.getDefault().logError(e);
+				}
+			};
+		}.start();
 	}
 
 	/*

@@ -23,13 +23,14 @@ package de.ovgu.featureide.examples.wizards;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHILDREN_COULD_NOT_BE_LOADED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXAMPLES_COULD_NOT_BE_LOADED_;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,8 +43,9 @@ import de.ovgu.featureide.examples.utils.ProjectRecord;
  * 
  * @author Reimar Schroeter
  */
-public class DynamicContentProvider extends ProjectProvider {
-	private Hashtable<IPath, Set<Object>> pathtoRecord;
+public class DynamicContentProvider implements ITreeContentProvider {
+
+	private HashMap<IPath, Set<Object>> pathToRecord;
 	private String contentProviderName;
 
 	public DynamicContentProvider(String contentProviderName) {
@@ -51,11 +53,11 @@ public class DynamicContentProvider extends ProjectProvider {
 	}
 
 	public Object[] getElements(Object inputElement) {
-		if (pathtoRecord == null) {
+		if (pathToRecord == null) {
 			computeHashtable();
 		}
-		if (pathtoRecord != null) {
-			return pathtoRecord.get(new Path("MYROOT")).toArray();
+		if (pathToRecord != null) {
+			return pathToRecord.get(new Path("MYROOT")).toArray();
 		} else {
 			return new Object[] { EXAMPLES_COULD_NOT_BE_LOADED_ };
 		}
@@ -63,7 +65,7 @@ public class DynamicContentProvider extends ProjectProvider {
 
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IPath) {
-			return pathtoRecord.get(parentElement).toArray();
+			return pathToRecord.get(parentElement).toArray();
 		} else if (parentElement instanceof ProjectRecord.TreeItem) {
 			return new Object[0];
 		} else {
@@ -73,17 +75,14 @@ public class DynamicContentProvider extends ProjectProvider {
 
 	public Object getParent(Object element) {
 		if (element instanceof ProjectRecord.TreeItem) {
-			for (Entry<IPath, Set<Object>> entries : pathtoRecord.entrySet()) {
+			for (Entry<IPath, Set<Object>> entries : pathToRecord.entrySet()) {
 				if (entries.getValue().contains(element)) {
 					return entries.getKey();
 				}
 			}
-		}
-		if (element instanceof IPath) {
-			IPath path = (IPath) element;
-			IPath returnPath = path.removeLastSegments(1);
-			boolean isEmpty = returnPath.isEmpty();
-			if (isEmpty) {
+		} else if (element instanceof IPath) {
+			IPath returnPath = ((IPath) element).removeLastSegments(1);
+			if (returnPath.isEmpty()) {
 				return null;
 			}
 			return returnPath;
@@ -93,7 +92,7 @@ public class DynamicContentProvider extends ProjectProvider {
 
 	public boolean hasChildren(Object element) {
 		if (element instanceof IPath) {
-			return pathtoRecord.containsKey((IPath) element) && !pathtoRecord.get((IPath) element).isEmpty();
+			return pathToRecord.containsKey((IPath) element) && !pathToRecord.get((IPath) element).isEmpty();
 		} else {
 			return false;
 		}
@@ -105,28 +104,24 @@ public class DynamicContentProvider extends ProjectProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 	}
 
+	// TODO read XML only once
 	private void computeHashtable() {
-		pathtoRecord = new Hashtable<>();
-		for (ProjectRecord projectRecord : getProjects()) {
-			Document doc = projectRecord.getInformationDocument();
-			if (doc == null) {
-				continue;
-			}
-			NodeList nlInterfaces = doc.getElementsByTagName("contentProvider");
-			for (int i = 0; i < nlInterfaces.getLength(); i++) {
-				if (nlInterfaces.item(i).getNodeType() == Node.ELEMENT_NODE) {
-					Element el = ((Element) nlInterfaces.item(i));
-					String attribute = el.getAttribute("name");
-					if (!attribute.equals(contentProviderName)) {
-						continue;
-					} else {
-						NodeList pathNode = el.getElementsByTagName("path");
-						for (int j = 0; j < pathNode.getLength(); j++) {
-							if (pathNode.item(j).getNodeType() == Node.ELEMENT_NODE) {
-								Element pathEl = ((Element) pathNode.item(j));
-								String textContent = pathEl.getTextContent();
-								IPath path = new Path(textContent);
-								assignProjectToRecPath(projectRecord, path);
+		pathToRecord = new HashMap<>();
+		for (ProjectRecord projectRecord : ProjectProvider.getProjects()) {
+			final Document doc = projectRecord.getInformationDocument();
+			if (doc != null) {
+				final NodeList nlInterfaces = doc.getElementsByTagName("contentProvider");
+				for (int i = 0; i < nlInterfaces.getLength(); i++) {
+					final Node item1 = nlInterfaces.item(i);
+					if (item1.getNodeType() == Node.ELEMENT_NODE) {
+						final Element el = ((Element) item1);
+						if (el.getAttribute("name").equals(contentProviderName)) {
+							NodeList pathNode = el.getElementsByTagName("path");
+							for (int j = 0; j < pathNode.getLength(); j++) {
+								final Node item2 = pathNode.item(j);
+								if (item2.getNodeType() == Node.ELEMENT_NODE) {
+									assignProjectToRecPath(projectRecord, new Path(((Element) item2).getTextContent()));
+								}
 							}
 						}
 					}
@@ -136,40 +131,34 @@ public class DynamicContentProvider extends ProjectProvider {
 	}
 
 	private void assignProjectToRecPath(ProjectRecord projectRecord, IPath path) {
-		if (pathtoRecord.containsKey(path)) {
-			pathtoRecord.get(path).add(projectRecord.createNewTreeItem(this));
-		} else {
+		Set<Object> record = pathToRecord.get(path);
+		if (record == null) {
+			record = new HashSet<>();
+			pathToRecord.put(path, record);
+
 			int length = path.segmentCount();
-			if (length >= 1) {
-				IPath longPath = path;
-				while (length >= 1) {
-					if (length == 1) {
-						if (pathtoRecord.containsKey(new Path("MYROOT"))) {
-							pathtoRecord.get(new Path("MYROOT")).add(longPath);
-						} else {
-							Set<Object> l = new HashSet<Object>();
-							l.add(longPath);
-							pathtoRecord.put(new Path("MYROOT"), l);
-						}
-						length = 0;
-					} else {
-						IPath newPath = path.removeLastSegments(1);
-						if (pathtoRecord.containsKey(newPath)) {
-							pathtoRecord.get(newPath).add(longPath);
-							length = 1;
-						} else {
-							Set<Object> l = new HashSet<Object>();
-							l.add(longPath);
-							pathtoRecord.put(newPath, l);
-						}
-						longPath = newPath;
-						length = longPath.segmentCount();
-					}
+			while (length > 0) {
+				final IPath parent;
+				if (length == 1) {
+					parent = new Path("MYROOT");
+					length = 0;
+				} else {
+					parent = path.removeLastSegments(1);
+					length = parent.segmentCount();
 				}
+				Set<Object> parentRecord = pathToRecord.get(parent);
+				if (parentRecord != null) {
+					parentRecord.add(path);
+					break;
+				} else {
+					Set<Object> children = new HashSet<>();
+					children.add(path);
+					pathToRecord.put(parent, children);
+				}
+				path = parent;
 			}
-			Set<Object> newProjectSet = new HashSet<Object>();
-			newProjectSet.add(projectRecord.createNewTreeItem(this));
-			pathtoRecord.put(path, newProjectSet);
 		}
+		record.add(projectRecord.createNewTreeItem(this));
 	}
+
 }

@@ -30,6 +30,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -44,7 +45,8 @@ import de.ovgu.featureide.examples.utils.ProjectRecord.TreeItem;
  * 
  * @author Reimar Schroeter
  */
-public class ContainerTreeViewerWrapper {
+public class ContainerTreeViewerWrapper implements ICheckable {
+
 	private List<ContainerCheckedTreeViewer> listOfTreeViewer = new ArrayList<>();
 	private ContainerCheckedTreeViewer selectedViewer;
 
@@ -65,7 +67,7 @@ public class ContainerTreeViewerWrapper {
 		}
 	}
 
-	class WrappedContainerCheckedTreeViewer extends ContainerCheckedTreeViewer {
+	private class WrappedContainerCheckedTreeViewer extends ContainerCheckedTreeViewer {
 		public WrappedContainerCheckedTreeViewer(Composite parent, int style) {
 			super(parent, style);
 		}
@@ -78,11 +80,7 @@ public class ContainerTreeViewerWrapper {
 				ParentCheckStateChangedEvent event = new ParentCheckStateChangedEvent(this, object, this.getChecked(element));
 				if (object instanceof ProjectRecord.TreeItem) {
 					ProjectRecord.TreeItem item = (ProjectRecord.TreeItem) object;
-					if (item.getRecord().hasErrors() || item.getRecord().hasWarnings()) {
-						event.setOnlyRefresh(false);
-					} else {
-						event.setOnlyRefresh(true);
-					}
+					event.setOnlyRefresh(!item.getRecord().hasErrors() && !item.getRecord().hasWarnings());
 					fireCheckStateChanged(event);
 				} else if (object instanceof IPath) {
 					fireCheckStateChanged(event);
@@ -114,7 +112,7 @@ public class ContainerTreeViewerWrapper {
 			}
 		}
 	}
-	
+
 	public boolean setChecked(Object element, boolean state) {
 		boolean ret = true;
 		if (element instanceof ProjectRecord.TreeItem) {
@@ -188,9 +186,8 @@ public class ContainerTreeViewerWrapper {
 	public Object[] getCheckedProjectItems(ContainerCheckedTreeViewer viewer) {
 		Set<ProjectRecord.TreeItem> ret = new HashSet<>();
 		for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
-			if ((viewer != null && containerCheckedTreeViewer == selectedViewer) || viewer == null) {
-				ArrayList<Object> list = new ArrayList<>(Arrays.asList(((CheckboxTreeViewer) containerCheckedTreeViewer).getCheckedElements()));
-				for (Object object : new ArrayList<>(list)) {
+			if (viewer == null || (viewer != null && containerCheckedTreeViewer == selectedViewer)) {
+				for (Object object : ((CheckboxTreeViewer) containerCheckedTreeViewer).getCheckedElements()) {
 					if ((object instanceof ProjectRecord.TreeItem)) {
 						ret.add((TreeItem) object);
 					}
@@ -216,4 +213,18 @@ public class ContainerTreeViewerWrapper {
 			containerCheckedTreeViewer.removeFilter(filter);
 		}
 	}
+
+	@Override
+	public void addCheckStateListener(ICheckStateListener listener) {
+	}
+
+	@Override
+	public boolean getChecked(Object element) {
+		return false;
+	}
+
+	@Override
+	public void removeCheckStateListener(ICheckStateListener listener) {
+	}
+
 }

@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -54,19 +55,22 @@ import de.ovgu.featureide.core.CorePlugin;
  * @author Reimar Schroeter
  */
 public class ProjectRecord implements Serializable {
+
 	private static final long serialVersionUID = 7680436510104564244L;
-	private String projectDescriptionRelativePath;
+
+	private final String projectDescriptionRelativePath;
+	private final String projectName;
+
 	private Collection<ProjectRecord> subProjects;
-	private String projectName;
+
 	private transient IProjectDescription projectDescription;
 	private transient CommentParser comment;
-	private transient String warning = "";
-	private transient String error = "";
+	private transient String warning;
+	private transient String error;
+	private transient List<TreeItem> contentProviderItems;
 	private transient boolean hasWarnings = false;
 	private transient boolean hasErrors = false;
 	private transient boolean updated = false;
-	private transient Collection<TreeItem> contentProviderItems;
-	private static transient int nextGlobalItemID = 0;
 
 	/**
 	 * Create a record for a project based on the info given in the file.
@@ -76,24 +80,36 @@ public class ProjectRecord implements Serializable {
 	public ProjectRecord(String projectDescriptionRelativePath, String projectName) {
 		this.projectName = projectName;
 		this.projectDescriptionRelativePath = projectDescriptionRelativePath;
+		initFields();
 	}
 
-	public Collection<TreeItem> getTreeItems() {
+	/**
+	 * Deserialization
+	 * 
+	 * @param in
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
+		in.defaultReadObject();
+		initFields();
+	}
+
+	private void initFields() {
+		warning = "";
+		error = "";
+		contentProviderItems = new ArrayList<>();
+	}
+
+	public List<TreeItem> getTreeItems() {
 		return contentProviderItems;
 	}
 
 	public class TreeItem {
-		private transient int id = 0;
 		private transient IContentProvider contProv;
 
-		public TreeItem(IContentProvider contProv, int id) {
+		public TreeItem(IContentProvider contProv) {
 			this.contProv = contProv;
-			this.id = id;
-		}
-
-		@Override
-		public int hashCode() {
-			return projectName.hashCode() + projectDescriptionRelativePath.hashCode() + id;
 		}
 
 		public ProjectRecord getRecord() {
@@ -108,6 +124,7 @@ public class ProjectRecord implements Serializable {
 		public IContentProvider getProvider() {
 			return contProv;
 		}
+
 	}
 
 	@Override
@@ -116,10 +133,7 @@ public class ProjectRecord implements Serializable {
 	}
 
 	public TreeItem createNewTreeItem(IContentProvider prov) {
-		if (contentProviderItems == null) {
-			contentProviderItems = new ArrayList<TreeItem>();
-		}
-		TreeItem ti = new TreeItem(prov, nextGlobalItemID++);
+		final TreeItem ti = new TreeItem(prov);
 		contentProviderItems.add(ti);
 		return ti;
 	}
@@ -132,7 +146,6 @@ public class ProjectRecord implements Serializable {
 			e.printStackTrace();
 		}
 
-		projectName = projectDescription.getName();
 		comment = new CommentParser(projectDescription.getComment());
 
 		performAlreadyExistsCheck();
@@ -233,12 +246,23 @@ public class ProjectRecord implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return projectName.hashCode() + projectDescriptionRelativePath.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + projectDescriptionRelativePath.hashCode();
+		result = prime * result + projectName.hashCode();
+		return result;
 	}
 
 	@Override
-	public boolean equals(Object arg) {
-		return (arg instanceof ProjectRecord) && ((ProjectRecord) arg).projectName.equals(this.projectName);
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final ProjectRecord other = (ProjectRecord) obj;
+		return projectDescriptionRelativePath.equals(other.projectDescriptionRelativePath) && projectName.equals(other.projectName);
 	}
 
 	/**
@@ -271,48 +295,27 @@ public class ProjectRecord implements Serializable {
 		return ResourcesPlugin.getWorkspace().getRoot().getProjects();
 	}
 
-	/**
-	 * Deserialization
-	 * 
-	 * @param in
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 */
-	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
-		in.defaultReadObject();
-		warning = "";
-		error = "";
-	}
-
 	public String getRelativePath() {
+		// TODO Use general root path
 		return new Path(projectDescriptionRelativePath).removeFirstSegments(1).removeLastSegments(1).toString();
 	}
 
 	public String getIndexDocumentPath() {
-		return projectDescriptionRelativePath.replace(".project", "index.s");
+		return projectDescriptionRelativePath.replace(".project", CreateMetaInformation.INDEX_FILENAME);
 	}
 
 	public String getInformationDocumentPath() {
-		return projectDescriptionRelativePath.replace(".project", "projectInformation.xml");
+		return projectDescriptionRelativePath.replace(".project", CreateMetaInformation.PROJECT_INFORMATION_XML);
 	}
 
-	/**
-	 * @return the projectDescription
-	 */
 	public IProjectDescription getProjectDescription() {
 		return projectDescription;
 	}
 
 	public Document getInformationDocument() {
-		InputStream inputStream = null;
+		final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		try {
-			inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
-		} catch (Exception e1) {
-			return null;
-		}
-
-		try {
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(inputStream);
 			return doc;
@@ -323,19 +326,13 @@ public class ProjectRecord implements Serializable {
 	}
 
 	public void resetItems() {
-		contentProviderItems = new ArrayList<TreeItem>();
+		contentProviderItems.clear();
 	}
 
-	/**
-	 * @return the updated
-	 */
 	public boolean updated() {
 		return updated;
 	}
 
-	/**
-	 * @param updated the newVersion to set
-	 */
 	public void setUpdated(boolean updated) {
 		this.updated = updated;
 	}
