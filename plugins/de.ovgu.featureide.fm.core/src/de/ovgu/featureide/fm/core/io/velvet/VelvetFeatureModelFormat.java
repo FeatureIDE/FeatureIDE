@@ -411,38 +411,33 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void copyChildnodes(final ExtendedFeatureModel targetModel, final IFeatureStructure targetParentNode, final IFeatureStructure sourceParentNode,
-			final String parentModelName, final String parentNodeName, final int type) {
-		for (final IFeatureStructure child : sourceParentNode.getChildren()) {
+			final String parentModelName, final String targetParentName, final int type) {
+		for (final IFeatureStructure sourceChildStructure : sourceParentNode.getChildren()) {
 			final ExtendedFeature feature;
 			if (velvetImport) {
-				feature = factory.createFeature(targetModel, child.getFeature().getName());
+				feature = factory.createFeature(targetModel, sourceChildStructure.getFeature().getName());
 			} else {
-				String nameWithoutRoot = child.getFeature().getName()
-						.replace(sourceParentNode.getFeature().getFeatureModel().getStructure().getRoot().getFeature().getName(), "");
-				if (nameWithoutRoot.contains(".")) {
-					feature = factory.createFeature(targetModel, parentNodeName + nameWithoutRoot);
-				} else {
-					feature = factory.createFeature(targetModel, parentNodeName + "." + nameWithoutRoot);
-				}
+				String shortName = sourceChildStructure.getFeature().getName().replace(sourceParentNode.getFeature().getName() + ".", "");
+				feature = factory.createFeature(targetModel, targetParentName + "." + shortName);
 			}
-			IFeatureStructure featureStructure = feature.getStructure();
-			featureStructure.setMandatory(child.isMandatory());
-			featureStructure.setAbstract(child.isAbstract());
-			featureStructure.setHidden(child.isHidden());
+			IFeatureStructure targetChildStructure = feature.getStructure();
+			targetChildStructure.setMandatory(sourceChildStructure.isMandatory());
+			targetChildStructure.setAbstract(sourceChildStructure.isAbstract());
+			targetChildStructure.setHidden(sourceChildStructure.isHidden());
 			feature.setExternalModelName(parentModelName);
 
-			featureStructure.setAND(child.isAnd());
-			featureStructure.setMultiple(child.isMultiple());
-			if (child.isOr()) {
-				featureStructure.setOr();
+			targetChildStructure.setAND(sourceChildStructure.isAnd());
+			targetChildStructure.setMultiple(sourceChildStructure.isMultiple());
+			if (sourceChildStructure.isOr()) {
+				targetChildStructure.setOr();
 			}
 
 			targetModel.addFeature(feature);
-			targetParentNode.addChild(featureStructure);
+			targetParentNode.addChild(targetChildStructure);
 			feature.setType(type);
 
-			if (child.hasChildren()) {
-				copyChildnodes(targetModel, featureStructure, child, parentModelName, parentNodeName, type);
+			if (sourceChildStructure.hasChildren()) {
+				copyChildnodes(targetModel, targetChildStructure, sourceChildStructure, parentModelName, feature.getName(), type);
 			}
 		}
 	}
@@ -472,6 +467,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 				literal.var = parentModelname;
 			} else {
 				//if fully qualified name
+				
 				IFeature feature = targetModel.getFeature(literal.var.toString().replace(rootName, parentModelname));
 				if (feature == null) {
 					//else
