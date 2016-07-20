@@ -639,6 +639,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		if (!extFeatureModel.getImports().isEmpty() && !IS_USED_AS_API) {
 			for (String path : extFeatureModel.getImports()) {
 				IProject project = getProject();
+				if(!path.endsWith(name)) continue; 
 				if (project != null) {
 					IResource res = project.getFile(path + ".xml");
 					if (res != null && res.exists()) {
