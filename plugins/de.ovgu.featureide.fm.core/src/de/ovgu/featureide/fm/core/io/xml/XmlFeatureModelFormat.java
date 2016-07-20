@@ -524,7 +524,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (!object.getFMComposerExtension().isValidFeatureName(name)) {
 				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
-			final IFeature f = FMFactoryManager.getFactory().createFeature(object, name);
+			final IFeature f = FMFactoryManager.getFactory().createFeature(object, name); // TODO: This throws custom implementations away
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.getStructure().setAnd();
