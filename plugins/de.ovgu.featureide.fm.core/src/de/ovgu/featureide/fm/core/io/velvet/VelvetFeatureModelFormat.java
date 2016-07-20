@@ -442,7 +442,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			feature.setType(type);
 
 			if (child.hasChildren()) {
-				copyChildnodes(targetModel, featureStructure, child, parentModelName, parentNodeName, type);
+				copyChildnodes(targetModel, featureStructure, child, parentModelName, feature.getName(), type);
 			}
 		}
 	}
