@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -105,7 +106,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		modeleditor.setFeatureModel(subtreeModel);
 		FeatureDiagramEditor diagramEditor = new FeatureDiagramEditor(modeleditor, comp, subtreeModel);
 		subtreeModel.addListener(diagramEditor);
-		
+
 		analyzer.calculateFeatures = oldFm.getAnalyser().calculateFeatures;
 		analyzer.calculateConstraints = oldFm.getAnalyser().calculateConstraints;
 		analyzer.calculateRedundantConstraints = oldFm.getAnalyser().calculateRedundantConstraints;
@@ -134,7 +135,15 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 			List<String> expl = new Redundancy().explain(oldFm, subtreeModel, redundantC);
 			subtreeModel.getAnalyser().redundantConstrExpl.put(FeatureUtils.getConstraintIndex(subtreeModel, redundantC), expl);
 			redundantC.setConstraintAttribute(ConstraintAttribute.IMPLICIT, false);
+			
+			// remember for all respective graphical constraints that they are implicit (needed for legend) 
+			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {
+				if (gc.getObject().equals(redundantC)) {
+					gc.setConstraintImplicit(true);
+				}
+			}
 		}
+
 	}
 
 	/**
