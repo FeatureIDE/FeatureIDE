@@ -30,17 +30,21 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Default reader to be extended for each feature model format.
  * 
  * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
  * 
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead.
+ * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public abstract class AbstractFeatureModelReader implements IFeatureModelReader {
 
 	/**
@@ -95,7 +99,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 				}
 			}
 		}

@@ -47,5 +47,4 @@ public interface IFeatureModelLayout {
 	public boolean hasFeaturesAutoLayout();
 	
 	public FeatureModelLayout clone();
-	
 }

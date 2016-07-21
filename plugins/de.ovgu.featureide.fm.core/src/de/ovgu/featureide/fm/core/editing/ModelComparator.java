@@ -34,7 +34,7 @@ import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -140,10 +140,7 @@ public class ModelComparator {
 		} catch (TimeoutException e) {
 			result = Comparison.TIMEOUT;
 		} catch (Exception e) {
-			if (FMCorePlugin.getDefault() != null)
-				FMCorePlugin.getDefault().logError(e);
-			else
-				e.printStackTrace();
+			Logger.logError(e);
 			result = Comparison.ERROR;
 		}
 		return result;
@@ -281,7 +278,7 @@ public class ModelComparator {
 
 	public boolean isImplied() {		
 		if (isImplied == null) {
-			FMCorePlugin.getDefault().reportBug(278);
+			Logger.reportBug(278);
 			return false;
 		}
 		return isImplied;

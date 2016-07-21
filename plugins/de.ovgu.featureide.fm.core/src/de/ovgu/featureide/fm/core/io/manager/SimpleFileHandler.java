@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -41,7 +40,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class SimpleFileHandler<T> {
 
-	private static final String DEFAULT_CHARSET = "UTF-8";
+	private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
 	private IPersistentFormat<T> format;
 
@@ -61,6 +60,26 @@ public class SimpleFileHandler<T> {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
 		fileHandler.write();
 		return fileHandler.getLastProblems();
+	}
+	
+	public static <T> ProblemList convert(Path inPath, Path outPath, T object, IPersistentFormat<T> inFormat, IPersistentFormat<T> outFormat) {
+		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(inPath, object, inFormat);
+		ProblemList pl = new ProblemList();
+		fileHandler.read();
+		pl.addAll(fileHandler.getLastProblems());
+		fileHandler.setPath(outPath);
+		fileHandler.setFormat(outFormat);
+		fileHandler.write();
+		pl.addAll(fileHandler.getLastProblems());
+		return pl;
+	}
+	
+	public static <T> String saveToString(T object, IPersistentFormat<T> format) {
+		return format.write(object);
+	}
+	
+	public static <T> ProblemList loadFromString(String source, T object, IPersistentFormat<T> format) {
+		return format.read(object, source);
 	}
 
 	public SimpleFileHandler(Path path, T object, IPersistentFormat<T> format) {
@@ -106,7 +125,7 @@ public class SimpleFileHandler<T> {
 		try {
 			final T newObject = object;
 
-			final String content = new String(Files.readAllBytes(path), Charset.forName(DEFAULT_CHARSET));
+			final String content = new String(Files.readAllBytes(path), DEFAULT_CHARSET);
 			final List<Problem> problemList = format.getInstance().read(newObject, content);
 			if (problemList != null) {
 				lastProblems.addAll(problemList);
@@ -114,23 +133,22 @@ public class SimpleFileHandler<T> {
 		} catch (final Exception e) {
 			handleException(e);
 		}
-		return lastProblems.containsError();
+		return !lastProblems.containsError();
 	}
 
 	public boolean write() {
 		lastProblems.clear();
 		try {
-			final byte[] content = format.getInstance().write(object).getBytes(Charset.forName(DEFAULT_CHARSET));
+			final byte[] content = format.getInstance().write(object).getBytes(DEFAULT_CHARSET);
 			Files.write(path, content, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 		} catch (final Exception e) {
 			handleException(e);
 		}
-		return lastProblems.containsError();
+		return !lastProblems.containsError();
 	}
 
 	private void handleException(Exception e) {
 		lastProblems.add(new Problem(e));
-		FMCorePlugin.getDefault().logError(e);
 	}
 
 }

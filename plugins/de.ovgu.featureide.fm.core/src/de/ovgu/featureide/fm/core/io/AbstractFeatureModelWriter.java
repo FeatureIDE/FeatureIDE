@@ -21,15 +21,19 @@
 package de.ovgu.featureide.fm.core.io;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Default reader to be extended for each feature model format.
  * 
  * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
  * 
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead.
+ * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public abstract class AbstractFeatureModelWriter extends AbstractObjectWriter<IFeatureModel> implements IFeatureModelWriter {
 
 	@Override

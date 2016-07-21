@@ -21,7 +21,7 @@ import org.antlr.runtime.tree.RewriteRuleTokenStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 
 
 @SuppressWarnings({"all", "warnings", "unchecked"})
@@ -122,7 +122,7 @@ public TreeAdaptor getTreeAdaptor() {
 
     @Override    
     public void emitErrorMessage(String msg) {
-    	FMCorePlugin.getDefault().logError(new Exception(msg));
+    	Logger.logError(new Exception(msg));
     }
 
 

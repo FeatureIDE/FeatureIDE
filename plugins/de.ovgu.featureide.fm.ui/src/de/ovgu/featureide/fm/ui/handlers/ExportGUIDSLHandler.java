@@ -20,13 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 
 /**
@@ -38,13 +35,14 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 public class ExportGUIDSLHandler extends AbstractExportHandler {
 
 	@Override
-	protected IFeatureModelWriter getFeatureModelWriter(IFeatureModel fm) {
-		final GuidslWriter fmWriter = new GuidslWriter(fm);
-		if (fmWriter.hasConcreteCompounds()
-				&& !MessageDialog.openQuestion(new Shell(), "Warning!",
-						"The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)")) {
-			return null;
-		}
+	protected IFeatureModelFormat getFormat() {
+		final GuidslFormat fmWriter = new GuidslFormat();
+		// TODO Guidsl
+//		if (fmWriter.hasConcreteCompounds()
+//				&& !MessageDialog.openQuestion(new Shell(), "Warning!",
+//						"The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)")) {
+//			return null;
+//		}
 		return fmWriter;
 	}
 
@@ -53,7 +51,7 @@ public class ExportGUIDSLHandler extends AbstractExportHandler {
 		super.configureFileDialog(fileDialog);
 		fileDialog.setFileName("model.m");
 		fileDialog.setFilterExtensions(new String[] { "*.m" });
-		fileDialog.setFilterNames(new String[] { "GUIDSL foramt *.m" });
+		fileDialog.setFilterNames(new String[] { "GUIDSL format *.m" });
 	}
 
 }

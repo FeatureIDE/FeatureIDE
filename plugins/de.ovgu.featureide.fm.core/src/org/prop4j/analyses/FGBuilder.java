@@ -20,60 +20,58 @@
  */
 package org.prop4j.analyses;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.conf.AFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds certain solutions of propositional formulas.
  * 
  * @author Sebastian Krieter
  */
-public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
+public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 
 	private byte[] core = new byte[0];
 
 	private final Deque<Integer> parentStack = new LinkedList<>();
 	private byte[] recArray = new byte[0];
-	private final List<int[]> solutions = new ArrayList<>();
 
 	private byte[] visited;
 	private boolean[] complete;
 	private int[] index;
 	private IFeatureGraph featureGraph;
 
-	public FGBuilder(ISolverProvider solver) {
+	public FGBuilder(ISatSolver solver) {
 		super(solver);
 	}
 
-	@Override
-	public IFeatureGraph execute(WorkMonitor monitor) throws Exception {
-		parentStack.clear();
-		solutions.clear();
+	public FGBuilder(SatInstance satInstance) {
+		super(satInstance);
+	}
 
+	@Override
+	public IFeatureGraph analyze(IMonitor monitor) throws Exception {
+		parentStack.clear();
+
+		solver.initSolutionList(Math.min(solver.getSatInstance().getNumberOfVariables(), ISatSolver.MAX_SOLUTION_BUFFER));
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		solver.sat();
-		int[] model1 = getModel(solutions);
+		int[] model1 = solver.findModel();
 
 		// satisfiable?
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			solver.sat();
-			int[] model2 = getModel(solutions);
+			int[] model2 = solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
@@ -85,7 +83,7 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.getAssignment().push(-varX);
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						core[i] = (byte) (varX > 0 ? 1 : -1);
 						solver.getAssignment().pop().unsafePush(varX);
@@ -95,7 +93,7 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 						break;
 					case TRUE:
 						solver.getAssignment().pop();
-						model2 = getModel(solutions);
+						model2 = solver.getModel();
 						SatInstance.updateModel(model1Copy, model2);
 						solver.shuffleOrder();
 						break;
@@ -149,17 +147,15 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 					final int x = solver.getSatInstance().getSignedVariable((Literal) literals[0]);
 					final int y = solver.getSatInstance().getSignedVariable((Literal) literals[1]);
 					addRelation(x, y);
-				}
-				else
-				{
+				} else {
 					for (int i = 0; i < childrenCount - 1; i++) {
 						final int x = solver.getSatInstance().getSignedVariable((Literal) literals[i]);
 						final int indexX = index[Math.abs(x) - 1];
-	
+
 						for (int j = i + 1; j < childrenCount; j++) {
 							final int y = solver.getSatInstance().getSignedVariable((Literal) literals[j]);
 							final int indexY = index[Math.abs(y) - 1];
-	
+
 							if (x > 0) {
 								if (y > 0) {
 									featureGraph.setEdge(indexX, indexY, AFeatureGraph.EDGE_01Q);
@@ -194,7 +190,7 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 
 			visited = new byte[featureGraph.getSize()];
 			complete = new boolean[featureGraph.getSize()];
-			
+
 			for (int i = 0; i < featureGraph.getSize(); i++) {
 				Arrays.fill(visited, (byte) 0);
 				dfs(visited, complete, i, true);
@@ -231,14 +227,6 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 		}
 	}
 
-	private int[] getModel(final Collection<int[]> solutions) {
-		final int[] model = solver.getModel();
-		if (model != null) {
-			solutions.add(model);
-		}
-		return model;
-	}
-
 	private void testVariable() {
 		final int mx1 = parentStack.peek();
 		final int i = Math.abs(mx1) - 1;
@@ -249,7 +237,7 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 			recArray[i] |= compareB;
 
 			int[] xModel1 = null;
-			for (int[] solution : solutions) {
+			for (int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
 					xModel1 = solution;
 					break;
@@ -273,7 +261,7 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 								|| (!positive && !(AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_00Q) || AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_01Q))))) {
 
 					final int my1 = xModel1[j];
-					for (int[] solution : solutions) {
+					for (int[] solution : solver.getSolutionList()) {
 						final int mxI = solution[i];
 						final int myI = solution[j];
 						if ((mx1 == mxI) && (my1 != myI)) {
@@ -284,7 +272,7 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 					solver.getAssignment().push(-my1);
 					solver.setSelectionStrategy((c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						for (int mx0 : parentStack) {
 							addRelation(-mx0, my1);
@@ -298,10 +286,6 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 						solver.getAssignment().pop();
 						break;
 					case TRUE:
-						final int[] model = solver.getModel();
-						if (model != null) {
-							solutions.add(model);
-						}
 						solver.shuffleOrder();
 						solver.getAssignment().pop();
 						break;

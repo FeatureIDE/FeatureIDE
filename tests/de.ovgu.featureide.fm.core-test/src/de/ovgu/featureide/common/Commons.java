@@ -2,13 +2,11 @@ package de.ovgu.featureide.common;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
@@ -124,21 +122,15 @@ public class Commons {
 	 */
 	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final String remotePath,
 			final String localClassPath) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		File modelFileFolder = getFile(remotePath, localClassPath);
+		final File modelFileFolder = getFile(remotePath, localClassPath);
+		assert modelFileFolder != null;
+		
 		for (File f : modelFileFolder.listFiles(filter)) {
 			if (f.getName().equals(featureModelXmlFilename)) {
-				try {
-					new XmlFeatureModelReader(fm).readFromFile(f);
-					break;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (UnsupportedModelException e) {
-					e.printStackTrace();
-				}
+				return FeatureModelManager.readFromFile(f.toPath());
 			}
 		}
-		return fm;
+		return FMFactoryManager.getFactory().createFeatureModel();
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

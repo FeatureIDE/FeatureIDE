@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) {
@@ -70,6 +70,12 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 			object.getLayout().showHiddenFeatures(true);
 		} else if (showHidden.equals(FALSE)) {
 			object.getLayout().showHiddenFeatures(false);
+		}
+		String showShort = eElement.getAttribute(SHOW_SHORT_NAMES);
+		if (showShort.equals(TRUE)) {
+			object.getLayout().setShowShortNames(true);
+		} else if (showShort.equals(FALSE)) {
+			object.getLayout().setShowShortNames(false);
 		}
 	}
 
@@ -172,6 +178,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		}
 		if (!object.getLayout().showHiddenFeatures()) {
 			root.setAttribute(SHOW_HIDDEN_FEATURES, FALSE);
+		}
+		if (object.getLayout().showShortNames()) {
+			root.setAttribute(SHOW_SHORT_NAMES, TRUE);
 		}
 
 		doc.appendChild(root);

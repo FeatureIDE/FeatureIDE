@@ -26,12 +26,13 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RotatableDecoration;
+import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
@@ -39,6 +40,7 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editparts.AbstractConnectionEditPart;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
+import org.eclipse.gef.requests.SelectionRequest;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 
@@ -56,6 +58,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -114,8 +117,42 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	@Override
 	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_OPEN) {
+			final boolean success = changeMandatory(request);
+			if (success) {
+				return;
+			}
 			changeConnectionType();
 		}
+	}
+
+	/**
+	 * Change the mandatory type is the circle decoration was selected.
+	 */
+	private boolean changeMandatory(Request request) {
+		final IFeature feature = getConnectionModel().getSource().getObject();
+		if (feature.getStructure().getParent().isAnd()) {
+			final List<?> decorators = getConnectionFigure().getChildren();
+			if (!decorators.isEmpty()) {
+				Object child = decorators.get(0);
+				if (child instanceof CircleDecoration) {
+					final Rectangle decoratorBounds = new Rectangle(((CircleDecoration) child).getBounds());
+					if (request instanceof SelectionRequest) {
+						final Point requestLocation = ((SelectionRequest) request).getLocation();
+						if (decoratorBounds.contains(requestLocation)) {
+							final IFeatureModel featureModel = feature.getFeatureModel();
+							final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);
+							try {
+								PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+							} catch (ExecutionException e) {
+								FMUIPlugin.getDefault().logError(e);
+							}
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	private void changeConnectionType() {
@@ -143,7 +180,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-
 	}
 
 	@Override
@@ -173,12 +209,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		boolean parentHidden = false;
 
-		RotatableDecoration sourceDecoration = new CircleDecoration(true) {
-			@Override
-			protected void fillShape(Graphics graphics) {
-				
-			}
-		};;
+		RotatableDecoration sourceDecoration = null;
 		while (!sourceParent.getStructure().isRoot()) {
 			sourceParent = sourceParent.getStructure().getParent().getFeature();
 			if (sourceParent.getStructure().isHidden())
@@ -195,12 +226,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 	
 	private static CircleDecoration createClearDecoration() {
-		return new CircleDecoration(true) {
-			@Override
-			protected void fillShape(Graphics graphics) {
-				
-			}
-		};
+		return null;
 	}
 	private static CircleDecoration getSourceDecoration(boolean mandatory) {
 		return new CircleDecoration(mandatory);

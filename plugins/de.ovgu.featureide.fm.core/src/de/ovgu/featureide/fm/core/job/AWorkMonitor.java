@@ -25,13 +25,17 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
+import de.ovgu.featureide.fm.core.job.monitor.AMonitor;
 
 /**
  * Control object for {@link IJob}s.
  * Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
+ * @deprecated Use {@link AMonitor} instead.
+ * 
  * @author Sebastian Krieter
  */
+@Deprecated
 public abstract class AWorkMonitor {
 
 	private static final int maxRelativeWork = 100;
@@ -105,7 +109,7 @@ public abstract class AWorkMonitor {
 	public abstract void invoke(Object t);
 
 	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new Functional.NullConsumer<Object>();
+		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new Functional.NullConsumer<>();
 	}
 
 	/**
@@ -114,7 +118,7 @@ public abstract class AWorkMonitor {
 	 * @param maxAbsoluteWork the absolute amount of work this job has to do
 	 */
 	public final void setMaxAbsoluteWork(int maxAbsoluteWork) {
-		this.maxAbsoluteWork = maxAbsoluteWork;
+		this.maxAbsoluteWork = maxAbsoluteWork > 0 ? maxAbsoluteWork : 1;
 	}
 
 	public final void setMonitor(IProgressMonitor monitor) {

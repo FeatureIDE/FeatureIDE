@@ -20,14 +20,14 @@
  */
 package org.prop4j.analyses;
 
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.conf.AFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
@@ -38,12 +38,17 @@ public class ConditionallyCoreDeadAnalysisFG extends ConditionallyCoreDeadAnalys
 
 	private final IFeatureGraph featureGraph;
 
-	public ConditionallyCoreDeadAnalysisFG(ISolverProvider solver, IFeatureGraph featureGraph) {
+	public ConditionallyCoreDeadAnalysisFG(ISatSolver solver, IFeatureGraph featureGraph) {
 		super(solver);
 		this.featureGraph = featureGraph;
 	}
 
-	public int[] execute(WorkMonitor monitor) throws Exception {
+	public ConditionallyCoreDeadAnalysisFG(SatInstance satInstance, IFeatureGraph featureGraph) {
+		super(satInstance);
+		this.featureGraph = featureGraph;
+	}
+
+	public int[] analyze(IMonitor monitor) throws Exception {
 		solver.getAssignment().clear();
 
 		solver.getAssignment().ensure(fixedVariables.length);
@@ -62,10 +67,9 @@ public class ConditionallyCoreDeadAnalysisFG extends ConditionallyCoreDeadAnalys
 			// monitor.setMaxAbsoluteWork(model1.length);
 
 			// if there are more negative than positive literals
-			solver.setSelectionStrategy((model1.length < countNegative(model2) + countNegative(model1) 
-				? SelectionStrategy.POSITIVE 
-				: SelectionStrategy.NEGATIVE));
-			
+			solver.setSelectionStrategy(
+					(model1.length < countNegative(model2) + countNegative(model1) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE));
+
 			SatInstance.updateModel(model1, model2);
 			for (int i = 0; i < fixedVariables.length; i++) {
 				model1[Math.abs(fixedVariables[i]) - 1] = 0;
@@ -90,7 +94,7 @@ public class ConditionallyCoreDeadAnalysisFG extends ConditionallyCoreDeadAnalys
 			v.pop();
 			if (model1[Math.abs(varX) - 1] == varX) {
 				solver.getAssignment().push(-varX);
-				switch (solver.sat()) {
+				switch (solver.isSatisfiable()) {
 				case FALSE:
 					solver.getAssignment().pop().unsafePush(varX);
 					traverse2(v, varX);

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -53,7 +53,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class DefaultFormat implements IConfigurationFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + DefaultFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + DefaultFormat.class.getSimpleName();
 
 	private static final String NEWLINE = System.lineSeparator();
 

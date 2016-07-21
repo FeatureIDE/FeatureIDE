@@ -36,7 +36,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 import no.sintef.ict.splcatool.CoveringArray;
@@ -63,7 +63,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	}
 	
 	@Override
-	public Void execute(WorkMonitor monitor) throws Exception {
+	public Void execute(IMonitor monitor) throws Exception {
 		runSPLCATool();
 		return null;
 	}

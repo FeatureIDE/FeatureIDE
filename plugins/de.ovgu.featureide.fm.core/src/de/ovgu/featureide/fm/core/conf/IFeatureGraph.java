@@ -22,18 +22,26 @@ package de.ovgu.featureide.fm.core.conf;
 
 import java.io.Serializable;
 
+import org.prop4j.solver.SatInstance;
+
 public interface IFeatureGraph extends Serializable {
 
 	boolean setEdge(int from, int to, byte edgeType);
 
 	byte getEdge(int fromIndex, int toIndex);
-	
+
 	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
 
 	int getSize();
 
+	int[] getIndex();
+
+	SatInstance getSatInstance();
+
 	void copyValues(IFeatureGraph otherGraph);
 
 	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
+
+	int getFeatureIndex(String name);
 
 }

@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_FEATURE_NAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
@@ -52,7 +51,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -60,14 +59,18 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 
 /**
  * Parses a FeatureModel from XML
  * 
+ * @deprecated Use {@link XmlFeatureModelFormat} and {@link FileHandler} instead.
+ * 
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
+@Deprecated
 public class XmlFeatureModelReader extends AbstractFeatureModelReader implements XMLFeatureModelTags {
 
 	public XmlFeatureModelReader(IFeatureModel featureModel) {
@@ -88,11 +91,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 		} catch (SAXParseException e) {
 			throw new UnsupportedModelException(e.getMessage(), e.getLineNumber());
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		} catch (SAXException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		} catch (ParserConfigurationException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		doc.getDocumentElement().normalize();
 		
@@ -232,9 +235,6 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			
 			if (featureModel.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
-			}
-			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
-				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
 			IFeature f = FMFactoryManager.getFactory().createFeature(featureModel, name);
 			f.getStructure().setMandatory(true);

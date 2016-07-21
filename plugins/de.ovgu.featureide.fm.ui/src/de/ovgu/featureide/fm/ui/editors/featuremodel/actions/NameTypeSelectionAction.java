@@ -24,31 +24,31 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Preferences;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectionOperation;
 
 /**
- * Action to select the layout for the feature model.
+ * Action to select the name type (short or lang name) of the feature model.
  * 
- * @author Marcus Pinnecke (Feature interface)
+ * @author Reimar Schroeter
  */
 public class NameTypeSelectionAction extends Action {
+	private int newNameType;
+	private int oldNameType;
+	private final IGraphicalFeatureModel featureModel;
 
-	private final FeatureDiagramEditor editor;
-	private final int newNameType;
-
-	public NameTypeSelectionAction(FeatureDiagramEditor editor, IFeatureModel featureModel, int newNameType) {
-		super(Preferences.getNameTypeLabel(newNameType));
+	public NameTypeSelectionAction(IGraphicalFeatureModel featureModel, int newNameType, int oldNameType) {
+		super(FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
 		this.newNameType = newNameType;
-		this.editor = editor;
+		this.oldNameType = oldNameType;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final NameTypeSelectionOperation op = new NameTypeSelectionOperation(editor, newNameType);
+		final NameTypeSelectionOperation op = new NameTypeSelectionOperation(featureModel, newNameType, oldNameType);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

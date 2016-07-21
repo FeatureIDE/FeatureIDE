@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Basic test super-class for IFeatureModelReader/IFeatureModelWriter
@@ -94,10 +94,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		
 		for (File f : MODEL_FILE_FOLDER.listFiles(fileFilter)) {
 			Object[] models = new Object[2];
-
-			IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-			XmlFeatureModelReader r = new XmlFeatureModelReader(fm);
-			r.readFromFile(f);
+			IFeatureModel fm = FeatureModelManager.readFromFile(f.toPath());
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);
@@ -256,9 +253,8 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	private final IFeatureModel writeAndReadModel() throws UnsupportedModelException {
 		IFeatureModel newFm = FMFactoryManager.getFactory().createFeatureModel();
-		IFeatureModelWriter writer = getWriter(origFm);
-		IFeatureModelReader reader = getReader(newFm);
-		reader.readFromString(writer.writeToString());
+		final IFeatureModelFormat format = getFormat();
+		format.read(newFm, format.write(origFm));
 		return newFm;
 	}
 
@@ -272,8 +268,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		return filter;
 	}
 
-	protected abstract IFeatureModelWriter getWriter(IFeatureModel fm);
-
-	protected abstract IFeatureModelReader getReader(IFeatureModel fm);
+	protected abstract IFeatureModelFormat getFormat();
 
 }

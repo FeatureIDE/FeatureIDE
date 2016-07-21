@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -48,7 +48,7 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 	}
 
 	@Override
-	public Void execute(WorkMonitor monitor) throws Exception {
+	public Void execute(IMonitor monitor) throws Exception {
 		buildModule(featureProject, monitor, featureName);
 		return null;
 	}
@@ -58,7 +58,7 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 	 * @param featureProject The feature project
 	 * @param featureName The feature to build
 	 */
-	private void buildModule(IFeatureProject featureProject, WorkMonitor monitor, String featureName) {
+	private void buildModule(IFeatureProject featureProject, IMonitor monitor, String featureName) {
 		// create a configuration where the feature is selected
 		Configuration configuration = new Configuration(featureModel, true);
 		boolean success = createValidConfiguration(configuration, featureName, Selection.SELECTED);

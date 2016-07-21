@@ -42,6 +42,9 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
@@ -117,7 +120,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();
-				final IJob job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
+				final LongRunningMethod<?> job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
 
 				String tempConfigName = featureProject.getCurrentConfiguration().getName();
 				final String configName;
@@ -131,10 +134,10 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				JobSequence buildSequence = new JobSequence();
 				buildSequence.setIgnorePreviousJobFail(false);
 				buildSequence.addJob(job);
-				buildSequence.addJobFinishedListener(new JobFinishListener() {
-
+				final IRunner<Boolean> runner = LongRunningWrapper.getRunner(buildSequence);
+				runner.addJobFinishedListener(new JobFinishListener<Boolean>() {
 					@Override
-					public void jobFinished(IJob finishedJob, boolean success) {
+					public void jobFinished(IJob<Boolean> finishedJob) {
 						MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
 						synchronized (buildMap) {
 							buildMap.put(project.getName(), false);
@@ -142,7 +145,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 						featureProject.built();
 					}
 				});
-				buildSequence.schedule();
+				runner.schedule();
 			} catch (Exception e) {
 				MPLPlugin.getDefault().logError(e);
 				synchronized (buildMap) {

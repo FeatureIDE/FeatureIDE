@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 
@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
  */
 public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".DefaultFeatureModelFactory";
+	public static final String ID = PluginID.PLUGIN_ID + ".DefaultFeatureModelFactory";
 
 	public static DefaultFeatureModelFactory getInstance() {
 		return new DefaultFeatureModelFactory();

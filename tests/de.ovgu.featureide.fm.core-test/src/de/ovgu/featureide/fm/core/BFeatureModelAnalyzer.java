@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.util.HashMap;
-
 import org.junit.Test;
 
 import de.ovgu.featureide.common.Commons;
@@ -115,7 +113,7 @@ public class BFeatureModelAnalyzer {
 	 * Analyzes constraints only
 	 */
 	private void BUpdateConstraints(final int i) {
-		getFM(i).getAnalyser().updateConstraints(new HashMap<Object, Object>(), new HashMap<Object, Object>());
+		getFM(i).getAnalyser().updateConstraints();
 	}
 	
 	@Test (timeout=2500) // 0.509 @ i5(3,3GHz)
@@ -177,7 +175,7 @@ public class BFeatureModelAnalyzer {
 	 * Analyzes features only
 	 */
 	private void BUpdateFeatures(final int i) {
-		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
+		getFM(i).getAnalyser().updateFeatures();
 	}
 	
 	@Test (timeout=1000) // 0.053s @ i5(3,3GHz)

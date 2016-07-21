@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class ExpressionFormat extends DefaultFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + ExpressionFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + ExpressionFormat.class.getSimpleName();
 
 	@Override
 	public String getSuffix() {

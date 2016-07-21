@@ -37,9 +37,12 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 /**
  * Writes the feature model to a string in velvet syntax.
  * 
+ * @deprecated Use {@link VelvetFeatureModelFormat} instead.
+ * 
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 
 	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->",

@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.prop4j.Literal;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
@@ -34,7 +35,7 @@ import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.SatCalcThread;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * For evaluation purposes.
@@ -46,12 +47,14 @@ public class SatConfChanger implements IConfigurationChanger {
 	private final VariableConfiguration variableConfiguration;
 	private final SatCalcThread calcThread;
 	private final IFeatureModel featureModel;
+	private final String[] featureNames;
 
 	public SatConfChanger(IFeatureModel featureModel, IFeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
 		this.featureModel = featureModel;
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
 		this.calcThread = new SatCalcThread(featureGraph, this, AdvancedNodeCreator.createCNF(featureModel));
+		this.featureNames = FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
 	}
 
 	private final ConcurrentLinkedQueue<String> changedFeatures = new ConcurrentLinkedQueue<>();
@@ -61,7 +64,7 @@ public class SatConfChanger implements IConfigurationChanger {
 
 	public class UpdateMethod implements LongRunningMethod<List<String>> {
 		@Override
-		public List<String> execute(WorkMonitor monitor) {
+		public List<String> execute(IMonitor monitor) {
 			if (newValue == Variable.UNDEFINED) {
 				return Collections.emptyList();
 			}
@@ -69,7 +72,7 @@ public class SatConfChanger implements IConfigurationChanger {
 
 			final int index = featureGraph.getFeatureIndex(f.getName());
 			variableConfiguration.setVariable(index, newValue, true);
-			changedFeatures.add(featureGraph.getFeatureArray()[index] + ": " + (newValue == Variable.TRUE));
+			changedFeatures.add(featureNames[index] + ": " + (newValue == Variable.TRUE));
 
 			final List<Integer> compList = new ArrayList<>();
 			final List<Literal> knownLiterals = new ArrayList<>();
@@ -80,10 +83,10 @@ public class SatConfChanger implements IConfigurationChanger {
 			for (Variable var : variableConfiguration) {
 				switch (var.getValue()) {
 				case Variable.TRUE:
-					knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], true));
+					knownLiterals.add(new Literal(featureNames[i], true));
 					break;
 				case Variable.FALSE:
-					knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], false));
+					knownLiterals.add(new Literal(featureNames[i], false));
 					break;
 				default:
 					compList.add(i);
@@ -93,7 +96,7 @@ public class SatConfChanger implements IConfigurationChanger {
 			}
 			variableConfiguration.setVariable(index, newValue, true);
 
-			calcThread.setKnownLiterals(knownLiterals, new Literal(featureGraph.getFeatureArray()[index], newValue == Variable.TRUE));
+			calcThread.setKnownLiterals(knownLiterals, new Literal(featureNames[index], newValue == Variable.TRUE));
 			calcThread.addObjects(compList);
 			calcThread.start();
 
@@ -105,12 +108,12 @@ public class SatConfChanger implements IConfigurationChanger {
 
 	public void setNewValue(int index, int value, boolean manual) {
 		if (manual) {
-			f = featureModel.getFeature(featureGraph.getFeatureArray()[index]);
+			f = featureModel.getFeature(featureNames[index]);
 			newValue = value;
 		} else {
 			if (value != Variable.UNDEFINED && variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
 				variableConfiguration.setVariable(index, value, false);
-				changedFeatures.add(featureGraph.getFeatureArray()[index] + ": " + (value == Variable.TRUE));
+				changedFeatures.add(featureNames[index] + ": " + (value == Variable.TRUE));
 			}
 		}
 	}

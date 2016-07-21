@@ -35,17 +35,18 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
@@ -54,7 +55,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Arguments> implements LongRunningMethod<IFeatureModel> {
+public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Arguments, IFeatureModel> {
 
 	public static class Arguments extends JobArguments {
 		private final IFeatureModel featuremodel;
@@ -72,7 +73,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 	private IFeatureModel newInterfaceModel = null;
 
 	protected SliceFeatureModelJob(Arguments arguments) {
-		super("Slice Feature Model", arguments);
+		super(arguments);
 	}
 
 	public IFeatureModel getInterfaceModel() {
@@ -80,13 +81,8 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 	}
 
 	@Override
-	public IFeatureModel execute(WorkMonitor monitor) throws Exception {
-		return createInterface(arguments.featuremodel, arguments.featureNames);
-	}
-
-	@Override
-	protected boolean work() {
-		newInterfaceModel = createInterface(arguments.featuremodel, arguments.featureNames);
+	public IFeatureModel execute(IMonitor monitor) throws Exception {
+		newInterfaceModel = createInterface(arguments.featuremodel, arguments.featureNames, monitor);
 
 		String fileName = arguments.modelFile.getFileName().toString();
 		final int extIndex = fileName.lastIndexOf('.');
@@ -98,18 +94,18 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		final Path outputPathRoot = arguments.modelFile.getRoot();
 		final Path outputPath = arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1);
 
-		FileHandler.save(outputPathRoot.resolve(outputPath).resolve(fileName), newInterfaceModel, new XmlFeatureModelFormat());
+		FileHandler.save(outputPathRoot.resolve(outputPath).resolve(fileName), newInterfaceModel, FMFormatManager.getInstance().getFormatByExtension(fileName));
 
-		return true;
+		return newInterfaceModel;
 	}
 
-	private IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
+	private IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames, IMonitor workMonitor) {
 		// Calculate Constraints
 		IFeatureModel m = orgFeatureModel.clone();
 		for (IFeature feat : m.getFeatures()) {
 			feat.getStructure().setAbstract(!selectedFeatureNames.contains(feat.getName()));
 		}
-		workMonitor.setMaxAbsoluteWork(3);
+		workMonitor.setRemainingWork(3);
 		ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(m));
 		removeFeatures.removeAll(selectedFeatureNames);
 		final AdvancedNodeCreator nc = new AdvancedNodeCreator(m, removeFeatures, CNFType.Regular, ModelType.All, false);
@@ -162,7 +158,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 
 		if (cnf instanceof And) {
 			final Node[] children = cnf.getChildren();
-			workMonitor.setMaxAbsoluteWork(children.length + 2);
+			workMonitor.setRemainingWork(children.length + 2);
 
 			final SatSolver modelSatSolver = new SatSolver(AdvancedNodeCreator.createCNF(m), 1000, false);
 			workMonitor.worked();
@@ -174,7 +170,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 						m.addConstraint(FMFactoryManager.getFactory().createConstraint(m, child));
 					}
 				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 				} finally {
 					workMonitor.worked();
 				}

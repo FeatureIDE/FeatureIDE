@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.base.event;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Default implementation of {@link IEventManager}.
@@ -52,7 +52,7 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 		try {
 			listener.propertyChange(event);
 		} catch (Throwable e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 

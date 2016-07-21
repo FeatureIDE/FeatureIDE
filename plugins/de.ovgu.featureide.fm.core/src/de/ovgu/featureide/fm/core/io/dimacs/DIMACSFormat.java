@@ -33,7 +33,7 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -44,9 +44,9 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.job.ConsoleProgressMonitor;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Reads / Writes feature models in the DIMACS CNF format.
@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  */
 public class DIMACSFormat implements IFeatureModelFormat {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
@@ -77,7 +77,6 @@ public class DIMACSFormat implements IFeatureModelFormat {
 				lineNumber++;
 			}
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
 			problemList.add(new Problem(e, lineNumber));
 		}
 		final IFeature rootFeature = FMFactoryManager.getFactory().createFeature(featureModel, ""); 
@@ -125,8 +124,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			clauseParts.clear();
 		}
 		Node cnf = new And(clauses.toArray(new Or[0]));
-		final WorkMonitor workMonitor = new WorkMonitor();
-		workMonitor.setMonitor(new ConsoleProgressMonitor());
+		final IMonitor workMonitor = new ConsoleMonitor();
 		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
 		for (Node clause : cnf.getChildren()) {
 			featureModel.addConstraint(FMFactoryManager.getFactory().createConstraint(featureModel, clause));

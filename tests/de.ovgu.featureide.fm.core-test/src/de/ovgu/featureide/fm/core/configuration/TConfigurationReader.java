@@ -21,20 +21,17 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Test class for the {@link ConfigurationReader}.
@@ -53,13 +50,10 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		}
 	};
 	
-
-	
 	String text = ""; 
 	InputStream a; // = new InputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 	
 	private IFeatureModel FM_test_1 = init("test_5.xml");
-	
 	
 	private static File getFolder() { 
 		File folder =  new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/"); 
@@ -69,20 +63,15 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		return folder; 
 	}
 	
-	
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		FeatureModelingFMExtension comp = new FeatureModelingFMExtension();
-		fm.getFMComposerManager(null).setComposerID("de.ovgu.featureide.core.FeatureModeling", comp);
-		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
+		IFeatureModel fm = null;
+		File[] listFiles = MODEL_FILE_FOLDER.listFiles(filter);
+		assertNotNull(listFiles);
+		for (File f : listFiles) {
 			if (f.getName().equals(name)) {
-				try {
-					new XmlFeatureModelReader(fm).readFromFile(f);
+				fm = FeatureModelManager.readFromFile(f.toPath());
+				if (fm!= null) {
 					break;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (UnsupportedModelException e) {
-					e.printStackTrace();
 				}
 			}
 		}

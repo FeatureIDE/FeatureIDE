@@ -20,31 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -55,7 +42,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFileManager<T> implements IFileManager, IEventManager, IResourceChangeListener {
+public abstract class AFileManager<T> implements IFileManager, IEventManager {
 
 	private final IEventManager eventManager = new DefaultEventManager();
 
@@ -69,12 +56,8 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 	protected final String absolutePath;
 	protected final Path path;
 
-	private IPath eclipseFile;
-
 	protected T persistentObject;
 	protected T variableObject;
-
-	private boolean saveFlag = false;
 
 	public IPersistentFormat<T> getFormat() {
 		return format;
@@ -87,30 +70,6 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 
 		variableObject = object;
 		persistentObject = copyObject(variableObject);
-
-		findEclipseFile();
-	}
-
-	private void findEclipseFile() {
-		IPath absolutePath2 = new org.eclipse.core.runtime.Path(absolutePath);
-		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		final IPath rootLocation = root.getLocation();
-		if (absolutePath2.matchingFirstSegments(rootLocation) != rootLocation.segmentCount()) {
-			try {
-				IFile[] filesOfLocation = root.findFilesForLocationURI(URI.create("file:/" + absolutePath2.toString().replace(" ", "%20")));
-				absolutePath2 = filesOfLocation[0].getFullPath().makeRelativeTo(rootLocation);
-			} catch (IndexOutOfBoundsException e) {
-				FMCorePlugin.getDefault().logError(e);
-				eclipseFile = null;
-				return;
-			}
-		}
-		synchronized (syncObject) {
-			if (eclipseFile == null) {
-				eclipseFile = absolutePath2.makeRelativeTo(rootLocation);
-				ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);				
-			}
-		}
 	}
 
 	public T getObject() {
@@ -162,27 +121,11 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 	public boolean save() {
 		lastProblems.clear();
 		try {
-			synchronized (syncObject) {
-				saveFlag = true;
-			}
 			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
-			if (eclipseFile != null) {
-				final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(eclipseFile);
 				synchronized (saveSyncObject) {
-					if (!file.exists()) {
-						file.create(new ByteArrayInputStream(content), true, null);
-					} else {
-						file.setContents(new ByteArrayInputStream(content), true, true, null);
-					}
+					FileSystem.write(path, content);
 					persist();
 				}
-			} else {
-				synchronized (saveSyncObject) {
-					Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-					persist();
-				}
-				findEclipseFile();
-			}
 			fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
 		} catch (Exception e) {
 			handleException(e);
@@ -192,7 +135,6 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 
 	private void handleException(Exception e) {
 		lastProblems.add(new Problem(e));
-		FMCorePlugin.getDefault().logError(e);
 	}
 
 	@Override
@@ -211,37 +153,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 	}
 
 	@Override
-	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-			final IResourceDelta delta = event.getDelta();
-			if (delta != null) {
-				final IResourceDelta deltaMember = delta.findMember(eclipseFile);
-				if (deltaMember != null) {
-					final IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
-						public boolean visit(IResourceDelta delta) {
-							if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-								synchronized (syncObject) {
-									if (saveFlag) {
-										saveFlag = false;
-									} else {
-										read();
-									}
-								}
-							}
-							return true;
-						}
-					};
-					try {
-						deltaMember.accept(visitor);
-					} catch (CoreException e) {
-					}
-				}
-			}
-		}
-	}
-
 	public void dispose() {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 		FileManagerMap.remove(absolutePath);
 
 		persistentObject = null;

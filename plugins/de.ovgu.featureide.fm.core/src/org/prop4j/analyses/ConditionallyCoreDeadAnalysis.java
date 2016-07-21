@@ -20,24 +20,29 @@
  */
 package org.prop4j.analyses;
 
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
  * 
  * @author Sebastian Krieter
  */
-public class ConditionallyCoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
+public class ConditionallyCoreDeadAnalysis extends AbstractAnalysis<int[]> {
 
 	protected int[] fixedVariables;
 	protected int newCount;
 
-	public ConditionallyCoreDeadAnalysis(ISolverProvider solver) {
+	public ConditionallyCoreDeadAnalysis(ISatSolver solver) {
 		super(solver);
+		resetFixedFeatures();
+	}
+
+	public ConditionallyCoreDeadAnalysis(SatInstance satInstance) {
+		super(satInstance);
 		resetFixedFeatures();
 	}
 
@@ -51,7 +56,7 @@ public class ConditionallyCoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
 		newCount = 0;
 	}
 
-	public int[] execute(WorkMonitor monitor) throws Exception {
+	public int[] analyze(IMonitor monitor) throws Exception {
 		for (int i = 0; i < fixedVariables.length; i++) {
 			solver.getAssignment().push(fixedVariables[i]);
 		}
@@ -76,7 +81,7 @@ public class ConditionallyCoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
 				final int varX = model1[i];
 				if (varX != 0) {
 					solver.getAssignment().push(-varX);
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						solver.getAssignment().pop().unsafePush(varX);
 						monitor.invoke(solver.getSatInstance().getVariableObject(varX));

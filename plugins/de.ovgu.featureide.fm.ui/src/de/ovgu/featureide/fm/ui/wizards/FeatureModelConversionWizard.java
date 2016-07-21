@@ -22,7 +22,9 @@ package de.ovgu.featureide.fm.ui.wizards;
 
 import org.eclipse.ui.INewWizard;
 
-import de.ovgu.featureide.fm.core.io.FMConverter.Format;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -46,22 +48,28 @@ public class FeatureModelConversionWizard extends AbstractWizard implements INew
 		return (String) getData(WizardConstants.KEY_OUT_FOLDER);
 	}
 
-	public Format getInputFormat() {
-		switch ((int)getData(WizardConstants.KEY_OUT_INPUTFORMAT)) {
-		case 0:
-			return Format.SXFM;
-		default:
-			return null;
+	public IFeatureModelFormat getInputFormat() {
+		final Object data = getData(WizardConstants.KEY_OUT_INPUTFORMAT);
+		if (data != null) {
+			try {
+				return FMFormatManager.getInstance().getExtension((String) data);
+			} catch (NoSuchExtensionException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
 		}
+		return null;
 	}
 
-	public Format getOutputFormat() {
-		switch ((int)getData(WizardConstants.KEY_OUT_OUTPUTFORMAT)) {
-		case 0:
-			return Format.FIDE;
-		default:
-			return null;
+	public IFeatureModelFormat getOutputFormat() {
+		final Object data = getData(WizardConstants.KEY_OUT_OUTPUTFORMAT);
+		if (data != null) {
+			try {
+				return FMFormatManager.getInstance().getExtension((String) data);
+			} catch (NoSuchExtensionException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
 		}
+		return null;
 	}
 
 }

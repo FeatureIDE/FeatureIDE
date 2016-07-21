@@ -24,11 +24,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.prop4j.analyses.ImplicationSetsAnalysis.Relationship;
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Creates a complete implication graph.</br>
@@ -36,19 +36,23 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter AtomicSetAnalysis
  */
-public class NaiveImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relationship, Relationship>> {
+public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationship, Relationship>> {
 
 	private static final byte BIT_11 = 1 << 3;
 	private static final byte BIT_10 = 1 << 2;
 	private static final byte BIT_01 = 1 << 1;
 	private static final byte BIT_00 = 1 << 0;
 
-	public NaiveImplicationSetsAnalysis(ISolverProvider solver) {
+	public NaiveImplicationSetsAnalysis(ISatSolver solver) {
 		super(solver);
 	}
 
+	public NaiveImplicationSetsAnalysis(SatInstance satInstance) {
+		super(satInstance);
+	}
+
 	@Override
-	public HashMap<Relationship, Relationship> execute(WorkMonitor monitor) throws Exception {
+	public HashMap<Relationship, Relationship> analyze(IMonitor monitor) throws Exception {
 		final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
@@ -69,17 +73,17 @@ public class NaiveImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<R
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
-					solver.getAssignment().push(-varX);
-					switch (solver.sat()) {
+					solver.assignmentPush(-varX);
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						done[i] = 2;
-						solver.getAssignment().pop().push(varX);
+						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						model2 = solver.getModel();
 						SatInstance.updateModel(model1Copy, model2);
 						solver.shuffleOrder();
@@ -101,7 +105,7 @@ public class NaiveImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<R
 	}
 
 	private void testCombinations(final HashMap<Relationship, Relationship> relationSet, int[] model1, final byte[] done, int i, final int varX) {
-		solver.getAssignment().push(varX);
+		solver.assignmentPush(varX);
 		for (int j = i + 1; j < model1.length; j++) {
 			if (done[j] != 0) {
 				continue;
@@ -110,12 +114,12 @@ public class NaiveImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<R
 			testCombination(relationSet, varX, varY);
 			testCombination(relationSet, varX, -varY);
 		}
-		solver.getAssignment().pop();
+		solver.assignmentPop();
 	}
 
 	private void testCombination(final HashMap<Relationship, Relationship> relationSet, final int varX, final int varY) {
-		solver.getAssignment().push(-varY);
-		switch (solver.sat()) {
+		solver.assignmentPush(-varY);
+		switch (solver.isSatisfiable()) {
 		case FALSE:
 			addRelation(relationSet, varX, varY);
 			break;
@@ -124,7 +128,7 @@ public class NaiveImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<R
 		case TRUE:
 			break;
 		}
-		solver.getAssignment().pop();
+		solver.assignmentPop();
 	}
 
 	private void addRelation(final HashMap<Relationship, Relationship> relationSet, final int mx0, final int my0) {

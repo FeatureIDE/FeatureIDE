@@ -717,7 +717,7 @@ public abstract class Functional {
 	 * @return <b>true</b> if <code>iterable</code> is empty, otherwise <b>false</b>
 	 */
 	public static <T> boolean isEmpty(Iterable<T> iterable) {
-		return iterable.iterator().hasNext();
+		return !iterable.iterator().hasNext();
 	}
 
 }

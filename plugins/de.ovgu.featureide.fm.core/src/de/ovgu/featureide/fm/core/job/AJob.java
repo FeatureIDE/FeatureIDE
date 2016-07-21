@@ -29,8 +29,12 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * Abstract eclipse job with support for {@link JobFinishListener}.
  * This class offers convenience constructors and hides the {@link #run2(IProgressMonitor)}-method.
  * 
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead to create jobs.
+ * 
  * @author Sebastian Krieter
  */
+@SuppressWarnings("rawtypes")
+@Deprecated
 public abstract class AJob extends AbstractJob {
 
 	public AJob(String name) {
@@ -39,16 +43,6 @@ public abstract class AJob extends AbstractJob {
 
 	public AJob(String name, int priority) {
 		super(name, priority);
-	}
-
-	@Override
-	final boolean run2() throws Exception {
-		workMonitor.begin(getName());
-		try {
-			return work();
-		} finally {
-			workMonitor.done();
-		}
 	}
 
 }

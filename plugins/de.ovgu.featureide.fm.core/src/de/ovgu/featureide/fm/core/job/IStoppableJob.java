@@ -23,8 +23,13 @@ package de.ovgu.featureide.fm.core.job;
 /**
  * Interface for a stoppable job.
  * 
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br/>
+ * A {@link IRunner} from the wrapper can be made stoppable via {@link IRunner#setStoppable(boolean)}.
+ * 
  * @author Sebastian Krieter
  */
+@SuppressWarnings("rawtypes")
+@Deprecated
 public interface IStoppableJob extends IJob {
 	int getCancelingTimeout();
 	void setCancelingTimeout(int cancelingTimeout);

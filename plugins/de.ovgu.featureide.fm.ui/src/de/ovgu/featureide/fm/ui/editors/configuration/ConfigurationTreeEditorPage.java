@@ -100,10 +100,9 @@ import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.IJob;
-import de.ovgu.featureide.fm.core.job.IStoppableJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.EXPAND_ALGORITHM;
@@ -527,14 +526,13 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (configurationEditor.getConfiguration().getPropagator() == null) {
 			return;
 		}
-		final LongRunningJob<Long> job = LongRunningWrapper.createJob("", configurationEditor.getConfiguration().getPropagator().number(250));
-		job.addJobFinishedListener(new JobFinishListener() {
+		final LongRunningJob<Long> job = new LongRunningJob<>("", configurationEditor.getConfiguration().getPropagator().number(250));
+		job.addJobFinishedListener(new JobFinishListener<Long>() {
 			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
+			public void jobFinished(IJob<Long> finishedJob) {
 				final StringBuilder sb = new StringBuilder();
 				sb.append(valid ? VALID_COMMA_ : INVALID_COMMA_);
 
-				@SuppressWarnings("unchecked")
 				final Long number = ((LongRunningJob<Long>) finishedJob).getResults();
 				if (number != null) {
 					if (number < 0) {
@@ -912,10 +910,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		LongRunningJob<List<Node>> job = new LongRunningJob<List<Node>>("FindClauses", jobs); 
 		job.schedule();
 		
-		job.addJobFinishedListener(new JobFinishListener() {
-			@SuppressWarnings("unchecked")
+		job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
 			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
+			public void jobFinished(IJob<List<Node>> finishedJob) {
 				LongRunningJob<List<Node>> job = ((LongRunningJob<List<Node>>) finishedJob);
 				maxGroup = job.getResults().size() - 1;
 				for (final SelectableFeature feature : manualFeatureList) {
@@ -995,9 +992,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 		if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.OPEN_CLAUSE
 				|| configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.PARENT_CLAUSE) {
-			job.addJobFinishedListener(new JobFinishListener() {
+			job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
 				@Override
-				public void jobFinished(IJob finishedJob, boolean success) {
+				public void jobFinished(IJob<List<Node>> finishedJob) {
 					currentDisplay.asyncExec(new Runnable() {
 						@Override
 						public void run() {
@@ -1019,7 +1016,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
 		final LongRunningMethod<List<String>> update = configurationEditor.getConfiguration().getPropagator()
 				.update(redundantManual, feature.getFeature().getName());
-		final LongRunningJob<List<String>> job = LongRunningWrapper.createJob("", update);
+		final LongRunningJob<List<String>> job = new LongRunningJob<>("", update);
 		job.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
 			public void invoke(Object t) {
@@ -1056,12 +1053,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		updateInfoLabel(null);
 
-		final IStoppableJob updateJob = computeFeatures(redundantManual, currentDisplay);
+		final LongRunningJob<List<String>> updateJob = computeFeatures(redundantManual, currentDisplay);
 		if (updateJob != null) {
-			updateJob.addJobFinishedListener(new JobFinishListener() {
+			updateJob.addJobFinishedListener(new JobFinishListener<List<String>>() {
 				@Override
-				public void jobFinished(IJob finishedJob, boolean success) {
-					if (success) {
+				public void jobFinished(IJob<List<String>> finishedJob) {
+					if (finishedJob.getStatus() == JobStatus.OK) {
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
 						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);

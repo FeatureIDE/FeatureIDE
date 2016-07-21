@@ -27,25 +27,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.sat4j.core.VecInt;
-import org.sat4j.minisat.core.Solver;
-import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-
 /**
  * Represents an instance of a satisfiability problem in CNF.</br>
- * Use a {@link ISolverProvider solver provider} or the {@link #getSolver()} method
+ * Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()} method
  * to get a {@link BasicSolver solver} for this problem.
  * 
  * @author Sebastian Krieter
  */
-public class SatInstance implements ISolverProvider, Serializable {
+public class SatInstance implements Serializable {
 
 	private static final long serialVersionUID = 5698037305716648285L;
 
@@ -58,7 +54,7 @@ public class SatInstance implements ISolverProvider, Serializable {
 			}
 		}
 	}
-	
+
 	public static int[] negateModel(int[] ar) {
 		int[] nar = Arrays.copyOf(ar, ar.length);
 		for (int i = 0; i < nar.length; i++) {
@@ -85,52 +81,65 @@ public class SatInstance implements ISolverProvider, Serializable {
 			intToVar[index] = name;
 		}
 	}
-	
+
 	public SatInstance(Node root) {
-		this(root, getFeatures(root));
+		this(root, getDistinctVariableObjects(root));
 	}
 
-	private static Collection<Object> getFeatures(Node root) {
-		final Collection<Object> featureList = new HashSet<>();
-		for (Node clause : root.getChildren()) {
+	public static Set<Object> getDistinctVariableObjects(Node cnf) {
+		final HashSet<Object> result = new HashSet<>();
+		for (Node clause : cnf.getChildren()) {
 			final Node[] literals = clause.getChildren();
-			for (Node literal : literals) {
-				featureList.add(((Literal)literal).var);
+			for (int i = 0; i < literals.length; i++) {
+				result.add(((Literal) literals[i]).var);
 			}
 		}
-		return featureList;
-	}
-
-	protected void initSolver(Solver<?> solver) {
-		solver.newVar(varToInt.size());
-		final Node[] cnfChildren = cnf.getChildren();
-		solver.setExpectedNumberOfClauses(cnfChildren.length);
-		try {
-			for (Node node : cnfChildren) {
-				final Node[] children = node.getChildren();
-				final int[] clause = new int[children.length];
-				for (int i = 0; i < children.length; i++) {
-					final Literal literal = (Literal) children[i];
-					clause[i] = literal.positive ? varToInt.get(literal.var) : -varToInt.get(literal.var);
-				}
-				solver.addClause(new VecInt(clause));
-			}
-		} catch (ContradictionException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
+		return result;
 	}
 
 	public List<String> convertToString(int[] model) {
+		return convertToString(model, true, false);
+	}
+
+	public List<String> convertToString(int[] model, boolean includePositive, boolean includeNegative) {
 		final List<String> resultList = new ArrayList<>();
 		for (int var : model) {
 			if (var > 0) {
-				resultList.add(intToVar[Math.abs(var)].toString());
+				if (includePositive) {
+					resultList.add(intToVar[Math.abs(var)].toString());
+				}
+			} else {
+				if (includeNegative) {
+					resultList.add("-" + intToVar[Math.abs(var)].toString());
+				}
 			}
 		}
 		return resultList;
 	}
 
-	public List<String> convertToString(IVecInt model) {
+	public int[] convertToInt(Collection<Literal> literals) {
+		final int[] resultList = new int[literals.size()];
+		int i = 0;
+		for (Literal literal : literals) {
+			final Integer varIndex = varToInt.get(literal.var);
+			resultList[i++] = varIndex == null ? 0 : (literal.positive ? varIndex : -varIndex);
+		}
+		return resultList;
+	}
+
+	public int[] convertToInt(Literal[] literals) {
+		return convertToInt(Arrays.asList(literals));
+	}
+
+	public List<Literal> convertToLiterals(int[] model) {
+		final List<Literal> resultList = new ArrayList<>();
+		for (int var : model) {
+			resultList.add(new Literal(intToVar[Math.abs(var)], (var > 0)));
+		}
+		return resultList;
+	}
+
+	protected List<String> convertToString(IVecInt model) {
 		final List<String> resultList = new ArrayList<>(model.size());
 		final IteratorInt modelIt = model.iterator();
 		while (modelIt.hasNext()) {
@@ -153,11 +162,6 @@ public class SatInstance implements ISolverProvider, Serializable {
 
 	public int getSignedVariable(Literal l) {
 		return l.positive ? varToInt.get(l.var) : -varToInt.get(l.var);
-	}
-
-	@Override
-	public BasicSolver getSolver() {
-		return new BasicSolver(this);
 	}
 
 	public int getVariable(Literal l) {

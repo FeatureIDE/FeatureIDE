@@ -64,7 +64,7 @@ public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtens
 			try {
 				return classObject.cast(configurationElement.createExecutableExtension("class"));
 			} catch (CoreException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 		}
 		return null;

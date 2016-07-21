@@ -35,14 +35,15 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * 
  * @author Jens Meinicke
  */
-public class RandConfigurationGenerator extends MASKConfigurationGenerator {
+public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
 
 	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
 	}
-	
+
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance solver, int solutionCount) {
-		return new RandomConfigurationGenerator(solver, solutionCount);
+	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
+		return new RandomConfigurationGenerator(satInstance, solutionCount);
 	}
+
 }

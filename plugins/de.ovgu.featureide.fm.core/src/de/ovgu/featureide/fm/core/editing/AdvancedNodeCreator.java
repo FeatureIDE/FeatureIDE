@@ -29,6 +29,7 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
+import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -42,7 +43,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
@@ -63,6 +64,20 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
+	}
+
+	public static Node createRegularCNF(IFeatureModel featureModel) {
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(false);
+		return nodeCreator.createNodes();
+	}
+	
+	public static SatInstance createSatInstance(IFeatureModel featureModel) {
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(false);
+		return new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(featureModel));
 	}
 
 	public static Node createCNFWithoutAbstract(IFeatureModel featureModel) {
@@ -101,8 +116,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return nodeCreator.createNodes();
 	}
 
-	private static Literal getVariable(IFeature feature, boolean positive) {
-		final String oldName = feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName());
+	private Literal getVariable(IFeature feature, boolean positive) {
+		final String oldName = useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
 		return new Literal(oldName, positive);
 	}
 
@@ -115,6 +130,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * Default values is {@code true} (values will be included).
 	 */
 	private boolean includeBooleanValues = true;
+
+	private boolean useOldNames = true;
 
 	private boolean optionalRoot = false;
 
@@ -145,7 +162,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		setFeatureModel(featureModel, excludedFeatureNames);
 	}
 
-	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
+	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType,
+			boolean includeBooleanValues) {
 		this.cnfType = cnfType;
 		this.modelType = modelType;
 		this.includeBooleanValues = includeBooleanValues;
@@ -167,7 +185,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		default:
 			for (IConstraint constraint : featureModel.getConstraints()) {
 				final Node cnfNode = Node.buildCNF(constraint.getNode());
-//				final Node cnfNode = constraint.getNode().toCNF();
+				//				final Node cnfNode = constraint.getNode().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
 						clauses.add((compact || (andChild instanceof Or)) ? andChild : new Or(andChild));
@@ -310,7 +328,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	@Override
-	public Node execute(WorkMonitor monitor) throws Exception {
+	public Node execute(IMonitor monitor) throws Exception {
 		return createNodes();
 	}
 
@@ -341,6 +359,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public void setCnfType(CNFType cnfType) {
 		this.cnfType = cnfType;
+	}
+
+	public void setUseOldNames(boolean useOldNames) {
+		this.useOldNames = useOldNames;
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {

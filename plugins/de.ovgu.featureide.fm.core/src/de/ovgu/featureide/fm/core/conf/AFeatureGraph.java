@@ -94,4 +94,13 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 		return satInstance;
 	}
 
+	public int[] getIndex() {
+		return index;
+	}
+
+	@Override
+	public int getFeatureIndex(String name) {
+		return index[satInstance.getVariable(name) - 1];
+	}
+
 }

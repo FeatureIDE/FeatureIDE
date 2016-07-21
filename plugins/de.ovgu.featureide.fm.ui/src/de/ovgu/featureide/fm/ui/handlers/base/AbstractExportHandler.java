@@ -20,63 +20,43 @@
  */
 package de.ovgu.featureide.fm.ui.handlers.base;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 public abstract class AbstractExportHandler extends AFileHandler {
 
 	@Override
 	protected final void singleAction(IFile modelFile) {
-		try {
-			final IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-
-			// Read model
-			final FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
-			reader.readFromFile(modelFile);
-
-			// Get writer
-			final IFeatureModelWriter fmWriter = getFeatureModelWriter(fm);
-			if (fmWriter == null) {
-				return;
-			}
-
-			// Ask for file name
-			FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
-			configureFileDialog(fileDialog);
-			final String filepath = fileDialog.open();
-			if (filepath == null) {
-				return;
-			}
-
-			// Write model
-			fmWriter.writeToFile(new File(filepath));
-
-			modelFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (FileNotFoundException | UnsupportedModelException | CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
+		// Ask for file name
+		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		configureFileDialog(fileDialog);
+		final String filepath = fileDialog.open();
+		if (filepath == null) {
+			return;
 		}
+
+		final IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+
+		FileHandler<IFeatureModel> handler = new FileHandler<>(fm);
+		// Read model
+		handler.read(Paths.get(modelFile.getLocationURI()), new XmlFeatureModelFormat());
+		handler.write(Paths.get(filepath), getFormat());
 	}
 
 	/**
-	 * @param fm
-	 * @return
+	 * Returns an instance of {@link IFeatureModelFormat}.
 	 */
-	protected abstract IFeatureModelWriter getFeatureModelWriter(IFeatureModel fm);
+	protected abstract IFeatureModelFormat getFormat();
 
 	protected void configureFileDialog(FileDialog fileDialog) {
 		fileDialog.setOverwrite(true);

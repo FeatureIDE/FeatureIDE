@@ -34,8 +34,8 @@ import javax.annotation.CheckForNull;
 
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -254,23 +254,23 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	public void runTests() {
 		final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(this);
-		FMCorePlugin.getDefault().logInfo(VELVET_FEATUREMODEL_IMPORTED);
+		Logger.logInfo(VELVET_FEATUREMODEL_IMPORTED);
 
 		try {
-			FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? VALID : INVALID);
+			Logger.logInfo(analyzer.isValid() ? VALID : INVALID);
 			StringBuilder sb = new StringBuilder("Dead Features: ");
 			for (IFeature deadFeature : analyzer.getDeadFeatures()) {
 				sb.append(deadFeature.getName() + ", ");
 			}
-			FMCorePlugin.getDefault().logInfo(sb.toString());
+			Logger.logInfo(sb.toString());
 			sb.delete(0, sb.length());
 			sb.append("FO Features: ");
 			for (IFeature deadFeature : analyzer.getFalseOptionalFeatures()) {
 				sb.append(deadFeature.getName() + ", ");
 			}
-			FMCorePlugin.getDefault().logInfo(sb.toString());
+			Logger.logInfo(sb.toString());
 		} catch (final TimeoutException e ) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 	
@@ -281,9 +281,12 @@ public class ExtendedFeatureModel extends FeatureModel {
 		if (feature != null) {
 			return feature;
 		}
-		return null;
-		// TODO MPL: Search for possible right feature
-//		return super.getFeature(parentModel + "." + name);
+		
+		if(name.toString().contains(".")){
+			return super.getFeature(this.getStructure().getRoot().getFeature().getName() + "." + name);
+		}else{
+			return null;
+		}
 	}
 	
 	public boolean isInterface() {

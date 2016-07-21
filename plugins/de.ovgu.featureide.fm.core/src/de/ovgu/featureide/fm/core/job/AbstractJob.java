@@ -20,16 +20,20 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
+import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -38,89 +42,119 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-abstract class AbstractJob extends Job implements IJob {
-	protected final WorkMonitor workMonitor = new WorkMonitor();
+public abstract class AbstractJob<T> extends Job implements IJob<T> {
+
+	private class JobFL extends JobChangeAdapter {
+		private JobFinishListener<T> listener;
+
+		public JobFL(JobFinishListener<T> listener) {
+			this.listener = listener;
+		}
+
+		@Override
+		public void done(IJobChangeEvent event) {
+			listener.jobFinished(AbstractJob.this);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			return listener.equals(((JobFL) obj).listener);
+		}
+
+		@Override
+		public int hashCode() {
+			return listener.hashCode();
+		}
+	}
+
+	private IConsumer<Object> intermediateFunction;
+
+	private T methodResult = null;
+
 	private JobStatus status = JobStatus.NOT_STARTED;
-	private LinkedList<JobFinishListener> jobFinishedListeners = new LinkedList<JobFinishListener>();
-	
+
 	protected AbstractJob(String name, int priority) {
 		super(name);
 		setPriority(priority);
 	}
-	
+
+	@Override
+	public final void addJobFinishedListener(final JobFinishListener<T> listener) {
+		addJobChangeListener(new JobFL(listener));
+	}
+
+	@Override
+	public T getResults() {
+		return methodResult;
+	}
+
 	@Override
 	public final JobStatus getStatus() {
 		return status;
 	}
-	
+
 	@Override
-	public final void addJobFinishedListener(JobFinishListener listener) {
-		jobFinishedListeners.add(listener);
-	}
-	
-	@Override
-	public final void removeJobFinishedListener(JobFinishListener listener) {
-		jobFinishedListeners.remove(listener);
-	}
-	
-	@Override
-	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		workMonitor.setIntermediateFunction(intermediateFunction);
+	public final void removeJobFinishedListener(JobFinishListener<T> listener) {
+		removeJobChangeListener(new JobFL(listener));
 	}
 
 	@Override
 	public final IStatus run(IProgressMonitor monitor) {
 		status = JobStatus.RUNNING;
-		boolean success = false;
-		workMonitor.setMonitor(monitor);
-		
+
 		// run job and catch possible runtime exceptions
+		final ProgressMonitor workMonitor = new ProgressMonitor(getName(), monitor);
+		workMonitor.setIntermediateFunction(intermediateFunction);
 		try {
-			success = run2();
+			methodResult = work(workMonitor);
+			status = JobStatus.OK;
+		} catch (MethodCancelException e) {
+			status = JobStatus.FAILED;
+			throw new OperationCanceledException();
 		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+			status = JobStatus.FAILED;
+			Logger.logError(e);
+			return new Status(Status.ERROR, PluginID.PLUGIN_ID, "FAILED", e);
 		} finally {
-			finalWork(success);
+			finalWork();
+			workMonitor.done();
 		}
-		
-		status = success ? JobStatus.OK : JobStatus.FAILED;
-		
-		// inform all registered listeners
-		for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
-		    try {
-		    	it.next().jobFinished(this, success);
-		    } catch (RuntimeException e) {
-		    	FMCorePlugin.getDefault().logError(e);
-		    }
-		}
-		
-		return success ? Status.OK_STATUS : Status.CANCEL_STATUS;
+
+		return Status.OK_STATUS;
 	}
-	
+
+	@Override
+	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
+		this.intermediateFunction = intermediateFunction;
+	}
+
 	public Class<?> getImplementationClass() {
 		return getClass();
 	}
-	
+
 	/**
 	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not.
 	 * The default method is empty.
 	 * 
 	 * @param success {@code true} if the execution of {@link #work()} was complete and successful, {@code false} otherwise
 	 */
-	protected void finalWork(boolean success) {}
-	
+	protected void finalWork() {
+	}
+
 	/**
 	 * In this method all the work of the job is done.</br>
-	 * Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.
+	 * Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.</br>
+	 * </br>
+	 * Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
 	 * 
 	 * @return {@code true} if no error occurred during the process
 	 * @throws Exception any exception (will be catched by the parent class)
 	 */
-	protected abstract boolean work() throws Exception;
-	
-	/**
-	 * This method is used by {@link AStoppableJob} to handle the inner thread.
-	 * The job's task should be implemented in {@link #work()}.
-	 */
-	abstract boolean run2() throws Exception;
+	protected abstract T work(IMonitor workMonitor) throws Exception;
+
 }

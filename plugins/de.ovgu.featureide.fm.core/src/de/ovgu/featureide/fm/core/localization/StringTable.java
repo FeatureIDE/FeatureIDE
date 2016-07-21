@@ -86,7 +86,8 @@ public class StringTable {
 	public static final String GET_FALSE_OPTIONAL_FEATURES = "get false optional features";
 	public static final String GET_UNUSED_FEATURES = "get unused features";
 	public static final String REFESH_CONFIGURATION_FOLER = "refesh configuration foler";
-	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = "Error while loading feature model from ";
+	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL = "Error while loading feature model from ";
+	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = ERROR_WHILE_LOADING_FEATURE_MODEL + " from ";
 	public static final String THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_ = "This annotation is not supported yet - moved to the comment section.";
 	public static final String PERFORMING_FULL_BUILD = "Performing full build";
 	public static final String THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_ = "The feature module is empty. You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
@@ -94,7 +95,7 @@ public class StringTable {
 	public static final String LOAD_MODEL = "Load Model";
 	public static final String CHECKING_CONFIGURATIONS = "Checking configurations";
 	public static final String DELETE_CONFIGURATION_MARKERS = "Delete Configuration Markers";
-	public static final String CHECK_VALIDITY_OF = "Check validity of ";
+	public static final String CHECK_VALIDITY_OF = "Checking validity";
 	public static final String CONFIGURATION_ = "Configuration '";
 	public static final String NO_COMPOSER_COULD_BE_CREATED_FOR_ID = "No composer could be created for ID ";
 	public static final String REMOVE_PROJECT = "Remove project";
@@ -625,7 +626,6 @@ public class StringTable {
 	public static final String DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_ = "Defines the algorithm for t-wise sampling.";
 	public static final String DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_ = "Defines how the generated produkts are ordered.";
 	public static final String SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_ = "Searches for test cases in the generated products and executes them.";
-	public static final String DEFINE_THE_T_FOR_T_WISE_SAMPLING_ = "Define the t for t-wise sampling.";
 	public static final String DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_ = "Defnies whether the products are generated into separate projects or into a folder in this project.";
 	public static final String BUILD_PRODUCTS_FOR_PROJECT = "Build products for project ";
 	public static final String ERROR_ = "-Error-";
@@ -660,7 +660,7 @@ public class StringTable {
 	public static final String CHVATAL = "Chvatal";
 	public static final String CASA = "CASA";
 	public static final String ICPL = "ICPL";
-	public static final String MASK = "MASK";
+	public static final String INCLING = "IncLing";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";
 	public static final String COMPILER = "Compiler";
 	public static final String SYMBOL = "symbol";
