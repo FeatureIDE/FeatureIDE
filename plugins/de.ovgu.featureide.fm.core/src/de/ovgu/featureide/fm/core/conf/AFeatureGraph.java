@@ -40,33 +40,25 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 
 	public static final byte MASK_0_CLEAR = (byte) 0b11110000, //0xf3,
 			MASK_1_CLEAR = (byte) 0b00001111; //0xf3,
-	
-	protected final SatInstance satInstance;
-	protected final int[] index;
 
+	protected transient SatInstance satInstance;
+
+	protected int[] index;
 	protected int size;
-//	protected HashMap<String, Integer> featureMap;
-//	protected ArrayList<LinkedList<Expression>> expListAr;
-	
+
 	public static boolean isEdge(byte edge, byte q) {
 		return (edge & q) != EDGE_NONE;
-	}	
-	
+	}
+
 	public static boolean isWeakEdge(byte edge) {
 		return isEdge(edge, EDGE_00Q) || isEdge(edge, EDGE_01Q) || isEdge(edge, EDGE_10Q) || isEdge(edge, EDGE_11Q);
 	}
-	
+
 	public static boolean isStrongEdge(byte edge) {
 		return isEdge(edge, EDGE_00) || isEdge(edge, EDGE_01) || isEdge(edge, EDGE_10) || isEdge(edge, EDGE_11);
 	}
-	
+
 	public AFeatureGraph(SatInstance satInstance, int[] index) {
-//		size = variantfeatures.size();
-//		featureMap = new HashMap<>(size << 1);
-//		featureArray = new String[size];
-//		this.coreFeatures = new String[coreFeatures.size()];
-//		this.deadFeatures = new String[deadFeatures.size()];
-		
 		int count = 0;
 		for (int i = 0; i < index.length; i++) {
 			if (index[i] >= 0) {
@@ -74,41 +66,11 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 			}
 		}
 		this.size = count;
-		
+
 		this.satInstance = satInstance;
 		this.index = index;
-
-//		expListAr = new ArrayList<>(size);
-//		for (int i = 0; i < size; i++) {
-//			expListAr.add(null);
-//		}
-
-//		int i = 0;
-//		for (String feature : coreFeatures) {
-//			this.coreFeatures[i++] = feature;
-//		}
-//
-//		i = 0;
-//		for (String feature : deadFeatures) {
-//			this.deadFeatures[i++] = feature;
-//		}
-//
-//		i = 0;
-//		for (String feature : variantfeatures) {
-//			featureArray[i++] = feature;
-//		}
-
-//		Arrays.sort(featureArray);
-//		Arrays.sort(this.coreFeatures);
-//		Arrays.sort(this.deadFeatures);
-//		for (int j = 0; j < featureArray.length; j++) {
-//			featureMap.put(featureArray[j], j);
-//		}
 	}
-	
-	/**
-	 * 
-	 */
+
 	public AFeatureGraph() {
 		this.satInstance = null;
 		this.index = null;
@@ -116,79 +78,20 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 
 	public void copyValues(IFeatureGraph otherGraph) {
 		final AFeatureGraph anotherAGraph = (AFeatureGraph) otherGraph;
-//		this.size = anotherAGraph.size;
-//		this.coreFeatures = Arrays.copyOf(anotherAGraph.coreFeatures, anotherAGraph.coreFeatures.length);
-//		this.deadFeatures = Arrays.copyOf(anotherAGraph.deadFeatures, anotherAGraph.deadFeatures.length);
-//		this.featureArray = Arrays.copyOf(anotherAGraph.featureArray, anotherAGraph.featureArray.length);
-//		this.expListAr = new ArrayList<>(anotherAGraph.expListAr);
-//		this.featureMap = new HashMap<>(anotherAGraph.featureMap);
+		this.size = anotherAGraph.size;
+		this.index = anotherAGraph.index;
 	}
 
-//	public void implies(String implyFeature, String impliedFeature) {
-//		implies(implyFeature, impliedFeature, 0);
-//	}
-
-//	public void implies(String implyFeature, String impliedFeature, int negation) {
-//		switch (negation) {
-//		case 0:
-//			setEdge(implyFeature, impliedFeature, ListFeatureGraph.EDGE_11);
-//			setEdge(impliedFeature, implyFeature, ListFeatureGraph.EDGE_00);
-//			break;
-//		case 1:
-//			setEdge(implyFeature, impliedFeature, ListFeatureGraph.EDGE_10);
-//			setEdge(impliedFeature, implyFeature, ListFeatureGraph.EDGE_10);
-//			break;
-//		case 2:
-//			setEdge(implyFeature, impliedFeature, ListFeatureGraph.EDGE_01);
-//			setEdge(impliedFeature, implyFeature, ListFeatureGraph.EDGE_01);
-//			break;
-//		case 3:
-//			setEdge(impliedFeature, implyFeature, ListFeatureGraph.EDGE_11);
-//			setEdge(implyFeature, impliedFeature, ListFeatureGraph.EDGE_00);
-//			break;
-//		}
-//	}
-
-//	public byte getEdge(String from, String to) {
-//		return getEdge(featureMap.get(from), featureMap.get(to));
-//	}
-//
-//	@Override
-//	public byte getValue(String from, String to, boolean fromSelected) {
-//		return getValue(featureMap.get(from), featureMap.get(to), fromSelected);
-//	}
-//
-//	public void setEdge(String from, String to, byte edgeType) {
-//		setEdge(featureMap.get(from), featureMap.get(to), edgeType);
-//	}
-//
-//	public int getFeatureIndex(String featureName) {
-//		final Integer index = featureMap.get(featureName);
-//		return index != null ? index : -1;
-//	}
+	public void setSatInstance(SatInstance satInstance) {
+		this.satInstance = satInstance;
+	}
 
 	public int getSize() {
 		return size;
 	}
 
-//	public ArrayList<LinkedList<Expression>> getExpListAr() {
-//		return expListAr;
-//	}
-
 	public SatInstance getSatInstance() {
 		return satInstance;
 	}
-
-//	public String[] getFeatureArray() {
-//		return featureArray;
-//	}
-//
-//	public String[] getCoreFeatures() {
-//		return coreFeatures;
-//	}
-//
-//	public String[] getDeadFeatures() {
-//		return deadFeatures;
-//	}
 
 }

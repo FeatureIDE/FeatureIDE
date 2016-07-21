@@ -41,9 +41,6 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 		}
 	}
 	
-	/**
-	 * @param object
-	 */
 	public MatrixFeatureGraph(IFeatureModel object) {
 		super();
 		featureArray = new Object[size];
@@ -153,25 +150,5 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 		final int index = (internalFrom * size) + internalTo;
 		return (byte) (((fromSelected ? (adjMatrix[index] >>> 4) : adjMatrix[index])) & 0x0000000f);
 	}
-
-//	@Override
-//	public int countNeighbors(String from, boolean selected, boolean strongConnectionsOnly) {
-//		Integer integer = featureMap.get(from);
-//		if (integer == null) {
-//			return -1;
-//		}
-//		final int fromIndex = integer;
-//
-//		final byte countEdge = selected ? (strongConnectionsOnly ? (EDGE_10 | EDGE_11) : MASK_0_CLEAR) : (strongConnectionsOnly ? (EDGE_00 | EDGE_01) : MASK_1_CLEAR);
-//
-//		int count = 0;
-//		for (int i = (fromIndex * size), end = i + size; i < end; i++) {
-//			if (isEdge(adjMatrix[i], countEdge)) {
-//				count++;
-//			}
-//		}
-//
-//		return count;
-//	}
 
 }

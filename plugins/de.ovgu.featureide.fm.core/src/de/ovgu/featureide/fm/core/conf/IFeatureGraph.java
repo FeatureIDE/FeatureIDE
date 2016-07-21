@@ -24,44 +24,16 @@ import java.io.Serializable;
 
 public interface IFeatureGraph extends Serializable {
 
-//	void implies(String implyFeature, String impliedFeature);
-
-//	void implies(String implyFeature, String impliedFeature, int negation);
-
-//	void setEdge(String from, String to, byte edgeType);
-
 	boolean setEdge(int from, int to, byte edgeType);
 
 	byte getEdge(int fromIndex, int toIndex);
 	
-//	byte getEdge(String fromIndex, String toIndex);
-
 	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
-
-//	byte getValue(String from, String to, boolean fromSelected);
-//
-//	int getFeatureIndex(String featureName);
 
 	int getSize();
 
-//	ArrayList<LinkedList<Expression>> getExpListAr();
-
-//	int countNeighbors(String from, boolean selected, boolean subtractReal);
-
-//	String[] getFeatureArray();
-//
-//	String[] getCoreFeatures();
-//
-//	String[] getDeadFeatures();
-	
 	void copyValues(IFeatureGraph otherGraph);
 
-	/**
-	 * @param fromIndex
-	 * @param toIndex
-	 * @param fromSelected
-	 * @return
-	 */
 	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
 
 }

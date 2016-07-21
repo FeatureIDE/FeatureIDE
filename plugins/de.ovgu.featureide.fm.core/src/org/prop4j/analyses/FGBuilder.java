@@ -106,12 +106,21 @@ public class FGBuilder extends SingleThreadAnalysis<IFeatureGraph> {
 			index = new int[model1.length];
 			int count = 0;
 			for (int i = 0; i < index.length; i++) {
-				index[i] = i - count;
-				if (core[i] != 0) {
+				final byte coreValue = core[i];
+				switch (coreValue) {
+				case -1:
+					count++;
+					index[i] = -2;
+					break;
+				case 1:
 					count++;
 					index[i] = -1;
-				} else {
+					break;
+				case 0:
 					index[i] = i - count;
+					break;
+				default:
+					throw new RuntimeException();
 				}
 			}
 
