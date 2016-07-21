@@ -55,7 +55,7 @@
         id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
         name="Extended Feature Model"
         priority="high">
-  </content-type>               
+  </content-type>
 	</extension>
 
 	<extension
@@ -88,7 +88,6 @@
         class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
         contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
         default="true"
-        extensions="xml,velvet"
         icon="icons/featuretree.ico"
         id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
         name="Feature Model Editor">
@@ -310,7 +309,24 @@
 				</visibleWhen>
 			</command>
 			<separator
-					name="de.ovgu.featureide.fm.ui.separator2"
+					name="de.ovgu.featureide.fm.ui.separator7"
+					visible="true">
+			</separator>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportFAMA"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportFAMA"
+					label="Export model to FaMa format"
+					style="push">
+					<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator9"
 					visible="true">
 			</separator>
 			<command
@@ -339,6 +355,19 @@
 			</reference>
 		</visibleWhen>
    </command>
+   			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
+					icon="icons/featuretree.ico"
+					id="de.ovgu.featureide.fm.ui.actions.EliminateComplexConstraints"
+					label="Product-equivalent model with simple constraints"
+					style="push">
+					<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
 			<separator
 					name="de.ovgu.featureide.fm.ui.separator4"
 					visible="true">
@@ -458,6 +487,14 @@
         id="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
         name="Feature Model Slicing">
   </command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
+				name="Eliminate complex constraints">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ExportFAMA"
+				name="Import model to FaMa format">
+		</command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -520,6 +557,14 @@
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.OpenWithGUIDSLHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.openWithGuidsl">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.EliminateComplexConstraintsHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ExportFAMAHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ExportFAMA">
 		</handler>
 	</extension>
 	<extension

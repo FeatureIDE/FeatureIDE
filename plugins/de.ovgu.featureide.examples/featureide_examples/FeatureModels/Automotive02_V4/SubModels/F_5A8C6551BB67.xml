@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="F_5A8C6551BB67">
+				<description>
+					
+				</description>
+				<feature name="F_04F84EADBE6A">
+					<description>
+						
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_400AA7D309A2">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ip
+					</description>
+					<feature mandatory="true" name="F_44B06779E249">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_96A9F2329532">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_20E5630C6D89">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+					</description>
+					<feature mandatory="true" name="F_88B37BD015C4">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_7711077E1354">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<and name="F_95E46AD146DD">
+					<description>
+						
+					</description>
+					<and name="F_D1ADBBA03C5E">
+						<description>
+							
+						</description>
+						<and name="F_318F7F8EE99F">
+							<description>
+								
+							</description>
+							<feature name="F_97FCA4DD2A93">
+								<description>
+									
+								</description>
+							</feature>
+							<feature name="F_74DF894A309E">
+								<description>
+									
+								</description>
+							</feature>
+							<feature name="F_4D6152D7EFBF">
+								<description>
+									
+								</description>
+							</feature>
+						</and>
+					</and>
+					<and name="F_87A6E2F8F8DE">
+						<description>
+							
+						</description>
+						<feature name="F_2602C0552F1D">
+							<description>
+								
+							</description>
+						</feature>
+						<and name="F_4A2D34DA0CA7">
+							<description>
+								
+							</description>
+							<feature name="F_63729C518C0D">
+								<description>
+									
+								</description>
+							</feature>
+							<feature name="F_69996786985B">
+								<description>
+									
+								</description>
+							</feature>
+						</and>
+					</and>
+					<feature name="F_5B84EC723F39">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_48058A639832">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_6952DFFB4E8C">
+						<description>
+							
+						</description>
+					</feature>
+				</and>
+				<and name="F_81D18F0C63B0">
+					<description>
+						
+					</description>
+					<feature name="F_CD642E8BF7C5">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_29EEF563D02E">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_8A764EA54180">
+						<description>
+							
+						</description>
+					</feature>
+				</and>
+				<and name="F_19D128AD9D64">
+					<description>
+						
+					</description>
+					<feature name="F_5185EC6392FC">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_D757293286D6">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_9D5CE3FA2E7A">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_7B83A9208BEE">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="F_4746737838ED">
+						<description>
+							
+						</description>
+					</feature>
+				</and>
+				<feature name="F_9F55FDBB2113">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_362599757447">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_B0A6E744F198">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A233A6877792">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_D1206C1976D7">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F315A57C3909">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A0D32788EBDC">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_D46CCD87F719">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_37DEA03E7F1B">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_FE46533917E7">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_3368E7E1EB69">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_202CA3F2FF6C">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_CE2198A5795D">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_B6249BCCA165">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_0FAB3B4F0D0B">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_15A4FDAE2A4C">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>F_95E46AD146DD</var>
+					<disj>
+						<var>F_D1ADBBA03C5E</var>
+						<disj>
+							<var>F_87A6E2F8F8DE</var>
+							<disj>
+								<var>F_6952DFFB4E8C</var>
+								<disj>
+									<var>F_48058A639832</var>
+									<var>F_5B84EC723F39</var>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_81D18F0C63B0</var>
+					<disj>
+						<var>F_8A764EA54180</var>
+						<disj>
+							<var>F_29EEF563D02E</var>
+							<var>F_CD642E8BF7C5</var>
+						</disj>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_19D128AD9D64</var>
+					<disj>
+						<var>F_4746737838ED</var>
+						<disj>
+							<var>F_7B83A9208BEE</var>
+							<disj>
+								<var>F_9D5CE3FA2E7A</var>
+								<disj>
+									<var>F_D757293286D6</var>
+									<var>F_5185EC6392FC</var>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_9F55FDBB2113</var>
+					<var>F_69996786985B</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_362599757447</var>
+					<disj>
+						<var>F_69996786985B</var>
+						<var>F_63729C518C0D</var>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_B0A6E744F198</var>
+					<var>F_6952DFFB4E8C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_A233A6877792</var>
+					<var>F_6952DFFB4E8C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_D1206C1976D7</var>
+					<var>F_48058A639832</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_F315A57C3909</var>
+					<var>F_2602C0552F1D</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_A0D32788EBDC</var>
+					<var>F_2602C0552F1D</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_D46CCD87F719</var>
+					<var>F_97FCA4DD2A93</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_37DEA03E7F1B</var>
+					<var>F_4D6152D7EFBF</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_FE46533917E7</var>
+					<disj>
+						<var>F_4D6152D7EFBF</var>
+						<var>F_74DF894A309E</var>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_3368E7E1EB69</var>
+					<conj>
+						<var>F_8A764EA54180</var>
+						<var>F_4A2D34DA0CA7</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_202CA3F2FF6C</var>
+					<conj>
+						<var>F_4746737838ED</var>
+						<disj>
+							<var>F_4D6152D7EFBF</var>
+							<disj>
+								<var>F_74DF894A309E</var>
+								<var>F_2602C0552F1D</var>
+							</disj>
+						</disj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_CE2198A5795D</var>
+					<conj>
+						<var>F_5185EC6392FC</var>
+						<var>F_97FCA4DD2A93</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_D1ADBBA03C5E</var>
+					<var>F_318F7F8EE99F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_87A6E2F8F8DE</var>
+					<disj>
+						<var>F_4A2D34DA0CA7</var>
+						<var>F_2602C0552F1D</var>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_318F7F8EE99F</var>
+					<disj>
+						<var>F_4D6152D7EFBF</var>
+						<disj>
+							<var>F_74DF894A309E</var>
+							<var>F_97FCA4DD2A93</var>
+						</disj>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_4A2D34DA0CA7</var>
+					<disj>
+						<var>F_69996786985B</var>
+						<var>F_63729C518C0D</var>
+					</disj>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

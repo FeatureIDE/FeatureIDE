@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -35,7 +37,9 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  * 
  * @author Sebastian Krieter
  */
-public class XMLConfFormat extends AXMLFormat<Configuration> {
+public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
+
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
 
 	@Override
@@ -44,8 +48,13 @@ public class XMLConfFormat extends AXMLFormat<Configuration> {
 	}
 
 	@Override
-	public String getFactoryID() {
-		return null;
+	public boolean supportsRead() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return false;
 	}
 
 	@Override
@@ -56,6 +65,11 @@ public class XMLConfFormat extends AXMLFormat<Configuration> {
 	@Override
 	protected void writeDocument(Document doc) {
 
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

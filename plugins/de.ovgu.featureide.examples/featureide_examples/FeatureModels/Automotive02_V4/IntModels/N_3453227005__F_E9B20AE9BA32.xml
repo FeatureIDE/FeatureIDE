@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_3453227005__F_E9B20AE9BA32">
+				<description>
+					
+				</description>
+				<feature name="F_01FE9992C754">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_C6872F8FFCAE">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_CDB89BF6F313">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_EF749E3C8A36">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<not>
+						<var>F_CDB89BF6F313</var>
+					</not>
+					<not>
+						<var>F_01FE9992C754</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>F_C6872F8FFCAE</var>
+					</not>
+					<not>
+						<var>F_01FE9992C754</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>F_CDB89BF6F313</var>
+					</not>
+					<not>
+						<var>F_C6872F8FFCAE</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_01FE9992C754</var>
+					<var>F_C6872F8FFCAE</var>
+					<var>F_CDB89BF6F313</var>
+					<not>
+						<var>N_3453227005__F_E9B20AE9BA32</var>
+					</not>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model Core Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.core;singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.1.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
@@ -28,15 +28,18 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.configuration;uses:="de.ovgu.featureide.fm.core.model,org.eclipse.core.resources",
  de.ovgu.featureide.fm.core.constraint,
  de.ovgu.featureide.fm.core.constraint.analysis,
+ de.ovgu.featureide.fm.core.conversion,
  de.ovgu.featureide.fm.core.editing;uses:="org.prop4j,featureide.fm.core.model",
  de.ovgu.featureide.fm.core.editing.cnf,
  de.ovgu.featureide.fm.core.editing.evaluation,
  de.ovgu.featureide.fm.core.editing.remove,
+ de.ovgu.featureide.fm.core.explanations,
  de.ovgu.featureide.fm.core.filter,
  de.ovgu.featureide.fm.core.filter.base,
  de.ovgu.featureide.fm.core.functional,
  de.ovgu.featureide.fm.core.io;uses:="de.ovgu.featureide.fm.core.model,org.eclipse.core.resources",
  de.ovgu.featureide.fm.core.io.dimacs,
+ de.ovgu.featureide.fm.core.io.fama,
  de.ovgu.featureide.fm.core.io.guidsl;uses:="org.prop4j,featureide.fm.core.model,org.eclipse.core.resources",
  de.ovgu.featureide.fm.core.io.manager,
  de.ovgu.featureide.fm.core.io.splconquerer,
@@ -48,6 +51,8 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.localization,
  guidsl,
  org.prop4j,
+ org.prop4j.analyses,
+ org.prop4j.solver,
  org.sat4j;uses:="org.sat4j.core,org.sat4j.specs,org.sat4j.reader",
  org.sat4j.core;uses:="org.sat4j.specs",
  org.sat4j.minisat;uses:="org.sat4j.minisat.core,org.sat4j.core,org.sat4j.specs",

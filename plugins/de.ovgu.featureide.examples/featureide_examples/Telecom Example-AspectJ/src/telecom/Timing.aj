@@ -54,4 +54,9 @@ public aspect Timing {
         c.getCaller().totalConnectTime += getTimer(c).getTime();
         c.getReceiver().totalConnectTime += getTimer(c).getTime();
     }
+    
+    before(Customer c): execution(* BasicSimulation.report(Customer)) && args(c)  {
+        Timing t = Timing.aspectOf();
+        System.out.println(c + " spent " + t.getTotalConnectTime(c));
+    }
 }

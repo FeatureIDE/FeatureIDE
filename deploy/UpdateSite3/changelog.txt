@@ -7,6 +7,24 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.1.0 (July 2016)
+* New extension point to exchange classes for features, constraints, and feature models with the factory pattern
+* Explanations for anomalies in feature models
+* Support to compute implicit constraints for subtrees of the feature model
+* Export for feature models to the FAMA format
+* Algorithm to refactor complex constraints (e.g., A or B) into simple requires and excludes constraints
+* Several fixes for feature-model analysis, configuration checking, and legend of feature diagrams
+* Improved tool support for multi-product lines
+* Example wizard revised and new examples added
+
+Release 3.0.1 (May 2016)
+* Several Hotfixes:
+  * Configuration is updated when opening configuration editor (Fix #345).
+  * Feature model layout is saved properly (Fix #346).
+  * Changes in feature model editor trigger outline refresh.
+  * Feature models from outside the workspace can be save properly.
+* Further stability improvements
+
 Release 3.0.0 (April 2016)
 * Three new generators added for black-box frameworks, runtime parameters, and images
 * New interfaces for feature model, features, and constraints to improve extensibility (new extension points are planned for 3.1.0)

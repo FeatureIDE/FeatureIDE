@@ -29,19 +29,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Extended configuration format for FeatureIDE projects.</br> Lists all
- * features and indicates the manual and automatic selection.
+ * Extended configuration format for FeatureIDE projects.</br>
+ * Lists all features and indicates the manual and automatic selection.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureIDEFormat implements IPersistentFormat<Configuration> {
+public class FeatureIDEFormat implements IConfigurationFormat {
+
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + FeatureIDEFormat.class.getSimpleName();
 
 	public static final String EXTENSION = StringTable.FIDECONF;
 
@@ -165,8 +169,18 @@ public class FeatureIDEFormat implements IPersistentFormat<Configuration> {
 	}
 
 	@Override
-	public String getFactoryID() {
-		return null;
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

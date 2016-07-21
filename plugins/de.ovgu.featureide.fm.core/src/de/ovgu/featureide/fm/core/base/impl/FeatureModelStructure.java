@@ -232,7 +232,10 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	@Override
 	public void replaceRoot(IFeatureStructure feature) {
+		//TODO remove all features that are no children of the new root (part of a different sub tree)
 		correspondingFeatureModel.deleteFeatureFromTable(rootFeature.getFeature());
+
+		feature.setParent(null);
 		rootFeature = feature;
 	}
 
@@ -253,6 +256,11 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasFalseOptionalFeatures() {
 		return existsFeatureWithStatus(FeatureStatus.FALSE_OPTIONAL);
+	}
+
+	@Override
+	public boolean hasDeadFeatures() {
+		return existsFeatureWithStatus(FeatureStatus.DEAD);
 	}
 
 	@Override

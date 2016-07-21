@@ -28,6 +28,6 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  * @author Cyrill Meyer
  */
 public enum ConstraintAttribute {
-		NORMAL, TAUTOLOGY, UNSATISFIABLE, REDUNDANT, VOID_MODEL, DEAD, FALSE_OPTIONAL
+		NORMAL, TAUTOLOGY, UNSATISFIABLE, REDUNDANT, VOID_MODEL, DEAD, FALSE_OPTIONAL, IMPLICIT
 
 }

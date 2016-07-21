@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -38,12 +37,12 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  */
 public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>> {
 
-	public AtomicSetAnalysis(ISolverProvider solver) {
-		super(solver);
+	public AtomicSetAnalysis(SatInstance satInstance) {
+		super(satInstance);
 	}
 
 	@Override
-	public List<List<Literal>> execute(WorkMonitor monitor) throws Exception {
+	public List<List<Literal>> analyze(WorkMonitor monitor) throws Exception {
 		final List<int[]> solutions = new ArrayList<>();
 		final List<List<Literal>> result = new ArrayList<>();
 
@@ -67,7 +66,7 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.getAssignment().push(-varX);
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						done[i] = 2;
 						solver.getAssignment().pop().unsafePush(varX);
@@ -115,7 +114,7 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 							
 							solver.getAssignment().push(-my0);
 
-							switch (solver.sat()) {
+							switch (solver.isSatisfiable()) {
 							case FALSE:
 								done[j] = 1;
 								break;
@@ -134,7 +133,7 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 
 					solver.getAssignment().pop().unsafePush(-mx0);
 
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						break;
 					case TIMEOUT:
@@ -153,7 +152,7 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 							if (my0 != 0) {
 								solver.getAssignment().push(-my0);
 
-								switch (solver.sat()) {
+								switch (solver.isSatisfiable()) {
 								case FALSE:
 									done[j] = 2;
 									setList.add(solver.getSatInstance().getLiteral(-my0));

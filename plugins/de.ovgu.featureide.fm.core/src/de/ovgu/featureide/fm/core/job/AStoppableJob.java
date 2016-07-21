@@ -59,7 +59,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 		}
 	}
 	
-	private int cancelingTimeout = 100;
+	private int cancelingTimeout = 300;
 	
 	private InnerThread innerThread = null;
 	
@@ -137,10 +137,11 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 	 */
 	protected abstract boolean work() throws Exception;
 
+	@SuppressWarnings("deprecation")
 	private void stopInnerThread() {
 		try {
 		if (innerThread.isAlive()) {
-			innerThread.join();
+			innerThread.stop();
 		}
 		} catch (Exception e) {
 			e.printStackTrace();

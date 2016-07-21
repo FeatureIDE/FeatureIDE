@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import javax.annotation.CheckForNull;
+
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -248,6 +250,7 @@ public class FeatureUIHelper {
 		legendFigure.put(featureModel, figure);
 	}
 
+	@CheckForNull
 	public static LegendFigure getLegendFigure(IGraphicalFeatureModel featureModel) {
 		return legendFigure.get(featureModel);
 	}

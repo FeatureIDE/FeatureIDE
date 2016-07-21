@@ -23,6 +23,7 @@ package org.prop4j.analyses;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +33,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.solver.BasicSolver.SelectionStrategy;
-import org.prop4j.solver.ISolverProvider;
 import org.prop4j.solver.SatInstance;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
@@ -56,7 +56,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		private int deltaCoverage;
 		private final int[] model;
 		private int totalCoverage;
-		
+
 		public long time = 0;
 
 		public Configuration(int[] model, int deltaCoverage, int totalCoverage) {
@@ -140,6 +140,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		}
 
 	}
+
 	public static final boolean VERBOSE = false;
 
 	protected static final byte BIT_00 = 1 << 0;
@@ -166,18 +167,22 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 	protected byte[] recArray = new byte[0];
 	protected final List<int[]> solutions = new ArrayList<>();
 
-	private final Deque<Configuration> tempConfigurationList = new LinkedList<>();
+	protected final Deque<Configuration> tempConfigurationList = new LinkedList<>();
 	public final BlockingQueue<Configuration> q = new LinkedBlockingQueue<>();
 
 	protected long time = 0;
-	public PairWiseConfigurationGenerator(ISolverProvider solver, int maxNumber) {
-		super(solver);
+
+	public PairWiseConfigurationGenerator(SatInstance satInstance, int maxNumber) {
+		super(satInstance);
 		this.maxNumber = maxNumber;
 		this.numVariables = this.solver.getSatInstance().getNumberOfVariables();
 	}
 
 	@Override
-	public List<List<String>> execute(WorkMonitor monitor) throws Exception {
+	public List<List<String>> analyze(WorkMonitor monitor) throws Exception {
+		if (maxNumber <= 0) {
+			return Collections.emptyList();
+		}
 		time = System.nanoTime();
 		synchronized (tempConfigurationList) {
 			tempConfigurationList.clear();
@@ -185,10 +190,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 
 		findInvalid();
 		IVecInt orgBackbone = solver.getAssignment();
-		final SatInstance satInstance = solver.getSatInstance();
-		final int featureCount = satInstance.getNumberOfVariables();
-
-		System.out.println("Found all invalid!");
+		final int featureCount = solver.getSatInstance().getNumberOfVariables();
 
 		orgBackbone.ensure(numVariables);
 		final int numberOfFixedFeatures = orgBackbone.size();
@@ -217,34 +219,28 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 		orgBackbone = solver.getAssignment();
 
-		handleNewConfig(solutions.get(0), satInstance, featuresUsedOrg);
-		handleNewConfig(solutions.get(1), satInstance, featuresUsedOrg);
-		System.out.println("----");
+		// allyes
+		handleNewConfig(solutions.get(0), featuresUsedOrg);
+		if (maxNumber == 1) {
+			return getConfigurations();
+		}
+		// allno
+		handleNewConfig(solutions.get(1), featuresUsedOrg);
 
 		final int[] varStatus = new int[2];
 
 		while (count <= maxNumber) {
+			if (monitor.checkCancel()) {
+				break;
+			}
 			final boolean[] featuresUsed = Arrays.copyOf(featuresUsedOrg, featuresUsedOrg.length);
 
 			countLoops = featureIndexArray.length;
-//			if (count <= 40) {
-//			for (FeatureIndex featureIndex : featureIndexArray) {
-//				featureIndex.setPriority(Math.random());
-//			}
 			int prio = 0;
 			for (FeatureIndex featureIndex : featureIndexArray) {
 				featureIndex.setPriority(prio++);
 			}
-				Arrays.sort(featureIndexArray);
-//			} else {
-//				final Random rnd = new Random();
-//				for (int i = featureIndexArray.length - 1; i >= 0; i--) {
-//					final int index = rnd.nextInt(i + 1);
-//					final FeatureIndex a = featureIndexArray[index];
-//					featureIndexArray[index] = featureIndexArray[i];
-//					featureIndexArray[i] = a;
-//				}
-//			}
+			Arrays.sort(featureIndexArray);
 
 			for (int x = 1, end = featureIndexArray.length; x < end; x++) {
 				final FeatureIndex featureIndexA = featureIndexArray[x];
@@ -290,23 +286,11 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 				}
 			}
 
-			if (handleNewConfig(solver.findModel(), satInstance, featuresUsedOrg)) {
+			if (handleNewConfig(solver.findModel(), featuresUsedOrg)) {
 				break;
 			}
 			orgBackbone.shrinkTo(numberOfFixedFeatures);
 		}
-		System.out.println("Done!");
-
-//		System.out.println("-- Proof --");
-//		clearTempConfigurations();
-//		Arrays.fill(combinations2, (byte) 0);
-//		addInvalidCombinations();
-//		count = 1;
-//		for (Configuration config : finalConfigurationList) {
-//			addCombinationsFromModel(config.getModel());
-//			printStatisticNumbers(config);
-//		}
-
 		return getConfigurations();
 	}
 
@@ -553,13 +537,13 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		solutions.clear();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		solver.sat();
+		solver.isSatisfiable();
 		int[] model1 = getModel(solutions);
 
 		// satisfiable?
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			solver.sat();
+			solver.isSatisfiable();
 			int[] model2 = getModel(solutions);
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
@@ -572,7 +556,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.getAssignment().push(-varX);
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						core[i] = (byte) (varX > 0 ? 1 : -1);
 						solver.getAssignment().pop().unsafePush(varX);
@@ -717,8 +701,9 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 
 	protected int getLastCoverage() {
 		synchronized (tempConfigurationList) {
-			return (tempConfigurationList.isEmpty()) ? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1)
-					.getTotalCoverage()) : tempConfigurationList.getLast().getTotalCoverage();
+			return (tempConfigurationList.isEmpty())
+					? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1).getTotalCoverage())
+					: tempConfigurationList.getLast().getTotalCoverage();
 		}
 	}
 
@@ -730,9 +715,8 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		return model;
 	}
 
-	protected boolean handleNewConfig(int[] curModel, final SatInstance satInstance, final boolean[] featuresUsedOrg) {
+	protected boolean handleNewConfig(int[] curModel, final boolean[] featuresUsedOrg) {
 		if (curModel == null) {
-			System.out.println("Found everything!");
 			return true;
 		}
 		final int partCount = count(curModel) - fixedPartCount;
@@ -743,13 +727,12 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 			if (!tempConfigurationList.isEmpty() && config.isBetterThan(tempConfigurationList.getLast())) {
 				while (config.isBetterThan(tempConfigurationList.getLast()) && ((count - lesserCount) > finalCount)) {
 					final Configuration lastConfig = tempConfigurationList.removeLast();
-					solver.getSolver().removeConstr(lastConfig.getBlockingClauseConstraint());
+					solver.getInternalSolver().removeConstr(lastConfig.getBlockingClauseConstraint());
 					lesserCount++;
 				}
 			}
 		}
 		if (lesserCount > 0) {
-			System.out.println("Found Larger Model!");
 			count -= lesserCount;
 
 			for (int i = 0; i < comboIndex.length; i++) {
@@ -810,16 +793,14 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 			featureIndex.setCoveredCombinations(coveredCombinations);
 			featureIndex.setSelected(selected);
 		}
-		
+
 		config.time = System.nanoTime() - time;
 		q.offer(config);
 		time = System.nanoTime();
 
 		try {
-			config.setBlockingClauseConstraint(solver.getSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
+			config.setBlockingClauseConstraint(solver.getInternalSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
 		} catch (ContradictionException e) {
-			e.printStackTrace();
-			System.out.println("Unsatisfiable1!");
 			return true;
 		}
 
@@ -828,7 +809,6 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 
 		finalCount = Math.max(finalCount, count - maxBackJumping);
 		if (absUncovered <= 0) {
-			System.out.println("Found everything2!");
 			return true;
 		}
 		return false;
@@ -847,8 +827,10 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		double relTotal = (double) (config.getTotalCoverage()) / combinationCount;
 		relDelta = Math.floor(relDelta * 100000.0) / 1000.0;
 		relTotal = Math.floor(relTotal * 1000.0) / 10.0;
-		System.out.println(count++ + ": " + config.getTotalCoverage() + "/" + combinationCount + " | " + relTotal + "% | left = " + absUncovered + " | new = "
-				+ config.getDeltaCoverage() + " | delta = " + relDelta);
+		if (VERBOSE) {
+			System.out.println(count++ + ": " + config.getTotalCoverage() + "/" + combinationCount + " | " + relTotal + "% | left = " + absUncovered
+					+ " | new = " + config.getDeltaCoverage() + " | delta = " + relDelta);
+		}
 		return absUncovered;
 	}
 
@@ -867,7 +849,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 
 			if (varStatus[1] == 0) {
 				orgBackbone.push(sb);
-				switch (solver.sat()) {
+				switch (solver.isSatisfiable()) {
 				case FALSE:
 					orgBackbone.pop().unsafePush(-sb);
 					varStatus[1] = -sigB;
@@ -887,7 +869,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 				orgBackbone.push(sa);
 			}
 
-			switch (solver.sat()) {
+			switch (solver.isSatisfiable()) {
 			case FALSE:
 				if (varStatus[1] != 0) {
 					orgBackbone.pop().unsafePush(-sa);
@@ -955,7 +937,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 					solver.getAssignment().push(-my1);
 					solver.setSelectionStrategy((c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
-					switch (solver.sat()) {
+					switch (solver.isSatisfiable()) {
 					case FALSE:
 						for (int mx0 : parentStack) {
 							addRelation(mx0, my1);

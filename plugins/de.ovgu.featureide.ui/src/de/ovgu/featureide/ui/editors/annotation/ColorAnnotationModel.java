@@ -654,10 +654,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			if (child.getEndLength() > 0) {
 				childEnd++;
 			}
-			if (childEnd > lastLine) {
-				lastLine = childEnd;
-			}
-			lastLine = getLastChildLine(child, lastLine);
+			lastLine = Math.max(childEnd, lastLine);
+			lastLine = Math.max(getLastChildLine(child, lastLine), lastLine);
 		}
 		return lastLine;
 	}

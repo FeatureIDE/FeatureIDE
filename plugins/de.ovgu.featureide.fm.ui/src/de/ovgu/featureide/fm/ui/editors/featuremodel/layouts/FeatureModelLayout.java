@@ -27,13 +27,14 @@ import org.eclipse.draw2d.geometry.Point;
  * 
  * @author soenke
  */
-public class FeatureModelLayout implements IFeatureModelLayout {
+public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private boolean autoLayoutLegend;
 	private boolean showHiddenFeatures;
 	private boolean hasVerticalLayout;
 	private Point legendPos;
 
 	private int selectedLayoutAlgorithm;
+	private boolean showShortNames;
 	
 	public FeatureModelLayout() {
 		this.autoLayoutLegend = true;
@@ -59,6 +60,16 @@ public class FeatureModelLayout implements IFeatureModelLayout {
 	@Override
 	public boolean hasLegendAutoLayout() {
 		return autoLayoutLegend;
+	}
+	
+	@Override
+	public boolean showShortNames() {
+		return showShortNames;
+	}
+
+	@Override
+	public void setShowShortNames(boolean b) {
+		showShortNames = b;
 	}
 
 	@Override

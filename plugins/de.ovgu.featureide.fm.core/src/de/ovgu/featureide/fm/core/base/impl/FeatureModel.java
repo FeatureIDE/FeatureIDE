@@ -78,7 +78,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	protected final FeatureModelAnalyzer analyser;
-	protected final List<IConstraint> constraints = new LinkedList<>();
+	protected final List<IConstraint> constraints = new ArrayList<>();
 	
 	/**
 	 * A list containing the feature names in their specified order will be
@@ -290,11 +290,11 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public Collection<String> getFeatureOrderList() {
+	public List<String> getFeatureOrderList() {
 		if (featureOrderList.isEmpty()) {
 			return Functional.toList(Functional.mapToStringList(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter())));
 		}
-		return Collections.unmodifiableCollection(featureOrderList);
+		return Collections.unmodifiableList(featureOrderList);
 	}
 
 	@Override
@@ -530,7 +530,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public void setConstraint(int index, Constraint constraint) {
+	public void setConstraint(int index, IConstraint constraint) {
 		constraints.set(index, constraint);
 	}
 

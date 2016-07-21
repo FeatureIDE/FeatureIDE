@@ -74,6 +74,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		right.addView(IPageLayout.ID_OUTLINE);
 		
 		left.addView("org.eclipse.jdt.ui.PackageExplorer");
+		left.addView("org.eclipse.ui.navigator.ProjectExplorer");
 		
 		layout.addShowViewShortcut(FeatureStatisticsView.ID);
 		layout.addShowViewShortcut(FeatureModelEditView.ID);

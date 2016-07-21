@@ -3,7 +3,7 @@
 <schema targetNamespace="de.ovgu.featureide.fm.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="de.ovgu.featureide.fm.core" id="fmFactory" name="FMFactory"/>
+         <meta.schema plugin="de.ovgu.featureide.fm.core" id="fmFactories" name="FMFactory"/>
       </appInfo>
       <documentation>
          Add factories to create customized feature models, features, and constraints.

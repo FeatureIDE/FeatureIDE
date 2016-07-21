@@ -23,9 +23,10 @@ package de.ovgu.featureide.fm.core.base.util.tree;
 import java.util.Iterator;
 
 /**
- * TODO description
+ * Iterates through a tree.<br/>
+ * Defines additional methods on the tree.
  * 
- * @author skrieter
+ * @author Sebastian Krieter
  */
 public interface TreeIterator<E> extends Iterator<E>, Iterable<E> {
 
