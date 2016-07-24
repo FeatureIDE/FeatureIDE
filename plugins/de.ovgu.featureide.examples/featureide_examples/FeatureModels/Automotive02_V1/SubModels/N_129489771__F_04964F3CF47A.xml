@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_129489771__F_04964F3CF47A">
+				<description>
+					
+				</description>
+				<alt mandatory="true" name="F_B908E72817B6">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod t
+					</description>
+					<feature mandatory="true" name="F_C196B4B30F7B">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_348EDDB44CB1">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_52359244EF87">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_E01206CF487A">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam e
+					</description>
+					<feature mandatory="true" name="F_2B8CC8357F82">
+						<description>
+							Lorem ipsum dolor sit amet, consetet
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5BAFAD3B5DC7">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadi
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_D169215E4677">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+					</description>
+				</feature>
+				<feature name="F_1BFC41C5187D">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam vol
+					</description>
+				</feature>
+				<feature name="F_E403069AD2F6">
+					<description>
+						
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_DED597264011">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore e
+					</description>
+					<feature mandatory="true" name="F_DCB290CA9A30">
+						<description>
+							Lorem i
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_51DD61071340">
+						<description>
+							Lorem i
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_18D9FDF0C9E9">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5EFFA800EE1A">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_50B1C3AD5734">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invi
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_FB9E430EDACE">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et d
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_8C2C122A9540">
+						<description>
+							Lorem i
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_44E4C23ACCBC">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_04472A8A1421">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invi
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_FEED4AEC2F9B">
+						<description>
+							Lorem i
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_F834EB3FED45">
+						<description>
+							Lorem ip
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5D55370FFB4B">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5D2BCBDBB825">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invid
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_6D7D923FAB33">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_85CE5CFE8390">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_41631878B72F">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_FE59776ED689">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidun
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_3D41E566D269">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidun
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_B611410ACCB0">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidun
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_697E843BE43D">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_9FEAE7ECE4F5">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5D57683A11A2">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C97F496DD3EF">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invid
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_A64E085081AD">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invid
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5007BAC59F57">
+						<description>
+							Lorem ip
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_1FD0E01C7344">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_1905ABAC35AC">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+					</description>
+					<feature mandatory="true" name="F_42F063ABCF2F">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_A5626667C404">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_1CA41DCD9BA7">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
+					</description>
+					<feature mandatory="true" name="F_177AF96D76AC">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C4BC8981C4E6">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_5BBCA14E9B0E">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor
+					</description>
+					<feature mandatory="true" name="F_5B2E4589500D">
+						<description>
+							Lorem i
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_6FD8FD9ADBFC">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eir
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_23D9F5B7C525">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam n
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_BF00F5941440">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_6DBE1FF610FA">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy ei
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_E5DBBD0BD1EB">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C8E6B16EE6E8">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmo
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_E328B2A65496">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam v
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_804417AAC25A">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invid
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C249F24742FD">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_95C5DE380DF2">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_1868316F612E">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam e
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C743F8EFB4D5">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_A1A8A7CA9E64">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed d
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_7773A76698B5">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_F9C8788B5582">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
+					</description>
+					<feature mandatory="true" name="F_E1E2240A403B">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing eli
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_54E74651E0D1">
+						<description>
+							Lorem ipsum dolor sit a
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_22E8549D6815">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_BDD6BA21FE59">
+						<description>
+							Lorem ipsum dolor sit ame
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_6FB13DFD13D9">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et jus
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_79119FBD48C5">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
+					</description>
+					<feature mandatory="true" name="F_CE98C26B53C6">
+						<description>
+							Lorem ipsum dolor sit amet, consetetu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_FB20195EFCE1">
+						<description>
+							Lorem ipsum dolor s
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_4AF1653B9726">
+						<description>
+							Lorem ipsum dolor s
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C8B970129499">
+						<description>
+							Lorem ipsum dolor s
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_2C6A1F4AF29A">
+						<description>
+							Lorem ipsum dolor
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_81F35F14B3D1">
+						<description>
+							Lorem ipsum dolor s
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_96202116771A">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_B57A1A538889">
+						<description>
+							Lorem ipsum dolor sit amet, conset
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_D4B668BE676D">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_678DBC18571F">
+						<description>
+							Lorem ipsum dolor sit amet, c
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_4DB4D354C6D0">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_F3C6F5A5F0CB">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_780770CFC6E8">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_05AF41774251">
+						<description>
+							Lorem ipsum dolor sit amet, c
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_63FE20E968EE">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_97A81A1496C0">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5BBC726E9645">
+						<description>
+							Lorem i
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_CF2E7657B98A">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
+					</description>
+					<feature mandatory="true" name="F_862F0A30CD3C">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C77B9E29AA8F">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_121AABC3C03E">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. S
+					</description>
+					<feature mandatory="true" name="F_D6FA820F663D">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadip
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_8E143AF2020E">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod t
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_D59577CA8CAE">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam non
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_0C694E0F1FE5">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ips
+					</description>
+					<feature mandatory="true" name="F_C8374F1B0736">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_487AC3300799">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_C132A0CEBBF8">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam vo
+					</description>
+				</feature>
+				<alt name="F_6C577E28F313">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+					</description>
+					<feature mandatory="true" name="F_502EC63733A2">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C12C1B87F175">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidun
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_65CB06783F5A">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod te
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_4953820240C6">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_A3F80EB015BC">
+						<description>
+							Lorem ipsum dolor
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_014A07D259BF">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus
+					</description>
+				</feature>
+				<feature name="F_A34D257E615A">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, s
+					</description>
+				</feature>
+				<alt name="F_06A1A9373E7C">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus
+					</description>
+					<feature mandatory="true" name="F_98AB3DA5D7C2">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur s
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_64741CD08A3D">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sa
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_8DBBAB9FC733">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sa
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_64A31F08A28C">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lore
+					</description>
+				</feature>
+				<feature mandatory="true" name="F_4CC196FE3EAD">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing
+					</description>
+				</feature>
+				<alt name="F_8E3E021B9833">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua
+					</description>
+					<feature mandatory="true" name="F_EE22243B86D7">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam non
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_76C64BD45A3F">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolo
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_B2D27DE5EAC2">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_9B12E4B2F5E8">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna a
+						</description>
+					</feature>
+				</alt>
+				<alt name="F_993DED6D04A5">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscin
+					</description>
+					<feature mandatory="true" name="F_61923576DA61">
+						<description>
+							Lorem ipsum
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C951C3F2945F">
+						<description>
+							Lorem ipsum dolor sit amet, cons
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_6A71063E30A3">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadi
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_09E5B8388C79">
+						<description>
+							Lorem ipsum
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_FFEC99186901">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscin
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_A44F5DEBF8D6">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

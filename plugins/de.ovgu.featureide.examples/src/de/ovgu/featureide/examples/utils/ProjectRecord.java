@@ -22,23 +22,30 @@ package de.ovgu.featureide.examples.utils;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.core.CorePlugin;
 
@@ -47,42 +54,97 @@ import de.ovgu.featureide.core.CorePlugin;
  * 
  * @author Reimar Schroeter
  */
-/**
- * Class declared public only for test suite.
- * 
- */
 public class ProjectRecord implements Serializable {
+
 	private static final long serialVersionUID = 7680436510104564244L;
-	private String projectDescriptionPath;
+
+	private final String projectDescriptionRelativePath;
+	private final String projectName;
+
 	private Collection<ProjectRecord> subProjects;
-	private String projectName;
+
 	private transient IProjectDescription projectDescription;
 	private transient CommentParser comment;
-	private transient String warning = "";
-	private transient String error = "";
+	private transient String warning;
+	private transient String error;
+	private transient List<TreeItem> contentProviderItems;
 	private transient boolean hasWarnings = false;
 	private transient boolean hasErrors = false;
+	private transient boolean updated = false;
 
 	/**
-	 * Create a record for a project based on the info in the file.
+	 * Create a record for a project based on the info given in the file.
 	 * 
 	 * @param file
 	 */
-	public ProjectRecord(File file) {
-		IPath p = new Path(file.getPath());
-		projectDescriptionPath = p.toString();
-		projectName = file.getParentFile().getName();
+	public ProjectRecord(String projectDescriptionRelativePath, String projectName) {
+		this.projectName = projectName;
+		this.projectDescriptionRelativePath = projectDescriptionRelativePath;
+		initFields();
+	}
+
+	/**
+	 * Deserialization
+	 * 
+	 * @param in
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
+		in.defaultReadObject();
+		initFields();
+	}
+
+	private void initFields() {
+		warning = "";
+		error = "";
+		contentProviderItems = new ArrayList<>();
+	}
+
+	public List<TreeItem> getTreeItems() {
+		return contentProviderItems;
+	}
+
+	public class TreeItem {
+		private transient IContentProvider contProv;
+
+		public TreeItem(IContentProvider contProv) {
+			this.contProv = contProv;
+		}
+
+		public ProjectRecord getRecord() {
+			return ProjectRecord.this;
+		}
+
+		@Override
+		public String toString() {
+			return getProjectName();
+		}
+
+		public IContentProvider getProvider() {
+			return contProv;
+		}
+
+	}
+
+	@Override
+	public String toString() {
+		return getProjectName();
+	}
+
+	public TreeItem createNewTreeItem(IContentProvider prov) {
+		final TreeItem ti = new TreeItem(prov);
+		contentProviderItems.add(ti);
+		return ti;
 	}
 
 	public void init() {
-		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionPath).openConnection().getInputStream()) {
+		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection()
+				.getInputStream()) {
 			projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}
-		
-		projectName = projectDescription.getName();
-
 
 		comment = new CommentParser(projectDescription.getComment());
 
@@ -94,18 +156,38 @@ public class ProjectRecord implements Serializable {
 		}
 	}
 
-	/**
-	 * @param subProjects
-	 */
-	public void setSubProjects(Collection<ProjectRecord> subProjects) {
-		this.subProjects = subProjects;
+	private void performAlreadyExistsCheck() {
+		if (isProjectInWorkspace(getProjectName())) {
+			error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
+			hasErrors = true;
+		}
 	}
 
-	/**
-	 * @return
-	 */
-	public String getRelativeLocation() {
-		return new Path(projectDescriptionPath).removeFirstSegments(1).removeLastSegments(1).toString();
+	private void performRequirementCheck() {
+		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
+
+		if (status.isOK()) {
+			status = CorePlugin.getDefault().isComposable(projectDescription);
+		}
+
+		if (!status.isOK()) {
+			warning = status.getMessage();
+			if (status instanceof MultiStatus) {
+				MultiStatus multi = (MultiStatus) status;
+				if (multi.getChildren().length > 0) {
+					warning += " (";
+					for (int j = 0; j < multi.getChildren().length - 1; j++) {
+						warning += multi.getChildren()[j].getMessage() + " ;";
+					}
+					warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
+				}
+			}
+			hasWarnings = true;
+		}
+	}
+
+	public void setSubProjects(Collection<ProjectRecord> subProjects) {
+		this.subProjects = subProjects;
 	}
 
 	public boolean hasSubProjects() {
@@ -151,36 +233,6 @@ public class ProjectRecord implements Serializable {
 		return error;
 	}
 
-	private void performAlreadyExistsCheck() {
-		if (isProjectInWorkspace(getProjectName())) {
-			error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
-			hasErrors = true;
-		}
-	}
-
-	private void performRequirementCheck() {
-		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
-
-		if (status.isOK()) {
-			status = CorePlugin.getDefault().isComposable(projectDescription);
-		}
-
-		if (!status.isOK()) {
-			warning = status.getMessage();
-			if (status instanceof MultiStatus) {
-				MultiStatus multi = (MultiStatus) status;
-				if (multi.getChildren().length > 0) {
-					warning += " (";
-					for (int j = 0; j < multi.getChildren().length - 1; j++) {
-						warning += multi.getChildren()[j].getMessage() + " ;";
-					}
-					warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
-				}
-			}
-			hasWarnings = true;
-		}
-	}
-
 	/**
 	 * Gets the label to be used when rendering this project record in the
 	 * UI.
@@ -194,26 +246,23 @@ public class ProjectRecord implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return projectName.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + projectDescriptionRelativePath.hashCode();
+		result = prime * result + projectName.hashCode();
+		return result;
 	}
 
 	@Override
-	public boolean equals(Object arg) {
-		return (arg instanceof ProjectRecord) && ((ProjectRecord) arg).projectName.equals(this.projectName);
-	}
-
-	/**
-	 * @return the projectDescription
-	 */
-	public IProjectDescription getProjectDescription() {
-		return projectDescription;
-	}
-
-	/**
-	 * @return
-	 */
-	public String getIndexPath() {
-		return projectDescriptionPath.replace(".project", "index.s");
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final ProjectRecord other = (ProjectRecord) obj;
+		return projectDescriptionRelativePath.equals(other.projectDescriptionRelativePath) && projectName.equals(other.projectName);
 	}
 
 	/**
@@ -246,16 +295,45 @@ public class ProjectRecord implements Serializable {
 		return ResourcesPlugin.getWorkspace().getRoot().getProjects();
 	}
 
-	/**
-	 * Deserialization
-	 * 
-	 * @param in
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 */
-	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
-		in.defaultReadObject();
-		warning = "";
-		error = "";
+	public String getRelativePath() {
+		// TODO Use general root path
+		return new Path(projectDescriptionRelativePath).removeFirstSegments(1).removeLastSegments(1).toString();
+	}
+
+	public String getIndexDocumentPath() {
+		return projectDescriptionRelativePath.replace(".project", CreateMetaInformation.INDEX_FILENAME);
+	}
+
+	public String getInformationDocumentPath() {
+		return projectDescriptionRelativePath.replace(".project", CreateMetaInformation.PROJECT_INFORMATION_XML);
+	}
+
+	public IProjectDescription getProjectDescription() {
+		return projectDescription;
+	}
+
+	public Document getInformationDocument() {
+		final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		try {
+			InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(inputStream);
+			return doc;
+		} catch (IOException | ParserConfigurationException | SAXException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public void resetItems() {
+		contentProviderItems.clear();
+	}
+
+	public boolean updated() {
+		return updated;
+	}
+
+	public void setUpdated(boolean updated) {
+		this.updated = updated;
 	}
 }

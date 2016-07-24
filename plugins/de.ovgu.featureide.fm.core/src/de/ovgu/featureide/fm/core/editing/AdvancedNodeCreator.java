@@ -101,8 +101,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return nodeCreator.createNodes();
 	}
 
-	private static Literal getVariable(IFeature feature, boolean positive) {
-		final String oldName = feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName());
+	private Literal getVariable(IFeature feature, boolean positive) {
+		final String oldName = useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
 		return new Literal(oldName, positive);
 	}
 
@@ -115,6 +115,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * Default values is {@code true} (values will be included).
 	 */
 	private boolean includeBooleanValues = true;
+	
+	private boolean useOldNames = true;
 
 	private boolean optionalRoot = false;
 
@@ -341,6 +343,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public void setCnfType(CNFType cnfType) {
 		this.cnfType = cnfType;
+	}
+	
+	public void setUseOldNames(boolean useOldNames) {
+		this.useOldNames = useOldNames;
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {

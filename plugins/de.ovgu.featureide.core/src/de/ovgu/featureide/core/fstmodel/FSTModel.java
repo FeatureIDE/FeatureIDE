@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
@@ -182,8 +183,13 @@ public class FSTModel {
 	}
 		
 	public static String getAbsoluteClassName(IFile file, IFeatureProject project) {
-		final int segments = project.getSourceFolder().getFullPath().segmentCount()
-				+ ((project.getComposer().createFolderForFeatures()) ? 1 : 0);
-		return file.getFullPath().removeFirstSegments(segments).toString();
+		final IPath filePath = file.getFullPath();
+		final int segments;
+		if (project.getBuildFolder().getFullPath().isPrefixOf(filePath)) {
+			segments = project.getBuildFolder().getFullPath().segmentCount();
+		} else {
+			segments = project.getSourceFolder().getFullPath().segmentCount() + ((project.getComposer().createFolderForFeatures()) ? 1 : 0);
+		}
+		return filePath.removeFirstSegments(segments).toString();
 	}
 }

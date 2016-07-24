@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_1552566376__F_AAC42F8F0527">
+				<description>
+					Lorem
+				</description>
+				<alt mandatory="true" name="F_A23FAA8A8416">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
+					</description>
+					<feature mandatory="true" name="F_88F23F323EF4">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_532681C80EF4">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_CF997FA1E40D">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+					</description>
+				</feature>
+				<feature name="F_E5574F3A640D">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+					</description>
+				</feature>
+				<feature name="F_D9BC68FC2084">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et just
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

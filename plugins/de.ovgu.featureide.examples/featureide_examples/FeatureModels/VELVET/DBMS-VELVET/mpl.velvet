@@ -1,0 +1,16 @@
+concept DBMS 
+	instance Index index{
+	mandatory feature Access{
+		use index;
+	}
+	feature Multimedia{
+		constraint DBMS.Access.index.Queries.Knn;
+	}
+	mandatory feature Storage{
+		someOf{
+			feature CSV;
+			feature Paged;
+		}
+	}
+	constraint DBMS.Access.index -> DBMS.Storage.Paged;
+}

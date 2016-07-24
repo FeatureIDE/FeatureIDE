@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.conversion;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,10 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.prop4j.And;
-import org.prop4j.AtLeast;
-import org.prop4j.AtMost;
-import org.prop4j.Choose;
-import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;

@@ -411,37 +411,33 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void copyChildnodes(final ExtendedFeatureModel targetModel, final IFeatureStructure targetParentNode, final IFeatureStructure sourceParentNode,
-			final String parentModelName, final String parentNodeName, final int type) {
-		for (final IFeatureStructure child : sourceParentNode.getChildren()) {
+			final String parentModelName, final String targetParentName, final int type) {
+		for (final IFeatureStructure sourceChildStructure : sourceParentNode.getChildren()) {
 			final ExtendedFeature feature;
 			if (velvetImport) {
-				feature = factory.createFeature(targetModel, child.getFeature().getName());
+				feature = factory.createFeature(targetModel, sourceChildStructure.getFeature().getName());
 			} else {
-				String nameWithoutRoot = child.getFeature().getName().replace(sourceParentNode.getFeature().getFeatureModel().getStructure().getRoot().getFeature().getName(), "");
-				if(nameWithoutRoot.contains(".")){
-					feature = factory.createFeature(targetModel, parentNodeName + nameWithoutRoot);
-				}else{
-					feature = factory.createFeature(targetModel, parentNodeName + "." + nameWithoutRoot);
-				}
+				String shortName = sourceChildStructure.getFeature().getName().replace(sourceParentNode.getFeature().getName() + ".", "");
+				feature = factory.createFeature(targetModel, targetParentName + "." + shortName);
 			}
-			IFeatureStructure featureStructure = feature.getStructure();
-			featureStructure.setMandatory(child.isMandatory());
-			featureStructure.setAbstract(child.isAbstract());
-			featureStructure.setHidden(child.isHidden());
+			IFeatureStructure targetChildStructure = feature.getStructure();
+			targetChildStructure.setMandatory(sourceChildStructure.isMandatory());
+			targetChildStructure.setAbstract(sourceChildStructure.isAbstract());
+			targetChildStructure.setHidden(sourceChildStructure.isHidden());
 			feature.setExternalModelName(parentModelName);
 
-			featureStructure.setAND(child.isAnd());
-			featureStructure.setMultiple(child.isMultiple());
-			if (child.isOr()) {
-				featureStructure.setOr();
+			targetChildStructure.setAND(sourceChildStructure.isAnd());
+			targetChildStructure.setMultiple(sourceChildStructure.isMultiple());
+			if (sourceChildStructure.isOr()) {
+				targetChildStructure.setOr();
 			}
 
 			targetModel.addFeature(feature);
-			targetParentNode.addChild(featureStructure);
+			targetParentNode.addChild(targetChildStructure);
 			feature.setType(type);
 
-			if (child.hasChildren()) {
-				copyChildnodes(targetModel, featureStructure, child, parentModelName, parentNodeName, type);
+			if (sourceChildStructure.hasChildren()) {
+				copyChildnodes(targetModel, targetChildStructure, sourceChildStructure, parentModelName, feature.getName(), type);
 			}
 		}
 	}
@@ -471,10 +467,11 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 				literal.var = parentModelname;
 			} else {
 				//if fully qualified name
-				IFeature feature = targetModel.getFeature( literal.var.toString().replace(rootName, parentModelname));
-				if(feature == null){
-				//else
-					feature = targetModel.getFeature(  parentModelname + "." + literal.var.toString());
+				
+				IFeature feature = targetModel.getFeature(literal.var.toString().replace(rootName, parentModelname));
+				if (feature == null) {
+					//else
+					feature = targetModel.getFeature(parentModelname + "." + literal.var.toString());
 				}
 				literal.var = feature.getName();
 			}
@@ -484,7 +481,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 		}
 	}
-
+	
 	protected synchronized void parseInputStream(final InputStream inputStream) throws UnsupportedModelException {
 		ANTLRInputStream antlrInputStream = null;
 		try {
@@ -496,20 +493,29 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		final VelvetParser parser = new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
 		Tree root = null;
 		try {
+			init();
 			root = (Tree) parser.velvetModel().getTree();
 			if (root == null) {
 				throw new UnsupportedModelException("Error while parsing model!", 0);
 			}
 
-			init();
+			
 
 			checkTree(root);
 			parseModel(root);
 			parseAttributeConstraints();
-		} catch (final RecognitionException e) {
-			FMCorePlugin.getDefault().logError(e);
-			UnsupportedModelException unsupportedModelException = new UnsupportedModelException(e.getMessage(), e.line);
-			unsupportedModelException.addSuppressed(e);
+		} catch (RecognitionException | VelvetParser.InternalSyntaxException e) {
+			RecognitionException re;
+			if (e instanceof VelvetParser.InternalSyntaxException) {
+				re = ((VelvetParser.InternalSyntaxException) e).getException();
+			} else {
+				re = (RecognitionException) e;
+			}
+			FMCorePlugin.getDefault().logError(re);
+			String internalMessage = parser.getErrorMessage(re, parser.getTokenNames());
+			String errorMessage = ILLEGAL_SYNTAX_IN_LINE + re.line + ":" + re.charPositionInLine + " ("+internalMessage+")";
+			UnsupportedModelException unsupportedModelException = new UnsupportedModelException(errorMessage, re.line);
+			unsupportedModelException.addSuppressed(re);
 			throw unsupportedModelException;
 		}
 
@@ -580,9 +586,9 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private IFeatureModel readModel(File modelFile, Tree curNode) {
 		IFeatureModel fm = null;
-		if(IS_USED_AS_API){
+		if (IS_USED_AS_API) {
 			fm = readExternalModelFileAPI(modelFile);
-		}else{
+		} else {
 			fm = readExternalModelFile(modelFile);
 		}
 		if (fm == null) {
@@ -602,7 +608,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		if (file.getName().endsWith(".xml")) {
 			format = new XmlFeatureModelFormat();
 			fmFactory = new ExtendedFeatureModelFactory();
-		}else{
+		} else {
 			format = new VelvetFeatureModelFormat();
 			fmFactory = new ExtendedFeatureModelFactory();
 		}
@@ -626,6 +632,23 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	 * @return File object if found else null
 	 */
 	private File getExternalModelFile(String name) {
+		if (!extFeatureModel.getImports().isEmpty() && !IS_USED_AS_API) {
+			for (String path : extFeatureModel.getImports()) {
+				IProject project = getProject();
+				if(!path.endsWith(name)) continue; 
+				if (project != null) {
+					IResource res = project.getFile(path + ".xml");
+					if (res != null && res.exists()) {
+						return res.getLocation().toFile();
+					}
+					res = project.getFile(path + ".velvet");
+					if (res != null && res.exists()) {
+						return res.getLocation().toFile();
+					}
+				}
+			}
+		}
+
 		if (localSearch || IS_USED_AS_API) {
 			return localSearch(name);
 		}
@@ -888,14 +911,14 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		}
 
 		for (ConstraintNode constraintNode : constraintNodeList) {
-			if(!IS_USED_AS_API){
+			if (!IS_USED_AS_API) {
 				String nameError = checkNode(constraintNode.computedNode);
 				if (nameError == null) {
 					extFeatureModel.addConstraint(factory.createConstraint(extFeatureModel, constraintNode.computedNode));
 				} else {
 					reportWarning(constraintNode.rawNode, format("There is no feature with the name %s.", nameError));
 				}
-			}else{
+			} else {
 				extFeatureModel.addConstraint(factory.createConstraint(extFeatureModel, constraintNode.computedNode));
 			}
 		}
@@ -1002,7 +1025,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		final IFeature parentFeature = parentStack.pop();
-		parentFeature.getStructure().setAnd();
+		//		parentFeature.getStructure().setAnd();
 
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
@@ -1040,7 +1063,6 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	}
 
-
 	private void parseDescription(Tree root, IFeature parent) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 		final Tree valueNode = nodeList.poll();
@@ -1062,9 +1084,9 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			featureName = checkTree(childList.poll()).getText();
 		} else {
 			String childName = checkTree(childList.poll()).getText();
-			if(childName.startsWith(parent.getName())){
+			if (childName.startsWith(parent.getName())) {
 				featureName = childName;
-			}else{
+			} else {
 				featureName = parent.getName() + "." + childName;
 			}
 		}
@@ -1219,6 +1241,9 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
 			switch (curNode.getType()) {
+			case VelvetParser.IMPORT:
+				parseImport(curNode);
+				break;
 			case VelvetParser.CONCEPT:
 				parseConcept(curNode);
 				break;
@@ -1234,13 +1259,13 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 				reportSyntaxError(curNode);
 			}
 		}
-		if(!IS_USED_AS_API){
+		if (!IS_USED_AS_API) {
 			IFeatureModel mappingModel = FMFactoryManager.getFactory().createFeatureModel();
 			IFeatureStructure rootFeature = FMFactoryManager.getFactory().createFeature(mappingModel, "MPL").getStructure();
 			rootFeature.setAnd();
 			rootFeature.setAbstract(true);
 			rootFeature.setMandatory(true);
-	
+
 			LinkedList<String> possibleProjects = new LinkedList<String>();
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (int i = 0; i < projects.length; i++) {
@@ -1249,7 +1274,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 					possibleProjects.add(project.getName());
 				}
 			}
-	
+
 			for (Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
 				if (parameter.getValue().getType() == ExtendedFeature.TYPE_INTERFACE) {
 					IFeatureStructure parameterFeature = FMFactoryManager.getFactory().createFeature(mappingModel, parameter.getKey()).getStructure();
@@ -1257,7 +1282,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 					parameterFeature.setAbstract(true);
 					parameterFeature.setMandatory(true);
 					rootFeature.addChild(parameterFeature);
-	
+
 					for (String projectName : possibleProjects) {
 						IFeatureStructure projectFeature = FMFactoryManager.getFactory()
 								.createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
@@ -1267,9 +1292,18 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 					}
 				}
 			}
-	
+
 			mappingModel.getStructure().setRoot(rootFeature);
 			extFeatureModel.setMappingModel(mappingModel);
+		}
+	}
+
+	private void parseImport(Tree curNode) throws RecognitionException {
+		final LinkedList<Tree> nodeList = getChildren(curNode);
+		while (!nodeList.isEmpty()) {
+			final Tree node = nodeList.poll();
+			String text = node.getText();
+			extFeatureModel.addImport(text);
 		}
 	}
 
@@ -1334,7 +1368,12 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private void throwException(RecognitionException e, Tree curNode) throws RecognitionException {
 		if (modelMarkerHandler != null) {
-			final String message = ILLEGAL_SYNTAX_IN_LINE + e.line + ":" + e.charPositionInLine + ". " + curNode.getText();
+			String text = "";
+			
+			if(curNode !=null) {
+				curNode.getText();
+			}
+			final String message = ILLEGAL_SYNTAX_IN_LINE + e.line + ":" + e.charPositionInLine + ". " + text;
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_ERROR, e.line);
 		}
 		throw e;

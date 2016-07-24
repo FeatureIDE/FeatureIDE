@@ -84,7 +84,7 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 
 				return ar;
 			} else {
-				return new String[] { "loading..." };
+				return new String[] { "Feature Context Outline is not supported" };
 			}
 		} else {
 			return new String[] { "no feature project" };

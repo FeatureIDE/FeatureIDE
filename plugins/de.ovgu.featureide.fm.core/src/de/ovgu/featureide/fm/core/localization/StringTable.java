@@ -417,6 +417,7 @@ public class StringTable {
 	public static final String AUTO_LAYOUT_CONSTRAINTS = "Auto Layout Constraints";
 	public static final String AUTOMATED_CALCULATIONS = "Automated Calculations";
 	public static final String CALCULATE_CONSTRAINT_ERRORS = "Calculate Constraint Errors";
+	public static final String CALCULATE_DEAD_FO_CONSTRAINTS = "Calculate Constraint That Lead to Dead or False-Optional Features";
 	public static final String CALCULATE_FEATURES = "Calculate Features";
 	public static final String CALCULATE_REDUNDANT_CONSTRAINTS = "Calculate Redundant Constraints";
 	public static final String RUN_MANUAL_CALCULATIONS = "Run Manual Calculations";
@@ -424,6 +425,7 @@ public class StringTable {
 	public static final String CHANGE_DESCRIPTION = "Change Description";
 	public static final String FEATURE_DESCRIPTION = "Feature Description";
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
+	public static final String CALCULATE_DEPENDENCY = "Calculate Dependencies of Sub Feature Model";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
 	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
