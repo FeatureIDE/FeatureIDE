@@ -17,19 +17,24 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
+/**
+ * Configurations Analysis utils
+ * 
+ * @author jabier.martinez
+ */
 public class ConfigAnalysisUtils {
 
-	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, boolean ignoreCoreFeatures) throws CoreException {
-
-		Collection<String> featureList = featureProject.getFeatureModel().getFeatureOrderList();
-		if(ignoreCoreFeatures){
-			List<IFeature> coreFeatures = featureProject.getFeatureModel().getAnalyser().getCoreFeatures();
-			for(IFeature coref : coreFeatures){
-				featureList.remove(coref.getName());
-			}
-		}
+	/**
+	 * Get a matrix configurations/features
+	 * 
+	 * @param featureProject
+	 * @param featureList
+	 * @return boolean[][]
+	 * @throws CoreException
+	 */
+	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, List<String> featureList) throws CoreException {
 		Collection<IFile> configs = new ArrayList<IFile>();
-
+		// check that they are config files
 		IFolder configsFolder = featureProject.getConfigFolder();
 		for (IResource res : configsFolder.members()) {
 			if (res instanceof IFile) {
@@ -40,7 +45,6 @@ public class ConfigAnalysisUtils {
 		}
 
 		boolean[][] matrix = new boolean[configs.size()][featureList.size()];
-
 		int iconf = 0;
 		for (IFile config : configs) {
 			final Configuration configuration = new Configuration(featureProject.getFeatureModel());
@@ -57,5 +61,25 @@ public class ConfigAnalysisUtils {
 		return matrix;
 	}
 
-	
+	/**
+	 * No core nor hidden features
+	 * 
+	 * @param featureProject
+	 * @return list of feature names
+	 */
+	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {
+		// make a copy because it is unmodifiable
+		List<String> featureList1 = featureProject.getFeatureModel().getFeatureOrderList();
+		List<String> featureList = new ArrayList<String>();
+		featureList.addAll(featureList1);
+		List<IFeature> coreFeatures = featureProject.getFeatureModel().getAnalyser().getCoreFeatures();
+		Collection<IFeature> hiddenFeatures = featureProject.getFeatureModel().getAnalyser().getHiddenFeatures();
+		for (IFeature coref : coreFeatures) {
+			featureList.remove(coref.getName());
+		}
+		for (IFeature hiddenf : hiddenFeatures) {
+			featureList.remove(hiddenf.getName());
+		}
+		return featureList;
+	}
 }

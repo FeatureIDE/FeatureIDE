@@ -34,8 +34,9 @@ public class ShowFeatureCoocurrenceCommandHandler extends ASelectionHandler {
 		}
 		boolean[][] matrix = null;
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
 		try {
-			matrix = ConfigAnalysisUtils.getConfigsMatrix(featureProject, false);
+			matrix = ConfigAnalysisUtils.getConfigsMatrix(featureProject, featureList);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -52,7 +53,6 @@ public class ShowFeatureCoocurrenceCommandHandler extends ASelectionHandler {
 		}
 
 		StringBuffer json = new StringBuffer("{\"nodes\":[");
-		List<String> featureList = (List<String>) featureProject.getFeatureModel().getFeatureOrderList();
 		for (String f : featureList) {
 			json.append("{\"name\":\"");
 			json.append(f);
@@ -85,14 +85,13 @@ public class ShowFeatureCoocurrenceCommandHandler extends ASelectionHandler {
 
 		json.append("]}");
 
-		File f = Utils.getFileFromPlugin("de.ovgu.featureide.visualisation","template/cooccurrence/page.html");
+		File f = Utils.getFileFromPlugin("de.ovgu.featureide.visualisation", "template/cooccurrence/page.html");
 		String html = Utils.getStringOfFile(f);
-		html = html.replaceFirst("// DATA_HERE", " myjson ='"+json.toString() + "';");
-		
+		html = html.replaceFirst("// DATA_HERE", " myjson ='" + json.toString() + "';");
+
 		browser.setText(html);
 		shell.open();
 	}
-
 
 	public static int getCoocurrence(boolean[][] matrix, int i, int i2) {
 		int occurrences = 0;
@@ -103,9 +102,5 @@ public class ShowFeatureCoocurrenceCommandHandler extends ASelectionHandler {
 		}
 		return occurrences;
 	}
-	
-	
-
-	
 
 }

@@ -17,20 +17,20 @@ import org.osgi.framework.Bundle;
 
 public class Utils {
 
-	public static File getFileFromPlugin(String pluginId, String relativePath){
+	public static File getFileFromPlugin(String pluginId, String relativePath) {
 		Bundle bundle = Platform.getBundle(pluginId);
 		URL fileURL = bundle.getEntry(relativePath);
 		File file = null;
 		try {
-		    file = new File(FileLocator.resolve(fileURL).toURI());
+			file = new File(FileLocator.resolve(fileURL).toURI());
 		} catch (URISyntaxException e1) {
-		    e1.printStackTrace();
+			e1.printStackTrace();
 		} catch (IOException e1) {
-		    e1.printStackTrace();
+			e1.printStackTrace();
 		}
 		return file;
 	}
-	
+
 	public static List<String> getLinesOfFile(File file) {
 		List<String> lines = new ArrayList<String>();
 		try {
@@ -56,5 +56,5 @@ public class Utils {
 		string.setLength(string.length() - 1);
 		return string.toString();
 	}
-	
+
 }
