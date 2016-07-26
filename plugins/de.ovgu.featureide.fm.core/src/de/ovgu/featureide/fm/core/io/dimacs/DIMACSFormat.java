@@ -89,8 +89,11 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			final String line = sb.removeFirst();
 			if (line.startsWith("c")) {
 				final String[] commentLine = line.split("\\s");
-				final String id = commentLine[1].trim();
-				final String name = commentLine[2].trim();
+				String id = commentLine[1].trim();
+				String name = commentLine[2].trim();
+				if (id.endsWith("$")) {
+					id = id.substring(0, name.length() - 1);
+				}
 				names[Integer.parseInt(id)] = name;
 			} else {
 				break;
@@ -101,7 +104,10 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		for (int i = 1; i < names.length; i++) {
 			final String name = names[i];
 			if (name == null) {
-				abstractNames.add("__Abstract__" + i);
+//				abstractNames.add("__Abstract__" + i);
+				final IFeature feature = FMFactoryManager.getFactory().createFeature(featureModel, "__Abstract__" + i); 
+				featureModel.addFeature(feature);
+				rootFeature.getStructure().addChild(feature.getStructure());
 			} else {
 				final IFeature feature = FMFactoryManager.getFactory().createFeature(featureModel, name); 
 				featureModel.addFeature(feature);
@@ -124,8 +130,8 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			clauseParts.clear();
 		}
 		Node cnf = new And(clauses.toArray(new Or[0]));
-		final IMonitor workMonitor = new ConsoleMonitor();
-		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
+//		final IMonitor workMonitor = new ConsoleMonitor();
+//		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
 		for (Node clause : cnf.getChildren()) {
 			featureModel.addConstraint(FMFactoryManager.getFactory().createConstraint(featureModel, clause));
 		}

@@ -20,10 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -59,13 +64,34 @@ public class FeatureModelConversionHandler extends ASelectionHandler {
 					return false;
 				}
 				final Path projectPath = Paths.get(next.getProject().getLocationURI());
+				final Path outputPath = projectPath.resolve(wizard.getOutputFolder());
+				
 				try {
-					IFeatureModel fm = FMFactoryManager.getFactory(inputFormat).createFeatureModel();
-					FileHandler.convert(Paths.get(next.getLocationURI()), projectPath.resolve(wizard.getOutputFolder()), fm, inputFormat, outputFormat);
-				} catch (NoSuchExtensionException e) {
+					if (!Files.exists(outputPath)) {
+						Files.createDirectory(outputPath);
+					}
+					final IResource[] members = next.members();
+					for (IResource resource : members) {
+						if (resource instanceof IFile && resource.isAccessible()) {
+							try {
+								final IFeatureModel fm = FMFactoryManager.getFactory(inputFormat).createFeatureModel();
+								String name = resource.getName();
+								final int lastIndexOf = name.lastIndexOf('.');
+								if (lastIndexOf > 0) {
+									name = name.substring(0, lastIndexOf);
+								}
+								FileHandler.convert(Paths.get(resource.getLocationURI()),
+										outputPath.resolve(name + "." + outputFormat.getSuffix()), fm, inputFormat,
+										outputFormat);
+							} catch (NoSuchExtensionException e) {
+								FMUIPlugin.getDefault().logError(e);
+							}
+						}
+					}
+				} catch (CoreException | IOException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
-				
+
 			}
 		}
 		return true;
