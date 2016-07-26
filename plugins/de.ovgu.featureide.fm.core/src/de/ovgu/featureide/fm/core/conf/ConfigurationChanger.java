@@ -33,6 +33,7 @@ import org.prop4j.SatSolver.ValueType;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
@@ -168,7 +169,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					lastComputedValues[i++] = (byte) variable.getAutomaticValue();
 				}
 				node = AdvancedNodeCreator.createCNF(featureModel);
-				calcThread = new GraphCalcThread(featureGraph.getFeatureArray(), ConfigurationChanger.this, node);
+				calcThread = new GraphCalcThread(features, ConfigurationChanger.this, node);
 				initialized = true;
 			}
 			return null;
@@ -225,7 +226,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					if (newValue == Variable.UNDEFINED) {
 						undefined = true;
 					} else {
-						knownLiterals.add(new Literal(featureGraph.getFeatureArray()[index], newValue == Variable.TRUE));
+						knownLiterals.add(new Literal(features[index], newValue == Variable.TRUE));
 					}
 
 					for (int i = 0; i < featureGraph.getSize(); i++) {
@@ -304,34 +305,6 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 							compList.add(new CalcObject(i, valueType));
 						}
 					}
-
-					//					final LinkedList<Expression> varExpList = featureGraph.getExpListAr().get(i);
-					//					if (varExpList == null || varExpList.isEmpty()) {
-					//						compList.add(new CalcObject(i, valueType));
-					//						continue;
-					//					}
-					//
-					//					final int oldManualValue = variableConfiguration.getVariable(i).getManualValue();
-					//					int newAutomaticValue = Variable.UNDEFINED;
-					//
-					//					for (Expression expression : varExpList) {
-					//						if (oldManualValue != Variable.TRUE && testExpression(expression, i, Variable.TRUE)) {
-					//							newAutomaticValue = Variable.FALSE;
-					//							break;
-					//						}
-					//						if (oldManualValue != Variable.FALSE && testExpression(expression, i, Variable.FALSE)) {
-					//							newAutomaticValue = Variable.TRUE;
-					//							break;
-					//						}
-					//					}
-					//
-					//					variableConfiguration.setVariable(i, oldManualValue, true);
-					//					if (newAutomaticValue != Variable.UNDEFINED) {
-					//						featureToCompute[i] = (byte) -newAutomaticValue;
-					//						setNewValue(index, newAutomaticValue, false);
-					//					} else {
-					//						compList.add(new CalcObject(i, valueType));
-					//					}
 				}
 			}
 
@@ -342,10 +315,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					for (Variable var : variableConfiguration) {
 						switch (var.getManualValue()) {
 						case Variable.TRUE:
-							knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], true));
+							knownLiterals.add(new Literal(features[i], true));
 							break;
 						case Variable.FALSE:
-							knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], false));
+							knownLiterals.add(new Literal(features[i], false));
 							break;
 						default:
 							break;
@@ -356,10 +329,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					for (Variable var : variableConfiguration) {
 						switch (var.getAutomaticValue()) {
 						case Variable.TRUE:
-							knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], true));
+							knownLiterals.add(new Literal(features[i], true));
 							break;
 						case Variable.FALSE:
-							knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], false));
+							knownLiterals.add(new Literal(features[i], false));
 							break;
 						default:
 							break;
@@ -383,12 +356,12 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 						f.setManual(manu == Variable.UNDEFINED ? Selection.UNDEFINED : manu == Variable.TRUE ? Selection.SELECTED : Selection.UNSELECTED);
 						monitor.invoke(f);
 					} else {
-						if (Arrays.binarySearch(featureGraph.getCoreFeatures(), f.getName()) >= 0) {
+						if (Arrays.binarySearch(coreFeatures, f.getName()) >= 0) {
 							f.setAutomatic(Selection.SELECTED);
 							f.setManual(Selection.UNDEFINED);
 							monitor.invoke(f);
 						} else {
-							if (Arrays.binarySearch(featureGraph.getDeadFeatures(), f.getName()) >= 0) {
+							if (Arrays.binarySearch(deadFeatures, f.getName()) >= 0) {
 								f.setAutomatic(Selection.UNSELECTED);
 								f.setManual(Selection.UNDEFINED);
 								monitor.invoke(f);
@@ -448,10 +421,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			for (Variable var : variableConfiguration) {
 				switch (var.getValue()) {
 				case Variable.TRUE:
-					knownLiterals[i++] = new Literal(featureGraph.getFeatureArray()[var.getId()], true);
+					knownLiterals[i++] = new Literal(features[var.getId()], true);
 					break;
 				case Variable.FALSE:
-					knownLiterals[i++] = new Literal(featureGraph.getFeatureArray()[var.getId()], false);
+					knownLiterals[i++] = new Literal(features[var.getId()], false);
 					break;
 				default:
 					break;
@@ -460,7 +433,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		private boolean calc(int featureID) {
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
+			final Literal curLiteral = new Literal(features[featureID], false);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
 				if (!sat(knownLiterals)) {
@@ -479,7 +452,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		private boolean calcNegative(int featureID) {
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
+			final Literal curLiteral = new Literal(features[featureID], true);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
 				if (!sat(knownLiterals)) {
@@ -493,7 +466,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		private boolean calcPositive(int featureID) {
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
+			final Literal curLiteral = new Literal(features[featureID], false);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
 				if (!sat(knownLiterals)) {
@@ -557,12 +530,19 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	private SatSolver satSolver1 = null;
 
 	private final VariableConfiguration variableConfiguration;
+	
+	private final String[] coreFeatures, deadFeatures, features;
 
 	public ConfigurationChanger(IFeatureGraph featureGraph, IFeatureModel featureModel, VariableConfiguration variableConfiguration, ConfigurationFG c) {
 		this.featureModel = featureModel;
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
 		this.c = c;
+
+		coreFeatures = FeatureUtils.getCoreFeaturesFromFeatureGraph(featureGraph);
+		deadFeatures = FeatureUtils.getDeadFeaturesFromFeatureGraph(featureGraph);
+		features = FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
+		
 		LongRunningWrapper.runMethod(load());
 	}
 
@@ -658,7 +638,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		int i = 0;
 		for (Variable var : variableConfiguration) {
 			if (!definedVariablesOnly || var.getValue() != Variable.UNDEFINED) {
-				literals[i++] = new Literal(featureGraph.getFeatureArray()[var.getId()], var.getValue() == Variable.TRUE);
+				literals[i++] = new Literal(features[var.getId()], var.getValue() == Variable.TRUE);
 			}
 		}
 		return literals;

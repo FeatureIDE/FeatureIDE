@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 // TODO Change to Runnable so it can be started more than once
 // TODO Implement prioritization
 public class LongRunningThread<T> extends Thread implements IRunner<T> {
-	protected final List<JobFinishListener> listenerList = new LinkedList<>();
+	protected final List<JobFinishListener<T>> listenerList = new LinkedList<>();
 
 	private final LongRunningMethod<T> method;
 	private final IMonitor monitor;
@@ -55,7 +55,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 	}
 
 	@Override
-	public void addJobFinishedListener(JobFinishListener listener) {
+	public void addJobFinishedListener(JobFinishListener<T> listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
@@ -68,7 +68,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 	}
 
 	public void fireEvent() {
-		for (final JobFinishListener listener : listenerList) {
+		for (final JobFinishListener<T> listener : listenerList) {
 			try {
 				listener.jobFinished(this);
 			} catch (Throwable e) {
@@ -100,7 +100,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 	}
 
 	@Override
-	public void removeJobFinishedListener(JobFinishListener listener) {
+	public void removeJobFinishedListener(JobFinishListener<T> listener) {
 		listenerList.remove(listener);
 	}
 
@@ -115,7 +115,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 			Logger.logError(e);
 			status = JobStatus.FAILED;
 		} finally {
-			for (final JobFinishListener listener : listenerList) {
+			for (final JobFinishListener<T> listener : listenerList) {
 				try {
 					listener.jobFinished(this);
 				} catch (Throwable e) {

@@ -37,7 +37,6 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -347,6 +346,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		private static final int DEFAULT_MODE = -1;
 
 		private final List<SelectableFeature> featureList;
+		@SuppressWarnings("unused")
 		private final int mode;
 
 		public LeadToValidConfiguration(List<SelectableFeature> featureList) {
@@ -360,18 +360,11 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 		@Override
 		public Void execute(IMonitor monitor) throws Exception {
-			if (mode == DEFAULT_MODE) {
-				if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
-					leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES, monitor);
-				} else {
-					leadToValidConfiguration(featureList, Preferences.defaultCompletion, monitor);
-				}
-			} else {
-				leadToValidConfiguration(featureList, mode, monitor);
-			}
+			leadToValidConfig2(featureList, monitor);
 			return null;
 		}
 
+		@SuppressWarnings("unused")
 		private void leadToValidConfig1(List<SelectableFeature> featureList, IMonitor workMonitor) {
 			if (rootNode == null) {
 				return;
@@ -527,22 +520,6 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 					}
 				}
 				workMonitor.worked();
-			}
-		}
-
-		private void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, IMonitor workMonitor) {
-			for (SelectableFeature feature : configuration.features) {
-				feature.setRecommended(Selection.UNDEFINED);
-			}
-			switch (mode) {
-			case Preferences.COMPLETION_ONE_CLICK:
-				leadToValidConfig1(featureList, workMonitor);
-				break;
-			case Preferences.COMPLETION_OPEN_CLAUSES:
-				leadToValidConfig2(featureList, workMonitor);
-				break;
-			case Preferences.COMPLETION_NONE:
-			default:
 			}
 		}
 	}

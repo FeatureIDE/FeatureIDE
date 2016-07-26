@@ -36,7 +36,7 @@ public class RingList<T> implements Iterable<T> {
 	private int size;
 
 	public RingList(int size) {
-		this.ring = new ArrayList<T>(size);
+		this.ring = new ArrayList<>();
 		this.size = size > 0 ? size : 1;
 		this.firstPointer = 0;
 	}

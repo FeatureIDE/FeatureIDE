@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * 
  * @author Sebastian Krieter
  */
-public class SignatureSetter implements JobFinishListener {
+public class SignatureSetter implements JobFinishListener<Object> {
 	private final FujiSignaturesCreator sigCreator = new FujiSignaturesCreator();
 	
 	private FSTModel fstModel = null;
@@ -57,7 +57,7 @@ public class SignatureSetter implements JobFinishListener {
 	}
 
 	@Override
-	public void jobFinished(IJob<?> finishedJob) {
+	public void jobFinished(IJob<Object> finishedJob) {
 		if (finishedJob.getStatus() == JobStatus.OK) {
 			ProjectSignatures sigs = sigCreator.createSignatures(fp, ast);
 			synchronized (this) {

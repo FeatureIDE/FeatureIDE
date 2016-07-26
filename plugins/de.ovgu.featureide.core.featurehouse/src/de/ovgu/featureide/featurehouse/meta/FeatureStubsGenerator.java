@@ -111,9 +111,9 @@ public class FeatureStubsGenerator {
 //		}
 		
 		IRunner<ProjectSignatures> efsj = LongRunningWrapper.getRunner(new ExtendedFujiSignaturesJob(featureProject));
-		efsj.addJobFinishedListener(new JobFinishListener() {
+		efsj.addJobFinishedListener(new JobFinishListener<ProjectSignatures>() {
 			@Override
-			public void jobFinished(IJob<?> finishedJob) {
+			public void jobFinished(IJob<ProjectSignatures> finishedJob) {
 				getFeatures(featureProject.getFSTModel().getProjectSignatures());
 			}
 			

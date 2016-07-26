@@ -270,9 +270,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		if (!configurationManager.editObject().getPropagator().isLoaded()) {
 			final Display currentDisplay = Display.getCurrent();
 			LongRunningJob<Void> configJob = new LongRunningJob<>("Load Propagator", configurationManager.editObject().getPropagator().load());
-			configJob.addJobFinishedListener(new JobFinishListener() {
+			configJob.addJobFinishedListener(new JobFinishListener<Void>() {
 				@Override
-				public void jobFinished(IJob<?> finishedJob) {
+				public void jobFinished(IJob<Void> finishedJob) {
 					autoSelectFeatures = true;
 					currentDisplay.asyncExec(new Runnable() {
 						@Override

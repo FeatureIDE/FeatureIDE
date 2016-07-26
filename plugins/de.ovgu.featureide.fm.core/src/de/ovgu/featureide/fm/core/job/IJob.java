@@ -80,7 +80,7 @@ public interface IJob<T> {
 	 * @param listener the listener to add
 	 * @see #removeJobFinishedListener
 	 */
-	void addJobFinishedListener(JobFinishListener listener);
+	void addJobFinishedListener(JobFinishListener<T> listener);
 
 	/**
 	 * Removes a certain {@link JobFinishListener} from this job.
@@ -88,7 +88,7 @@ public interface IJob<T> {
 	 * @param listener the listener to remove
 	 * @see #addJobFinishedListener
 	 */
-	void removeJobFinishedListener(JobFinishListener listener);
+	void removeJobFinishedListener(JobFinishListener<T> listener);
 
 	/**
 	 * {@link org.eclipse.core.runtime.jobs.Job#cancel()}

@@ -444,7 +444,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * Parses the feature order section.
 	 */
 	private void parseFeatureOrder(NodeList nodeList) throws UnsupportedModelException {
-		final ArrayList<String> order = new ArrayList<String>(object.getNumberOfFeatures());
+		final ArrayList<String> order = new ArrayList<>(object.getNumberOfFeatures());
 		for (final Element e : getElements(nodeList)) {
 			if (e.hasAttributes()) {
 				final NamedNodeMap nodeMap = e.getAttributes();

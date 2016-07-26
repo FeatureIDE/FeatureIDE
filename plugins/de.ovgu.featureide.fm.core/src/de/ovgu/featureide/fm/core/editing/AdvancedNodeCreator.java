@@ -29,6 +29,7 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
+import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -63,6 +64,20 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
+	}
+
+	public static Node createRegularCNF(IFeatureModel featureModel) {
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(false);
+		return nodeCreator.createNodes();
+	}
+	
+	public static SatInstance createSatInstance(IFeatureModel featureModel) {
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(false);
+		return new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(featureModel));
 	}
 
 	public static Node createCNFWithoutAbstract(IFeatureModel featureModel) {
@@ -115,7 +130,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * Default values is {@code true} (values will be included).
 	 */
 	private boolean includeBooleanValues = true;
-	
+
 	private boolean useOldNames = true;
 
 	private boolean optionalRoot = false;

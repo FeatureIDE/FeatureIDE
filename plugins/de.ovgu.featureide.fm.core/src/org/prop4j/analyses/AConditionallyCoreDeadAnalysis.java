@@ -18,30 +18,49 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf;
+package org.prop4j.analyses;
 
-import java.io.Serializable;
-
+import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.SatInstance;
 
-public interface IFeatureGraph extends Serializable {
+/**
+ * Finds core and dead features.
+ * 
+ * @author Sebastian Krieter
+ */
+public abstract class AConditionallyCoreDeadAnalysis extends AbstractAnalysis<int[]> {
 
-	boolean setEdge(int from, int to, byte edgeType);
+	public int satCount;
 
-	byte getEdge(int fromIndex, int toIndex);
+	protected int[] fixedVariables;
+	protected int newCount;
 
-	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
+	public AConditionallyCoreDeadAnalysis(ISatSolver solver) {
+		super(solver);
+		resetFixedFeatures();
+	}
 
-	int getSize();
+	public AConditionallyCoreDeadAnalysis(SatInstance satInstance) {
+		super(satInstance);
+		resetFixedFeatures();
+	}
 
-	int[] getIndex();
+	public void setFixedFeatures(int[] fixedVariables, int newCount) {
+		this.fixedVariables = fixedVariables;
+		this.newCount = newCount;
+	}
 
-	SatInstance getSatInstance();
+	public void resetFixedFeatures() {
+		fixedVariables = new int[0];
+		newCount = 0;
+	}
 
-	void copyValues(IFeatureGraph otherGraph);
-
-	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getFeatureIndex(String name);
+	protected static int countNegative(int[] model) {
+		int count = 0;
+		for (int i = 0; i < model.length; i++) {
+			count += model[i] >>> (Integer.SIZE - 1);
+		}
+		return count;
+	}
 
 }
