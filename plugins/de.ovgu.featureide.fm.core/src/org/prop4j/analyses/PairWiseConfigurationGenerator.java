@@ -172,9 +172,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 
 	protected long time = 0;
 
-	private int[] allYesSolution;
-
-	private int[] allNoSolution;
+	private int[] allYesSolution, allNoSolution;
 
 	public PairWiseConfigurationGenerator(SatInstance satInstance, int maxNumber) {
 		super(satInstance);
@@ -197,8 +195,6 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		findInvalid();
 		IVecInt orgBackbone = solver.getAssignment();
 		final int featureCount = solver.getSatInstance().getNumberOfVariables();
-
-		System.out.println("Found all invalid!");
 
 		final int numberOfFixedFeatures = orgBackbone.size();
 		final boolean[] featuresUsedOrg = new boolean[featureCount];
@@ -719,7 +715,6 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 
 	protected boolean handleNewConfig(int[] curModel, final boolean[] featuresUsedOrg) {
 		if (curModel == null) {
-			System.out.println("Found everything!");
 			return true;
 		}
 		final int partCount = count(curModel) - fixedPartCount;
@@ -736,7 +731,6 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 			}
 		}
 		if (lesserCount > 0) {
-			System.out.println("Found Larger Model!");
 			count -= lesserCount;
 
 			for (int i = 0; i < comboIndex.length; i++) {
@@ -805,8 +799,6 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		try {
 			config.setBlockingClauseConstraint(solver.getInternalSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
 		} catch (ContradictionException e) {
-			e.printStackTrace();
-			System.out.println("Unsatisfiable1!");
 			return true;
 		}
 
@@ -815,7 +807,6 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 
 		finalCount = Math.max(finalCount, count - maxBackJumping);
 		if (absUncovered <= 0) {
-			System.out.println("Found everything2!");
 			return true;
 		}
 		return false;
@@ -834,8 +825,10 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		double relTotal = (double) (config.getTotalCoverage()) / combinationCount;
 		relDelta = Math.floor(relDelta * 100000.0) / 1000.0;
 		relTotal = Math.floor(relTotal * 1000.0) / 10.0;
-		System.out.println(count++ + ": " + config.getTotalCoverage() + "/" + combinationCount + " | " + relTotal + "% | left = " + absUncovered + " | new = "
-				+ config.getDeltaCoverage() + " | delta = " + relDelta);
+		if (VERBOSE) {
+			System.out.println(count++ + ": " + config.getTotalCoverage() + "/" + combinationCount + " | " + relTotal + "% | left = " + absUncovered
+					+ " | new = " + config.getDeltaCoverage() + " | delta = " + relDelta);
+		}
 		return absUncovered;
 	}
 

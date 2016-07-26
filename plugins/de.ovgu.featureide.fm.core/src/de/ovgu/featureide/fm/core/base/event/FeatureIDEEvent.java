@@ -157,6 +157,10 @@ public class FeatureIDEEvent {
 		 * The children of a feature changed
 		 */
 		CHILDREN_CHANGED,
+		/**
+		 * The dependency for a subtree was calculated 
+		 */
+		DEPENDENCY_CALCULATED,
 	}
 	
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];

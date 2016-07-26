@@ -72,6 +72,24 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
  */
 public class FeatureModelAnalyzer {
 
+	/**
+	 * Used for tool tip: remember explanation for redundant constraint.
+	 * Key = constraintIndex, Value = explanation
+	 */
+	public HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
+
+	/**
+	 * Used for tool tip: remember explanation for redundant constraint.
+	 * Key = constraintIndex, Value = explanation
+	 */
+	public HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
+
+	/**
+	 * Used for tool tip: remember explanation for redundant constraint.
+	 * Key = constraintIndex, Value = explanation
+	 */
+	public HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
+
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
 	}
@@ -105,6 +123,10 @@ public class FeatureModelAnalyzer {
 	 * Defines whether constraints that are tautologies should be calculated.
 	 */
 	public boolean calculateTautologyConstraints = true;
+
+	public boolean calculateFOConstraints = true;
+
+	public boolean calculateDeadConstraints = true;
 	/**
 	 * Defines whether analysis should be performed automatically.
 	 */
@@ -533,11 +555,16 @@ public class FeatureModelAnalyzer {
 		analysis.setCalculateConstraints(calculateConstraints);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
+		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
+		analysis.setCalculateFOConstraints(calculateFOConstraints);
 		final HashMap<Object, Object> newAttributes = LongRunningWrapper.runMethod(analysis, this.monitor);
 		cachedValidity = analysis.isValid();
 		cachedCoreFeatures = analysis.getCoreFeatures();
 		cachedDeadFeatures = analysis.getDeadFeatures();
 		cachedFalseOptionalFeatures = analysis.getFalseOptionalFeatures();
+		deadFeatureExpl = analysis.deadFeatureExpl;
+		falseOptFeatureExpl = analysis.falseOptFeatureExpl;
+		redundantConstrExpl = analysis.redundantConstrExpl;
 		return newAttributes;
 	}
 
@@ -550,8 +577,11 @@ public class FeatureModelAnalyzer {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(false);
 		analysis.setCalculateConstraints(true);
+		analysis.setCalculateExplanations(false);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
+		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
+		analysis.setCalculateFOConstraints(calculateFOConstraints);
 		analysis.updateConstraints();
 		cachedValidity = analysis.isValid();
 	}
@@ -573,6 +603,7 @@ public class FeatureModelAnalyzer {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(true);
 		analysis.setCalculateConstraints(false);
+		analysis.setCalculateExplanations(false);
 		analysis.updateFeatures();
 		cachedValidity = analysis.isValid();
 		cachedCoreFeatures = analysis.getCoreFeatures();
@@ -686,9 +717,11 @@ public class FeatureModelAnalyzer {
 		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000);
 		for (IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure = feature.getStructure();
-			final IFeature parent = FeatureUtils.getParent(feature);
-			if (!structure.isMandatory() && parent != null && solver.isImplied(new Literal(parent.getName(), false), new Literal(feature.getName()))) {
-				falseOptionalFeatures.add(feature);
+			if (!FeatureUtils.getRoot(fm).getName().equals(feature.getName())) { // this might be indeed the case within the analysis for subtree dependencies
+				final IFeature parent = FeatureUtils.getParent(feature);
+				if (!structure.isMandatory() && parent != null && solver.isImplied(new Literal(parent.getName(), false), new Literal(feature.getName()))) {
+					falseOptionalFeatures.add(feature);
+				}
 			}
 		}
 		return falseOptionalFeatures;

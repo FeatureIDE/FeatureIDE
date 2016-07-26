@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="F_4459AF8EF5C3">
+				<description>
+					Lorem
+				</description>
+				<alt mandatory="true" name="F_656327585305">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
+					</description>
+					<feature mandatory="true" name="F_A91B6C2F9101">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_615262019661">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy ei
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_55F539F1F74B">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_D829C2301A68">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea taki
+					</description>
+					<feature mandatory="true" name="F_CCD414C6E484">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5C198F970D3E">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_04526E039819">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_8DF945D73E2D">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea re
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

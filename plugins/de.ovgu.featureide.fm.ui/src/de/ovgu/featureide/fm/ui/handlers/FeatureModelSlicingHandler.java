@@ -49,7 +49,7 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
 			if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
 				final JobArguments arguments = new SliceFeatureModelJob.Arguments(Paths.get(file.getLocationURI()), featureModel,
-						(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES));
+						(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES), true);
 				LongRunningWrapper.getRunner(arguments.createJob()).schedule();
 			}
 		}

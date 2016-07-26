@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_2058330622__F_858E34A9BEFB">
+				<description>
+					
+				</description>
+				<feature name="F_90C6322BD63E">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_B709EC4C65DD">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_55D95DA906FE">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="I_2979276807__F_9D6466EC9799">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F785E9DB694C">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_C6D6D916FF14">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<var>F_F785E9DB694C</var>
+					<var>F_B709EC4C65DD</var>
+					<not>
+						<var>N_2058330622__F_858E34A9BEFB</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>F_B709EC4C65DD</var>
+					</not>
+					<not>
+						<var>F_F785E9DB694C</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_F785E9DB694C</var>
+					<var>F_B709EC4C65DD</var>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

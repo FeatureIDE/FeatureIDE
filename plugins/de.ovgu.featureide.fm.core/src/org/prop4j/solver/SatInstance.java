@@ -128,6 +128,17 @@ public class SatInstance {
 		return convertToInt(Arrays.asList(literals));
 	}
 
+	public int[] convertToInt(Node[] literals) {
+		final int[] resultList = new int[literals.length];
+		int i = 0;
+		for (Node node : literals) {
+			Literal literal = (Literal) node;
+			final Integer varIndex = varToInt.get(literal.var);
+			resultList[i++] = varIndex == null ? 0 : (literal.positive ? varIndex : -varIndex);
+		}
+		return resultList;
+	}
+
 	public List<Literal> convertToLiterals(int[] model) {
 		final List<Literal> resultList = new ArrayList<>();
 		for (int var : model) {

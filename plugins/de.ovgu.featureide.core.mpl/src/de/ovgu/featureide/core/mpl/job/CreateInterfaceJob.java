@@ -382,6 +382,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 							pseudoAlternative.getStructure().setAlternative();
 							for (IFeature child : list) {
 								pseudoAlternative.getStructure().addChild(child.getStructure());
+								structure.removeChild(child.getStructure());
 							}
 							list.clear();
 							structure.setAnd();
