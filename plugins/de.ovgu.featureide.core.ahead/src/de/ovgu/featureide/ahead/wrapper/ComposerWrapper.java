@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_SKIPPED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FEATURE_FOLDER_FOUND_IN_THE_JAK_FILE_PATH_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_NOT_CONTAINED_IN_THE_JAK_FILE_PATH_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNEXPECTED_ERROR_WHILE_PARSING;
-import jampack.Jampack;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,8 +38,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-import mixin.Mixin;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -48,13 +45,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
-import Jakarta.util.ExitError;
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.ahead.model.AbstractJakModelBuilder;
 import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
 import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import jampack.Jampack;
+import mixin.Mixin;
 
 /**
  * 
@@ -439,7 +437,7 @@ public class ComposerWrapper {
 		//run Mixin
 		try {
 			Mixin.main(args);
-		} catch (ExitError e) {
+		} catch (Error e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}	
 		
@@ -472,7 +470,7 @@ public class ComposerWrapper {
 		//run Jampack
 		try {
 			Jampack.main(args);
-		} catch (ExitError e) {
+		} catch (Error e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}	
 		
