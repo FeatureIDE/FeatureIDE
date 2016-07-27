@@ -31,7 +31,6 @@ import java.util.Stack;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import Jakarta.util.Util;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -542,8 +541,7 @@ public class LTMS {
 			return -1;
 		}
 		}
-		Util.fatalError((String) ("Unknown value: " + l));
-		return -3; // will never get here
+		throw new RuntimeException("Unknown value: " + l);
 	}
 
 	/**

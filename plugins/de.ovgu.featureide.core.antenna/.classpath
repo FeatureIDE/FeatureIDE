@@ -4,6 +4,5 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/preprocessor-v3-bin-1.3.jar"/>
-	<classpathentry kind="lib" path="/de.ovgu.featureide.fm.core/lib/annotations.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
