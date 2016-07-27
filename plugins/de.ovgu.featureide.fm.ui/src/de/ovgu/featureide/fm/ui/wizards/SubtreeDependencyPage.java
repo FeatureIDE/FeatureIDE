@@ -136,10 +136,11 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 			subtreeModel.getAnalyser().redundantConstrExpl.put(FeatureUtils.getConstraintIndex(subtreeModel, redundantC), expl);
 			redundantC.setConstraintAttribute(ConstraintAttribute.IMPLICIT, false);
 			
-			// remember for all respective graphical constraints that they are implicit (needed for legend) 
+			// remember if an implicit constraint exists to adapt legend 
 			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {
 				if (gc.getObject().equals(redundantC)) {
 					gc.setConstraintImplicit(true);
+					break;
 				}
 			}
 		}
