@@ -20,10 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.constraint.analysis;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
+
+import com.google.common.collect.BiMap;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
@@ -37,7 +38,7 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 
 	private ExtendedFeatureModel efm;
-	private HashMap<String, Integer> map;
+	private BiMap<String, Integer> map;
 	private List<DeRestriction> deFm;
 	
 	private UniqueId idGen;

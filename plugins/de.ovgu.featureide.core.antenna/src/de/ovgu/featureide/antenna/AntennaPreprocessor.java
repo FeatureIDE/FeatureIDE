@@ -38,6 +38,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
@@ -639,8 +640,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				if (res instanceof IFolder) {
 					postProcess((IFolder) res);
 				} else if (res instanceof IFile) {
-					final String fileExtension = res.getFileExtension();
-					if (fileExtension == null || fileExtension.equals(getConfigurationExtension())) {
+					if (res.getFileExtension().equals(getConfigurationExtension())) {
 						continue;
 					}
 					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));

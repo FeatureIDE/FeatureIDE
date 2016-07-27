@@ -6,7 +6,15 @@ Bundle-Version: 3.1.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
-Export-Package: de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.resources",
+Export-Package: Jakarta.DRAttributes,
+ Jakarta.SwingUtils;uses:="javax.swing",
+ Jakarta.collection,
+ Jakarta.io;uses:="Jakarta.collection,Jakarta.string",
+ Jakarta.loader,
+ Jakarta.string,
+ Jakarta.symtab,
+ Jakarta.util;uses:="Jakarta.loader",
+ de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.resources",
  de.ovgu.featureide.fm.core.annotation,
  de.ovgu.featureide.fm.core.base,
  de.ovgu.featureide.fm.core.base.event,
@@ -42,9 +50,6 @@ Export-Package: de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.re
  de.ovgu.featureide.fm.core.job.util,
  de.ovgu.featureide.fm.core.localization,
  guidsl,
- javax.annotation,
- javax.annotation.concurrent,
- javax.annotation.meta,
  org.prop4j,
  org.prop4j.analyses,
  org.prop4j.solver,
@@ -73,8 +78,10 @@ Export-Package: de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.re
  org.sat4j.tools.xplain
 Bundle-ClassPath: .,
  lib/guidsl.jar,
+ lib/jakarta.jar,
  lib/org.sat4j.core.jar,
  lib/annotations.jar,
+ lib/guava-r09.jar,
  lib/org.sat4j.pb.jar,
  lib/antlr-3.4.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
