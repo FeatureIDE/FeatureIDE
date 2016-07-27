@@ -370,7 +370,7 @@ public class LTMS {
 	 * Finds unit-open clauses depending on the initial truth value assumptions of
 	 * the features from the redundant constraint and pushes them to stack.
 	 * 
-	 * @param literal The literal from the redundant constraint whose value is initially set
+	 * @param literal The literal whose value is initially set
 	 * @param allClauses All clauses of the conjunctive normal form
 	 */
 	private void findOpenClauses(ArrayList<Literal> literals, Node[] allClauses) {
