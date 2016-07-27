@@ -34,11 +34,9 @@ import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtilsLegacy;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Calculates dependencies of features
@@ -46,7 +44,6 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Soenke Holthusen
  * @author Marcus Pinnecke (Feature Interface) * 
  */
-@SuppressWarnings("deprecation")
 public class FeatureDependencies {
     private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected then Y is selected in every valid configuration."
 	    + "\n"
@@ -195,30 +192,12 @@ public class FeatureDependencies {
     	return always.get(feature);
     }
     
-    /*
-     * Don't remove this method - it is called by Fuji
-     * 
-     */
-    @Deprecated
-    public Set<Feature> always(Feature feature) {
-    	return Functional.toSet(Functional.map(always.get(FeatureUtilsLegacy.convert(feature)), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
-    }
-
     /**
      * @param feature
      * @return
      */
     public Set<IFeature> never(IFeature feature) {
     	return never.get(feature);
-    }
-    
-    /*
-     * Don't remove this method - it is called by Fuji
-     * 
-     */
-    @Deprecated
-    public Set<Feature> never(Feature feature) {
-    	return Functional.toSet(Functional.map(never.get(FeatureUtilsLegacy.convert(feature)), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
     }
     
     /**
@@ -229,15 +208,6 @@ public class FeatureDependencies {
     	return maybe.get(feature);
     }
     
-    /*
-     * Don't remove this method - it is called by Fuji
-     * 
-     */
-    @Deprecated
-    public Set<Feature> maybe(Feature feature) {
-    	return Functional.toSet(Functional.map(maybe.get(FeatureUtilsLegacy.convert(feature)), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
-    }
-
     public String toString() {
     	StringBuilder builder = new StringBuilder();
 		for (IFeature feature : fm.getFeatures()) {

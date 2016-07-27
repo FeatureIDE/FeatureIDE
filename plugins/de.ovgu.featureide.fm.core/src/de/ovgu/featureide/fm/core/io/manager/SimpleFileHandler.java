@@ -24,9 +24,9 @@ import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -125,7 +125,7 @@ public class SimpleFileHandler<T> {
 		try {
 			final T newObject = object;
 
-			final String content = new String(Files.readAllBytes(path), DEFAULT_CHARSET);
+			final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
 			final List<Problem> problemList = format.getInstance().read(newObject, content);
 			if (problemList != null) {
 				lastProblems.addAll(problemList);
@@ -140,7 +140,7 @@ public class SimpleFileHandler<T> {
 		lastProblems.clear();
 		try {
 			final byte[] content = format.getInstance().write(object).getBytes(DEFAULT_CHARSET);
-			Files.write(path, content, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			FileSystem.write(path, content);
 		} catch (final Exception e) {
 			handleException(e);
 		}

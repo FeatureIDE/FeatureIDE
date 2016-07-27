@@ -41,12 +41,13 @@ public class DynamicProfileMenu extends ContributionItem {
 	private AddProfileColorSchemeAction addProfileSchemeAction;
 	private RenameProfileColorSchemeAction renameProfileSchemeAction;
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
-	private IFeatureProject myFeatureProject = getCurrentFeatureProject();
-	private IFeatureModel featureModel = myFeatureProject.getFeatureModel();
+	private final IFeatureModel featureModel; {
+		IFeatureProject curFeatureProject = getCurrentFeatureProject();
+		featureModel = curFeatureProject == null ? null : curFeatureProject.getFeatureModel();
+	}
 	private boolean multipleSelected = isMultipleSelection();
 
 	public DynamicProfileMenu() {
-
 	}
 
 	public DynamicProfileMenu(String id) {
@@ -58,10 +59,12 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 	@Override
 	public void fill(Menu menu, int index) {
+		if (featureModel == null) {
+			return;
+		}
 		MenuManager man = new MenuManager("Color Scheme", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
 		man.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager m) {
-
 				fillContextMenu(m);
 			}
 		});
@@ -72,7 +75,6 @@ public class DynamicProfileMenu extends ContributionItem {
 
 		man.setVisible(true);
 		createActions();
-
 	}
 
 	/**
@@ -113,7 +115,6 @@ public class DynamicProfileMenu extends ContributionItem {
 		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Color Scheme", featureModel);
 		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", featureModel);
 		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Color Scheme", featureModel);
-
 	}
 
 	/**
@@ -124,7 +125,6 @@ public class DynamicProfileMenu extends ContributionItem {
 
 		ISelection selection = selectionService.getSelection();
 		return (IStructuredSelection) selection;
-
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class DynamicProfileMenu extends ContributionItem {
 		} else if (element instanceof IJavaElement) {
 			return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
 		} else if (element instanceof IAdaptable) {
-			final IProject project = (IProject)((IAdaptable) element).getAdapter(IProject.class);
+			final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
 			if (project != null) {
 				return CorePlugin.getFeatureProject(project);
 			}

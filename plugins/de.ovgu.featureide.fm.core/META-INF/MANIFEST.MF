@@ -6,11 +6,20 @@ Bundle-Version: 3.1.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
-Export-Package: de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.resources",
+Export-Package: Jakarta.DRAttributes,
+ Jakarta.SwingUtils,
+ Jakarta.collection,
+ Jakarta.io,
+ Jakarta.loader,
+ Jakarta.string,
+ Jakarta.symtab,
+ Jakarta.util,
+ de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.resources",
  de.ovgu.featureide.fm.core.annotation,
  de.ovgu.featureide.fm.core.base,
  de.ovgu.featureide.fm.core.base.event,
  de.ovgu.featureide.fm.core.base.impl,
+ de.ovgu.featureide.fm.core.base.util,
  de.ovgu.featureide.fm.core.base.util.tree,
  de.ovgu.featureide.fm.core.color,
  de.ovgu.featureide.fm.core.conf,
@@ -43,10 +52,12 @@ Export-Package: de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.re
  de.ovgu.featureide.fm.core.job.monitor,
  de.ovgu.featureide.fm.core.job.util,
  de.ovgu.featureide.fm.core.localization,
+ edu.umd.cs.findbugs.annotations,
  guidsl,
  javax.annotation,
  javax.annotation.concurrent,
  javax.annotation.meta,
+ net.jcip.annotations,
  org.prop4j,
  org.prop4j.analyses,
  org.prop4j.solver,
@@ -74,14 +85,14 @@ Export-Package: de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.re
  org.sat4j.tools.encoding,
  org.sat4j.tools.xplain
 Bundle-ClassPath: .,
+ lib/annotations.jar,
+ lib/antlr-3.4.jar,
  lib/guidsl.jar,
  lib/org.sat4j.core.jar,
- lib/annotations.jar,
  lib/org.sat4j.pb.jar,
- lib/antlr-3.4.jar
+ lib/jakarta.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
-Import-Package: de.ovgu.featureide.fm.core,
- org.eclipse.swt.graphics
+Import-Package: org.eclipse.swt.graphics
 
