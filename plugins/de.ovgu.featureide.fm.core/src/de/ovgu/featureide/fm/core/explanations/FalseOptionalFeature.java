@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * 
  * @author "Ananieva Sofia"
  */
-public class FalseOptional {
+public class FalseOptionalFeature {
 
 	/**
 	 * The model after a change (with a constraint that makes a feature false optional).

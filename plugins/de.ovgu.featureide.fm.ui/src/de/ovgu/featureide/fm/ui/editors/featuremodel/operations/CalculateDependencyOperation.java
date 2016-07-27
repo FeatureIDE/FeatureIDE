@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.explanations.Redundancy;
+import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob.Arguments;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
@@ -129,7 +129,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 */
 	private void resetExplanations() {
 		// reset model to the origin one so that constraint index is consistent when closing page
-		Redundancy.setNewModel(oldFm);
+		RedundantConstraint.setNewModel(oldFm);
 
 		// clear maps which hold explanations for defect constraints and features
 		oldFm.getAnalyser().deadFeatureExpl.clear();

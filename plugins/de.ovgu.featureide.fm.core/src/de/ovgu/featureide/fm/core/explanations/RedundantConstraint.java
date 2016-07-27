@@ -40,7 +40,7 @@ import org.prop4j.Node;
  * 
  * @author "Ananieva Sofia"
  */
-public class Redundancy {
+public class RedundantConstraint {
 
 	/**
 	 * A hash map for storing truth values, reasons and antecedents per literal.
