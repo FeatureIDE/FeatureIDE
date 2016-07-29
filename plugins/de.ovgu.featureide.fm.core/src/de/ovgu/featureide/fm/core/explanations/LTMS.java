@@ -135,12 +135,12 @@ public class LTMS {
 			}
 			//weight explanation strings according their occurrences 
 			for (String tmp : reason) {
-				if (Redundancy.getWeighted().containsKey(tmp)) {
-					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+				if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+					RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 				} else {
-					Redundancy.getWeighted().put(tmp, 1);
+					RedundantConstraint.getWeighted().put(tmp, 1);
 				}
-				Redundancy.setCntExpl(); // increase counter of explanations by 1				
+				RedundantConstraint.setCntExpl(); // increase counter of explanations by 1				
 			}
 
 			return reason;
@@ -242,7 +242,7 @@ public class LTMS {
 		int allExpl = 1;
 
 		// count number of explanations outside this class due to different truth values for features from redundant constraint
-		Redundancy.setCntExpl();
+		RedundantConstraint.setCntExpl();
 
 		// remember first explanation parts in order to weight them later according their occurrences 
 		if (mode != ExplanationMode.Redundancy) {
@@ -252,10 +252,10 @@ public class LTMS {
 		} else {
 			// remember explanation parts for different truth values of feat. from redundant constraint
 			for (String tmp : shortestExpl) {
-				if (Redundancy.getWeighted().containsKey(tmp)) {
-					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+				if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+					RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 				} else {
-					Redundancy.getWeighted().put(tmp, 1);
+					RedundantConstraint.getWeighted().put(tmp, 1);
 				}
 			}
 		}
@@ -292,7 +292,7 @@ public class LTMS {
 			if (!reason.isEmpty()) {
 
 				allExpl++;
-				Redundancy.setCntExpl();
+				RedundantConstraint.setCntExpl();
 
 				// remember how often a certain string occurred in several explanations for the same defect
 				if (mode != ExplanationMode.Redundancy) {
@@ -305,10 +305,10 @@ public class LTMS {
 					}
 				} else { // remember explanation parts for different truth values of feat. from redundant constraint
 					for (String tmp : reason) {
-						if (Redundancy.getWeighted().containsKey(tmp)) {
-							Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+						if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+							RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 						} else {
-							Redundancy.getWeighted().put(tmp, 1);
+							RedundantConstraint.getWeighted().put(tmp, 1);
 						}
 					}
 				}

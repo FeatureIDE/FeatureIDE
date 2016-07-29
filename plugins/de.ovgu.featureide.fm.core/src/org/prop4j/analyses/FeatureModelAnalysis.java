@@ -52,9 +52,9 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
-import de.ovgu.featureide.fm.core.explanations.DeadFeatures;
-import de.ovgu.featureide.fm.core.explanations.FalseOptional;
-import de.ovgu.featureide.fm.core.explanations.Redundancy;
+import de.ovgu.featureide.fm.core.explanations.DeadFeature;
+import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeature;
+import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -402,7 +402,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 								 * Explain redundant constraint. Differentiate between redundancy within a feature model 
 								 * and redundancy in a sliced sub feature model when calculating implicit dependencies
 								 */
-								Redundancy redundancy = new Redundancy();
+								RedundantConstraint redundancy = new RedundantConstraint();
 								List<String> expl = redundancy.explain(clone, fm, constraint); //store explanation for redundant constraint
 								redundantConstrExpl.put(FeatureUtils.getConstraintIndex(fm, constraint), expl);
 							}
@@ -477,7 +477,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	// explain void feature model, treat root as dead feature
 	private void explainVoidFM() {
-		DeadFeatures deadF = new DeadFeatures();
+		DeadFeature deadF = new DeadFeature();
 		List<String> expl = deadF.explain(fm, FeatureUtils.getRoot(fm), true);
 		deadFeatureExpl.put(FeatureUtils.getRoot(fm), expl);
 	}
@@ -495,7 +495,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 				if (calculateExplanations) {
 					// explain dead features and remember explanation in map
-					DeadFeatures deadF = new DeadFeatures();
+					DeadFeature deadF = new DeadFeature();
 					List<String> expl = deadF.explain(fm, feature, false);
 					deadFeatureExpl.put(feature, expl);
 
@@ -543,7 +543,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 			if (calculateExplanations) {
 				// explain false optional features and remember explanation in map
-				FalseOptional falseOpts = new FalseOptional();
+				FalseOptionalFeature falseOpts = new FalseOptionalFeature();
 				List<String> expl = falseOpts.explain(fm, feature);
 				falseOptFeatureExpl.put(feature, expl);
 			}

@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * 
  * @author "Ananieva Sofia"
  */
-public class DeadFeatures {
+public class DeadFeature {
 
 	/**
 	 * The model after a change (with a constraint that makes a feature dead).
