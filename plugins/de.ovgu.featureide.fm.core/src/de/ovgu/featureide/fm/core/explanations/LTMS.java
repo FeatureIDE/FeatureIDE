@@ -701,13 +701,13 @@ public class LTMS {
 
 			if (features == null) {
 				final Literal literal = (Literal) clause;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 				continue;
 			}
 			for (Node feature : features) {
 				final Literal literal = (Literal) feature;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 			}
 		}
