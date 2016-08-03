@@ -32,11 +32,6 @@ import org.prop4j.Node;
  * @author "Ananieva Sofia"
  */
 public class Bookkeeping {
-
-	/**
-	 * The name of a literal.
-	 */
-	public Object name; 
 	
 	/**
 	 * A truth value.
@@ -69,8 +64,7 @@ public class Bookkeeping {
 	 * @param a The antecedents of the literal
 	 * @param p Boolean flag whether the literal is a premise
 	 */
-	public Bookkeeping(Object n, int v, Node r, ArrayList<Literal> a, boolean p) {
-		name = n;
+	public Bookkeeping(int v, Node r, ArrayList<Literal> a, boolean p) {
 		value = v;
 		reason = r;
 		antecedents = a;
