@@ -94,4 +94,6 @@ Import-Package: org.eclipse.jdt.core,
  org.eclipse.jface.text,
  org.eclipse.jface.text.contentassist,
  org.eclipse.jface.text.source,
- org.eclipse.ui.texteditor
+ org.eclipse.ui.texteditor,
+ org.junit.runner;resolution:=optional,
+ org.junit.runner.notification;resolution:=optional

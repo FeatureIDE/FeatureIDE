@@ -135,12 +135,12 @@ public class LTMS {
 			}
 			//weight explanation strings according their occurrences 
 			for (String tmp : reason) {
-				if (Redundancy.getWeighted().containsKey(tmp)) {
-					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+				if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+					RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 				} else {
-					Redundancy.getWeighted().put(tmp, 1);
+					RedundantConstraint.getWeighted().put(tmp, 1);
 				}
-				Redundancy.setCntExpl(); // increase counter of explanations by 1				
+				RedundantConstraint.setCntExpl(); // increase counter of explanations by 1				
 			}
 
 			return reason;
@@ -242,7 +242,7 @@ public class LTMS {
 		int allExpl = 1;
 
 		// count number of explanations outside this class due to different truth values for features from redundant constraint
-		Redundancy.setCntExpl();
+		RedundantConstraint.setCntExpl();
 
 		// remember first explanation parts in order to weight them later according their occurrences 
 		if (mode != ExplanationMode.Redundancy) {
@@ -252,10 +252,10 @@ public class LTMS {
 		} else {
 			// remember explanation parts for different truth values of feat. from redundant constraint
 			for (String tmp : shortestExpl) {
-				if (Redundancy.getWeighted().containsKey(tmp)) {
-					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+				if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+					RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 				} else {
-					Redundancy.getWeighted().put(tmp, 1);
+					RedundantConstraint.getWeighted().put(tmp, 1);
 				}
 			}
 		}
@@ -292,7 +292,7 @@ public class LTMS {
 			if (!reason.isEmpty()) {
 
 				allExpl++;
-				Redundancy.setCntExpl();
+				RedundantConstraint.setCntExpl();
 
 				// remember how often a certain string occurred in several explanations for the same defect
 				if (mode != ExplanationMode.Redundancy) {
@@ -305,10 +305,10 @@ public class LTMS {
 					}
 				} else { // remember explanation parts for different truth values of feat. from redundant constraint
 					for (String tmp : reason) {
-						if (Redundancy.getWeighted().containsKey(tmp)) {
-							Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+						if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+							RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 						} else {
-							Redundancy.getWeighted().put(tmp, 1);
+							RedundantConstraint.getWeighted().put(tmp, 1);
 						}
 					}
 				}
@@ -371,7 +371,7 @@ public class LTMS {
 	 * Finds unit-open clauses depending on the initial truth value assumptions of
 	 * the features from the redundant constraint and pushes them to stack.
 	 * 
-	 * @param literal The literal from the redundant constraint whose value is initially set
+	 * @param literal The literal whose value is initially set
 	 * @param allClauses All clauses of the conjunctive normal form
 	 */
 	private void findOpenClauses(ArrayList<Literal> literals, Node[] allClauses) {
@@ -701,13 +701,13 @@ public class LTMS {
 
 			if (features == null) {
 				final Literal literal = (Literal) clause;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 				continue;
 			}
 			for (Node feature : features) {
 				final Literal literal = (Literal) feature;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 			}
 		}

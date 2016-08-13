@@ -40,7 +40,7 @@ import org.prop4j.Node;
  * 
  * @author "Ananieva Sofia"
  */
-public class Redundancy {
+public class RedundantConstraint {
 
 	/**
 	 * A hash map for storing truth values, reasons and antecedents per literal.
@@ -224,13 +224,13 @@ public class Redundancy {
 			Node[] features = clause.getChildren();
 			if (features == null) {
 				final Literal literal = (Literal) clause;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 				continue;
 			}
 			for (Node feature : features) {
 				final Literal literal = (Literal) feature;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 			}
 		}
