@@ -398,12 +398,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 							setConstraintAttribute(constraint, ConstraintAttribute.REDUNDANT);
 
 							if (calculateExplanations) {
-								/*
-								 * Explain redundant constraint. Differentiate between redundancy within a feature model 
-								 * and redundancy in a sliced sub feature model when calculating implicit dependencies
-								 */
 								RedundantConstraint redundancy = new RedundantConstraint();
-								List<String> expl = redundancy.explain(clone, fm, constraint); //store explanation for redundant constraint
+								List<String> expl = redundancy.explain(clone, constraint); //store explanation for redundant constraint
 								redundantConstrExpl.put(FeatureUtils.getConstraintIndex(fm, constraint), expl);
 							}
 						}

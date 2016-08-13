@@ -34,7 +34,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob.Arguments;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
@@ -101,17 +100,17 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
 		boolean isCoreFeature = false;
 		// feature model slicing 
-		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, oldFm, subtreeFeatures,true);
+		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, oldFm, subtreeFeatures, true);
 		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
 		IFeatureModel slicedModel = slice.createInterface(oldFm, subtreeFeatures).clone(); // returns new feature model
-		
+
 		// only replace root with selected feature if feature is core-feature
 		List<IFeature> coreFeatures = oldFm.getAnalyser().getCoreFeatures();
 		if (coreFeatures.contains(subtreeRoot)) {
-			isCoreFeature = true; 
+			isCoreFeature = true;
 		}
 		if (isCoreFeature) {
-		FeatureUtils.replaceRoot(slicedModel, slicedModel.getFeature(subtreeRoot.getName()));
+			FeatureUtils.replaceRoot(slicedModel, slicedModel.getFeature(subtreeRoot.getName()));
 		}
 
 		// Instantiating a wizard page, removing the help button and opening a wizard dialog
@@ -125,16 +124,12 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 
 	/**
 	 * Performs finishing actions when closing the wizard, i.e. set model to analyze back to origin feature model
-	 * and clear maps which hold explanations for anomalies.
+	 * and clear maps which hold explanations for defects.
 	 */
 	private void resetExplanations() {
-		// reset model to the origin one so that constraint index is consistent when closing page
-		RedundantConstraint.setNewModel(oldFm);
-
-		// clear maps which hold explanations for defect constraints and features
-		oldFm.getAnalyser().deadFeatureExpl.clear();
-		oldFm.getAnalyser().falseOptFeatureExpl.clear();
-		oldFm.getAnalyser().redundantConstrExpl.clear();
+	oldFm.getAnalyser().deadFeatureExpl.clear();
+	oldFm.getAnalyser().falseOptFeatureExpl.clear();
+	oldFm.getAnalyser().redundantConstrExpl.clear();
 	}
 
 	/**
