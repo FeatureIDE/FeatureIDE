@@ -54,7 +54,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	/**
 	 * The origin feature model which contains the sub feature model.
 	 */
-	private final IFeatureModel oldFm;
+	private final IFeatureModel completeFm;
 
 	private static final String LABEL = CALCULATE_DEPENDENCY;
 
@@ -67,7 +67,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	public CalculateDependencyOperation(IFeatureModel featureModel, IFeature selectedFeature) {
 		super(featureModel, LABEL);
 		subtreeRoot = selectedFeature;
-		oldFm = featureModel;
+		completeFm = featureModel;
 	}
 
 	/**
@@ -100,12 +100,12 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
 		boolean isCoreFeature = false;
 		// feature model slicing 
-		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, oldFm, subtreeFeatures, true);
+		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, completeFm, subtreeFeatures, true);
 		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
-		IFeatureModel slicedModel = slice.createInterface(oldFm, subtreeFeatures).clone(); // returns new feature model
+		IFeatureModel slicedModel = slice.createInterface(completeFm, subtreeFeatures).clone(); // returns new feature model
 
 		// only replace root with selected feature if feature is core-feature
-		List<IFeature> coreFeatures = oldFm.getAnalyser().getCoreFeatures();
+		List<IFeature> coreFeatures = completeFm.getAnalyser().getCoreFeatures();
 		if (coreFeatures.contains(subtreeRoot)) {
 			isCoreFeature = true;
 		}
@@ -114,12 +114,12 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		}
 
 		// Instantiating a wizard page, removing the help button and opening a wizard dialog
-		final AbstractWizard wizard = new SubtreeDependencyWizard("Subtree Dependencies", slicedModel, oldFm);
+		final AbstractWizard wizard = new SubtreeDependencyWizard("Submodel Dependencies", slicedModel, completeFm);
 		TrayDialog.setDialogHelpAvailable(false);
 		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		dialog.open();
 		resetExplanations();
-		return new FeatureIDEEvent(oldFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);
+		return new FeatureIDEEvent(completeFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);
 	}
 
 	/**
@@ -127,9 +127,9 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 * and clear maps which hold explanations for defects.
 	 */
 	private void resetExplanations() {
-	oldFm.getAnalyser().deadFeatureExpl.clear();
-	oldFm.getAnalyser().falseOptFeatureExpl.clear();
-	oldFm.getAnalyser().redundantConstrExpl.clear();
+	completeFm.getAnalyser().deadFeatureExpl.clear();
+	completeFm.getAnalyser().falseOptFeatureExpl.clear();
+	completeFm.getAnalyser().redundantConstrExpl.clear();
 	}
 
 	/**
