@@ -58,7 +58,7 @@ public class CalculateDependencyAction extends Action {
 	public static final String ID = "de.ovgu.featureide.calculatedependency";
 
 	/**
-	 * The underlying feature model.
+	 * The complete feature model.
 	 */
 	private final IFeatureModel featureModel;
 
@@ -81,7 +81,7 @@ public class CalculateDependencyAction extends Action {
 	 * Constructor.
 	 * 
 	 * @param viewer
-	 * @param featureModel The feature model
+	 * @param featureModel The complete feature model
 	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {
 		super(CALCULATE_DEPENDENCY);

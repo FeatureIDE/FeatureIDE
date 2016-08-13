@@ -47,14 +47,12 @@ public class RedundantConstraint {
 	 * Key = literal.var, value = class Bookkeeping
 	 */
 	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>();
+	
 	/**
 	 * The model before changes (usually without redundant constraints).
 	 */
 	private IFeatureModel model;
-	/**
-	 * The model after changes (with redundant constraint).
-	 */
-	private static IFeatureModel newModel;
+
 	/**
 	 * The list which contains a literal of a respective feature from the redundant constraint.
 	 */
@@ -101,9 +99,8 @@ public class RedundantConstraint {
 	 * @param oldModel The feature model without the redundant constraint
 	 * @param redundantConstraint The redundant constraint
 	 */
-	public List<String> explain(IFeatureModel oldModel, IFeatureModel newModel, IConstraint redundantConstraint) {
+	public List<String> explain(IFeatureModel oldModel, IConstraint redundantConstraint) {
 		model = oldModel; // the model without the redundant constraint
-		setNewModel(newModel);
 		featRedundantConstr = getLiterals(redundantConstraint.getNode());
 		featRedundantConstr = new ArrayList<Literal>(new LinkedHashSet<Literal>(featRedundantConstr)); // remove duplicates from list
 		weightedExplRedundancy.clear();
@@ -111,7 +108,7 @@ public class RedundantConstraint {
 
 		List<String> explList = new ArrayList<>();
 		explList.add("\nConstraint is redundant, because:");
-		Node node = NodeCreator.createNodes(oldModel, true).toCNF();
+		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node redundantConstr = redundantConstraint.getNode().toCNF();
 
 		//remember all truth values which lead to an invalid CNF
@@ -145,24 +142,6 @@ public class RedundantConstraint {
 		}
 		LTMS.weightExpl(explList, weightedExplRedundancy, cntExpl);
 		return explList;
-	}
-
-	/**
-	 * Sets the model with the new redundant constraint.
-	 * 
-	 * @param Feature model The model with the new constraint
-	 */
-	public static void setNewModel(IFeatureModel model) {
-		newModel = model;
-	}
-
-	/**
-	 * Gets the model with the new constraint. Used for tool tips to get the correct constraint index.
-	 * 
-	 * @return newModel The model with the new constraint
-	 */
-	public static IFeatureModel getNewModel() {
-		return newModel;
 	}
 
 	/**

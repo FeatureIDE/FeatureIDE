@@ -38,19 +38,19 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	/**
 	 * The origin feature model which contains the sub feature model.
 	 */
-	IFeatureModel oldFm;
+	IFeatureModel completeFm;
 
 	/**
 	 * Constructor. 
 	 * 
 	 * @param title The title of the wizard page
 	 * @param newModel The sub feature model 
-	 * @param oldModel The origin feature model
+	 * @param completeModel The origin feature model
 	 */
-	public SubtreeDependencyWizard(String title, IFeatureModel newModel, IFeatureModel oldModel) {
+	public SubtreeDependencyWizard(String title, IFeatureModel newModel, IFeatureModel completeModel) {
 		super(title);
 		subFm = newModel;
-		oldFm = oldModel;
+		completeFm = completeModel;
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	 */
 	@Override
 	public void addPages() {
-		addPage(new SubtreeDependencyPage(subFm, oldFm));
+		addPage(new SubtreeDependencyPage(subFm, completeFm));
 	}
 
 
