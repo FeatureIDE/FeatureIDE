@@ -133,21 +133,23 @@ public class LTMS {
 				String tmpReason = explainVariable(l);
 				addToReasonListOptionally(tmpReason);
 			}
-			//weight explanation strings according their occurrences 
-			for (String tmp : reason) {
+			/*
+			 * Weight explanation strings according to their occurrences including in
+			 * explanations which were generated for other premises (truth values).
+			 */
+			for (String tmp : reason) { // reason always consists of one explanation (the violated clause)
 				if (RedundantConstraint.getWeighted().containsKey(tmp)) {
 					RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 				} else {
 					RedundantConstraint.getWeighted().put(tmp, 1);
 				}
-				RedundantConstraint.setCntExpl(); // increase counter of explanations by 1				
 			}
-
+			RedundantConstraint.setCntExpl(); // increase counter of explanations by 1 (the violated clause)				
 			return reason;
 		}
 		// if we are here, propagated values via BCP lead to a false clause
 		findOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
-		BCP(clauses);// true, if violation occured during BCP	
+		BCP(clauses);// true, if violation occurred during BCP	
 		return shortestExpl(clauses, map, null, ExplanationMode.Redundancy);
 	}
 
@@ -239,9 +241,9 @@ public class LTMS {
 	@SuppressWarnings ("unchecked")
 	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
 		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
+		
+		// count the first explanation
 		int allExpl = 1;
-
-		// count number of explanations outside this class due to different truth values for features from redundant constraint
 		RedundantConstraint.setCntExpl();
 
 		// remember first explanation parts in order to weight them later according their occurrences 
@@ -291,6 +293,7 @@ public class LTMS {
 			BCP(clauses); // generate new explanation with remaining clauses in stack 
 			if (!reason.isEmpty()) {
 
+				// count generated explanations after the first one
 				allExpl++;
 				RedundantConstraint.setCntExpl();
 
