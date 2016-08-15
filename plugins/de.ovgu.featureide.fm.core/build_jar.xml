@@ -73,7 +73,9 @@
 		</jar>
 
 		<!-- Delete temp build folder -->
-		<delete dir="${build}" />
+		<!--
+		<delete dir="${build}" /> 
+		-->
 
 	</target>
 
