@@ -73,8 +73,8 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 		this.index = index;
 	}
 
-	public AFeatureGraph(SatInstance satInstance) {
-		this.satInstance = satInstance;
+	public AFeatureGraph() {
+		this.satInstance = null;
 		this.index = null;
 	}
 
@@ -82,6 +82,10 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 		final AFeatureGraph anotherAGraph = (AFeatureGraph) otherGraph;
 		this.size = anotherAGraph.size;
 		this.index = anotherAGraph.index;
+	}
+
+	public void setSatInstance(SatInstance satInstance) {
+		this.satInstance = satInstance;
 	}
 
 	public int getSize() {

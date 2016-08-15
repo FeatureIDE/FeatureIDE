@@ -178,6 +178,10 @@ public class BasicSolver implements ISatSolver {
 		}
 	}
 
+	public int[] getOrder() {
+		return order;
+	}
+
 	@Override
 	public void setSelectionStrategy(SelectionStrategy strategy) {
 		switch (strategy) {

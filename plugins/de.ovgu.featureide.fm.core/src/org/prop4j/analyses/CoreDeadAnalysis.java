@@ -20,9 +20,12 @@
  */
 package org.prop4j.analyses;
 
+import org.prop4j.solver.FixedLiteralSelectionStrategy;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
+import org.sat4j.minisat.core.Solver;
 import org.prop4j.solver.SatInstance;
+import org.prop4j.solver.VarOrderHeap2;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -61,11 +64,6 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 			int[] model2 = solver.findModel();
 
-			// if there are more negative than positive literals
-			if (model1.length - countNegative(model1) < countNegative(model2)) {
-				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-			}
-
 			if (features != null) {
 				final int[] model3 = new int[model1.length];
 				for (int i = 0; i < features.length; i++) {
@@ -78,6 +76,16 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 			}
 
 			SatInstance.updateModel(model1, model2);
+			((Solver<?>) solver
+					.getInternalSolver())
+							.setOrder(
+									new VarOrderHeap2(
+											new FixedLiteralSelectionStrategy(model1,
+													model1.length > (AConditionallyCoreDeadAnalysis
+															.countNegative(model2)
+															+ AConditionallyCoreDeadAnalysis.countNegative(model1))),
+											solver.getOrder()));
+
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
 				if (varX != 0) {
@@ -101,14 +109,6 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 		}
 
 		return solver.getAssignmentArray(0, solver.getAssignment().size());
-	}
-
-	private static int countNegative(int[] model) {
-		int count = 0;
-		for (int i = 0; i < model.length; i++) {
-			count += model[i] >>> (Integer.SIZE - 1);
-		}
-		return count;
 	}
 
 	public int[] getFeatures() {

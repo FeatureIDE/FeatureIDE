@@ -90,4 +90,12 @@ public class RingList<T> implements Iterable<T> {
 		return ring.get((firstPointer + k) % size);
 	}
 
+	public T getLast() {
+		return ring.get((firstPointer + (ring.size() - 2)) % size);
+	}
+
+	public T getFirst() {
+		return ring.get(firstPointer);
+	}
+
 }

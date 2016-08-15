@@ -287,7 +287,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 	
 	private IFeatureGraph loadFeatureGraph(IPath file) {
-		final IFeatureGraph featureGraph = new MatrixFeatureGraph(featureModelManager.getObject());
+		final IFeatureGraph featureGraph = new MatrixFeatureGraph();
 		final FeatureGraphFormat format = new FeatureGraphFormat();
 		Path path = Paths.get(file.toFile().toURI());
 		if (FileHandler.load(path, featureGraph, format).containsError()) {

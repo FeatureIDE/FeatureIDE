@@ -24,9 +24,6 @@ import java.util.Arrays;
 
 import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-
 public class MatrixFeatureGraph extends AFeatureGraph {
 
 	private static final long serialVersionUID = 3919685766908834399L;
@@ -38,8 +35,8 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 		adjMatrix = new byte[size * size];
 	}
 
-	public MatrixFeatureGraph(IFeatureModel featureModel) {
-		super(AdvancedNodeCreator.createSatInstance(featureModel));
+	public MatrixFeatureGraph() {
+		super();
 	}
 
 	@Override

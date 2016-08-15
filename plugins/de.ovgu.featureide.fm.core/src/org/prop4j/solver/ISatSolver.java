@@ -85,6 +85,8 @@ public interface ISatSolver extends Cloneable {
 	void setSelectionStrategy(SelectionStrategy strategy);
 
 	void shuffleOrder();
+	
+	int[] getOrder();
 
 	List<IConstr> addClauses(Node constraint) throws ContradictionException;
 
