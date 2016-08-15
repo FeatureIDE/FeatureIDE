@@ -28,6 +28,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WILL_BE_RESTAR
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.internal.resources.Workspace;
+import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -43,6 +44,7 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
@@ -83,6 +85,17 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 
 	private BuilderConfiguration configuration;
 
+	private static boolean JUNIT_INSTALLED = false;
+	static {
+		final Bundle[] bundles = InternalPlatform.getDefault().getBundleContext().getBundles();
+		for (Bundle bundle : bundles) {
+			if ("org.junit".equals(bundle.getSymbolicName())) {
+				JUNIT_INSTALLED = true;
+				break;
+			}
+		}
+	}
+
 	/**
 	 * 
 	 * @param nr The number of the job
@@ -95,10 +108,16 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 			try {
 				if (builder.featureProject.getProject().hasNature(JAVA_NATURE)) {
 					compiler = new JavaCompiler(nr, this);
-					testRunner = new TestRunner(compiler.tmp, builder.testResults, builder);
+					if (JUNIT_INSTALLED) {
+						testRunner = new TestRunner(compiler.tmp, builder.testResults, builder);
+					}
 				}
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
+			} catch (Exception e2) {
+				System.out.println(e2);
+			} catch (Error e3) {
+				System.out.println(e3);
 			}
 		}
 	}
@@ -163,7 +182,9 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 				if (compiler != null) {
 					compiler.compile(configuration);
 					if (builder.runTests) {
-						testRunner.runTests(configuration);
+						if (JUNIT_INSTALLED) {
+							testRunner.runTests(configuration);
+						}
 					}
 				}
 

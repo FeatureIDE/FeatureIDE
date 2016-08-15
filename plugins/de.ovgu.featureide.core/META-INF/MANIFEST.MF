@@ -8,8 +8,8 @@ Bundle-Localization:
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.ui,
- de.ovgu.featureide.fm.core,
- org.eclipse.jdt.core
+ org.eclipse.jdt.core,
+ de.ovgu.featureide.fm.core
 Export-Package: 
  de.ovgu.featureide.core,
  de.ovgu.featureide.core.builder,

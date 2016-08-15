@@ -78,6 +78,7 @@ public class Translator {
 	 * @param idGen
 	 */
 	public static void extendFeatureNameMap(HashMap<String, Integer> m, IFeatureModel fm, UniqueId idGen) {
+
 		for (CharSequence f : Functional.mapToString(fm.getFeatures())) {
 			if (!m.containsKey(f)) {
 				m.put(f.toString(), idGen.getNext());

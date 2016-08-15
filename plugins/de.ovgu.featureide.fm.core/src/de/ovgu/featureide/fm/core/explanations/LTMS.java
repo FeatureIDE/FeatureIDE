@@ -31,6 +31,7 @@ import java.util.Stack;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import Jakarta.util.Util;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -132,21 +133,23 @@ public class LTMS {
 				String tmpReason = explainVariable(l);
 				addToReasonListOptionally(tmpReason);
 			}
-			//weight explanation strings according their occurrences 
-			for (String tmp : reason) {
-				if (Redundancy.getWeighted().containsKey(tmp)) {
-					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+			/*
+			 * Weight explanation strings according to their occurrences including in
+			 * explanations which were generated for other premises (truth values).
+			 */
+			for (String tmp : reason) { // reason always consists of one explanation (the violated clause)
+				if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+					RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 				} else {
-					Redundancy.getWeighted().put(tmp, 1);
+					RedundantConstraint.getWeighted().put(tmp, 1);
 				}
-				Redundancy.setCntExpl(); // increase counter of explanations by 1				
 			}
-
+			RedundantConstraint.setCntExpl(); // increase counter of explanations by 1 (the violated clause)				
 			return reason;
 		}
 		// if we are here, propagated values via BCP lead to a false clause
 		findOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
-		BCP(clauses);// true, if violation occured during BCP	
+		BCP(clauses);// true, if violation occurred during BCP	
 		return shortestExpl(clauses, map, null, ExplanationMode.Redundancy);
 	}
 
@@ -238,10 +241,10 @@ public class LTMS {
 	@SuppressWarnings ("unchecked")
 	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
 		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
+		
+		// count the first explanation
 		int allExpl = 1;
-
-		// count number of explanations outside this class due to different truth values for features from redundant constraint
-		Redundancy.setCntExpl();
+		RedundantConstraint.setCntExpl();
 
 		// remember first explanation parts in order to weight them later according their occurrences 
 		if (mode != ExplanationMode.Redundancy) {
@@ -251,10 +254,10 @@ public class LTMS {
 		} else {
 			// remember explanation parts for different truth values of feat. from redundant constraint
 			for (String tmp : shortestExpl) {
-				if (Redundancy.getWeighted().containsKey(tmp)) {
-					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+				if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+					RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 				} else {
-					Redundancy.getWeighted().put(tmp, 1);
+					RedundantConstraint.getWeighted().put(tmp, 1);
 				}
 			}
 		}
@@ -290,8 +293,9 @@ public class LTMS {
 			BCP(clauses); // generate new explanation with remaining clauses in stack 
 			if (!reason.isEmpty()) {
 
+				// count generated explanations after the first one
 				allExpl++;
-				Redundancy.setCntExpl();
+				RedundantConstraint.setCntExpl();
 
 				// remember how often a certain string occurred in several explanations for the same defect
 				if (mode != ExplanationMode.Redundancy) {
@@ -304,10 +308,10 @@ public class LTMS {
 					}
 				} else { // remember explanation parts for different truth values of feat. from redundant constraint
 					for (String tmp : reason) {
-						if (Redundancy.getWeighted().containsKey(tmp)) {
-							Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
+						if (RedundantConstraint.getWeighted().containsKey(tmp)) {
+							RedundantConstraint.getWeighted().put(tmp, RedundantConstraint.getWeighted().get(tmp) + 1);
 						} else {
-							Redundancy.getWeighted().put(tmp, 1);
+							RedundantConstraint.getWeighted().put(tmp, 1);
 						}
 					}
 				}
@@ -541,7 +545,8 @@ public class LTMS {
 			return -1;
 		}
 		}
-		throw new RuntimeException("Unknown value: " + l);
+		Util.fatalError((String) ("Unknown value: " + l));
+		return -3; // will never get here
 	}
 
 	/**
@@ -699,13 +704,13 @@ public class LTMS {
 
 			if (features == null) {
 				final Literal literal = (Literal) clause;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 				continue;
 			}
 			for (Node feature : features) {
 				final Literal literal = (Literal) feature;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 			}
 		}

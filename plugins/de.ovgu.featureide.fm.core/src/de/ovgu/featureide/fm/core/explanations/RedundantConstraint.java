@@ -40,21 +40,19 @@ import org.prop4j.Node;
  * 
  * @author "Ananieva Sofia"
  */
-public class Redundancy {
+public class RedundantConstraint {
 
 	/**
 	 * A hash map for storing truth values, reasons and antecedents per literal.
 	 * Key = literal.var, value = class Bookkeeping
 	 */
 	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>();
+	
 	/**
 	 * The model before changes (usually without redundant constraints).
 	 */
 	private IFeatureModel model;
-	/**
-	 * The model after changes (with redundant constraint).
-	 */
-	private static IFeatureModel newModel;
+
 	/**
 	 * The list which contains a literal of a respective feature from the redundant constraint.
 	 */
@@ -101,9 +99,8 @@ public class Redundancy {
 	 * @param oldModel The feature model without the redundant constraint
 	 * @param redundantConstraint The redundant constraint
 	 */
-	public List<String> explain(IFeatureModel oldModel, IFeatureModel newModel, IConstraint redundantConstraint) {
+	public List<String> explain(IFeatureModel oldModel, IConstraint redundantConstraint) {
 		model = oldModel; // the model without the redundant constraint
-		setNewModel(newModel);
 		featRedundantConstr = getLiterals(redundantConstraint.getNode());
 		featRedundantConstr = new ArrayList<Literal>(new LinkedHashSet<Literal>(featRedundantConstr)); // remove duplicates from list
 		weightedExplRedundancy.clear();
@@ -111,7 +108,7 @@ public class Redundancy {
 
 		List<String> explList = new ArrayList<>();
 		explList.add("\nConstraint is redundant, because:");
-		Node node = NodeCreator.createNodes(oldModel, true).toCNF();
+		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node redundantConstr = redundantConstraint.getNode().toCNF();
 
 		//remember all truth values which lead to an invalid CNF
@@ -145,24 +142,6 @@ public class Redundancy {
 		}
 		LTMS.weightExpl(explList, weightedExplRedundancy, cntExpl);
 		return explList;
-	}
-
-	/**
-	 * Sets the model with the new redundant constraint.
-	 * 
-	 * @param Feature model The model with the new constraint
-	 */
-	public static void setNewModel(IFeatureModel model) {
-		newModel = model;
-	}
-
-	/**
-	 * Gets the model with the new constraint. Used for tool tips to get the correct constraint index.
-	 * 
-	 * @return newModel The model with the new constraint
-	 */
-	public static IFeatureModel getNewModel() {
-		return newModel;
 	}
 
 	/**
@@ -224,14 +203,14 @@ public class Redundancy {
 			Node[] features = clause.getChildren();
 			if (features == null) {
 				final Literal literal = (Literal) clause;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
 				valueMap.put(literal.var, expl);
 				continue;
 			}
 			for (Node feature : features) {
 				final Literal literal = (Literal) feature;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
-				valueMap.put(literal.var, expl);
+				Bookkeeping expl = new Bookkeeping(-1, null, null, false);
+  				valueMap.put(literal.var, expl);
 			}
 		}
 	}
