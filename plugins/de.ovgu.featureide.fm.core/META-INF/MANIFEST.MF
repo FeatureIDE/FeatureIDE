@@ -10,6 +10,7 @@ Bundle-ClassPath: .,
  lib/annotations.jar,
  lib/antlr-3.4.jar,
  lib/guidsl.jar,
+ lib/jakarta.jar,
  lib/org.sat4j.core.jar,
  lib/org.sat4j.pb.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
