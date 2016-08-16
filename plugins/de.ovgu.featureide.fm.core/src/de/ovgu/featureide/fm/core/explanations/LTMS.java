@@ -35,6 +35,7 @@ import Jakarta.util.Util;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * The class LTMS (logic truth maintenance system) uses BCP for managing logical implications. By recording proofs
@@ -99,11 +100,11 @@ public class LTMS {
 	/**
 	 * Constructor. Used to explain dead or false-optional features.
 	 * 
-	 * @param newModel The model with the constraint which leads to dead feature(s)
+	 * @param fm The model with the constraint which leads to the defect
 	 * @param map The valueMap which is used for bookkeeping
 	 */
-	public LTMS(IFeatureModel newModel) {
-		model = newModel;
+	public LTMS(IFeatureModel fm) {
+		model = fm;
 	}
 
 	/**
@@ -206,6 +207,9 @@ public class LTMS {
 		deads.add(deadF);
 		reason.clear();
 		setTruthValToUnknown(clauses);
+		
+		checkIfChildrenAlive(deadF);
+		
 		valueMap.get(deadF.var).value = 1;
 		valueMap.get(deadF.var).premise = true;
 
@@ -226,6 +230,35 @@ public class LTMS {
 		findOpenClauses(deads, clauses);
 		BCP(clauses);
 		return shortestExpl(clauses, null, deadF, ExplanationMode.DeadFeature);
+	}
+	
+	/**
+	 * Checks whether the dead feature to explain is dead due to dead children. 
+	 * If yes, we assume the dead children to be false (0) to explain the subsequently
+	 * dead parent feature.
+	 * @param deadFeature The dead feature to explain
+	 */
+	private void checkIfChildrenAlive(Literal deadFeature) {	
+	IFeature deadF = FeatureUtils.getFeatureTable(model).get(deadFeature.var);
+	List<IFeatureStructure> deadChildren = deadF.getStructure().getChildren();
+	boolean allChildrenAlive = true;
+	
+		if (deadF.getStructure().isAlternative() || deadF.getStructure().isOr()) {
+			for (IFeatureStructure child : deadChildren) {
+				List<IFeature> deads = model.getAnalyser().getDeadFeatures();
+				if (deads.contains(child.getFeature())) {
+					allChildrenAlive = false;
+				} 
+			}
+		}
+		if (!allChildrenAlive) {
+			for (IFeatureStructure childStruc : deadChildren) {
+				IFeature childFeat = childStruc.getFeature();
+				Literal deadChild = new Literal(childFeat.getName());
+				valueMap.get(deadChild.var).value = 0;
+				valueMap.get(deadChild.var).premise = true;
+			}
+		}
 	}
 
 	/**
