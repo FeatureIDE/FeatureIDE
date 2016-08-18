@@ -18,11 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.filter.base;
+package de.ovgu.featureide.fm.core.filter;
 
 import java.util.Collection;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Filters all features that are contained in a given collection.
