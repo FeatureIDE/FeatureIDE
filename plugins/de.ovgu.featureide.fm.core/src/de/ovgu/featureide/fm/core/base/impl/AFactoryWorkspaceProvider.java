@@ -20,32 +20,30 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.nio.file.Paths;
+import java.util.HashMap;
 
 /**
- * This {@link IFactoryWorkspaceProvider provider} only uses native Java methods.
+ * This {@link IFactoryWorkspaceProvider provider} maps paths to {@link FactoryWorkspace workspaces}.
  * 
  * @author Sebastian Krieter
  */
-public final class CoreFactoryWorkspaceProvider extends AFactoryWorkspaceProvider {
+public abstract class AFactoryWorkspaceProvider implements IFactoryWorkspaceProvider {
+
+	protected final HashMap<String, FactoryWorkspace> projectMap = new HashMap<>();
+	protected final FactoryWorkspace defaultWorkspace = new FactoryWorkspace();
 
 	public FactoryWorkspace getFactoryWorkspace(String path) {
-		return super.getFactoryWorkspace(Paths.get(path).toAbsolutePath().toString());
+		final FactoryWorkspace factoryWorkspace = projectMap.get(path);
+		return factoryWorkspace != null ? factoryWorkspace : defaultWorkspace;
+	}
+
+	public FactoryWorkspace getFactoryWorkspace() {
+		return defaultWorkspace;
 	}
 
 	@Override
 	public void addFactoryWorkspace(String path, FactoryWorkspace workspace) {
-		super.addFactoryWorkspace(Paths.get(path).toAbsolutePath().toString(), workspace);
-	}
-
-	@Override
-	public void save() {
-		
-	}
-
-	@Override
-	public boolean load() {
-		return false;
+		projectMap.put(path, workspace);
 	}
 
 }
