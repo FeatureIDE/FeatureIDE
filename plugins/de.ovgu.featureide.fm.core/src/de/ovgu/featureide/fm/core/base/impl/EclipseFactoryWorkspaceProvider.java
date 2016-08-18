@@ -44,7 +44,7 @@ public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProv
 
 	private static final String FACTORY_WORKSPACE_FILENAME = ".factoryWorkspace.";
 	private static final String DEFAULT_FACTORY_WORKSPACE_KEY = "defaultFactoryWorkspace";
-	private static final String FM_CORE_NODE = "de.ovgu.featureide.fm.core2ew";
+	private static final String FM_CORE_NODE = "de.ovgu.featureide.fm.core";
 
 	public FactoryWorkspace getFactoryWorkspace(String path) {
 		final IFile[] findFilesForLocationURI = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(Paths.get(path).toUri());
