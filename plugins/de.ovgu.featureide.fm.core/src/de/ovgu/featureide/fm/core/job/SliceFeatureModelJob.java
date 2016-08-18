@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
@@ -129,7 +130,8 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		m.reset();
 
 		// set new abstract root
-		IFeature nroot = FMFactoryManager.getFactory().createFeature(m, "__root__");
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(m);
+		IFeature nroot = factory.createFeature(m, "__root__");
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
 		nroot.getStructure().addChild(root.getStructure());
@@ -191,7 +193,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 
 				try {
 					if (checkOr(modelSatSolver, child)) {
-						m.addConstraint(FMFactoryManager.getFactory().createConstraint(m, child));
+						m.addConstraint(factory.createConstraint(m, child));
 					}
 				} catch (TimeoutException e) {
 					Logger.logError(e);
@@ -376,7 +378,8 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 								child.getStructure().setMandatory(false);
 							}
 						} else {
-							IFeature pseudoAlternative = FMFactoryManager.getFactory().createFeature(curFeature.getFeatureModel(), MARK2);
+							final IFeatureModel featureModel = curFeature.getFeatureModel();
+							IFeature pseudoAlternative = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, MARK2);
 							pseudoAlternative.getStructure().setMandatory(false);
 							pseudoAlternative.getStructure().setAlternative();
 							for (IFeature child : list) {

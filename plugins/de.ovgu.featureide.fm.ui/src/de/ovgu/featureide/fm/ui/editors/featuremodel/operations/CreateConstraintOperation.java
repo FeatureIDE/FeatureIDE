@@ -48,7 +48,7 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
 		super(featureModel, CREATE_CONSTRAINT);
-		constraint = FMFactoryManager.getFactory().createConstraint(featureModel, node);
+		constraint = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, node);
 	}
 
 	@Override

@@ -165,6 +165,19 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 */
 	long getId();
+	
+	/**
+	 * A feature model is created via a feature model {@link IFeatureModelFactory factory}.
+	 * This methods returns the identifier of the factory used to create this feature model.
+	 * The factory can be used to create more feature models, features, or constraint from the same type as this feature model.
+	 * 
+	 * @return the feature model factory ID.
+	 * 
+	 * @see FMFactoryManager#getFactoryById(String)
+	 * 
+	 * @since 3.1
+	 */
+	String getFactoryID();
 
 	/**
 	 * A constraint is an additional restriction on features in the feature model.

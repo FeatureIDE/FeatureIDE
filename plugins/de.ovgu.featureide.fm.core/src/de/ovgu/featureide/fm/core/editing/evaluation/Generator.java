@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -66,7 +67,8 @@ public abstract class Generator {
 	}
 	
 	public static IFeatureModel generateFeatureDiagram(Random random, int numberOfFeatures) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+		IFeatureModel fm = factory.createFeatureModel();
 		List<IFeature> leaves = new LinkedList<IFeature>();
 		leaves.add(fm.getFeature("C1"));
 		int count = 1;
@@ -77,7 +79,7 @@ public abstract class Generator {
 			int childrenCount = random.nextInt(maxChildren) + 1;
 			childrenCount = Math.min(childrenCount, numberOfFeatures - count);
 			for (int i = 1; i <= childrenCount; i++) {
-				IFeature child = FMFactoryManager.getFactory().createFeature(fm, "C" + (count + i));
+				IFeature child = factory.createFeature(fm, "C" + (count + i));
 				fm.addFeature(child);
 				parent.getStructure().addChild(child.getStructure());
 				leaves.add(child);
@@ -193,8 +195,9 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel generalization(IFeatureModel originalFM, long id, int numberOfEdits) {
-		IFeatureModel fm = originalFM.clone(null);
-		Random random = new Random(id);
+		final IFeatureModel fm = originalFM.clone(null);
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
+		final Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
 			List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
@@ -240,7 +243,7 @@ public abstract class Generator {
 						int j = 1;
 						IFeature child;
 						do {
-							child = FMFactoryManager.getFactory().createFeature(fm, "C" + j++);
+							child = factory.createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
 						feature.getStructure().addChild(child.getStructure());
 						break;
@@ -294,7 +297,7 @@ public abstract class Generator {
 						int j = 1;
 						IFeature child;
 						do {
-							child = FMFactoryManager.getFactory().createFeature(fm, "C" + j++);
+							child = factory.createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
 						child.getStructure().setMandatory(false);
 						feature.getStructure().addChild(child.getStructure());
@@ -321,7 +324,8 @@ public abstract class Generator {
 			Logger.logError(e);
 		}
 		IFeatureModel fm = originalFM.clone(null);
-		Random random = new Random(id);
+		IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
+		final Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
 			IFeatureModel backup = valid ? fm.clone(null) : null;
@@ -347,7 +351,7 @@ public abstract class Generator {
 							int j = 1;
 							IFeature child;
 							do {
-								child = FMFactoryManager.getFactory().createFeature(fm, "C" + j++);
+								child = factory.createFeature(fm, "C" + j++);
 							} while (!fm.addFeature(child));
 							feature.getStructure().addChild(child.getStructure());
 							break;

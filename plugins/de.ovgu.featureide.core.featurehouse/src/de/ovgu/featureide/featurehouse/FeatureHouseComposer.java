@@ -85,6 +85,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -448,6 +449,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			} else {
 				final IFeatureModel featureModel = featureProject.getFeatureModel();
+				final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
 				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						IFeature featureRole1 = featureModel.getFeature(r.getFeature().getName());
@@ -455,7 +457,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 							final List<IFeature> currentFeatureList = new LinkedList<IFeature>();
 							final List<IFeature> originalList = new LinkedList<IFeature>();
 
-							currentFeatureList.add(FMFactoryManager.getFactory().createFeature(featureModel, r.getFeature().getName()));
+							currentFeatureList.add(factory.createFeature(featureModel, r.getFeature().getName()));
 
 							for (final String feat : featureModel.getFeatureOrderList()) {
 								if (feat.equals(r.getFeature().getName())) {
@@ -482,7 +484,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									if (checkForIllegitimateContract(m, mm)) {
 										List<IFeature> finalContractList = new LinkedList<IFeature>();
 										finalContractList.add(featureRole2);
-										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(FMFactoryManager.getFactory().createFeature(featureModel, r.getFeature().getName()), finalContractList))
+										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(factory.createFeature(featureModel, r.getFeature().getName()), finalContractList))
 											setContractErrorMarker(m, "keyword \"\\final_contract\" found but possibly later contract refinement.");
 									}
 

@@ -37,6 +37,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -98,13 +99,17 @@ import de.ovgu.featureide.core.signature.documentation.SPLMerger;
 import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
@@ -560,11 +565,20 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, sourcePath);
 		createFolder(project, configPath);
 		createFolder(project, buildPath);
-		IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
+		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
+
+		IFeatureModelFactory factory;
+		try {
+			factory = FMFactoryManager.getFactory(modelPath.toString(), new XmlFeatureModelFormat());
+		} catch (NoSuchExtensionException e) {
+			Logger.logError(e);
+			factory = FMFactoryManager.getFactory();
+		}
+		IFeatureModel featureModel = factory.createFeatureModel();
 		FMComposerManager.getFMComposerExtension(project);
 		featureModel.createDefaultValues(project.getName());
 
-		FeatureModelManager.writeToFile(featureModel, Paths.get(project.getFile("model.xml").getLocationURI()));
+		FeatureModelManager.writeToFile(featureModel, modelPath);
 	}
 
 	/**

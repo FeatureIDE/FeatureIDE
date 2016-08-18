@@ -236,7 +236,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			if (featureModel.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
-			IFeature f = FMFactoryManager.getFactory().createFeature(featureModel, name);
+			IFeature f = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.getStructure().setAnd();
@@ -276,7 +276,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			for (Element child: getElements(e.getChildNodes())) {
 				String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					IConstraint c = FMFactoryManager.getFactory().createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
+					IConstraint c = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {

@@ -44,6 +44,8 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public abstract class AFileManager<T> implements IFileManager, IEventManager {
 
+	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
 	private final IEventManager eventManager = new DefaultEventManager();
 
 	private final ProblemList lastProblems = new ProblemList();
@@ -92,7 +94,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 		}
 		lastProblems.clear();
 		try {
-			final String content = new String(Files.readAllBytes(path), Charset.availableCharsets().get("UTF-8"));
+			final String content = new String(Files.readAllBytes(path), DEFAULT_CHARSET);
 			synchronized (saveSyncObject) {
 				List<Problem> problemList = format.getInstance().read(variableObject, content);
 				if (problemList != null) {
@@ -121,7 +123,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 	public boolean save() {
 		lastProblems.clear();
 		try {
-			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
+			final byte[] content = format.getInstance().write(variableObject).getBytes(DEFAULT_CHARSET);
 				synchronized (saveSyncObject) {
 					FileSystem.write(path, content);
 					persist();

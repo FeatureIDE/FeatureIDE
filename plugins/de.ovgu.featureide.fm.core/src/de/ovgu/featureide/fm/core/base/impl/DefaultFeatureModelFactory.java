@@ -55,7 +55,7 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 
 	@Override
 	public FeatureModel createFeatureModel() {
-		return new FeatureModel();
+		return new FeatureModel(ID);
 	}
 
 }

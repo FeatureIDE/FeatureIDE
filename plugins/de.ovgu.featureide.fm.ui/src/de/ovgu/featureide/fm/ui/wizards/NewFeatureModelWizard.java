@@ -44,10 +44,17 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMComposerManager;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
@@ -77,9 +84,18 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				}
 			}
 			if (!foundParent) {
-				final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
+				final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+				IFeatureModelFactory factory;
+				final String filePathString = fullFilePath.toOSString();
+				try {
+					factory = FMFactoryManager.getFactory(filePathString, format);
+				} catch (NoSuchExtensionException e) {
+					Logger.logError(e);
+					factory = FMFactoryManager.getFactory();
+				}
+				final IFeatureModel featureModel = factory.createFeatureModel();
 				featureModel.createDefaultValues("");
-				FeatureModelManager.writeToFile(featureModel, Paths.get(fullFilePath.toOSString()));
+				FileHandler.save(Paths.get(filePathString), featureModel, format);
 			}
 		}
 		assert (fullFilePath.toFile().exists()) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
@@ -115,11 +131,21 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		if (parentProject.getLocation().isPrefixOf(fullFilePath)) {
 			final IFile file = parentProject.getFile(fullFilePath.makeRelativeTo(parentProject.getLocation()));
 
-			final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
+			final java.nio.file.Path path = Paths.get(file.getLocationURI());
+
+			final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(path.getFileName().toString());
+			IFeatureModelFactory factory;
+			try {
+				factory = FMFactoryManager.getFactory(path.toString(), format);
+			} catch (NoSuchExtensionException e) {
+				Logger.logError(e);
+				factory = FMFactoryManager.getFactory();
+			}
+			final IFeatureModel featureModel = factory.createFeatureModel();
 			featureModel.createDefaultValues("");
 			FMComposerManager.getFMComposerExtension(file.getProject());
 			
-			FeatureModelManager.writeToFile(featureModel, Paths.get(file.getLocationURI()));
+			FeatureModelManager.writeToFile(featureModel, path);
 
 			open(file);
 			return true;

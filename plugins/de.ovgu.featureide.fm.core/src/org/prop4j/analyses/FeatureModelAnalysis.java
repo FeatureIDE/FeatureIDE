@@ -48,6 +48,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
@@ -125,12 +126,15 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	private final List<IFeature> deadFeatures;
 	private final List<IFeature> falseOptionalFeatures;
 
-	private IFeatureModel fm;
+	private final IFeatureModel fm;
+	private final IFeatureModelFactory factory;
+	private final AdvancedNodeCreator nodeCreator;
+
 	private IMonitor monitor = new NullMonitor();
-	private AdvancedNodeCreator nodeCreator;
 
 	public FeatureModelAnalysis(IFeatureModel fm) {
 		this.fm = fm;
+		this.factory = FMFactoryManager.getFactory(fm);
 
 		deadFeatures = new ArrayList<>();
 		coreFeatures = new ArrayList<>();
@@ -588,7 +592,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint rightConstraint = FMFactoryManager.getFactory().createConstraint(fm, rightChild);
+						IConstraint rightConstraint = factory.createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -596,7 +600,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 						}
 					}
 					if (rightChild instanceof Literal && ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint leftConstraint = FMFactoryManager.getFactory().createConstraint(fm, leftChild);
+						IConstraint leftConstraint = factory.createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);

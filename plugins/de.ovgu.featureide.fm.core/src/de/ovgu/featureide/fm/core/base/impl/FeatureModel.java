@@ -74,9 +74,11 @@ public class FeatureModel implements IFeatureModel {
 		return nextElementId++;
 	}
 
+	protected final String factoryID;
+
 	protected final FeatureModelAnalyzer analyser;
 	protected final List<IConstraint> constraints = new ArrayList<>();
-	
+
 	/**
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
@@ -99,7 +101,9 @@ public class FeatureModel implements IFeatureModel {
 	protected Object undoContext = null;
 	private File sourceFile;
 
-	public FeatureModel() {
+	public FeatureModel(String factoryID) {
+		this.factoryID = factoryID;
+
 		id = getNextId();
 		featureOrderList = new LinkedList<String>();
 		featureOrderUserDefined = false;
@@ -111,7 +115,8 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
-		id = oldFeatureModel.getId();
+		factoryID = oldFeatureModel.factoryID;
+		id = oldFeatureModel.id;
 		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
@@ -123,10 +128,11 @@ public class FeatureModel implements IFeatureModel {
 		if (newRoot == null) {
 			final IFeatureStructure root = oldFeatureModel.getStructure().getRoot();
 			if (root != null) {
-			structure.setRoot(root.cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
-			for (final IConstraint constraint : oldFeatureModel.constraints) {
-				constraints.add(constraint.clone(this));
-			}}
+				structure.setRoot(root.cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
+				for (final IConstraint constraint : oldFeatureModel.constraints) {
+					constraints.add(constraint.clone(this));
+				}
+			}
 		} else {
 			structure.setRoot(newRoot.getStructure().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
@@ -510,6 +516,11 @@ public class FeatureModel implements IFeatureModel {
 
 	public FeatureModel clone() {
 		return new FeatureModel(this, null);
+	}
+
+	@Override
+	public String getFactoryID() {
+		return factoryID;
 	}
 
 }

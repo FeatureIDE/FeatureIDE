@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
@@ -79,7 +80,8 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		} catch (IOException e) {
 			problemList.add(new Problem(e, lineNumber));
 		}
-		final IFeature rootFeature = FMFactoryManager.getFactory().createFeature(featureModel, ""); 
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
+		final IFeature rootFeature = factory.createFeature(featureModel, ""); 
 				
 		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);
@@ -103,7 +105,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			if (name == null) {
 				abstractNames.add("__Abstract__" + i);
 			} else {
-				final IFeature feature = FMFactoryManager.getFactory().createFeature(featureModel, name); 
+				final IFeature feature = factory.createFeature(featureModel, name); 
 				featureModel.addFeature(feature);
 				rootFeature.getStructure().addChild(feature.getStructure());
 			}
@@ -127,7 +129,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		final IMonitor workMonitor = new ConsoleMonitor();
 		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
 		for (Node clause : cnf.getChildren()) {
-			featureModel.addConstraint(FMFactoryManager.getFactory().createConstraint(featureModel, clause));
+			featureModel.addConstraint(factory.createConstraint(featureModel, clause));
 		}
 		return problemList;
 	}

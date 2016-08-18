@@ -59,7 +59,7 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 
 	@Override
 	public ExtendedFeatureModel createFeatureModel() {
-		return new ExtendedFeatureModel();
+		return new ExtendedFeatureModel(ID);
 	}
 
 }

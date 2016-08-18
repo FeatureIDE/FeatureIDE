@@ -59,9 +59,10 @@ public class FeatureModelConversionHandler extends ASelectionHandler {
 					return false;
 				}
 				final Path projectPath = Paths.get(next.getProject().getLocationURI());
+				final Path inPath = Paths.get(next.getLocationURI());
 				try {
-					IFeatureModel fm = FMFactoryManager.getFactory(inputFormat).createFeatureModel();
-					FileHandler.convert(Paths.get(next.getLocationURI()), projectPath.resolve(wizard.getOutputFolder()), fm, inputFormat, outputFormat);
+					IFeatureModel fm = FMFactoryManager.getFactory(inPath.toString(), inputFormat).createFeatureModel();
+					FileHandler.convert(inPath, projectPath.resolve(wizard.getOutputFolder()), fm, inputFormat, outputFormat);
 				} catch (NoSuchExtensionException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}

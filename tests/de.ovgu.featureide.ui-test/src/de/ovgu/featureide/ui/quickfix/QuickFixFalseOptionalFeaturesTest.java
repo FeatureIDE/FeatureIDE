@@ -78,7 +78,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			IFeatureModel fm = new FeatureModel() {
+			IFeatureModel fm = new FeatureModel("") {
 				// display file name at JUnit view
 				public String toString() {
 					return f.getName();

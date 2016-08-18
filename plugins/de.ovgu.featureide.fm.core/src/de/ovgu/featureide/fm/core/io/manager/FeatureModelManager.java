@@ -51,7 +51,12 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 			// TODO throw exception
 			if (format == null) {
 				Logger.logError(new ExtensionManager.NoSuchExtensionException("No format found for " + path));
-				factory = FMFactoryManager.getFactory();
+				try {
+					factory = FMFactoryManager.getFactory(path);
+				} catch (Exception e) {
+					Logger.logError(e);
+					factory = FMFactoryManager.getFactory();
+				}
 			} else {
 				try {
 					factory = FMFactoryManager.getFactory(path, format);

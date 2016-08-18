@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -627,6 +628,7 @@ public class FeatureModelAnalyzer {
 		 * where A is an expression containing only non hidden features
 		 * If there is a constraint of that kind for a hidden feature it is added to a list.
 		 */
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
 		Collection<IFeature> list = new LinkedList<IFeature>();
 		Collection<IFeature> hiddenFeatures = getHiddenFeatures();
 		for (IFeature feature : hiddenFeatures) {
@@ -637,7 +639,7 @@ public class FeatureModelAnalyzer {
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint rightConstraint = FMFactoryManager.getFactory().createConstraint(fm, rightChild);
+						IConstraint rightConstraint = factory.createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -645,7 +647,7 @@ public class FeatureModelAnalyzer {
 						}
 					}
 					if (rightChild instanceof Literal && ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint leftConstraint = FMFactoryManager.getFactory().createConstraint(fm, leftChild);
+						IConstraint leftConstraint = factory.createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);
