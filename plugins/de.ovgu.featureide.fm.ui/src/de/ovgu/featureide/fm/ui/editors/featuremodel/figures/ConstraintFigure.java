@@ -28,16 +28,20 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAK
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.Panel;
+import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -75,11 +79,11 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 	private final Label label = new Label();
 
-	private IGraphicalConstraint constraint;
+	private IGraphicalConstraint graphicalConstraint;
 
 	public ConstraintFigure(IGraphicalConstraint constraint) {
 		super();
-		this.constraint = constraint;
+		this.graphicalConstraint = constraint;
 		setLayoutManager(new FreeformLayout());
 
 		label.setForegroundColor(CONSTRAINT_FOREGROUND);
@@ -100,9 +104,10 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	}
 
 	private void init() {
-		setText(getConstraintText(constraint.getObject()));
+		setText(getConstraintText(graphicalConstraint.getObject()));
+
+		setBorder(FMPropertyManager.getConstraintBorder(graphicalConstraint.isFeatureSelected()));
 		setToolTip(null);
-		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
 
@@ -112,8 +117,8 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public void setConstraintProperties() {
 		init();
 
-		final IConstraint constraint = this.constraint.getObject();
-		
+		IConstraint constraint = this.graphicalConstraint.getObject();
+
 		switch (constraint.getConstraintAttribute()) {
 		case NORMAL:
 			break;
@@ -131,8 +136,34 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			break;
 		case REDUNDANT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(new Label(REDUNDANCE));
-			break;
+			List<String> explanationRedundant = constraint.getFeatureModel().getAnalyser().redundantConstrExpl
+					.get(FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint));
+			Panel panelRedundant = new Panel();
+			panelRedundant.setLayoutManager(new ToolbarLayout(false));
+			panelRedundant.add(new Label(REDUNDANCE));
+			setToolTip(panelRedundant, explanationRedundant != null ? explanationRedundant : Collections.<String> emptyList());
+			return;
+		case IMPLICIT:
+			setBackgroundColor(FMPropertyManager.getWarningColor());
+			setBorder(FMPropertyManager.getImplicitConstraintBorder());
+			// set tooltip with explanation for redundant constraint
+			List<String> explanationImplicit = constraint.getFeatureModel().getAnalyser().redundantConstrExpl
+					.get(FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint));
+			explanationImplicit = explanationImplicit != null ? explanationImplicit : Collections.<String> emptyList();
+
+			// replace "redundant" with "transitive" in explanation if constraint represents an implicit dependency
+			for (int i = 0; i < explanationImplicit.size(); i++) {
+				if (explanationImplicit.get(i).contains("redundant")) {
+					String newStr = explanationImplicit.get(i).replace("redundant", "transitive");
+					explanationImplicit.set(i, newStr);
+					break;
+				}
+			}
+			Panel panelImplicit = new Panel();
+			panelImplicit.setLayoutManager(new ToolbarLayout(false));
+			panelImplicit.add(new Label(REDUNDANCE));
+			setToolTip(panelImplicit, explanationImplicit);
+			return;
 		case DEAD:
 		case FALSE_OPTIONAL:
 			final StringBuilder toolTip = new StringBuilder();
@@ -175,8 +206,64 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			break;
 		default:
 			break;
-
 		}
+	}
+
+	/**
+	 * Color explanation parts according to their occurrences in all explanations for a defect constraint.
+	 * If expl. part occured once, it is colored black. If it occurred in every explanation, it is colored red.
+	 * For all other cases, a color gradient is used.
+	 * 
+	 * @param panel the panel to pass for a tool tip
+	 * @param expl the explanation within a tool tip
+	 */
+	private void setToolTip(Panel panel, List<String> expl) {
+		for (String s : expl) {
+			if (s.contains("$")) {
+				int lastChar = s.lastIndexOf("$");
+				String text = s.substring(0, lastChar); // pure explanation without delimiter and count of explanation part
+				int occur = 1; //if non-negative, intersection, number of all occurences of expl. part
+				int allExpl = 1; // number of all explanations
+				if (lastChar < s.length() - 1) {
+					String suffix = s.substring(lastChar + 1, s.length()); // 2 (occur) /3 (allExpl)
+					String[] l = suffix.split("/");
+					if (l.length == 2) {
+						try {
+							occur = Integer.parseInt(l[0]);
+							allExpl = Integer.parseInt(l[1]);
+
+						} catch (NumberFormatException e) {
+							System.out.println(e);
+						}
+					}
+				}
+				//check validity
+				if (allExpl < 1 || occur < 1 || occur > allExpl) {
+					System.out.println("inconsistent suffix: " + occur + "/" + allExpl + ", use defaults 1/1");
+					occur = 1;
+					allExpl = 1;
+				}
+				//if we are here, occur and allExpl are both >=1 and occur <= allExpl - consistent!
+				Label tmp = new Label(text + " (" + occur + "/" + allExpl + ")");
+				if (allExpl == 1) {
+					tmp.setForegroundColor(GUIBasics.createColor(255, 0, 0));
+				} else { //allExp > 1, can divide through allExpl - 1 
+					if (occur == 1)
+						tmp.setForegroundColor(GUIBasics.createColor(0, 0, 0)); // black for explanation part which occurs once
+
+					// color gradient for remaining explanations
+					else {
+						int confidence = (int) (255.0 * (occur - 1.0) / (allExpl - 1.0) + 0.5);
+						tmp.setForegroundColor(GUIBasics.createColor(confidence, 0, 0));
+					}
+				}
+				panel.add(tmp);
+			} else {
+				Label tmp = new Label(s);
+				panel.add(tmp);
+			}
+		}
+		setToolTip(panel);
 	}
 
 	private String getConstraintText(IConstraint constraint) {

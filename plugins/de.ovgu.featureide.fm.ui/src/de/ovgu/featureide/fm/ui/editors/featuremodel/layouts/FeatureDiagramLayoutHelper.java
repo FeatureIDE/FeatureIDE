@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANUAL_LAYOUT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHORT_NAMES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LONG_NAMES;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -62,6 +64,19 @@ public class FeatureDiagramLayoutHelper {
 		default:
 			return "Top-Down (ordered)";
 		}
+	}
+	
+	/**
+	 * returns label texts (e.g. for the context menu)
+	 */
+	public static String getNameTypeLabel(int layoutType){		
+		switch(layoutType){
+			case 1: 
+				return SHORT_NAMES;
+			case 0:
+			default:
+				return LONG_NAMES;
+		}	
 	}
 
 	/**

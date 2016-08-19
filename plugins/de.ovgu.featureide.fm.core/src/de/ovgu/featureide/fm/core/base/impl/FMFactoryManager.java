@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
  * @author Sebastian Krieter
  */
 public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactory> {
-	
+
 	public static IFactoryWorkspaceProvider factoryWorkspaceProvider = new CoreFactoryWorkspaceProvider();
 
 	private FMFactoryManager() {
@@ -69,11 +69,16 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	public static void setDefaultFactory(String id) throws NoSuchExtensionException {
-		defaultFactory = getFactory(id);
+		defaultFactory = getFactoryById(id);
+		factoryWorkspaceProvider.getFactoryWorkspace().setDefaultFactoryID(defaultFactory.getId());
 	}
 
 	public static FactoryWorkspace getFactoryWorkspace() {
 		return factoryWorkspaceProvider.getFactoryWorkspace();
+	}
+
+	public static FactoryWorkspace getFactoryWorkspace(String path) {
+		return factoryWorkspaceProvider.getFactoryWorkspace(path);
 	}
 
 	/**

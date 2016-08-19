@@ -20,26 +20,32 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.nio.file.Paths;
+
 /**
  * This {@link IFactoryWorkspaceProvider provider} only uses native Java methods.
  * 
  * @author Sebastian Krieter
  */
-public final class CoreFactoryWorkspaceProvider implements IFactoryWorkspaceProvider {
-
-	private final FactoryWorkspace defaultWorkspace = new FactoryWorkspace();
+public final class CoreFactoryWorkspaceProvider extends AFactoryWorkspaceProvider {
 
 	public FactoryWorkspace getFactoryWorkspace(String path) {
-		return defaultWorkspace;
+		return super.getFactoryWorkspace(Paths.get(path).toAbsolutePath().toString());
 	}
 
-	public FactoryWorkspace getFactoryWorkspace() {
-		return defaultWorkspace;
-	}
-
-	//TODO Implement map for core factory workspace provider
 	@Override
 	public void addFactoryWorkspace(String path, FactoryWorkspace workspace) {
+		super.addFactoryWorkspace(Paths.get(path).toAbsolutePath().toString(), workspace);
+	}
+
+	@Override
+	public void save() {
+		
+	}
+
+	@Override
+	public boolean load() {
+		return false;
 	}
 
 }

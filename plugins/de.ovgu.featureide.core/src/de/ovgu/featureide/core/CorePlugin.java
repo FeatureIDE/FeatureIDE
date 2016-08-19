@@ -684,6 +684,10 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		if (signatures != null) {
 			SignatureIterator it = signatures.iterator();
+			int featureID = signatures.getFeatureID(featureName);
+			if(featureID == -1){
+				return Collections.emptyList();
+			}
 			it.addFilter(new ContextFilter(featureName, signatures));
 
 			while (it.hasNext()) {
@@ -759,7 +763,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public ProjectStructure extendedModules_getStruct(final IFeatureProject project, final String featureName) {
 		final ProjectSignatures signatures = project.getProjectSignatures();
-		if (signatures != null) {
+		if (signatures != null && signatures.getFeatureID(featureName) != -1) {
 			SignatureIterator it = signatures.iterator();
 			//TODO check
 			if (featureName != null) {

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="F_FB197705B17E">
+				<description>
+					
+				</description>
+				<alt mandatory="true" name="F_29F74BBAB54A">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidun
+					</description>
+					<feature mandatory="true" name="F_4E965EAFCD0F">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature mandatory="true" name="F_527041918AE0">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, s
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_8F588DE4FFF3">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd
+					</description>
+					<feature mandatory="true" name="F_9AFF67CD7787">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_27CC73CD2A05">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature mandatory="true" name="F_2AD73622C699">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+					</description>
+				</feature>
+				<feature mandatory="true" name="F_936990E592A7">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam volupt
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_5EE2077C90B7">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="F_BDE0416F7D5F">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_E47C0CD43764">
+					<description>
+						
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_03103A1B722B">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="F_DEE69AF2CC21">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_398029426BBF">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>F_E47C0CD43764</var>
+					<var>F_398029426BBF</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

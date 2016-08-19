@@ -38,6 +38,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaModelException;
@@ -83,6 +84,8 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 
 	private BuilderConfiguration configuration;
 
+	private static boolean JUNIT_INSTALLED = Platform.getBundle("org.junit") != null;
+
 	/**
 	 * 
 	 * @param nr The number of the job
@@ -95,10 +98,16 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 			try {
 				if (builder.featureProject.getProject().hasNature(JAVA_NATURE)) {
 					compiler = new JavaCompiler(nr, this);
-					testRunner = new TestRunner(compiler.tmp, builder.testResults, builder);
+					if (JUNIT_INSTALLED) {
+						testRunner = new TestRunner(compiler.tmp, builder.testResults, builder);
+					}
 				}
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
+			} catch (Exception e2) {
+				System.out.println(e2);
+			} catch (Error e3) {
+				System.out.println(e3);
 			}
 		}
 	}
@@ -163,7 +172,9 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 				if (compiler != null) {
 					compiler.compile(configuration);
 					if (builder.runTests) {
-						testRunner.runTests(configuration);
+						if (JUNIT_INSTALLED) {
+							testRunner.runTests(configuration);
+						}
 					}
 				}
 

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_2085033141__F_C53EADCFF030">
+				<description>
+					
+				</description>
+				<feature name="F_82DCD05F18F2">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_3E7B30821203">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_94312C79B3B9">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_8A42FBF6E175">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_65C1A78CCAD2">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_FBF1B4DE7B5D">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A6909BC6DCEB">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_D5618F0EE740">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="I_570790106__F_803DE74C7964">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="I_4050661265__F_DF2DCA533C20">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_EE73A35EC9E9">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_8F6BEE85A1D3">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_FBFC87325974">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A8233DC6F861">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_FDEAC6EBC906">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_0A7FB52A4A78">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_C9E9E9A7FF4B">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_125B566D5B71">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F0E42FA32BBD">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A4FD8098241E">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<var>F_A6909BC6DCEB</var>
+					<var>F_FDEAC6EBC906</var>
+					<not>
+						<var>N_2085033141__F_C53EADCFF030</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>F_EE73A35EC9E9</var>
+					</not>
+					<not>
+						<var>F_F0E42FA32BBD</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>F_FDEAC6EBC906</var>
+					</not>
+					<not>
+						<var>F_A6909BC6DCEB</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_0A7FB52A4A78</var>
+					<not>
+						<var>F_82DCD05F18F2</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_FBFC87325974</var>
+					<not>
+						<var>F_D5618F0EE740</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_8F6BEE85A1D3</var>
+					<not>
+						<var>F_FBF1B4DE7B5D</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_A8233DC6F861</var>
+					<not>
+						<var>N_2085033141__F_C53EADCFF030</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_FBFC87325974</var>
+					<not>
+						<var>N_2085033141__F_C53EADCFF030</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_A4FD8098241E</var>
+					<not>
+						<var>N_2085033141__F_C53EADCFF030</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_0A7FB52A4A78</var>
+					<not>
+						<var>N_2085033141__F_C53EADCFF030</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_8F6BEE85A1D3</var>
+					<not>
+						<var>N_2085033141__F_C53EADCFF030</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>F_A4FD8098241E</var>
+					<not>
+						<var>F_C9E9E9A7FF4B</var>
+					</not>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

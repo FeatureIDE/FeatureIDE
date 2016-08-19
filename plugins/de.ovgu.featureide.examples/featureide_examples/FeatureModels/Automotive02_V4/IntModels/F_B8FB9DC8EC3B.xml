@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="F_B8FB9DC8EC3B">
+				<description>
+					
+				</description>
+				<feature name="F_78BE99948CCD">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_D5F49223689C">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_0F39B09522E2">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_1587476B18FF">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_4C9008DF6137">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A62329B1F858">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_7A7F1EBFAFDC">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_252CE0D78B05">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_D52386A7CCE2">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_44069C20CEEA">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_29CFF8E598E4">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_AB6415C30F38">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F03A6DB09A0D">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_8296200DE197">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

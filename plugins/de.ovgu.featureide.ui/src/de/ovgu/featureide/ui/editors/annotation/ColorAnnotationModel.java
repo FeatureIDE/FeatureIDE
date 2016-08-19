@@ -729,8 +729,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		throw new UnsupportedOperationException();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public Iterator<?> getAnnotationIterator() {
+	public Iterator getAnnotationIterator() {
 		return annotations.iterator();
 	}
 

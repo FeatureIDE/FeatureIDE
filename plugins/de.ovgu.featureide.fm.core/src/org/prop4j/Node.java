@@ -73,6 +73,24 @@ public abstract class Node {
 		return cnf.clausify();
 	}
 
+	public Node toRegularCNF() {
+		Node regularCNFNode = this.toCNF();
+		if (regularCNFNode instanceof And) {
+			final Node[] children = regularCNFNode.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				final Node child = children[i];
+				if (child instanceof Literal) {
+					children[i] = new Or(child);
+				}
+			}
+		} else if (regularCNFNode instanceof Or) {
+			regularCNFNode = new And(regularCNFNode);
+		} else if (regularCNFNode instanceof Literal) {
+			regularCNFNode = new And(new Or(regularCNFNode));
+		}
+		return regularCNFNode;
+	}
+
 	public boolean getValue(Map<Object, Boolean> map) {
 		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
@@ -83,7 +101,7 @@ public abstract class Node {
 		cnf = buildCNF_rec(cnf);
 		return cnf;
 	}
-	
+
 	protected final Node eliminateNonCNFOperators() {
 		if (children != null) {
 			final Node[] newChildren = new Node[children.length];
@@ -95,8 +113,8 @@ public abstract class Node {
 			return eliminateNonCNFOperators(null);
 		}
 	}
-	
-	protected abstract Node eliminateNonCNFOperators(Node[] newChildren);	
+
+	protected abstract Node eliminateNonCNFOperators(Node[] newChildren);
 
 	private static Node deMorgan(Node node) {
 		if (node instanceof Literal) {

@@ -56,7 +56,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		private int deltaCoverage;
 		private final int[] model;
 		private int totalCoverage;
-		
+
 		public long time = 0;
 
 		public Configuration(int[] model, int deltaCoverage, int totalCoverage) {
@@ -140,6 +140,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		}
 
 	}
+
 	public static final boolean VERBOSE = false;
 
 	protected static final byte BIT_00 = 1 << 0;
@@ -170,6 +171,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 	public final BlockingQueue<Configuration> q = new LinkedBlockingQueue<>();
 
 	protected long time = 0;
+
 	public PairWiseConfigurationGenerator(SatInstance satInstance, int maxNumber) {
 		super(satInstance);
 		this.maxNumber = maxNumber;
@@ -189,8 +191,6 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		findInvalid();
 		IVecInt orgBackbone = solver.getAssignment();
 		final int featureCount = solver.getSatInstance().getNumberOfVariables();
-
-		System.out.println("Found all invalid!");
 
 		orgBackbone.ensure(numVariables);
 		final int numberOfFixedFeatures = orgBackbone.size();
@@ -701,8 +701,9 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 
 	protected int getLastCoverage() {
 		synchronized (tempConfigurationList) {
-			return (tempConfigurationList.isEmpty()) ? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1)
-					.getTotalCoverage()) : tempConfigurationList.getLast().getTotalCoverage();
+			return (tempConfigurationList.isEmpty())
+					? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1).getTotalCoverage())
+					: tempConfigurationList.getLast().getTotalCoverage();
 		}
 	}
 
@@ -716,7 +717,6 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 
 	protected boolean handleNewConfig(int[] curModel, final boolean[] featuresUsedOrg) {
 		if (curModel == null) {
-			System.out.println("Found everything!");
 			return true;
 		}
 		final int partCount = count(curModel) - fixedPartCount;
@@ -733,7 +733,6 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 			}
 		}
 		if (lesserCount > 0) {
-			System.out.println("Found Larger Model!");
 			count -= lesserCount;
 
 			for (int i = 0; i < comboIndex.length; i++) {
@@ -794,7 +793,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 			featureIndex.setCoveredCombinations(coveredCombinations);
 			featureIndex.setSelected(selected);
 		}
-		
+
 		config.time = System.nanoTime() - time;
 		q.offer(config);
 		time = System.nanoTime();
@@ -802,8 +801,6 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		try {
 			config.setBlockingClauseConstraint(solver.getInternalSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
 		} catch (ContradictionException e) {
-			e.printStackTrace();
-			System.out.println("Unsatisfiable1!");
 			return true;
 		}
 
@@ -812,7 +809,6 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 
 		finalCount = Math.max(finalCount, count - maxBackJumping);
 		if (absUncovered <= 0) {
-			System.out.println("Found everything2!");
 			return true;
 		}
 		return false;
@@ -831,8 +827,10 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		double relTotal = (double) (config.getTotalCoverage()) / combinationCount;
 		relDelta = Math.floor(relDelta * 100000.0) / 1000.0;
 		relTotal = Math.floor(relTotal * 1000.0) / 10.0;
-		System.out.println(count++ + ": " + config.getTotalCoverage() + "/" + combinationCount + " | " + relTotal + "% | left = " + absUncovered + " | new = "
-				+ config.getDeltaCoverage() + " | delta = " + relDelta);
+		if (VERBOSE) {
+			System.out.println(count++ + ": " + config.getTotalCoverage() + "/" + combinationCount + " | " + relTotal + "% | left = " + absUncovered
+					+ " | new = " + config.getDeltaCoverage() + " | delta = " + relDelta);
+		}
 		return absUncovered;
 	}
 

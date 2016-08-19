@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_1503296467__F_CB24154D8F34">
+				<description>
+					Lorem
+				</description>
+				<feature name="F_244AEDB10A05">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_1D185851F626">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed dia
+					</description>
+					<feature mandatory="true" name="F_0E44E4DE77B8">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_CA691578A34D">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_952EBD805867">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_3850D3424659">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
+					</description>
+					<feature mandatory="true" name="F_3C5730BFA7B1">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_3427BB6CFCF2">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

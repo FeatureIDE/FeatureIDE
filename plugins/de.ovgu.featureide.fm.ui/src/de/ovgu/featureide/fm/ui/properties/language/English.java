@@ -54,6 +54,7 @@ public class English implements ILanguage {
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = INDETERMINATE_HIDDEN;
 	private static final String REDUNDANT = REDUNDANT_CONSTRAINT;
+	private static final String IMPLICIT = "Implicit constraint";
 	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
 	private static final String VOID_MODEL_CONST = CONSTRAINT_MAKES_THE_MODEL_VOID;
@@ -61,6 +62,11 @@ public class English implements ILanguage {
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
+	}
+	
+	@Override
+	public String getImplicitConst() {
+		return IMPLICIT;
 	}
 
 	@Override

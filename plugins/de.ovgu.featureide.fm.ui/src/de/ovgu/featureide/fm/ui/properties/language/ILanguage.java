@@ -31,6 +31,11 @@ public interface ILanguage {
 	 * @return The translation for: REDUNDANT_CONSTRAINT
 	 */
 	public String getRedundantConst();
+	
+	/**
+	 * @return The translation for: IMPLICIT_CONSTRAINT
+	 */
+	public String getImplicitConst();
 
 	/**
 	 * @return The translation for: UNSATISFIABLE_CONSTRAINT
