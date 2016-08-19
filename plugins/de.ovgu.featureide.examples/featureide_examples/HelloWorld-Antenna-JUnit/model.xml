@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and abstract="true" mandatory="true" name="HelloWorld">
+				<feature name="Hello"/>
+				<alt abstract="true" name="Feature">
+					<feature mandatory="true" name="Beautiful"/>
+					<feature mandatory="true" name="Wonderful"/>
+				</alt>
+				<feature name="World"/>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
