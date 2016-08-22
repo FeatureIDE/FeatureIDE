@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -81,7 +82,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			problemList.add(new Problem(e, lineNumber));
 		}
 		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
-		final IFeature rootFeature = factory.createFeature(featureModel, ""); 
+		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__"); 
 				
 		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);
@@ -93,18 +94,19 @@ public class DIMACSFormat implements IFeatureModelFormat {
 				final String[] commentLine = line.split("\\s");
 				final String id = commentLine[1].trim();
 				final String name = commentLine[2].trim();
-				names[Integer.parseInt(id)] = name;
+				try {
+					names[Integer.parseInt(id)] = name;
+				} catch (NumberFormatException e) {
+				}
 			} else {
 				break;
 			}
 		}
 
-		final ArrayList<String> abstractNames = new ArrayList<>();
+		final HashSet<String> abstractNames = new HashSet<>();
 		for (int i = 1; i < names.length; i++) {
 			final String name = names[i];
-			if (name == null) {
-				abstractNames.add("__Abstract__" + i);
-			} else {
+			if (name != null) {
 				final IFeature feature = factory.createFeature(featureModel, name); 
 				featureModel.addFeature(feature);
 				rootFeature.getStructure().addChild(feature.getStructure());
@@ -118,7 +120,11 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			for (int i = 0; i < clauseLine.length - 1; i++) {
 				final int varIndex = Integer.parseInt(clauseLine[i]);
 				String name = names[Math.abs(varIndex)];
-				clauseParts.add(new Literal(name != null ? name : "__Abstract__" + Math.abs(varIndex), varIndex > 0));
+				if (name == null) {
+					name = "__Abstract__" + Math.abs(varIndex);
+					abstractNames.add(name);
+				}
+				clauseParts.add(new Literal(name, varIndex > 0));
 			}
 			final Literal[] array = clauseParts.toArray(new Literal[0]);
 			final Or propNode = new Or(array);
