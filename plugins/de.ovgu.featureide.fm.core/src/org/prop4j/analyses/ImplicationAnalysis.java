@@ -60,11 +60,15 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+
+		monitor.checkCancel();
 		int[] model1 = solver.findModel();
 
 		if (model1 != null) {
 			solutionList.add(model1);
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+
+			monitor.checkCancel();
 			int[] model2 = solver.findModel();
 			solutionList.add(model2);
 
@@ -74,6 +78,7 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 			}
 
 			pairLoop: for (int[] pair : pairs) {
+				monitor.checkCancel();
 				solutionLoop: for (int[] is : solutionList) {
 					for (int i : pair) {
 						if (is[Math.abs(i) - 1] == i) {

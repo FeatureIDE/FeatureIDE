@@ -61,11 +61,12 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 				if (project != null) {
 					IMonitor monitor2 = new ProgressMonitor("Cover unused features", monitor);
 					monitor2.setRemainingWork(2);
-					IMonitor subTask = monitor2.subTask("Collect unused features", 1);
+					IMonitor subTask = monitor2.subTask(1);
+					subTask.setTaskName("Collect unused features");
 					final Collection<String> unusedFeatures = project.getFalseOptionalConfigurationFeatures();
 					subTask.step();
 					subTask.done();
-					createConfigurations(unusedFeatures, monitor2.subTask("Create configurations", 1), false);
+					createConfigurations(unusedFeatures, monitor2.subTask(1), false);
 					monitor2.done();
 				}
 				return Status.OK_STATUS;
@@ -75,6 +76,7 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 	}
 
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
+		monitor.setTaskName("Create configurations");
 		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());

@@ -28,7 +28,7 @@ package de.ovgu.featureide.fm.core.job;
 public class LongRunningCore {
 
 	public <T> IRunner<T> getRunner(LongRunningMethod<T> method, String name) {
-		return LongRunning.getThread(method, name);
+		return LongRunningWrapper.getThread(method, name);
 	}
 
 }

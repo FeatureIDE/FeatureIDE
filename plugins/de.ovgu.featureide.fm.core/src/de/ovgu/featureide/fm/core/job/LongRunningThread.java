@@ -115,6 +115,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 			Logger.logError(e);
 			status = JobStatus.FAILED;
 		} finally {
+			monitor.done();
 			for (final JobFinishListener<T> listener : listenerList) {
 				try {
 					listener.jobFinished(this);

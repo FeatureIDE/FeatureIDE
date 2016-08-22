@@ -65,13 +65,8 @@ public final class NullMonitor extends AMonitor {
 	public void setTaskName(String name) {
 	}
 
-	@Override
-	public IMonitor subTask(String name, int size) {
-		return this;
-	}
-
-	@Override
-	public void setTaskNameSuffix(String suffix) {
+	public String getTaskName() {
+		return "";
 	}
 
 }

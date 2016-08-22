@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
@@ -72,7 +73,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		nodeCreator.setIncludeBooleanValues(false);
 		return nodeCreator.createNodes();
 	}
-	
+
 	public static SatInstance createSatInstance(IFeatureModel featureModel) {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Regular);
@@ -162,7 +163,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		setFeatureModel(featureModel, excludedFeatureNames);
 	}
 
-	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
+	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType,
+			boolean includeBooleanValues) {
 		this.cnfType = cnfType;
 		this.modelType = modelType;
 		this.includeBooleanValues = includeBooleanValues;
@@ -184,7 +186,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		default:
 			for (IConstraint constraint : featureModel.getConstraints()) {
 				final Node cnfNode = Node.buildCNF(constraint.getNode());
-//				final Node cnfNode = constraint.getNode().toCNF();
+				//				final Node cnfNode = constraint.getNode().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
 						clauses.add((compact || (andChild instanceof Or)) ? andChild : new Or(andChild));
@@ -199,6 +201,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public Node createNodes() {
+		return createNodes(new NullMonitor());
+	}
+
+	public Node createNodes(IMonitor monitor) {
 		if (featureModel == null) {
 			final Or emptyNode = includeBooleanValues ? new Or(new Literal(NodeCreator.varTrue), new Literal(NodeCreator.varFalse, false)) : new Or();
 			switch (cnfType) {
@@ -211,6 +217,16 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			}
 		}
 
+		monitor.setRemainingWork(10);
+		final Node[] basicFormula = createFormula(monitor.subTask(1));
+		final Node newFormula = removeFeatures(basicFormula, monitor.subTask(9));
+
+		return newFormula;
+	}
+
+	private Node[] createFormula(IMonitor monitor) {
+		monitor.setTaskName("Creating Formula");
+		monitor.setRemainingWork(2);
 		final Node[] andChildren1;
 		final Node[] andChildren2;
 
@@ -232,6 +248,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			andChildren2 = new Node[0];
 			break;
 		}
+		monitor.step();
 
 		final int length = andChildren1.length + andChildren2.length;
 		final Node[] nodeArray;
@@ -255,9 +272,14 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		}
 		System.arraycopy(andChildren1, 0, nodeArray, 0, andChildren1.length);
 		System.arraycopy(andChildren2, 0, nodeArray, andChildren1.length, andChildren2.length);
+		monitor.step();
+		
+		return nodeArray;
+	}
 
+	private Node removeFeatures(final Node[] nodeArray, IMonitor monitor) {
 		if (excludedFeatureNames != null && !excludedFeatureNames.isEmpty()) {
-			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular));
+			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular), monitor);
 		} else {
 			return new And(nodeArray);
 		}
@@ -328,7 +350,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	@Override
 	public Node execute(IMonitor monitor) throws Exception {
-		return createNodes();
+		return createNodes(monitor);
 	}
 
 	public CNFType getCnfType() {
@@ -359,7 +381,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	public void setCnfType(CNFType cnfType) {
 		this.cnfType = cnfType;
 	}
-	
+
 	public void setUseOldNames(boolean useOldNames) {
 		this.useOldNames = useOldNames;
 	}

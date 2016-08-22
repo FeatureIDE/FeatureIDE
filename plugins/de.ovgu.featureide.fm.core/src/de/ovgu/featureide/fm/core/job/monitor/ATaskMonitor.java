@@ -27,21 +27,22 @@ package de.ovgu.featureide.fm.core.job.monitor;
 abstract class ATaskMonitor extends AMonitor {
 
 	protected String name = null;
-	protected String subName = null;
+
+	public ATaskMonitor() {
+		super();
+	}
+
+	public ATaskMonitor(IMonitor parent) {
+		super(parent);
+	}
 
 	@Override
 	public void setTaskName(String name) {
 		this.name = name;
 	}
-
-	protected String constructTaskName() {
-		boolean hasSubName = this.subName != null;
-		return (this.name != null ? this.name + (hasSubName ? " - " : "") : "") + (hasSubName ? this.subName : "");
-	}
-
-	@Override
-	public void setTaskNameSuffix(String suffix) {
-		setTaskName(constructTaskName() + suffix);
+	
+	public String getTaskName() {
+		return (parent != null ? parent.getTaskName() + " - " : "") + (name != null ? name : "");
 	}
 
 }

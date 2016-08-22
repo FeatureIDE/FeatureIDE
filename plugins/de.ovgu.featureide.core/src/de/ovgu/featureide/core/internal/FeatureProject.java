@@ -264,7 +264,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 				private void next(String subTaskName, IMonitor workMonitor) {
 					workMonitor.step();
-					workMonitor.setTaskNameSuffix(subTaskName);
+					workMonitor.setTaskName(subTaskName);
 				}
 
 				private String createShortMessage(Collection<String> features) {
@@ -1018,18 +1018,19 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
 				final FileHandler<Configuration> reader = new FileHandler<>(config);
 				try {
-					IMonitor subTask = workMonitor.subTask(DELETE_CONFIGURATION_MARKERS, 1);
+					IMonitor subTask = workMonitor.subTask(1);
+					subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
 					subTask.setRemainingWork(files.size());
 					for (IFile file : files) {
 						deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
 						subTask.step();
 					}
 					subTask.done();
-					subTask = workMonitor.subTask(CHECK_VALIDITY_OF, 1);
+					subTask = workMonitor.subTask(1);
 					subTask.setRemainingWork(files.size());
 					// check validity
 					for (IFile file : files) {
-						subTask.setTaskNameSuffix(" - " + file.getName());
+						subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
 						reader.read(Paths.get(file.getLocationURI()), ConfigurationManager.getFormat(file.getName()));
 						if (!config.isValid()) {
 							String name = file.getName();

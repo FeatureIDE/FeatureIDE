@@ -30,13 +30,23 @@ import de.ovgu.featureide.fm.core.job.IJob;
  * @author Sebastian Krieter
  */
 public abstract class AMonitor implements IMonitor {
-	
+
+	protected final IMonitor parent;
+
 	protected IConsumer<Object> intermediateFunction = null;
+
+	public AMonitor(IMonitor parent) {
+		this.parent = parent;
+	}
+
+	public AMonitor() {
+		this.parent = null;
+	}
 
 	@Override
 	public final void invoke(Object t) {
 		if (intermediateFunction != null) {
-			intermediateFunction.invoke(t);		
+			intermediateFunction.invoke(t);
 		}
 	}
 
@@ -54,7 +64,7 @@ public abstract class AMonitor implements IMonitor {
 
 	@Override
 	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		this.intermediateFunction = intermediateFunction;		
+		this.intermediateFunction = intermediateFunction;
 	}
 
 }

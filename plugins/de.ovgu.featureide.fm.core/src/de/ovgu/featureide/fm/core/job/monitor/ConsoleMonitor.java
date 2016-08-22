@@ -45,8 +45,8 @@ public class ConsoleMonitor extends ATaskMonitor {
 		this.output = output;
 	}
 
-	private ConsoleMonitor(boolean output, boolean canceled, IConsumer<Object> intermediateFunction) {
-		super();
+	private ConsoleMonitor(boolean output, boolean canceled, IConsumer<Object> intermediateFunction, IMonitor parent) {
+		super(parent);
 		this.output = output;
 		this.canceled = canceled;
 		setIntermediateFunction(intermediateFunction);
@@ -74,11 +74,6 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public IMonitor subTask(int size) {
-		return new ConsoleMonitor(output, canceled, intermediateFunction);
-	}
-
-	@Override
 	public void worked() {
 		work--;
 		print("\t" + work);
@@ -95,7 +90,7 @@ public class ConsoleMonitor extends ATaskMonitor {
 	@Override
 	public void setTaskName(String name) {
 		super.setTaskName(name);
-		print(name);
+		print(getTaskName());
 	}
 
 	private void print(String name) {
@@ -105,12 +100,8 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public IMonitor subTask(String name, int size) {
-		final ConsoleMonitor consoleMonitor = new ConsoleMonitor(output, canceled, intermediateFunction);
-		if (name != null) {
-			this.subName = name;
-			consoleMonitor.setTaskName(constructTaskName());
-		}
+	public IMonitor subTask(int size) {
+		final ConsoleMonitor consoleMonitor = new ConsoleMonitor(output, canceled, intermediateFunction, this);
 		consoleMonitor.setRemainingWork(size);
 		work -= size;
 		return consoleMonitor;

@@ -35,11 +35,13 @@ public class ProgressMonitor extends ATaskMonitor {
 
 	private SubMonitor monitor;
 
-	private ProgressMonitor(IProgressMonitor monitor) {
+	private ProgressMonitor(IProgressMonitor monitor, IMonitor parent) {
+		super(parent);
 		this.monitor = SubMonitor.convert(monitor, 1);
 	}
 
 	public ProgressMonitor(String taskName, IProgressMonitor monitor) {
+		super();
 		this.monitor = SubMonitor.convert(monitor, taskName, 1);
 	}
 
@@ -71,17 +73,7 @@ public class ProgressMonitor extends ATaskMonitor {
 
 	@Override
 	public IMonitor subTask(int size) {
-		return new ProgressMonitor(monitor.newChild(size));
-	}
-
-	@Override
-	public IMonitor subTask(String name, int size) {
-		SubMonitor newChild = monitor.newChild(size);
-		if (name != null) {
-			this.subName = name;
-			newChild.setTaskName(constructTaskName());
-		}
-		return new ProgressMonitor(newChild);
+		return new ProgressMonitor(monitor.newChild(size), this);
 	}
 
 	@Override
@@ -92,7 +84,7 @@ public class ProgressMonitor extends ATaskMonitor {
 	@Override
 	public void setTaskName(String name) {
 		super.setTaskName(name);
-		monitor.setTaskName(name);
+		monitor.setTaskName(getTaskName());
 	}
 
 }

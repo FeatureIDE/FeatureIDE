@@ -103,7 +103,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		// feature model slicing 
 		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, completeFm, subtreeFeatures, true);
 		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
-		IFeatureModel slicedModel = slice.createInterface(completeFm, subtreeFeatures, new NullMonitor()).clone(); // returns new feature model
+		IFeatureModel slicedModel = slice.sliceModel(completeFm, subtreeFeatures, new NullMonitor()).clone(); // returns new feature model
 		
 		// only replace root with selected feature if feature is core-feature
 		List<IFeature> coreFeatures = completeFm.getAnalyser().getCoreFeatures();

@@ -596,10 +596,6 @@ public class FeatureModelAnalyzer {
 		monitor.step();
 	}
 
-	private void setSubTask(String name) {
-		monitor.setTaskNameSuffix(name);
-	}
-
 	public void updateFeatures() {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(true);
@@ -621,7 +617,7 @@ public class FeatureModelAnalyzer {
 		if (!fm.getStructure().hasHidden()) {
 			return;
 		}
-		setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
+		monitor.setTaskName(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
 		/**
 		 * First every relevant constraint of every hidden feature is checked if its form equals
 		 * HIDDEN_FEATURE <=> A
@@ -671,7 +667,7 @@ public class FeatureModelAnalyzer {
 			if (canceled()) {
 				return;
 			}
-			setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
+			monitor.setTaskName(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
 			if (!list.contains(feature)) {
 				Collection<IFeature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;

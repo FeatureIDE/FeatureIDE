@@ -55,12 +55,10 @@ public interface IMonitor {
 
 	IMonitor subTask(int size);
 
-	IMonitor subTask(String name, int size);
-
 	void setTaskName(String name);
 	
-	void setTaskNameSuffix(String suffix);
-
+	String getTaskName();
+	
 	/**
 	 * Increases the monitor's progress.
 	 */

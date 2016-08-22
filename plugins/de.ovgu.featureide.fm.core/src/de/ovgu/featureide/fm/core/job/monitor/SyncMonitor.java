@@ -99,13 +99,8 @@ public class SyncMonitor implements IMonitor {
 	}
 
 	@Override
-	public IMonitor subTask(String name, int size) {
-		return monitor.subTask(name, size);
-	}
-
-	@Override
-	public void setTaskNameSuffix(String suffix) {
-		monitor.setTaskNameSuffix(suffix);
+	public String getTaskName() {
+		return monitor.getTaskName();
 	}
 
 }

@@ -217,7 +217,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		if (calculateFeatures) {
 			work += 5;
 			if (calculateConstraints) {
-				work += 2 * (fm.getConstraints().size() + 1);
+				work += 2;
 			}
 		}
 		monitor.setRemainingWork(work);
@@ -288,9 +288,13 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		try {
 			if (valid) {
 				checkConstraintRedundant(constraints);
+				monitor.step();
 				checkConstraintDeadAndFalseOptional(constraints);
+				monitor.step();
 			} else {
 				checkConstraintUnsatisfiable(constraints);
+				monitor.step();
+				monitor.step();
 			}
 		} catch (ContradictionException e) {
 			Logger.logError(e);
@@ -311,7 +315,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 		final List<IFeature> deadList = new LinkedList<>(deadFeatures);
 		final List<IFeature> foList = new LinkedList<>(falseOptionalFeatures);
-		monitor.step();
+		monitor.checkCancel();
 
 		for (IConstraint constraint : constraints) {
 			modSat.addClauses(makeRegular(constraint.getNode()));
@@ -337,7 +341,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					}
 				}
 			}
-			monitor.step();
+			monitor.checkCancel();
 		}
 	}
 
@@ -364,7 +368,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 				constraintMarkers.add(redundantSat.addClauses(cnf));
 			}
-			monitor.step();
+			monitor.checkCancel();
 
 			int i = -1;
 			for (IConstraint constraint : constraints) {
@@ -406,14 +410,14 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 						}
 					}
 				}
-				monitor.step();
+				monitor.checkCancel();
 			}
 		} else if (calculateTautologyConstraints) {
 			for (IConstraint constraint : constraints) {
 				if (checkConstraintTautology(constraint.getNode())) {
 					setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
 				}
-				monitor.step();
+				monitor.checkCancel();
 			}
 		}
 	}
@@ -426,8 +430,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator.setModelType(ModelType.OnlyStructure);
 		final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 		final ModifiableSolver unsat = new ModifiableSolver(si);
-		monitor.step();
-		monitor.step();
+		monitor.checkCancel();
 
 		for (IConstraint constraint : constraints) {
 			Node cnf = makeRegular(constraint.getNode());
@@ -467,8 +470,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					}
 				}
 			}
-			monitor.step();
-			monitor.step();
+			monitor.checkCancel();
 		}
 	}
 
@@ -482,8 +484,10 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	private void checkFeatureDead(final SatInstance si) {
 		deadFeatures.clear();
 		coreFeatures.clear();
-		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si));
+		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si), monitor.subTask(0));
+		monitor.checkCancel();
 		for (int i = 0; i < solution2.length; i++) {
+			monitor.checkCancel();
 			final int var = solution2[i];
 			final IFeature feature = fm.getFeature((String) si.getVariableObject(var));
 			if (var < 0) {
@@ -531,9 +535,11 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
 			}
 		}
-		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(si, possibleFOFeatures));
+		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(si, possibleFOFeatures), monitor.subTask(0));
+		monitor.checkCancel();
 		falseOptionalFeatures.clear();
 		for (int[] pair : solution3) {
+			monitor.checkCancel();
 			final IFeature feature = fm.getFeature((CharSequence) si.getVariableObject(pair[1]));
 			setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
 			falseOptionalFeatures.add(feature);
@@ -585,6 +591,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		Collection<IFeature> list = new LinkedList<>();
 		Collection<IFeature> hiddenFeatures = Functional.toList(Functional.filter(features, new HiddenFeatureFilter()));
 		for (IFeature feature : hiddenFeatures) {
+			monitor.checkCancel();
 			for (IConstraint constraint : feature.getStructure().getRelevantConstraints()) {
 				Node node = constraint.getNode();
 				if (node instanceof Equals) {
@@ -620,6 +627,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		 */
 		FeatureDependencies featureDependencies = new FeatureDependencies(fm, false);
 		for (IFeature feature : hiddenFeatures) {
+			monitor.checkCancel();
 			if (!list.contains(feature)) {
 				Collection<IFeature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;
