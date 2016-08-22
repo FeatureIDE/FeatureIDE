@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -100,7 +101,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 				}
 				MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
 			} else {
-				FileHandler.save(Paths.get(outputFile.getLocationURI()), fm, modelFormat);
+				FileHandler.save(Paths.get(outputFile.getLocationURI()), fm, new XmlFeatureModelFormat());
 				try {
 					openFileInEditor(outputFile);
 				} catch (PartInitException e) {

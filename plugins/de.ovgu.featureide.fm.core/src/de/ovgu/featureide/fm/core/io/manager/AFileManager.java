@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -37,7 +36,7 @@ import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
- * Responsible to load and save all information from / to a file.</br>
+ * Responsible to load and save all information from / to a file.<br/>
  * To get an instance use the {@link FileManagerMap}.
  * 
  * @author Sebastian Krieter
@@ -75,33 +74,36 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 	}
 
 	public T getObject() {
-		synchronized (saveSyncObject) {
+		synchronized (syncObject) {
 			return persistentObject;
 		}
 	}
 
 	public T editObject() {
-		return variableObject;
+		synchronized (saveSyncObject) {
+			return variableObject;
+		}
 	}
 
 	public ProblemList getLastProblems() {
 		return lastProblems;
 	}
 
-	public synchronized boolean read() {
-		if (!Files.exists(path)) {
+	public boolean read() {
+		if (!FileSystem.exists(path)) {
 			return false;
 		}
 		lastProblems.clear();
 		try {
-			final String content = new String(Files.readAllBytes(path), DEFAULT_CHARSET);
+			final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+			List<Problem> problemList;
 			synchronized (saveSyncObject) {
-				List<Problem> problemList = format.getInstance().read(variableObject, content);
-				if (problemList != null) {
-					lastProblems.addAll(problemList);
-				}
-				persist();
+				problemList = format.getInstance().read(variableObject, content);
 			}
+			if (problemList != null) {
+				lastProblems.addAll(problemList);
+			}
+			persist();
 			fireEvent(new FeatureIDEEvent(persistentObject, EventType.MODEL_DATA_LOADED));
 		} catch (Exception e) {
 			handleException(e);
@@ -124,10 +126,10 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 		lastProblems.clear();
 		try {
 			final byte[] content = format.getInstance().write(variableObject).getBytes(DEFAULT_CHARSET);
-				synchronized (saveSyncObject) {
-					FileSystem.write(path, content);
-					persist();
-				}
+			synchronized (saveSyncObject) {
+				FileSystem.write(path, content);
+			}
+			persist();
 			fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
 		} catch (Exception e) {
 			handleException(e);

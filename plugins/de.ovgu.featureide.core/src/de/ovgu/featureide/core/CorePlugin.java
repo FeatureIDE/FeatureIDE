@@ -108,7 +108,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -567,9 +567,10 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, buildPath);
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
+		final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
 		IFeatureModelFactory factory;
 		try {
-			factory = FMFactoryManager.getFactory(modelPath.toString(), new XmlFeatureModelFormat());
+			factory = FMFactoryManager.getFactory(modelPath.toString(), format);
 		} catch (NoSuchExtensionException e) {
 			Logger.logError(e);
 			factory = FMFactoryManager.getFactory();
@@ -578,7 +579,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		FMComposerManager.getFMComposerExtension(project);
 		featureModel.createDefaultValues(project.getName());
 
-		FeatureModelManager.writeToFile(featureModel, modelPath);
+		FileHandler.save(modelPath, featureModel, format);
 	}
 
 	/**

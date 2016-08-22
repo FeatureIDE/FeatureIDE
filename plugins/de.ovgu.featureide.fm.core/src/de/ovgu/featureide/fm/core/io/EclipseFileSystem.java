@@ -25,7 +25,11 @@ public class EclipseFileSystem implements IFileSystem {
 			throw new IOException(new NullPointerException());
 		}
 		try {
-			file.setContents(new ByteArrayInputStream(content), true, true, null);
+			if (file.exists()) {
+				file.setContents(new ByteArrayInputStream(content), true, true, null);
+			} else {
+				file.create(new ByteArrayInputStream(content), true, null);
+			}
 		} catch (CoreException e) {
 			throw new IOException(e);
 		}

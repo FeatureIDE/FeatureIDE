@@ -665,7 +665,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				}
 				analyzeJob = new LongRunningJob<>(ANALYZE_FEATURE_MODEL, new LongRunningMethod<Boolean>() {
 					@Override
-					public Boolean execute(IMonitor workMonitor) throws Exception {
+					public Boolean execute(IMonitor monitor) throws Exception {
 						if (waiting) {
 							return true;
 						}
@@ -684,7 +684,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						}
 
 						analyzer = getFeatureModel().getAnalyser();
-						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(null);
+						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(monitor);
 						refreshGraphics(changedAttributes);
 						return true;
 					}
