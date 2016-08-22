@@ -15,7 +15,7 @@
 
 		<!-- Compile the src folder -->
 		<mkdir dir="${build}" />
-		<javac srcdir="${src}" destdir="${build}" includeantruntime="false" source="1.7" classpathref="classpath">
+		<javac srcdir="${src}" destdir="${build}" debug="on" includeantruntime="false" source="1.7" classpathref="classpath">
 			<!-- Exclude all classes containing Eclipse dependencies -->
 			<exclude name="de/ovgu/featureide/fm/core/AbstractCorePlugin.java"/>
 			<exclude name="de/ovgu/featureide/fm/core/AWaitingJob.java"/>
