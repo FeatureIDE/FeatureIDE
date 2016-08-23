@@ -207,9 +207,7 @@ public class LTMS {
 		deads.add(deadF);
 		reason.clear();
 		setTruthValToUnknown(clauses);
-		
-		checkIfChildrenAlive(deadF);
-		
+				
 		valueMap.get(deadF.var).value = 1;
 		valueMap.get(deadF.var).premise = true;
 
@@ -231,35 +229,35 @@ public class LTMS {
 		BCP(clauses);
 		return shortestExpl(clauses, null, deadF, ExplanationMode.DeadFeature);
 	}
-	
-	/**
-	 * Checks whether the dead feature to explain is dead due to dead children. 
-	 * If yes, we assume the dead children to be false (0) to explain the subsequently
-	 * dead parent feature.
-	 * @param deadFeature The dead feature to explain
-	 */
-	private void checkIfChildrenAlive(Literal deadFeature) {	
-	IFeature deadF = FeatureUtils.getFeatureTable(model).get(deadFeature.var);
-	List<IFeatureStructure> deadChildren = deadF.getStructure().getChildren();
-	boolean allChildrenAlive = true;
-	
-		if (deadF.getStructure().isAlternative() || deadF.getStructure().isOr()) {
-			for (IFeatureStructure child : deadChildren) {
-				List<IFeature> deads = model.getAnalyser().getDeadFeatures();
-				if (deads.contains(child.getFeature())) {
-					allChildrenAlive = false;
-				} 
-			}
-		}
-		if (!allChildrenAlive) {
-			for (IFeatureStructure childStruc : deadChildren) {
-				IFeature childFeat = childStruc.getFeature();
-				Literal deadChild = new Literal(childFeat.getName());
-				valueMap.get(deadChild.var).value = 0;
-				valueMap.get(deadChild.var).premise = true;
-			}
-		}
-	}
+//	
+//	/**
+//	 * Checks whether the dead feature to explain is dead due to dead children. 
+//	 * If yes, we assume the dead children to be false (0) to explain the subsequently
+//	 * dead parent feature.
+//	 * @param deadFeature The dead feature to explain
+//	 */
+//	private void checkIfChildrenAlive(Literal deadFeature) {	
+//	IFeature deadF = FeatureUtils.getFeatureTable(model).get(deadFeature.var);
+//	List<IFeatureStructure> deadChildren = deadF.getStructure().getChildren();
+//	boolean allChildrenAlive = true;
+//	
+//		if (deadF.getStructure().isAlternative() || deadF.getStructure().isOr()) {
+//			for (IFeatureStructure child : deadChildren) {
+//				List<IFeature> deads = model.getAnalyser().getDeadFeatures();
+//				if (deads.contains(child.getFeature())) {
+//					allChildrenAlive = false;
+//				} 
+//			}
+//		}
+//		if (!allChildrenAlive) {
+//			for (IFeatureStructure childStruc : deadChildren) {
+//				IFeature childFeat = childStruc.getFeature();
+//				Literal deadChild = new Literal(childFeat.getName());
+//				valueMap.get(deadChild.var).value = 0;
+//				valueMap.get(deadChild.var).premise = true;
+//			}
+//		}
+//	}
 
 	/**
 	 * Generate all possible explanations and choose the shortest one. The length of an explanation
