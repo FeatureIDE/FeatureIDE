@@ -20,12 +20,18 @@
  */
 package org.prop4j.analyses;
 
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_11;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_10;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_01;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_00;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -40,13 +46,18 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relationship, Relationship>> {
+public class ImplicationSetsAnalysis extends SingleThreadAnalysis<Set<Relationship>> {
 
 	public ImplicationSetsAnalysis(SatInstance satInstance) {
 		super(satInstance);
 	}
 
 	public static class Relationship implements Comparable<Relationship> {
+		
+		public static final byte BIT_11 = 1 << 3;
+		public static final byte BIT_10 = 1 << 2;
+		public static final byte BIT_01 = 1 << 1;
+		public static final byte BIT_00 = 1 << 0;
 
 		private final int featureID1, featureID2;
 
@@ -105,10 +116,6 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 		}
 	}
 
-	private static final byte BIT_11 = 1 << 3;
-	private static final byte BIT_10 = 1 << 2;
-	private static final byte BIT_01 = 1 << 1;
-	private static final byte BIT_00 = 1 << 0;
 	private static final byte BIT_CHECK = 1 << 6;
 	private static final byte BITS_POSITIVE_IMPLY = BIT_11 | BIT_10;
 	private static final byte BITS_NEGATIVE_IMPLY = BIT_01 | BIT_00;
@@ -124,7 +131,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 	private final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 	@Override
-	public HashMap<Relationship, Relationship> analyze(WorkMonitor monitor) throws Exception {
+	public Set<Relationship> analyze(WorkMonitor monitor) throws Exception {
 		relationSet.clear();
 		parentStack.clear();
 		solutions.clear();
@@ -253,7 +260,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 				testVariable();
 			}
 		}
-		return relationSet;
+		return relationSet.keySet();
 	}
 
 	private boolean testVariable2() {
