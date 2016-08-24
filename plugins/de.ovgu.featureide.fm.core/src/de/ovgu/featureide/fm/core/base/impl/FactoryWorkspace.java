@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -33,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
  */
 public class FactoryWorkspace {
 
-	protected final HashMap<String, String> map;
+	protected final Map<String, String> map;
 
 	private String defaultFactoryID;
 
@@ -70,6 +72,10 @@ public class FactoryWorkspace {
 
 	public void assignID(String formatID, String factoryID) {
 		map.put(formatID, factoryID);
+	}
+
+	public Map<String, String> getMap() {
+		return Collections.unmodifiableMap(map);
 	}
 
 	@Override

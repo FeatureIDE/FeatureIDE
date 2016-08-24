@@ -90,10 +90,14 @@ public class FMCorePlugin extends AbstractCorePlugin {
 
 		Logger.logger = new EclipseLogger();
 		FMFactoryManager.factoryWorkspaceProvider = new EclipseFactoryWorkspaceProvider();
-		FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+
+		if (!FMFactoryManager.factoryWorkspaceProvider.load()) {
+			FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+		}
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		FMFactoryManager.factoryWorkspaceProvider.save();
 		plugin = null;
 		super.stop(context);
 	}

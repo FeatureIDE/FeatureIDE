@@ -28,7 +28,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WILL_BE_RESTAR
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.internal.resources.Workspace;
-import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -39,12 +38,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
-import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
@@ -85,16 +84,7 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 
 	private BuilderConfiguration configuration;
 
-	private static boolean JUNIT_INSTALLED = false;
-	static {
-		final Bundle[] bundles = InternalPlatform.getDefault().getBundleContext().getBundles();
-		for (Bundle bundle : bundles) {
-			if ("org.junit".equals(bundle.getSymbolicName())) {
-				JUNIT_INSTALLED = true;
-				break;
-			}
-		}
-	}
+	private static boolean JUNIT_INSTALLED = Platform.getBundle("org.junit") != null;
 
 	/**
 	 * 
