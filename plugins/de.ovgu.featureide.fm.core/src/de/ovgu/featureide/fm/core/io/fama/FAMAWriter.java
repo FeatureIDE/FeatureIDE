@@ -33,8 +33,11 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 /**
  * Prints feature models in the FaMa format.
  * 
+ * @deprecated Use {@link FAMAFormat} instead.
+ * 
  * @author Alexander Knueppel
  */
+@Deprecated
 public class FAMAWriter extends AbstractFeatureModelWriter {
 	/**
 	 * 
