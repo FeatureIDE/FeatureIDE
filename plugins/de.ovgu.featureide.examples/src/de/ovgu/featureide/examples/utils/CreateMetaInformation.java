@@ -47,9 +47,6 @@ import de.ovgu.featureide.examples.ExamplePlugin;
  */
 public class CreateMetaInformation {
 
-	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
-	public static final String INDEX_FILENAME = "index.s";
-
 	private final static FilenameFilter filter = new NameFilter();
 	private final static FilenameFilter projectfilter = new ProjectFilter();
 
@@ -60,7 +57,7 @@ public class CreateMetaInformation {
 	 */
 	private static class NameFilter implements FilenameFilter {
 		final static Set<String> names = new HashSet<>(
-				Arrays.asList(".svn", ".git", ".gitignore", ".metadata", INDEX_FILENAME, "bin", "projectInformation.xml"));
+				Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
 
 		@Override
 		public boolean accept(File dir, String name) {
@@ -220,12 +217,12 @@ public class CreateMetaInformation {
 		createIndex(projectDir, listOfFiles, new Path(projectDir.getPath()).segmentCount());
 
 		@SuppressWarnings("unchecked")
-		List<String> listOfFilesOld = readFile(new File(projectDir, INDEX_FILENAME), List.class);
+		List<String> listOfFilesOld = readFile(new File(projectDir, ProjectRecord.INDEX_FILENAME), List.class);
 
 		if ((listOfFilesOld == null) || listOfFilesOld.hashCode() != listOfFiles.hashCode()) {
 			if (listOfFilesOld == null || (listOfFilesOld != null && !listOfFiles.equals(listOfFilesOld))) {
 
-				try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(projectDir, INDEX_FILENAME)))) {
+				try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(projectDir, ProjectRecord.INDEX_FILENAME)))) {
 					obj.writeObject(listOfFiles);
 				} catch (IOException e) {
 					e.printStackTrace();

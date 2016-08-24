@@ -55,6 +55,9 @@ import de.ovgu.featureide.core.CorePlugin;
  * @author Reimar Schroeter
  */
 public class ProjectRecord implements Serializable {
+	
+	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
+	public static final String INDEX_FILENAME = "index.s";
 
 	private static final long serialVersionUID = 7680436510104564244L;
 
@@ -301,11 +304,11 @@ public class ProjectRecord implements Serializable {
 	}
 
 	public String getIndexDocumentPath() {
-		return projectDescriptionRelativePath.replace(".project", CreateMetaInformation.INDEX_FILENAME);
+		return projectDescriptionRelativePath.replace(".project", INDEX_FILENAME);
 	}
 
 	public String getInformationDocumentPath() {
-		return projectDescriptionRelativePath.replace(".project", CreateMetaInformation.PROJECT_INFORMATION_XML);
+		return projectDescriptionRelativePath.replace(".project", PROJECT_INFORMATION_XML);
 	}
 
 	public IProjectDescription getProjectDescription() {
