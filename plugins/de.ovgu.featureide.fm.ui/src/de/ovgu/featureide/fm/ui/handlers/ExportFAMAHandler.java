@@ -22,36 +22,31 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
+import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
-import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.fama.FAMAWriter;
+import de.ovgu.featureide.fm.core.io.fama.FAMAFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard;
 
 /**
@@ -64,65 +59,47 @@ public class ExportFAMAHandler extends AFileHandler {
 	@Override
 	protected void singleAction(IFile file) {
 		final IFeatureModel fm = readModel(file);
-		
+
 		IConverterStrategy strategy = new NNFConverter();
 		ComplexConstraintConverter converter = new ComplexConstraintConverter();
 		String path = "";
 		boolean trivial = ComplexConstraintConverter.trivialRefactoring(fm);
 
-		if (!trivial
-				&& !MessageDialog.openQuestion(new Shell(), "Warning!",
-						"Complex constraints of current feature model cannot be transformed trivially! Proceed? (Feature model will become bigger.)")) {
+		if (!trivial && !MessageDialog.openQuestion(new Shell(), "Warning!",
+				"Complex constraints of current feature model cannot be transformed trivially! Proceed? (Feature model will become bigger.)")) {
 			return;
 		}
-		
+
 		int pseudo = 0, strict = 0;
-		for(IConstraint c : fm.getConstraints()) {
-			if(ComplexConstraintConverter.isSimple(c.getNode())) {
-			}
-			else if(ComplexConstraintConverter.isPseudoComplex(c.getNode()))
+		for (IConstraint c : fm.getConstraints()) {
+			if (ComplexConstraintConverter.isSimple(c.getNode())) {
+			} else if (ComplexConstraintConverter.isPseudoComplex(c.getNode()))
 				pseudo++;
 			else {
 				strict++;
 			}
 		}
-		
+
 		final EliminateConstraintsWizard wizard = new EliminateConstraintsWizard(file, "Complex-constraints elimination", trivial, pseudo, strict, "fm");
-		
+
 		List<Option> options = new ArrayList<Option>();
 		if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
 			strategy = wizard.getStrategy();
-			if(wizard.preserveConfigurations())
+			if (wizard.preserveConfigurations())
 				options.add(Option.COHERENT);
-			if(wizard.removeRedundancy()) 
+			if (wizard.removeRedundancy())
 				options.add(Option.REMOVE_RDUNDANCY);
 			path = wizard.getPath();
-			if((new File(path)).exists() && !MessageDialog.openQuestion(new Shell(), "Warning!",
-					"Selected file already exists. File will be overwritten.")) {
+			if ((new File(path)).exists() && !MessageDialog.openQuestion(new Shell(), "Warning!", "Selected file already exists. File will be overwritten.")) {
 				return;
 			}
-			
+
 		}
-		
-		IFeatureModel result = converter.convert(fm, strategy,  options.toArray(new Option[options.size()]));
-		final FAMAWriter fmWriter = new FAMAWriter();
-		fmWriter.setFeatureModel(result);
-		
-		try {
-			fmWriter.writeToFile(new File(path));
-			file.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//return fmWriter;
+
+		IFeatureModel result = converter.convert(fm, strategy, options.toArray(new Option[options.size()]));
+		FileHandler.save(Paths.get(path), result, new FAMAFormat());
 	}
 
-//	@Override
-//	protected void configureFileDialog(FileDialog fileDialog) {
-//		super.configureFileDialog(fileDialog);
-//		fileDialog.setFileName("model.fm");
-//	}
 	/**
 	 * reads the featureModel from file
 	 * 
