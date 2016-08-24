@@ -499,8 +499,6 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 				throw new UnsupportedModelException("Error while parsing model!", 0);
 			}
 
-			
-
 			checkTree(root);
 			parseModel(root);
 			parseAttributeConstraints();
@@ -936,7 +934,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 				break;
 			case VelvetParser.CONSTR:
 				Node newNode = parseConstraint_rec(curNode);
-				newNode = new Implies(new Literal(parent.getName()), newNode);
+//				newNode = new Implies(new Literal(parent.getName()), newNode);
 				constraintNodeList.add(new ConstraintNode(newNode, curNode));
 				break;
 			case VelvetParser.ACONSTR:
@@ -1077,6 +1075,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		}
 	}
 
+	// XXX Temporarily disabled support for full names (see issue #383)
 	private void parseFeature(final Tree root, IFeature parent) throws RecognitionException {
 		final LinkedList<Tree> childList = getChildren(root);
 		final String featureName;
@@ -1084,11 +1083,11 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			featureName = checkTree(childList.poll()).getText();
 		} else {
 			String childName = checkTree(childList.poll()).getText();
-			if (childName.startsWith(parent.getName())) {
+//			if (childName.startsWith(parent.getName())) {
 				featureName = childName;
-			} else {
-				featureName = parent.getName() + "." + childName;
-			}
+//			} else {
+//				featureName = parent.getName() + "." + childName;
+//			}
 		}
 		boolean isMandatory = false, isAbstract = false, moreDefinitions = false;
 
