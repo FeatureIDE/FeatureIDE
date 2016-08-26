@@ -1,0 +1,11 @@
+.classpath
+.project
+configs\BeautifulWorld.config
+configs\HelloWorld.config
+configs\WonderfulWorld.config
+model.xml
+src\Beautiful.aj
+src\Hello.aj
+src\Main.java
+src\Wonderful.aj
+src\World.aj

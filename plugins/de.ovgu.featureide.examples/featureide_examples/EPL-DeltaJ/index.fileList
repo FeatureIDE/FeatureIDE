@@ -1,0 +1,14 @@
+.classpath
+.project
+configs\All.config
+configs\RemAdd.config
+model.xml
+modules\DAddEval.deltaj
+modules\DLitAddPrint.deltaj
+modules\DLitEval.deltaj
+modules\DNeg.deltaj
+modules\DNegEval.deltaj
+modules\DNegPrint.deltaj
+modules\DOptionalPrint.deltaj
+modules\DremAdd.deltaj
+rules.deltas

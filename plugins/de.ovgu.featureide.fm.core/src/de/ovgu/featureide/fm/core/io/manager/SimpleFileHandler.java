@@ -20,7 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,6 +57,12 @@ public class SimpleFileHandler<T> {
 	public static <T> ProblemList load(Path path, T object, IPersistentFormat<T> format) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
 		fileHandler.read();
+		return fileHandler.getLastProblems();
+	}
+
+	public static <T> ProblemList load(InputStream inputStream, T object, IPersistentFormat<T> format) {
+		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(null, object, format);
+		fileHandler.read(inputStream);
 		return fileHandler.getLastProblems();
 	}
 
@@ -108,6 +117,30 @@ public class SimpleFileHandler<T> {
 
 			final String content = new String(Files.readAllBytes(path), Charset.forName(DEFAULT_CHARSET));
 			final List<Problem> problemList = format.getInstance().read(newObject, content);
+			if (problemList != null) {
+				lastProblems.addAll(problemList);
+			}
+		} catch (final Exception e) {
+			handleException(e);
+		}
+		return lastProblems.containsError();
+	}
+
+	public boolean read(InputStream inputStream) {
+		lastProblems.clear();
+		try {
+			final T newObject = object;
+
+			final StringBuilder sb = new StringBuilder();
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, Charset.forName(DEFAULT_CHARSET)))) {
+				String line;
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+					sb.append(System.lineSeparator());
+				}
+			}
+
+			final List<Problem> problemList = format.getInstance().read(newObject, sb.toString());
 			if (problemList != null) {
 				lastProblems.addAll(problemList);
 			}

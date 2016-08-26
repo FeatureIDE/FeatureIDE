@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_EXAMPLE_A
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,30 +49,28 @@ import org.xml.sax.SAXException;
 import de.ovgu.featureide.core.CorePlugin;
 
 /**
- * Handles metadata of a project that is represented in the ExmampleWizard
+ * Handles meta data of a project that is represented in the ExmampleWizard.
  * 
  * @author Reimar Schroeter
  */
-public class ProjectRecord implements Serializable {
+public class ProjectRecord {
 	
 	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
-	public static final String INDEX_FILENAME = "index.s";
-
-	private static final long serialVersionUID = 7680436510104564244L;
+	public static final String INDEX_FILENAME = "index.fileList";
 
 	private final String projectDescriptionRelativePath;
 	private final String projectName;
 
 	private Collection<ProjectRecord> subProjects;
 
-	private transient IProjectDescription projectDescription;
-	private transient CommentParser comment;
-	private transient String warning;
-	private transient String error;
-	private transient List<TreeItem> contentProviderItems;
-	private transient boolean hasWarnings = false;
-	private transient boolean hasErrors = false;
-	private transient boolean updated = false;
+	private IProjectDescription projectDescription;
+	private CommentParser comment;
+	private String warning;
+	private String error;
+	private List<TreeItem> contentProviderItems;
+	private boolean hasWarnings = false;
+	private boolean hasErrors = false;
+	private boolean updated = false;
 
 	/**
 	 * Create a record for a project based on the info given in the file.
@@ -109,7 +106,7 @@ public class ProjectRecord implements Serializable {
 	}
 
 	public class TreeItem {
-		private transient IContentProvider contProv;
+		private IContentProvider contProv;
 
 		public TreeItem(IContentProvider contProv) {
 			this.contProv = contProv;
@@ -189,8 +186,11 @@ public class ProjectRecord implements Serializable {
 		}
 	}
 
-	public void setSubProjects(Collection<ProjectRecord> subProjects) {
-		this.subProjects = subProjects;
+	public void addSubProject(ProjectRecord subProject) {
+		if (subProjects == null) {
+			subProjects = new ArrayList<>();
+		}
+		subProjects.add(subProject);
 	}
 
 	public boolean hasSubProjects() {
@@ -339,4 +339,9 @@ public class ProjectRecord implements Serializable {
 	public void setUpdated(boolean updated) {
 		this.updated = updated;
 	}
+
+	public String getProjectDescriptionRelativePath() {
+		return projectDescriptionRelativePath;
+	}
+	
 }

@@ -22,7 +22,6 @@ package de.ovgu.featureide.examples.wizards;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,6 +34,9 @@ import org.w3c.dom.NodeList;
 
 import de.ovgu.featureide.examples.ExamplePlugin;
 import de.ovgu.featureide.examples.utils.ProjectRecord;
+import de.ovgu.featureide.examples.utils.ProjectRecordCollection;
+import de.ovgu.featureide.examples.utils.ProjectRecordFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * 
@@ -54,7 +56,7 @@ public final class ProjectProvider {
 		}
 		InputStream inputStream = null;
 		try {
-			final URL url = new URL("platform:/plugin/de.ovgu.featureide.examples/projects.s");
+			final URL url = new URL("platform:/plugin/de.ovgu.featureide.examples/" + ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
 			inputStream = url.openConnection().getInputStream();
 		} catch (IOException e) {
 			ExamplePlugin.getDefault().logError(e);
@@ -63,20 +65,15 @@ public final class ProjectProvider {
 		return getProjects(inputStream);
 	}
 
-	@SuppressWarnings("unchecked")
 	private static Collection<ProjectRecord> getProjects(InputStream inputStream) {
-		Collection<ProjectRecord> projects = null;
-		try (ObjectInputStream stream = new ObjectInputStream(inputStream)) {
-			projects = ((Collection<ProjectRecord>) stream.readObject());
-		} catch (IOException | ClassNotFoundException | ClassCastException e) {
-			ExamplePlugin.getDefault().logError(e);
+		ProjectRecordCollection projects = new ProjectRecordCollection();
+
+		FileHandler.load(inputStream, projects, new ProjectRecordFormat());
+
+		for (ProjectRecord projectRecord : projects) {
+			projectRecord.init();
 		}
 
-		if (projects != null) {
-			for (ProjectRecord projectRecord : projects) {
-				projectRecord.init();
-			}
-		}
 		return projects;
 	}
 
