@@ -38,7 +38,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
@@ -586,7 +585,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
 
 				// do checking and some stuff
-				processLinesOfFile(lines, (IFile) res);
+				if (featureModel != null) {// TODO check why the FM is null when generating products
+					processLinesOfFile(lines, (IFile) res);
+				}
 				boolean changed = false;
 				try {
 					// run antenna preprocessor
