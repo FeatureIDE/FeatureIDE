@@ -589,7 +589,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
 
 				// do checking and some stuff
-				processLinesOfFile(lines, (IFile) res);
+				if (featureModel != null) {// TODO check why the FM is null when generating products
+					processLinesOfFile(lines, (IFile) res);
+				}
 				boolean changed = false;
 				try {
 					// run antenna preprocessor
