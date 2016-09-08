@@ -138,9 +138,11 @@ public class FeatureColorManager {
 	 * Returns the current color scheme.
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeatureModel featureModel) {
-		IProject project = getProject(featureModel);
-		if (project == null) {
-			// bad workaround 
+		IProject project;
+		
+		try {
+			project = getProject(featureModel);
+		} catch(NullPointerException e) {
 			return new DefaultColorScheme();
 		}
 		
