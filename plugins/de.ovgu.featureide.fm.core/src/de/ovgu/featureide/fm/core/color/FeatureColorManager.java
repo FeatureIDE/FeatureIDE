@@ -139,7 +139,7 @@ public class FeatureColorManager {
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeatureModel featureModel) {
 		IProject project;
-		
+		// Fix for #398
 		try {
 			project = getProject(featureModel);
 		} catch(NullPointerException e) {

@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.progress.UIJob;
+import org.prop4j.Implies;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.Not;
@@ -55,8 +56,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.editing.Comparison;
-import de.ovgu.featureide.fm.core.editing.ModelComparator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -143,7 +143,7 @@ public final class ConstraintTextValidator {
 		return featureString.toString();
 	}
 
-	private List<IFeature> getFalseOptional(String input, IFeatureModel model) {
+	private List<IFeature> getFalseOptional(IConstraint constraint, String input, IFeatureModel model) {
 		List<IFeature> list = new ArrayList<IFeature>();
 		IFeatureModel clonedModel = model.clone(null);
 
@@ -151,6 +151,14 @@ public final class ConstraintTextValidator {
 
 		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
+		// The following code fixes issue #406; should be enhanced in further development 
+		// to not always clone the whole feature model for every performed analysis
+		if (propNode != null) {
+			if (constraint != null) {
+				clonedModel.removeConstraint(constraint);
+			}
+		}
+		
 		for (IFeature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
 				//if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
@@ -178,17 +186,31 @@ public final class ConstraintTextValidator {
 	 *            The actual {@link IConstraint}
 	 * @return <code>true</code> if the {@link IConstraint} is redundant
 	 */
-	private boolean isRedundant(final IFeatureModel featureModel, String constraint) {
-		if (constraint.length() == 0) {
+	private boolean isRedundant(IConstraint constraint, final IFeatureModel featureModel, String input, final int timeOut) {
+		if (input.length() == 0) {
 			return false;
 		}
 		IFeatureModel clonedModel = featureModel.clone(null);
-		Node propNode = new NodeReader().stringToNode(constraint, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
-		clonedModel.addConstraint(new Constraint(clonedModel, propNode));
-		if (new ModelComparator(20000).compare(featureModel, clonedModel) == Comparison.REFACTORING) {
+		Node propNode = new NodeReader().stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
+		
+		// The following code fixes issue #406; should be enhanced in further development 
+		// to not always clone the whole feature model for every performed analysis
+		if (propNode != null) {
+			if (constraint != null) {
+				clonedModel.removeConstraint(constraint);
+			}
+		}
+		
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(clonedModel);
+		Node check = new Implies(nodeCreator.createNodes(), propNode);
+		
+		SatSolver satsolver = new SatSolver(new Not(check), timeOut);
+
+		try {
+			return !satsolver.isSatisfiable();
+		} catch (TimeoutException e) {
 			return true;
 		}
-		return false;
 	}
 
 	/**
@@ -409,7 +431,7 @@ public final class ConstraintTextValidator {
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
-					final List<IFeature> falseOptionalFeatures = getFalseOptional(con, featureModel);
+					final List<IFeature> falseOptionalFeatures = getFalseOptional(constraint, con, featureModel);
 
 					new UIJob(UPDATING_RESULTS_FOR_FALSE_OPTIONAL_FEATURES___) {
 
@@ -447,7 +469,7 @@ public final class ConstraintTextValidator {
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
-					final boolean problemFoundRedundant = isRedundant(featureModel, con);
+					final boolean problemFoundRedundant = isRedundant(constraint, featureModel, con, timeOut);
 
 					new UIJob(UPDATING_RESULTS_FOR_REDUNDANCY___) {
 
