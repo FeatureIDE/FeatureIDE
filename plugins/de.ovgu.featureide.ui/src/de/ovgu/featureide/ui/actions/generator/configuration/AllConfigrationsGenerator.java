@@ -245,17 +245,13 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			build(currentFeature, selected, selectedFeatures3, monitor);
 			return;
 		}
-		int k2;
-		int i2 = 1;
-		if (getChildren(currentFeature).size() < currentFeature.getStructure().getChildren().size()) {
-			i2 = 0;
-		}
-		for (; i2 < (int) java.lang.Math.pow(2, getChildren(currentFeature).size()); i2++) {
-			k2 = i2;
+		final LinkedList<IFeature> children2 = getChildren(currentFeature);
+		for (int i2 = (int) java.lang.Math.pow(2, children2.size()) - 1; i2 > 0; i2--) {
+			int k2 = i2;
 			selectedFeatures3 = new LinkedList<IFeature>();
-			for (int j = 0; j < getChildren(currentFeature).size(); j++) {
+			for (int j = 0; j < children2.size(); j++) {
 				if (k2 % 2 != 0) {
-					selectedFeatures3.add(getChildren(currentFeature).get(j));
+					selectedFeatures3.add(children2.get(j));
 				}
 				k2 = k2 / 2;
 			}
@@ -311,7 +307,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 	/**
 	 * Returns all children of a feature if it is a layer or if it has a child
-	 * that is a layer.
+	 * that is concrete.
 	 * 
 	 * @param currentFeature
 	 *            The feature
@@ -332,7 +328,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	 * @param feature
 	 *            The feature
 	 * @return <code>true</code> if the feature is a layer or if it has a child
-	 *         that is a layer
+	 *         that is a concrete
 	 */
 	private boolean hasLayerChild(IFeature feature) {
 		if (feature.getStructure().hasChildren()) {
