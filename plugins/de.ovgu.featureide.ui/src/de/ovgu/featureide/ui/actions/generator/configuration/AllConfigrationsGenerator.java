@@ -153,7 +153,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 					}
 				}
 				for (IFeature f : configuration.getSelectedFeatures()) {
-					if (f.getStructure().isConcrete()) {
+					if (isSelectable(f)) {
 						if (!selectedFeatures3.contains(f.getName())) {
 							return;
 						}
@@ -199,7 +199,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
+		if (isSelectable(currentFeature)) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
@@ -228,7 +228,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
+		if (isSelectable(currentFeature)) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
@@ -263,7 +263,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	private void buildAnd(String selected, LinkedList<IFeature> selectedFeatures2, WorkMonitor monitor) {
 		IFeature currentFeature = selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
+		if (isSelectable(currentFeature)) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
@@ -317,7 +317,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		LinkedList<IFeature> children = new LinkedList<IFeature>();
 		for (IFeatureStructure childStructure : currentFeature.getStructure().getChildren()) {
 			IFeature child = childStructure.getFeature();
-			if (child.getStructure().isConcrete() || hasLayerChild(child)) {
+			if (isSelectable(child) || hasLayerChild(child)) {
 				children.add(child);
 			}
 		}
@@ -334,12 +334,21 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		if (feature.getStructure().hasChildren()) {
 			for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
 				IFeature child = childStructure.getFeature();
-				if (child.getStructure().isConcrete() || hasLayerChild(child)) {
+				if (isSelectable(child) || hasLayerChild(child)) {
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Checks whether the concrete feature can be selected manually. 
+	 */
+	private boolean isSelectable(final IFeature child) {
+		final IFeatureStructure structure = child.getStructure();
+		boolean concrete = structure.isConcrete();
+		return concrete && !structure.isHidden();
 	}
 	
 }
