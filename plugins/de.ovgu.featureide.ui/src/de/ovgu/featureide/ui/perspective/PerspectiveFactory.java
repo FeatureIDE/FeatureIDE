@@ -74,7 +74,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		right.addView(Outline.ID);
 		right.addView(IPageLayout.ID_OUTLINE);
 
-		left.addView("org.eclipse.ui.navigator.ProjectExplorer");
 		left.addView("org.eclipse.jdt.ui.PackageExplorer");
 		left.addView("org.eclipse.ui.navigator.ProjectExplorer");
 
