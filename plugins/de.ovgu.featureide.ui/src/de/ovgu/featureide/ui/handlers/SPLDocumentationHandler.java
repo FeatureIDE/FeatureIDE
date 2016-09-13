@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.handlers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DOCUMENTATION_WIZARD;
+
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;

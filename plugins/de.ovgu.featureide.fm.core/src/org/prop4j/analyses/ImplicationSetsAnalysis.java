@@ -20,10 +20,10 @@
  */
 package org.prop4j.analyses;
 
-import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_11;
-import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_10;
-import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_01;
 import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_00;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_01;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_10;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_11;
 
 import java.util.ArrayList;
 import java.util.Arrays;
