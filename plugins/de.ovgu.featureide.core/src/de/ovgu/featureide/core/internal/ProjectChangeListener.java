@@ -67,8 +67,6 @@ public class ProjectChangeListener implements IResourceChangeListener {
 			} else {
 				//FeatureIDE project closed or deleted
 				if (!project.isOpen()) {
-					// Quick fix #402 (maybe should be positioned somewhere else)
-					ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 					removeProject(project);
 				}
 			}
