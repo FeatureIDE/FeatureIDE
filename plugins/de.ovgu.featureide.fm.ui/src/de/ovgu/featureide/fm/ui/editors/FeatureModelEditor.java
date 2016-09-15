@@ -706,7 +706,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 							final IFile editorFile = (IFile) editorRef.getEditorInput().getAdapter(IFile.class);
 							if (editorFile.getProject().equals(project)) {
 								((ConfigurationEditor) editorRef.getEditor(true)).propertyChange(new FeatureIDEEvent(getModelFile(),
-										EventType.MODEL_DATA_CHANGED, null, null));
+										EventType.MODEL_DATA_SAVED, null, null));
 							}
 						} catch (PartInitException e) {
 							FMCorePlugin.getDefault().logError(e);

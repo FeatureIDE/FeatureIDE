@@ -659,7 +659,7 @@ public class StringTable {
 	public static final String INTERACTIONS = "Interactions";
 	public static final String DISSIMILARITY = "Dissimilarity";
 	public static final String CHVATAL = "Chvatal";
-	public static final String CASA = "CASA";
+	public static final String CASA = "CASA (experimental)";
 	public static final String ICPL = "ICPL";
 	public static final String INCLING = "IncLing";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";

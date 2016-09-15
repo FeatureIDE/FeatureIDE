@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -65,8 +66,9 @@ public class ProjectChangeListener implements IResourceChangeListener {
 				}
 			} else {
 				//FeatureIDE project closed or deleted
-				if (!project.isOpen())
+				if (!project.isOpen()) {
 					removeProject(project);
+				}
 			}
 		}
 	}
