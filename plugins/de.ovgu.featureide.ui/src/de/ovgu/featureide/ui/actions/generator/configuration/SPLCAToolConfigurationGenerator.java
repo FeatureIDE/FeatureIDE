@@ -73,7 +73,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	private void runSPLCATool() {
 		CoveringArray ca = null;
 		try {
-			if (algorithm.equals(CASA)) {
+			if (algorithm.equals(CASA.substring(0, CASA.indexOf(" ")))) {
 				URL url = BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
 				try {
 					url = FileLocator.toFileURL(url);
@@ -101,7 +101,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 		try{
 			solutions = removeDuplicates(ca);
 		}catch(Exception e){
-			UIPlugin.getDefault().logWarning("Problems during the execution of CASA");
+			UIPlugin.getDefault().logWarning("Problems occurred during the execution of " + algorithm);
 		}
 		builder.configurationNumber = solutions.size();
 		for (final List<String> solution : solutions) {
