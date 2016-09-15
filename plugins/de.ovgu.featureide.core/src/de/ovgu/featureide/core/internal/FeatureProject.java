@@ -391,6 +391,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				LOGGER.logError(e);
 			}
 		}
+		checkFeatureCoverage();
 	}
 
 	public void dispose() {
