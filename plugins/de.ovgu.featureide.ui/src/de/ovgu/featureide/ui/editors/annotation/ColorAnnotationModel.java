@@ -133,6 +133,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			@Override
 			public void propertyChanged(Object source, int propId) {
 				if (propId == IEditorPart.PROP_DIRTY && !((ITextEditor) source).isDirty()) {
+					composer.buildFSTModel();
 					updateAnnotations(true);
 				}
 			}
@@ -258,7 +259,6 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			if (project.getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 				try {
 					createFOPAnnotations();
-
 				} catch (BadLocationException e) {
 					CorePlugin.getDefault().logError(e);
 				}
@@ -267,7 +267,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				createAnnotations();
 			}
 		} else {
-			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {
+			if (project.getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 				try {
 					createFOPAnnotations();
 				} catch (BadLocationException e) {
@@ -306,7 +306,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		directiveMap.clear();
 		validDirectiveList.clear();
 		FSTModel model = project.getFSTModel();
-		if (model == null) {
+		if (model == null || model.getClasses().isEmpty()) {
 			composer.buildFSTModel();
 			model = project.getFSTModel();
 		}
