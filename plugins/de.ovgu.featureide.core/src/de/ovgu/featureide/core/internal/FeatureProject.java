@@ -74,6 +74,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
@@ -86,6 +87,7 @@ import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.job.ModelScheduleRule;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
@@ -546,7 +548,15 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private void renameFeature(final IFeatureModel model, String oldName, String newName) {
 		final IComposerExtensionClass composer = getComposer();
-		if (!model.getFMComposerManager(getProject()).performRenaming(oldName, newName, project) && composer.hasFeatureFolder()) {
+		boolean renamePerformed = false;
+		IJobManager manager = Job.getJobManager();
+		try {
+			manager.beginRule(ModelScheduleRule.RULE, null);
+			renamePerformed = model.getFMComposerManager(getProject()).performRenaming(oldName, newName, project);
+		} finally {
+			manager.endRule(ModelScheduleRule.RULE);
+		}
+		if (!renamePerformed && composer.hasFeatureFolder()) {
 			try {
 				sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 				IFolder folder = sourceFolder.getFolder(oldName);
@@ -1047,6 +1057,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 		};
 		job.setPriority(Job.INTERACTIVE);
+		job.setRule(ModelScheduleRule.RULE);
 		job.schedule();
 		return true;
 	}
@@ -1098,6 +1109,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				return true;
 			}
 		};
+		job.setRule(ModelScheduleRule.RULE);
 		job.schedule();
 	}
 
