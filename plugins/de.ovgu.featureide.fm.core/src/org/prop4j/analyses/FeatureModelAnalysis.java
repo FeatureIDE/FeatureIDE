@@ -320,7 +320,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					final List<IFeature> newDeadFeature = checkFeatureDead2(modSat, deadList);
 					if (!newDeadFeature.isEmpty()) {
 						constraint.setDeadFeatures(newDeadFeature);
-						deadList.retainAll(newDeadFeature);
+						deadList.removeAll(newDeadFeature);
 						setConstraintAttribute(constraint, ConstraintAttribute.DEAD);
 					}
 				}
@@ -329,7 +329,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					final List<IFeature> newFOFeature = checkFeatureFalseOptional2(modSat, foList);
 					if (!newFOFeature.isEmpty()) {
 						constraint.setFalseOptionalFeatures(newFOFeature);
-						foList.retainAll(newFOFeature);
+						foList.removeAll(newFOFeature);
 						if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
 							setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
 						}
@@ -510,7 +510,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		int[] deadVar = new int[deadList.size()];
 		int j = 0;
 		for (IFeature deadFeature : deadList) {
-			deadVar[j] = solver.getSatInstance().getVariable(deadFeature.getName());
+			deadVar[j++] = solver.getSatInstance().getVariable(deadFeature.getName());
 		}
 		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(solver, deadVar));
 		for (int i = 0; i < solution2.length; i++) {

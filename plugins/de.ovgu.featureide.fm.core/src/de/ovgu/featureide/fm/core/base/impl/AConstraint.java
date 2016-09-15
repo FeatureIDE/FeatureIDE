@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.TreeSet;
 
 import org.prop4j.Node;
@@ -166,9 +165,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public void setDeadFeatures(Iterable<IFeature> deadFeatures) {
 		this.deadFeatures.clear();
-		List<IFeature> list = Functional.toList(deadFeatures);
-		list.retainAll(this.containedFeatureList);
-		this.deadFeatures.addAll(list);
+		this.deadFeatures.addAll(Functional.toList(deadFeatures));
 	}
 
 	@Override
@@ -182,9 +179,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public void setFalseOptionalFeatures(Iterable<IFeature> foFeatures) {
 		falseOptionalFeatures.clear();
-		List<IFeature> list = Functional.toList(foFeatures);
-		list.retainAll(this.containedFeatureList);
-		this.falseOptionalFeatures.addAll(list);
+		this.falseOptionalFeatures.addAll(Functional.toList(foFeatures));
 	}
 	
 	public void setNode(Node node) {
