@@ -1,5 +1,5 @@
 .classpath
 .project
-configs\default.config
+configs/default.config
 model.xml
-src\Main.java
+src/Main.java

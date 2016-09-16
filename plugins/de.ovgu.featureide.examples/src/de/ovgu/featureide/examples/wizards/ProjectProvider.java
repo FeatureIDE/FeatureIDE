@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.w3c.dom.Document;
@@ -70,8 +71,10 @@ public final class ProjectProvider {
 
 		FileHandler.load(inputStream, projects, new ProjectRecordFormat());
 
-		for (ProjectRecord projectRecord : projects) {
-			projectRecord.init();
+		for (Iterator<ProjectRecord> iterator = projects.iterator(); iterator.hasNext();) {
+			if (!iterator.next().init()) {
+				iterator.remove();
+			}
 		}
 
 		return projects;

@@ -49,6 +49,8 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  */
 public class CreateMetaInformation {
 
+	private static final String SPACE_REPLACEMENT = "%20";
+
 	private static final class FileWalker implements FileVisitor<Path> {
 		private final static Set<String> names = new HashSet<>(
 				Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
@@ -69,7 +71,7 @@ public class CreateMetaInformation {
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			if (!names.contains(file.getFileName().toString())) {
-				listOfFiles.add(projectDir.relativize(file).toString());
+				listOfFiles.add(projectDir.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "));
 			}
 			return FileVisitResult.CONTINUE;
 		}
@@ -86,6 +88,7 @@ public class CreateMetaInformation {
 	}
 
 	private static final class ProjectWalker implements FileVisitor<Path> {
+
 		private final static Set<String> names = new HashSet<>(Arrays.asList("originalProject", ".svn", ".git", ".gitignore", ".metadata", "bin"));
 
 		private final List<ProjectRecord> projects;
@@ -110,7 +113,7 @@ public class CreateMetaInformation {
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			if (IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getFileName().toString())) {
 				final Path parent = file.getParent();
-				final ProjectRecord newProject = new ProjectRecord(pluginRoot.relativize(file).toString(), parent.getFileName().toString());
+				final ProjectRecord newProject = new ProjectRecord(pluginRoot.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "), parent.getFileName().toString());
 				newProject.setUpdated(createIndex(parent));
 				projects.add(newProject);
 				lastProjects.removeLast();
@@ -166,7 +169,11 @@ public class CreateMetaInformation {
 		final ProjectRecordFormat format = new ProjectRecordFormat();
 		
 		final ProjectRecordCollection oldProjectFiles = new ProjectRecordCollection();
-		FileHandler.load(indexFile, oldProjectFiles, format);
+		if (Files.exists(indexFile)) {
+			FileHandler.load(indexFile, oldProjectFiles, format);
+		} else {
+			System.out.println("Creating New Project List...");
+		}
 		if (!oldProjectFiles.equals(projectFiles)) {
 			FileHandler.save(indexFile, projectFiles, format);
 		

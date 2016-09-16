@@ -47,6 +47,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.examples.ExamplePlugin;
 
 /**
  * Handles meta data of a project that is represented in the ExmampleWizard.
@@ -54,7 +55,7 @@ import de.ovgu.featureide.core.CorePlugin;
  * @author Reimar Schroeter
  */
 public class ProjectRecord {
-	
+
 	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
 	public static final String INDEX_FILENAME = "index.fileList";
 
@@ -138,22 +139,30 @@ public class ProjectRecord {
 		return ti;
 	}
 
-	public void init() {
+	public boolean init() {
 		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection()
 				.getInputStream()) {
 			projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
 		} catch (IOException | CoreException e) {
-			e.printStackTrace();
+			ExamplePlugin.getDefault().logError(e);
+			return false;
 		}
 
-		comment = new CommentParser(projectDescription.getComment());
+		if (projectDescription != null) {
+			comment = new CommentParser(projectDescription.getComment());
 
-		performAlreadyExistsCheck();
-		performRequirementCheck();
+			performAlreadyExistsCheck();
+			performRequirementCheck();
 
-		for (ProjectRecord projectRecord : getSubProjects()) {
-			projectRecord.init();
+			for (ProjectRecord projectRecord : getSubProjects()) {
+				if (!projectRecord.init()) {
+					return false;
+				}
+			}
+		} else {
+			return false;
 		}
+		return true;
 	}
 
 	private void performAlreadyExistsCheck() {

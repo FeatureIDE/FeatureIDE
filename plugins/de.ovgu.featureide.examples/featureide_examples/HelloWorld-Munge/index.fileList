@@ -1,8 +1,8 @@
 .classpath
 .project
-.settings\org.eclipse.jdt.core.prefs
-configs\BeautifulWorld.config
-configs\HelloWorld.config
-configs\WonderfulWorld.config
+.settings/org.eclipse.jdt.core.prefs
+configs/BeautifulWorld.config
+configs/HelloWorld.config
+configs/WonderfulWorld.config
 model.xml
-source\Main.java
+source/Main.java
