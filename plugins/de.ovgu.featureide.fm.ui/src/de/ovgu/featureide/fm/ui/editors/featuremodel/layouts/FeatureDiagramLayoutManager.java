@@ -52,6 +52,8 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 	}
 
+	protected static final HiddenFilter hiddenFilter = new HiddenFilter();
+
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden;
@@ -270,5 +272,13 @@ abstract public class FeatureDiagramLayoutManager {
 			feature.getObject().getFeatureModel().handleModelDataChanged();
 		}
 		return new Rectangle(getLocation(feature), feature.getSize());
+	}
+
+	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
+		if (showHidden) {
+			return FeatureUIHelper.getGraphicalChildren(feature);
+		} else {
+			return Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), hiddenFilter));
+		}
 	}
 }

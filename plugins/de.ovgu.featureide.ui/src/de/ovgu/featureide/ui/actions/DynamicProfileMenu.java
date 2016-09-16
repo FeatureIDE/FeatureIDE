@@ -24,6 +24,7 @@ import org.eclipse.ui.internal.Workbench;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -41,8 +42,15 @@ public class DynamicProfileMenu extends ContributionItem {
 	private AddProfileColorSchemeAction addProfileSchemeAction;
 	private RenameProfileColorSchemeAction renameProfileSchemeAction;
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
-	private IFeatureProject myFeatureProject = getCurrentFeatureProject();
-	private IFeatureModel featureModel = myFeatureProject.getFeatureModel();
+	private IFeatureModel featureModel;
+	{
+		final IFeatureProject myFeatureProject = getCurrentFeatureProject();
+		if (myFeatureProject != null) {
+			featureModel = myFeatureProject.getFeatureModel();
+		} else {
+			featureModel = FMFactoryManager.getFactory().createFeatureModel();
+		}
+	}
 	private boolean multipleSelected = isMultipleSelection();
 
 	public DynamicProfileMenu() {
@@ -150,20 +158,23 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 	private static IFeatureProject getCurrentFeatureProject() {
 		final Object element = getIStructuredCurrentSelection().getFirstElement();
-		if (element instanceof IResource) {
-			return CorePlugin.getFeatureProject((IResource) element);
-		} else if (element instanceof PackageFragmentRootContainer) {
-			IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
-			return CorePlugin.getFeatureProject(jProject.getProject());
-		} else if (element instanceof IJavaElement) {
-			return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
-		} else if (element instanceof IAdaptable) {
-			final IProject project = (IProject)((IAdaptable) element).getAdapter(IProject.class);
-			if (project != null) {
-				return CorePlugin.getFeatureProject(project);
+		if (element != null) {
+			if (element instanceof IResource) {
+				return CorePlugin.getFeatureProject((IResource) element);
+			} else if (element instanceof PackageFragmentRootContainer) {
+				IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
+				return CorePlugin.getFeatureProject(jProject.getProject());
+			} else if (element instanceof IJavaElement) {
+				return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
+			} else if (element instanceof IAdaptable) {
+				final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+				if (project != null) {
+					return CorePlugin.getFeatureProject(project);
+				}
 			}
+			throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
 		}
-		throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
+		return null;
 	}
 
 }

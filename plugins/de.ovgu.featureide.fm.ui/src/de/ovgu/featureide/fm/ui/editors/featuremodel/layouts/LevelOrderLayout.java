@@ -158,7 +158,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 			levels.add(level);
 			LinkedList<IGraphicalFeature> newLevel = new LinkedList<IGraphicalFeature>();
 			for (IGraphicalFeature feature : level) {
-				for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
+				for (IGraphicalFeature child : getChildren(feature)) {
 					newLevel.add(child);
 				}
 			}
@@ -169,7 +169,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void centerAboveChildren(IGraphicalFeature feature) {
-		final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(feature);
+		final List<IGraphicalFeature> graphicalChildren = getChildren(feature);
 		int minX = getBounds(graphicalChildren.get(0)).x;
 		int maxX = getBounds(graphicalChildren.get(graphicalChildren.size() - 1)).right();
 		Point location = getLocation(feature);
@@ -192,10 +192,10 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private void moveTree(IGraphicalFeature root, int deltaX) {
 		Point location = getLocation(root);
 		setLocation(root, new Point(location.x + deltaX, location.y));
-		for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(root))
+		for (IGraphicalFeature child : getChildren(root))
 			moveTree(child, deltaX);
 	}
-
+	
 	private void centerTheRoot(IGraphicalFeature root) {
 		int newX = (controlWidth - getBounds(root).width) / 2;
 		moveTree(root, newX - getLocation(root).x);

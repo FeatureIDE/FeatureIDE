@@ -360,8 +360,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 									cancelGenerationJobs();
 									break;
 								}
-								Generator generator = generatorJobs.get(0);
-								if (generator.getState() == Thread.State.TERMINATED) {
+								final Generator generator = generatorJobs.get(0);
+								if (generator == null) {
+									// generator can never be null, however see #416
+									generatorJobs.remove(0);
+								} else if (generator.getState() == Thread.State.TERMINATED) {
 									generatorJobs.remove(generator);
 									if (sorter.getBufferSize() != 0) {
 										createNewGenerator(generator.nr);

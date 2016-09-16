@@ -20,51 +20,27 @@
  */
 package de.ovgu.featureide.examples.utils;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.examples.ExamplePlugin;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Creates Metadata that is used as input for the ExampleWizard
@@ -73,294 +49,167 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  */
 public class CreateMetaInformation {
 
-	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
-	public static final String INDEX_FILENAME = "index.s";
+	private static final String SPACE_REPLACEMENT = "%20";
 
-	private final static FilenameFilter filter = new NameFilter();
-	private final static FilenameFilter projectfilter = new ProjectFilter();
-	private static File pluginRoot;
+	private static final class FileWalker implements FileVisitor<Path> {
+		private final static Set<String> names = new HashSet<>(
+				Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
 
-	/**
-	 * The filter to not return specific files...
-	 */
-	private static class NameFilter implements FilenameFilter {
-		final static Set<String> names = new HashSet<>(
-				Arrays.asList(".svn", ".git", ".gitignore", ".metadata", INDEX_FILENAME, "bin", "projectInformation.xml"));
+		private final List<String> listOfFiles;
+		private final Path projectDir;
+
+		private FileWalker(List<String> listOfFiles, Path projectDir) {
+			this.listOfFiles = listOfFiles;
+			this.projectDir = projectDir;
+		}
 
 		@Override
-		public boolean accept(File dir, String name) {
-			return !names.contains(name);
+		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+			return names.contains(dir.getFileName().toString()) ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
 		}
-	};
-
-	/**
-	 * The filter to not return specific files...
-	 */
-	private static class ProjectFilter implements FilenameFilter {
-		final static Set<String> names = new HashSet<>(Arrays.asList("originalProject", ".svn", ".git", ".gitignore", ".metadata", "bin"));
 
 		@Override
-		public boolean accept(File dir, String name) {
-			return !names.contains(name);
+		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			if (!names.contains(file.getFileName().toString())) {
+				listOfFiles.add(projectDir.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "));
+			}
+			return FileVisitResult.CONTINUE;
 		}
-	};
 
-	public static void main(String[] args) {
-		pluginRoot = new File(args[0]).getParentFile();
+		@Override
+		public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+			return FileVisitResult.CONTINUE;
+		}
 
-		File exampleDir = new File(pluginRoot, ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
-		File indexFile = new File(pluginRoot, ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
-		createProjectMetaInformation(indexFile, exampleDir);
+		@Override
+		public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+			return FileVisitResult.CONTINUE;
+		}
 	}
 
-	public static void createProjectMetaInformation(File indexFile, File exampleDir) {
-		Collection<ProjectRecord> projectFiles = new ArrayList<ProjectRecord>();
-		collectProjects(projectFiles, exampleDir, null);
+	private static final class ProjectWalker implements FileVisitor<Path> {
 
+		private final static Set<String> names = new HashSet<>(Arrays.asList("originalProject", ".svn", ".git", ".gitignore", ".metadata", "bin"));
+
+		private final List<ProjectRecord> projects;
+
+		private LinkedList<ProjectRecord> lastProjects = new LinkedList<>();
+
+		private ProjectWalker(List<ProjectRecord> projects) {
+			this.projects = projects;
+		}
+
+		@Override
+		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+			if (names.contains(dir.getFileName().toString())) {
+				return FileVisitResult.SKIP_SUBTREE;
+			} else {
+				lastProjects.add(null);
+				return FileVisitResult.CONTINUE;
+			}
+		}
+
+		@Override
+		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			if (IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getFileName().toString())) {
+				final Path parent = file.getParent();
+				final ProjectRecord newProject = new ProjectRecord(pluginRoot.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "), parent.getFileName().toString());
+				newProject.setUpdated(createIndex(parent));
+				projects.add(newProject);
+				lastProjects.removeLast();
+				lastProjects.addLast(newProject);
+			}
+			return FileVisitResult.CONTINUE;
+		}
+
+		@Override
+		public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+			return FileVisitResult.CONTINUE;
+		}
+
+		@Override
+		public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+			final ProjectRecord lastProject = lastProjects.removeLast();
+			if (lastProject != null) {
+				final ListIterator<ProjectRecord> listIterator = projects.listIterator(projects.size());
+				while (listIterator.hasPrevious()) {
+					final ProjectRecord previousProject = listIterator.previous();
+					final String ppPath = previousProject.getRelativePath();
+					final String lpPath = lastProject.getRelativePath();
+					if (ppPath.startsWith(lpPath)) {
+						if (ppPath.length() > lpPath.length()) {
+							lastProject.addSubProject(previousProject);
+							listIterator.remove();
+						}
+					} else {
+						break;
+					}
+				}
+			}
+			return FileVisitResult.CONTINUE;
+		}
+	}
+
+	private static Path pluginRoot;
+
+	public static void main(String[] args) throws IOException {
+		pluginRoot = Paths.get(".");
+		Path exampleDir = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
+		Path indexFile = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
+		
+		final ProjectRecordCollection projectFiles = new ProjectRecordCollection();
+		Files.walkFileTree(exampleDir, new ProjectWalker(projectFiles));
+		
 		for (ProjectRecord projectRecord : projectFiles) {
 			if (projectRecord.updated()) {
 				System.out.printf("New index file for project %s was created \n", projectRecord.getProjectName());
 			}
 		}
-
-		Collection<ProjectRecord> oldFiles = readFile(indexFile, Collection.class);
-		if (oldFiles == null || (projectFiles != null && oldFiles.hashCode() != projectFiles.hashCode())) {
-			try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(indexFile))) {
-				obj.writeObject(projectFiles);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			System.out.println("Changed project list...");
-			if (oldFiles != null) {
-				if (new ArrayList<>(oldFiles).addAll(projectFiles)) {
-					for (ProjectRecord projectRecord : projectFiles) {
-						if (!oldFiles.contains(projectRecord)) {
-							System.out.printf("New Project: %s \n", projectRecord.getProjectName());
-						}
-					}
+		
+		final ProjectRecordFormat format = new ProjectRecordFormat();
+		
+		final ProjectRecordCollection oldProjectFiles = new ProjectRecordCollection();
+		if (Files.exists(indexFile)) {
+			FileHandler.load(indexFile, oldProjectFiles, format);
+		} else {
+			System.out.println("Creating New Project List...");
+		}
+		if (!oldProjectFiles.equals(projectFiles)) {
+			FileHandler.save(indexFile, projectFiles, format);
+		
+			for (ProjectRecord projectRecord : projectFiles) {
+				if (!oldProjectFiles.contains(projectRecord)) {
+					System.out.printf("New Project: %s \n", projectRecord.getProjectName());
 				}
-				if (new ArrayList<>(projectFiles).addAll(oldFiles)) {
-					for (ProjectRecord projectRecord : oldFiles) {
-						if (!projectFiles.contains(projectRecord)) {
-							System.out.printf("Removed Project: %s \n", projectRecord.getProjectName());
-						}
-					}
+			}
+			for (ProjectRecord projectRecord : oldProjectFiles) {
+				if (!projectFiles.contains(projectRecord)) {
+					System.out.printf("Removed Project: %s \n", projectRecord.getProjectName());
 				}
 			}
 		}
 	}
 
-	/**
-	 * Collect the list of .project files that are under directory into files.
-	 * 
-	 * @param projects
-	 * @param directory
-	 * @param directoriesVisited
-	 *            Set of canonical paths of directories, used as recursion guard
-	 * @return boolean <code>true</code> if the operation was completed.
-	 */
-	private static boolean collectProjects(Collection<ProjectRecord> projects, File directory, Set<String> directoriesVisited) {
-		// TODO Use Files.walkFileTree
-		File[] contents = directory.listFiles(projectfilter);
-		if (contents == null) {
-			return false;
-		}
-
-		// Initialize recursion guard for recursive symbolic links
-		if (directoriesVisited == null) {
-			directoriesVisited = new HashSet<>();
-			try {
-				directoriesVisited.add(directory.getCanonicalPath());
-			} catch (IOException exception) {
-				exception.printStackTrace();
-			}
-		}
-
-		// first look for project description files
-		ProjectRecord newProject = null;
-		for (int i = 0; i < contents.length; i++) {
-			final File file = contents[i];
-			IPath p = new Path(file.getPath());
-			p = p.removeFirstSegments(1);
-			if (file.isFile() && IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getName())) {
-				newProject = new ProjectRecord(new Path(file.getPath()).makeRelativeTo(new Path(CreateMetaInformation.pluginRoot.getPath())).toString(),
-						file.getParentFile().getName());
-				newProject.setUpdated(createIndex(file));
-				//				createInformationFile(newProject);
-				projects.add(newProject);
-			}
-		}
-
-		//look for subprojects
-		if (newProject != null) {
-			Collection<ProjectRecord> subProjects = new ArrayList<>();
-			for (int i = 0; i < contents.length; i++) {
-				if (contents[i].isDirectory()) {
-					collectProjects(subProjects, contents[i], directoriesVisited);
-				}
-			}
-			newProject.setSubProjects(subProjects);
-			return true;
-		}
-
-		// no project description found, so recurse into sub-directories
-		for (int i = 0; i < contents.length; i++) {
-			final File file = contents[i];
-			if (file.isDirectory()) {
-				try {
-					if (!directoriesVisited.add(file.getCanonicalPath())) {
-						// already been here --> do not recurse
-						continue;
-					}
-				} catch (IOException exception) {
-					exception.printStackTrace();
-				}
-				collectProjects(projects, contents[i], directoriesVisited);
-			}
-		}
-		return true;
-	}
-
-	private static void createInformationFile(ProjectRecord newProject) {
-		String informationPath = newProject.getInformationDocumentPath();
-		File file = new File(pluginRoot, informationPath);
-		System.out.println(file.toString() + file.exists());
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		dbf.setIgnoringComments(true);
-		dbf.setIgnoringElementContentWhitespace(false);
-		dbf.setCoalescing(true);
-		dbf.setExpandEntityReferences(true);
-		DocumentBuilder db = null;
+	private static boolean createIndex(final Path projectDir) {
 		try {
-			db = dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException pce) {
-			FMCorePlugin.getDefault().logError(pce);
-		}
-		Document doc = db.newDocument();
-
-		Element root = doc.createElement("exampleWizard");
-		doc.appendChild(root);
-		Element contprov = doc.createElement("contentProvider");
-		root.appendChild(contprov);
-		//			Attr createAttribute = doc.createAttribute("name");
-		//			createAttribute.setValue("Composer");
-		contprov.setAttribute("name", "Composer");
-		Element path = doc.createElement("path");
-		root.appendChild(contprov);
-		contprov.appendChild(path);
-		Text createTextNode = doc.createTextNode(getComposer(newProject, new File(file.getParentFile(), ".project")));
-		path.appendChild(createTextNode);
-
-		//Transform the Xml Representation into a String
-		Transformer transfo = null;
-		try {
-			transfo = TransformerFactory.newInstance().newTransformer();
-		} catch (TransformerConfigurationException e) {
-			FMCorePlugin.getDefault().logError(e);
-		} catch (TransformerFactoryConfigurationError e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-
-		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
-		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		StreamResult result = new StreamResult(new StringWriter());
-		DOMSource source = new DOMSource(doc);
-		try {
-			transfo.transform(source, result);
-		} catch (TransformerException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-
-		String string = result.getWriter().toString();
-		try {
-			Files.write(Paths.get(file.getPath()), string.getBytes());
+			final List<String> listOfFiles = new ArrayList<>();
+			Files.walkFileTree(projectDir, new FileWalker(listOfFiles, projectDir));
+			final Path fileToRead = projectDir.resolve(ProjectRecord.INDEX_FILENAME);
+			final List<String> listOfFilesOld = readFile(fileToRead);
+			if (listOfFilesOld == null || listOfFilesOld.hashCode() != listOfFiles.hashCode() || !listOfFiles.equals(listOfFilesOld)) {
+				Files.write(fileToRead, listOfFiles, Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+						StandardOpenOption.WRITE);
+				return true;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		System.out.println(string);
-	}
-
-	private static String getComposer(ProjectRecord newProject, File file) {
-		Document doc = null;
-		try {
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			doc = dBuilder.parse(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		}
-
-		XPathFactory xPathfactory = XPathFactory.newInstance();
-		XPath xpath = xPathfactory.newXPath();
-
-		try {
-			String res = (String) xpath.compile("//dictionary/key[text()='composer']/following-sibling::value/text()").evaluate(doc, XPathConstants.STRING);
-			int lastIndexOf = res.lastIndexOf(".");
-			lastIndexOf++;
-			char[] charArray = res.substring(lastIndexOf).toCharArray();
-			if (charArray.length == 0) {
-				return "array";
-			}
-			charArray[0] = Character.toUpperCase(charArray[0]);
-			return new String(charArray);
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
-		}
-		return "Error";
-	}
-
-	private static void createIndex(File dir, List<String> list, int segmentsToRemove) {
-		File[] listFiles = dir.listFiles(filter);
-
-		if (listFiles != null) {
-			for (File file : listFiles) {
-				if (file.isDirectory()) {
-					createIndex(file, list, segmentsToRemove);
-				} else {
-					IPath path = new Path(file.getPath());
-					path = path.setDevice(null);
-					path = path.removeFirstSegments(segmentsToRemove);
-					list.add(path.toString());
-				}
-			}
-		}
-	}
-
-	private static boolean createIndex(File projectFile) {
-		File projectDir = projectFile.getParentFile();
-		List<String> listOfFiles = new ArrayList<>();
-		List<String> listOfFilesOld = null;
-		createIndex(projectDir, listOfFiles, new Path(projectDir.getPath()).segmentCount());
-
-		listOfFilesOld = readFile(new File(projectDir, INDEX_FILENAME), List.class);
-
-		if ((listOfFilesOld == null) || listOfFilesOld.hashCode() != listOfFiles.hashCode()) {
-			if (listOfFilesOld == null || (listOfFilesOld != null && !listOfFiles.equals(listOfFilesOld))) {
-
-				try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(projectDir, INDEX_FILENAME)))) {
-					obj.writeObject(listOfFiles);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			return true;
 		}
 		return false;
 	}
 
-	private static <T> T readFile(File fileToRead, Class<T> classType) {
-		if (!fileToRead.exists()) {
-			return null;
-		}
-		try (ObjectInputStream obj = new ObjectInputStream(new FileInputStream(fileToRead))) {
-			return classType.cast(obj.readObject());
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
+	private static List<String> readFile(Path fileToRead) throws IOException {
+		if (Files.exists(fileToRead)) {
+			return Files.readAllLines(fileToRead, Charset.forName("UTF-8"));
 		}
 		return null;
 	}

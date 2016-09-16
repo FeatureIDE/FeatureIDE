@@ -74,6 +74,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
@@ -86,6 +87,7 @@ import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.job.ModelScheduleRule;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
@@ -131,7 +133,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private static final String FEATURE_MODULE_MARKER = "de.ovgu.featureide.core.featureModuleMarker";
 
-	public class FeatureModelChangeListner implements IEventListener {
+	public class FeatureModelChangeListener implements IEventListener {
 		/**
 		 * listens to changed feature names
 		 */
@@ -149,7 +151,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * the model representation of the model file
 	 */
 	private final FeatureModelManager featureModelManager;
-
+	
 	private FSTModel fstModel;
 
 	/**
@@ -260,23 +262,25 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
+			
 			if (!deadFeatures.isEmpty()) {
-				createConfigurationMarker(folder, MARKER_UNUSED + deadFeatures.size() + " features are not used: " + createShortMessage(deadFeatures), -1,
-						IMarker.SEVERITY_WARNING);
+				createConfigurationMarker(folder, MARKER_UNUSED + deadFeatures.size() + (deadFeatures.size() > 1 ? " features are " : " feature is ") + "not used: " + createShortMessage(deadFeatures), -1,
+						IMarker.SEVERITY_INFO);
 			}
 			next("create marker: false optional features");
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
 			if (!falseOptionalFeatures.isEmpty()) {
-				createConfigurationMarker(folder, MARKER_FALSE_OPTIONAL + falseOptionalFeatures.size()
-						+ " features are optional but used in all configurations: " + createShortMessage(falseOptionalFeatures), -1, IMarker.SEVERITY_WARNING);
+				createConfigurationMarker(folder, MARKER_FALSE_OPTIONAL + falseOptionalFeatures.size() + (falseOptionalFeatures.size() > 1 ? " features are " : " feature is ")
+						+ "optional but used in all configurations: " + createShortMessage(falseOptionalFeatures), -1, IMarker.SEVERITY_INFO);
 			}
 			next(REFESH_CONFIGURATION_FOLER);
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
 			workMonitor.worked();
+			
 			return true;
 		}
 
@@ -290,11 +294,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			int addedFeatures = 0;
 			for (String feature : features) {
 				message.append(feature);
-				message.append(", ");
 				if (addedFeatures++ >= 10) {
-					message.append("...");
+					message.append(",...");
 					break;
 				}
+				if(addedFeatures < features.size()) message.append(", ");
 			}
 
 			return message.toString();
@@ -311,7 +315,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	public FeatureProject(IProject aProject) {
 		super(aProject);
 		project = aProject;
-
+		
 		try {
 			project.refreshLocal(IResource.DEPTH_ONE, null);
 		} catch (CoreException e) {
@@ -325,7 +329,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		
 		featureModelManager = FeatureModelManager.getInstance(modelFile.getModelFile());
-		featureModelManager.addListener(new FeatureModelChangeListner());
+		featureModelManager.addListener(new FeatureModelChangeListener());
 
 		// initialize project structure
 		try {
@@ -366,7 +370,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		};
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
-
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
 		setPaths(getProjectSourcePath(), projectBuildPath, getProjectConfigurationPath());
@@ -388,6 +391,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				LOGGER.logError(e);
 			}
 		}
+		checkFeatureCoverage();
 	}
 
 	public void dispose() {
@@ -545,7 +549,15 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private void renameFeature(final IFeatureModel model, String oldName, String newName) {
 		final IComposerExtensionClass composer = getComposer();
-		if (!model.getFMComposerManager(getProject()).performRenaming(oldName, newName, project) && composer.hasFeatureFolder()) {
+		boolean renamePerformed = false;
+		IJobManager manager = Job.getJobManager();
+		try {
+			manager.beginRule(ModelScheduleRule.RULE, null);
+			renamePerformed = model.getFMComposerManager(getProject()).performRenaming(oldName, newName, project);
+		} finally {
+			manager.endRule(ModelScheduleRule.RULE);
+		}
+		if (!renamePerformed && composer.hasFeatureFolder()) {
 			try {
 				sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 				IFolder folder = sourceFolder.getFolder(oldName);
@@ -891,6 +903,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			IFile currentConfig = getCurrentConfiguration();
 			for (IFile config : configs) {
 				IResourceDelta delta = event.getDelta().findMember(config.getFullPath());
+				
 				if (delta != null) {
 					checkFeatureCoverage();
 					break;
@@ -1045,6 +1058,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 		};
 		job.setPriority(Job.INTERACTIVE);
+		job.setRule(ModelScheduleRule.RULE);
 		job.schedule();
 		return true;
 	}
@@ -1096,6 +1110,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				return true;
 			}
 		};
+		job.setRule(ModelScheduleRule.RULE);
 		job.schedule();
 	}
 

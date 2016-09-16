@@ -28,11 +28,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_PER_D
 import static de.ovgu.featureide.fm.core.localization.StringTable.IN_CLASS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_FEATURES_PER_DIRECTIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_NESTING_OF_DIRECTIVES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_NUMBER_OF_DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_FEATURES_PER_DIRECTIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_NUMBER_OF_DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_STATISTICS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_NUMBER_OF_DIRECTIVES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_NUMBER_OF_DIRECTIVES;
 
 import java.util.Map;
 

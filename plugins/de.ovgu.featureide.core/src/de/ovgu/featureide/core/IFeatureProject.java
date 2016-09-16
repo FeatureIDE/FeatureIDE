@@ -26,6 +26,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABILITY_AW
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -171,7 +173,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 *   specified by the nature or builder (every project has the same nature
 	 *   and builder, which can be extended by other eclipse plug-ins)
 	 */
-	IComposerExtensionClass getComposer();
+	@CheckForNull IComposerExtensionClass getComposer();
 	
 	/**
 	 * Sets the JAVA class path that is in order to build the project

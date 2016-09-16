@@ -425,7 +425,7 @@ public class StringTable {
 	public static final String CHANGE_DESCRIPTION = "Change Description";
 	public static final String FEATURE_DESCRIPTION = "Feature Description";
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
-	public static final String CALCULATE_DEPENDENCY = "Calculate Dependencies of Sub Feature Model";
+	public static final String CALCULATE_DEPENDENCY = "Show Hidden Dependencies of Submodel";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
 	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
@@ -659,7 +659,7 @@ public class StringTable {
 	public static final String INTERACTIONS = "Interactions";
 	public static final String DISSIMILARITY = "Dissimilarity";
 	public static final String CHVATAL = "Chvatal";
-	public static final String CASA = "CASA";
+	public static final String CASA = "CASA (experimental)";
 	public static final String ICPL = "ICPL";
 	public static final String INCLING = "IncLing";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";

@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * 
  * @author "Ananieva Sofia"
  */
-public class FalseOptional {
+public class FalseOptionalFeature {
 
 	/**
 	 * The model after a change (with a constraint that makes a feature false optional).
@@ -64,7 +64,7 @@ public class FalseOptional {
 		}
 		setFeatureModel(featuremodel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
-		Node withoutTrueClauses = eliminateTrueClauses(node);
+		Node withoutTrueClauses = eliminateTrueClauses(node); // True clauses of the form True & -False & (A|B|C|True) lead to wrong BCP results
 		Node[] clauses = withoutTrueClauses.getChildren();
 
 		IFeature parentFalseOpt = FeatureUtils.getParent(foFeature);
