@@ -490,13 +490,15 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			IJavaElement[] elements = proj.getChildren();
 			for (IJavaElement e : elements) {
 				String path = e.getPath().toOSString();
-				if (path.contains(":")) {
+				if (e.getPath().isAbsolute()) {
 					classpath += sep + "\"" + path + "\"";
-					continue;
-				}
-				IResource resource = e.getResource();
-				if (resource != null && "jar".equals(resource.getFileExtension())) {
-					classpath += sep + "\"" + resource.getRawLocation().toOSString() + "\"";
+				} else {
+					IResource resource = e.getResource();
+					if (resource != null && "jar".equals(resource.getFileExtension())) {
+						classpath += sep + "\"" + resource.getLocation().toOSString() + "\"";
+					} else {
+						UIPlugin.getDefault().logWarning("ClassPath element " + e.toString() + " is missing.");
+					}
 				}
 			}
 		} catch (JavaModelException e) {
