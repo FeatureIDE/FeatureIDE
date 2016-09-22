@@ -238,7 +238,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		super.setSelection(selStart + prefix.length() + textToInsert.length() + suffix.length());
 	}
 
-	public void UnderlineEverything(boolean b) {
+	public void underlineEverything(boolean b) {
 		underlineEverything = b;
 		if (underlineEverything) {
 			StyleRange styleRange = new StyleRange();
@@ -250,8 +250,9 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			styleRange.underline = true;
 			styleRange.underlineColor = wrongWordColor;
 			setStyleRange(styleRange);
-		} else
+		} else {
 			updateHighlight();
+		}
 	}
 
 }
