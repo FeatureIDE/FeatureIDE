@@ -929,7 +929,13 @@ public final class FeatureUtils {
 	public static final Set<String> getFeatureNames(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 		
-		return Functional.toSet(FeatureUtils.extractFeatureNames(Functional.toList(featureModel.getFeatures())));
+		return Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures()));
+	}
+
+	public static final List<String> getFeatureNamesList(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+		
+		return Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()));
 	}
 
 	public static final int getNumberOfFeatures(IFeatureModel featureModel) {

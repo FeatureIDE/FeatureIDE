@@ -22,6 +22,7 @@ package de.ovgu.featureide.examples.utils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -36,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProjectDescription;
 
@@ -49,11 +51,35 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  */
 public class CreateMetaInformation {
 
+	private static final String TEMPLATE_PROJECT_INFORMATION_XML = "template_" + ProjectRecord.PROJECT_INFORMATION_XML;
 	private static final String SPACE_REPLACEMENT = "%20";
 
 	private static final class FileWalker implements FileVisitor<Path> {
-		private final static Set<String> names = new HashSet<>(
-				Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
+		private final static Pattern names;
+		static {
+			List<String> lines = new ArrayList<>(
+					Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
+			try {
+				lines.addAll(Files.readAllLines(Paths.get(".gitignore"), Charset.forName("UTF-8")));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			final StringBuilder sb = new StringBuilder();
+			if (!lines.isEmpty()) {
+				for (String line : lines) {
+					sb.append("|");
+					//TODO implement full support for .gitignore syntax
+					if (line.startsWith("*")) {
+						sb.append(".*" + Pattern.quote(line.substring(1)));
+					} else {
+						sb.append(Pattern.quote(line));
+					}
+				}
+				names = Pattern.compile(sb.toString().substring(1));
+			} else {
+				names = Pattern.compile("");
+			}
+		}
 
 		private final List<String> listOfFiles;
 		private final Path projectDir;
@@ -65,12 +91,14 @@ public class CreateMetaInformation {
 
 		@Override
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-			return names.contains(dir.getFileName().toString()) ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
+			final Path dirName = dir.getFileName();
+			return dirName != null && names.matcher(dirName.toString()).matches() ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
 		}
 
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-			if (!names.contains(file.getFileName().toString())) {
+			final Path fileName = file.getFileName();
+			if (fileName != null && !names.matcher(fileName.toString()).matches()) {
 				listOfFiles.add(projectDir.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "));
 			}
 			return FileVisitResult.CONTINUE;
@@ -101,7 +129,8 @@ public class CreateMetaInformation {
 
 		@Override
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-			if (names.contains(dir.getFileName().toString())) {
+			final Path dirName = dir.getFileName();
+			if (dirName != null && names.contains(dirName.toString())) {
 				return FileVisitResult.SKIP_SUBTREE;
 			} else {
 				lastProjects.add(null);
@@ -111,13 +140,20 @@ public class CreateMetaInformation {
 
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-			if (IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getFileName().toString())) {
+			final Path fileName = file.getFileName();
+			if (fileName != null && IProjectDescription.DESCRIPTION_FILE_NAME.equals(fileName.toString())) {
 				final Path parent = file.getParent();
-				final ProjectRecord newProject = new ProjectRecord(pluginRoot.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "), parent.getFileName().toString());
-				newProject.setUpdated(createIndex(parent));
-				projects.add(newProject);
-				lastProjects.removeLast();
-				lastProjects.addLast(newProject);
+				if (parent != null) {
+					final Path parentName = parent.getFileName();
+					if (parentName != null) {
+						final ProjectRecord newProject = new ProjectRecord(
+								pluginRoot.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "), parentName.toString());
+						newProject.setUpdated(createIndex(parent));
+						projects.add(newProject);
+						lastProjects.removeLast();
+						lastProjects.addLast(newProject);
+					}
+				}
 			}
 			return FileVisitResult.CONTINUE;
 		}
@@ -156,37 +192,50 @@ public class CreateMetaInformation {
 		pluginRoot = Paths.get(".");
 		Path exampleDir = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
 		Path indexFile = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
-		
+
+		System.out.println("Examining Files...");
 		final ProjectRecordCollection projectFiles = new ProjectRecordCollection();
 		Files.walkFileTree(exampleDir, new ProjectWalker(projectFiles));
-		
+
+		System.out.println("Updating Index Files...");
 		for (ProjectRecord projectRecord : projectFiles) {
 			if (projectRecord.updated()) {
-				System.out.printf("New index file for project %s was created \n", projectRecord.getProjectName());
+				System.out.printf("New index file for project %s was created. \n", projectRecord.getProjectName());
 			}
 		}
-		
+
 		final ProjectRecordFormat format = new ProjectRecordFormat();
-		
+
 		final ProjectRecordCollection oldProjectFiles = new ProjectRecordCollection();
 		if (Files.exists(indexFile)) {
 			FileHandler.load(indexFile, oldProjectFiles, format);
+			System.out.println("Updating Project List...");
 		} else {
 			System.out.println("Creating New Project List...");
 		}
+
 		if (!oldProjectFiles.equals(projectFiles)) {
 			FileHandler.save(indexFile, projectFiles, format);
-		
+
 			for (ProjectRecord projectRecord : projectFiles) {
 				if (!oldProjectFiles.contains(projectRecord)) {
-					System.out.printf("New Project: %s \n", projectRecord.getProjectName());
+					System.out.printf("\tAdded Project: %s \n", projectRecord.getProjectName());
+					try {
+						Files.copy(pluginRoot.resolve(TEMPLATE_PROJECT_INFORMATION_XML), Paths.get(projectRecord.getInformationDocumentPath()));
+					} catch (FileAlreadyExistsException e) {
+					} catch (IOException | UnsupportedOperationException e) {
+						System.err.println("\t\tWARNING: Could not create " + ProjectRecord.PROJECT_INFORMATION_XML + " file.");
+						e.printStackTrace();
+					}
 				}
 			}
 			for (ProjectRecord projectRecord : oldProjectFiles) {
 				if (!projectFiles.contains(projectRecord)) {
-					System.out.printf("Removed Project: %s \n", projectRecord.getProjectName());
+					System.out.printf("\tRemoved Project: %s \n", projectRecord.getProjectName());
 				}
 			}
+		} else {
+			System.out.println("\tNo projects were added or removed.");
 		}
 	}
 

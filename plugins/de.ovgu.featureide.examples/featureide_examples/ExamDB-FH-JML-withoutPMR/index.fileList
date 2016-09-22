@@ -26,7 +26,6 @@ model.xml
 originalProject/ExamDB/.classpath
 originalProject/ExamDB/.project
 originalProject/ExamDB/.settings/org.eclipse.jdt.core.prefs
-originalProject/ExamDB/index.s
 originalProject/ExamDB/readme.txt
 originalProject/ExamDB/src/core/ExamDataBase.java
 originalProject/ExamDB/src/core/ExamDataBaseException.java
