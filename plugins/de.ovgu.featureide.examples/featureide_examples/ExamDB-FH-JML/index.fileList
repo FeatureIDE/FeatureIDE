@@ -18,7 +18,6 @@ model.xml
 originalProject/ExamDB/.classpath
 originalProject/ExamDB/.project
 originalProject/ExamDB/.settings/org.eclipse.jdt.core.prefs
-originalProject/ExamDB/index.s
 originalProject/ExamDB/readme.txt
 originalProject/ExamDB/src/core/ExamDataBase.java
 originalProject/ExamDB/src/core/ExamDataBaseException.java
@@ -28,7 +27,6 @@ originalProject/ExamDB-VarEnc/.classpath
 originalProject/ExamDB-VarEnc/.project
 originalProject/ExamDB-VarEnc/.settings/org.eclipse.jdt.core.prefs
 originalProject/ExamDB-VarEnc/experiences.txt
-originalProject/ExamDB-VarEnc/index.s
 originalProject/ExamDB-VarEnc/proof-statistics.xlsx
 originalProject/ExamDB-VarEnc/src/ExamDataBase.java
 originalProject/ExamDB-VarEnc/src/ExamDataBase.java.proof

@@ -17,7 +17,6 @@ model.xml
 originalProject/DiGraph/.classpath
 originalProject/DiGraph/.project
 originalProject/DiGraph/.settings/org.eclipse.jdt.core.prefs
-originalProject/DiGraph/index.s
 originalProject/DiGraph/src/org/jmlspecs/models/JMLType.java
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/Arc.java
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/ArcType.java

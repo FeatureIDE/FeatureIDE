@@ -16,7 +16,6 @@ model.xml
 originalProject/Paycard/.classpath
 originalProject/Paycard/.project
 originalProject/Paycard/.settings/org.eclipse.jdt.core.prefs
-originalProject/Paycard/index.s
 originalProject/Paycard/src/gui/ChargeUI.java
 originalProject/Paycard/src/gui/IssueCardUI.java
 originalProject/Paycard/src/gui/Start.java
