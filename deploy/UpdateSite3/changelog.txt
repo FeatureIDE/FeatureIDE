@@ -7,6 +7,17 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.1.1 (September 2016)
+* Several hotfixes regarding:
+  * Example wizard and example projects (#393, #399)
+  * Feature model editor and constraint dialog (#383, #389, #404, #406, #409, #420, #422)
+  * Source code editor (#397, #402, #410)
+  * Collaboration diagram (#395, #397)
+  * Product generation (#384, #385, #413, #416)
+* Added warnings in "New Source File" Dialog (#256)
+* Added Automotive examples (large-scale feature models)
+* Further stability improvements
+
 Release 3.1.0 (July 2016)
 * New extension point to exchange classes for features, constraints, and feature models with the factory pattern
 * Explanations for anomalies in feature models

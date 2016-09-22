@@ -21,18 +21,16 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+
+import org.prop4j.Literal;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.explanations.Bookkeeping;
-import de.ovgu.featureide.fm.core.explanations.LTMS;
-
-import org.prop4j.Literal;
-import org.prop4j.Node;
 
 /**
  * The class Redundancy generates explanations for redundant constraints. It uses a logic truth maintenance system (LTMS)

@@ -260,7 +260,7 @@ public class CollaborationModelBuilder {
 	 */
 	private void getFstModel(IComposerExtensionClass composer) {
 		fSTModel = project.getFSTModel();
-		if (fSTModel == null) {
+		if (fSTModel == null || fSTModel.getClasses().isEmpty()) {
 			composer.buildFSTModel();
 			fSTModel = project.getFSTModel();
 		}

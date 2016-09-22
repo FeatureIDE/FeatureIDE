@@ -27,11 +27,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IN_FOLDER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OVERWRITE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.QUESTION;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -43,6 +46,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -165,7 +169,6 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean createExistingProject(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		String projectName = record.getProjectName();
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -180,16 +183,19 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 			return false;
 		}
 
-		try (ObjectInputStream instr = new ObjectInputStream(inputStream);) {
-			final List<String> res = (List<String>) instr.readObject();
-
-			new ImportOperation(project.getFullPath(), res.get(0), new SimpleStructureProvider(record.getRelativePath()), this, res).run(monitor);
+		List<String> res = new ArrayList<>();
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				res.add(line);
+			}
+			new ImportOperation(project.getFullPath(), null, new SimpleStructureProvider(record.getRelativePath()), this, res).run(monitor);
 			if (record.hasSubProjects()) {
 				for (ProjectRecord sub : record.getSubProjects()) {
 					importSubProjects(sub, monitor);
 				}
 			}
-		} catch (IOException | ClassNotFoundException | ClassCastException e) {
+		} catch (IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 			return false;
 		}
@@ -230,6 +236,11 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 			throw new InvocationTargetException(e);
 		} finally {
 			monitor.done();
+		}
+		if (record.hasSubProjects()) {
+			for (ProjectRecord sub : record.getSubProjects()) {
+				importSubProjects(sub, new NullProgressMonitor());
+			}
 		}
 	}
 

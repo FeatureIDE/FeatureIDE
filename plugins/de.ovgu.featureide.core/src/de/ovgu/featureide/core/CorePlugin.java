@@ -287,6 +287,9 @@ public class CorePlugin extends AbstractCorePlugin {
 			return;
 
 		IFeatureProject featureProject = featureProjectMap.remove(project);
+		// Quick fix #402 
+		featureProject.dispose();
+		
 		logInfo(project.getName() + REMOVED);
 
 		for (IProjectListener listener : projectListeners)

@@ -383,7 +383,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			return;
 		}
 
-		final Configuration configuration = new Configuration(configurationManager.editObject(), featureModelManager.getObject());
+		configurationManager.read();
+		final Configuration configuration = new Configuration(configurationManager.getObject(), featureModelManager.getObject());
 		configuration.loadPropagator();
 		LongRunningWrapper.runMethod(configuration.getPropagator().resolve());
 		

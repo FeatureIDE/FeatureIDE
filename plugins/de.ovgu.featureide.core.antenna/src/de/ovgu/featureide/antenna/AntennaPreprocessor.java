@@ -38,7 +38,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
@@ -70,6 +69,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -557,6 +557,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		if (length > 0) {
 			featureList.deleteCharAt(length - 1);
 		}
+
+		featureModel = AdvancedNodeCreator.createNodes(configuration.getFeatureModel());
+
 		// add source files
 		try {
 			// add activated features as definitions to preprocessor
@@ -579,14 +582,16 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				// for folders do recursively 
 				preprocessSourceFiles((IFolder) res, preprocessor, null);
 			} else if (res instanceof IFile) {
-				if (res.getName().equals(congurationName + getConfigurationExtension())) {
+				if (res.getName().equals(congurationName + "." + getConfigurationExtension())) {
 					continue;
 				}
 				// get all lines from file
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
 
 				// do checking and some stuff
-				processLinesOfFile(lines, (IFile) res);
+				if (featureModel != null) {// TODO check why the FM is null when generating products
+					processLinesOfFile(lines, (IFile) res);
+				}
 				boolean changed = false;
 				try {
 					// run antenna preprocessor
@@ -640,11 +645,12 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				if (res instanceof IFolder) {
 					postProcess((IFolder) res);
 				} else if (res instanceof IFile) {
-					if (res.getFileExtension().equals(getConfigurationExtension())) {
+					final String fileExtension = res.getFileExtension();
+					if (fileExtension != null && fileExtension.equals(getConfigurationExtension())) {
 						continue;
 					}
 					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));
-							final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")))) {
+							final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
 						String line = null;
 						final StringBuilder content = new StringBuilder();
 						boolean hasAnnotations = false;

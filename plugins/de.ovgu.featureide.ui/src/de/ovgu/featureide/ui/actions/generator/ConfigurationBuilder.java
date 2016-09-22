@@ -356,8 +356,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 								cancelGenerationJobs();
 								break;
 							}
-							Generator generator = generatorJobs.get(0);
-							if (generator.getState() == Thread.State.TERMINATED) {
+								final Generator generator = generatorJobs.get(0);
+								if (generator == null) {
+									// generator can never be null, however see #416
+									generatorJobs.remove(0);
+								} else if (generator.getState() == Thread.State.TERMINATED) {
 								generatorJobs.remove(generator);
 								if (sorter.getBufferSize() != 0) {
 									createNewGenerator(generator.nr);
@@ -482,13 +485,15 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			IJavaElement[] elements = proj.getChildren();
 			for (IJavaElement e : elements) {
 				String path = e.getPath().toOSString();
-				if (path.contains(":")) {
+				if (e.getPath().isAbsolute()) {
 					classpath += sep + "\"" + path + "\"";
-					continue;
-				}
+				} else {
 				IResource resource = e.getResource();
 				if (resource != null && "jar".equals(resource.getFileExtension())) {
-					classpath += sep + "\"" + resource.getRawLocation().toOSString() + "\"";
+						classpath += sep + "\"" + resource.getLocation().toOSString() + "\"";
+					} else {
+						UIPlugin.getDefault().logWarning("ClassPath element " + e.toString() + " is missing.");
+					}
 				}
 			}
 		} catch (JavaModelException e) {

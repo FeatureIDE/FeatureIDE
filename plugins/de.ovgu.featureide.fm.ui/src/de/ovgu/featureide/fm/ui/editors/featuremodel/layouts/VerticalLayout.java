@@ -62,7 +62,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	 * (centered by their children's positions
 	 */
 	private int centerOther(IGraphicalFeature parent, int level) {
-		final Iterable<? extends IGraphicalFeature> children = FeatureUIHelper.getGraphicalChildren(parent);
+		final Iterable<? extends IGraphicalFeature> children = getChildren(parent);
 		if (!children.iterator().hasNext()) {
 			height += heightStep;
 			setLocation(parent, new Point(levelWidth.get(level), height));
@@ -100,7 +100,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 			levelWidth.set(level, parentWidth);
 		}
 
-		for (IGraphicalFeature feature : FeatureUIHelper.getGraphicalChildren(parent)) {
+		for (IGraphicalFeature feature : getChildren(parent)) {
 			calculateLevelWidth(feature, level + 1);
 		}
 	}

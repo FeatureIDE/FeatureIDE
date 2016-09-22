@@ -180,6 +180,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 	protected List<String> getFeatureNames(String expression) {
 		String exp = expression.replaceAll("[()]", "");
 		exp = exp.replaceAll("&&", "");
+		exp = exp.replaceAll("!", "");
 		exp = exp.replaceAll("\\|\\|", "");
 		exp = exp.replaceAll("\\^", "");
 		List<String> featureNameList = new LinkedList<String>();

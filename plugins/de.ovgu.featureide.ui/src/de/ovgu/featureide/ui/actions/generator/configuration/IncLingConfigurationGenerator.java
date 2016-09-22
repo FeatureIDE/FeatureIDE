@@ -27,11 +27,11 @@ import org.prop4j.analyses.PairWiseConfigurationGenerator;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
+import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -54,14 +54,14 @@ public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 		callConfigurationGenerator(featureModel, (int) builder.configurationNumber, monitor);
 		return null;
 	}
-
+	
 	private void callConfigurationGenerator(IFeatureModel fm, int solutionCount, IMonitor monitor) {
-		final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm);
+		final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm, new AbstractFeatureFilter());
 		advancedNodeCreator.setCnfType(CNFType.Regular);
 		advancedNodeCreator.setIncludeBooleanValues(false);
 
 		Node createNodes = advancedNodeCreator.createNodes();
-		SatInstance satInstance = new SatInstance(createNodes, FeatureUtils.getFeatureNamesPreorder(fm));
+		SatInstance satInstance = new SatInstance(createNodes);
 		PairWiseConfigurationGenerator gen = getGenerator(satInstance, solutionCount);
 		exec(satInstance, gen, monitor);
 	}
