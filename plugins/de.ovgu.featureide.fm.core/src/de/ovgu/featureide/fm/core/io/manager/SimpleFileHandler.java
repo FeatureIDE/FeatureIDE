@@ -43,7 +43,11 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class SimpleFileHandler<T> {
 
-	private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+	private static final Charset DEFAULT_CHARSET;
+	static {
+		final Charset utf8 = Charset.forName("UTF-8");
+		DEFAULT_CHARSET = utf8 != null ? utf8 : Charset.defaultCharset();
+	}
 
 	private IPersistentFormat<T> format;
 
