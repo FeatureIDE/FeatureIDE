@@ -115,14 +115,14 @@ public class CustomFeaturesCustomPropertiesTest {
 		Assert.assertTrue(f4 instanceof MyFeatureImplementation);
 
 		final ProblemList problems = FileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
-		Assert.assertFalse(problems.containsError());
+		Assert.assertFalse(problems.getErrors().toString(), problems.containsError());
 	}
 
 	@Test
 	public void testCustomProperties() {
 		final IFeatureModel model = factory.createFeatureModel();
 		final ProblemList problems = FileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
-		Assert.assertFalse(problems.containsError());
+		Assert.assertFalse(problems.getErrors().toString(), problems.containsError());
 		
 		System.out.println(model.getFeature("A") .getClass().getName());
 		
