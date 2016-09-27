@@ -35,6 +35,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -109,7 +112,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	private void buildAll(IFeature root, IMonitor monitor) {
 		LinkedList<IFeature> selectedFeatures2 = new LinkedList<IFeature>();
 		selectedFeatures2.add(root);
-		rootNode = AdvancedNodeCreator.createCNFWithoutAbstract(featureModel);
+		rootNode = AdvancedNodeCreator.createNodes(featureModel, new AbstractFeatureFilter(), CNFType.Compact, ModelType.All, true);
 		children = new LinkedList<Node>();
 		build(root, "", selectedFeatures2, monitor);
 	}
