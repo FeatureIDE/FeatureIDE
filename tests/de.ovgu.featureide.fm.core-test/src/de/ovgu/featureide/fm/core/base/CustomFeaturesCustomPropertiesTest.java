@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base;
 
 import java.io.File;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -176,6 +177,7 @@ public class CustomFeaturesCustomPropertiesTest {
 		Assert.assertFalse(model2.getFeature("A").getCustomProperties().has("key1"));
 	}
 
+	@After
 	public void cleanUp() {
 		modelFile.delete();
 	}

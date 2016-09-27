@@ -125,7 +125,10 @@ public class Commons {
 		final File modelFileFolder = getFile(remotePath, localClassPath);
 		assert modelFileFolder != null;
 		
-		for (File f : modelFileFolder.listFiles(filter)) {
+		final File[] files = modelFileFolder.listFiles(filter);
+		assert files != null;
+		
+		for (File f : files) {
 			if (f.getName().equals(featureModelXmlFilename)) {
 				return FeatureModelManager.readFromFile(f.toPath());
 			}

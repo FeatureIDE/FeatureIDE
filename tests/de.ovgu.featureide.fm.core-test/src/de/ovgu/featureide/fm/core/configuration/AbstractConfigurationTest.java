@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
  */
 public abstract class AbstractConfigurationTest {
 
-	public static IFeatureModel fm;
+	public IFeatureModel fm;
 
 	@Before
 	public void setModel() {

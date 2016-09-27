@@ -66,6 +66,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 				return name.endsWith(".xml");
 			}
 		});
+		assert children != null;
 		Collection<Object[]> params = new ArrayList<Object[]>();
 		for (File f : children) {
 			params.add(new Object[]{f});
