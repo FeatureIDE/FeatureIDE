@@ -32,6 +32,8 @@ import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.JavaFileSystem;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -80,9 +82,16 @@ public class CustomFeaturesCustomPropertiesTest {
 	
 	static final File modelFile = new File("feature_model_tmp_" + System.currentTimeMillis() + ".xml");
 	static final IFeatureModelFactory factory = new MyFeatureModelFactoryImplementation();
+	
+	public static void setFileSystem() {
+		// TODO find better solution for setting JavaFileSystem under testing circumstances
+		FileSystem.INSTANCE = new JavaFileSystem();
+	}
 
 	@Before
 	public void setup() throws Throwable {
+		setFileSystem();
+		
 		FMFactoryManager.getInstance().addExtension(factory);
 		
 		final IFeatureModel model = factory.createFeatureModel();
@@ -115,11 +124,6 @@ public class CustomFeaturesCustomPropertiesTest {
 		Assert.assertTrue(f4 instanceof MyFeatureImplementation);
 
 		final ProblemList problems = FileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
-		if (problems.containsError()) {
-			final Throwable error = problems.getErrors().get(0).error;
-			error.printStackTrace();
-			throw error;
-		}
 		Assert.assertFalse(problems.getErrors().toString(), problems.containsError());
 	}
 

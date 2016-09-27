@@ -39,7 +39,9 @@ public class CustomPropertiesTest {
 	static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
 
 	@Before
-	public void setup() {		
+	public void setup() {
+		CustomFeaturesCustomPropertiesTest.setFileSystem();
+		
 		final IFeatureModel model = factory.createFeatureModel();
 
 		final IFeature f1 = factory.createFeature(model, "A");
