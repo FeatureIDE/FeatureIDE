@@ -1004,4 +1004,6 @@ public class StringTable {
 	public static final String FEATURES_ = "Features:";
 	public static final String FIDECONF = "fideconf";
 	public static final String PARAMETER_IS_EXPECTED_TO_BE_NON_NULL = "The method parameter is expected to be non-null";
+	public static final String FOLD_IN_FEATURE = "Collapse Feature";
+	public static final String EXPAND_FEATURE = "Expand Feature";
 }

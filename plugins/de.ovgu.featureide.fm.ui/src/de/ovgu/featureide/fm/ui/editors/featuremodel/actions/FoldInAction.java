@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_ABOVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOLD_IN_FEATURE;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,7 +33,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -42,25 +41,32 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FoldInOperation;
 
 /**
- * Creates a new feature with the currently selected features as children.
+ * TODO description
  * 
- * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Joshua Sprey
+ * @author Enis Belli
  */
-public class CreateCompoundAction extends Action {
+public class FoldInAction extends Action {
 
-	public static final String ID = "de.ovgu.featureide.createcompound";
+	//LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 
-	private final IFeatureModel featureModel;
+	IFeatureModel featureModel;
+	IFeature selectedFeature;
 
-	private IFeature parent = null;
-
-	private LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
-
-	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
+	public FoldInAction(Object viewer, IFeatureModel featureModel) {
+		super(FOLD_IN_FEATURE);
+		this.featureModel = featureModel;
+		setEnabled(false);
+		// TODO Auto-generated constructor stub
+		if (viewer instanceof GraphicalViewerImpl) {
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+		} else {
+			((TreeViewer) viewer).addSelectionChangedListener(listener);
+		}
+	}
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -69,63 +75,28 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
-		super(CREATE_FEATURE_ABOVE, createImage);
-		this.featureModel = featureModel;
-		setEnabled(false);
-		if (viewer instanceof GraphicalViewerImpl) {
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
-		} else {
-			((TreeViewer) viewer).addSelectionChangedListener(listener);
-		}
-	}
-
 	@Override
 	public void run() {
-		if (selectedFeatures.size() != 1)
-			throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
-		CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures.get(0));
-
+		FoldInOperation op = new FoldInOperation(featureModel, selectedFeature);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {
-		// check empty selection (i.e. ModelEditPart is selected)
-		if (selection.size() == 1 && (selection.getFirstElement() instanceof ModelEditPart))
-			return false;
-
-		// check that selected features have the same parent
-		selectedFeatures.clear();
-		Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature))
-				continue;
-			IFeature feature;
-
-			if (editPart instanceof FeatureEditPart)
-				feature = ((FeatureEditPart) editPart).getFeature().getObject();
-			else
-				feature = (IFeature) editPart;
-
-			IFeatureStructure structureParent = feature.getStructure().getParent();
-			if (structureParent != null) {
-				IFeature featureParent = structureParent.getFeature();
-				if (selectedFeatures.isEmpty()) {
-					parent = featureParent;
-				} else if (parent != featureParent) {
-					return false;
-				}
+		// check selected only one element
+		if (selection.size() == 1 && !(selection.getFirstElement() instanceof ModelEditPart)) {
+			Object editPart = selection.getFirstElement();
+			if (editPart instanceof FeatureEditPart) {
+				selectedFeature = ((FeatureEditPart) editPart).getFeature().getObject();
+			} else {
+				selectedFeature = (IFeature) editPart;
 			}
-
-			selectedFeatures.add(feature);
+			return true;
 		}
-		return !selectedFeatures.isEmpty();
+		return false;
 	}
 
 }

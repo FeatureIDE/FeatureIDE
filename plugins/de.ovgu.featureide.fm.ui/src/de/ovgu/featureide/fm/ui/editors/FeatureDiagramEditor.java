@@ -109,6 +109,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FoldInAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -174,6 +175,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
 	private ChangeFeatureDescriptionAction changeFeatureDescriptionAction;
+	private FoldInAction foldInAction;
 
 	private MoveAction moveStopAction;
 	private MoveAction moveUpAction;
@@ -347,6 +349,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createLayerAction = new CreateLayerAction(this, featureModel);
 		createCompoundAction = new CreateCompoundAction(this, featureModel);
 		deleteAction = new DeleteAction(this, featureModel);
+		foldInAction = new FoldInAction(this, featureModel);
 
 		colorSelectedFeatureAction = new SetFeatureColorAction(this, featureModelEditor.getModelFile().getProject());
 
@@ -504,6 +507,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			menu.add(colorSelectedFeatureAction);
 			menu.add(new Separator());
+			menu.add(foldInAction);
+			menu.add(new Separator());
+			//FOLDACTION
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);

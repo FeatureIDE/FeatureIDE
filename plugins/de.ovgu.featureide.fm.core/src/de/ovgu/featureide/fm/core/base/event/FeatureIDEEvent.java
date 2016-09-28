@@ -165,6 +165,14 @@ public class FeatureIDEEvent {
 		 * The dependency for a subtree was calculated 
 		 */
 		DEPENDENCY_CALCULATED,
+		/**
+		 * Collapse structure children
+		 */
+		FOLD_IN_FEATURE,
+		/**
+		 * Expand structure children
+		 */
+		FOLD_OUT_FEATURE,
 	}
 	
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];
