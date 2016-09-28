@@ -55,7 +55,6 @@ public class FoldOutAction extends Action {
 		super(FOLD_OUT_FEATURE);
 		this.featureModel = featureModel;
 		setEnabled(false);
-		// TODO Auto-generated constructor stub
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
 		} else {

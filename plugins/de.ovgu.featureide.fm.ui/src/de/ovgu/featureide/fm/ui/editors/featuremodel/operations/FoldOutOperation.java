@@ -43,18 +43,12 @@ public class FoldOutOperation extends AbstractFeatureModelOperation {
 
 	public FoldOutOperation(IFeatureModel featureModel, IFeature selectedFeature) {
 		super(featureModel, FOLD_OUT_FEATURE);
-		// TODO Auto-generated constructor stub
 		this.selectedFeature = selectedFeature;
 		child = selectedFeature.getStructure().getChildren();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#operation()
-	 */
 	@Override
 	protected FeatureIDEEvent operation() {
-		// TODO Auto-generated method stub
-		FMUIPlugin.getDefault().logInfo("Before Fold out call");
 //		for (IFeatureStructure iFeatureStructure : child) {
 //			iFeatureStructure.setCollapsed(false);
 //		}
@@ -62,12 +56,8 @@ public class FoldOutOperation extends AbstractFeatureModelOperation {
 		return new FeatureIDEEvent(featureModel, EventType.FOLD_OUT_FEATURE);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#inverseOperation()
-	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		// TODO Auto-generated method stub
 //		for (IFeatureStructure iFeatureStructure : child) {
 //			iFeatureStructure.setCollapsed(true);
 //		}

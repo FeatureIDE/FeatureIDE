@@ -970,9 +970,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(false);
 			break;
 		case FOLD_IN_FEATURE:
-			//Gänseblümchen :)
+			featureModelEditor.setPageModified(true);
 			break;
 		case FOLD_OUT_FEATURE:
+			featureModelEditor.setPageModified(true);
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");

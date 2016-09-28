@@ -415,7 +415,6 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public void setCollapsed(boolean collapsed) {
 		this.collapsed = collapsed;
-		FMCorePlugin.getDefault().logInfo(""+collapsed);
 		fireCollapsedChanged();
 	}
 
