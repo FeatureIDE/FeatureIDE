@@ -20,15 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.FOLD_IN_FEATURE;
-
-import java.util.Iterator;
-import java.util.LinkedList;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOLD_OUT_FEATURE;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -37,11 +33,10 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FoldInOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FoldOutOperation;
 
 /**
  * TODO description
@@ -49,15 +44,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FoldInOperation;
  * @author Joshua Sprey
  * @author Enis Belli
  */
-public class FoldInAction extends Action {
+public class FoldOutAction extends Action {
 
 	//LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 
 	IFeatureModel featureModel;
 	IFeature selectedFeature;
 
-	public FoldInAction(Object viewer, IFeatureModel featureModel) {
-		super(FOLD_IN_FEATURE);
+	public FoldOutAction(Object viewer, IFeatureModel featureModel) {
+		super(FOLD_OUT_FEATURE);
 		this.featureModel = featureModel;
 		setEnabled(false);
 		// TODO Auto-generated constructor stub
@@ -77,7 +72,7 @@ public class FoldInAction extends Action {
 
 	@Override
 	public void run() {
-		FoldInOperation op = new FoldInOperation(featureModel, selectedFeature);
+		FoldOutOperation op = new FoldOutOperation(featureModel, selectedFeature);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

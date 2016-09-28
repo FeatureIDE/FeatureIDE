@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.FOLD_IN_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOLD_OUT_FEATURE;
 
 import java.util.List;
 
@@ -32,17 +32,17 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Operation with functionality to collapse a Feature. Enables undo/redo functionality.
+ * Operation with functionality to expand a Feature. Enables undo/redo functionality.
  * 
  * @author Joshua Sprey
  * @author Enis Belli
  */
-public class FoldInOperation extends AbstractFeatureModelOperation {
+public class FoldOutOperation extends AbstractFeatureModelOperation {
 	IFeature selectedFeature;
 	List<IFeatureStructure> child;
 
-	public FoldInOperation(IFeatureModel featureModel, IFeature selectedFeature) {
-		super(featureModel, FOLD_IN_FEATURE);
+	public FoldOutOperation(IFeatureModel featureModel, IFeature selectedFeature) {
+		super(featureModel, FOLD_OUT_FEATURE);
 		// TODO Auto-generated constructor stub
 		this.selectedFeature = selectedFeature;
 		child = selectedFeature.getStructure().getChildren();
@@ -54,12 +54,12 @@ public class FoldInOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		// TODO Auto-generated method stub
-		FMUIPlugin.getDefault().logInfo("Before Fold in call");
+		FMUIPlugin.getDefault().logInfo("Before Fold out call");
 		for (IFeatureStructure iFeatureStructure : child) {
-			FMUIPlugin.getDefault().logInfo("Fold in called with true");
-			iFeatureStructure.setCollapsed(true);
+			FMUIPlugin.getDefault().logInfo("Fold out called with false");
+			iFeatureStructure.setCollapsed(false);
 		}
-		return new FeatureIDEEvent(featureModel, EventType.FOLD_IN_FEATURE);
+		return new FeatureIDEEvent(featureModel, EventType.FOLD_OUT_FEATURE, null, null);
 	}
 
 	/* (non-Javadoc)
@@ -69,9 +69,9 @@ public class FoldInOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent inverseOperation() {
 		// TODO Auto-generated method stub
 		for (IFeatureStructure iFeatureStructure : child) {
-			iFeatureStructure.setCollapsed(false);
+			iFeatureStructure.setCollapsed(true);
 		}
-		return new FeatureIDEEvent(featureModel, EventType.FOLD_IN_FEATURE);
+		return new FeatureIDEEvent(featureModel, EventType.FOLD_OUT_FEATURE, null, null);
 	}
 
 }
