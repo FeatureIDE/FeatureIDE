@@ -33,9 +33,10 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
+ * Class to test the collapse feature of XmlFeatureModelFormat.java
  * 
- * @author root
+ * @author Christopher Sontag
+ * @author Maximilian Kühl 
  */
 public class TXMLFeatureModelReaderWriter {
 	
