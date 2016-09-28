@@ -20,49 +20,56 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.FOLD_IN_FEATURE;
-
-import java.util.List;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_COLLAPSED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_EXPANDED;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Operation with functionality to collapse a Feature. Enables undo/redo functionality.
+ * TODO description
  * 
  * @author Joshua Sprey
  * @author Enis Belli
  */
-public class FoldInOperation extends AbstractFeatureModelOperation {
-	IFeature selectedFeature;
-	List<IFeatureStructure> child;
+public class SetFeatureToCollapsedOperation extends AbstractFeatureModelOperation {
 
-	public FoldInOperation(IFeatureModel featureModel, IFeature selectedFeature) {
-		super(featureModel, FOLD_IN_FEATURE);
-		this.selectedFeature = selectedFeature;
-		child = selectedFeature.getStructure().getChildren();
+	private IFeature feature;
+
+	/**
+	 * @param label
+	 *            Description of this operation to be used in the menu
+	 * @param feature
+	 *            feature on which this operation will be executed
+	 * 
+	 */
+	public SetFeatureToCollapsedOperation(IFeature feature, IFeatureModel featureModel) {
+		super(featureModel, getLabel(feature));
+		this.feature = feature;
+	}
+
+	/**
+	 * @param feature
+	 * @return String to be used in undo/redo menu
+	 */
+	private static String getLabel(IFeature feature) {
+		if (feature.getStructure().isCollapsed())
+			return SET_FEATURE_COLLAPSED;
+		else
+			return SET_FEATURE_EXPANDED;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-//		for (IFeatureStructure iFeatureStructure : child) {
-//			iFeatureStructure.setCollapsed(true);
-//		}
-		selectedFeature.getStructure().setCollapsed(true);
-		return new FeatureIDEEvent(featureModel, EventType.FOLD_IN_FEATURE);
+		feature.getStructure().setCollapsed(!feature.getStructure().isCollapsed());
+		return new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-//		for (IFeatureStructure iFeatureStructure : child) {
-//			iFeatureStructure.setCollapsed(false);
-//		}
-		selectedFeature.getStructure().setCollapsed(false);
-		return new FeatureIDEEvent(featureModel, EventType.FOLD_IN_FEATURE);
+		return operation();
 	}
 
 }

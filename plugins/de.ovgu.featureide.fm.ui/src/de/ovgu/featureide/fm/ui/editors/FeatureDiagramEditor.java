@@ -30,6 +30,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
 
+import java.awt.event.KeyEvent;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,6 +102,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AutoLayoutConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependencyAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
@@ -109,8 +111,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FoldInAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FoldOutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -169,6 +169,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private DeleteAllAction deleteAllAction;
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
+	private CollapseAction collapseAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private HiddenAction hiddenAction;
 	private AndAction andAction;
@@ -176,8 +177,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
 	private ChangeFeatureDescriptionAction changeFeatureDescriptionAction;
-	private FoldInAction foldInAction;
-	private FoldOutAction foldOutAction;
 
 	private MoveAction moveStopAction;
 	private MoveAction moveUpAction;
@@ -351,14 +350,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createLayerAction = new CreateLayerAction(this, featureModel);
 		createCompoundAction = new CreateCompoundAction(this, featureModel);
 		deleteAction = new DeleteAction(this, featureModel);
-		foldInAction = new FoldInAction(this, featureModel);
-		foldOutAction = new FoldOutAction(this, featureModel);
 
 		colorSelectedFeatureAction = new SetFeatureColorAction(this, featureModelEditor.getModelFile().getProject());
 
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
+		collapseAction = new CollapseAction(this, featureModel);
 		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
 		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
 		andAction = new AndAction(this, featureModel);
@@ -422,9 +420,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT, SWT.CTRL), moveRightAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_DOWN, SWT.CTRL), moveDownAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_LEFT, SWT.CTRL), moveLeftAction);
-		
-		handler.put(KeyStroke.getPressed('E', SWT.CTRL), foldInAction);
-		handler.put(KeyStroke.getPressed('R', SWT.CTRL), foldOutAction);
 
 		handler.put(KeyStroke.getReleased(SWT.CTRL, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(0, SWT.CTRL), moveStopAction);
@@ -503,6 +498,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(mandatoryAction);
 			menu.add(abstractAction);
 			menu.add(hiddenAction);
+			menu.add(collapseAction);
 			menu.add(changeFeatureDescriptionAction);
 			menu.add(new Separator());
 			menu.add(subMenuLayout);
@@ -513,9 +509,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(legendAction);
 			menu.add(new Separator());
 			menu.add(colorSelectedFeatureAction);
-			menu.add(new Separator());
-			menu.add(foldInAction);
-			menu.add(foldOutAction);
 			menu.add(new Separator());
 			//FOLDACTION
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
@@ -968,12 +961,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case DEPENDENCY_CALCULATED:
 			featureModelEditor.setPageModified(false);
-			break;
-		case FOLD_IN_FEATURE:
-			featureModelEditor.setPageModified(true);
-			break;
-		case FOLD_OUT_FEATURE:
-			featureModelEditor.setPageModified(true);
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");
