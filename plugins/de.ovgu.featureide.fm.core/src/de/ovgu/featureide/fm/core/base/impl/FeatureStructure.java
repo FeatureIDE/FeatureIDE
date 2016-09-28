@@ -240,7 +240,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 		if (isRoot()) {
 
-			return isCollapsed();
+			return false;
 		}
 		IFeatureStructure p = getParent();
 
@@ -249,7 +249,6 @@ public class FeatureStructure implements IFeatureStructure {
 				return true;
 			}
 			p = p.getParent();
-
 		}
 
 		return p.isCollapsed();
