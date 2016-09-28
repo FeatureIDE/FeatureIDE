@@ -498,7 +498,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			boolean mandatory = false;
 			boolean _abstract = false;
 			boolean hidden = false;
-			boolean collapsed = true;
+			boolean collapsed = false;
 			String name = "";
 			//			FMPoint featureLocation = null;
 			if (e.hasAttributes()) {

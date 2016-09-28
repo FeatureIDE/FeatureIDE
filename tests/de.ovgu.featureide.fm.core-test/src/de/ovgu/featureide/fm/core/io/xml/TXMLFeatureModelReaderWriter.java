@@ -46,25 +46,22 @@ public class TXMLFeatureModelReaderWriter {
 		IFeatureModel fmNotCollapsed = Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE, Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
 		
 		for (IFeature origF : fmOrig.getFeatures()) {
-			if (origF.getStructure().isCollapsed()) {
 				IFeature newF = fmCollapsed.getFeature(origF.getName());
 				if (newF == null) {
 					fail();
 				} else {
-					assertEquals("Feature: " + origF.getName(), origF.getStructure().isCollapsed(), fmCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
+					assertEquals("Feature: " + origF.getName(), !origF.getStructure().isCollapsed(), fmCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
 				}
-			}
 		}
 		
 		for (IFeature origF : fmOrig.getFeatures()) {
-			if (origF.getStructure().isCollapsed()) {
 				IFeature newF = fmNotCollapsed.getFeature(origF.getName());
+				
 				if (newF == null) {
 					fail();
 				} else {
-					assertEquals("Feature: " + origF.getName(), !origF.getStructure().isCollapsed(), fmNotCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
+					assertEquals("Feature: " + origF.getName(), origF.getStructure().isCollapsed(), fmNotCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
 				}
-			}
 		}
 	}
 	

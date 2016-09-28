@@ -148,7 +148,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 	
 	protected void fireCollapsedChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.COLLAPSED_CHANGED, Boolean.TRUE, Boolean.FALSE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.COLLAPSED_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
