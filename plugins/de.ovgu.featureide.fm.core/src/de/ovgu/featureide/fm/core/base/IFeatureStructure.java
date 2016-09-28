@@ -63,6 +63,8 @@ public interface IFeatureStructure {
 	boolean hasChildren();
 
 	boolean hasHiddenParent();
+	
+	boolean hasCollapsedParent();
 
 	boolean hasInlineRule();
 

@@ -218,8 +218,8 @@ public class FeatureUIHelper {
 				parentFeatureHidden = true;
 			}
 		}
-		if ((feature.getObject().getStructure().isHidden() || parentFeatureHidden)
-				&& !feature.getGraphicalModel().getLayout().showHiddenFeatures()) {
+		if (((feature.getObject().getStructure().isHidden() || parentFeatureHidden)
+				&& !feature.getGraphicalModel().getLayout().showHiddenFeatures()) || feature.getObject().getStructure().hasCollapsedParent()) {
 			return getTargetLocation(getGraphicalParent(feature));
 		}
 

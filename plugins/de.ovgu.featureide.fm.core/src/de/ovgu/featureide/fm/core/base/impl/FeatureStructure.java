@@ -230,6 +230,30 @@ public class FeatureStructure implements IFeatureStructure {
 
 		return false;
 	}
+	
+
+	/**
+	 * Checks for collapsed Parent. If the node to check is the root, the root collapse value is returned. 
+	 */
+	@Override
+	public boolean hasCollapsedParent() {
+
+		if (isRoot()) {
+
+			return isCollapsed();
+		}
+		IFeatureStructure p = getParent();
+
+		while (!p.isRoot()) {
+			if (p.isCollapsed()) {
+				return true;
+			}
+			p = p.getParent();
+
+		}
+
+		return p.isCollapsed();
+	}
 
 	/**
 	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef ::
@@ -446,5 +470,6 @@ public class FeatureStructure implements IFeatureStructure {
 		sb.append(")");
 		return sb.toString();
 	}
+
 
 }

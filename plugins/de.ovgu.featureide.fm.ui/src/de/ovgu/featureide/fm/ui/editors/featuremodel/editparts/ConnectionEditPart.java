@@ -202,7 +202,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IFeature source = getConnectionModel().getSource().getObject();
 		IFeature sourceParent = getConnectionModel().getSource().getObject();
 		final IGraphicalFeature graphicalTarget = getConnectionModel().getTarget();
-		if (graphicalTarget == null) {
+		if (graphicalTarget == null || source.getStructure().hasCollapsedParent()) {
 			return;
 		}
 		IFeature target = graphicalTarget.getObject();
@@ -235,7 +235,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	public void refreshTargetDecoration() {
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
-		if (target == null) {
+		if (target == null || target.getObject().getStructure().hasCollapsedParent()) {
 			return;
 		}
 		RotatableDecoration targetDecoration = createClearDecoration();

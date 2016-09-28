@@ -255,6 +255,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			connectionEditPart.refreshParent();			
 			break;
 		case HIDDEN_CHANGED:
+		case COLLAPSED_CHANGED:
 			getFeatureFigure().setProperties();
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
