@@ -3,9 +3,9 @@
  *
  * This file is part of FeatureIDE.
  * 
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * FeatureIDE is free software: you can redistributeinitialSelectedColor/or modify
+ * it under the terms of the GNU LinitialSelectedColoreneral PuinitialSelectedColorcense as published by
+ * the FreinitialSelectedColorare Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
  * FeatureIDE is distributed in the hope that it will be useful,
@@ -65,15 +65,20 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * 
  * @author Christian Elzholz, Marcus Schmelz
  * @author Marcus Pinnecke
+ * @author Niklas Lehnfeld, Paul Maximilian Bittner
  */
 public class SetFeatureColorDialog extends Dialog {
 
 	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif").createImage();
-	
+
 	private static final Color WHITE = new Color(null, 255, 255, 255);
+	private final FeatureColor initialSelectedColor;
+	private FeatureColor newColor = FeatureColor.NO_COLOR;
+	
 	final protected List<IGraphicalFeature> featureList;
 	protected ArrayList<IGraphicalFeature> featureListBuffer = new ArrayList<>();
-	private FeatureColor newColor = FeatureColor.NO_COLOR;
+	
+	private Table featureTable;
 	private Combo colorDropDownMenu;
 
 	/**
@@ -81,8 +86,13 @@ public class SetFeatureColorDialog extends Dialog {
 	 * @param featurelist
 	 */
 	protected SetFeatureColorDialog(Shell parentShell, List<IGraphicalFeature> featurelist) {
+		this(parentShell, featurelist, null);
+	}
+
+	protected SetFeatureColorDialog(Shell parentShell, List<IGraphicalFeature> featurelist, FeatureColor selectedColor) {
 		super(parentShell);
 		this.featureList = featurelist;
+		this.initialSelectedColor = selectedColor;
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
 	}
 
@@ -135,10 +145,15 @@ public class SetFeatureColorDialog extends Dialog {
 		colorDropDownMenu = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		final String[] colorDropDownItems = new String[FeatureColor.values().length];
 		int i = 0;
+		int initiallySelectedColorIndex = 0; // NO COLOR
 		for (FeatureColor color : FeatureColor.values()) {
-			colorDropDownItems[i++] = color.getColorName();
+			colorDropDownItems[i] = color.getColorName();
+			if (this.initialSelectedColor != null && initialSelectedColor.equals(color)) {
+				initiallySelectedColorIndex = i;
+			}
+			i++;
 		}
-		
+
 		colorDropDownMenu.setLayoutData(gridData);
 		colorDropDownMenu.setItems(colorDropDownItems);
 
@@ -153,30 +168,19 @@ public class SetFeatureColorDialog extends Dialog {
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 
-		final Table featureTable = new Table(container, SWT.BORDER | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
+		featureTable = new Table(container, SWT.BORDER | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
 		featureTable.setLayoutData(gridData);
 
 		SelectionListener colorSelectionListener = new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
-				String selectedColor = colorDropDownMenu.getItem(((Combo) event.widget).getSelectionIndex());
-				FeatureColor color = FeatureColor.getColor(selectedColor);
-				for (int j = 0; j < featureListBuffer.size(); j++) {
-					if (color != FeatureColor.NO_COLOR) {
-						featureTable.getItem(j).setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
-					} else {
-						featureTable.getItem(j).setBackground(WHITE);
-					}
-				}
-				newColor = color;
+				onColorSelectionChanged(((Combo) event.widget).getSelectionIndex());
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 			};
 		};
 		colorDropDownMenu.addSelectionListener(colorSelectionListener);
-		colorDropDownMenu.select(0);
-		
-		
+
 		SelectionListener actionSelectionListener = new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
 				bufferSelectedFeatures();
@@ -199,7 +203,8 @@ public class SetFeatureColorDialog extends Dialog {
 					IGraphicalFeatureModel model = featureListBuffer.get(0).getGraphicalModel();
 					for (int j = 0; j < featureListBuffer.size(); j++) {
 						if (!featureListBuffer.get(j).getObject().getStructure().isRoot()) {
-							affectedFeatures.addAll(FeatureUIHelper.getGraphicalChildren(featureListBuffer.get(j).getObject().getStructure().getParent().getFeature(), model));
+							affectedFeatures.addAll(
+									FeatureUIHelper.getGraphicalChildren(featureListBuffer.get(j).getObject().getStructure().getParent().getFeature(), model));
 						}
 					}
 				}
@@ -213,7 +218,7 @@ public class SetFeatureColorDialog extends Dialog {
 				}
 				featureListBuffer = affectedFeatures;
 			}
-			
+
 			private ArrayList<IGraphicalFeature> findAllChildren(IGraphicalFeature item) {
 				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
 				final List<IGraphicalFeature> children = findChildren(item);
@@ -222,7 +227,7 @@ public class SetFeatureColorDialog extends Dialog {
 					affectedFeatures.addAll(findAllChildren(children.get(j)));
 				return affectedFeatures;
 			}
-			
+
 			private List<IGraphicalFeature> findChildren(IGraphicalFeature parent) {
 				return toList(FeatureUIHelper.getGraphicalChildren(parent));
 			}
@@ -235,20 +240,38 @@ public class SetFeatureColorDialog extends Dialog {
 				featureListBuffer = affectedFeatures;
 			}
 
-		
-
 			public void widgetDefaultSelected(SelectionEvent e) {
 			};
 		};
 		actionDropDownMenu.addSelectionListener(actionSelectionListener);
-		
+
 		actionDropDownMenu.select(0);
 		bufferSelectedFeatures();
 		featureTable.redraw();
 		featureTable.removeAll();
 		colorPreview(featureTable);
+		colorDropDownMenu.select(initiallySelectedColorIndex);
+		// selection changed is only triggered when user changes the selection, so we have to do it manually
+		onColorSelectionChanged(initiallySelectedColorIndex);
 		return parent;
 
+	}
+	
+	/**
+	 * Invoked if the selection in the color combo box has changed.
+	 * @param index The index of the newly selected color.
+	 */
+	private void onColorSelectionChanged(int index) {
+		String selectedColor = colorDropDownMenu.getItem(index);
+		FeatureColor color = FeatureColor.getColor(selectedColor);
+		for (int j = 0; j < featureListBuffer.size(); j++) {
+			if (color != FeatureColor.NO_COLOR) {
+				featureTable.getItem(j).setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
+			} else {
+				featureTable.getItem(j).setBackground(WHITE);
+			}
+		}
+		newColor = color;
 	}
 
 	private void bufferSelectedFeatures() {
@@ -257,7 +280,7 @@ public class SetFeatureColorDialog extends Dialog {
 			featureListBuffer.add(featureList.get(i));
 		}
 	}
-	
+
 	/**
 	 * @param featureTable
 	 *            Colors the background of the table items to show a preview of the changed colors
@@ -266,7 +289,7 @@ public class SetFeatureColorDialog extends Dialog {
 		for (int i = 0; i < featureListBuffer.size(); i++) {
 			TableItem item = new TableItem(featureTable, SWT.NONE);
 			item.setText(featureListBuffer.get(i).getObject().getName());
-			FeatureColor color = FeatureColor.getColor(colorDropDownMenu.getText()); 
+			FeatureColor color = FeatureColor.getColor(colorDropDownMenu.getText());
 			if (color != FeatureColor.NO_COLOR) {
 				item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
 			} else {
@@ -274,7 +297,7 @@ public class SetFeatureColorDialog extends Dialog {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param parent
 	 */

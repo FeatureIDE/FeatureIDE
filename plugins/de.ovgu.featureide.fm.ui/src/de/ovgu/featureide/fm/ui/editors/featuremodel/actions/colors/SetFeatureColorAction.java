@@ -36,6 +36,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -109,8 +111,16 @@ public class SetFeatureColorAction extends Action {
 	}
 
 	public void run() {
-
-		SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, this.featureList);
+				
+		FeatureColor selectedColor = null;
+		
+		// If the color of only one object should be changed, its color is selected in the dialog initially.
+		if (this.featureList.size() == 1) {
+			IGraphicalFeature selectedFeature = featureList.get(0);
+			selectedColor = FeatureColorManager.getColor(selectedFeature.getObject());
+		}
+		
+		SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, this.featureList, selectedColor);
 		int returnstat = dialog.open();
 		
 		if (!featureList.isEmpty() && Window.OK == returnstat) {
