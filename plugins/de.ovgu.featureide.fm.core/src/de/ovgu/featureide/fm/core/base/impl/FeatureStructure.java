@@ -48,6 +48,7 @@ public class FeatureStructure implements IFeatureStructure {
 	protected final IFeature correspondingFeature;
 
 	protected boolean hidden;
+	protected boolean collapsed;
 
 	protected boolean mandatory;
 	protected boolean multiple;
@@ -143,6 +144,11 @@ public class FeatureStructure implements IFeatureStructure {
 
 	protected void fireHiddenChanged() {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		correspondingFeature.fireEvent(event);
+	}
+	
+	protected void fireCollapsedChanged() {
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.COLLAPSED_CHANGED, Boolean.TRUE, Boolean.FALSE);
 		correspondingFeature.fireEvent(event);
 	}
 
@@ -288,6 +294,11 @@ public class FeatureStructure implements IFeatureStructure {
 	public boolean isHidden() {
 		return hidden;
 	}
+	
+	@Override
+	public boolean isCollapsed() {
+		return collapsed;
+	}
 
 	@Override
 	public boolean isMandatory() {
@@ -375,6 +386,12 @@ public class FeatureStructure implements IFeatureStructure {
 	public void setHidden(boolean hid) {
 		hidden = hid;
 		fireHiddenChanged();
+	}
+	
+	@Override
+	public void setCollapsed(boolean collapsed) {
+		this.collapsed = collapsed;
+		fireCollapsedChanged();
 	}
 
 	@Override

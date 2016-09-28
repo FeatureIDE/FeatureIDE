@@ -498,6 +498,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			boolean mandatory = false;
 			boolean _abstract = false;
 			boolean hidden = false;
+			boolean collapsed = true;
 			String name = "";
 			//			FMPoint featureLocation = null;
 			if (e.hasAttributes()) {
@@ -516,6 +517,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 						hidden = attributeValue.equals(TRUE);
 					} else if (attributeName.equals(COORDINATES)) {
 						// Legacy case, for backwards compatibility
+					} else if (attributeName.equals(COLLAPSED)) {
+						collapsed = attributeValue.equals(TRUE);
 					} else {
 						throwError("Unknown feature attribute: " + attributeName, e);
 					}
@@ -546,6 +549,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
+			f.getStructure().setCollapsed(collapsed);
 
 			object.addFeature(f);
 			if (parent == null) {
@@ -588,6 +592,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		fnod.setAttribute(NAME, feat.getName());
 		if (feat.getStructure().isHidden()) {
 			fnod.setAttribute(HIDDEN, TRUE);
+		}
+		if (feat.getStructure().isCollapsed()) {
+			fnod.setAttribute(COLLAPSED, TRUE);
 		}
 		if (feat.getStructure().isMandatory()) {
 			fnod.setAttribute(MANDATORY, TRUE);

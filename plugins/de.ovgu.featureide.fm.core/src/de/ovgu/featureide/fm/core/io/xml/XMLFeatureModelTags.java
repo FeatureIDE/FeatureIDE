@@ -35,6 +35,7 @@ public interface XMLFeatureModelTags {
 	static final String FEATURE_ORDER = "featureOrder";
 	static final String CONSTRAINTS = "constraints";
 	static final String CONSTRAINT = "constraint";
+	static final String COLLAPSED = "collapsed";
 	static final String FEATURES = "features";
 	static final String CHOSEN_LAYOUT_ALGORITHM = "chosenLayoutAlgorithm";
 	static final String C = "c";
