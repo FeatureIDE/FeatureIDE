@@ -55,11 +55,11 @@ public class FoldOutOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent operation() {
 		// TODO Auto-generated method stub
 		FMUIPlugin.getDefault().logInfo("Before Fold out call");
-		for (IFeatureStructure iFeatureStructure : child) {
-			FMUIPlugin.getDefault().logInfo("Fold out called with false");
-			iFeatureStructure.setCollapsed(false);
-		}
-		return new FeatureIDEEvent(featureModel, EventType.FOLD_OUT_FEATURE, null, null);
+//		for (IFeatureStructure iFeatureStructure : child) {
+//			iFeatureStructure.setCollapsed(false);
+//		}
+		selectedFeature.getStructure().setCollapsed(false);
+		return new FeatureIDEEvent(featureModel, EventType.FOLD_OUT_FEATURE);
 	}
 
 	/* (non-Javadoc)
@@ -68,10 +68,11 @@ public class FoldOutOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		// TODO Auto-generated method stub
-		for (IFeatureStructure iFeatureStructure : child) {
-			iFeatureStructure.setCollapsed(true);
-		}
-		return new FeatureIDEEvent(featureModel, EventType.FOLD_OUT_FEATURE, null, null);
+//		for (IFeatureStructure iFeatureStructure : child) {
+//			iFeatureStructure.setCollapsed(true);
+//		}
+		selectedFeature.getStructure().setCollapsed(true);
+		return new FeatureIDEEvent(featureModel, EventType.FOLD_OUT_FEATURE);
 	}
 
 }

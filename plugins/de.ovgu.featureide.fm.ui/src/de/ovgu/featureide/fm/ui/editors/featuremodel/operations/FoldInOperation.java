@@ -55,10 +55,10 @@ public class FoldInOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent operation() {
 		// TODO Auto-generated method stub
 		FMUIPlugin.getDefault().logInfo("Before Fold in call");
-		for (IFeatureStructure iFeatureStructure : child) {
-			FMUIPlugin.getDefault().logInfo("Fold in called with true");
-			iFeatureStructure.setCollapsed(true);
-		}
+//		for (IFeatureStructure iFeatureStructure : child) {
+//			iFeatureStructure.setCollapsed(true);
+//		}
+		selectedFeature.getStructure().setCollapsed(true);
 		return new FeatureIDEEvent(featureModel, EventType.FOLD_IN_FEATURE);
 	}
 
@@ -68,9 +68,10 @@ public class FoldInOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		// TODO Auto-generated method stub
-		for (IFeatureStructure iFeatureStructure : child) {
-			iFeatureStructure.setCollapsed(false);
-		}
+//		for (IFeatureStructure iFeatureStructure : child) {
+//			iFeatureStructure.setCollapsed(false);
+//		}
+		selectedFeature.getStructure().setCollapsed(false);
 		return new FeatureIDEEvent(featureModel, EventType.FOLD_IN_FEATURE);
 	}
 

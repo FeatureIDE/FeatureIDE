@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -414,6 +415,7 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public void setCollapsed(boolean collapsed) {
 		this.collapsed = collapsed;
+		FMCorePlugin.getDefault().logInfo(""+collapsed);
 		fireCollapsedChanged();
 	}
 
