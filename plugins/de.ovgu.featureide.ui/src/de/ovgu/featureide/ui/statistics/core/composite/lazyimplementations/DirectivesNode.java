@@ -127,6 +127,7 @@ public class DirectivesNode extends LazyParent {
 					p.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, aggProject.getNestingCountForClass(c.getName())));
 					addChild(p);
 				}
+				addChild(new StatisticsProgramSizeNew(NUMBER_OF_CODELINES, fstModel));
 			}
 		};
 		addChild(classes);

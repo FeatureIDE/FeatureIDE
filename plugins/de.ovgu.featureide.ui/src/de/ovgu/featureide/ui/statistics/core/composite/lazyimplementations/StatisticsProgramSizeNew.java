@@ -97,14 +97,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			numberOfUniMethods += methHelper.size();
 			numberOfClasses += allFrag.size();
 		}
-
-		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
+		
+//		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
 			try {
 				checkLOC();
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
-		}
+//		}
 
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
@@ -112,7 +112,12 @@ public class StatisticsProgramSizeNew extends LazyParent {
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
 		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
-		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
+		
+		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
+			addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
+		} else {
+			addChild(new LOCNodePreprocessor(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
+		}
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {
