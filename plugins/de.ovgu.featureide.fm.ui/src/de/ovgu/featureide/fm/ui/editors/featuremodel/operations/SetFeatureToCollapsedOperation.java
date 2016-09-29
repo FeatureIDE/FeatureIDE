@@ -64,7 +64,7 @@ public class SetFeatureToCollapsedOperation extends AbstractFeatureModelOperatio
 	@Override
 	protected FeatureIDEEvent operation() {
 		feature.getStructure().setCollapsed(!feature.getStructure().isCollapsed());
-		return new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED);
+		return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, Boolean.FALSE, Boolean.TRUE);
 	}
 
 	@Override

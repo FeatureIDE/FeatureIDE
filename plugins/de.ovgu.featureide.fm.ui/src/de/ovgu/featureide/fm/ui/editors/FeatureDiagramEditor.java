@@ -460,9 +460,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 
 		NameTypeSelectionAction curNameType = null;
-		if(graphicalFeatureModel.getLayout().showShortNames()){
+		if (graphicalFeatureModel.getLayout().showShortNames()) {
 			curNameType = setNameType.get(1);
-		}else{
+		} else {
 			curNameType = setNameType.get(0);
 		}
 		curNameType.setChecked(true);
@@ -920,7 +920,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
-			
+
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			reload();
@@ -941,13 +941,35 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			internRefresh(false);
 			break;
 		case HIDDEN_CHANGED:
+			reload();
+			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
+			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
+				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
+			}
+			legendLayoutAction.refresh();
+			featureModelEditor.setPageModified(true);
+			internRefresh(true);
+			analyzeFeatureModel();
+			refreshAll();
+			break;
 		case COLLAPSED_CHANGED:
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
-			internRefresh(true);
-			analyzeFeatureModel();
+			// clear registry
+			final Map<?, ?> registryCollapsed = getEditPartRegistry();
+			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+				registryCollapsed.remove(f);
+				registryCollapsed.remove(f.getSourceConnection());
+			}
+			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
+				registryCollapsed.remove(f);
+			}
+			graphicalFeatureModel.init();
+			setContents(graphicalFeatureModel);
+			reload();
 			featureModelEditor.setPageModified(true);
+			internRefresh(true);
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
