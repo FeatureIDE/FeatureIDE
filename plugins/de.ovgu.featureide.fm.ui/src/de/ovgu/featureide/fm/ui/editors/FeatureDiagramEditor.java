@@ -348,7 +348,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createCompoundAction = new CreateCompoundAction(this, featureModel);
 		deleteAction = new DeleteAction(this, featureModel);
 
-		colorSelectedFeatureAction = new SetFeatureColorAction(this, featureModelEditor.getModelFile().getProject());
+		colorSelectedFeatureAction = new SetFeatureColorAction(this, featureModelEditor.getModelFile().getProject(), getFeatureModel());
 
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
@@ -471,10 +471,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			ExtendedFeatureModel ext = (ExtendedFeatureModel) getFeatureModel();
 			mplModel = ext.isMultiProductLineModel();
 		}
+		/*
 		// only allow coloration if the active profile is not the default profile
 		if (FeatureColorManager.isDefault(getFeatureModel())) {
 			colorSelectedFeatureAction.setEnabled(false);
-		}
+		}*/
 		if (mplModel) {
 			menu.add(subMenuLayout);
 			menu.add(subMenuNameType);
@@ -550,13 +551,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(colorSelectedFeatureAction);
 			colorSelectedFeatureAction.setEnabled(false);
 			menu.add(new Separator());
-			/*menu.add(createConstraintAction);
-			menu.add(new Separator());
-			menu.add(subMenuLayout);
-			menu.add(subMenuCalculations);
-			menu.add(new Separator());
-			menu.add(reverseOrderAction);
-			menu.add(legendAction);*/
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
@@ -816,7 +810,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
-		final EventType prop = event.getEventType();
+		final EventType prop = event.getEventType();System.err.println("lol");
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
 			IFeature oldParent = (IFeature) event.getOldValue();
@@ -986,6 +980,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			} else {
 				FMUIPlugin.getDefault().logWarning(event + " contains wrong source type: " + event.getSource());
 			}
+			
+			reload();
+			refreshGraphics(null);
 			break;
 		case DEPENDENCY_CALCULATED:
 			featureModelEditor.setPageModified(false);

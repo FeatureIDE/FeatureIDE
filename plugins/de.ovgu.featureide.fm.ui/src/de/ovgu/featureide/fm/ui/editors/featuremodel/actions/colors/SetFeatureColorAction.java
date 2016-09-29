@@ -23,18 +23,23 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -42,6 +47,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
 
 /**
  * ColorSelectedFeatureAction is the action that opens the ColorSelectedFeatureDialog
@@ -53,48 +59,52 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 public class SetFeatureColorAction extends Action {
 
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
-	
-	protected ArrayList<IGraphicalFeature> featureList = new ArrayList<>();
-	final protected Shell shell = new Shell();
-	TreeViewer viewer;
 
-	public ISelectionChangedListener listener = new ISelectionChangedListener() {
-		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			updateFeatureList(selection);
-			if (featureList.isEmpty()) {
-				SetFeatureColorAction.this.setEnabled(false);
-			} else {
-				SetFeatureColorAction.this.setEnabled(true);
-			}
-		}
-
-	};
+	protected List<IGraphicalFeature> featureList = new ArrayList<>();
+	private final IFeatureModel featureModel;
 
 	/**
 	 * @param viewer
 	 * @param project
 	 */
 	public SetFeatureColorAction(FeatureDiagramEditor viewer, IProject project) {
+		this(viewer, project, null);
+	}
+
+	/**
+	 * @param viewer
+	 * @param project
+	 * @param featureModel
+	 */
+	public SetFeatureColorAction(FeatureDiagramEditor viewer, IProject project, IFeatureModel featureModel) {
 		super(COLORATION);
 		if (viewer instanceof GraphicalViewerImpl) {
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+			
+			ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+				public void selectionChanged(SelectionChangedEvent event) {
+					IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+					updateFeatureList(selection);
+					setEnabled(!featureList.isEmpty());
+				}
+			};
+			
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(selectionListener);
 		}
+		
 		setImageDescriptor(colorImage);
-
+		this.featureModel = featureModel;
 	}
 
 	/**
 	 * @param selection
-	 * Creates a featureList with the selected features of the feature diagram.
+	 *            Creates a featureList with the selected features of the feature diagram.
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
-
 		if (!selection.isEmpty()) {
 			featureList.clear();
 
 			Object[] editPartArray = selection.toArray();
-			
+
 			for (int i = 0; i < selection.size(); i++) {
 				Object editPart = editPartArray[i];
 				if (editPart instanceof FeatureEditPart) {
@@ -104,29 +114,43 @@ public class SetFeatureColorAction extends Action {
 						featureList.add(feature);
 				}
 			}
-			return;
-		} else {
-			return;
+		}
+	}
+	
+
+	public void run() {
+		FeatureColor selectedColor = null;
+		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		List<IGraphicalFeature> features = new ArrayList<>(featureList);
+
+		if (!features.isEmpty()) {
+
+			if (featureModel != null) {
+				// only allow coloration if the active profile is not the default profile
+				if (FeatureColorManager.isDefault(featureModel)) {
+					Wizard selectColorSchemeWizard = new SelectColorSchemeWizard(featureModel);
+
+					WizardDialog dialog = new WizardDialog(shell, selectColorSchemeWizard);
+					dialog.create();
+
+					if (dialog.open() == Dialog.CANCEL) {
+						return;
+					}
+				}
+			}
+
+			// If the color of only one object should be changed, its color is selected in the dialog initially.
+			if (features.size() == 1) {
+				IGraphicalFeature selectedFeature = features.get(0);
+				selectedColor = FeatureColorManager.getColor(selectedFeature.getObject());
+			}
+
+			SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, features, selectedColor);
+
+			if (dialog.open() == Window.OK) {
+				featureModel.fireEvent(new FeatureIDEEvent(features, FeatureIDEEvent.EventType.COLOR_CHANGED));
+			}
 		}
 	}
 
-	public void run() {
-				
-		FeatureColor selectedColor = null;
-		
-		// If the color of only one object should be changed, its color is selected in the dialog initially.
-		if (this.featureList.size() == 1) {
-			IGraphicalFeature selectedFeature = featureList.get(0);
-			selectedColor = FeatureColorManager.getColor(selectedFeature.getObject());
-		}
-		
-		SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, this.featureList, selectedColor);
-		int returnstat = dialog.open();
-		
-		if (!featureList.isEmpty() && Window.OK == returnstat) {
-			featureList.get(0).getGraphicalModel().getFeatureModel().fireEvent(new FeatureIDEEvent(dialog.featureListBuffer, FeatureIDEEvent.EventType.COLOR_CHANGED));
-		}
-	}
-	
-	
 }

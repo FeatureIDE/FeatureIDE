@@ -31,7 +31,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATU
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_SIBLINGS;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
@@ -74,10 +76,10 @@ public class SetFeatureColorDialog extends Dialog {
 	private static final Color WHITE = new Color(null, 255, 255, 255);
 	private final FeatureColor initialSelectedColor;
 	private FeatureColor newColor = FeatureColor.NO_COLOR;
-	
+
 	final protected List<IGraphicalFeature> featureList;
 	protected ArrayList<IGraphicalFeature> featureListBuffer = new ArrayList<>();
-	
+
 	private Table featureTable;
 	private Combo colorDropDownMenu;
 
@@ -256,21 +258,20 @@ public class SetFeatureColorDialog extends Dialog {
 		return parent;
 
 	}
-	
+
 	/**
 	 * Invoked if the selection in the color combo box has changed.
+	 * 
 	 * @param index The index of the newly selected color.
 	 */
 	private void onColorSelectionChanged(int index) {
 		String selectedColor = colorDropDownMenu.getItem(index);
 		FeatureColor color = FeatureColor.getColor(selectedColor);
+
 		for (int j = 0; j < featureListBuffer.size(); j++) {
-			if (color != FeatureColor.NO_COLOR) {
-				featureTable.getItem(j).setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
-			} else {
-				featureTable.getItem(j).setBackground(WHITE);
-			}
+			featureTable.getItem(j).setBackground(getItemColorFor(color));
 		}
+
 		newColor = color;
 	}
 
@@ -289,12 +290,9 @@ public class SetFeatureColorDialog extends Dialog {
 		for (int i = 0; i < featureListBuffer.size(); i++) {
 			TableItem item = new TableItem(featureTable, SWT.NONE);
 			item.setText(featureListBuffer.get(i).getObject().getName());
+			
 			FeatureColor color = FeatureColor.getColor(colorDropDownMenu.getText());
-			if (color != FeatureColor.NO_COLOR) {
-				item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
-			} else {
-				item.setBackground(WHITE);
-			}
+			item.setBackground(getItemColorFor(color));
 		}
 	}
 
@@ -312,5 +310,9 @@ public class SetFeatureColorDialog extends Dialog {
 			FeatureColorManager.setColor(feature, newColor);
 		}
 		super.okPressed();
+	}
+	
+	private Color getItemColorFor(FeatureColor featureColor) {
+		return featureColor == FeatureColor.NO_COLOR ? WHITE : featureColor.toSwtColor();
 	}
 }

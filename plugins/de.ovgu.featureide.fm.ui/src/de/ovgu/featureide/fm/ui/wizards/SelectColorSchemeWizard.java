@@ -18,45 +18,44 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions;
+package de.ovgu.featureide.fm.ui.wizards;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.wizard.Wizard;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.color.DefaultColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * This class enables you to switch profiles
+ * TODO description
  * 
- * @author Jonas Weigt
- * @author Christian Harnisch
- * @author Marcus Pinnecke
+ * @author Niklas Lehnfeld
+ * @author Paul Maximilian Bittner
  */
+public class SelectColorSchemeWizard extends Wizard {
 
-public class SetProfileColorSchemeAction extends Action {
-	private IFeatureModel model;
-	private String newProfileColorSchemeName;
-
-	/*
-	 * Constructor
-	 */
-	public SetProfileColorSchemeAction(String text, int style, IFeatureModel model) {
-		super(text, style);
-		this.model = model;
-		this.newProfileColorSchemeName = text;
+	private SelectColorSchemePage page;
+	private IFeatureModel featureModel;
+	
+	public SelectColorSchemeWizard(IFeatureModel featureModel) {
+		super();
+		setWindowTitle(StringTable.SELECT_COLOR_SCHEME);
+		this.featureModel = featureModel;
 	}
 
-	/**
-	 * Changes selected color scheme and saves the configuration 
-	 */
-	public void run() {
-		String clrSchemeName = newProfileColorSchemeName;
-		
-		if (FeatureColorManager.isCurrentColorScheme(model, clrSchemeName))
-			clrSchemeName = DefaultColorScheme.defaultName;
+	public void addPages() {
+		page = new SelectColorSchemePage(featureModel);
+		addPage(page);
+	}
 
-		FeatureColorManager.setActive(model, clrSchemeName);
+	@Override
+	public boolean performFinish() {
+		final String csName = page.getColorSchemeName();
+		if (csName != null && !csName.isEmpty() && FeatureColorManager.hasColorScheme(featureModel, csName)) {
+			FeatureColorManager.setActive(featureModel, csName);
+			return true;
+		}
+		
+		return false;
 	}
 }

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.color;
 
+import org.eclipse.swt.graphics.Color;
+
 /**
  * A mapping from colors to indexes.
  * 
@@ -39,6 +41,10 @@ public enum FeatureColor {
 	
 	public int getValue() {
 		return value;
+	}
+	
+	public Color toSwtColor() {
+		return new Color(null, ColorPalette.getRGB(getValue(), 0.4f));
 	}
 
 	public static FeatureColor getColor(int index) {
