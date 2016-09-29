@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DISABLE_AUTOMA
 import static de.ovgu.featureide.fm.core.localization.StringTable.START_CALCULATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_EDITS;
 
+import org.eclipse.core.internal.runtime.Log;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -58,6 +59,7 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  * A view to calculate the category an edit. Given an open feature model editor
  * the current editing version is compared to the last saved model.
  * 
+ *TODO: Task Performance
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -74,6 +76,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private static final String MANUAL_CALCULATION_TEXT = START_CALCULATION;
 
 	private static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+	
+	
 
 	private TreeViewer viewer;
 
@@ -123,9 +127,12 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private IPartListener editorListener = new IPartListener() {
 
 		public void partOpened(IWorkbenchPart part) {
+	
 		}
 
 		public void partDeactivated(IWorkbenchPart part) {
+			
+			
 		}
 
 		public void partClosed(IWorkbenchPart part) {
@@ -135,7 +142,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part instanceof IEditorPart)
+				
 				setFeatureModelEditor(part);
+			    refresh();
 		}
 
 		public void partActivated(IWorkbenchPart part) {
@@ -148,7 +157,20 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private IEventListener modelListener = new IEventListener() {
 		public void propertyChange(FeatureIDEEvent evt) {
 			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType()))
+				System.out.println("ModelEdit " + evt.getEventType());
+			
+			    IWorkbenchPage page = getSite().getPage();
+			
+			    System.out.println("FeatureModelEdit: isVisible: " + page.isPartVisible(getSite().getPart()) + " Part: " + getSite().getPart().getTitle());
+			
+			    if(page.isPartVisible(getSite().getPart())){
+			   
+			    	
 				refresh();
+				
+				System.out.println("Refresh");
+				
+			    }
 		}
 	};
 
@@ -277,13 +299,27 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						activatorAction.setEnabled(true);
 						activatorAction.setChecked(isActivatorChecked());
 						manualAction.setEnabled(isActivatorChecked());
+						
 
 						if (featureModelEditor == null) {
 							contentProvider.defaultContent();
 						} else if (isActivatorChecked()) {
 							contentProvider.defaultManualContent();
+							System.out.println("MODELEDIT: " + isActivatorChecked() + ": Not Calculating " );
 						} else {
+							IWorkbenchPage page = getSite().getPage();
+							
+							
+							System.out.println("Is part visible: " + page.isPartVisible(getSite().getPart()) + " Part: " + getSite().getPart().getTitle());
+							System.out.println("Team2: FeatureModelEditView: In else Schleife");
+							
+							if(page.isPartVisible(getSite().getPart())){
+							
+						    System.out.println("Team2: FeatureModelEditView: isActivatorChecked: " + isActivatorChecked() + ": isCalculating" );
 							contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+							
+							
+							}
 						}
 						return Status.OK_STATUS;
 					}

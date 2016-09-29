@@ -88,10 +88,12 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
@@ -206,6 +208,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		public IStatus execute(IProgressMonitor monitor) {
 			disableToolbarFilterItems();
+			
+			boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
+			
+			
 			if (configurations.isEmpty()) {
 				refreshButton.setEnabled(true);
 				return Status.OK_STATUS;
@@ -215,7 +221,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			if (configurationFile != null && CollaborationModelBuilder.editorFile != null) {
 				builder.configuration = configurationFile;
 			}
+			
+			
+			if(isVisible){
 			final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
+			System.out.println("Team2: Aufruf updateGUIJob!");
+		
 			if (model == null) {
 				refreshButton.setEnabled(true);
 				return Status.OK_STATUS;
@@ -224,13 +235,20 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			if (!configurations.isEmpty()) {
 				return Status.OK_STATUS;
 			}
+			
 			UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
 				public IStatus runInUIThread(IProgressMonitor monitor) {
+					System.out.println("Collaboration_view: update");
+					
+					if(getSite().getPage().isPartVisible(getSite().getPart())){
+						
 					viewer.setContents(model);
 					EditPart part = viewer.getContents();
 					if (part != null) {
 						part.refresh();
 					}
+					}
+					
 					refreshButton.setEnabled(true);
 					search.refreshSearchContent();
 					return Status.OK_STATUS;
@@ -243,6 +261,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			} catch (InterruptedException e) {
 				UIPlugin.getDefault().logError(e);
 			}
+			}
+			
+			
 			return Status.OK_STATUS;
 		}
 	};
@@ -282,8 +303,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		}
 
-		public void partDeactivated(IWorkbenchPart part) {
-
+		public void partDeactivated(IWorkbenchPart part) {			
+			
 		}
 
 		public void partClosed(IWorkbenchPart part) {
@@ -293,9 +314,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart) {
+			if (part == getSite().getPart()) {
 				setEditorActions(part);
+				System.out.println("Team2: REFRESH!");
+				refresh();
+				
 			}
+			System.out.println("Team2: auﬂerhalb von if!");
 
 		}
 
@@ -431,6 +456,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			}
 		}
 
+		
+		
 		if (activeEditor != null && activeEditor.getEditorInput() instanceof FileEditorInput) {
 			// case: open editor
 			final IFile inputFile = ((FileEditorInput) activeEditor.getEditorInput()).getFile();
@@ -804,6 +831,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	public void refresh() {
 		refreshActionBars();
+		System.out.println("Team2: Innerhalb von der Refresh Methode!");
 
 		final FSTModel model = builder.buildCollaborationModel(featureProject);
 
@@ -815,7 +843,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			public void run() {
 				viewer.setContents(model);
 				viewer.getContents().refresh();
-				search.refreshSearchContent();
+				search.refreshSearchContent();	
 			}
 		});
 	}

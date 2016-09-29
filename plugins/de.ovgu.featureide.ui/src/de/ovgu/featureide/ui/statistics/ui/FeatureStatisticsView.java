@@ -84,6 +84,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		viewer.addDoubleClickListener(new TreeClickListener(viewer));
 		ColumnViewerToolTipSupport.enableFor(viewer);
 
+		
+		//TODO: Task Performance
 		getSite().getPage().addPartListener(editorListener);
 		setEditor(getSite().getPage().getActiveEditor());
 		currentInput = (currentEditor == null) ? null : ResourceUtil.getResource((currentEditor.getEditorInput()));
@@ -120,23 +122,32 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private IPartListener editorListener = new IPartListener() {
 
 		public void partOpened(IWorkbenchPart part) {
+			System.out.println("Ich bin hier: " +  part.getTitle());
+			
+			
 		}
 
 		public void partDeactivated(IWorkbenchPart part) {
+			System.out.println("Ich bin nur im Hintergrund: " +  part.getTitle());
 		}
 
 		public void partClosed(IWorkbenchPart part) {
+			System.out.println("ich bin raus: " + part.getTitle());
 			if (part == currentEditor) {
 				setEditor(null);
 			}
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			System.out.println("Ich bin wieder geöffnet: " + part.getTitle());
+			if (part instanceof IEditorPart){
 				setEditor((IEditorPart) part);
+			    refresh(true);
+			}
 		}
 
 		public void partActivated(IWorkbenchPart part) {
+			System.out.println("Part activated: " + part.getTitle());
 			if (part instanceof IEditorPart) {
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
 				setEditor((IEditorPart) part);
@@ -151,11 +162,17 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
+	 * TODO: Task Performance
 	 */
 	private IEventListener modelListener = new IEventListener() {
 		public void propertyChange(FeatureIDEEvent evt) {
+			
 			if (EventType.MODEL_LAYOUT_CHANGED != evt.getEventType()){
+				
+				
+				if(getSite().getPage().isPartVisible(getSite().getPart())){
 				refresh(false);
+				}
 			}
 		}
 
@@ -199,12 +216,17 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 						} else {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
 							//TODO is refresh really necessary? -> true?
+							
+							
+							System.out.println("FeatureStatistics: isVisible = " + getSite().getPage().isPartVisible(getSite().getPart())+ "Part: " +getSite().getPart().getTitle() );
+							if(getSite().getPage().isPartVisible(getSite().getPart())){
 
 							if (force || currentInput == null || !anyFile.getProject().equals(currentInput.getProject())) {
 								contentProvider.calculateContent(anyFile, true);
 								currentInput = anyFile;
 							} else {
 								contentProvider.calculateContent(anyFile, false);
+							}
 							}
 						}
 						return Status.OK_STATUS;
