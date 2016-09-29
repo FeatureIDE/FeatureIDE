@@ -26,45 +26,57 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
  * Node in the statistics view to show lines of code.<br>
- * Creates each entry for features resp. file extenstions.
+ * Creates each entry for the category loc by feature or
+ * loc by extension.
  * 
  * @author Schleicher Miro
+ * @author Maximilian Homann
+ * @author Philipp Kuhn
  */
 public class HashMapNodeTwoStringsSub extends AbstractSortModeNode {
 
-	private final HashMap<String, Integer> featureExtensionLOCList, count;
-	private final String name;
-	private final int side;
+	private final HashMap<String, Integer> extensionFeatureLOCList, locCount;
+	private final String selectedParent;
+	private final int childIndex;
 	
-	public HashMapNodeTwoStringsSub(String name, Integer integer, HashMap<String, Integer> featureExtensionLOCList, int side) {
+	public HashMapNodeTwoStringsSub(String name, Integer integer, HashMap<String, Integer> featureExtensionLOCList, int childIndex) {
 		super(name, integer);
-		this.featureExtensionLOCList = featureExtensionLOCList;
-		count = new HashMap<String, Integer>();
-		this.name = name;
-		this.side = side;
+		this.extensionFeatureLOCList = featureExtensionLOCList;
+		locCount = new HashMap<String, Integer>();
+		this.selectedParent = name;
+		this.childIndex = childIndex;
 	}
 
+	//team2
 	@Override
 	protected void initChildren() {
-		
-		for (String tempName : featureExtensionLOCList.keySet()) {
-			if(side == 1 && tempName.split("#")[0].equals(name)) {
-				if(!count.containsKey(tempName.split("#")[1])) {
-					count.put(tempName.split("#")[1], featureExtensionLOCList.get(tempName) );
+		for (String extAndFeature : extensionFeatureLOCList.keySet()) {
+			String extensionName = extAndFeature.split("#")[0];
+			String featureName = extAndFeature.split("#")[1];
+//			System.out.println("## Start: "+ extAndFeature);
+//			System.out.println("   ext:"+ extensionName);
+//			System.out.println("   selected:"+ selectedFeat);
+//			System.out.println("   feat:"+ featureName);
+			
+			//LOC by Extension
+			if(childIndex == 1 && extensionName.equals(selectedParent)) {
+				if(!locCount.containsKey(featureName)) {
+					locCount.put(featureName, extensionFeatureLOCList.get(extAndFeature));
 				} else {
-					count.put(tempName.split("#")[1], count.get(tempName.split("#")[1]) + featureExtensionLOCList.get(tempName) );
+					locCount.put(featureName, locCount.get(featureName) + extensionFeatureLOCList.get(extAndFeature));
 				}
-			} else if(side == 2 && tempName.split("#")[1].equals(name)) {
-				if(!count.containsKey(tempName.split("#")[0])) {
-					count.put(tempName.split("#")[0], featureExtensionLOCList.get(tempName) );
+			//LOC by Feature
+			} else if(childIndex == 2 && featureName.equals(selectedParent)) {
+				if(!locCount.containsKey(extensionName)) {
+					locCount.put(extensionName, extensionFeatureLOCList.get(extAndFeature));
 				} else {
-					count.put(tempName.split("#")[0], count.get(tempName.split("#")[0]) + featureExtensionLOCList.get(tempName) );
+					locCount.put(extensionName, locCount.get(extensionName) + extensionFeatureLOCList.get(extAndFeature));
 				}
 			}
 		}
 		
-		for (String key : count.keySet()) {
-			addChild(new Parent(key, count.get(key)));
+		for (String key : locCount.keySet()) {
+			addChild(new Parent(key, locCount.get(key)));
 		}
 		
 	}

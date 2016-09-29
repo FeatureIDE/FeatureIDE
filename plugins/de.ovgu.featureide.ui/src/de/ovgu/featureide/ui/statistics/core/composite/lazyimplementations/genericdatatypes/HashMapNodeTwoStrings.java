@@ -26,39 +26,59 @@ import java.util.HashMap;
  * Node in the statistics view to show lines of code. 
  * 
  * @author Schleicher Miro
+ * @author Maximilian Homann
+ * @author Philipp Kuhn
  */
 public class HashMapNodeTwoStrings extends AbstractSortModeNode {
 
-	private HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
-	private HashMap<String, Integer> count = new HashMap<String, Integer>();
-	private int side;
+	private HashMap<String, Integer> extensionFeatureLOCList = new HashMap<String, Integer>();
+	private HashMap<String, Integer> locCount = new HashMap<String, Integer>();
+	/* child 1: LOC by extension
+	 * child 2: LOC by feature
+	 * child 3: LOC by file
+	 */
+	private int childIndex;
 
-	public HashMapNodeTwoStrings(String description, int side, HashMap<String, Integer> extList) {
+	public HashMapNodeTwoStrings(String description, int childIndex, HashMap<String, Integer> extList) {
 		super(description);
-		featureExtensionLOCList = extList;
-		this.side = side;
+		extensionFeatureLOCList = extList;
+		this.childIndex = childIndex;
 	}
 
 	@Override
 	protected void initChildren() {
-		for (String name : featureExtensionLOCList.keySet()) {
-			if (side == 1) {
-				if (!count.containsKey(name.split("#")[0])) {
-					count.put(name.split("#")[0], featureExtensionLOCList.get(name));
+		for (String extAndFeature : extensionFeatureLOCList.keySet()) {
+			String extensionName = extAndFeature.split("#")[0];
+			String featureName = extAndFeature.split("#")[1];
+//			System.out.println("## Start: "+ extAndFeature);//extAndFeature);
+//			System.out.println("   ext:"+ extensionName);
+//			System.out.println("   feat:"+ featureName);
+			
+			//LOC by extension
+			if (childIndex == 1) {
+				System.out.println("childIndex 1: ext");
+				if (!locCount.containsKey(extensionName)) {
+					locCount.put(extensionName, extensionFeatureLOCList.get(extAndFeature));
 				} else {
-					count.put(name.split("#")[0], count.get(name.split("#")[0]) + featureExtensionLOCList.get(name));
+					locCount.put(extensionName, locCount.get(extensionName) + extensionFeatureLOCList.get(extAndFeature));
 				}
-			} else if (side == 2) {
-				if (!count.containsKey(name.split("#")[1])) {
-					count.put(name.split("#")[1], featureExtensionLOCList.get(name));
+			//LOC by feature
+			} else if (childIndex == 2) {
+				System.out.println("childIndex 2: ext");
+				if (!locCount.containsKey(featureName)) {
+					locCount.put(featureName, extensionFeatureLOCList.get(extAndFeature));
 				} else {
-					count.put(name.split("#")[1], count.get(name.split("#")[1]) + featureExtensionLOCList.get(name));
+					locCount.put(featureName, locCount.get(featureName) + extensionFeatureLOCList.get(extAndFeature));
 				}
 			}
 		}
 
-		for (String name : count.keySet()) {
-			addChild(new HashMapNodeTwoStringsSub(name, count.get(name), featureExtensionLOCList, side));
+		for (String key : locCount.keySet()) {
+//			if (childIndex == 1) 
+//			addChild(new HashMapNodeTwoStringsSub(name, locCount.get(name), extensionFeatureLOCList, false));
+//			if (childIndex == 2)
+//			addChild(new HashMapNodeTwoStringsSub(name, locCount.get(name), extensionFeatureLOCList, true));
+			addChild(new HashMapNodeTwoStringsSub(key, locCount.get(key), extensionFeatureLOCList, childIndex));
 		}
 
 	}
