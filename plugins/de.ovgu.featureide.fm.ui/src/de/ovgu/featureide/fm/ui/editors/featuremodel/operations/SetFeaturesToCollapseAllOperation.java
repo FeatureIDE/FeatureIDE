@@ -20,13 +20,18 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_COLLAPSED;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_EXPANDED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
 
+import java.util.Collections;
+import java.util.Iterator;
+
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
  * TODO description
@@ -34,42 +39,37 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * @author Joshua Sprey
  * @author Enis Belli
  */
-public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation {
-
-	private IFeature feature;
-
-	/**
-	 * @param label
-	 *            Description of this operation to be used in the menu
-	 * @param feature
-	 *            feature on which this operation will be executed
-	 * 
-	 */
-	public SetFeatureToCollapseOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, getLabel(feature));
-		this.feature = feature;
-	}
-
-	/**
-	 * @param feature
-	 * @return String to be used in undo/redo menu
-	 */
-	private static String getLabel(IFeature feature) {
-		if (feature.getStructure().isCollapsed())
-			return SET_FEATURE_COLLAPSED;
-		else
-			return SET_FEATURE_EXPANDED;
+public class SetFeaturesToCollapseAllOperation extends AbstractFeatureModelOperation {
+	
+	Iterable<IFeature> featureModel;
+	boolean collapse;
+	public SetFeaturesToCollapseAllOperation(IFeatureModel featureModel, IFeature selectedFeature, boolean collapse) {
+		super(featureModel, COLLAPSE_ALL);
+		this.featureModel = featureModel.getFeatures();
+		this.collapse = collapse;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		feature.getStructure().setCollapsed(!feature.getStructure().isCollapsed());
-		return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		Iterator<IFeature> feautureModelIterator = featureModel.iterator();
+		while(feautureModelIterator.hasNext())
+		{
+			IFeature feature = feautureModelIterator.next();
+			feature.getStructure().setCollapsed(collapse);
+		}
+		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, !collapse, collapse);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		return operation();
+		Iterator<IFeature> feautureModelIterator = featureModel.iterator();
+		while(feautureModelIterator.hasNext())
+		{
+			IFeature feature = feautureModelIterator.next();
+			feature.getStructure().setCollapsed(collapse);
+		}
+		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, !collapse, collapse);
+		
 	}
 
 }

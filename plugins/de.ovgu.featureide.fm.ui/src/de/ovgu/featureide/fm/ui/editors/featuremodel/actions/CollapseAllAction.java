@@ -20,16 +20,30 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_ABOVE;
+
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.ObjectUndoContext;
+import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeaturesToCollapseAllOperation;
 
 /**
  * TODO description
@@ -37,36 +51,27 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToColl
  * @author Joshua Sprey
  * @author Enis Belli
  */
-public class CollapseAction extends SingleSelectionAction {
+public class CollapseAllAction extends Action {
+	public static final String ID = "de.ovgu.featureide.collapseall";
 
-	public static final String ID = "de.ovgu.featureide.collapse";
+	private final IFeatureModel featureModel;
+	private boolean collapse;
 
-	private IFeatureModel featureModel;
-
-	public CollapseAction(Object viewer, IFeatureModel featureModel) {
-		super(COLLAPSE_FEATURE, viewer);
+	public CollapseAllAction(Object viewer, IFeatureModel featureModel, boolean collapse, String title) {
+		super(title);
 		this.featureModel = featureModel;
+		this.collapse = collapse;
 	}
 
 	@Override
 	public void run() {
-
-		setChecked(feature.getStructure().isCollapsed());
-		SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
-
+		SetFeaturesToCollapseAllOperation op = new SetFeaturesToCollapseAllOperation(featureModel, null, collapse);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
-
 	}
 
-	@Override
-	protected void updateProperties() {
-		setEnabled(true);
-		setChecked(feature.getStructure().isCollapsed());
-	}
-
+	
 }

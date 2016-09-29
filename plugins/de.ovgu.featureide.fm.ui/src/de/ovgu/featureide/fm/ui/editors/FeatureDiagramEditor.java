@@ -29,12 +29,15 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIO
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 
 import java.awt.event.KeyEvent;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -103,6 +106,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AutoLayoutConstrain
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependencyAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
@@ -170,6 +174,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
 	private CollapseAction collapseAction;
+	private CollapseAllAction collapseAllAction;
+	private CollapseAllAction expandAllAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private HiddenAction hiddenAction;
 	private AndAction andAction;
@@ -357,6 +363,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
 		collapseAction = new CollapseAction(this, featureModel);
+		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
+		expandAllAction = new CollapseAllAction(this, featureModel, false, EXPAND_ALL);
 		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
 		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
 		andAction = new AndAction(this, featureModel);
@@ -525,6 +533,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		} else {
 			menu.add(createConstraintAction);
 			menu.add(new Separator());
+			menu.add(collapseAllAction);
+			menu.add(expandAllAction);
 			menu.add(subMenuLayout);
 			menu.add(subMenuCalculations);
 			menu.add(new Separator());
@@ -590,6 +600,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return deleteAction;
 		if (MandatoryAction.ID.equals(workbenchActionID))
 			return mandatoryAction;
+		if (AbstractAction.ID.equals(workbenchActionID))
+			return abstractAction;
+		if (CollapseAction.ID.equals(workbenchActionID))
+			return collapseAction;
 		if (AbstractAction.ID.equals(workbenchActionID))
 			return abstractAction;
 		if (HiddenAction.ID.equals(workbenchActionID))
@@ -981,6 +995,30 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			reload();
 			featureModelEditor.setPageModified(true);
 			internRefresh(true);
+			break;
+		case COLLAPSED_ALL_CHANGED:
+			try {
+				Iterator<IFeature> feautureModelIterator = (Iterator<IFeature>) event.getSource();
+				while (feautureModelIterator.hasNext()) {
+					FeatureUIHelper.getGraphicalFeature(feautureModelIterator.next(), graphicalFeatureModel).update(event);
+				}
+				// clear registry
+				final Map<?, ?> registryCollapsedAll = getEditPartRegistry();
+				for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+					registryCollapsedAll.remove(f);
+					registryCollapsedAll.remove(f.getSourceConnection());
+				}
+				for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
+					registryCollapsedAll.remove(f);
+				}
+				graphicalFeatureModel.init();
+				setContents(graphicalFeatureModel);
+				reload();
+				featureModelEditor.setPageModified(true);
+				internRefresh(true);
+			} catch (Exception e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
