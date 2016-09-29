@@ -728,5 +728,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			break;
 		}
 	}
+	
+	public IGraphicalFeatureModel getGraphicalFeatureModel() {
+		return diagramEditor.getGraphicalFeatureModel();
+	}
 
 }

@@ -348,7 +348,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createCompoundAction = new CreateCompoundAction(this, featureModel);
 		deleteAction = new DeleteAction(this, featureModel);
 
-		colorSelectedFeatureAction = new SetFeatureColorAction(this, featureModelEditor.getModelFile().getProject(), getFeatureModel());
+		colorSelectedFeatureAction = new SetFeatureColorAction(this, getFeatureModel());
 
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);

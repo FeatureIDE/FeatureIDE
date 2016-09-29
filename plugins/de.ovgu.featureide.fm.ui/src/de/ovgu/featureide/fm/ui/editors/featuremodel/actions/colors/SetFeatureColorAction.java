@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
@@ -33,6 +32,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -41,11 +41,13 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
 
@@ -67,8 +69,8 @@ public class SetFeatureColorAction extends Action {
 	 * @param viewer
 	 * @param project
 	 */
-	public SetFeatureColorAction(FeatureDiagramEditor viewer, IProject project) {
-		this(viewer, project, null);
+	public SetFeatureColorAction(FeatureDiagramEditor viewer) {
+		this(viewer, null);
 	}
 
 	/**
@@ -76,7 +78,7 @@ public class SetFeatureColorAction extends Action {
 	 * @param project
 	 * @param featureModel
 	 */
-	public SetFeatureColorAction(FeatureDiagramEditor viewer, IProject project, IFeatureModel featureModel) {
+	public SetFeatureColorAction(FeatureDiagramEditor viewer, IFeatureModel featureModel) {
 		super(COLORATION);
 		if (viewer instanceof GraphicalViewerImpl) {
 			
@@ -94,19 +96,47 @@ public class SetFeatureColorAction extends Action {
 		setImageDescriptor(colorImage);
 		this.featureModel = featureModel;
 	}
+	
+	public SetFeatureColorAction(final TreeViewer viewer, final IGraphicalFeatureModel graphicalFeatureModel, IFeatureModel featureModel){
+		super(COLORATION);
+		ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+			
+			public void selectionChanged(SelectionChangedEvent event) {
+				
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				featureList.clear();
+				
+				Object[] objects = selection.toArray();
+				for(Object obj : objects){
+					Feature feature = (Feature) obj;
+					featureList.add(graphicalFeatureModel.getGraphicalFeature(feature));					
+				}
+				setEnabled(!featureList.isEmpty());
+				
+				viewer.refresh();
+			}
+		};
+			
+		viewer.addSelectionChangedListener(selectionListener);
+		
+
+		setImageDescriptor(colorImage);
+		this.featureModel = featureModel;
+	}
 
 	/**
 	 * @param selection
 	 *            Creates a featureList with the selected features of the feature diagram.
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
-		if (!selection.isEmpty()) {
+		if (!selection.isEmpty()) {			
 			featureList.clear();
-
+			
 			Object[] editPartArray = selection.toArray();
 
 			for (int i = 0; i < selection.size(); i++) {
 				Object editPart = editPartArray[i];
+				
 				if (editPart instanceof FeatureEditPart) {
 					FeatureEditPart editP = (FeatureEditPart) editPart;
 					IGraphicalFeature feature = editP.getFeature();
