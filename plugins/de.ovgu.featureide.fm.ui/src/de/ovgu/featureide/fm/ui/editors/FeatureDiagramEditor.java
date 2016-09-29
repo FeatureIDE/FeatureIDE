@@ -54,6 +54,7 @@ import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.LayerConstants;
+import org.eclipse.gef.MouseWheelZoomHandler;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
@@ -71,8 +72,11 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
@@ -127,6 +131,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.TemporaryMouseHandler;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.DeadFOCalculationsAction;
@@ -362,7 +367,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
-		collapseAction = new CollapseAction(this, featureModel);
+		collapseAction = new CollapseAction(this, featureModel, getFigureCanvas());
 		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
 		expandAllAction = new CollapseAllAction(this, featureModel, false, EXPAND_ALL);
 		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
@@ -435,6 +440,23 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		handler.put(KeyStroke.getReleased(0, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(SWT.CTRL, 0), moveStopAction);
 
+		getFigureCanvas().addListener(SWT.MouseWheel, new Listener() {
+			
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				FMUIPlugin.getDefault().logInfo("MouseEvent: " + event.count);
+				
+				if (event.count > 0) {
+					zoomIn.run();
+				} else {
+					zoomOut.run();
+				}
+			}
+		});
+
+		//		MouseWheelZoomHandler tempMouse;
+		//		getFigureCanvas().addMouseWheelListener(tempMouse);
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
