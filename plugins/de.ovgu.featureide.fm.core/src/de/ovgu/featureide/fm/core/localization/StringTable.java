@@ -428,7 +428,8 @@ public class StringTable {
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
 	public static final String CALCULATE_DEPENDENCY = "Show Hidden Dependencies of Submodel";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
-	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures";
+	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures (CTRL + D)";
+	public static final String COLLAPSE_FEATURE = "Collapse (CTRL + F)";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
 	public static final String EXPORT_AS = "Export As";
 	public static final String HIDE_LEGEND = "Hide Legend";

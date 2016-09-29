@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_FEATURE;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.ui.PlatformUI;
@@ -42,7 +44,7 @@ public class CollapseAction extends SingleSelectionAction {
 	private IFeatureModel featureModel;
 
 	public CollapseAction(Object viewer, IFeatureModel featureModel) {
-		super("Collapse", viewer);
+		super(COLLAPSE_FEATURE, viewer);
 		this.featureModel = featureModel;
 	}
 
