@@ -23,16 +23,15 @@ package de.ovgu.featureide.fm.ui.editors;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DIAGRAM;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 
-import java.awt.event.KeyEvent;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,6 +72,8 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
@@ -107,7 +108,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
@@ -115,6 +115,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
@@ -364,7 +365,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
-		collapseAction = new CollapseAction(this, featureModel);
+		collapseAction = new CollapseAction(this, featureModel, getFigureCanvas());
 		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
 		expandAllAction = new CollapseAllAction(this, featureModel, false, EXPAND_ALL);
 		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
@@ -438,6 +439,23 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		handler.put(KeyStroke.getReleased(0, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(SWT.CTRL, 0), moveStopAction);
 
+		getFigureCanvas().addListener(SWT.MouseWheel, new Listener() {
+			
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				FMUIPlugin.getDefault().logInfo("MouseEvent: " + event.count);
+				
+				if (event.count > 0) {
+					zoomIn.run();
+				} else {
+					zoomOut.run();
+				}
+			}
+		});
+
+		//		MouseWheelZoomHandler tempMouse;
+		//		getFigureCanvas().addMouseWheelListener(tempMouse);
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
