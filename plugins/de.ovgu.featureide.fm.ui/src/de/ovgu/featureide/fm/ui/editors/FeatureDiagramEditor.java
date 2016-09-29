@@ -549,7 +549,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			
 			menu.add(colorSelectedFeatureAction);
-			colorSelectedFeatureAction.setEnabled(false);
 			menu.add(new Separator());
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -810,7 +809,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
-		final EventType prop = event.getEventType();System.err.println("lol");
+		final EventType prop = event.getEventType();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
 			IFeature oldParent = (IFeature) event.getOldValue();
