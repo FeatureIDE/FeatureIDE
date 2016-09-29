@@ -106,6 +106,10 @@ public class FeatureIDEEvent {
 		 */
 		COLLAPSED_CHANGED,
 		/**
+		 * A collapsed feature was changed
+		 */
+		COLLAPSED_ALL_CHANGED,
+		/**
 		 * The location of an object was
 		 */
 		LOCATION_CHANGED,
