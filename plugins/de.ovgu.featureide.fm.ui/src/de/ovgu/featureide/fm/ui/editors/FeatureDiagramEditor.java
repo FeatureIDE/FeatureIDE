@@ -424,7 +424,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
 		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
 		handler.put(KeyStroke.getPressed((char) ('d' - 'a' + 1), 'd', SWT.CTRL), deleteAllAction);
-		handler.put(KeyStroke.getPressed((char) ('f'- 'a' + 1), 'f' , SWT.CTRL), collapseAction);
+		handler.put(KeyStroke.getPressed((char) ('f' - 'a' + 1), 'f', SWT.CTRL), collapseAction);
 
 		handler.put(KeyStroke.getPressed(SWT.ARROW_UP, SWT.CTRL), moveUpAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT, SWT.CTRL), moveRightAction);
@@ -823,18 +823,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IFeature newFeature = (IFeature) event.getNewValue();
 			IFeature parent = (IFeature) event.getOldValue();
 			IFeatureModel fm = (IFeatureModel) event.getSource();
-			// Uncollapse if collapsed
-			if (parent.getStructure().isCollapsed()) {
-				parent.getStructure().setCollapsed(false);
-				fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED));
-			}
-			//Draws the connections
-			if (parent.getStructure().hasChildren()) {
-				for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
-					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+			if (parent != null) {
+				// Uncollapse if collapsed
+				if (parent.getStructure().isCollapsed()) {
+					parent.getStructure().setCollapsed(false);
+					fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED));
+				}
+				//Draws the connections
+				if (parent.getStructure().hasChildren()) {
+					for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
+						child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+					}
 				}
 			}
-			
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) getEditPartRegistry().get(newGraphicalFeature);
 			if (newEditPart != null) {// TODO move to FeatureEditPart
