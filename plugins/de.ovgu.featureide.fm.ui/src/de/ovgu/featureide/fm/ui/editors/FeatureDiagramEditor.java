@@ -807,11 +807,20 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			reload();
 			featureModelEditor.setPageModified(true);
 			IFeature newFeature = (IFeature) event.getNewValue();
-			if (newFeature.getStructure().hasChildren()) {
+			IFeature parent = (IFeature) event.getOldValue();
+			IFeatureModel fm = (IFeatureModel) event.getSource();
+			// Uncollapse if collapsed
+			if (parent.getStructure().isCollapsed()) {
+				parent.getStructure().setCollapsed(false);
+				fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED));
+			}
+			//Draws the connections
+			if (parent.getStructure().hasChildren()) {
 				for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
 			}
+			
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) getEditPartRegistry().get(newGraphicalFeature);
 			if (newEditPart != null) {// TODO move to FeatureEditPart
