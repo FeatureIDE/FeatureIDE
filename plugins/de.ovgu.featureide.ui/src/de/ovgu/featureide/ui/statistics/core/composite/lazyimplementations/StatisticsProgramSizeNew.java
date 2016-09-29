@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -38,6 +39,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -50,6 +52,8 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  * This node should only be used for a feature oriented project.
  * 
  * @author Schleicher Miro
+ * @author Maximilian Homann
+ * @author Philipp Kuhn
  */
 public class StatisticsProgramSizeNew extends LazyParent {
 
@@ -99,13 +103,11 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			numberOfClasses += allFrag.size();
 		}
 		
-//		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
-			try {
-				checkLOC();
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
-			}
-//		}
+		try {
+			checkLOC();
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
 
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
@@ -114,11 +116,8 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 		
-		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
-			addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList, extFileLOCList));
-		} else {
-			addChild(new LOCNodePreprocessor(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
-		}
+		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList, extFileLOCList));
+
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {
@@ -183,20 +182,20 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						
-						String filePath = file.getFullPath().toString();
-						int featureLength = 9; //features has 8 chars plus 1 for /
-				
-						String featurePath = filePath.substring(filePath.indexOf(FEATURES) + featureLength, filePath.length() - 1);
-						String featureName = featurePath.split("/")[0];
-						String fileExt = file.getFileExtension();
-						String key = fileExt + "#" + featureName;
-						if (!featureExtensionLOCList.containsKey(key)) {
-							featureExtensionLOCList.put(key, numberOfLinesInThisFile);
-						} else {
-							featureExtensionLOCList.put(key, featureExtensionLOCList.get(key) + numberOfLinesInThisFile);
+						Iterator<FSTFeature> it = fstModel.getFeatures().iterator();
+						String key = "";
+						String fileExt = "";
+						while(it.hasNext()) {
+							FSTFeature feat = it.next();					
+							String featureName = feat.getName();
+							fileExt = file.getFileExtension();
+							key = fileExt + "#" + featureName;
+							if (!featureExtensionLOCList.containsKey(key)) {
+								featureExtensionLOCList.put(key, numberOfLinesInThisFile);
+							} else {
+								featureExtensionLOCList.put(key, featureExtensionLOCList.get(key) + numberOfLinesInThisFile);
+							}
 						}
-
 						String fileName = file.getName();
 						key = fileExt + "#" + fileName;
 						if (!extFileLOCList.containsKey(key)) {
