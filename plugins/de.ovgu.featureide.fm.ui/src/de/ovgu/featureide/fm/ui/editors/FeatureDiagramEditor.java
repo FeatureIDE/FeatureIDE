@@ -53,6 +53,7 @@ import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.LayerConstants;
+import org.eclipse.gef.MouseWheelZoomHandler;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
@@ -70,8 +71,11 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
@@ -368,9 +372,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
-		collapseAction = new CollapseAction(this, featureModel);
+
+		collapseAction = new CollapseAction(this, featureModel, getFigureCanvas());
 		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL); 
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
+
 		expandAllAction = new CollapseAllAction(this, featureModel, false, EXPAND_ALL);
 		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND);	//icon for expand added
 		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
@@ -452,6 +458,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseHandler(SWT.SHIFT, getFigureCanvas()));
 		//add scroll handler via middle mouse button
 		getFigureCanvas().addMouseListener(new FeatureDiagramEditorMouseHandler(getFigureCanvas()));
+
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
