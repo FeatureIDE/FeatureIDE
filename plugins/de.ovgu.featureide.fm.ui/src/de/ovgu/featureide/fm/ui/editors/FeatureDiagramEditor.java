@@ -514,13 +514,49 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		} else if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
 			connectionEntrys(menu);
 		} else {
-			menu.add(createConstraintAction);
+			menu.add(createCompoundAction);
+			createCompoundAction.setEnabled(false);
+			menu.add(createLayerAction);
+			createLayerAction.setEnabled(false);
+			menu.add(createConstraintWithAction);
+			createConstraintWithAction.setEnabled(false);
+			menu.add(renameAction);
+			renameAction.setEnabled(false);
+			menu.add(deleteAction);
+			menu.add(deleteAllAction);
+			deleteAllAction.setEnabled(false);
+			menu.add(new Separator());
+			connectionEntrys(menu);
+			menu.add(mandatoryAction);
+			mandatoryAction.setEnabled(false);
+			menu.add(abstractAction);
+			abstractAction.setEnabled(false);
+			menu.add(hiddenAction);
+			hiddenAction.setEnabled(false);
+			menu.add(changeFeatureDescriptionAction);
+			changeFeatureDescriptionAction.setEnabled(false);
+			menu.add(new Separator());
+			
+			menu.add(subMenuLayout);
+			menu.add(subMenuCalculations);
+			
+			menu.add(new Separator());
+			menu.add(calculateDependencyAction);
+			calculateDependencyAction.setEnabled(false);
+			menu.add(reverseOrderAction);
+			menu.add(legendAction);
+			menu.add(new Separator());
+			
+			menu.add(colorSelectedFeatureAction);
+			colorSelectedFeatureAction.setEnabled(false);
+			menu.add(new Separator());
+			/*menu.add(createConstraintAction);
 			menu.add(new Separator());
 			menu.add(subMenuLayout);
 			menu.add(subMenuCalculations);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
-			menu.add(legendAction);
+			menu.add(legendAction);*/
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
