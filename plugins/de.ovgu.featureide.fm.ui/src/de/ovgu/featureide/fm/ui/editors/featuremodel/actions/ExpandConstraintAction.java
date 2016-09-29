@@ -20,58 +20,84 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_ABOVE;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraintOperation;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRAINT;
+
+import java.util.Iterator;
 
 /**
  * TODO description
  * 
- * @author Joshua Sprey
- * @author Enis Belli
+ * @author Maximilian Kühl
+ * @author Christopher Sontag
  */
-public class CollapseAllAction extends Action {
-	public static final String ID = "de.ovgu.featureide.collapseall";
+public class ExpandConstraintAction extends Action {
 
-	private final IFeatureModel featureModel;
-	private boolean collapse;
+	private IFeatureModel featureModel;
+	private IConstraint constraint;
+	private ISelectionChangedListener listener = new ISelectionChangedListener() {
+		public void selectionChanged(SelectionChangedEvent event) {
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection));
+		}
+	};
 
-	public CollapseAllAction(Object viewer, IFeatureModel featureModel, boolean collapse, String title) {
-		super(title);
+	/**
+	 * @param viewer
+	 * @param featuremodel
+	 * @param menuname
+	 */
+	public ExpandConstraintAction(Object viewer, IFeatureModel featureModel) {
+		super(EXPAND_CONSTRAINT);
 		this.featureModel = featureModel;
-		this.collapse = collapse;
+		if (viewer instanceof TreeViewer) {
+			((TreeViewer) viewer).addSelectionChangedListener(listener);
+		} else {
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+		}
 	}
 
 	@Override
 	public void run() {
-		CollapseAllOperation op = new CollapseAllOperation(featureModel, collapse);
+		ExpandConstraintOperation op = new ExpandConstraintOperation(featureModel, constraint);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
-
 	
+	protected boolean isValidSelection(IStructuredSelection selection) {
+		if (selection.size() == 1 && selection.getFirstElement() instanceof ModelEditPart)
+			return false;
+
+		Iterator<?> iter = selection.iterator();
+		while (iter.hasNext()) {
+			Object editPart = iter.next();
+			if (editPart instanceof ConstraintEditPart) {
+				constraint = ((ConstraintEditPart) editPart).getConstraintModel().getObject();
+				return true;
+			}
+			if (editPart instanceof IConstraint) {
+				constraint = (IConstraint) editPart;
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

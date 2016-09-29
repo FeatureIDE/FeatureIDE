@@ -39,11 +39,11 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
  * @author Joshua Sprey
  * @author Enis Belli
  */
-public class SetFeaturesToCollapseAllOperation extends AbstractFeatureModelOperation {
+public class CollapseAllOperation extends AbstractFeatureModelOperation {
 	
 	Iterable<IFeature> featureModel;
 	boolean collapse;
-	public SetFeaturesToCollapseAllOperation(IFeatureModel featureModel, IFeature selectedFeature, boolean collapse) {
+	public CollapseAllOperation(IFeatureModel featureModel, boolean collapse) {
 		super(featureModel, COLLAPSE_ALL);
 		this.featureModel = featureModel.getFeatures();
 		this.collapse = collapse;

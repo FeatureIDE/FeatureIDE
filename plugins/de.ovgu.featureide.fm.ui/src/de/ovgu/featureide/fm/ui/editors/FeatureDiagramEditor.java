@@ -107,6 +107,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
@@ -203,6 +204,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private EditConstraintAction editConstraintAction;
 	private CreateConstraintAction createConstraintAction;
 	private CreateConstraintWithAction createConstraintWithAction;
+	private ExpandConstraintAction expandConstraintAction;
 
 	private ReverseOrderAction reverseOrderAction;
 
@@ -383,6 +385,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createConstraintAction = new CreateConstraintAction(this, featureModel);
 		createConstraintWithAction = new CreateConstraintWithAction(this, featureModel);
 		editConstraintAction = new EditConstraintAction(this, featureModel);
+		expandConstraintAction = new ExpandConstraintAction(this, featureModel);
 		reverseOrderAction = new ReverseOrderAction(this, graphicalFeatureModel);
 
 		exportFeatureModelAction = new ExportFeatureModelAction(featureModelEditor);
@@ -523,6 +526,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			//FOLDACTION
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
+			menu.add(expandConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
 		} else if (legendLayoutAction.isEnabled()) {
