@@ -66,7 +66,7 @@ public class SetFeaturesToCollapseAllOperation extends AbstractFeatureModelOpera
 		while(feautureModelIterator.hasNext())
 		{
 			IFeature feature = feautureModelIterator.next();
-			feature.getStructure().setCollapsed(collapse);
+			feature.getStructure().setCollapsed(!collapse);
 		}
 		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, !collapse, collapse);
 		
