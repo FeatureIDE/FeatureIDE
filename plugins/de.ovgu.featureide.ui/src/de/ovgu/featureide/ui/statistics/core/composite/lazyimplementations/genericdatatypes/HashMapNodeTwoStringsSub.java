@@ -33,18 +33,14 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Maximilian Homann
  * @author Philipp Kuhn
  */
-public class HashMapNodeTwoStringsSub extends AbstractSortModeNode {
+public class HashMapNodeTwoStringsSub extends HashMapNodeTwoStrings {
 
-	private final HashMap<String, Integer> extensionFeatureLOCList, locCount;
-	private final String selectedParent;
-	private final int childIndex;
+	private String selectedParent;
 	
-	public HashMapNodeTwoStringsSub(String name, Integer integer, HashMap<String, Integer> featureExtensionLOCList, int childIndex) {
-		super(name, integer);
-		this.extensionFeatureLOCList = featureExtensionLOCList;
-		locCount = new HashMap<String, Integer>();
-		this.selectedParent = name;
-		this.childIndex = childIndex;
+	public HashMapNodeTwoStringsSub(String selectedParent, Integer locCount, int childIndex, HashMap<String, Integer> featureExtensionLOCList, HashMap<String, Integer> extensionFileLOCList) {
+		super(selectedParent, locCount, childIndex, featureExtensionLOCList, extensionFileLOCList);
+		this.selectedParent = selectedParent;
+		
 	}
 
 	//team2
@@ -53,11 +49,7 @@ public class HashMapNodeTwoStringsSub extends AbstractSortModeNode {
 		for (String extAndFeature : extensionFeatureLOCList.keySet()) {
 			String extensionName = extAndFeature.split("#")[0];
 			String featureName = extAndFeature.split("#")[1];
-//			System.out.println("## Start: "+ extAndFeature);
-//			System.out.println("   ext:"+ extensionName);
-//			System.out.println("   selected:"+ selectedFeat);
-//			System.out.println("   feat:"+ featureName);
-			
+		
 			//LOC by Extension
 			if(childIndex == 1 && extensionName.equals(selectedParent)) {
 				if(!locCount.containsKey(featureName)) {
@@ -67,10 +59,21 @@ public class HashMapNodeTwoStringsSub extends AbstractSortModeNode {
 				}
 			//LOC by Feature
 			} else if(childIndex == 2 && featureName.equals(selectedParent)) {
-				if(!locCount.containsKey(extensionName)) {
-					locCount.put(extensionName, extensionFeatureLOCList.get(extAndFeature));
-				} else {
-					locCount.put(extensionName, locCount.get(extensionName) + extensionFeatureLOCList.get(extAndFeature));
+					if(!locCount.containsKey(extensionName)) {
+						locCount.put(extensionName, extensionFeatureLOCList.get(extAndFeature));
+					} else {
+						locCount.put(extensionName, locCount.get(extensionName) + extensionFeatureLOCList.get(extAndFeature));
+					}
+			} 
+		}
+		
+		for (String extAndFile: extensionFileLOCList.keySet()) {
+			String fileName = extAndFile.split("#")[1];
+			String extensionName = extAndFile.split("#")[0];
+			//LOC by file
+			if(childIndex == 3 && extensionName.equals(selectedParent)){
+				if (!locCount.containsKey(fileName)) {
+					locCount.put(fileName, extensionFileLOCList.get(extAndFile));
 				}
 			}
 		}
@@ -78,7 +81,6 @@ public class HashMapNodeTwoStringsSub extends AbstractSortModeNode {
 		for (String key : locCount.keySet()) {
 			addChild(new Parent(key, locCount.get(key)));
 		}
-		
 	}
 	
 }

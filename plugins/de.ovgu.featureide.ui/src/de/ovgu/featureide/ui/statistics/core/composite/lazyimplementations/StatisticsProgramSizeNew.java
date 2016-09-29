@@ -57,6 +57,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			"avi", "flv", "midi" };
 
 	private final HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
+	private final HashMap<String, Integer> extFileLOCList = new HashMap<String, Integer>();
 	private final FSTModel fstModel;
 
 	private int numberOfLines = 0;
@@ -114,7 +115,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 		
 		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
-			addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
+			addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList, extFileLOCList));
 		} else {
 			addChild(new LOCNodePreprocessor(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
 		}
@@ -182,15 +183,26 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-
-						String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf(FEATURES) + 9, file.getFullPath()
-								.toString().length() - 1)).split("/")[0];
-
-						if (!featureExtensionLOCList.containsKey(file.getFileExtension() + "#" + feat)) {
-							featureExtensionLOCList.put(file.getFileExtension() + "#" + feat, numberOfLinesInThisFile);
+						
+						String filePath = file.getFullPath().toString();
+						int featureLength = 9; //features has 8 chars plus 1 for /
+				
+						String featurePath = filePath.substring(filePath.indexOf(FEATURES) + featureLength, filePath.length() - 1);
+						String featureName = featurePath.split("/")[0];
+						String fileExt = file.getFileExtension();
+						String key = fileExt + "#" + featureName;
+						if (!featureExtensionLOCList.containsKey(key)) {
+							featureExtensionLOCList.put(key, numberOfLinesInThisFile);
 						} else {
-							featureExtensionLOCList.put(file.getFileExtension() + "#" + feat, featureExtensionLOCList.get(file.getFileExtension() + "#" + feat)
-									+ numberOfLinesInThisFile);
+							featureExtensionLOCList.put(key, featureExtensionLOCList.get(key) + numberOfLinesInThisFile);
+						}
+
+						String fileName = file.getName();
+						key = fileExt + "#" + fileName;
+						if (!extFileLOCList.containsKey(key)) {
+							extFileLOCList.put(key, numberOfLinesInThisFile);
+						} else {
+							extFileLOCList.put(key, extFileLOCList.get(key) + numberOfLinesInThisFile);
 						}
 					}
 				}

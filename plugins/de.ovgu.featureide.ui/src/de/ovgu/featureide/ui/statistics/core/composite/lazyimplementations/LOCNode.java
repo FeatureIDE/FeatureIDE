@@ -37,17 +37,19 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
 public class LOCNode extends LazyParent {
 
 	private final HashMap<String, Integer> featureExtensionLOCList;
+	private final HashMap<String, Integer> extFileLOCList;
 
-	LOCNode(String description, HashMap<String, Integer> fExList) {
+	LOCNode(String description, HashMap<String, Integer> fExList, HashMap<String, Integer> extFileLOCList) {
 		super(description);
-		featureExtensionLOCList = fExList;
+		this.featureExtensionLOCList = fExList;
+		this.extFileLOCList = extFileLOCList;
 	}
 
 	@Override
 	protected void initChildren() {
-		addChild(new HashMapNodeTwoStrings(LOC_BY_EXTENSION, 1, featureExtensionLOCList));
-		addChild(new HashMapNodeTwoStrings(LOC_BY_FEATURE, 2, featureExtensionLOCList));
-		addChild(new HashMapNodeTwoStrings(LOC_BY_FILE, 3, featureExtensionLOCList));
+		addChild(new HashMapNodeTwoStrings(LOC_BY_EXTENSION, 1, featureExtensionLOCList, extFileLOCList));
+		addChild(new HashMapNodeTwoStrings(LOC_BY_FEATURE, 2, featureExtensionLOCList, extFileLOCList));
+		addChild(new HashMapNodeTwoStrings(LOC_BY_FILE, 3, featureExtensionLOCList, extFileLOCList));
 
 	}
 
