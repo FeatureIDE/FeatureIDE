@@ -20,6 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRAINT;
+
+import java.util.LinkedList;
+
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.PlatformUI;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -28,13 +35,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRAINT;
-
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.PlatformUI;
-
 /**
- * TODO description
  * 
  * @author Maximilian Kühl
  * @author Christopher Sontag
@@ -42,6 +43,9 @@ import org.eclipse.ui.PlatformUI;
 public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	private IConstraint iConstraint;
+
+	private LinkedList<IFeature> affectedFeatureList;
+	
 	/**
 	 * @param featureModel
 	 * @param label
@@ -58,19 +62,20 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		
 		IFeatureStructure p = feature.getStructure().getParent();
 		while (!p.isRoot()) {
-			p.setCollapsed(false);
-			featureModel.fireEvent(new FeatureIDEEvent(p.getFeature(), EventType.COLLAPSED_CHANGED));
+			if (!p.isCollapsed()) {
+				expandFeature(p);
+			} else {
+				break;
+			}
 			p = p.getParent();
 		}
 		p.setCollapsed(false);
 		featureModel.fireEvent(new FeatureIDEEvent(p.getFeature(), EventType.COLLAPSED_CHANGED));
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#operation()
-	 */
 	@Override
 	protected FeatureIDEEvent operation() {
+		getCollapsedFeatures();
 		CollapseAllOperation collapseAll = new CollapseAllOperation(featureModel, true);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(collapseAll, null, null);
@@ -82,14 +87,39 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		}
 		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED);
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#inverseOperation()
-	 */
+	
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		// TODO Auto-generated method stub
-		return null;
+		CollapseAllOperation collapseAll = new CollapseAllOperation(featureModel, true);
+		try {
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(collapseAll, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+		for (IFeature f : affectedFeatureList) {
+			expandFeature(f.getStructure());
+		}
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED);
 	}
-
+	
+	/**
+	 * Collects all features that are not collapsed from the featureModel.
+	 */
+	private void getCollapsedFeatures() {
+		affectedFeatureList = new LinkedList<IFeature>();
+		for (IFeature f : featureModel.getFeatures()) {
+			if (!f.getStructure().isCollapsed()) {
+				affectedFeatureList.add(f);
+			}
+		}
+	}
+	
+	/**
+	 * Expands a single feature.
+	 * @param featureStructure
+	 */
+	private void expandFeature(IFeatureStructure featureStructure) {
+		featureStructure.setCollapsed(false);
+		featureModel.fireEvent(new FeatureIDEEvent(featureStructure.getFeature(), EventType.COLLAPSED_CHANGED));
+	}
 }
