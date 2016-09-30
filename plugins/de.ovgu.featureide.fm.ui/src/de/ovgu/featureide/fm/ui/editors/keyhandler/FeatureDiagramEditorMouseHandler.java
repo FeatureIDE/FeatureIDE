@@ -30,51 +30,46 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
 
 /**
- * <<<<<<< HEAD:plugins/de.ovgu.featureide.fm.ui/src/de/ovgu/featureide/fm/ui/editors/keyhandler/FeatureDiagramEditorMouseWheelHandler.java
- * The mouse wheel listener performs two actions depending on mouse wheel input
- * preferred with state mask (optional)
- * =======
  * The mouse listener performs actions depending on mouse input including scrolling and zooming
- * >>>>>>> Added mouse scrolling while holding shift and using middle mouse
- * button:plugins/de.ovgu.featureide.fm.ui/src/de/ovgu/featureide/fm/ui/editors/keyhandler/FeaetureDiagramEditorMouseHandler.java
  * 
  * The default state mask is 0x0
  * 
  * @author Enis Belli
  * @author Joshua Sprey
  */
-public class FeatureDiagramEditorMouseWheelHandler implements MouseWheelListener, MouseListener {
+public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, MouseListener {
+
 	private Action mouseWheelUpAction;
 	private Action mouseWheelDownAction;
 	private FigureCanvas figureCanvas;
 	private int stateMask;
-
 	private MouseMoveListener mouseMoveListener;
 	private Point positionAtClick;
 
-	public FeatureDiagramEditorMouseWheelHandler(Action mouseWheelUpAction, Action mouseWheelDownAtion) {
+	public FeatureDiagramEditorMouseHandler(Action mouseWheelUpAction, Action mouseWheelDownAtion) {
 		this.mouseWheelDownAction = mouseWheelDownAtion;
 		this.mouseWheelUpAction = mouseWheelUpAction;
 		stateMask = 0x0;
 	}
 
-	public FeatureDiagramEditorMouseWheelHandler(Action mouseWheelUpAction, Action mouseWheelDownAtion, int stateMask) {
+	public FeatureDiagramEditorMouseHandler(Action mouseWheelUpAction, Action mouseWheelDownAtion, int stateMask) {
 		this.mouseWheelDownAction = mouseWheelDownAtion;
 		this.mouseWheelUpAction = mouseWheelUpAction;
 		this.stateMask = stateMask;
 	}
 
-	public FeatureDiagramEditorMouseWheelHandler(int stateMask, FigureCanvas figureCanvas) {
+	public FeatureDiagramEditorMouseHandler(int stateMask, FigureCanvas figureCanvas) {
 		this.stateMask = stateMask;
 		this.figureCanvas = figureCanvas;
 	}
 
-	public FeatureDiagramEditorMouseWheelHandler(final FigureCanvas figureCanvas) {
+	public FeatureDiagramEditorMouseHandler(final FigureCanvas figureCanvas) {
 		this.figureCanvas = figureCanvas;
 		mouseMoveListener = new MouseMoveListener() {
 
 			@Override
 			public void mouseMove(MouseEvent e) {
+				// Perform drag scrolling when middle mouse button is pressed
 				Point currentMousePosition = new Point(e.x, e.y);
 				Dimension difference = currentMousePosition.getDifference(positionAtClick);
 				int xPosition = figureCanvas.getViewport().getViewLocation().x - difference.width;
@@ -87,14 +82,15 @@ public class FeatureDiagramEditorMouseWheelHandler implements MouseWheelListener
 
 	@Override
 	public void mouseScrolled(MouseEvent e) {
+		// Perform actions when set
 		if (mouseWheelUpAction != null || mouseWheelDownAction != null) {
 			if (e.stateMask == stateMask && e.count > 0) {
 				mouseWheelUpAction.run();
 			} else if (e.stateMask == stateMask && e.count < 0) {
 				mouseWheelDownAction.run();
 			}
-
-		} else if (mouseWheelDownAction == null && mouseWheelUpAction == null) {
+		// Perform horizontal scroll when Shift is pressed while scrolling
+		} else if (mouseWheelDownAction == null && mouseWheelUpAction == null && figureCanvas != null && figureCanvas.getViewport() != null) { 
 			if (e.stateMask == stateMask && e.count > 0) {
 				figureCanvas.scrollTo(figureCanvas.getViewport().getViewLocation().x + 200, figureCanvas.getViewport().getViewLocation().y);
 			} else if (e.stateMask == stateMask && e.count < 0) {
@@ -120,6 +116,5 @@ public class FeatureDiagramEditorMouseWheelHandler implements MouseWheelListener
 		if (e.button == 2) {
 			figureCanvas.removeMouseMoveListener(mouseMoveListener);
 		}
-
 	}
 }
