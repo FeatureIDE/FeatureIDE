@@ -141,7 +141,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPart
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
-import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorMouseWheelHandler;
+import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
@@ -436,9 +436,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		handler.put(KeyStroke.getReleased(0, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(SWT.CTRL, 0), moveStopAction);
 		
-		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseWheelHandler(zoomIn, zoomOut, SWT.CTRL));
-		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseWheelHandler(SWT.SHIFT, getFigureCanvas()));
-		getFigureCanvas().addMouseListener(new FeatureDiagramEditorMouseWheelHandler(getFigureCanvas()));
+		// add zoom handler
+		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseHandler(zoomIn, zoomOut, SWT.CTRL));
+		//add scroll handler via shift
+		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseHandler(SWT.SHIFT, getFigureCanvas()));
+		//add scroll handler via middle mouse button
+		getFigureCanvas().addMouseListener(new FeatureDiagramEditorMouseHandler(getFigureCanvas()));
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
