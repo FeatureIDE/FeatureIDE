@@ -48,7 +48,6 @@ public class FeatureDiagramEditorMouseWheelHandler implements MouseWheelListener
 	public FeatureDiagramEditorMouseWheelHandler(Action mouseWheelUpAction, Action mouseWheelDownAction, int stateMask) {
 		this.mouseWheelDownAction = mouseWheelDownAction;
 		this.mouseWheelUpAction = mouseWheelUpAction;
-		;
 		this.stateMask = stateMask;
 	}
 
