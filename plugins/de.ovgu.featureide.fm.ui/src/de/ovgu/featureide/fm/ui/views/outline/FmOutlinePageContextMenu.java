@@ -147,7 +147,7 @@ public class FmOutlinePageContextMenu {
 	}
 
 	private void initActions() {
-		setFeatureColorAction = new SetFeatureColorAction(viewer, graphicalFM, fInput);
+		setFeatureColorAction = new SetFeatureColorAction(fTextEditor.diagramEditor, fInput, viewer);
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
 		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
@@ -198,9 +198,14 @@ public class FmOutlinePageContextMenu {
 	 */
 	private void addListeners() {
 		viewer.addDoubleClickListener(dblClickListener);
+		
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
+
+				//Temporär
+				viewer.refresh();
+				
 				if (viewer.getSelection() == null)
 					return;
 
@@ -229,7 +234,8 @@ public class FmOutlinePageContextMenu {
 				EditPartViewer view = part.getViewer();
 				if (view != null) {
 					view.reveal(part);
-				}
+				}			
+				
 			}
 
 		});

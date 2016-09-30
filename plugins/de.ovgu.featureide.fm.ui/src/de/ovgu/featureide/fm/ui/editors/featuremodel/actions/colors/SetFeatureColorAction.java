@@ -64,13 +64,27 @@ public class SetFeatureColorAction extends Action {
 
 	protected List<IGraphicalFeature> featureList = new ArrayList<>();
 	private final IFeatureModel featureModel;
-
+	private final IGraphicalFeatureModel graphicalFeatureModel;
+	
+	private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+		public void selectionChanged(SelectionChangedEvent event) {
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			updateFeatureList(selection);
+			setEnabled(!featureList.isEmpty());
+		}
+	};
+	
 	/**
 	 * @param viewer
 	 * @param project
 	 */
 	public SetFeatureColorAction(FeatureDiagramEditor viewer) {
 		this(viewer, null);
+	}
+	
+	public SetFeatureColorAction(FeatureDiagramEditor editor, IFeatureModel featureModel, TreeViewer viewer){
+		this(editor, featureModel);
+		viewer.addSelectionChangedListener(selectionListener);		
 	}
 
 	/**
@@ -79,50 +93,15 @@ public class SetFeatureColorAction extends Action {
 	 * @param featureModel
 	 */
 	public SetFeatureColorAction(FeatureDiagramEditor viewer, IFeatureModel featureModel) {
-		super(COLORATION);
-		if (viewer instanceof GraphicalViewerImpl) {
-			
-			ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
-				public void selectionChanged(SelectionChangedEvent event) {
-					IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-					updateFeatureList(selection);
-					setEnabled(!featureList.isEmpty());
-				}
-			};
-			
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(selectionListener);
-		}
+		super(COLORATION);			
+		
+		viewer.addSelectionChangedListener(selectionListener);		
 		
 		setImageDescriptor(colorImage);
 		this.featureModel = featureModel;
+		this.graphicalFeatureModel = viewer.getGraphicalFeatureModel();
 	}
 	
-	public SetFeatureColorAction(final TreeViewer viewer, final IGraphicalFeatureModel graphicalFeatureModel, IFeatureModel featureModel){
-		super(COLORATION);
-		ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
-			
-			public void selectionChanged(SelectionChangedEvent event) {
-				
-				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				featureList.clear();
-				
-				Object[] objects = selection.toArray();
-				for(Object obj : objects){
-					Feature feature = (Feature) obj;
-					featureList.add(graphicalFeatureModel.getGraphicalFeature(feature));					
-				}
-				setEnabled(!featureList.isEmpty());
-				
-				viewer.refresh();
-			}
-		};
-			
-		viewer.addSelectionChangedListener(selectionListener);
-		
-
-		setImageDescriptor(colorImage);
-		this.featureModel = featureModel;
-	}
 
 	/**
 	 * @param selection
@@ -131,17 +110,21 @@ public class SetFeatureColorAction extends Action {
 	public void updateFeatureList(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {			
 			featureList.clear();
-			
 			Object[] editPartArray = selection.toArray();
 
 			for (int i = 0; i < selection.size(); i++) {
-				Object editPart = editPartArray[i];
+				Object obj = editPartArray[i];
 				
-				if (editPart instanceof FeatureEditPart) {
-					FeatureEditPart editP = (FeatureEditPart) editPart;
+				if (obj instanceof FeatureEditPart) {
+					FeatureEditPart editP = (FeatureEditPart) obj;
 					IGraphicalFeature feature = editP.getFeature();
 					if (!featureList.contains(feature))
 						featureList.add(feature);
+				}
+				
+				if(obj instanceof Feature){
+					Feature feature = (Feature) obj;
+					featureList.add(graphicalFeatureModel.getGraphicalFeature(feature));					
 				}
 			}
 		}
