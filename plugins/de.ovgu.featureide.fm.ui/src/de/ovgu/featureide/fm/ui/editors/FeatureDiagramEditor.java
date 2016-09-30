@@ -142,7 +142,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPart
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
-import de.ovgu.featureide.fm.ui.editors.keyhandler.FeaetureDiagramEditorMouseHandler;
+import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorMouseWheelHandler;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
@@ -258,7 +258,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		editorKeyHandler = new FeatureDiagramEditorKeyHandler(this, graphicalFeatureModel);
 		setKeyHandler(editorKeyHandler);
 
-		
 	}
 
 	/**
@@ -422,6 +421,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		// menu
 		// getSite().registerContextMenu(menu, graphicalViewer);
 	}
+
 	public void createKeyBindings() {
 		KeyHandler handler = getKeyHandler();
 
@@ -438,8 +438,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		handler.put(KeyStroke.getReleased(SWT.CTRL, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(0, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(SWT.CTRL, 0), moveStopAction);
-		
-		getFigureCanvas().addMouseWheelListener(new FeaetureDiagramEditorMouseHandler(zoomIn, zoomOut, SWT.CTRL));
+
+		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseWheelHandler(zoomIn, zoomOut, SWT.CTRL));
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
