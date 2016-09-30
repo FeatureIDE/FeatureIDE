@@ -435,7 +435,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		handler.put(KeyStroke.getReleased(SWT.CTRL, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(0, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(SWT.CTRL, 0), moveStopAction);
-		
+	}
+
+	public void createMouseHandlers() {
 		// add zoom handler
 		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseHandler(zoomIn, zoomOut, SWT.CTRL));
 		//add scroll handler via shift
@@ -1081,11 +1083,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createContextMenu();
 		createActions();
 		createKeyBindings();
+		createMouseHandlers();
 	}
 
 	public void initEditorView() {
 		createContextMenu();
 		createKeyBindings();
+		createMouseHandlers();
 	}
 
 	private void createContextMenu() {
