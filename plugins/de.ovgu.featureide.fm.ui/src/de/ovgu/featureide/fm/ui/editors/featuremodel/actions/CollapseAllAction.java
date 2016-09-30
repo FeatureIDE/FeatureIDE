@@ -20,33 +20,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_ABOVE;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOperation;
 
 /**
- * TODO description
+ * collapses/expand all features in the given feature model
  * 
  * @author Joshua Sprey
  * @author Enis Belli

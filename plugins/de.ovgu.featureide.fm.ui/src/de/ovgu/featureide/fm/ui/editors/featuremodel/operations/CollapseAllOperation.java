@@ -22,27 +22,25 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
 
-import java.util.Collections;
 import java.util.Iterator;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
- * TODO description
+ * Operation with functionality to set all features to collapsed. Enables
+ * undo/redo functionality.
  * 
  * @author Joshua Sprey
  * @author Enis Belli
  */
 public class CollapseAllOperation extends AbstractFeatureModelOperation {
-	
+
 	Iterable<IFeature> featureModel;
 	boolean collapse;
+
 	public CollapseAllOperation(IFeatureModel featureModel, boolean collapse) {
 		super(featureModel, COLLAPSE_ALL);
 		this.featureModel = featureModel.getFeatures();
@@ -52,8 +50,7 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		Iterator<IFeature> feautureModelIterator = featureModel.iterator();
-		while(feautureModelIterator.hasNext())
-		{
+		while (feautureModelIterator.hasNext()) {
 			IFeature feature = feautureModelIterator.next();
 			feature.getStructure().setCollapsed(collapse);
 		}
@@ -63,13 +60,12 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		Iterator<IFeature> feautureModelIterator = featureModel.iterator();
-		while(feautureModelIterator.hasNext())
-		{
+		while (feautureModelIterator.hasNext()) {
 			IFeature feature = feautureModelIterator.next();
 			feature.getStructure().setCollapsed(!collapse);
 		}
 		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, !collapse, collapse);
-		
+
 	}
 
 }

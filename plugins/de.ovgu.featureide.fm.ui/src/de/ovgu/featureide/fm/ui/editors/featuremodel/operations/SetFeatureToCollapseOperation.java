@@ -29,7 +29,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Operation with functionality to set a feature to collapsed. Enables
+ * undo/redo functionality.
  * 
  * @author Joshua Sprey
  * @author Enis Belli
