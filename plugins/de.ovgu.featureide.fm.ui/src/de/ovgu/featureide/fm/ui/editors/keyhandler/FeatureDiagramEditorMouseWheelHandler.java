@@ -25,7 +25,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 
 /**
- * The mouse wheel listener performs two actions depending on mouse wheel input 
+ * The mouse wheel listener performs two actions depending on mouse wheel input
  * preferred with state mask (optional)
  * 
  * The default state mask is 0x0
@@ -33,41 +33,32 @@ import org.eclipse.swt.events.MouseWheelListener;
  * @author Enis Belli
  * @author Joshua Sprey
  */
-public class FeaetureDiagramEditorMouseHandler implements MouseWheelListener{
+public class FeatureDiagramEditorMouseWheelHandler implements MouseWheelListener {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.MouseWheelListener#mouseScrolled(org.eclipse.swt.events.MouseEvent)
-	 */
-	
 	private Action mouseWheelUpAction;
 	private Action mouseWheelDownAction;
 	private int stateMask;
-	
-	
-	public FeaetureDiagramEditorMouseHandler(Action mouseWheelUpAction, Action mouseWheelDownAtion) {
-		this.mouseWheelDownAction = mouseWheelDownAtion;
+
+	public FeatureDiagramEditorMouseWheelHandler(Action mouseWheelUpAction, Action mouseWheelDownAction) {
+		this.mouseWheelDownAction = mouseWheelDownAction;
 		this.mouseWheelUpAction = mouseWheelUpAction;
 		stateMask = 0x0;
 	}
-	
-	public FeaetureDiagramEditorMouseHandler(Action mouseWheelUpAction, Action mouseWheelDownAtion, int stateMask) {
-		this.mouseWheelDownAction = mouseWheelDownAtion;
-		this.mouseWheelUpAction = mouseWheelUpAction;;
+
+	public FeatureDiagramEditorMouseWheelHandler(Action mouseWheelUpAction, Action mouseWheelDownAction, int stateMask) {
+		this.mouseWheelDownAction = mouseWheelDownAction;
+		this.mouseWheelUpAction = mouseWheelUpAction;
+		;
 		this.stateMask = stateMask;
 	}
-	
 
-	
 	@Override
 	public void mouseScrolled(MouseEvent e) {
 		if (e.stateMask == stateMask && e.count > 0) {
 			mouseWheelUpAction.run();
-		} else if(e.stateMask == stateMask && e.count < 0){
+		} else if (e.stateMask == stateMask && e.count < 0) {
 			mouseWheelDownAction.run();
 		}
-		
+
 	}
-	
-
-
 }
