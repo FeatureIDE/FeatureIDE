@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_FEATURE;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -39,17 +38,17 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToColl
 public class CollapseAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.collapse";
-	private FigureCanvas wurst;
+
 	private IFeatureModel featureModel;
 
-	public CollapseAction(Object viewer, IFeatureModel featureModel, FigureCanvas wurst) {
+	public CollapseAction(Object viewer, IFeatureModel featureModel) {
 		super(COLLAPSE_FEATURE, viewer);
 		this.featureModel = featureModel;
-		this.wurst = wurst;
 	}
 
 	@Override
 	public void run() {
+
 		setChecked(feature.getStructure().isCollapsed());
 		SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
 
@@ -60,7 +59,6 @@ public class CollapseAction extends SingleSelectionAction {
 
 		}
 
-		wurst.scrollSmoothTo(0, 0);
 	}
 
 	@Override
