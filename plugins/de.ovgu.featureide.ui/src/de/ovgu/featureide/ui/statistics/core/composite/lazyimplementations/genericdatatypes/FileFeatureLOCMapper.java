@@ -3,9 +3,9 @@
  *
  * This file is part of FeatureIDE.
  * 
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * FeatureIDE is free software: you can redistrlocByFeatMapt and/or modify
+ * it under the terms of thelocByFeatMapsser GenelocByFeatMaplic License as published by
+ * locByFeatMape Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
  * FeatureIDE is distributed in the hope that it will be useful,
@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gene
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
 
@@ -58,7 +59,7 @@ public class FileFeatureLOCMapper {
 	 * @param featureList A list of features used in file
 	 * @param locByFeat lines of code per feature in file
 	 */
-	public void addFullEntry(IFile file, int locInFile, List<FSTFeature> featureList, Map<FSTFeature, Integer> locByFeat) {
+	public void addEntry(IFile file, int locInFile, ArrayList<FSTFeature> featureList, HashMap<FSTFeature, Integer> locByFeat) {
 		TableRow newRow = new TableRow(file, locInFile, featureList, locByFeat);
 		if (!listTable.contains(newRow)) {
 			listTable.add(newRow);
@@ -70,7 +71,7 @@ public class FileFeatureLOCMapper {
 	 * @param file specifies the entry
 	 * @param LocInFile the lines of code in file
 	 */
-	public void addLocToEntry(IFile file, int LocInFile){
+	public void addLOCToEntry(IFile file, int LocInFile){
 		TableRow existingRow = searchRow(file);
 		if(existingRow != null) {
 			if(existingRow.getLocInFile() == null) {
@@ -97,21 +98,60 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
-	 * Adds the featLocMap in the specified entry
+	 * Add a single feature to the list of features for file
+	 * @param file the file for the new feature
+	 * @param feat the new feature
+	 */
+	public void addSingleFeatToEntry(IFile file, FSTFeature feat) {
+		TableRow existingRow = searchRow(file);
+		if (existingRow != null) {
+			if (existingRow.getFeatureList() == null) {
+				existingRow.setFeatureList(new ArrayList<FSTFeature>());
+			}
+			if (!existingRow.getFeatureList().contains(feat)) {
+				existingRow.getFeatureList().add(feat);
+			}
+		}
+	}
+	
+	/**
+	 * Adds a feature LOC map to the entry specified by file
 	 * @param file specifies the entry
 	 * @param locByFeat lines of code per feature in file
 	 */
-	public void addFeatLocMapToEntry(IFile file, Map<FSTFeature, Integer> locByFeat) {
+	public void addFeatLOCMapToEntry(IFile file, Map<FSTFeature, Integer> locByFeat) {
 		TableRow existingRow = searchRow(file);
 		if(existingRow != null) {		
-			if(existingRow.getLocByFeat() == null) {
-				existingRow.setLocByFeat(locByFeat);
+			if(existingRow.getLocByFeatMap() == null) {
+				existingRow.setLocByFeatMap(locByFeat);
 			}
 			
 		} else {
 			listTable.add(new TableRow(file, locByFeat));
 		}	
 	}
+	
+	/**
+	 * Adds a single entry to the feature LOC map specified by file
+	 * @param file
+	 * @param feat the feature
+	 * @param loc the LOC of this feature
+	 */
+	public void addSingleLOCMapEntry(IFile file, FSTFeature feat, Integer loc) {
+		TableRow existingRow = searchRow(file);
+		if (existingRow != null) {
+			if (existingRow.getLocByFeatMap() == null) {
+				existingRow.setLocByFeatMap(new HashMap<FSTFeature, Integer>());
+			}
+			if (!existingRow.getLocByFeatMap().containsKey(feat)) {
+				existingRow.getLocByFeatMap().put(feat, loc);
+			} else {
+				int oldLOC = existingRow.getLocByFeatMap().get(feat);
+				existingRow.getLocByFeatMap().put(feat, oldLOC + loc.intValue());
+			}
+		}
+	}
+	
 	/**
 	 * searching a row in the column 
 	 * @param file is used as an identifier
@@ -129,7 +169,23 @@ public class FileFeatureLOCMapper {
 		return existingRow;
 	}
 	
-	
+	/**
+	 * Prints the table in an ugly way to the console
+	 */
+	public void printTableToConsole() {
+		System.out.println("IFile  |  LOC  |  ListOfFeat  |  Map<Feat, LOC>");
+		for (TableRow row: listTable) {
+			System.out.print(row.getFile().getName() + "  |  ");
+			System.out.print(row.getLocInFile() + "  |  ");
+			for (FSTFeature feat: row.getFeatureList()) {
+				System.out.println(feat.getName());
+			}
+			System.out.print("  |  ");
+			for (FSTFeature feat: row.getLocByFeatMap().keySet()) {
+				System.out.println(feat.getName() + ", " + row.getLocByFeatMap().get(feat));
+			}
+		}
+	}
 	
 	/**
 	 * 
@@ -140,10 +196,10 @@ public class FileFeatureLOCMapper {
 	 */
 	private class TableRow {
 		//the columns
-		public IFile file;
-		public Integer locInFile;
-		public List<FSTFeature> featureList;
-		public Map<FSTFeature, Integer> locByFeat;
+		private IFile file;
+		private Integer locInFile;
+		private List<FSTFeature> featureList;
+		private Map<FSTFeature, Integer> locByFeatMap;
 		
 		/**
 		 * constructor to create a complete column
@@ -152,11 +208,11 @@ public class FileFeatureLOCMapper {
 		 * @param newFeatureList
 		 * @param newLocByFeat
 		 */
-		public TableRow(IFile newFile, int newLocInFile, List<FSTFeature> newFeatureList, Map<FSTFeature, Integer> newLocByFeat) {
+		public TableRow(IFile newFile, int newLocInFile, ArrayList<FSTFeature> newFeatureList, HashMap<FSTFeature, Integer> newLocByFeat) {
 			file = newFile;
 			locInFile = newLocInFile;
 			featureList = newFeatureList;
-			locByFeat = newLocByFeat;
+			locByFeatMap = newLocByFeat;
 		}
 
 		/**
@@ -186,7 +242,7 @@ public class FileFeatureLOCMapper {
 		 */
 		public TableRow(IFile newFile, Map<FSTFeature, Integer> newLocByFeat) {
 			file = newFile;
-			locByFeat = newLocByFeat;;
+			locByFeatMap = newLocByFeat;;
 		}
 
 		/* (non-Javadoc)
@@ -200,7 +256,7 @@ public class FileFeatureLOCMapper {
 				if (compareMe.getFile().equals(file)) {
 					if (compareMe.getLocInFile() == locInFile) {
 						if (compareMe.getFeatureList().equals(featureList)) {
-							if (compareMe.getLocByFeat().equals(locByFeat))
+							if (compareMe.getLocByFeatMap().equals(locByFeatMap))
 								return true;
 						}
 					}
@@ -254,15 +310,15 @@ public class FileFeatureLOCMapper {
 		/**
 		 * @return the locByFeat
 		 */
-		public Map<FSTFeature, Integer> getLocByFeat() {
-			return locByFeat;
+		public Map<FSTFeature, Integer> getLocByFeatMap() {
+			return locByFeatMap;
 		}
 
 		/**
 		 * @param locByFeat the locByFeat to set
 		 */
-		public void setLocByFeat(Map<FSTFeature, Integer> locByFeat) {
-			this.locByFeat = locByFeat;
+		public void setLocByFeatMap(Map<FSTFeature, Integer> locByFeat) {
+			this.locByFeatMap = locByFeat;
 		}
 		
 	}

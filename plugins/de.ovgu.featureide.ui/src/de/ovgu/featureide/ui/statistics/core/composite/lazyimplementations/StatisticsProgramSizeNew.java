@@ -26,10 +26,13 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -43,8 +46,11 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.FileFeatureLOCMapper;
 
 /**
  * TreeNode who stores the number of classes, roles, fields and methods of a
@@ -63,7 +69,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	private final HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
 	private final HashMap<String, Integer> extFileLOCList = new HashMap<String, Integer>();
 	private final FSTModel fstModel;
-
+	private final FileFeatureLOCMapper fileFeatLOCMapper = new FileFeatureLOCMapper();
 	private int numberOfLines = 0;
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
@@ -182,27 +188,36 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						Iterator<FSTFeature> it = fstModel.getFeatures().iterator();
-						String key = "";
-						String fileExt = "";
-						while(it.hasNext()) {
-							FSTFeature feat = it.next();					
-							String featureName = feat.getName();
-							fileExt = file.getFileExtension();
-							key = fileExt + "#" + featureName;
-							if (!featureExtensionLOCList.containsKey(key)) {
-								featureExtensionLOCList.put(key, numberOfLinesInThisFile);
-							} else {
-								featureExtensionLOCList.put(key, featureExtensionLOCList.get(key) + numberOfLinesInThisFile);
-							}
-						}
-						String fileName = file.getName();
-						key = fileExt + "#" + fileName;
-						if (!extFileLOCList.containsKey(key)) {
-							extFileLOCList.put(key, numberOfLinesInThisFile);
-						} else {
-							extFileLOCList.put(key, extFileLOCList.get(key) + numberOfLinesInThisFile);
-						}
+						
+						//File with loc > Mapper
+						fileFeatLOCMapper.addLOCToEntry(file, numberOfLinesInThisFile);
+						
+//						Iterator<FSTFeature> it = fstModel.getFeatures().iterator();
+//						String key = "";
+//						String fileExt = "";		
+						
+//						while(it.hasNext()) {
+//							FSTFeature feat = it.next();
+//							LinkedList<FSTRole> roleList = feat.getRoles();
+//							for(FSTRole a : roleList){
+//								System.out.println("roleeeee: " + a);
+//							}
+//							String featureName = feat.getName();
+//							fileExt = file.getFileExtension();
+//							key = fileExt + "#" + featureName;
+//							if (!featureExtensionLOCList.containsKey(key)) {
+//								featureExtensionLOCList.put(key, numberOfLinesInThisFile);
+//							} else {
+//								featureExtensionLOCList.put(key, featureExtensionLOCList.get(key) + numberOfLinesInThisFile);
+//							}
+//						}
+//						String fileName = file.getName();
+//						key = fileExt + "#" + fileName;
+//						if (!extFileLOCList.containsKey(key)) {
+//							extFileLOCList.put(key, numberOfLinesInThisFile);
+//						} else {
+//							extFileLOCList.put(key, extFileLOCList.get(key) + numberOfLinesInThisFile);
+//						}
 					}
 				}
 				numberOfLines += numberOfLinesInThisFile;
@@ -211,15 +226,56 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 
 		});
+		fillMapper();
 	}
 	
+	/**
+	 * Fills the File Feature LOC Mapper.
+	 */
+	private void fillMapper() {
+		for (FSTClass fstClass: fstModel.getClasses()) {
+			for (FSTRole role: fstClass.getRoles()) {
+				FSTFeature currentFeat = role.getFeature();
+				IFile file = role.getFile();
+				
+				fileFeatLOCMapper.addSingleFeatToEntry(file, currentFeat);
+				int loc = countDirectivesCode(role.getDirectives());
+				fileFeatLOCMapper.addSingleLOCMapEntry(file, currentFeat, loc);
+			}
+		}
+		fileFeatLOCMapper.printTableToConsole();
+		
+	}
+	
+	/**
+	 * Counts the lines of code of all directives and adds them to the File Feature LOC Mapper.
+	 * @param directives in this file
+	 * @return the LOC in all directives
+	 */
+	private int countDirectivesCode(TreeSet<FSTDirective> directives) {
+		Iterator<FSTDirective> iterator = directives.iterator();
+		int locForDirectives = 0;
+		while (iterator.hasNext()) {
+			FSTDirective directive = iterator.next();
+			locForDirectives += directive.getEndLine() - directive.getStartLine();
+		}
+		return locForDirectives;
+	}
+	
+	/**
+	 * Counts the lines of code in file.
+	 * 
+	 * @param file
+	 * @param oneLineComment
+	 * @param moreLineStart
+	 * @param moreLineEnd
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public static int countLOC(final IFile file, String oneLineComment, String moreLineStart, String moreLineEnd) throws FileNotFoundException, IOException {
 		FileReader fr = new FileReader(file.getLocation().toString());
 		BufferedReader br = new BufferedReader(fr);
-		return countLineNumber(oneLineComment, moreLineStart, moreLineEnd, br);
-	}
-	
-	public static int countLineNumber(String oneLineComment, String moreLineStart, String moreLineEnd, BufferedReader br) throws IOException {
 		int numberOfLinesInThisFile = 0;
 		String s;
 		boolean isInComment = false;
@@ -245,5 +301,5 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		br.close();
 		return numberOfLinesInThisFile;
 	}
-
+	
 }
