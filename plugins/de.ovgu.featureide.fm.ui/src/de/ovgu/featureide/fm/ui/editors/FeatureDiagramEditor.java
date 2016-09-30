@@ -438,8 +438,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		handler.put(KeyStroke.getReleased(SWT.CTRL, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(0, SWT.CTRL), moveStopAction);
 		handler.put(KeyStroke.getReleased(SWT.CTRL, 0), moveStopAction);
-
+		
 		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseWheelHandler(zoomIn, zoomOut, SWT.CTRL));
+		getFigureCanvas().addMouseWheelListener(new FeatureDiagramEditorMouseWheelHandler(SWT.SHIFT, getFigureCanvas()));
+		getFigureCanvas().addMouseListener(new FeatureDiagramEditorMouseWheelHandler(getFigureCanvas()));
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
