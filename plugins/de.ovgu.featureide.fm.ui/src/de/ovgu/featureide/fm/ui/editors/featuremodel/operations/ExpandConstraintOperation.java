@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
+ * Operation with functionality to expand only features of this constraint. Enables undo/redo
+ * functionality. Enables undo/redo functionality.
  * 
  * @author Maximilian Kühl
  * @author Christopher Sontag

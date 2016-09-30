@@ -40,7 +40,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRA
 import java.util.Iterator;
 
 /**
- * TODO description
+ * Expands up to the level of the features of this constraint and collapses all other features.
  * 
  * @author Maximilian Kühl
  * @author Christopher Sontag
