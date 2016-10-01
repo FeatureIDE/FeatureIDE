@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FILE;
 import java.util.HashMap;
 
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNodeTwoStrings;
 
 /**
@@ -38,19 +39,28 @@ public class LOCNode extends LazyParent {
 
 	private final HashMap<String, Integer> featureExtensionLOCList;
 	private final HashMap<String, Integer> extFileLOCList;
+	private final FileFeatureLOCMapper fileFeatureLOCMapper;
 
 	LOCNode(String description, HashMap<String, Integer> fExList, HashMap<String, Integer> extFileLOCList) {
 		super(description);
 		this.featureExtensionLOCList = fExList;
 		this.extFileLOCList = extFileLOCList;
+		this.fileFeatureLOCMapper = null;
+	}
+	
+	public LOCNode(String description, FileFeatureLOCMapper ffLOCMapper) {
+		super(description);
+		this.fileFeatureLOCMapper = ffLOCMapper;
+		featureExtensionLOCList = null;
+		extFileLOCList = null;
 	}
 
 	@Override
 	protected void initChildren() {
-		addChild(new HashMapNodeTwoStrings(LOC_BY_EXTENSION, 1, featureExtensionLOCList, extFileLOCList));
-		addChild(new HashMapNodeTwoStrings(LOC_BY_FEATURE, 2, featureExtensionLOCList, extFileLOCList));
-		addChild(new HashMapNodeTwoStrings(LOC_BY_FILE, 3, featureExtensionLOCList, extFileLOCList));
-
+//		addChild(new HashMapNodeTwoStrings(LOC_BY_EXTENSION, 1, featureExtensionLOCList, extFileLOCList));
+//		addChild(new HashMapNodeTwoStrings(LOC_BY_FEATURE, 2, featureExtensionLOCList, extFileLOCList));
+//		addChild(new HashMapNodeTwoStrings(LOC_BY_FILE, 3, featureExtensionLOCList, extFileLOCList));
+		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper));
 	}
 
 }

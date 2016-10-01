@@ -103,12 +103,12 @@ public class HashMapNodeTwoStrings extends AbstractSortModeNode {
 		//LOC by file	
 		} else if (childIndex == 3) {
 			for (String extAndFile: extensionFileLOCList.keySet()) {
-				String extensionName = extAndFile.split("#")[0];
+				String fileName = extAndFile.split("#")[0];
 				
-				if(!locCount.containsKey(extensionName)) {
-					locCount.put(extensionName, extensionFileLOCList.get(extAndFile));
+				if(!locCount.containsKey(fileName)) {
+					locCount.put(fileName, extensionFileLOCList.get(extAndFile));
 				} else {
-					locCount.put(extensionName, locCount.get(extensionName) + extensionFileLOCList.get(extAndFile));
+					locCount.put(fileName, locCount.get(fileName) + extensionFileLOCList.get(extAndFile));
 				}
 			}
 		}

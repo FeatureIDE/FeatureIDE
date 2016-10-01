@@ -50,7 +50,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.FileFeatureLOCMapper;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
 /**
  * TreeNode who stores the number of classes, roles, fields and methods of a
@@ -195,12 +195,11 @@ public class StatisticsProgramSizeNew extends LazyParent {
 //						Iterator<FSTFeature> it = fstModel.getFeatures().iterator();
 //						String key = "";
 //						String fileExt = "";		
-						
+//						
 //						while(it.hasNext()) {
 //							FSTFeature feat = it.next();
 //							LinkedList<FSTRole> roleList = feat.getRoles();
 //							for(FSTRole a : roleList){
-//								System.out.println("roleeeee: " + a);
 //							}
 //							String featureName = feat.getName();
 //							fileExt = file.getFileExtension();
@@ -238,7 +237,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 				FSTFeature currentFeat = role.getFeature();
 				IFile file = role.getFile();
 				
-				fileFeatLOCMapper.addSingleFeatToEntry(file, currentFeat);
 				int loc = countDirectivesCode(role.getDirectives());
 				fileFeatLOCMapper.addSingleLOCMapEntry(file, currentFeat, loc);
 			}
@@ -269,7 +267,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	 * @param oneLineComment
 	 * @param moreLineStart
 	 * @param moreLineEnd
-	 * @return
+	 * @return the lines of code in file
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */

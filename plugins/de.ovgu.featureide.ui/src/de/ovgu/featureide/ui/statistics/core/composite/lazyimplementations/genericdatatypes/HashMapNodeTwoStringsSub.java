@@ -43,7 +43,6 @@ public class HashMapNodeTwoStringsSub extends HashMapNodeTwoStrings {
 		
 	}
 
-	//team2
 	@Override
 	protected void initChildren() {
 		for (String extAndFeature : extensionFeatureLOCList.keySet()) {
