@@ -24,16 +24,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRA
 
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.PlatformUI;
-
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Operation with functionality to expand only features of this constraint. Enables undo/redo
@@ -75,7 +71,6 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		FMUIPlugin.getDefault().logInfo(this.toString());
 		getCollapsedFeatures();
 		CollapseAllOperation collapseAll = new CollapseAllOperation(featureModel, true);
 
@@ -93,10 +88,6 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
 		collapseAll.operation();
-		for (IFeature f : affectedFeatureList) {
-			FMUIPlugin.getDefault().logInfo(f.getName());
-		}
-		FMUIPlugin.getDefault().logInfo("ENd");
 		for (IFeature f : affectedFeatureList) {
 			expandFeature(f.getStructure());
 		}
