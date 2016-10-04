@@ -108,19 +108,24 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	@Override
 	protected void initChildren() {
 		if (nodeType.equals(LOC_BY_EXTENSION)) {
-			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getExtensions(); 
+			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getExtensionsWithLOC(); 
 			for (String extension: extAndCount.keySet()) {
-				addChild(new LOCFilterChildNode(extension, nodeType, fileFeatureLOCMapper));
+				if (extension != null) {
+					int LOC = extAndCount.get(extension).intValue();
+					addChild(new LOCFilterChildNode(extension + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper));
+				}
 			}
 		} else if (nodeType.equals(LOC_BY_FEATURE)) {
-			HashMap<FSTFeature, Integer> featAndCount = fileFeatureLOCMapper.getFeatures(); 
+			HashMap<FSTFeature, Integer> featAndCount = fileFeatureLOCMapper.getFeaturesWithLOC(); 
 			for (FSTFeature feature: featAndCount.keySet()) {
-				addChild(new LOCFilterChildNode(feature.getName(), nodeType, fileFeatureLOCMapper));
+				int LOC = featAndCount.get(feature).intValue(); 
+				addChild(new LOCFilterChildNode(feature.getName() + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper));
 			}
 		} else if (nodeType.equals(LOC_BY_FILE)) {
 			ArrayList<IFile> files = fileFeatureLOCMapper.getFiles();
 			for (IFile file: files) {
-				//addChild(new );
+				int LOC = fileFeatureLOCMapper.getLOCByFile(file);
+				addChild(new LOCFilterChildNode(file.getName() + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper));
 			}
 		}
 		

@@ -55,8 +55,16 @@ public class FileFeatureLOCMapper {
 
 	private ArrayList<TableRow> table = new ArrayList<TableRow>();
 	
+	/**
+	 * Adds a simple entry to the table
+	 * @param file the new file
+	 * @param locInFile 
+	 */
 	public void addEntry(IFile file, int locInFile) {
 		TableRow newRow = new TableRow(file, locInFile);
+		if (!table.contains(newRow)) {
+			table.add(newRow);
+		}
 	}
 	
 	/**
@@ -71,23 +79,6 @@ public class FileFeatureLOCMapper {
 		if (!table.contains(newRow)) {
 			table.add(newRow);
 		}
-	}
-	
-	/**
-	 * Adds 'lines of code' in the specified entry
-	 * (only if there wasn't any)
-	 * @param file specifies the entry
-	 * @param LocInFile the lines of code in file
-	 */
-	public void addLOCToEntry(IFile file, int LocInFile){
-		TableRow existingRow = searchRow(file);
-		if(existingRow != null) {
-			if(existingRow.getLocInFile() == null) {
-				existingRow.setLocInFile(LocInFile);
-			}
-		} else {
-			table.add(new TableRow(file, LocInFile));
-		}	
 	}
 
 	/**
@@ -113,14 +104,20 @@ public class FileFeatureLOCMapper {
 	 * @param file specifies the entry
 	 * @param locByFeat lines of code per feature in file
 	 */
-	public void addFeatLOCMap(IFile file, Map<FSTFeature, Integer> locByFeat) {
+	public void addFeatLOCMap(IFile file, HashMap<FSTFeature, Integer> locByFeat) {
 		TableRow existingRow = searchRow(file);
 		if(existingRow != null) {		
 			if(existingRow.getLocByFeatMap() == null) {
 				existingRow.setLocByFeatMap(locByFeat);
 			}
 		} else {
-			table.add(new TableRow(file, locByFeat));
+			if (locByFeat != null) {
+				int locInFile = 0;
+				for (FSTFeature feature: locByFeat.keySet()) {
+					locInFile += locByFeat.get(feature).intValue();
+				}
+				table.add(new TableRow(file, locInFile, locByFeat));
+			}
 		}	
 	}
 	
@@ -132,6 +129,7 @@ public class FileFeatureLOCMapper {
 	 */
 	public void addSingleLOCMapEntry(IFile file, FSTFeature feat, Integer loc) {
 		TableRow existingRow = searchRow(file);
+		System.out.println("LOC          : " + loc);
 		if (existingRow != null) {
 			if (existingRow.getLocByFeatMap() == null) {
 				existingRow.setLocByFeatMap(new HashMap<FSTFeature, Integer>());
@@ -168,6 +166,25 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
+	 * Returns a map of all extensions with the lines of code per extension
+	 * @return
+	 */
+	public HashMap<String, Integer> getExtensionsWithLOC() {
+		HashMap<String, Integer> extAndNumber = new HashMap<>();
+		
+		for (TableRow row: table) {
+			String fileExt = row.getFile().getFileExtension();
+			int locHere = row.getLocInFile();
+			Integer oldValue = extAndNumber.putIfAbsent(fileExt, locHere); 
+			if (oldValue != null) {
+				extAndNumber.put(fileExt, oldValue.intValue() + locHere);
+			}
+		}
+		
+		return extAndNumber;
+	}
+	
+	/**
 	 * Returns a HashMap of all FSTFeatures in this table with the number of appearance
 	 * @return
 	 */
@@ -179,6 +196,26 @@ public class FileFeatureLOCMapper {
 				Integer oldValue = features.putIfAbsent(singleFeature, 1);
 				if (oldValue != null) {
 					features.put(singleFeature, oldValue.intValue() +1);
+				}
+			}
+		}
+		
+		return features;
+	}
+	
+	/**
+	 * Returns a HashMap of all FSTFeatures in this table with the lines of code per feature
+	 * @return
+	 */
+	public HashMap<FSTFeature, Integer> getFeaturesWithLOC() {
+		HashMap<FSTFeature, Integer> features = new HashMap<>();
+		
+		for (TableRow row: table) {
+			for (FSTFeature singleFeature: row.getLocByFeatMap().keySet()) {
+				int locInFeature = row.getLocByFeatMap().get(singleFeature);
+				Integer oldValue = features.putIfAbsent(singleFeature, locInFeature);
+				if (oldValue != null) {
+					features.put(singleFeature, oldValue.intValue() +locInFeature);
 				}
 			}
 		}
@@ -230,22 +267,54 @@ public class FileFeatureLOCMapper {
 	 * @param feature to look for
 	 * @return
 	 */
-	public HashMap<String, Integer> getExtensionsByFeatureWithLOC(String feature) {
+	public HashMap<String, Integer> getExtensionsByFeatureWithLOC(FSTFeature feature) {
 		HashMap<String, Integer> extensionsAndLOC = new HashMap<>();
 		
 		for (TableRow row: table) {
-			if (row.containsFeature(feature)) {
-				String extension = row.getFile().getFileExtension();
+			String extension = row.getFile().getFileExtension();
+			HashMap<FSTFeature, Integer> locByFeatMap = row.getLocByFeatMap();
+			
+			if (!locByFeatMap.isEmpty() && locByFeatMap.containsKey(feature)) {
 				int locForFeature = row.getLocByFeatMap().get(feature);
-				
 				Integer oldValue = extensionsAndLOC.putIfAbsent(extension, locForFeature);
 				if (oldValue != null) {
 					extensionsAndLOC.put(extension, oldValue.intValue() + locForFeature);
 				}
 			}
+			
 		}
 		
 		return extensionsAndLOC;
+	}
+	
+	/**
+	 * Returns the feature by name
+	 * @param featureName
+	 * @return
+	 */
+	public FSTFeature resolveFeature(String featureName) {
+		for (TableRow row: table) {
+			if (!row.getLocByFeatMap().isEmpty()) {
+				for (FSTFeature feat: row.getLocByFeatMap().keySet()) {
+					if (feat.getName().equals(featureName)) {
+						return feat;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	public IFile resolveFile(String fileName) { 
+		for (TableRow row: table) {
+			IFile file = row.getFile();
+			if(file != null) {
+				if(file.getName().equals(fileName)) {
+					return file;
+				}
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -331,6 +400,19 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
+	 * Returns the LOC per feature for one file
+	 * @param file defines the file which is searched
+	 * @return null or the HashMap containing the LOC per file
+	 */
+	public HashMap<FSTFeature, Integer> getLOCByFeatMap(IFile file) {
+		TableRow row = searchRow(file);
+		if(row != null) {
+			return row.getLocByFeatMap();
+		}
+		return null;
+	}
+	
+	/**
 	 * Search a row in the table 
 	 * @param file is used as an identifier
 	 * @return null if the column wasn't found
@@ -344,19 +426,38 @@ public class FileFeatureLOCMapper {
 		return null;
 	}
 	
+	public int locWithoutFeatures(IFile file) {
+		TableRow row = searchRow(file);
+		if(row != null) {
+			HashMap<FSTFeature, Integer> featMap = row.getLocByFeatMap();
+			if(featMap != null) {
+				int featLOC = 0;
+				System.out.println("-------------------Start--------------------------------");
+				for(FSTFeature feature: featMap.keySet()) {
+					featLOC += featMap.get(feature).intValue();
+					System.out.println("LOCinFeat "+ feature.getName() + ": " + featMap.get(feature).intValue() );
+					System.out.println("LOCinFeat: " + featLOC );
+				}
+				System.out.println("LOCinFile: " + row.getLocInFile() );
+				System.out.println("LOCinFeat: " + featLOC );
+				System.out.println("-------------------End-------------------------------------");
+				return row.getLocInFile() - featLOC;
+			}
+		}
+		return -1;
+	}
+	
 	/**
 	 * Prints the table in an ugly way to the console
 	 */
 	public void printTableToConsole() {
-		System.out.println("IFile  |  LOC  |  ListOfFeat  |  Map<Feat, LOC>");
+
+		System.out.println("IFile       |  LOC  |  Map<Feat, LOC>");
 		for (TableRow row: table) {
 			System.out.print(row.getFile().getName() + "  |  ");
 			System.out.print(row.getLocInFile() + "  |  ");
-			for (FSTFeature feat: row.getFeatures()) {
-				System.out.println(feat.getName());
-			}
-			System.out.print("  |  ");
 			for (FSTFeature feat: row.getLocByFeatMap().keySet()) {
+				System.out.print("                    ");
 				System.out.println(feat.getName() + ", " + row.getLocByFeatMap().get(feat));
 			}
 		}
@@ -373,7 +474,7 @@ public class FileFeatureLOCMapper {
 		//the columns
 		private IFile file;
 		private Integer locInFile;
-		private Map<FSTFeature, Integer> locByFeatMap;
+		private HashMap<FSTFeature, Integer> locByFeatMap;
 		
 		/**
 		 * constructor to create a complete column
@@ -396,16 +497,7 @@ public class FileFeatureLOCMapper {
 		public TableRow(IFile newFile, int newLocInFile) {
 			file = newFile;
 			locInFile = newLocInFile;
-		}
-
-		/**
-		 * constructor to create a column only filled with a file and lines of code per feature
-		 * @param newFile
-		 * @param newLocByFeat
-		 */
-		public TableRow(IFile newFile, Map<FSTFeature, Integer> newLocByFeat) {
-			file = newFile;
-			locByFeatMap = newLocByFeat;;
+			locByFeatMap = new HashMap<>();
 		}
 		
 		/**
@@ -490,14 +582,14 @@ public class FileFeatureLOCMapper {
 		/**
 		 * @return the locByFeat
 		 */
-		public Map<FSTFeature, Integer> getLocByFeatMap() {
+		public HashMap<FSTFeature, Integer> getLocByFeatMap() {
 			return locByFeatMap;
 		}
 
 		/**
 		 * @param locByFeat the locByFeat to set
 		 */
-		public void setLocByFeatMap(Map<FSTFeature, Integer> locByFeat) {
+		public void setLocByFeatMap(HashMap<FSTFeature, Integer> locByFeat) {
 			this.locByFeatMap = locByFeat;
 		}
 		

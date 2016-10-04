@@ -122,8 +122,8 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 		
-		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList, extFileLOCList));
-
+		//addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList, extFileLOCList));
+		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper));
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {
@@ -190,7 +190,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						}
 						
 						//File with loc > Mapper
-						fileFeatLOCMapper.addLOCToEntry(file, numberOfLinesInThisFile);
+						fileFeatLOCMapper.addEntry(file, numberOfLinesInThisFile);
 						
 //						Iterator<FSTFeature> it = fstModel.getFeatures().iterator();
 //						String key = "";
@@ -232,17 +232,18 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	 * Fills the File Feature LOC Mapper.
 	 */
 	private void fillMapper() {
+		System.out.println(" Mapfiller     #");
 		for (FSTClass fstClass: fstModel.getClasses()) {
 			for (FSTRole role: fstClass.getRoles()) {
+				System.out.println("    Working on role: "+ role.getFeature().getName());
 				FSTFeature currentFeat = role.getFeature();
 				IFile file = role.getFile();
-				
-				int loc = countDirectivesCode(role.getDirectives());
+				int loc = 0;
+				loc = countDirectivesCode(role.getDirectives()); //here if
 				fileFeatLOCMapper.addSingleLOCMapEntry(file, currentFeat, loc);
 			}
 		}
-		fileFeatLOCMapper.printTableToConsole();
-		
+		//fileFeatLOCMapper.printTableToConsole();
 	}
 	
 	/**
@@ -255,7 +256,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int locForDirectives = 0;
 		while (iterator.hasNext()) {
 			FSTDirective directive = iterator.next();
-			locForDirectives += directive.getEndLine() - directive.getStartLine();
+			locForDirectives += directive.getEndLine() - directive.getStartLine() - 1;
 		}
 		return locForDirectives;
 	}

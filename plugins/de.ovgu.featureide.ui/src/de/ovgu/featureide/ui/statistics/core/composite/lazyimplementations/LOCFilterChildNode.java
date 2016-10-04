@@ -23,6 +23,8 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.eclipse.core.resources.IFile;
+
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FILE;
@@ -32,9 +34,8 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
 /**
- * TODO description
- * 
- * @author Gordon
+ * @author Maximilian Homann
+ * @author Philipp Kuhn
  */
 public class LOCFilterChildNode extends LOCFilterNode {
 
@@ -54,17 +55,28 @@ public class LOCFilterChildNode extends LOCFilterNode {
 	@Override
 	protected void initChildren() {
 		if (parentNodeName.equals(LOC_BY_EXTENSION)) {
-			HashMap<FSTFeature, Integer> features = fileFeatureLOCMapper.getFeaturesByExtensionWithLOC(description);
+			String extension = description.split(SEPARATOR)[0];
+			HashMap<FSTFeature, Integer> features = fileFeatureLOCMapper.getFeaturesByExtensionWithLOC(extension);
+
 			for (FSTFeature feature: features.keySet()) {
 				addChild(new Parent(feature.getName(), features.get(feature)));
 			}
 		} else if (parentNodeName.equals(LOC_BY_FEATURE)) {
-			HashMap<String, Integer> extensionsWithLOC = fileFeatureLOCMapper.getExtensionsByFeatureWithLOC(description);
+			String feature = description.split(SEPARATOR)[0];
+			FSTFeature nodeFeature = fileFeatureLOCMapper.resolveFeature(feature);
+			HashMap<String, Integer> extensionsWithLOC = fileFeatureLOCMapper.getExtensionsByFeatureWithLOC(nodeFeature);
+
 			for (String extension: extensionsWithLOC.keySet()) {
 				addChild(new Parent(extension, extensionsWithLOC.get(extension)));
 			}
 		} else if (parentNodeName.equals(LOC_BY_FILE)) {
-			//TODO
+			String fileName = description.split(SEPARATOR)[0];
+			IFile file = fileFeatureLOCMapper.resolveFile(fileName);
+			HashMap<FSTFeature, Integer> fileWithLOC = fileFeatureLOCMapper.getLOCByFeatMap(file);
+			addChild(new Parent("LOC without features" + SEPARATOR, fileFeatureLOCMapper.locWithoutFeatures(file)));
+			for (FSTFeature feature: fileWithLOC.keySet()) {
+				addChild(new Parent(feature.getName(), fileWithLOC.get(feature)));
+			}
 		}
 	}
 

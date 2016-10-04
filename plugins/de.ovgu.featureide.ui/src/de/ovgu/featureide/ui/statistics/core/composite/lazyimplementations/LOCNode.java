@@ -60,7 +60,10 @@ public class LOCNode extends LazyParent {
 //		addChild(new HashMapNodeTwoStrings(LOC_BY_EXTENSION, 1, featureExtensionLOCList, extFileLOCList));
 //		addChild(new HashMapNodeTwoStrings(LOC_BY_FEATURE, 2, featureExtensionLOCList, extFileLOCList));
 //		addChild(new HashMapNodeTwoStrings(LOC_BY_FILE, 3, featureExtensionLOCList, extFileLOCList));
+
 		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper));
+		addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper));
+		addChild(new LOCFilterNode(LOC_BY_FILE, fileFeatureLOCMapper));
 	}
 
 }
