@@ -114,11 +114,15 @@ import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
@@ -145,7 +149,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
  * @author Max Kammler
  */
 
-public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener, ISaveablePart {
+public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener, ISaveablePart, IEventListener {
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.Collaboration";
 
@@ -204,6 +208,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private IToolBarManager toolbarManager;
 
 	private final Vector<IFile> configurations = new Vector<IFile>();
+	
+	/**
+	 * updates the GUI when CollaborationView is visible
+	 */
 	private final Job updateGUIJob = new AWaitingJob(UPDATE_COLLABORATION_VIEW) {
 
 		public IStatus execute(IProgressMonitor monitor) {
@@ -223,47 +231,40 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			}
 			
 			
-			if(isVisible){
-			final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
-			System.out.println("Team2: Aufruf updateGUIJob!");
+			if (isVisible) {
+				final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
+				UIPlugin.getDefault().logInfo("Team2: Aufruf updateGUIJob!");
 		
-			if (model == null) {
-				refreshButton.setEnabled(true);
-				return Status.OK_STATUS;
-			}
-
-			if (!configurations.isEmpty()) {
-				return Status.OK_STATUS;
-			}
-			
-			UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					System.out.println("Collaboration_view: update");
-					
-					if(getSite().getPage().isPartVisible(getSite().getPart())){
-						
-					viewer.setContents(model);
-					EditPart part = viewer.getContents();
-					if (part != null) {
-						part.refresh();
-					}
-					}
-					
+				if (model == null) {
 					refreshButton.setEnabled(true);
-					search.refreshSearchContent();
 					return Status.OK_STATUS;
 				}
-			};
-			uiJob.setPriority(Job.SHORT);
-			uiJob.schedule();
-			try {
-				uiJob.join();
-			} catch (InterruptedException e) {
-				UIPlugin.getDefault().logError(e);
-			}
-			}
+
+				if (!configurations.isEmpty()) {
+					return Status.OK_STATUS;
+				}
 			
-			
+				UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						viewer.setContents(model);
+						EditPart part = viewer.getContents();
+						if (part != null) {
+							part.refresh();
+						}
+				
+						refreshButton.setEnabled(true);
+						search.refreshSearchContent();
+						return Status.OK_STATUS;
+					}
+				};
+				uiJob.setPriority(Job.SHORT);
+				uiJob.schedule();
+				try {
+					uiJob.join();
+				} catch (InterruptedException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
 			return Status.OK_STATUS;
 		}
 	};
@@ -297,6 +298,21 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		this.cursorPosition = new Point(x, y);
 	}
 
+	/** 
+	 * Refreshes the Collaboration Diagram when model changed
+	 */
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
+		if (isVisible && event.getEventType() != EventType.STRUCTURE_CHANGED && event.getEventType() != EventType.MODEL_LAYOUT_CHANGED) {
+			// TODO: Filter proper events to handle
+			updateGUIJob.setPriority(Job.LONG);
+			updateGUIJob.schedule();
+			UIPlugin.getDefault().logInfo("Team2: CollaborationDiagram -> PropertyChanged");
+			UIPlugin.getDefault().logInfo("Team2: PropertyChanged -> EventType: " + event.getEventType().name());
+		}
+	}
+	
 	private IPartListener editorListener = new IPartListener() {
 
 		public void partOpened(IWorkbenchPart part) {
@@ -315,13 +331,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part == getSite().getPart()) {
-				setEditorActions(part);
-				System.out.println("Team2: REFRESH!");
-				refresh();
+				UIPlugin.getDefault().logInfo("Team2: " + part.getTitle() + "-> partBroughtToTop");
+				updateGUIJob.setPriority(Job.LONG);
+				updateGUIJob.schedule();
 				
 			}
-			System.out.println("Team2: außerhalb von if!");
-
 		}
 
 		public void partActivated(IWorkbenchPart part) {
@@ -346,8 +360,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		viewer = new ScrollingGraphicalViewer();
 		viewer.createControl(parent);
 		viewer.getControl().setBackground(DIAGRAM_BACKGROUND);
-
+		
 		getSite().getPage().addPartListener(editorListener); // EditorListener
+		FeatureModelEditor featureModelEditor = (FeatureModelEditor) getSite().getPage().getActiveEditor();
+		featureModelEditor.getFeatureModel().addListener(this); // IEventListener
 		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
 
 		// required for borders
@@ -792,8 +808,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			} else {
 				configurations.add(configurationFile);
 			}
-			updateGUIJob.setPriority(Job.LONG);
-			updateGUIJob.schedule();
+			if (getSite().getPage().isPartVisible(getSite().getPart())) {
+				UIPlugin.getDefault().logInfo("Team2: Collaboration Diagram -> updateGUIAfterBuild");
+				updateGUIJob.setPriority(Job.LONG);
+				updateGUIJob.schedule();
+			}
 		}
 	}
 
@@ -831,7 +850,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	public void refresh() {
 		refreshActionBars();
-		System.out.println("Team2: Innerhalb von der Refresh Methode!");
+		UIPlugin.getDefault().logInfo("Team2: Collaboration Diagram -> refresh");
 
 		final FSTModel model = builder.buildCollaborationModel(featureProject);
 
