@@ -87,6 +87,11 @@ public class FeatureDragAndDropCommand extends Command {
 				return false;
 			}
 
+			//test if next has collapsed parent
+			if ((next.getGraphicalModel().getFeatureModel().getFeature(next.getObject().getName()).getStructure().hasCollapsedParent())) {
+				return false;
+			}
+			
 			// calculate new parent (if exists)
 			if (!calculateNewParentAndIndex(next))
 				return false;
@@ -109,7 +114,6 @@ public class FeatureDragAndDropCommand extends Command {
 		}
 		return true;
 	}
-	
 
 	@Override
 	public void execute() {
@@ -198,8 +202,7 @@ public class FeatureDragAndDropCommand extends Command {
 		int distance = Integer.MAX_VALUE;
 		for (IGraphicalFeature child : featureModel.getFeatures()) {
 			final Point targetLocation = FeatureUIHelper.getTargetLocation(child);
-			if ( hasVerticalLayout && targetLocation.x < referencePoint.x ||
-				!hasVerticalLayout && targetLocation.y < referencePoint.y) {
+			if (hasVerticalLayout && targetLocation.x < referencePoint.x || !hasVerticalLayout && targetLocation.y < referencePoint.y) {
 				int newDistance = (int) targetLocation.getDistance(referencePoint);
 				if (newDistance > 0 && newDistance < distance) {
 					next = child;

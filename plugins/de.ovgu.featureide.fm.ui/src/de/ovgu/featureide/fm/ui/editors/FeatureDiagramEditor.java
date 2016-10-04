@@ -49,6 +49,7 @@ import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.EditPartViewer;
+import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
@@ -66,6 +67,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -998,18 +1000,36 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			refreshAll();
 			break;
-		case COLLAPSED_CHANGED:
-			//Get selected feature
-			IFeature selectedFeature = (IFeature) event.getSource();
+		case COLLAPSED_CHANGED:			
+			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
+				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
+			}
+			final Map<?, ?> registryCollapsed = getEditPartRegistry();
+			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+				registryCollapsed.remove(f);
+				registryCollapsed.remove(f.getSourceConnection());
+				registryCollapsed.remove(f.getTargetConnections());
+			}
+			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
+				registryCollapsed.remove(f);
+			}
+			graphicalFeatureModel.init();
+			setContents(graphicalFeatureModel);
+			analyzeFeatureModel();
+
 			//Get EditPart registry
 			final Map<?, ?> editPartRegistry = getEditPartRegistry();
-			
-			//refresh connections and nodes
-			redrawSubtree(selectedFeature, editPartRegistry);
-			
-			//refreshConnections();
+			//Get selected feature
+			IFeature selectedFeature = (IFeature) event.getSource();
+			IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(selectedFeature);
+			final Object featureEditPart = editPartRegistry.get(graphFeature);
+			if(featureEditPart instanceof FeatureEditPart)
+			{
+				getSelectionManager().appendSelection((FeatureEditPart) featureEditPart);
+			}
 			featureModelEditor.setPageModified(true);
 			internRefresh(true);
+			
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			try {
@@ -1101,41 +1121,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		MenuManager menu = new MenuManager("#PopupMenu");
 		menu.setRemoveAllWhenShown(true);
 		createContextMenu(menu);
-	}
-	
-	/*
-	 * This function activates/deactivates the features node and connections depending if
-	 * feature is collapsed or not.
-	 * 
-	 */
-	private void redrawSubtree(IFeature feature, Map<?, ?> registry) {
-		//Get Graphical Features
-		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
-
-		for (FeatureConnection connection : graphicalFeature.getTargetConnections()) {
-			final Object connectionEditPart = registry.get(connection);
-			if ((connectionEditPart instanceof ConnectionEditPart && feature.getStructure().isCollapsed())) {
-				//if feature collapsed deactivate all connections
-				((ConnectionEditPart) connectionEditPart).deactivate();
-			} else if ((connectionEditPart instanceof ConnectionEditPart && !feature.getStructure().isCollapsed())) {
-				//if feature not collapsed activate all connections
-				((ConnectionEditPart) connectionEditPart).activate();
-			}
-		}
-
-		final Object featureEditPart = registry.get(graphicalFeature);
-		if ((featureEditPart instanceof FeatureEditPart && feature.getStructure().hasCollapsedParent())) {
-			//if feature collapsed deactivate all connections
-			((FeatureEditPart) featureEditPart).deactivate();
-		} else if ((featureEditPart instanceof FeatureEditPart && !feature.getStructure().hasCollapsedParent())) {
-			//if feature not collapsed activate all connections
-			((FeatureEditPart) featureEditPart).activate();
-		}
-		
-		//refresh the children too
-		for (IFeatureStructure children : feature.getStructure().getChildren()) {
-			redrawSubtree(children.getFeature(), registry);
-		}
 	}
 
 	@Override
