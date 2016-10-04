@@ -68,6 +68,8 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.annotation.LogService;
 import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 
 /**
@@ -78,7 +80,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColor;
 public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/** Key used to piggyback the model to the editors model. */
-	private static final Object KEY = new Object();
+	public static final Object KEY = new Object();
 
 	private static boolean highlighting = true;
 
@@ -138,6 +140,22 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				}
 			}
 		});
+	}
+	
+	public IFeatureModel getFeatureModel(){
+		return project.getFeatureModel();
+	}
+	
+	public IFeature getFeature(int line){
+		FSTDirective found = null;
+		for(FSTDirective fst : validDirectiveList){
+			if(fst.getStartLine() <= line && line <= fst.getEndLine()){
+				found = fst;
+			}
+		}
+		String name = found.getExpression();
+		IFeature feature = project.getFeatureModel().getFeature(name);
+		return feature;
 	}
 
 	/**
@@ -729,7 +747,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		throw new UnsupportedOperationException();
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public Iterator getAnnotationIterator() {
 		return annotations.iterator();

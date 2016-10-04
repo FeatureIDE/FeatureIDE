@@ -65,6 +65,8 @@ public class SetFeatureColorAction extends Action {
 	private List<IEventListener> colorChangedListeners;
 	protected List<IFeature> featureList = new ArrayList<>();
 	private IFeatureModel featureModel;
+	
+	public static final String hartkot = "KeyVon3";
 
 	private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -105,6 +107,12 @@ public class SetFeatureColorAction extends Action {
 	public SetFeatureColorAction(ISelectionProvider viewer, IFeatureModel featureModel) {
 		super(COLORATION);
 		viewer.addSelectionChangedListener(selectionListener);
+		init(featureModel);
+	}
+	
+	public SetFeatureColorAction(IStructuredSelection selection, IFeatureModel featureModel){
+		super(COLORATION);
+		updateFeatureList(selection);
 		init(featureModel);
 	}
 
