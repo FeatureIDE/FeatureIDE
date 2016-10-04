@@ -146,6 +146,7 @@ import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandle
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature
@@ -222,6 +223,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private FeatureModelAnalyzer analyzer;
 
 	final FeatureDiagramEditorKeyHandler editorKeyHandler;
+	
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -365,8 +367,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
 		collapseAction = new CollapseAction(this, featureModel);
-		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
+		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL); 
+		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
 		expandAllAction = new CollapseAllAction(this, featureModel, false, EXPAND_ALL);
+		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND);	//icon for expand added
 		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
 		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
 		andAction = new AndAction(this, featureModel);
