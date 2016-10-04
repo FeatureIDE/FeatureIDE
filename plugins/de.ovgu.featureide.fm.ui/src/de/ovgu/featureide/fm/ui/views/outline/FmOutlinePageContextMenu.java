@@ -71,7 +71,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 
 /**
  * Context Menu for Outline view of FeatureModels
@@ -88,8 +87,6 @@ public class FmOutlinePageContextMenu {
 	private IFeatureModel fInput;
 	private IGraphicalFeatureModel graphicalFM;
 
-	
-	private SetFeatureColorAction setFeatureColorAction;
 	private HiddenAction hAction;
 	private MandatoryAction mAction;
 	private AbstractAction aAction;
@@ -119,7 +116,6 @@ public class FmOutlinePageContextMenu {
 		this.fTextEditor = fTextEditor;
 		this.viewer = viewer;
 		this.fInput = fInput;
-		this.graphicalFM = fTextEditor.getGraphicalFeatureModel();
 		initContextMenu();
 	}
 
@@ -147,7 +143,6 @@ public class FmOutlinePageContextMenu {
 	}
 
 	private void initActions() {
-		setFeatureColorAction = new SetFeatureColorAction(fTextEditor.diagramEditor, fInput, viewer);
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
 		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
@@ -198,14 +193,9 @@ public class FmOutlinePageContextMenu {
 	 */
 	private void addListeners() {
 		viewer.addDoubleClickListener(dblClickListener);
-		
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-
-				//Temporär
-				viewer.refresh();
-				
 				if (viewer.getSelection() == null)
 					return;
 
@@ -234,8 +224,7 @@ public class FmOutlinePageContextMenu {
 				EditPartViewer view = part.getViewer();
 				if (view != null) {
 					view.reveal(part);
-				}			
-				
+				}
 			}
 
 		});
@@ -302,8 +291,6 @@ public class FmOutlinePageContextMenu {
 		if (sel instanceof String)
 			if (sel.equals(CONSTRAINTS))
 				manager.add(ccAction);
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		manager.add(setFeatureColorAction);
 	}
 
 	/**

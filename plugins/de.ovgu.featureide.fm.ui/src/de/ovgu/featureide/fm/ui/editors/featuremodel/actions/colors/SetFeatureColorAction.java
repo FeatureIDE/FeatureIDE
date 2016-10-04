@@ -25,6 +25,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.commands.common.EventManager;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
@@ -32,22 +35,19 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
 
@@ -57,34 +57,21 @@ import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
  * 
  * @author Christian Elzholz, Marcus Schmelz
  * @author Marcus Pinnecke
+ * @author Paul Maximilian Bittner, Niklas Lehnfeld, Antje Moench, Mohammed Mahhouk
  */
 public class SetFeatureColorAction extends Action {
 
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
 
-	protected List<IGraphicalFeature> featureList = new ArrayList<>();
-	private final IFeatureModel featureModel;
-	private final IGraphicalFeatureModel graphicalFeatureModel;
-	
-	private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
-		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			updateFeatureList(selection);
-			setEnabled(!featureList.isEmpty());
-		}
-	};
-	
+	protected List<IFeature> featureList = new ArrayList<>();
+	private IFeatureModel featureModel;
+
 	/**
 	 * @param viewer
 	 * @param project
 	 */
-	public SetFeatureColorAction(FeatureDiagramEditor viewer) {
+	public SetFeatureColorAction(GraphicalViewerImpl viewer) {
 		this(viewer, null);
-	}
-	
-	public SetFeatureColorAction(FeatureDiagramEditor editor, IFeatureModel featureModel, TreeViewer viewer){
-		this(editor, featureModel);
-		viewer.addSelectionChangedListener(selectionListener);		
 	}
 
 	/**
@@ -92,49 +79,57 @@ public class SetFeatureColorAction extends Action {
 	 * @param project
 	 * @param featureModel
 	 */
-	public SetFeatureColorAction(FeatureDiagramEditor viewer, IFeatureModel featureModel) {
-		super(COLORATION);			
+	public SetFeatureColorAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
+		super(COLORATION);
 		
-		viewer.addSelectionChangedListener(selectionListener);		
+		ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				updateFeatureList(selection);
+				setEnabled(!featureList.isEmpty());
+			}
+		};
+		
+		viewer.addSelectionChangedListener(selectionListener);
 		
 		setImageDescriptor(colorImage);
 		this.featureModel = featureModel;
-		this.graphicalFeatureModel = viewer.getGraphicalFeatureModel();
+
 	}
-	
 
 	/**
 	 * @param selection
 	 *            Creates a featureList with the selected features of the feature diagram.
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
-		if (!selection.isEmpty()) {			
+		if (!selection.isEmpty()) {
 			featureList.clear();
+
 			Object[] editPartArray = selection.toArray();
 
 			for (int i = 0; i < selection.size(); i++) {
-				Object obj = editPartArray[i];
-				
-				if (obj instanceof FeatureEditPart) {
-					FeatureEditPart editP = (FeatureEditPart) obj;
+				Object editPart = editPartArray[i];
+				if (editPart instanceof FeatureEditPart) {
+					FeatureEditPart editP = (FeatureEditPart) editPart;
 					IGraphicalFeature feature = editP.getFeature();
-					if (!featureList.contains(feature))
-						featureList.add(feature);
-				}
-				
-				if(obj instanceof Feature){
-					Feature feature = (Feature) obj;
-					featureList.add(graphicalFeatureModel.getGraphicalFeature(feature));					
+					featureList.add(feature.getObject());
+				} else if (editPart instanceof AbstractGraphicalEditPart) {
+					AbstractGraphicalEditPart agep = (AbstractGraphicalEditPart) editPart;
+					IFeature feature = featureModel.getFeature(agep.getModel().toString());
+					featureList.add(feature);
 				}
 			}
 		}
 	}
-	
+
+	public void setFeatureModel(IFeatureModel featureModel) {
+		this.featureModel = featureModel;
+	}
 
 	public void run() {
 		FeatureColor selectedColor = null;
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		List<IGraphicalFeature> features = new ArrayList<>(featureList);
+		List<IFeature> features = new ArrayList<>(featureList);
 
 		if (!features.isEmpty()) {
 
@@ -154,14 +149,15 @@ public class SetFeatureColorAction extends Action {
 
 			// If the color of only one object should be changed, its color is selected in the dialog initially.
 			if (features.size() == 1) {
-				IGraphicalFeature selectedFeature = features.get(0);
-				selectedColor = FeatureColorManager.getColor(selectedFeature.getObject());
+				IFeature selectedFeature = features.get(0);
+				selectedColor = FeatureColorManager.getColor(selectedFeature);
 			}
 
 			SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, features, selectedColor);
 
+			// inform ui to update
 			if (dialog.open() == Window.OK) {
-				featureModel.fireEvent(new FeatureIDEEvent(features, FeatureIDEEvent.EventType.COLOR_CHANGED));
+				featureModel.fireEvent(new FeatureIDEEvent(dialog.getRecoloredFeatures(), FeatureIDEEvent.EventType.COLOR_CHANGED));
 			}
 		}
 	}

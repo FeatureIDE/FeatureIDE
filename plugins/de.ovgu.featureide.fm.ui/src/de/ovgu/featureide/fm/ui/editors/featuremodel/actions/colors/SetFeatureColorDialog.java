@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -60,6 +61,8 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Sets the color of the features in the feature diagram.
@@ -67,7 +70,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * 
  * @author Christian Elzholz, Marcus Schmelz
  * @author Marcus Pinnecke
- * @author Niklas Lehnfeld, Paul Maximilian Bittner
+ * @author Niklas Lehnfeld, Paul Maximilian Bittner, Antje Moench
  */
 public class SetFeatureColorDialog extends Dialog {
 
@@ -77,8 +80,8 @@ public class SetFeatureColorDialog extends Dialog {
 	private final FeatureColor initialSelectedColor;
 	private FeatureColor newColor = FeatureColor.NO_COLOR;
 
-	final protected List<IGraphicalFeature> featureList;
-	protected ArrayList<IGraphicalFeature> featureListBuffer = new ArrayList<>();
+	private final List<IFeature> featureList;
+	private ArrayList<IFeature> featureListBuffer = new ArrayList<>();
 
 	private Table featureTable;
 	private Combo colorDropDownMenu;
@@ -87,11 +90,11 @@ public class SetFeatureColorDialog extends Dialog {
 	 * @param parentShell
 	 * @param featurelist
 	 */
-	protected SetFeatureColorDialog(Shell parentShell, List<IGraphicalFeature> featurelist) {
+	protected SetFeatureColorDialog(Shell parentShell, List<IFeature> featurelist) {
 		this(parentShell, featurelist, null);
 	}
 
-	protected SetFeatureColorDialog(Shell parentShell, List<IGraphicalFeature> featurelist, FeatureColor selectedColor) {
+	protected SetFeatureColorDialog(Shell parentShell, List<IFeature> featurelist, FeatureColor selectedColor) {
 		super(parentShell);
 		this.featureList = featurelist;
 		this.initialSelectedColor = selectedColor;
@@ -200,42 +203,47 @@ public class SetFeatureColorDialog extends Dialog {
 			}
 
 			private void findSiblings() {
-				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
-				if (!featureListBuffer.isEmpty()) {
-					IGraphicalFeatureModel model = featureListBuffer.get(0).getGraphicalModel();
-					for (int j = 0; j < featureListBuffer.size(); j++) {
-						if (!featureListBuffer.get(j).getObject().getStructure().isRoot()) {
-							affectedFeatures.addAll(
-									FeatureUIHelper.getGraphicalChildren(featureListBuffer.get(j).getObject().getStructure().getParent().getFeature(), model));
+				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
+					for (IFeature feature : featureListBuffer) {
+						if (!feature.getStructure().isRoot()) {
+							//affectedFeatures.addAll(
+							//		FeatureUIHelper.getGraphicalChildren(feature.getStructure().getParent().getFeature(), model));
+							for (IFeatureStructure featureStructure : feature.getStructure().getParent().getChildren()) {
+								affectedFeatures.add(featureStructure.getFeature());
+							}
 						}
 					}
-				}
 				featureListBuffer = affectedFeatures;
 			}
 
 			private void findAllChildren() {
-				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
+				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
 				for (int j = 0; j < featureListBuffer.size(); j++) {
 					affectedFeatures.addAll(findAllChildren(featureListBuffer.get(j)));
 				}
 				featureListBuffer = affectedFeatures;
 			}
 
-			private ArrayList<IGraphicalFeature> findAllChildren(IGraphicalFeature item) {
-				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
-				final List<IGraphicalFeature> children = findChildren(item);
+			private ArrayList<IFeature> findAllChildren(IFeature item) {
+				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
+				final List<IFeature> children = findChildren(item);
 				affectedFeatures.addAll(children);
 				for (int j = 0; j < children.size(); j++)
 					affectedFeatures.addAll(findAllChildren(children.get(j)));
 				return affectedFeatures;
 			}
 
-			private List<IGraphicalFeature> findChildren(IGraphicalFeature parent) {
-				return toList(FeatureUIHelper.getGraphicalChildren(parent));
+			private List<IFeature> findChildren(IFeature parent) {
+				//return toList(FeatureUIHelper.getGraphicalChildren(parent));
+				List<IFeature> children = new ArrayList<>();
+				for (IFeatureStructure childStructure : parent.getStructure().getChildren()) {
+					children.add(childStructure.getFeature());
+				}
+				return children;
 			}
 
 			private void findDirectChildren() {
-				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
+				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
 				for (int j = 0; j < featureListBuffer.size(); j++) {
 					affectedFeatures.addAll(findChildren(featureListBuffer.get(j)));
 				}
@@ -289,7 +297,7 @@ public class SetFeatureColorDialog extends Dialog {
 	private void colorPreview(final Table featureTable) {
 		for (int i = 0; i < featureListBuffer.size(); i++) {
 			TableItem item = new TableItem(featureTable, SWT.NONE);
-			item.setText(featureListBuffer.get(i).getObject().getName());
+			item.setText(featureListBuffer.get(i).getName());
 			
 			FeatureColor color = FeatureColor.getColor(colorDropDownMenu.getText());
 			item.setBackground(getItemColorFor(color));
@@ -306,10 +314,14 @@ public class SetFeatureColorDialog extends Dialog {
 
 	protected void okPressed() {
 		for (int i = 0; i < featureListBuffer.size(); i++) {
-			final IFeature feature = featureListBuffer.get(i).getObject();
+			final IFeature feature = featureListBuffer.get(i);
 			FeatureColorManager.setColor(feature, newColor);
 		}
 		super.okPressed();
+	}
+	
+	public List<IFeature> getRecoloredFeatures() {
+		return featureListBuffer;
 	}
 	
 	private Color getItemColorFor(FeatureColor featureColor) {

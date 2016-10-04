@@ -455,9 +455,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 
 		NameTypeSelectionAction curNameType = null;
-		if(graphicalFeatureModel.getLayout().showShortNames()){
+		if (graphicalFeatureModel.getLayout().showShortNames()) {
 			curNameType = setNameType.get(1);
-		}else{
+		} else {
 			curNameType = setNameType.get(0);
 		}
 		curNameType.setChecked(true);
@@ -537,18 +537,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(changeFeatureDescriptionAction);
 			changeFeatureDescriptionAction.setEnabled(false);
 			menu.add(new Separator());
-			
+
 			menu.add(subMenuLayout);
 			menu.add(subMenuCalculations);
-			
+
 			menu.add(new Separator());
 			menu.add(calculateDependencyAction);
 			calculateDependencyAction.setEnabled(false);
 			menu.add(reverseOrderAction);
 			menu.add(legendAction);
 			menu.add(new Separator());
-			
+
 			menu.add(colorSelectedFeatureAction);
+			colorSelectedFeatureAction.setEnabled(false);
 			menu.add(new Separator());
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -942,7 +943,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
-			
+
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			reload();
@@ -972,14 +973,36 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
-				final List<IGraphicalFeature> features = (List<IGraphicalFeature>) event.getSource();
-				for (IGraphicalFeature gf : features) {
-					gf.update(FeatureIDEEvent.getDefault(EventType.COLOR_CHANGED));
+				List<?> srcList = (List<?>) event.getSource();
+
+				if (!srcList.isEmpty()) {
+					List<IGraphicalFeature> features;
+
+					Object firstElement = srcList.get(0);
+					// If IGraphicalFeatures are passed, use them
+					if (firstElement instanceof IGraphicalFeature) {
+						features = (List<IGraphicalFeature>) srcList;
+					} 
+					// If not....
+					else {
+						features = new ArrayList<>();
+						// ... get the IGraphicalFeatures, if Features are passed
+						if (firstElement instanceof IFeature) {
+							
+							for (Object featureObj : srcList) {
+								features.add(graphicalFeatureModel.getGraphicalFeature((IFeature) featureObj));
+							}
+						}
+					}
+
+					for (IGraphicalFeature gf : features) {
+						gf.update(FeatureIDEEvent.getDefault(EventType.COLOR_CHANGED));
+					}
 				}
 			} else {
 				FMUIPlugin.getDefault().logWarning(event + " contains wrong source type: " + event.getSource());
 			}
-			
+
 			reload();
 			refreshGraphics(null);
 			break;
