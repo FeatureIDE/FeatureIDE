@@ -136,6 +136,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.Tautol
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -988,21 +989,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			refreshAll();
 			break;
 		case COLLAPSED_CHANGED:
-			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
-				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
-			}
-			// clear registry
-			final Map<?, ?> registryCollapsed = getEditPartRegistry();
-			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
-				registryCollapsed.remove(f);
-				registryCollapsed.remove(f.getSourceConnection());
-			}
-			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
-				registryCollapsed.remove(f);
-			}
-			graphicalFeatureModel.init();
-			setContents(graphicalFeatureModel);
-			reload();
+			//Get selected feature
+			IFeature selectedFeature = (IFeature) event.getSource();
+			//Get EditPart registry
+			final Map<?, ?> editPartRegistry = getEditPartRegistry();
+			
+			//refresh connections and nodes
+			redrawSubtree(selectedFeature, editPartRegistry);
+			
+			//refreshConnections();
 			featureModelEditor.setPageModified(true);
 			internRefresh(true);
 			break;
@@ -1096,6 +1091,41 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		MenuManager menu = new MenuManager("#PopupMenu");
 		menu.setRemoveAllWhenShown(true);
 		createContextMenu(menu);
+	}
+	
+	/*
+	 * This function activates/deactivates the features node and connections depending if
+	 * feature is collapsed or not.
+	 * 
+	 */
+	private void redrawSubtree(IFeature feature, Map<?, ?> registry) {
+		//Get Graphical Features
+		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+
+		for (FeatureConnection connection : graphicalFeature.getTargetConnections()) {
+			final Object connectionEditPart = registry.get(connection);
+			if ((connectionEditPart instanceof ConnectionEditPart && feature.getStructure().isCollapsed())) {
+				//if feature collapsed deactivate all connections
+				((ConnectionEditPart) connectionEditPart).deactivate();
+			} else if ((connectionEditPart instanceof ConnectionEditPart && !feature.getStructure().isCollapsed())) {
+				//if feature not collapsed activate all connections
+				((ConnectionEditPart) connectionEditPart).activate();
+			}
+		}
+
+		final Object featureEditPart = registry.get(graphicalFeature);
+		if ((featureEditPart instanceof FeatureEditPart && feature.getStructure().hasCollapsedParent())) {
+			//if feature collapsed deactivate all connections
+			((FeatureEditPart) featureEditPart).deactivate();
+		} else if ((featureEditPart instanceof FeatureEditPart && !feature.getStructure().hasCollapsedParent())) {
+			//if feature not collapsed activate all connections
+			((FeatureEditPart) featureEditPart).activate();
+		}
+		
+		//refresh the children too
+		for (IFeatureStructure children : feature.getStructure().getChildren()) {
+			redrawSubtree(children.getFeature(), registry);
+		}
 	}
 
 	@Override
