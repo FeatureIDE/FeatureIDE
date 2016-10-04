@@ -46,7 +46,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	private IConstraint iConstraint;
 
-	private LinkedList<IFeature> affectedFeatureList;
+	private LinkedList<IFeature> affectedFeatureList = new LinkedList<IFeature>();
 	
 	/**
 	 * @param featureModel
@@ -64,11 +64,9 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		
 		IFeatureStructure p = feature.getStructure().getParent();
 		while (!p.isRoot()) {
-			if (!p.isCollapsed()) {
+			if (p.isCollapsed()) {
 				expandFeature(p);
-			} else {
-				break;
-			}
+			} 
 			p = p.getParent();
 		}
 		p.setCollapsed(false);
@@ -77,13 +75,12 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent operation() {
+		FMUIPlugin.getDefault().logInfo(this.toString());
 		getCollapsedFeatures();
 		CollapseAllOperation collapseAll = new CollapseAllOperation(featureModel, true);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(collapseAll, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+
+		// execute directly and push not in operation history otherwise no more than one undo possible
+		collapseAll.operation();
 		for (IFeature feature : iConstraint.getContainedFeatures()) {
 			expandParents(feature);
 		}
@@ -93,11 +90,13 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		CollapseAllOperation collapseAll = new CollapseAllOperation(featureModel, true);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(collapseAll, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
+
+		// execute directly and push not in operation history otherwise no more than one undo possible
+		collapseAll.operation();
+		for (IFeature f : affectedFeatureList) {
+			FMUIPlugin.getDefault().logInfo(f.getName());
 		}
+		FMUIPlugin.getDefault().logInfo("ENd");
 		for (IFeature f : affectedFeatureList) {
 			expandFeature(f.getStructure());
 		}
@@ -108,7 +107,6 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	 * Collects all features that are not collapsed from the featureModel.
 	 */
 	private void getCollapsedFeatures() {
-		affectedFeatureList = new LinkedList<IFeature>();
 		for (IFeature f : featureModel.getFeatures()) {
 			if (!f.getStructure().isCollapsed()) {
 				affectedFeatureList.add(f);
