@@ -42,7 +42,7 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 
 	Iterable<IFeature> featureModel;
 	boolean collapse;
-	
+
 	private LinkedList<IFeature> affectedFeatureList = new LinkedList<IFeature>();
 	
 	public CollapseAllOperation(IFeatureModel featureModel, boolean collapse) {
