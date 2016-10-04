@@ -53,14 +53,14 @@ import org.eclipse.ui.part.IPageSite;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependencyAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
@@ -71,6 +71,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 
 /**
  * Context Menu for Outline view of FeatureModels
@@ -78,6 +79,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
+ * @author Niklas Lehnfeld, Mohammed Mahhouk, Paul Maximilian Bittner
  */
 public class FmOutlinePageContextMenu {
 
@@ -85,15 +87,14 @@ public class FmOutlinePageContextMenu {
 	private FeatureModelEditor fTextEditor;
 	private TreeViewer viewer;
 	private IFeatureModel fInput;
-	private IGraphicalFeatureModel graphicalFM;
 
+	private SetFeatureColorAction setFeatureColorAction;	
 	private HiddenAction hAction;
 	private MandatoryAction mAction;
 	private AbstractAction aAction;
 	private DeleteAction dAction;
 	private DeleteAllAction dAAction;
 	private RenameAction reAction;
-	private CalculateDependencyAction cdAction;
 	private CreateCompoundAction cAction;
 	private CreateLayerAction clAction;
 	private CreateConstraintAction ccAction;
@@ -143,12 +144,21 @@ public class FmOutlinePageContextMenu {
 	}
 
 	private void initActions() {
+		
+		setFeatureColorAction = new SetFeatureColorAction(viewer, getFeatureModel());
+		setFeatureColorAction.addColorChangedListener(new IEventListener() {
+
+			@Override
+			public void propertyChange(FeatureIDEEvent event) {
+				viewer.refresh();
+			}
+			
+		});
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
 		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
 		dAction = new DeleteAction(viewer, fInput);
 		dAAction = new DeleteAllAction(viewer, fInput);
-		cdAction = new CalculateDependencyAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
 		ecAction = new EditConstraintAction(viewer, fInput);
 		cAction = new CreateCompoundAction(viewer, fInput);
@@ -290,7 +300,10 @@ public class FmOutlinePageContextMenu {
 		}
 		if (sel instanceof String)
 			if (sel.equals(CONSTRAINTS))
-				manager.add(ccAction);
+				manager.add(ccAction);		
+
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		manager.add(setFeatureColorAction);
 	}
 
 	/**

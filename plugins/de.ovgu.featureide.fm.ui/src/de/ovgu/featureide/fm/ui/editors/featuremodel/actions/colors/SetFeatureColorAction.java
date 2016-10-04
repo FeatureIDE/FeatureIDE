@@ -25,16 +25,15 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -44,6 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -62,39 +62,67 @@ import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
 public class SetFeatureColorAction extends Action {
 
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
-
+	private List<IEventListener> colorChangedListeners;
 	protected List<IFeature> featureList = new ArrayList<>();
 	private IFeatureModel featureModel;
 
+	private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+		public void selectionChanged(SelectionChangedEvent event) {
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			updateFeatureList(selection);
+			setEnabled(!featureList.isEmpty());
+		}
+	};
+
 	/**
 	 * @param viewer
-	 * @param project
 	 */
-	public SetFeatureColorAction(GraphicalViewerImpl viewer) {
+	public SetFeatureColorAction(ISelectionProvider viewer) {
 		this(viewer, null);
 	}
 
 	/**
 	 * @param viewer
-	 * @param project
+	 */
+	public SetFeatureColorAction(Viewer viewer) {
+		this(viewer, null);
+	}
+
+	/**
+	 * @param viewer
 	 * @param featureModel
 	 */
-	public SetFeatureColorAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
+	public SetFeatureColorAction(Viewer viewer, IFeatureModel featureModel) {
 		super(COLORATION);
-		
-		ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				updateFeatureList(selection);
-				setEnabled(!featureList.isEmpty());
-			}
-		};
-		
 		viewer.addSelectionChangedListener(selectionListener);
-		
+		init(featureModel);
+	}
+
+	/**
+	 * @param viewer
+	 * @param featureModel
+	 */
+	public SetFeatureColorAction(ISelectionProvider viewer, IFeatureModel featureModel) {
+		super(COLORATION);
+		viewer.addSelectionChangedListener(selectionListener);
+		init(featureModel);
+	}
+
+	private void init(IFeatureModel featureModel) {
 		setImageDescriptor(colorImage);
 		this.featureModel = featureModel;
+	}
 
+	public boolean addColorChangedListener(IEventListener eventListener) {
+		if (colorChangedListeners == null)
+			colorChangedListeners = new ArrayList<>();
+		return colorChangedListeners.add(eventListener);
+	}
+
+	public boolean removeColorChangedListener(IEventListener eventListener) {
+		if (colorChangedListeners != null)
+			return colorChangedListeners.remove(eventListener);
+		return false;
 	}
 
 	/**
@@ -109,7 +137,10 @@ public class SetFeatureColorAction extends Action {
 
 			for (int i = 0; i < selection.size(); i++) {
 				Object editPart = editPartArray[i];
-				if (editPart instanceof FeatureEditPart) {
+
+				if (editPart instanceof IFeature) {
+					featureList.add((IFeature) editPart);
+				} else if (editPart instanceof FeatureEditPart) {
 					FeatureEditPart editP = (FeatureEditPart) editPart;
 					IGraphicalFeature feature = editP.getFeature();
 					featureList.add(feature.getObject());
@@ -157,7 +188,13 @@ public class SetFeatureColorAction extends Action {
 
 			// inform ui to update
 			if (dialog.open() == Window.OK) {
-				featureModel.fireEvent(new FeatureIDEEvent(dialog.getRecoloredFeatures(), FeatureIDEEvent.EventType.COLOR_CHANGED));
+				FeatureIDEEvent colorChangedEvent = new FeatureIDEEvent(dialog.getRecoloredFeatures(), FeatureIDEEvent.EventType.COLOR_CHANGED);
+				featureModel.fireEvent(colorChangedEvent);
+				if (colorChangedListeners != null) {
+					for (IEventListener eventListener : colorChangedListeners) {
+						eventListener.propertyChange(colorChangedEvent);
+					}
+				}
 			}
 		}
 	}

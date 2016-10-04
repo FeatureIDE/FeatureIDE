@@ -84,7 +84,6 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
@@ -982,13 +981,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					// If IGraphicalFeatures are passed, use them
 					if (firstElement instanceof IGraphicalFeature) {
 						features = (List<IGraphicalFeature>) srcList;
-					} 
+					}
 					// If not....
 					else {
 						features = new ArrayList<>();
 						// ... get the IGraphicalFeatures, if Features are passed
 						if (firstElement instanceof IFeature) {
-							
+
 							for (Object featureObj : srcList) {
 								features.add(graphicalFeatureModel.getGraphicalFeature((IFeature) featureObj));
 							}
