@@ -142,12 +142,14 @@ public class GraphicalFeature implements IGraphicalFeature {
 		list.add(getSourceConnection());
 		return (list);
 	}
-	
+
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
-		for (IFeatureStructure child : feature.getStructure().getChildren()) {
-			targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
+		if (!this.getObject().getStructure().isCollapsed()) {
+			for (IFeatureStructure child : feature.getStructure().getChildren()) {
+				targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
+			}
 		}
 		return targetConnections;
 	}
@@ -195,7 +197,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void update(FeatureIDEEvent event) {
 		if (uiObject != null) {
