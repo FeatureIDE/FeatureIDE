@@ -203,6 +203,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	 * colors the tree in case a treeItem has been expanded (because the
 	 * children are lazily loaded)
 	 */
+	
 	private ITreeViewerListener treeListener = new ITreeViewerListener() {
 
 		@Override
@@ -604,7 +605,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
-												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
+												if (((IFeatureModel)viewer.getInput()) != ((FeatureModelEditor) active_editor).getFeatureModel())
+													viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 												
 												// recreate the context menu in case
 												// we switched to another model
