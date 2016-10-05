@@ -44,7 +44,15 @@ public enum FeatureColor {
 	}
 	
 	public Color toSwtColor() {
-		return new Color(null, ColorPalette.getRGB(getValue(), 0.4f));
+		float transparency = 0.4f;
+		int valTemp = value;
+		
+		if (valTemp < 0) {
+			valTemp = 0;
+			transparency = 1;
+		}
+		
+		return new Color(null, ColorPalette.getRGB(valTemp, transparency));
 	}
 
 	public static FeatureColor getColor(int index) {
