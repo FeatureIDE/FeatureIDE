@@ -249,8 +249,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			return;
 		}
 		if (target.getObject().getStructure().getChildrenCount() > 1) {
-//			FMUIPlugin.getDefault().logInfo("" + target.getObject().getName() + "\n" + source.getObject().getStructure().getParent().getFeature().getName()
-//					+ "\n" + source.getObject().getName());
 			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
 			final IGraphicalFeature object = graphicalChildren.get(0);
 			final IFeatureStructure structure = target.getObject().getStructure();
