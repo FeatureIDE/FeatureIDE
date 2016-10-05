@@ -31,6 +31,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_BY_FEATUR
 import static de.ovgu.featureide.fm.core.localization.StringTable.SYNC_COLLAPSED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_OUTLINE_VIEW;
 
+import java.awt.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -100,6 +101,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
@@ -587,7 +589,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					filter.setFile(iFile2);
 				}
 				if (providerChanged || !refreshContent(iFile, iFile2) || filter.isEnabled()) {
-					
+					providerChanged = false;
 
 					iFile = iFile2;
 
@@ -603,10 +605,20 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
-												// providerChanged needed to check whether a File or an IFeatureModel is used.
-												if (providerChanged | ((IFeatureModel)viewer.getInput()) != ((FeatureModelEditor) active_editor).getFeatureModel())
-													viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
+												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 												
+												if (viewer.getContentProvider() instanceof FmTreeContentProvider) {
+													if (syncCollapsedFeaturesToggle) {
+														FmTreeContentProvider contentProvider = (FmTreeContentProvider) viewer.getContentProvider();
+														ArrayList<IFeature> expandedElements = new ArrayList<>();
+														for (IFeature f: contentProvider.getFeatureModel().getFeatures()) {
+															if (f.getStructure().hasChildren() && !f.getStructure().isCollapsed())
+																expandedElements.add(f);
+														}
+														viewer.setExpandedElements(expandedElements.toArray());
+													}
+												}
+												syncCollapsedFeatures.setEnabled(true);
 												// recreate the context menu in case
 												// we switched to another model
 												if (contextMenu == null
@@ -623,16 +635,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 													contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
 															((FeatureModelEditor) active_editor).getFeatureModel());
 												}
-												FmTreeContentProvider contentProvider = (FmTreeContentProvider) viewer.getContentProvider();
-												if (syncCollapsedFeaturesToggle) {
-													ArrayList<IFeature> expandedElements = new ArrayList<>();
-													for (IFeature f: contentProvider.getFeatureModel().getFeatures()) {
-														if (f.getStructure().hasChildren() && !f.getStructure().isCollapsed())
-															expandedElements.add(f);
-													}
-													viewer.setExpandedElements(expandedElements.toArray());
-												}
-
 											} else {
 												viewer.setInput(iFile);
 											}
@@ -645,6 +647,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 											viewer.getContentProvider().inputChanged(viewer, null, iFile);
 										}
+										
 										viewer.getControl().setRedraw(true);
 										viewer.getControl().setEnabled(true);
 										viewer.refresh();
@@ -657,7 +660,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 						uiJob.setPriority(Job.SHORT);
 						uiJob.schedule();
 					}
-					providerChanged = false;
 				}
 			}
 		}
@@ -765,6 +767,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		public void run() {
 			syncCollapsedFeaturesToggle = !syncCollapsedFeaturesToggle;
+			update(iFile);
 		}
 	};
 
