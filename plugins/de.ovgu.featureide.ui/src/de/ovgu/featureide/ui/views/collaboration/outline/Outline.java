@@ -587,7 +587,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					filter.setFile(iFile2);
 				}
 				if (providerChanged || !refreshContent(iFile, iFile2) || filter.isEnabled()) {
-					providerChanged = false;
+					
 
 					iFile = iFile2;
 
@@ -603,7 +603,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
-												if (((IFeatureModel)viewer.getInput()) != ((FeatureModelEditor) active_editor).getFeatureModel())
+												if (providerChanged | ((IFeatureModel)viewer.getInput()) != ((FeatureModelEditor) active_editor).getFeatureModel())
 													viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 												
 												// recreate the context menu in case
@@ -656,6 +656,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 						uiJob.setPriority(Job.SHORT);
 						uiJob.schedule();
 					}
+					providerChanged = false;
 				}
 			}
 		}
