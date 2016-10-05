@@ -1201,6 +1201,20 @@
            </and>
         </visibleWhen>
      </command>
+     <command
+           commandId="de.ovgu.featureide.ui.commands.ImportFeatureHouseProject"
+           icon="icons/FeatureIconSmall.ico"
+           id="de.ovgu.featureide.fm.ui.actions.importFeatureHouseProject"
+           label="Import FeatureHouse Project..."
+           style="push">
+        <visibleWhen
+              checkEnabled="false">
+           <reference
+                 definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+           </reference>
+        </visibleWhen>
+     </command>
+     
   </menuContribution>
 	</extension>
 	<extension
@@ -1253,6 +1267,11 @@
   <command
         id="de.ovgu.featureide.fm.ui.colorscheme"
         name="Colorscheme">
+  </command>
+  <command
+        defaultHandler="de.ovgu.featureide.ui.handlers.ImportFeatureHouseProjectHandler"
+        id="de.ovgu.featureide.ui.commands.ImportFeatureHouseProject"
+        name="Import FeatureHouse Project ">
   </command>
 	</extension>
 	<extension
