@@ -131,6 +131,6 @@ public class DirectivesNode extends LazyParent {
 			}
 		};
 		addChild(classes);
-		addChild(new StatisticsProgramSizeNew(NUMBER_OF_CODELINES, fstModel));
+		addChild(new StatisticsProgramSizeNew(NUMBER_OF_CODELINES, fstModel, fstModel.getFeatureProject()));
 	}
 }

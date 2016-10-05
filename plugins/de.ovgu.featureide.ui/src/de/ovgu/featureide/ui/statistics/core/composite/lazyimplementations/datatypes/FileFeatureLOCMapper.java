@@ -411,7 +411,7 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
-	 * Returns the LOC per feature for one file
+	 * Returns the LOC per feature HashMap for one file
 	 * @param file defines the file which is searched
 	 * @return null or the HashMap containing the LOC per file
 	 */
@@ -437,7 +437,13 @@ public class FileFeatureLOCMapper {
 		return null;
 	}
 	
-	public int locWithoutFeatures(IFile file) {
+	/**
+	 * Returns the lines of code that don't belong to any feature in a
+	 * specific file.
+	 * @param file
+	 * @return
+	 */
+	public int locWithoutFeaturesByFile(IFile file) {
 		TableRow row = searchRow(file);
 		if(row != null) {
 			HashMap<FSTFeature, Integer> featMap = row.getLocByFeatMap();
@@ -445,14 +451,35 @@ public class FileFeatureLOCMapper {
 				int featLOC = 0;
 				for(FSTFeature feature: featMap.keySet()) {
 					featLOC += featMap.get(feature).intValue();
-					System.out.println("  LOC in feature "+ feature.getName() + ": " + featMap.get(feature).intValue());
 				}
-				System.out.println("All LOC in features: " + featLOC );
-				System.out.println("LOCinFile: " + row.getLocInFile() );
 				return row.getLocInFile() - featLOC;
 			}
 		}
 		return 0;
+	}
+	
+	/**
+	 * Returns the lines of code in all files that dont belong to any feature.
+	 * @return
+	 */
+	public int locWithoutFeatures() {
+		int loc = 0;
+		for (TableRow row: table) {
+			loc += locWithoutFeaturesByFile(row.getFile());
+		}
+		return loc;
+	}
+	
+	/**
+	 * Returns the lines of code of all files 
+	 * @return
+	 */
+	public int allLinesOfCode() {
+		int loc = 0;
+		for (TableRow row: table) {
+			loc += row.getLocInFile();
+		}
+		return loc;
 	}
 	
 	/**

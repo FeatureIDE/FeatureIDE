@@ -40,6 +40,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -74,10 +75,25 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	private final FileFeatureLOCMapper fileFeatLOCMapper = new FileFeatureLOCMapper();
 	private int numberOfLines = 0;
 	private boolean isPPProject = false;
+	private boolean isAspect = false;
+	private IFeatureProject project;
 	
-	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
+	public StatisticsProgramSizeNew(String description, FSTModel fstModel, IFeatureProject project) {
 		super(description);
 		this.fstModel = fstModel;
+		this.project = project;
+	}
+	/**
+	 * Constructor for AspectOrientated projects
+	 * @param description
+	 * @param project
+	 */
+	
+	public StatisticsProgramSizeNew(String description, IFeatureProject project) {
+		super(description);
+		this.fstModel = null;
+		this.project = project;
+		this.isAspect = true;
 	}
 
 	@Override
@@ -90,26 +106,28 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int numberOfMethods = 0;
 		int numberOfUniMethods = 0;
 
-		for (FSTClass fstClass : fstModel.getClasses()) {
-			final List<List<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
-			final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
-			final HashSet<FSTField> fieldHelper = new HashSet<FSTField>();
-
-			for (List<FSTClassFragment> linkedList : allFrag) {
-				numberOfRoles += linkedList.size();
-
-				for (FSTClassFragment fstClassFragment : linkedList) {
-					methHelper.addAll(fstClassFragment.getMethods());
-					fieldHelper.addAll(fstClassFragment.getFields());
-
-					numberOfMethods += fstClassFragment.getMethods().size();
-					numberOfFields += fstClassFragment.getFields().size();
+		if(!isAspect) {
+			for (FSTClass fstClass : fstModel.getClasses()) {
+				final List<List<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
+				final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
+				final HashSet<FSTField> fieldHelper = new HashSet<FSTField>();
+	
+				for (List<FSTClassFragment> linkedList : allFrag) {
+					numberOfRoles += linkedList.size();
+	
+					for (FSTClassFragment fstClassFragment : linkedList) {
+						methHelper.addAll(fstClassFragment.getMethods());
+						fieldHelper.addAll(fstClassFragment.getFields());
+	
+						numberOfMethods += fstClassFragment.getMethods().size();
+						numberOfFields += fstClassFragment.getFields().size();
+					}
 				}
+	
+				numberOfUniFields += fieldHelper.size();
+				numberOfUniMethods += methHelper.size();
+				numberOfClasses += allFrag.size();
 			}
-
-			numberOfUniFields += fieldHelper.size();
-			numberOfUniMethods += methHelper.size();
-			numberOfClasses += allFrag.size();
 		}
 		
 		try {
@@ -118,7 +136,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			UIPlugin.getDefault().logError(e);
 		}
 
-		if (fstModel.getFeatureProject().getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
+		if (project.getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 			addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 					SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
 			addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
@@ -127,7 +145,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 					fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 		}
 		boolean isPreprocessor = false;
-		if (fstModel.getFeatureProject().getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
+		if (project.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
 			isPreprocessor = true;
 		}
 		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, isPreprocessor));
@@ -143,7 +161,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	}
 
 	public void checkLOC() throws CoreException {
-		fstModel.getFeatureProject().getSourceFolder().accept(new IResourceVisitor() {
+		project.getSourceFolder().accept(new IResourceVisitor() {
 
 			@Override
 			public boolean visit(IResource resource) throws CoreException {
@@ -161,6 +179,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						case "c":
 						case "h":
 						case "jj":
+						case "aj":
 						case "jak":
 							oneLineComment = "//";
 							moreLineStart = "/*";
@@ -196,7 +215,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							e.printStackTrace();
 						}
 						
-						Mechanism mecha = fstModel.getFeatureProject().getComposer().getGenerationMechanism();
+						Mechanism mecha = project.getComposer().getGenerationMechanism();
 						if (mecha.ordinal() == mecha.PREPROCESSOR.ordinal()) {
 							isPPProject = true;
 							System.out.println(" PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPps");
@@ -213,7 +232,9 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 
 		});
-		fillMapper();
+		if(!isAspect) {
+			fillMapper();
+		}
 	}
 	
 	/**

@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FILE;
 import java.util.HashMap;
 
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
+import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNodeTwoStrings;
 
@@ -59,8 +60,10 @@ public class LOCNode extends LazyParent {
 		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper));
 		if (isPreprocessor) {
 			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper));
-			//addChild(new Parent(Variable Code));
-			//addChild(new Parent(Preprocessor Code));
+			int locWithoutFeat = fileFeatureLOCMapper.locWithoutFeatures();
+			addChild(new Parent("Variable lines of code", locWithoutFeat));
+			int preprocessorLOC = fileFeatureLOCMapper.allLinesOfCode() - locWithoutFeat;
+			addChild(new Parent("Preprocessor lines of code", preprocessorLOC));
 		}
 	}
 

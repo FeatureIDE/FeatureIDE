@@ -120,7 +120,7 @@ public class LOCFilterNode extends AbstractSortModeNode {
 			HashMap<FSTFeature, Integer> featAndCount = fileFeatureLOCMapper.getFeaturesWithLOC(); 
 			for (FSTFeature feature: featAndCount.keySet()) {
 				int LOC = featAndCount.get(feature).intValue(); 
-				addChild(new Parent(feature.getName() + SEPARATOR + LOC, fileFeatureLOCMapper));
+				addChild(new Parent(feature.getName(), LOC));
 			}
 		} 
 	}
