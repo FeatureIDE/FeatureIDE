@@ -155,22 +155,13 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	};
 
 	private IEventListener modelListener = new IEventListener() {
+		//TODO: filter proper events to handle
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType()))
-				System.out.println("ModelEdit " + evt.getEventType());
-			
-			    IWorkbenchPage page = getSite().getPage();
-			
-			    System.out.println("FeatureModelEdit: isVisible: " + page.isPartVisible(getSite().getPart()) + " Part: " + getSite().getPart().getTitle());
-			
-			    if(page.isPartVisible(getSite().getPart())){
-			   
-			    	
-				refresh();
-				
-				System.out.println("Refresh");
-				
-			    }
+			boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
+			if (isVisible && evt.getEventType() != EventType.STRUCTURE_CHANGED && evt.getEventType() != EventType.MODEL_LAYOUT_CHANGED)
+				System.out.println("Team2: ModelEdit " + evt.getEventType());
+				System.out.println("Team2: FeatureModelEdit isVisible: " + isVisible + ", Part: " + getSite().getPart().getTitle());
+			    refresh();
 		}
 	};
 
@@ -310,13 +301,13 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 							IWorkbenchPage page = getSite().getPage();
 							
 							
-							System.out.println("Is part visible: " + page.isPartVisible(getSite().getPart()) + " Part: " + getSite().getPart().getTitle());
+							System.out.println("Team2: Is part visible: " + page.isPartVisible(getSite().getPart()) + ", Part: " + getSite().getPart().getTitle());
 							System.out.println("Team2: FeatureModelEditView: In else Schleife");
 							
 							if(page.isPartVisible(getSite().getPart())){
 							
-						    System.out.println("Team2: FeatureModelEditView: isActivatorChecked: " + isActivatorChecked() + ": isCalculating" );
-							contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+								System.out.println("Team2: FeatureModelEditView: isActivatorChecked: " + isActivatorChecked() + ": isCalculating" );
+								contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
 							
 							
 							}
