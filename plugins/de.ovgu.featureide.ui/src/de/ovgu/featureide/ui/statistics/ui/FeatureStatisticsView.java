@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.statistics.ui;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURESTATISTICSVIEW;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -44,6 +45,9 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -62,7 +66,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
  * @author Dominik Hamann
  * @author Patrick Haese
  */
-public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
+public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICurrentBuildListener{
 	private TreeViewer viewer;
 	private ContentProvider contentProvider;
 	private IEditorPart currentEditor;
@@ -84,6 +88,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		viewer.addDoubleClickListener(new TreeClickListener(viewer));
 		ColumnViewerToolTipSupport.enableFor(viewer);
 
+		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
+		UIPlugin.getDefault().logInfo("Team2: StatisticsView -> addBuildListeners");
 		
 		//TODO: Task Performance
 		getSite().getPage().addPartListener(editorListener);
@@ -140,16 +146,15 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			if (partOf && part == getSite().getPart()) {
 				UIPlugin.getDefault().logInfo("Team2: FeatureStatistics -> partBroughtToTop, part: " + getSite().getPart().getTitle());
 				refresh(true);
-				//setEditor((IEditorPart) part);
 			}
 		}
 
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof IEditorPart && part == getSite().getPart()) {
+			/*if (part instanceof IEditorPart) {
 				UIPlugin.getDefault().logInfo("Team2: FeatureStatistics -> partActivated");
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
 				setEditor((IEditorPart) part);
-			}
+			}*/
 		}
 	};
 
@@ -161,16 +166,17 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 * TODO: Task Performance
-	 */
+	 *
 	private IEventListener modelListener = new IEventListener() {
 		//TODO: filter proper events to handle
 		public void propertyChange(FeatureIDEEvent evt) {
+			UIPlugin.getDefault().logInfo("Team2: PropertyChanged -> Event = " + evt.getEventType().name());
 			boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
-			if ( isVisible  && evt.getEventType() != EventType.STRUCTURE_CHANGED && evt.getEventType() != EventType.MODEL_LAYOUT_CHANGED) {
+			if ( isVisible  && (evt.getEventType() == EventType.MODEL_DATA_SAVED)) {
 				refresh(true);
 			}
 		}
-	};
+	};*/
 
 	private Job job = null;
 
@@ -257,9 +263,9 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 				return;
 			}
 
-			if (currentEditor instanceof FeatureModelEditor) {
-				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
-			}
+			//if (currentEditor instanceof FeatureModelEditor) {
+			//	((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
+			//}
 		}
 		boolean force = true;
 		if (newEditor != null && currentEditor != null) {
@@ -276,9 +282,26 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			}
 		}
 		currentEditor = newEditor;
-		if (newEditor instanceof FeatureModelEditor) {
-			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
-		}
+		//if (newEditor instanceof FeatureModelEditor) {
+		//	((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
+		//}
 		refresh(force);
+	}
+
+	/**
+	 * Refreshes the Statistics View if model was saved
+	 */
+	@Override
+	public void updateGuiAfterBuild(IFeatureProject project, IFile configurationFile) {
+		boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
+		
+		if (isVisible) {
+			UIPlugin.getDefault().logInfo("Team2: StatisticsView -> updateGuiAfterBuild");
+		
+			if (project != null && configurationFile != null) {
+				UIPlugin.getDefault().logInfo("Team2: StatisticsView -> updateGuiAfterBuild -> refresh");
+				refresh(true);
+			}
+		}
 	}
 }

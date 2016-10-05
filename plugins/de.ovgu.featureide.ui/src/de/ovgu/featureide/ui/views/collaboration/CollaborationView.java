@@ -149,7 +149,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
  * @author Max Kammler
  */
 
-public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener, ISaveablePart, IEventListener {
+public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener, ISaveablePart {
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.Collaboration";
 
@@ -173,6 +173,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	private GraphicalViewerImpl viewer;
 	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
+	private FeatureModelEditor featureModelEditor;
 	private IWorkbenchPart currentEditor;
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
@@ -229,7 +230,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			if (configurationFile != null && CollaborationModelBuilder.editorFile != null) {
 				builder.configuration = configurationFile;
 			}
-			
 			
 			if (isVisible) {
 				final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
@@ -297,10 +297,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		this.cursorPosition = new Point(x, y);
 	}
-
+	 
 	/** 
 	 * Refreshes the Collaboration Diagram when model changed
-	 */
+	 *
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
@@ -311,7 +311,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			UIPlugin.getDefault().logInfo("Team2: CollaborationDiagram -> PropertyChanged");
 			UIPlugin.getDefault().logInfo("Team2: PropertyChanged -> EventType: " + event.getEventType().name());
 		}
-	}
+	} 
+	*/
 	
 	private IPartListener editorListener = new IPartListener() {
 
@@ -362,8 +363,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		viewer.getControl().setBackground(DIAGRAM_BACKGROUND);
 		
 		getSite().getPage().addPartListener(editorListener); // EditorListener
-		FeatureModelEditor featureModelEditor = (FeatureModelEditor) getSite().getPage().getActiveEditor();
-		featureModelEditor.getFeatureModel().addListener(this); // IEventListener
 		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
 
 		// required for borders
@@ -519,6 +518,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				content.refresh();
 			}
 		} else {
+			/*featureModelEditor = (FeatureModelEditor) getSite().getPage().getActiveEditor();
+			if(featureModelEditor != null) {
+				featureModelEditor.getFeatureModel().addListener(this); // IEventListener
+			}*/
 			updateGuiAfterBuild(featureProject, null);
 		}
 	}
