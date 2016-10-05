@@ -828,6 +828,7 @@ public class StringTable {
 	public static final String HIDE_FIELDS = "Hide Fields";
 	public static final String HIDE_METHODS = "Hide Methods";
 	public static final String SORT_BY_FEATURE = "Sort By Feature";
+	public static final String SYNC_COLLAPSED_FEATURES = "Sync collapsed states with FM";
 	public static final String EMPTY_OUTLINE = "Empty Outline";
 	public static final String AN_OUTLINE_IS_NOT_AVAILABLE_ = "An outline is not available.";
 	public static final String THIS_IS_NO_FEATURE_PROJECT = "Not a FeatureIDE project";

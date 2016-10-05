@@ -28,8 +28,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_FIELDS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_METHODS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OUTLINE_SELECTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_BY_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SYNC_COLLAPSED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_OUTLINE_VIEW;
 
+import java.awt.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -97,7 +99,10 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SyncCollapsedFeaturesAction;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -141,7 +146,9 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	private static final ImageDescriptor IMG_SHOW_FIELDS = UIPlugin.getDefault().getImageDescriptor("icons/fields_co.gif");
 	private static final ImageDescriptor IMG_SHOW_METHODS = UIPlugin.getDefault().getImageDescriptor("icons/methods_co.gif");
 	private static final ImageDescriptor IMG_SORT_FEATURES = UIPlugin.getDefault().getImageDescriptor("icons/alphab_sort_co.gif");
-
+	private static final ImageDescriptor IMG_SYNC_FEATURES = UIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif");
+	
+	
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.outline.CollaborationOutline";
 
 	private ArrayList<IAction> actionOfProv = new ArrayList<IAction>();
@@ -163,6 +170,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	private boolean hideAllFieldsToggle = false;
 	private boolean hideAllMethodsToggle = false;
 	private boolean sortFeatureToggle = false;
+	private boolean syncCollapsedFeaturesToggle = false;
 
 	private IPartListener editorListener = new IPartListener() {
 
@@ -597,7 +605,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										if (iFile != null) {
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
 												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
-
+												
 												// recreate the context menu in case
 												// we switched to another model
 												if (contextMenu == null
@@ -613,6 +621,15 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 													}
 													contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
 															((FeatureModelEditor) active_editor).getFeatureModel());
+												}
+												FmTreeContentProvider contentProvider = (FmTreeContentProvider) viewer.getContentProvider();
+												if (syncCollapsedFeaturesToggle) {
+													ArrayList<IFeature> expandedElements = new ArrayList<>();
+													for (IFeature f: contentProvider.getFeatureModel().getFeatures()) {
+														if (f.getStructure().hasChildren() && !f.getStructure().isCollapsed())
+															expandedElements.add(f);
+													}
+													viewer.setExpandedElements(expandedElements.toArray());
 												}
 
 											} else {
@@ -648,6 +665,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		sortMethods.setEnabled(false);
 		hideAllFields.setEnabled(false);
 		hideAllMethods.setEnabled(false);
+		syncCollapsedFeatures.setEnabled(false);
 		if (currentFile != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(currentFile);
 			if (featureProject != null) {
@@ -657,6 +675,9 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 						sortMethods.setEnabled(true);
 						hideAllFields.setEnabled(true);
 						hideAllMethods.setEnabled(true);
+					}
+					if (viewer.getLabelProvider() instanceof FMOutlineLabelProviderWrapper) {
+						syncCollapsedFeatures.setEnabled(true);
 					}
 					if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 						OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
@@ -737,6 +758,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		}
 	};
+	
+	private Action syncCollapsedFeatures = new Action("", Action.AS_CHECK_BOX) {
+
+		public void run() {
+			syncCollapsedFeaturesToggle = !syncCollapsedFeaturesToggle;
+		}
+	};
 
 	/**
 	 * provides functionality to expand and collapse all items in viewer
@@ -775,9 +803,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		hideAllMethods.setImageDescriptor(IMG_SHOW_METHODS);
 		sortMethods.setToolTipText(SORT_BY_FEATURE);
 		sortMethods.setImageDescriptor(IMG_SORT_FEATURES);
+		
+		syncCollapsedFeatures.setToolTipText(SYNC_COLLAPSED_FEATURES);
+		syncCollapsedFeatures.setImageDescriptor(IMG_SYNC_FEATURES);
 
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
+		iToolBarManager.add(syncCollapsedFeatures);
 		iToolBarManager.add(hideAllFields);
 		iToolBarManager.add(hideAllMethods);
 		iToolBarManager.add(sortMethods);

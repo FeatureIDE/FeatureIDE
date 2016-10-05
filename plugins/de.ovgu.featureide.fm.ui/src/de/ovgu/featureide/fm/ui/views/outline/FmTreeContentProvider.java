@@ -56,6 +56,10 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 			fModel = ((IFeatureModel) newInput);
 
 	}
+	
+	public IFeatureModel getFeatureModel() {
+		return fModel;
+	}
 
 	@Override
 	public Object[] getElements(Object inputElement) {
@@ -88,6 +92,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		// we store the group stage into an extra object in order to be able to
 		// show an own element for GroupStages
 		if (parentElement instanceof FmOutlineGroupStateStorage) {
+			
 			return featureListToArray(FeatureUtils.convertToFeatureList(((FmOutlineGroupStateStorage) parentElement).getFeature().getStructure().getChildren()));
 		}
 
