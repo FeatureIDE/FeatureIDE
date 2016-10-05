@@ -38,6 +38,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorAnnotationModel;
 
 /**
@@ -78,6 +79,7 @@ public class ColorSchemeHandler extends AbstractHandler {
 		if (colormodel != null) {
 			IStructuredSelection strucki = new StructuredSelection(colormodel.getFeature(line));
 			SetFeatureColorAction sfca = new SetFeatureColorAction(strucki, colormodel.getFeatureModel());
+			//UIPlugin.getDefault().logInfo(colorModel.getFe);
 			sfca.run();
 			return true;
 		}

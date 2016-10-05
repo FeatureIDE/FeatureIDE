@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.swt.graphics.Color;
@@ -35,7 +36,12 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -50,7 +56,8 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 public class DrawImageForProjectExplorer {
 	
-	private static final int NRUMBER_OF_COLORS = 10;
+	private static final int NUMBER_OF_COLORS = 10;
+	
 	private static final Image JAVA_IMAGE = UIPlugin.getImage("JakFileIcon.png");
 	private static final Image FOLDER_IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
 	private static final Image PACKAGE_IMAGE = JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_PACKAGE);
@@ -59,12 +66,13 @@ public class DrawImageForProjectExplorer {
 	private static final Device DEVICE = FOLDER_IMAGE.getDevice();
 	private static final int ICON_HEIGHT = FOLDER_IMAGE.getBounds().height;
 	private static final int ICON_WIDTH = FOLDER_IMAGE.getBounds().width;
-
+	
 	/**
 	 * constant for the width of the single colorImage
 	 */
 	private final static int COLOR_IMAGE_WIDTH = FOLDER_IMAGE.getBounds().width / 4 + 1;
 	private final static Image WHITESPACE_IMAGE;
+	
 	static {
 		ImageData imageData = FOLDER_IMAGE.getImageData();
 		Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
@@ -75,12 +83,13 @@ public class DrawImageForProjectExplorer {
 		gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
 		gc.dispose();
 		WHITESPACE_IMAGE = finalImage;
-	}
+	} 
 	
-	private final static Image[] COLOR_IMAGES = new Image[NRUMBER_OF_COLORS]; 
-	static {
+	private final static Map<Integer, Image> COLOR_IMAGES = new HashMap<>(); 
+	
+	static {			
 		final ImageData imageData = FOLDER_IMAGE.getImageData();
-		for (int i = 0; i < NRUMBER_OF_COLORS; i++) {
+		for (int i = 0; i < NUMBER_OF_COLORS; i++) {
 			Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
 			GC gc = new GC(finalImage);
 			gc.setForeground(new Color(DEVICE, 0, 0, 0));
@@ -88,7 +97,7 @@ public class DrawImageForProjectExplorer {
 			gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
 			gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
 			gc.dispose();
-			COLOR_IMAGES[i] = finalImage;
+			COLOR_IMAGES.put(i, finalImage);
 		}
 	}
 	
@@ -123,7 +132,7 @@ public class DrawImageForProjectExplorer {
 		});
 		
 		// create hash value
-		if (superImage == null) {
+		if (superImage == null) { 
 			colors.add(explorerObject.value);
 		} else {
 			colors.add(superImage.getImageData().hashCode());
@@ -154,18 +163,17 @@ public class DrawImageForProjectExplorer {
 			}
 		}
 		
-		Image image = new Image(DEVICE, icon.getBounds().width + 2 + NRUMBER_OF_COLORS * COLOR_IMAGE_WIDTH - NRUMBER_OF_COLORS, ICON_HEIGHT);
+	
+		
+		Image image = new Image(DEVICE, icon.getBounds().width + 2 + colors.size() * COLOR_IMAGE_WIDTH - colors.size(), ICON_HEIGHT);
 		GC gc = new GC(image);
 		
 		gc.drawImage(icon, 0, 0);
 		
-		for (int i = 0; i < 10; i++) {
-			if (colors.contains(i)) {
+		for (int i = 0; i < colors.size(); i++) 
 				gc.drawImage(getColorImage(i), icon.getBounds().width + 1 + COLOR_IMAGE_WIDTH * i - i, 0);
-			} else {
-				gc.drawImage(WHITESPACE_IMAGE, icon.getBounds().width + 1 + COLOR_IMAGE_WIDTH * i - i, 0);
-			}
-		}
+		
+		
 		ImageData data = image.getImageData();
 		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));
 		gc.dispose();
@@ -209,7 +217,7 @@ public class DrawImageForProjectExplorer {
 	 *         de.ovgu.featureide.fm.core.annotation.ColorPalette
 	 */
 	private static Image getColorImage(int colorID) {
-		return COLOR_IMAGES[colorID];
+		return COLOR_IMAGES.get(colorID);
 	}
 
 	public static Image getPackageImage() {

@@ -44,12 +44,12 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	/*
 	 * constant to create space for the image 
 	 */
-	private static final String SPACE_STRING = "             ";
+	private static String SPACE_STRING = "";
 	
 	@Override
 	public Image getImage(Object element) {
 		Image superImage = super.getImage(element);
-		Set<Integer> elementColors = new HashSet<Integer>();
+		Set<Integer> elementColors = new HashSet<Integer>(); 
 		//returns the image for packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
@@ -71,7 +71,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			}
 			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return superImage;
-			}
+			}			
+			
 			FSTModel model = featureProject.getFSTModel();
 			if (model == null || model.getClasses().isEmpty()) {
 				composer.buildFSTModel();
@@ -271,6 +272,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	
 	@Override
 	public String getText(Object element) {
+		Set<Integer> elementColors = new HashSet<Integer>();
+		
 		//text for Packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
@@ -290,6 +293,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				return null;
 			}
 			String elementName = frag.getElementName();
+			
+			getPackageColors((IFolder) frag.getResource(), elementColors, featureProject.getFSTModel(), !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+			for(int i = 0; i<elementColors.size(); i++)
+				SPACE_STRING += " ";
 			if (elementName.isEmpty()) {
 				return SPACE_STRING + "(default package)";
 			}
