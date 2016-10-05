@@ -295,8 +295,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			String elementName = frag.getElementName();
 			
 			getPackageColors((IFolder) frag.getResource(), elementColors, featureProject.getFSTModel(), !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+			SPACE_STRING = "";
 			for(int i = 0; i<elementColors.size(); i++)
 				SPACE_STRING += " ";
+			
 			if (elementName.isEmpty()) {
 				return SPACE_STRING + "(default package)";
 			}
@@ -307,7 +309,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		}
 
 		//text for Folders
-		if (element instanceof IResource) {
+		else if (element instanceof IResource) {
 			IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) element);
 			if (featureProject != null) {
 				IComposerExtensionClass composer = featureProject.getComposer();
@@ -317,6 +319,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 					return null;
 				}
+				
+				IResource res = (IResource) element;
 				if (composer.hasFeatureFolder()) {
 					if (element instanceof IFolder) {
 						IFolder folder = (IFolder) element;
@@ -326,7 +330,6 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 						}
 					}
 				} else if (element instanceof IResource) {
-					IResource res = (IResource) element;
 					if (isInBuildFolder(res) || isInSourceFolder(res)) {
 						return SPACE_STRING + res.getName();
 					}
@@ -336,7 +339,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		}
 
 		//text for composed files
-		if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
+		else if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
 			CompilationUnit cu = (CompilationUnit) element;
 			IResource myfile = cu.getResource();
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
