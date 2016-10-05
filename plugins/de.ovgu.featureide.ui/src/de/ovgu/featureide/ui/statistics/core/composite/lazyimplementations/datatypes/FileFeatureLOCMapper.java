@@ -22,8 +22,6 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.data
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
@@ -31,8 +29,6 @@ import org.eclipse.core.resources.IFile;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 
 /**
- * TODO: synchronisieren von LOCinFile und allen loc von allen features in der map.
- * 		 Was passiert bei mehr LOCInFile als LOCInFeatures?
  * 
  * A class to represent the following table of information: <br>
  * <table>
@@ -62,7 +58,7 @@ public class FileFeatureLOCMapper {
 	 */
 	public void addEntry(IFile file, int locInFile) {
 		TableRow newRow = new TableRow(file, locInFile);
-		if (!table.contains(newRow)) {
+		if (searchRow(file) == null) {
 			table.add(newRow);
 		}
 	}
@@ -129,7 +125,6 @@ public class FileFeatureLOCMapper {
 	 */
 	public void addSingleLOCMapEntry(IFile file, FSTFeature feat, Integer loc) {
 		TableRow existingRow = searchRow(file);
-		System.out.println("LOC          : " + loc);
 		if (existingRow != null) {
 			if (existingRow.getLocByFeatMap() == null) {
 				existingRow.setLocByFeatMap(new HashMap<FSTFeature, Integer>());
@@ -140,10 +135,6 @@ public class FileFeatureLOCMapper {
 				int oldLOC = existingRow.getLocByFeatMap().get(feat);
 				existingRow.getLocByFeatMap().put(feat, oldLOC + loc.intValue());
 			}
-		} else {
-			HashMap<FSTFeature, Integer> newFeatLOCMap = new HashMap<>();
-			newFeatLOCMap.put(feat, loc);
-			TableRow newRow = new TableRow(file, loc, newFeatLOCMap);
 		}
 	}
 	
@@ -182,6 +173,21 @@ public class FileFeatureLOCMapper {
 		}
 		
 		return extAndNumber;
+	}
+	
+	/**
+	 * Returns a HashMap of files with the lines of code per file
+	 * @param extension to select the files
+	 * @return
+	 */
+	public HashMap<IFile, Integer> getFilesWithLOCByExtension(String extension) {
+		HashMap<IFile, Integer> filesWithLOC = new HashMap<>();
+		for (TableRow row: table) {
+			if (row.getFile().getFileExtension().equals(extension)) {
+				filesWithLOC.put(row.getFile(), row.getLocInFile());
+			}
+		}
+		return filesWithLOC;
 	}
 	
 	/**
@@ -305,6 +311,11 @@ public class FileFeatureLOCMapper {
 		return null;
 	}
 	
+	/**
+	 * Returns an IFile by name
+	 * @param fileName
+	 * @return
+	 */
 	public IFile resolveFile(String fileName) { 
 		for (TableRow row: table) {
 			IFile file = row.getFile();
@@ -432,19 +443,16 @@ public class FileFeatureLOCMapper {
 			HashMap<FSTFeature, Integer> featMap = row.getLocByFeatMap();
 			if(featMap != null) {
 				int featLOC = 0;
-				System.out.println("-------------------Start--------------------------------");
 				for(FSTFeature feature: featMap.keySet()) {
 					featLOC += featMap.get(feature).intValue();
-					System.out.println("LOCinFeat "+ feature.getName() + ": " + featMap.get(feature).intValue() );
-					System.out.println("LOCinFeat: " + featLOC );
+					System.out.println("  LOC in feature "+ feature.getName() + ": " + featMap.get(feature).intValue());
 				}
+				System.out.println("All LOC in features: " + featLOC );
 				System.out.println("LOCinFile: " + row.getLocInFile() );
-				System.out.println("LOCinFeat: " + featLOC );
-				System.out.println("-------------------End-------------------------------------");
 				return row.getLocInFile() - featLOC;
 			}
 		}
-		return -1;
+		return 0;
 	}
 	
 	/**

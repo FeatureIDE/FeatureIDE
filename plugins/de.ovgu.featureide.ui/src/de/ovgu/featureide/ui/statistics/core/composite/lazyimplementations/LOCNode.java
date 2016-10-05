@@ -34,36 +34,34 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  * Node for aggregated LOC.
  * 
  * @author Schleicher Miro
+ * @author Maximilian Homann
+ * @author Philipp Kuhn
  */
 public class LOCNode extends LazyParent {
-
-	private final HashMap<String, Integer> featureExtensionLOCList;
-	private final HashMap<String, Integer> extFileLOCList;
+	
 	private final FileFeatureLOCMapper fileFeatureLOCMapper;
+	private boolean isPreprocessor = false;
 
-	LOCNode(String description, HashMap<String, Integer> fExList, HashMap<String, Integer> extFileLOCList) {
+	LOCNode(String description, boolean isPreprocessor) {
 		super(description);
-		this.featureExtensionLOCList = fExList;
-		this.extFileLOCList = extFileLOCList;
 		this.fileFeatureLOCMapper = null;
+		this.isPreprocessor = isPreprocessor;
 	}
 	
-	public LOCNode(String description, FileFeatureLOCMapper ffLOCMapper) {
+	public LOCNode(String description, FileFeatureLOCMapper ffLOCMapper, boolean isPreprocessor) {
 		super(description);
 		this.fileFeatureLOCMapper = ffLOCMapper;
-		featureExtensionLOCList = null;
-		extFileLOCList = null;
+		this.isPreprocessor = isPreprocessor;
 	}
 
 	@Override
 	protected void initChildren() {
-//		addChild(new HashMapNodeTwoStrings(LOC_BY_EXTENSION, 1, featureExtensionLOCList, extFileLOCList));
-//		addChild(new HashMapNodeTwoStrings(LOC_BY_FEATURE, 2, featureExtensionLOCList, extFileLOCList));
-//		addChild(new HashMapNodeTwoStrings(LOC_BY_FILE, 3, featureExtensionLOCList, extFileLOCList));
-
 		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper));
-		addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper));
-		addChild(new LOCFilterNode(LOC_BY_FILE, fileFeatureLOCMapper));
+		if (isPreprocessor) {
+			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper));
+			//addChild(new Parent(Variable Code));
+			//addChild(new Parent(Preprocessor Code));
+		}
 	}
 
 }

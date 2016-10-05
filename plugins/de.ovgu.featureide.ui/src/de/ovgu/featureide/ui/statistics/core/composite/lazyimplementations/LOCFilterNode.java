@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
@@ -119,16 +120,9 @@ public class LOCFilterNode extends AbstractSortModeNode {
 			HashMap<FSTFeature, Integer> featAndCount = fileFeatureLOCMapper.getFeaturesWithLOC(); 
 			for (FSTFeature feature: featAndCount.keySet()) {
 				int LOC = featAndCount.get(feature).intValue(); 
-				addChild(new LOCFilterChildNode(feature.getName() + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper));
+				addChild(new Parent(feature.getName() + SEPARATOR + LOC, fileFeatureLOCMapper));
 			}
-		} else if (nodeType.equals(LOC_BY_FILE)) {
-			ArrayList<IFile> files = fileFeatureLOCMapper.getFiles();
-			for (IFile file: files) {
-				int LOC = fileFeatureLOCMapper.getLOCByFile(file);
-				addChild(new LOCFilterChildNode(file.getName() + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper));
-			}
-		}
-		
+		} 
 	}
 
 }

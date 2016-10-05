@@ -56,26 +56,11 @@ public class LOCFilterChildNode extends LOCFilterNode {
 	protected void initChildren() {
 		if (parentNodeName.equals(LOC_BY_EXTENSION)) {
 			String extension = description.split(SEPARATOR)[0];
-			HashMap<FSTFeature, Integer> features = fileFeatureLOCMapper.getFeaturesByExtensionWithLOC(extension);
+			HashMap<IFile, Integer> filesWithLOC = fileFeatureLOCMapper.getFilesWithLOCByExtension(extension);
 
-			for (FSTFeature feature: features.keySet()) {
-				addChild(new Parent(feature.getName(), features.get(feature)));
-			}
-		} else if (parentNodeName.equals(LOC_BY_FEATURE)) {
-			String feature = description.split(SEPARATOR)[0];
-			FSTFeature nodeFeature = fileFeatureLOCMapper.resolveFeature(feature);
-			HashMap<String, Integer> extensionsWithLOC = fileFeatureLOCMapper.getExtensionsByFeatureWithLOC(nodeFeature);
-
-			for (String extension: extensionsWithLOC.keySet()) {
-				addChild(new Parent(extension, extensionsWithLOC.get(extension)));
-			}
-		} else if (parentNodeName.equals(LOC_BY_FILE)) {
-			String fileName = description.split(SEPARATOR)[0];
-			IFile file = fileFeatureLOCMapper.resolveFile(fileName);
-			HashMap<FSTFeature, Integer> fileWithLOC = fileFeatureLOCMapper.getLOCByFeatMap(file);
-			addChild(new Parent("LOC without features" + SEPARATOR, fileFeatureLOCMapper.locWithoutFeatures(file)));
-			for (FSTFeature feature: fileWithLOC.keySet()) {
-				addChild(new Parent(feature.getName(), fileWithLOC.get(feature)));
+			for (IFile file: filesWithLOC.keySet()) {
+				String fileWithPath = file.getParent().toString().split("F/")[1] + "/" + file.getName();
+				addChild(new Parent(fileWithPath, filesWithLOC.get(file)));
 			}
 		}
 	}
