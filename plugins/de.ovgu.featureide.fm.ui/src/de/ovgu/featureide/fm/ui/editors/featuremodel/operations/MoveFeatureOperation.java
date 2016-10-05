@@ -66,9 +66,16 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 
 			if (newParent.getObject().getStructure().isCollapsed()) {
 				newParent.getObject().getStructure().addChildAtPosition(newParent.getObject().getStructure().getChildrenCount() + 1, featureStructure);
+				
+					for (IFeatureStructure fs : newParent.getObject().getStructure().getChildren()) {
+						if (fs != featureStructure) {
+							fs.setCollapsed(true);
+						}
+				}
 			} else {
 				newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
 			}
+
 
 			if (oldParent != newParent) {
 				oldParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));

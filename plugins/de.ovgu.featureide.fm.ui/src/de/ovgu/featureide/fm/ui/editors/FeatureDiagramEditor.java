@@ -849,6 +849,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				// Uncollapse if collapsed
 				if (parent.getStructure().isCollapsed()) {
 					parent.getStructure().setCollapsed(false);
+					for (IFeatureStructure featureStructure : parent.getStructure().getChildren()) {
+						if (featureStructure != newFeature.getStructure()) {
+							featureStructure.setCollapsed(true);
+						}
+					}
 					fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED));
 				}
 				//Draws the connections
