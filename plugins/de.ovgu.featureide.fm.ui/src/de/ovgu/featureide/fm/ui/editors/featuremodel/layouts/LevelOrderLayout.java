@@ -80,7 +80,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void layoutLevelInX(LinkedList<IGraphicalFeature> level) {
 		for (IGraphicalFeature feature : level)
-			if (feature.getObject().getStructure().hasChildren()) {
+			if (feature.getObject().getStructure().hasVisibleChildren()) {
 				centerAboveChildren(feature);
 			}
 
@@ -95,12 +95,11 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private int layoutFeatureInX(LinkedList<IGraphicalFeature> level, int j, int moveWidth, IGraphicalFeature lastFeature) {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
-		if (!feature.getObject().getStructure().hasChildren())
+		if (!feature.getObject().getStructure().hasVisibleChildren())
 			nextToLeftSibling(feature, lastFeature);
 		else {
 			if (lastFeature != null)
-				moveWidth = Math.max(moveWidth,
-						getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX() - getLocation(feature).x);
+				moveWidth = Math.max(moveWidth, getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX() - getLocation(feature).x);
 			if (moveWidth > 0)
 				moveTree(feature, moveWidth);
 			layoutSiblingsEquidistant(level, j, feature);
@@ -108,7 +107,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				firstCompound = false;
 				boolean compoundSibling = false;
 				for (int k = j - 1; k >= 0; k--)
-					if (level.get(k).getObject().getStructure().hasChildren())
+					if (level.get(k).getObject().getStructure().hasVisibleChildren())
 						compoundSibling = true;
 				if (!compoundSibling)
 					for (int k = j - 1; k >= 0; k--)
@@ -129,7 +128,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				l = k + 1;
 				break;
 			}
-			if (sibling.getObject().getStructure().hasChildren()) {
+			if (sibling.getObject().getStructure().hasVisibleChildren()) {
 				l = k + 1;
 				right = false;
 				space = getBounds(feature).x - getBounds(sibling).right() - width;
@@ -170,6 +169,9 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void centerAboveChildren(IGraphicalFeature feature) {
 		final List<IGraphicalFeature> graphicalChildren = getChildren(feature);
+		if(graphicalChildren.size() == 0) {
+			return;
+		}
 		int minX = getBounds(graphicalChildren.get(0)).x;
 		int maxX = getBounds(graphicalChildren.get(graphicalChildren.size() - 1)).right();
 		Point location = getLocation(feature);
@@ -195,7 +197,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		for (IGraphicalFeature child : getChildren(root))
 			moveTree(child, deltaX);
 	}
-	
+
 	private void centerTheRoot(IGraphicalFeature root) {
 		int newX = (controlWidth - getBounds(root).width) / 2;
 		moveTree(root, newX - getLocation(root).x);

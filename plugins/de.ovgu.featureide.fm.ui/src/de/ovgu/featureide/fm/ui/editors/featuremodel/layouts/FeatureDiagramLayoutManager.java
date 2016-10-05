@@ -48,22 +48,30 @@ abstract public class FeatureDiagramLayoutManager {
 	protected static final class HiddenFilter implements IFilter<IGraphicalFeature> {
 		@Override
 		public boolean isValid(IGraphicalFeature object) {
-			return !object.getObject().getStructure().isHidden();
+			return !object.getObject().getStructure().isHidden() && !object.getObject().getStructure().hasCollapsedParent();
+		}
+	}
+
+	protected static final class CollapseFilter implements IFilter<IGraphicalFeature> {
+		@Override
+		public boolean isValid(IGraphicalFeature object) {
+			return !object.getObject().getStructure().hasCollapsedParent();
 		}
 	}
 
 	protected static final HiddenFilter hiddenFilter = new HiddenFilter();
+	protected static final CollapseFilter collapseFilter = new CollapseFilter();
 
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden;
-	
+
 	public final void layout(IGraphicalFeatureModel featureModel) {
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		layoutFeatureModel(featureModel);
 		layoutHidden(featureModel);
-		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {
+		for (Entry<IGraphicalFeature, Point> entry : newLocations.entrySet()) {
 			entry.getKey().setLocation(entry.getValue());
 		}
 		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
@@ -92,7 +100,7 @@ abstract public class FeatureDiagramLayoutManager {
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
 			if (isHidden(feature) && !feature.getObject().getStructure().isRoot()) {
 				// TODO does nothing
-//				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
+				//				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
 			}
 		}
 	}
@@ -111,6 +119,9 @@ abstract public class FeatureDiagramLayoutManager {
 		int mostRightFeatureX = Integer.MIN_VALUE;
 		int mostLeftFeatureX = Integer.MAX_VALUE;
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
+			if (feature.getObject().getStructure().hasCollapsedParent()) {
+				continue;
+			}
 			int tempX = feature.getLocation().x;
 			int tempXOffset = feature.getSize().width;
 			if (mostRightFeatureX < tempX + tempXOffset)
@@ -121,7 +132,11 @@ abstract public class FeatureDiagramLayoutManager {
 		int width = mostRightFeatureX - mostLeftFeatureX;
 		int offset = mostRightFeatureX - ((controlWidth - width) / 2);
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			feature.setLocation(new Point(feature.getLocation().getCopy().x + offset, feature.getLocation().getCopy().y));
+			if (feature.getObject().getStructure().hasCollapsedParent()) {
+				feature.setLocation(new Point(0, 0));
+			} else {
+				feature.setLocation(new Point(feature.getLocation().getCopy().x + offset, feature.getLocation().getCopy().y));
+			}
 		}
 	}
 
@@ -180,7 +195,7 @@ abstract public class FeatureDiagramLayoutManager {
 		if (legendSize == null) {
 			return;
 		}
-		
+
 		boolean topRight = true;
 		boolean topLeft = true;
 		boolean botLeft = true;
@@ -248,16 +263,16 @@ abstract public class FeatureDiagramLayoutManager {
 			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		}
 	}
-	
+
 	/**
 	 * Stores locations separately to {@link IGraphicalFeature}.
 	 */
 	protected Map<IGraphicalFeature, Point> newLocations = new HashMap<>();
-	
-	protected void setLocation(IGraphicalFeature feature , Point location) {
+
+	protected void setLocation(IGraphicalFeature feature, Point location) {
 		newLocations.put(feature, location);
 	}
-	
+
 	protected Point getLocation(IGraphicalFeature feature) {
 		Point location = newLocations.get(feature);
 		if (location == null) {
@@ -265,7 +280,7 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 		return location;
 	}
-	
+
 	protected Rectangle getBounds(IGraphicalFeature feature) {
 		if (getLocation(feature) == null || feature.getSize() == null) {
 			// UIHelper not set up correctly, refresh the feature model
@@ -276,7 +291,7 @@ abstract public class FeatureDiagramLayoutManager {
 
 	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
 		if (showHidden) {
-			return FeatureUIHelper.getGraphicalChildren(feature);
+			return Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), collapseFilter));
 		} else {
 			return Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), hiddenFilter));
 		}

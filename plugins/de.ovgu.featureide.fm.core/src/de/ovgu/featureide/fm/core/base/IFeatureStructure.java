@@ -60,6 +60,8 @@ public interface IFeatureStructure {
 
 	Collection<IConstraint> getRelevantConstraints();
 
+	boolean hasVisibleChildren();
+	
 	boolean hasChildren();
 
 	boolean hasHiddenParent();
@@ -113,7 +115,7 @@ public interface IFeatureStructure {
 	void setChildren(List<IFeatureStructure> children);	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 
 	void setHidden(boolean hid);
-	
+
 	void setCollapsed(boolean collapsed);
 
 	void setMandatory(boolean mandatory);

@@ -204,6 +204,14 @@ public class FeatureStructure implements IFeatureStructure {
 		return partOfConstraints;
 	}
 
+	/**
+	 * Check if feature has visible children
+	 * @return true when the feature is not collapsed and has children
+	 */
+	@Override
+	public boolean hasVisibleChildren() {
+		return (!children.isEmpty() && !isCollapsed());
+	}
 	@Override
 	public boolean hasChildren() {
 		return !children.isEmpty();
