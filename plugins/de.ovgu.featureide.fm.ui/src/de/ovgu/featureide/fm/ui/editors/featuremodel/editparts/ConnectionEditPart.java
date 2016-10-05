@@ -198,7 +198,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		getFigure().setVisible(getTarget() != null);
 	}
 
-
 	public void refreshSourceDecoration() {
 		IFeature source = getConnectionModel().getSource().getObject();
 		IFeature sourceParent = getConnectionModel().getSource().getObject();
@@ -217,7 +216,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+		if ((target.getStructure().isAnd())
+				&& !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
 			}
@@ -225,10 +225,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
 	}
-	
+
 	private static CircleDecoration createClearDecoration() {
 		return null;
 	}
+
 	private static CircleDecoration getSourceDecoration(boolean mandatory) {
 		return new CircleDecoration(mandatory);
 	}
@@ -237,18 +238,19 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
 		IGraphicalFeature source = connectionModel.getSource();
-		
+
 		RotatableDecoration targetDecoration = createClearDecoration();
 		final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-		if (!source.getObject().getStructure().isRoot())
-			if (source.getObject().getStructure().getParent().isCollapsed()) {
-			connection.setTargetDecoration(new CollapsedDecoration(false));
-			return;
-			}
 		if (target == null || target.getObject().getStructure().hasCollapsedParent()) {
 			return;
 		}
+		if (target.getObject().getStructure().isCollapsed()) {
+			connection.setTargetDecoration(new CircleDecoration(true));
+			return;
+		}
 		if (target.getObject().getStructure().getChildrenCount() > 1) {
+//			FMUIPlugin.getDefault().logInfo("" + target.getObject().getName() + "\n" + source.getObject().getStructure().getParent().getFeature().getName()
+//					+ "\n" + source.getObject().getName());
 			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
 			final IGraphicalFeature object = graphicalChildren.get(0);
 			final IFeatureStructure structure = target.getObject().getStructure();
@@ -267,7 +269,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 					targetDecoration = createClearDecoration();
 				}
 			}
-			connection.setTargetDecoration(targetDecoration);	
+			connection.setTargetDecoration(targetDecoration);
 		} else {
 			connection.setTargetDecoration(createClearDecoration());
 		}
@@ -282,7 +284,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IFeature target = graphicalTarget.getObject();
 		toolTipContent.removeAll();
 		toolTipContent.setLayoutManager(new GridLayout());
-		toolTipContent.add(new Label(" Connection type: \n" + (target.getStructure().isAnd() ? " And" : (target.getStructure().isMultiple() ? " Or" : " Alternative"))));
+		toolTipContent.add(
+				new Label(" Connection type: \n" + (target.getStructure().isAnd() ? " And" : (target.getStructure().isMultiple() ? " Or" : " Alternative"))));
 
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
@@ -327,8 +330,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			return false;
 		}
 		final IFeature target = graphicalTarget.getObject();
-		return (source instanceof ExtendedFeature && ((ExtendedFeature) source).isFromExtern()
-				&& target instanceof ExtendedFeature && ((ExtendedFeature) target).isFromExtern());
+		return (source instanceof ExtendedFeature && ((ExtendedFeature) source).isFromExtern() && target instanceof ExtendedFeature
+				&& ((ExtendedFeature) target).isFromExtern());
 	}
 
 }
