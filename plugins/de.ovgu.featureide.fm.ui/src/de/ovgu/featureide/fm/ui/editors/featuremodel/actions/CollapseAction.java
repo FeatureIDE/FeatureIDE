@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_FEATURE;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.draw2d.FigureCanvas;
-import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
