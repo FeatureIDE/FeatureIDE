@@ -153,7 +153,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				found = fst;
 			}
 		}
-		String name = found.getExpression();
+		String name = found.getFeatureNames().get(0);
 		IFeature feature = project.getFeatureModel().getFeature(name);
 		return feature;
 	}
