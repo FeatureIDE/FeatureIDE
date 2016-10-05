@@ -31,7 +31,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_BY_FEATUR
 import static de.ovgu.featureide.fm.core.localization.StringTable.SYNC_COLLAPSED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_OUTLINE_VIEW;
 
-import java.awt.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -102,7 +101,6 @@ import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SyncCollapsedFeaturesAction;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
