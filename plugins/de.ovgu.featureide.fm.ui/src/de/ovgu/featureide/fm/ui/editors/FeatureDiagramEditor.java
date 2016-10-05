@@ -470,6 +470,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		subMenuCalculations.add(new DeadFOCalculationsAction(this, getFeatureModel()));
 
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
+		if (!getSelection().isEmpty() && (getSelectedEditParts().get(0) instanceof FeatureEditPart)) {
+			FeatureEditPart f = (FeatureEditPart) getSelectedEditParts().get(0);
+			if (f.getFeature().getObject().getStructure().hasChildren()) {
+				collapseAction.setEnabled(true);
+			} else {
+				collapseAction.setEnabled(false);
+			}
+		}
+		
 
 		final IMenuManager subMenuLayout = new MenuManager(SET_LAYOUT);
 		for (int i = 0; i < setLayoutActions.size(); i++) {
@@ -742,8 +751,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 	}
-
-	int count = 5;
 
 	/**
 	 * Refreshes the colors of the feature model.
