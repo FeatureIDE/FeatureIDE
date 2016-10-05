@@ -23,10 +23,16 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_FEATURE;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 
 /**
@@ -44,7 +50,29 @@ public class CollapseAction extends SingleSelectionAction {
 	public CollapseAction(Object viewer, IFeatureModel featureModel) {
 		super(COLLAPSE_FEATURE, viewer);
 		this.featureModel = featureModel;
+		setEnabled(false);
+		if (viewer instanceof GraphicalViewerImpl) {
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+		} else {
+			((TreeViewer) viewer).addSelectionChangedListener(listener);
+		}
 	}
+
+	private ISelectionChangedListener listener = new ISelectionChangedListener() {
+		public void selectionChanged(SelectionChangedEvent event) {
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection));
+			if (isValidSelection(selection)) {
+				if (selection.getFirstElement() instanceof FeatureEditPart) {
+					setEnabled(true);
+				} else {
+					setEnabled(false);
+				}
+			} else {
+				setEnabled(false);
+			}
+		}
+	};
 
 	@Override
 	public void run() {
