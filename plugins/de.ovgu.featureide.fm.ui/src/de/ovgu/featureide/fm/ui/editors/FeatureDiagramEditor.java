@@ -1025,6 +1025,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			final Object featureEditPart = editPartRegistry.get(graphFeature);
 			if(featureEditPart instanceof FeatureEditPart)
 			{
+				getSelectionManager().deselectAll();
 				getSelectionManager().appendSelection((FeatureEditPart) featureEditPart);
 			}
 			featureModelEditor.setPageModified(true);
