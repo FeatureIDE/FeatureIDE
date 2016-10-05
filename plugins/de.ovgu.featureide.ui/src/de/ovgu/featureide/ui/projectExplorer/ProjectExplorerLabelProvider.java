@@ -122,7 +122,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				if (element instanceof IFolder) {
 					IFolder folder = (IFolder) element;
 					if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
-						getPackageColors(folder, elementColors, model, true);
+						getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), null, superImage);
 					}
 				}
@@ -131,7 +131,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 					IContainer folder = file.getParent();
 					if (folder instanceof IFolder) {
 						if (isInSourceFolder(file)) {
-							getPackageColors((IFolder) folder, elementColors, model, true);
+							getPackageColors((IFolder) folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 							return DrawImageForProjectExplorer.drawExplorerImage(isJavaFile(file) ? ExplorerObject.JAVA_FILE : ExplorerObject.FILE, new ArrayList<Integer>(elementColors), null, superImage);
 						}
 					}
@@ -310,6 +310,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			getPackageColors((IFolder) frag.getResource(), elementColors, CorePlugin.getFeatureProject(frag.getResource()).getFSTModel(), !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			for(int i = 0; i<elementColors.size(); i++)
 				SPACE_STRING += " ";	
+			if(elementColors.size() == 0) SPACE_STRING = "";
+			
 			
 			if (elementName.isEmpty()) {
 				return SPACE_STRING + "(default package)";
@@ -372,10 +374,12 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			} else 
 				getColors(elementColors, (IFile) myfile, featureProject.getFSTModel(), !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			
+			
 			for(int i = 0; i<elementColors.size(); i++)
 				SPACE_STRING += " ";	
 
-
+			if(elementColors.size() == 0) SPACE_STRING = "";
+			
 			return SPACE_STRING + myfile.getName();
 
 		}
