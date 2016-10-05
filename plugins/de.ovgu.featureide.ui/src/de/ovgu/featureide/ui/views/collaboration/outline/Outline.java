@@ -100,6 +100,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
@@ -604,6 +605,11 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										if (iFile != null) {
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
 												// providerChanged needed to check whether a File or an IFeatureModel is used.
+												if(viewer.getInput() != null)
+												{
+													FMUIPlugin.getDefault().logInfo("OUTLINE: " + viewer.getInput().toString());
+												}
+												if(viewer.getInput() instanceof IFeatureModel)
 												if (providerChanged | ((IFeatureModel)viewer.getInput()) != ((FeatureModelEditor) active_editor).getFeatureModel())
 													viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 												
