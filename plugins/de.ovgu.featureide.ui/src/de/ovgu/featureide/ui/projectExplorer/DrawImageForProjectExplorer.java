@@ -71,36 +71,10 @@ public class DrawImageForProjectExplorer {
 	 * constant for the width of the single colorImage
 	 */
 	private final static int COLOR_IMAGE_WIDTH = FOLDER_IMAGE.getBounds().width / 4 + 1;
-	private final static Image WHITESPACE_IMAGE;
-	
-	static {
-		ImageData imageData = FOLDER_IMAGE.getImageData();
-		Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
-		GC gc = new GC(finalImage);
-		gc.setForeground(new Color(DEVICE, 0, 0, 0));
-		gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
-		gc.setBackground(new Color(DEVICE, 255, 255, 254));// use 255 for trancparency
-		gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
-		gc.dispose();
-		WHITESPACE_IMAGE = finalImage;
-	} 
+	private static Image WHITESPACE_IMAGE;
 	
 	private final static Map<Integer, Image> COLOR_IMAGES = new HashMap<>(); 
-	
-	static {			
-		final ImageData imageData = FOLDER_IMAGE.getImageData();
-		for (int i = 0; i < NUMBER_OF_COLORS; i++) {
-			Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
-			GC gc = new GC(finalImage);
-			gc.setForeground(new Color(DEVICE, 0, 0, 0));
-			gc.setBackground(ColorPalette.getColor(i, 0.4f));
-			gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
-			gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
-			gc.dispose();
-			COLOR_IMAGES.put(i, finalImage);
-		}
-	}
-	
+		
 	public enum ExplorerObject {
 		JAVA_FILE(1), FOLDER(2), PACKAGE(3), FILE(4);
 		
@@ -116,13 +90,42 @@ public class DrawImageForProjectExplorer {
 	 */
 	private final static Map<Integer, Image> images = new HashMap<Integer, Image>();
 
+	
+	private static void init(){
+		final ImageData imageData = FOLDER_IMAGE.getImageData();
+		
+		Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
+		GC gc = new GC(finalImage);
+		gc.setForeground(new Color(DEVICE, 0, 0, 0));
+		gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
+		gc.setBackground(new Color(DEVICE, 255, 255, 254));// use 255 for trancparency
+		gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
+		gc.dispose();
+		WHITESPACE_IMAGE = finalImage;
+		
+		for (int i = 0; i < NUMBER_OF_COLORS; i++) {
+			finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
+			gc = new GC(finalImage);
+			gc.setForeground(new Color(DEVICE, 0, 0, 0));
+			gc.setBackground(ColorPalette.getColor(i, 0.4f));
+			gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
+			gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
+			gc.dispose();
+			COLOR_IMAGES.put(i, finalImage);
+		}
+	}
+	
 	/**
 	 * @param explorerObject
 	 * @param colors List of colors from de.ovgu.featureide.fm.core.annotation.ColorPalette
 	 * @param superImage The default image (may be null)
 	 * @return the image with the icon of the file, folder or package (explorerObject) and the color of the feature
 	 */
-	public static Image drawExplorerImage(ExplorerObject explorerObject, List<Integer> colors, Image superImage) {
+	public static Image drawExplorerImage(ExplorerObject explorerObject, List<Integer> colors, List<Integer> parentColors, Image superImage) {
+		
+		if(WHITESPACE_IMAGE == null)
+			init();
+		
 		Collections.sort(colors, new Comparator<Integer>() {
 
 			@Override
@@ -161,17 +164,32 @@ public class DrawImageForProjectExplorer {
 			default:
 				throw new RuntimeException(explorerObject + " not supported");
 			}
+		}		
+		
+		Image image;
+		GC gc;
+		
+		if(parentColors != null){
+			image = new Image(DEVICE, icon.getBounds().width + 2 + parentColors.size() * COLOR_IMAGE_WIDTH - parentColors.size(), ICON_HEIGHT);
+			gc = new GC(image);
+			
+			gc.drawImage(icon, 0, 0);
+			
+			for (int i = 0; i < parentColors.size(); i++) 
+				if(colors.contains(parentColors.get(i)))
+					gc.drawImage(getColorImage(parentColors.get(i)), icon.getBounds().width + 1 + COLOR_IMAGE_WIDTH * i - i, 0);
+				else 
+					gc.drawImage(WHITESPACE_IMAGE, icon.getBounds().width + 1 + COLOR_IMAGE_WIDTH * i - i, 0);
 		}
-		
-	
-		
-		Image image = new Image(DEVICE, icon.getBounds().width + 2 + colors.size() * COLOR_IMAGE_WIDTH - colors.size(), ICON_HEIGHT);
-		GC gc = new GC(image);
-		
-		gc.drawImage(icon, 0, 0);
-		
-		for (int i = 0; i < colors.size(); i++) 
-				gc.drawImage(getColorImage(i), icon.getBounds().width + 1 + COLOR_IMAGE_WIDTH * i - i, 0);
+		else{	
+			image = new Image(DEVICE, icon.getBounds().width + 2 + colors.size() * COLOR_IMAGE_WIDTH - colors.size(), ICON_HEIGHT);
+			gc = new GC(image);
+			
+			gc.drawImage(icon, 0, 0);
+			
+			for (int i = 0; i < colors.size(); i++) 
+					gc.drawImage(getColorImage(colors.get(i)), icon.getBounds().width + 1 + COLOR_IMAGE_WIDTH * i - i, 0);
+		}
 		
 		
 		ImageData data = image.getImageData();
