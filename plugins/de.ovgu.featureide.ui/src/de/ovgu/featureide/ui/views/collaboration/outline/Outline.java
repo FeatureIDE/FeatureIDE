@@ -603,6 +603,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
+												// providerChanged needed to check whether a File or an IFeatureModel is used.
 												if (providerChanged | ((IFeatureModel)viewer.getInput()) != ((FeatureModelEditor) active_editor).getFeatureModel())
 													viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 												
