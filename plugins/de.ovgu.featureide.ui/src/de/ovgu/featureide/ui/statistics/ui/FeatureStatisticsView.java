@@ -150,11 +150,11 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 		}
 
 		public void partActivated(IWorkbenchPart part) {
-			/*if (part instanceof IEditorPart) {
+			if (part instanceof IEditorPart) {
 				UIPlugin.getDefault().logInfo("Team2: FeatureStatistics -> partActivated");
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
 				setEditor((IEditorPart) part);
-			}*/
+			}
 		}
 	};
 
