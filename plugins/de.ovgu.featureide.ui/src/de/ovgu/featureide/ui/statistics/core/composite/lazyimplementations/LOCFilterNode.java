@@ -76,23 +76,6 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	 *  - LOC_BY_FILE <br>
 	 * These types exist in the {@link StringTable}
 	 * @param description
-	 * @param nodeType
-	 * @param fileFeatureLOCMapper
-	 */
-	public LOCFilterNode(String description, String nodeType, FileFeatureLOCMapper fileFeatureLOCMapper) {
-		super(description);
-		this.nodeType = nodeType;
-		this.fileFeatureLOCMapper = fileFeatureLOCMapper;
-	}
-	
-	/**
-	 * Creates a new LOCFilterNode.<br>
-	 * There are currently three possible types for this node: <br>
-	 *  - LOC_BY_EXTENSION <br>
-	 *  - LOC_BY_FEATURE <br>
-	 *  - LOC_BY_FILE <br>
-	 * These types exist in the {@link StringTable}
-	 * @param description
 	 * @param loc
 	 * @param nodeType
 	 * @param fileFeatureLOCMapper

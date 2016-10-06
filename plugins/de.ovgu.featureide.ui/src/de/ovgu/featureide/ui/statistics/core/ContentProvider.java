@@ -150,7 +150,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 	private synchronized void addNodes() {
 		IComposerExtensionClass composer = project.getComposer();
-		if(composer != null){ 
+		if (composer != null) {
 			FSTModel fstModel = getFSTModel(composer);
 			IFeatureModel featModel = project.getFeatureModel();
 			JobDoneListener.getInstance().init(viewer);
