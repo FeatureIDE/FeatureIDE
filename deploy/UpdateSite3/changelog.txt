@@ -7,6 +7,10 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.1.2 (October 2016)
+* (Release used for FeatureIDE tutorial at SPLC in Beijing, China)
+* Hotfix for product generation under Unix operating systems
+
 Release 3.1.1 (September 2016)
 * Several hotfixes regarding:
   * Example wizard and example projects (#393, #399)
