@@ -35,7 +35,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -69,6 +71,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -539,21 +542,30 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 //      }
       
         
+        List<FileSystemElement> files = new ArrayList<FileSystemElement>();
+		
         
+        //File modelFile = null;
         
-		List<FileSystemElement> files = new ArrayList<FileSystemElement>();
-		while (resourcesEnum.hasNext()) {
-			FileSystemElement element = (FileSystemElement) resourcesEnum.next();
+        while (resourcesEnum.hasNext()) {
+			
+        	FileSystemElement element = (FileSystemElement) resourcesEnum.next();
+        	
 			if (element.getFileNameExtension().equals("m")) {
+				
 				System.out.println("Es ist ein Model1 " + element.getFileNameExtension());
 				System.out.println(element);
+				
 				File file = (File) element.getFileSystemObject();
-				//String path = file.getAbsolutePath();
+				
+				//modelFile = (File) element.getFileSystemObject();
+				
+				
 
 				IFeatureModel featureModel = null;
 
 				//IFeatureProject featureProject = null;
-
+				
 				final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
 				//final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
 				//			if(res != null){
@@ -562,7 +574,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 				//			featureModel.getSourceFile().getPath();
 				//			featureProject.get
-
+				
 				URI locationUri = featureProject.getModelFile().getLocationURI();
 
 				//URI locationUri3 = featureProject.
@@ -595,62 +607,40 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 						}
 					}
 				}
-
-				//        	GuidslReader guidslReader = new GuidslReader();
-				//        	try {
-				//        		System.out.println(file);
-				//				System.out.println(file.getAbsolutePath());
-				//        		
-				//        		guidslReader.parseInputStream(featureModel, file.getAbsolutePath());
-				//				
-				//			} catch (UnsupportedModelException e1) {
-				//				// TODO Auto-generated catch block
-				//				e1.printStackTrace();
-				//			}
-
-				BufferedReader reader = null;
-				//GuidslReader guidslReader = new GuidslReader();
-				try {
-					reader = new BufferedReader(new FileReader(file.getPath()));
-
-					int num = 0;
-					char ch;
-					while ((num = reader.read()) != -1) {
-						ch = (char) num;
-						System.out.print(ch);
-
-						//GuidslReader guidslReader = new GuidslReader();
-						//guidslReader.parseInputStream(featureModel, );
-
+					
+				
+				IProject project = null;
+				final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
+				if (res != null) {
+					project = res.getProject();
+					
+				    try {
+						
+				    	project.close(null);
+						project.open(null);
+						
+					} catch (CoreException e) {
+						
+						e.printStackTrace();
 					}
-
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
 				}
-
-				//        	GuidslReader guidslReader = new GuidslReader();
-				//        	guidslReader.parseInputStream(featureModel, source);
+				
+				System.out.println(featureProject.getFeaturestubPath());
+				System.out.println(featureProject.getSourcePath());
+				System.out.println(featureProject.getSourceFolder());
+				
+				
+				
 
 			}
-
-			//        	if(element.getFileNameExtension() == "model"){
-			//            	System.out.println("Es ist ein Model2 " + element.getFileNameExtension());
-			//            	
-			//            	}
-			//        	
-			//        	System.out.println(element.getFileNameExtension());
+			
 
 		}
 
-		//        GuidslReader guidslReader = new GuidslReader();
-		//        
-		//
-		//        if (fileSystemObjects.size() > 0) {
-		//			return super.importResources(fileSystemObjects);
-		//		}
 
-		return false;
+
+		return true;
 	}
 	
 	
@@ -672,6 +662,9 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 		}
 		IDE.openEditor(page, outputFile);
+		
+		
+		
 	}
 
 	
