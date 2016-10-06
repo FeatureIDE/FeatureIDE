@@ -262,7 +262,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			return Status.OK_STATUS;
 		}
 	};
-	
+
 	private IEventListener colorChangeListener = new IEventListener() {
 
 		@Override
@@ -271,7 +271,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				refresh();
 			}
 		}
-		
+
 	};
 
 	private IFeatureProject featureProject;
@@ -280,11 +280,22 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public IFeatureProject getFeatureProject() {
 		return featureProject;
 	}
-	
+
 	private void setFeatureProject(IFeatureProject featureProject) {
-		this.featureProject = featureProject;
+		if (this.featureProject != featureProject) {
+			if (this.featureProject != null)
+				this.featureModel.removeListener(colorChangeListener);
+
+			this.featureProject = featureProject;
+
+			if (this.featureProject != null) {
+				this.featureModel = this.featureProject.getFeatureModel();
+				this.featureModel.addListener(colorChangeListener);
+				this.setFeatureColourAction.setFeatureModel(this.featureModel);
+			}
+		}
 	}
-	
+
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
@@ -342,7 +353,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 
 	};
-	
+
 	public void createPartControl(Composite parent) {
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part = null;
@@ -357,9 +368,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		viewer = new ScrollingGraphicalViewer();
 		viewer.createControl(parent);
 		viewer.getControl().setBackground(DIAGRAM_BACKGROUND);
-		
-		featureModel = ((FeatureModelEditor)getSite().getPage().getActiveEditor()).getFeatureModel();
-		featureModel.addListener(colorChangeListener);
 
 		getSite().getPage().addPartListener(editorListener); // EditorListener
 		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
@@ -558,18 +566,18 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		// Show Feature Color Menu if necessary
 		if (isNotEmpty && selection instanceof StructuredSelection) {
 			StructuredSelection selectionAsStructuredSelection = (StructuredSelection) selection;
-			
+
 			Iterator<?> foreachWarAnscheinendZuViel = selectionAsStructuredSelection.iterator();
 			Object selectedItem = null;
 			boolean onlyCollaborations = true;
-			
+
 			while (foreachWarAnscheinendZuViel.hasNext() && (selectedItem = foreachWarAnscheinendZuViel.next()) != null) {
 				if (!(selectedItem instanceof CollaborationEditPart)) {
 					onlyCollaborations = false;
 					break;
 				}
 			}
-			
+
 			if (onlyCollaborations)
 				menuMgr.add(setFeatureColourAction);
 		}
@@ -620,7 +628,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		delAction = new DeleteAction(DELETE_LABEL, viewer);
 		filterAction = new FilterAction(FILTER_LABEL, viewer, this);
 		showUnselectedAction = new ShowUnselectedAction(UNSELECTED_LABEL, this);
-		setFeatureColourAction = new SetFeatureColorAction(viewer, getFeatureModel());
+		setFeatureColourAction = new SetFeatureColorAction(viewer);
 		for (int i = 0; i < FIELD_METHOD_LABEL_NAMES.length; i++) {
 			setFieldsMethodsActions[i] = new ShowFieldsMethodsAction(FIELD_METHOD_LABEL_NAMES[i], FIELD_METHOD_IMAGES[i], this, i);
 		}

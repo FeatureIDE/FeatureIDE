@@ -46,6 +46,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -97,6 +98,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
@@ -493,9 +495,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	};
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent) {		
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
+		
 
 		addContentProv(new NotAvailableContentProv(), new NotAvailableLabelProv());
 		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
@@ -523,7 +526,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		viewer.addTreeListener(treeListener);
 		viewer.addSelectionChangedListener(selectionChangedListener);
 
-		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
+		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());		
 	}
 
 	/**
@@ -595,14 +598,19 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setContentProvider(curContentProvider);
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
-											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
+											
+											if (contextMenu != null) contextMenu.setFeatureModel(CorePlugin.getFeatureProject(iFile).getFeatureModel());
+											else contextMenu =  new FmOutlinePageContextMenu(getSite(), viewer,	CorePlugin.getFeatureProject(iFile).getFeatureModel());
+											
+											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) || active_editor instanceof FeatureModelEditor) {
 												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
-
+												
 												// recreate the context menu in case
 												// we switched to another model
 												if (contextMenu == null
 														|| contextMenu.getFeatureModel() != ((FeatureModelEditor) active_editor).getFeatureModel()) {
 													if (contextMenu != null) {
+														
 														// the listener isn't
 														// recreated, if it still
 														// exists
