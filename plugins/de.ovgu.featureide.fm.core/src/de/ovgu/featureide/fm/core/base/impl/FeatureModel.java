@@ -302,6 +302,21 @@ public class FeatureModel implements IFeatureModel {
 	public Collection<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
+	
+	/**
+	 * Returns a list of features, which are not hidden and not collapsed
+	 * @return
+	 */
+	@Override
+	public Collection<IFeature> getVisibleFeatures(boolean showHiddenFeatures) {
+		Collection<IFeature> features = new ArrayList<IFeature>();
+		for (IFeature f : getFeatures()) {
+			if (!(f.getStructure().hasHiddenParent() && !showHiddenFeatures) && !f.getStructure().hasCollapsedParent()) {
+				features.add(f);
+			}
+		}
+		return features;
+	}
 
 	@Override
 	public int getNumberOfFeatures() {
