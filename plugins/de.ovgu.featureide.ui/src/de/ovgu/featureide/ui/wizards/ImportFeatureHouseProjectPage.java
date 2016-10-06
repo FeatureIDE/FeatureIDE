@@ -519,124 +519,133 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	
 
 	@SuppressWarnings({ "rawtypes" })
-	@Override 
-	public boolean finish(){
+	@Override
+	public boolean finish() {
 		if (!ensureSourceIsValid()) {
 			return false;
 		}
 
+		Iterator resourcesEnum = super.getSelectedResources().iterator();
+		List fileSystemObjects = new ArrayList();
 
-        Iterator resourcesEnum = super.getSelectedResources().iterator();
-        List fileSystemObjects = new ArrayList();
-        
-//        while (resourcesEnum.hasNext()) {
-//            fileSystemObjects.add(((FileSystemElement) resourcesEnum.next())
-//                    .getFileSystemObject());
-//            
-//        }
-        
-//      while (resourcesEnum.hasNext()) {
-//      if(((FileSystemElement) resourcesEnum.next()).getFileNameExtension().equals("model")){
-//    	  String path = ((FileSystemElement) resourcesEnum).
-//    	  
-//      }
-      
-        
-        List<FileSystemElement> files = new ArrayList<FileSystemElement>();
-		
-        
-        //File modelFile = null;
-        
-        while (resourcesEnum.hasNext()) {
+		//        while (resourcesEnum.hasNext()) {
+		//            fileSystemObjects.add(((FileSystemElement) resourcesEnum.next())
+		//                    .getFileSystemObject());
+		//            
+		//        }
+
+		//      while (resourcesEnum.hasNext()) {
+		//      if(((FileSystemElement) resourcesEnum.next()).getFileNameExtension().equals("model")){
+		//    	  String path = ((FileSystemElement) resourcesEnum).
+		//    	  
+		//      }
+
+		//List<FileSystemElement> files = new ArrayList<FileSystemElement>();
+
+		File modelFile = null;
+
+		while (resourcesEnum.hasNext()) {
 			
-        	FileSystemElement element = (FileSystemElement) resourcesEnum.next();
-        	
+
+			FileSystemElement element = (FileSystemElement) resourcesEnum.next();
+
 			if (element.getFileNameExtension().equals("m")) {
-				
+
 				System.out.println("Es ist ein Model1 " + element.getFileNameExtension());
 				System.out.println(element);
-				
-				File file = (File) element.getFileSystemObject();
-				
-				//modelFile = (File) element.getFileSystemObject();
-				
-				
 
-				IFeatureModel featureModel = null;
+				//File file = (File) element.getFileSystemObject();
 
-				//IFeatureProject featureProject = null;
-				
-				final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
-				//final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
-				//			if(res != null){
-				//				 featureProject = res.getProject();
-				//			}
+				modelFile = (File) element.getFileSystemObject();
 
-				//			featureModel.getSourceFile().getPath();
-				//			featureProject.get
-				
-				URI locationUri = featureProject.getModelFile().getLocationURI();
+				break;
 
-				//URI locationUri3 = featureProject.
+			}
+		}
 
-				final GuidslFormat guidslFormat = new GuidslFormat();
+		if (modelFile != null) {
+
+			IFeatureModel featureModel = null;
+
+			//IFeatureProject featureProject = null;
+
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
+			//final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
+			//			if(res != null){
+			//				 featureProject = res.getProject();
+			//			}
+
+			//			featureModel.getSourceFile().getPath();
+			//			featureProject.get
+
+			URI locationUri = featureProject.getModelFile().getLocationURI();
+
+
+			final GuidslFormat guidslFormat = new GuidslFormat();
+			try {
+				featureModel = FMFactoryManager.getFactory(modelFile.getAbsolutePath(), guidslFormat).createFeatureModel();
+			} catch (NoSuchExtensionException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			if (featureModel != null) {
+				final ProblemList errors = FileHandler.load(modelFile.toPath(), featureModel, guidslFormat).getErrors();
+				if (!errors.isEmpty()) {
+					final StringBuilder sb = new StringBuilder("Error while loading file: \n");
+					for (Problem problem : errors) {
+						sb.append("Line ");
+						sb.append(problem.getLine());
+						sb.append(": ");
+						sb.append(problem.getMessage());
+						sb.append("\n");
+					}
+					MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
+				} else {
+					FileHandler.save(Paths.get(locationUri), featureModel, new XmlFeatureModelFormat());
+					try {
+						openFileInEditor(featureProject.getModelFile());
+					} catch (PartInitException e) {
+						FMUIPlugin.getDefault().logError(e);
+					}
+				}
+			}
+
+			IProject project = null;
+			final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
+			if (res != null) {
+				project = res.getProject();
+
 				try {
-					featureModel = FMFactoryManager.getFactory(file.getAbsolutePath(), guidslFormat).createFeatureModel();
-				} catch (NoSuchExtensionException e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
 
-				if (featureModel != null) {
-					final ProblemList errors = FileHandler.load(file.toPath(), featureModel, guidslFormat).getErrors();
-					if (!errors.isEmpty()) {
-						final StringBuilder sb = new StringBuilder("Error while loading file: \n");
-						for (Problem problem : errors) {
-							sb.append("Line ");
-							sb.append(problem.getLine());
-							sb.append(": ");
-							sb.append(problem.getMessage());
-							sb.append("\n");
-						}
-						MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
-					} else {
-						FileHandler.save(Paths.get(locationUri), featureModel, new XmlFeatureModelFormat());
-						try {
-							openFileInEditor(featureProject.getModelFile());
-						} catch (PartInitException e) {
-							FMUIPlugin.getDefault().logError(e);
-						}
-					}
+					project.close(null);
+					project.open(null);
+
+				} catch (CoreException e) {
+
+					e.printStackTrace();
 				}
-					
-				
-				IProject project = null;
-				final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
-				if (res != null) {
-					project = res.getProject();
-					
-				    try {
-						
-				    	project.close(null);
-						project.open(null);
-						
-					} catch (CoreException e) {
-						
-						e.printStackTrace();
-					}
-					
-				}
-				
-				System.out.println(featureProject.getFeaturestubPath());
-				System.out.println(featureProject.getSourcePath());
-				System.out.println(featureProject.getSourceFolder());
-				
-				
-				
 
 			}
 			
+			Iterator resourcesEnum2 = super.getSelectedResources().iterator();
+			
+			while (resourcesEnum.hasNext()) {
+				
+
+				File element = (File) resourcesEnum.next();
+//				element.getP
+//				FileSystemElement parent = (FileSystemElement) element.getParent().getFileSystemObject();
+				
+			
+			}
+			
+
+			System.out.println(featureProject.getFeaturestubPath());
+			System.out.println(featureProject.getSourcePath());
+			System.out.println(featureProject.getSourceFolder());
 
 		}
+		
 
 
 
