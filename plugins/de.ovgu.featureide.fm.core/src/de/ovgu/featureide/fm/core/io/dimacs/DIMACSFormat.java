@@ -159,10 +159,10 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		string.append("p cnf ");
 		string.append(featureModel.getNumberOfFeatures());
 		string.append(' ');
-		string.append(nodes.getChildren().length - 3);
+		string.append(nodes.getChildren().length - 2);
 		string.append("\r\n");
 
-		for (Node and : nodes.getChildren()) {
+		CHILDREN : for (Node and : nodes.getChildren()) {
 			if (and instanceof Literal) {
 				if (and.toString().equals("True") || and.toString().equals("-False")) {
 					continue;
@@ -175,15 +175,10 @@ public class DIMACSFormat implements IFeatureModelFormat {
 				}
 				string.append(' ');
 			} else {
-				boolean skip = false;
 				for (Node literal : and.getChildren()) {
 					if (literal.toString().equals("True") || literal.toString().equals("-False")) {
-						skip = true;
-						break;
+						continue CHILDREN;
 					}
-				}
-				if (skip) {
-					continue;
 				}
 
 				for (Node literal : and.getChildren()) {
@@ -196,7 +191,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 					string.append(' ');
 				}
 			}
-			string.append("0");
+			string.append('0');
 			string.append(System.lineSeparator());
 		}
 
