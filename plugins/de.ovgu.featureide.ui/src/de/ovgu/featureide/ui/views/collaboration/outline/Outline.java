@@ -99,6 +99,8 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
@@ -128,6 +130,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	private static int selectedOutlineType;
 
+	private IEventListener colorChangedListener = new IEventListener(){
+		@Override
+		public void propertyChange(FeatureIDEEvent event) {
+			update(iFile);	
+		}		
+	};
+	
 	private TreeViewer viewer;
 	private IFile iFile;
 	private IEditorPart active_editor;
@@ -600,7 +609,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										if (iFile != null) {
 											
 											if (contextMenu != null) contextMenu.setFeatureModel(CorePlugin.getFeatureProject(iFile).getFeatureModel());
-											else contextMenu =  new FmOutlinePageContextMenu(getSite(), viewer,	CorePlugin.getFeatureProject(iFile).getFeatureModel());
+											else {
+												contextMenu =  new FmOutlinePageContextMenu(getSite(), viewer,	CorePlugin.getFeatureProject(iFile).getFeatureModel());
+												contextMenu.getSetFeatureAction().addColorChangedListener(colorChangedListener);
+											}
 											
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) || active_editor instanceof FeatureModelEditor) {
 												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
@@ -621,6 +633,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 													}
 													contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
 															((FeatureModelEditor) active_editor).getFeatureModel());
+													contextMenu.getSetFeatureAction().addColorChangedListener(colorChangedListener);
 												}
 
 											} else {
