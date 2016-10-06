@@ -150,32 +150,32 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 	private synchronized void addNodes() {
 		IComposerExtensionClass composer = project.getComposer();
-		FSTModel fstModel = getFSTModel(composer);
-		IFeatureModel featModel = project.getFeatureModel();
-		JobDoneListener.getInstance().init(viewer);
-
-		godfather = new Parent("GODFATHER", null);
-		String composerName = composer.getName();
-		Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
-
-		godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
-		godfather.addChild(composerParent);
-		Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
-		featureModelStatistics.addChild(new StatisticsFeatureComplexity(NUMBER_OF_FEATURE, featModel));
-		featureModelStatistics.addChild(new ConfigParentNode(VALID_CONFIGURATIONS, featModel));
-		godfather.addChild(featureModelStatistics);
-
-		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
-			godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, fstModel, project));
-			godfather.addChild(new StatisticsContractComplexityNew(CONTRACT_COMPLEXITY, fstModel, featModel, project.getContractComposition()));
+		if(composer != null){ 
+			FSTModel fstModel = getFSTModel(composer);
+			IFeatureModel featModel = project.getFeatureModel();
+			JobDoneListener.getInstance().init(viewer);
+	
+			godfather = new Parent("GODFATHER", null);
+			String composerName = composer.getName();
+			Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
+	
+			godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
+			godfather.addChild(composerParent);
+			Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
+			featureModelStatistics.addChild(new StatisticsFeatureComplexity(NUMBER_OF_FEATURE, featModel));
+			featureModelStatistics.addChild(new ConfigParentNode(VALID_CONFIGURATIONS, featModel));
+			godfather.addChild(featureModelStatistics);
+	
+			if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
+				godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, fstModel, project));
+				godfather.addChild(new StatisticsContractComplexityNew(CONTRACT_COMPLEXITY, fstModel, featModel, project.getContractComposition()));
+			} else if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
+				godfather.addChild(new DirectivesNode(PRODUCT_LINE_IMPLEMENTATION, fstModel));
+			} else {
+				godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, project));
+			}
+			refresh();
 		}
-		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
-			godfather.addChild(new DirectivesNode(PRODUCT_LINE_IMPLEMENTATION, fstModel));
-		}
-		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
-			godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, project));
-		}
-		refresh();
 	}
 
 	private FSTModel getFSTModel(IComposerExtensionClass composer) {

@@ -3,9 +3,9 @@
  *
  * This file is part of FeatureIDE.
  * 
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * FeatureIDE is free software: you can redistrisFeatureOrPreprocessorProjectt and/or modify
+ * it under the terms of theisFeatureOrPreprocessorProjectsser GeneisFeatureOrPreprocessorProjectlic License as published by
+ * isFeatureOrPreprocessorProjecte Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
  * FeatureIDE is distributed in the hope that it will be useful,
@@ -75,7 +75,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	private final FileFeatureLOCMapper fileFeatLOCMapper = new FileFeatureLOCMapper();
 	private int numberOfLines = 0;
 	private boolean isPPProject = false;
-	private boolean isAspect = false;
+	private boolean isFeatureOrPreprocessorProject = false;
 	private IFeatureProject project;
 	
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel, IFeatureProject project) {
@@ -93,7 +93,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		super(description);
 		this.fstModel = null;
 		this.project = project;
-		this.isAspect = true;
+		this.isFeatureOrPreprocessorProject = false;
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int numberOfMethods = 0;
 		int numberOfUniMethods = 0;
 
-		if(!isAspect) {
+		if(isFeatureOrPreprocessorProject) {
 			for (FSTClass fstClass : fstModel.getClasses()) {
 				final List<List<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
 				final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
@@ -216,7 +216,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						}
 						
 						Mechanism mecha = project.getComposer().getGenerationMechanism();
-						if (mecha.ordinal() == mecha.PREPROCESSOR.ordinal()) {
+						if (mecha == Mechanism.PREPROCESSOR) {
 							isPPProject = true;
 							System.out.println(" PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPps");
 							numberOfLinesInThisFile += getDirectiveCommandLOC(file);
@@ -232,7 +232,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 
 		});
-		if(!isAspect) {
+		if(isFeatureOrPreprocessorProject) {
 			fillMapper();
 		}
 	}
