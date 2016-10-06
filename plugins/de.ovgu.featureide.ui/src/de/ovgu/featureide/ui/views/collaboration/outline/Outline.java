@@ -632,7 +632,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 														viewer.removeDoubleClickListener(contextMenu.dblClickListener);
 													}
 													contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
-															((FeatureModelEditor) active_editor).getFeatureModel());
+															CorePlugin.getFeatureProject(iFile).getFeatureModel());
 													contextMenu.getSetFeatureAction().addColorChangedListener(colorChangedListener);
 												}
 
