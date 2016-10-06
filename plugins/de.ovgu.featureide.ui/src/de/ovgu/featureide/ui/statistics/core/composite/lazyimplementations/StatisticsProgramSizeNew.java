@@ -69,8 +69,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	private final static String[] ignoredExtensions = { "jpg", "jpeg", "raw", "hdr", "tiff", "bmp", "jpe", "dib", "gif", "pdf", "png", "zip", "wav", "mp3",
 			"avi", "flv", "midi" };
 
-	private final HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
-	private final HashMap<String, Integer> extFileLOCList = new HashMap<String, Integer>();
 	private final FSTModel fstModel;
 	private final FileFeatureLOCMapper fileFeatLOCMapper = new FileFeatureLOCMapper();
 	private int numberOfLines = 0;
@@ -208,7 +206,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 						try {
 							numberOfLinesInThisFile = countLOC(file, oneLineComment, moreLineStart, moreLineEnd);
-							
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						} catch (IOException e) {
@@ -216,9 +213,8 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						}
 						
 						Mechanism mecha = project.getComposer().getGenerationMechanism();
-						if (mecha.ordinal() == mecha.PREPROCESSOR.ordinal()) {
+						if (mecha == mecha.PREPROCESSOR) {
 							isPPProject = true;
-							System.out.println(" PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPps");
 							numberOfLinesInThisFile += getDirectiveCommandLOC(file);
 						}
 						//File with loc > Mapper
@@ -347,10 +343,8 @@ public class StatisticsProgramSizeNew extends LazyParent {
 					for (FSTDirective directive: role.getDirectives()) {
 						if (!directive.hasChildren() && directive.getParent() == null) {
 							loc += 2;
-							System.out.println("LOC big baba: " + loc );
 						} else if (directive.hasChildren() && directive.getParent() == null) {
 							countDirectiveChildrenCommandLOC(directive, loc);
-							System.out.println("LOC low baba: " + loc);
 						}
 					}
 				}
