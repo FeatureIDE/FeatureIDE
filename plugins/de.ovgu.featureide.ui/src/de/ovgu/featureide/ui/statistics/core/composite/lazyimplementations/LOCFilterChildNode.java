@@ -20,16 +20,12 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import java.util.ArrayList;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
+
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FILE;
-
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
@@ -59,8 +55,16 @@ public class LOCFilterChildNode extends LOCFilterNode {
 			HashMap<IFile, Integer> filesWithLOC = fileFeatureLOCMapper.getFilesWithLOCByExtension(extension);
 
 			for (IFile file: filesWithLOC.keySet()) {
-				String fileWithPath = file.getParent().toString().split("F/")[1] + "/" + file.getName();
-				addChild(new Parent(fileWithPath, filesWithLOC.get(file)));
+				String sourceFolder = fileFeatureLOCMapper.getSourceFolder().getName() + "/";
+				String filePath = file.getFullPath().toString();
+				
+				String[] path = filePath.split(sourceFolder);
+				String prettyPath = path[0];
+				if (path.length > 1) {
+					prettyPath = path[1];
+				}
+				
+				addChild(new Parent(prettyPath, filesWithLOC.get(file)));
 			}
 		}
 	}

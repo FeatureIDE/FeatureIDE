@@ -123,7 +123,9 @@ public class Aggregator {
 					else
 						directives.put(identifier, 1);
 				}
-				result.setNesting(Collections.max(this.nestings));
+				if(nestings.size() > 0) {
+					result.setNesting(Collections.max(this.nestings));
+				}
 				result.setDirectives(directives);
 				this.class_to_directives.put(role.getFSTClass().getName(), result);
 			}

@@ -159,6 +159,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 			String composerName = composer.getName();
 			Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
 	
+			System.out.println("Ich mach was");
 			godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
 			godfather.addChild(composerParent);
 			Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
@@ -166,16 +167,17 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 			featureModelStatistics.addChild(new ConfigParentNode(VALID_CONFIGURATIONS, featModel));
 			godfather.addChild(featureModelStatistics);
 	
-			if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
+			if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING && fstModel != null) {
 				godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, fstModel, project));
 				godfather.addChild(new StatisticsContractComplexityNew(CONTRACT_COMPLEXITY, fstModel, featModel, project.getContractComposition()));
-			} else if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
+			} else if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR && fstModel != null) {
 				godfather.addChild(new DirectivesNode(PRODUCT_LINE_IMPLEMENTATION, fstModel));
 			} else {
 				godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, project));
 			}
 			refresh();
 		}
+		
 	}
 
 	private FSTModel getFSTModel(IComposerExtensionClass composer) {

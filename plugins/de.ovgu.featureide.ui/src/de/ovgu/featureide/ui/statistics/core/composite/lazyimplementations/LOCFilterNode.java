@@ -100,10 +100,14 @@ public class LOCFilterNode extends AbstractSortModeNode {
 				}
 			}
 		} else if (nodeType.equals(LOC_BY_FEATURE)) {
-			HashMap<FSTFeature, Integer> featAndCount = fileFeatureLOCMapper.getFeaturesWithLOC(); 
-			for (FSTFeature feature: featAndCount.keySet()) {
-				int LOC = featAndCount.get(feature).intValue(); 
-				addChild(new Parent(feature.getName(), LOC));
+			HashMap<FSTFeature, Integer> featAndCount = fileFeatureLOCMapper.getFeaturesWithLOC();
+			if(featAndCount.size()== 0) { 
+				addChild(new Parent("No feature LOC count available for this composer."));
+			} else {
+				for (FSTFeature feature: featAndCount.keySet()) {
+					int LOC = featAndCount.get(feature).intValue(); 
+					addChild(new Parent(feature.getName(), LOC));
+				}
 			}
 		} 
 	}

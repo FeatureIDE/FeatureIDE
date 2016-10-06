@@ -20,17 +20,12 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -41,7 +36,6 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
@@ -70,7 +64,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			"avi", "flv", "midi" };
 
 	private final FSTModel fstModel;
-	private final FileFeatureLOCMapper fileFeatLOCMapper = new FileFeatureLOCMapper();
+	private final FileFeatureLOCMapper fileFeatLOCMapper;
 	private int numberOfLines = 0;
 	private boolean isPPProject = false;
 	private boolean isFeatureOrPreprocessorProject = false;
@@ -80,6 +74,8 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		super(description);
 		this.fstModel = fstModel;
 		this.project = project;
+		this.fileFeatLOCMapper = new FileFeatureLOCMapper(project.getSourceFolder());
+		this.isFeatureOrPreprocessorProject = true;
 	}
 	/**
 	 * Constructor for AspectOrientated projects
@@ -92,6 +88,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		this.fstModel = null;
 		this.project = project;
 		this.isFeatureOrPreprocessorProject = false;
+		this.fileFeatLOCMapper = new FileFeatureLOCMapper(project.getSourceFolder());
 	}
 
 	@Override
@@ -145,6 +142,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		boolean isPreprocessor = false;
 		if (project.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
 			isPreprocessor = true;
+			isFeatureOrPreprocessorProject = true;
 		}
 		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, isPreprocessor));
 	}
@@ -242,6 +240,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 				FSTFeature currentFeat = role.getFeature();
 				IFile file = role.getFile();
 				if (isPPProject) {
+					
 					int loc = countLOCOfDirectives(role.getDirectives());
 					fileFeatLOCMapper.addSingleLOCMapEntry(file, currentFeat, loc);
 				} else {
@@ -251,7 +250,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 				
 			}
 		}
-		fileFeatLOCMapper.printTableToConsole();
 	}
 	
 	/**

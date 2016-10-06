@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 
@@ -50,6 +51,11 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 public class FileFeatureLOCMapper {
 
 	private ArrayList<TableRow> table = new ArrayList<TableRow>();
+	private IFolder sourceFolder = null;
+	
+	public FileFeatureLOCMapper(IFolder sourceFolder) {
+		this.sourceFolder = sourceFolder;
+	}
 	
 	/**
 	 * Adds a simple entry to the table
@@ -495,9 +501,17 @@ public class FileFeatureLOCMapper {
 				System.out.print("                    ");
 				System.out.println(feat.getName() + ", " + row.getLocByFeatMap().get(feat));
 			}
+			System.out.println("");
 		}
 	}
 	
+	/**
+	 * @return the sourceFolder
+	 */
+	public IFolder getSourceFolder() {
+		return sourceFolder;
+	}
+
 	/**
 	 * 
 	 * This inner class represents a table row as seen in the example of the parent class FileFeatureLOCMapper
