@@ -72,7 +72,6 @@ public class SetFeatureColorAction extends Action {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			updateFeatureList(selection);
-			setEnabled(!featureList.isEmpty());
 		}
 	};
 
@@ -159,6 +158,7 @@ public class SetFeatureColorAction extends Action {
 				}
 			}
 		}
+		setEnabled(!featureList.isEmpty());
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {
