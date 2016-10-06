@@ -61,13 +61,18 @@ public class LOCNode extends LazyParent {
 		if (isPreprocessor) {
 			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper));
 			int locWithoutFeat = fileFeatureLOCMapper.locWithoutFeatures();
-			addChild(new Parent("Non-Variable lines of code", locWithoutFeat));
-			int preprocessorLOC = fileFeatureLOCMapper.allLinesOfCode() - locWithoutFeat;
-			if(preprocessorLOC == 0) {
-				addChild(new Parent("Preprocessor lines of code (This may not be accurate.)", preprocessorLOC));
+			int preProcessorLOC = fileFeatureLOCMapper.getFeatures().size()*2;
+			
+			int nonVariableCode = locWithoutFeat - preProcessorLOC;
+			int VariableLOC = fileFeatureLOCMapper.allLinesOfCode() - locWithoutFeat + preProcessorLOC;
+			
+			addChild(new Parent("Non-Variable lines of code", nonVariableCode));
+			if(VariableLOC == 0) {
+				addChild(new Parent("Variable lines of code (This may not be accurate.)", VariableLOC));
 			} else {
-				addChild(new Parent("Preprocessor lines of code", preprocessorLOC));
+				addChild(new Parent("Variable lines of code", VariableLOC));
 			}
+			addChild(new Parent("Preprocessor lines of code", preProcessorLOC ));
 		}
 	}
 

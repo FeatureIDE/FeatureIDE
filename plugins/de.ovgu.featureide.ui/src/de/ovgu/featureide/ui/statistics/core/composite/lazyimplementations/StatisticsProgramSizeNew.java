@@ -176,6 +176,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						case "h":
 						case "jj":
 						case "aj":
+						case "cpp":
 						case "jak":
 							oneLineComment = "//";
 							moreLineStart = "/*";
@@ -201,7 +202,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							moreLineEnd = "#|#|#";
 							break;
 						}
-
+						
 						try {
 							numberOfLinesInThisFile = countLOC(file, oneLineComment, moreLineStart, moreLineEnd);
 						} catch (FileNotFoundException e) {

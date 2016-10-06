@@ -150,17 +150,20 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 	private synchronized void addNodes() {
 		IComposerExtensionClass composer = project.getComposer();
+		
+		godfather = new Parent("GODFATHER", null);
+		godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
+		
 		if (composer != null) {
 			FSTModel fstModel = getFSTModel(composer);
 			IFeatureModel featModel = project.getFeatureModel();
 			JobDoneListener.getInstance().init(viewer);
 	
-			godfather = new Parent("GODFATHER", null);
+			
 			String composerName = composer.getName();
 			Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
-	
-			System.out.println("Ich mach was");
-			godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
+
+			
 			godfather.addChild(composerParent);
 			Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
 			featureModelStatistics.addChild(new StatisticsFeatureComplexity(NUMBER_OF_FEATURE, featModel));
@@ -175,8 +178,12 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 			} else {
 				godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, project));
 			}
-			refresh();
+			
+		} else {
+			godfather.addChild(new Parent("Statistics not supported without composer"));
 		}
+		
+		refresh();
 		
 	}
 

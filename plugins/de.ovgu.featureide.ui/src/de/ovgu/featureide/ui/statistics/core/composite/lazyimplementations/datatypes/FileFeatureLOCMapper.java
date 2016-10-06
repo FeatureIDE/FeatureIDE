@@ -249,6 +249,15 @@ public class FileFeatureLOCMapper {
 		return files;
 	}
 	
+	public ArrayList<FSTFeature> getFeaturesByFile(IFile file) {
+		for (TableRow row: table) {
+			if (row.getFile().equals(file)) {
+				return row.getFeatures();
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Returns a HashMap of all features that are contained in files with the specified extension.
 	 * The value for each entry in this map is the lines of code a given feature has.
@@ -465,7 +474,7 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
-	 * Returns the lines of code in all files that dont belong to any feature.
+	 * Returns the lines of code in all files that don't belong to any feature.
 	 * @return
 	 */
 	public int locWithoutFeatures() {
@@ -620,7 +629,7 @@ public class FileFeatureLOCMapper {
 		/**
 		 * @return the featureList
 		 */
-		public List<FSTFeature> getFeatures() {
+		public ArrayList<FSTFeature> getFeatures() {
 			ArrayList<FSTFeature> features = new ArrayList<>();
 			for (FSTFeature feature: locByFeatMap.keySet()) {
 				features.add(feature);
