@@ -49,7 +49,6 @@ import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.EditPartViewer;
-import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
@@ -67,7 +66,6 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -139,7 +137,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.Tautol
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -227,7 +224,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private FeatureModelAnalyzer analyzer;
 
 	final FeatureDiagramEditorKeyHandler editorKeyHandler;
-	
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -370,13 +366,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
-		
+
 		collapseAction = new CollapseAction(this, featureModel);
-		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL); 
+		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
-		
+
 		expandAllAction = new CollapseAllAction(this, featureModel, false, EXPAND_ALL);
-		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND);	//icon for expand added
+		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND); //icon for expand added
 		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
 		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
 		andAction = new AndAction(this, featureModel);
@@ -478,7 +474,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				collapseAction.setEnabled(false);
 			}
 		}
-		
 
 		final IMenuManager subMenuLayout = new MenuManager(SET_LAYOUT);
 		for (int i = 0; i < setLayoutActions.size(); i++) {
@@ -1012,7 +1007,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			refreshAll();
 			break;
-		case COLLAPSED_CHANGED:			
+		case COLLAPSED_CHANGED:
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
@@ -1035,14 +1030,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IFeature selectedFeature = (IFeature) event.getSource();
 			IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(selectedFeature);
 			final Object featureEditPart = editPartRegistry.get(graphFeature);
-			if(featureEditPart instanceof FeatureEditPart)
-			{
+			if (featureEditPart instanceof FeatureEditPart) {
 				getSelectionManager().deselectAll();
 				getSelectionManager().appendSelection((FeatureEditPart) featureEditPart);
 			}
 			featureModelEditor.setPageModified(true);
 			internRefresh(true);
-			
+
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			try {
