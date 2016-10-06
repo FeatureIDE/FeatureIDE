@@ -470,7 +470,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		subMenuCalculations.add(new DeadFOCalculationsAction(this, getFeatureModel()));
 
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
-		if (!getSelection().isEmpty() && (getSelectedEditParts().get(0) instanceof FeatureEditPart)) {
+		if (!getSelectedEditParts().isEmpty() && (getSelectedEditParts().get(0) instanceof FeatureEditPart)) {
 			FeatureEditPart f = (FeatureEditPart) getSelectedEditParts().get(0);
 			if (f.getFeature().getObject().getStructure().hasChildren()) {
 				collapseAction.setEnabled(true);
