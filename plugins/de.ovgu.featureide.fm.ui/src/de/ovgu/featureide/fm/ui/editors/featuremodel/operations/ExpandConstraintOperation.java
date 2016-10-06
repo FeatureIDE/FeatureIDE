@@ -43,7 +43,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint iConstraint;
 
 	private LinkedList<IFeature> affectedFeatureList = new LinkedList<IFeature>();
-	
+
 	/**
 	 * @param featureModel
 	 * @param label
@@ -52,21 +52,20 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		super(featureModel, EXPAND_CONSTRAINT);
 		this.iConstraint = iConstraint;
 	}
-	
+
 	public void expandParents(IFeature feature) {
 		if (feature.getStructure().isRoot()) {
 			return;
 		}
-		
+
 		IFeatureStructure p = feature.getStructure().getParent();
 		while (!p.isRoot()) {
 			if (p.isCollapsed()) {
 				expandFeature(p);
-			} 
+			}
 			p = p.getParent();
 		}
 		p.setCollapsed(false);
-		featureModel.fireEvent(new FeatureIDEEvent(p.getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint));
 	}
 
 	@Override
@@ -76,12 +75,14 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
 		collapseAll.operation();
+
 		for (IFeature feature : iConstraint.getContainedFeatures()) {
 			expandParents(feature);
 		}
+
 		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint);
 	}
-	
+
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		CollapseAllOperation collapseAll = new CollapseAllOperation(featureModel, true);
@@ -93,7 +94,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		}
 		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint);
 	}
-	
+
 	/**
 	 * Collects all features that are not collapsed from the featureModel.
 	 */
@@ -104,13 +105,13 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 			}
 		}
 	}
-	
+
 	/**
 	 * Expands a single feature.
+	 * 
 	 * @param featureStructure
 	 */
 	private void expandFeature(IFeatureStructure featureStructure) {
 		featureStructure.setCollapsed(false);
-		featureModel.fireEvent(new FeatureIDEEvent(featureStructure.getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint));
 	}
 }

@@ -1021,8 +1021,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 			//Get EditPart registry
 			final Map<?, ?> editPartRegistry = getEditPartRegistry();
-			
-			FMUIPlugin.getDefault().logInfo(""+event.getNewValue());
+
 			//when performing COLLAPSED_CHANGED while selecting IConstraint the getNewValue will be an iConstraint
 			if(event.getNewValue() != null)
 			{
