@@ -86,11 +86,6 @@ public class FeatureDragAndDropCommand extends Command {
 			if (next == null) {
 				return false;
 			}
-
-			//test if next has collapsed parent
-			if ((next.getGraphicalModel().getFeatureModel().getFeature(next.getObject().getName()).getStructure().hasCollapsedParent())) {
-				return false;
-			}
 			
 			// calculate new parent (if exists)
 			if (!calculateNewParentAndIndex(next))
