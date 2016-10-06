@@ -194,7 +194,7 @@ public class UnderlyingFeaturesConnectionEditPart extends AbstractConnectionEdit
 		}
 		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
-				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
+//				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
 			}
 		}
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
@@ -204,9 +204,9 @@ public class UnderlyingFeaturesConnectionEditPart extends AbstractConnectionEdit
 	private static CollapsedDecoration createClearDecoration() {
 		return null;
 	}
-	private static CollapsedDecoration getSourceDecoration(boolean mandatory) {
-		return new CollapsedDecoration(mandatory);
-	}
+//	private static CollapsedDecoration getSourceDecoration(boolean mandatory) {
+//		return new CollapsedDecoration(mandatory);
+//	}
 
 	public void refreshTargetDecoration() {
 		FeatureConnection connectionModel = getConnectionModel();

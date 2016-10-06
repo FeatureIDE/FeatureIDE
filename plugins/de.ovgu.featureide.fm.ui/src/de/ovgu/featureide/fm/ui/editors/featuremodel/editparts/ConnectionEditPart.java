@@ -47,7 +47,9 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
@@ -185,8 +187,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	@Override
 	protected void refreshVisuals() {
-		refreshParent();
 		refreshSourceDecoration();
+		refreshParent();
 		refreshTargetDecoration();
 		refreshToolTip();
 	}
@@ -245,12 +247,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			return;
 		}
 		if (target.getObject().getStructure().isCollapsed()) {
-			connection.setTargetDecoration(new CircleDecoration(true));
+			connection.setTargetDecoration(new CollapsedDecoration(target));
 			return;
 		}
 		if (target.getObject().getStructure().getChildrenCount() > 1) {
-//			FMUIPlugin.getDefault().logInfo("" + target.getObject().getName() + "\n" + source.getObject().getStructure().getParent().getFeature().getName()
-//					+ "\n" + source.getObject().getName());
 			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
 			final IGraphicalFeature object = graphicalChildren.get(0);
 			final IFeatureStructure structure = target.getObject().getStructure();
