@@ -213,7 +213,7 @@ public class FeatureUIHelper {
 		/* Checks if the feature is hidden or has a hidden parent and hidden features should not be shown or if the feature 
 		 * has a collapsed parent and should therefore not be shown.
 		 */
-		if (((feature.getObject().getStructure().isHidden() || feature.getObject().getStructure().hasHiddenParent())
+		if ((feature.getObject().getStructure().hasHiddenParent()
 				&& !feature.getGraphicalModel().getLayout().showHiddenFeatures()) || feature.getObject().getStructure().hasCollapsedParent()) {
 			return getTargetLocation(getGraphicalParent(feature));
 		}

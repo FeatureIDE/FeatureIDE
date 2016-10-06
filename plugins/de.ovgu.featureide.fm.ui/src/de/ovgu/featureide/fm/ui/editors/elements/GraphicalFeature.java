@@ -147,7 +147,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
 		for (IFeatureStructure child : feature.getStructure().getChildren()) {
-			targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
+			if (!(child.hasHiddenParent() && !graphicalFeatureModel.getLayout().showHiddenFeatures()) && !child.hasCollapsedParent())
+				targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
 		}
 		return targetConnections;
 	}

@@ -470,12 +470,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		subMenuCalculations.add(new DeadFOCalculationsAction(this, getFeatureModel()));
 
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
-		if (!getSelection().isEmpty() && (getSelectedEditParts().get(0) instanceof FeatureEditPart)) {
+		if (!getSelectedEditParts().isEmpty()) {
+			if (getSelectedEditParts().get(0) instanceof FeatureEditPart) {
 			FeatureEditPart f = (FeatureEditPart) getSelectedEditParts().get(0);
 			if (f.getFeature().getObject().getStructure().hasChildren()) {
 				collapseAction.setEnabled(true);
 			} else {
 				collapseAction.setEnabled(false);
+			}
 			}
 		}
 		
@@ -765,7 +767,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (changedAttributes == null) {
-					for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
+					for (IFeature f : featureModelEditor.getFeatureModel().getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
 						f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 						graphicalFeatureModel.getGraphicalFeature(f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}

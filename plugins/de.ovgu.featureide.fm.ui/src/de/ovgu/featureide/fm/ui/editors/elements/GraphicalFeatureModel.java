@@ -118,7 +118,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public Collection<IGraphicalFeature> getFeatures() {
 		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (IFeature f : correspondingFeatureModel.getFeatures()) {
+		for (IFeature f : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -177,8 +177,8 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			}
 			
 			features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
-			for (IFeature feature : correspondingFeatureModel.getFeatures()) {
-				features.put(feature, new GraphicalFeature(feature, this));
+			for (IFeature feature : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+					features.put(feature, new GraphicalFeature(feature, this));
 			}
 		} else {
 			constraints = new HashMap<>();
