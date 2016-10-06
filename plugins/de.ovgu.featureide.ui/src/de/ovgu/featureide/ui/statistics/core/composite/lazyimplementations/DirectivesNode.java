@@ -52,7 +52,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  */
 public class DirectivesNode extends LazyParent {
 	
-	private final FSTModel fstModel;
+	protected final FSTModel fstModel;
 
 	/**
 	 * Constructor for a {@code DirectivesNode}.
@@ -69,7 +69,6 @@ public class DirectivesNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		
 		Parent project = new Parent(PROJECT_STATISTICS);
 		final Aggregator aggProject = new Aggregator();
 		aggProject.processAll(fstModel);
@@ -87,14 +86,14 @@ public class DirectivesNode extends LazyParent {
 
 		final Parent directivesPerClass = new Parent(DIRECTIVES_PER_CLASS);
 		// 1.1.2.1 Maximum number of directives:
-		directivesPerClass.addChild(new Parent(MAXIMUM_NUMBER_OF_DIRECTIVES + maximumSum.getValue() + IN_CLASS + maximumSum.getKey()));
+		directivesPerClass.addChild(new DirectivesLeafNode(MAXIMUM_NUMBER_OF_DIRECTIVES + maximumSum.getValue() + IN_CLASS + maximumSum.getKey(), fstModel, maximumSum.getKey()));
 		// 1.1.2.2 Minimum number of directives:
-		directivesPerClass.addChild(new Parent(MINIMUM_NUMBER_OF_DIRECTIVES + minimumSum.getValue() + IN_CLASS + minimumSum.getKey()));
+		directivesPerClass.addChild(new DirectivesLeafNode(MINIMUM_NUMBER_OF_DIRECTIVES + minimumSum.getValue() + IN_CLASS + minimumSum.getKey(), fstModel, minimumSum.getKey()));
 		// 1.1.2.3 Average number of directives per class:
 		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, averageSum));
 		project.addChild(directivesPerClass);
 
-		// 1.1.3 Directives per class
+		// 1.1.3 Features per directive
 		final Parent featuresPerDirectives = new Parent(FEATURES_PER_DIRECTIVE);
 		project.addChild(featuresPerDirectives);
 		
@@ -103,15 +102,15 @@ public class DirectivesNode extends LazyParent {
 		final Double averageNumberOfFeatures = aggProject.getAverageNumberOfFeatures();
 		
 		// 1.1.3.1 Maximum number of features per directive:
-		featuresPerDirectives.addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue() + IN_CLASS + maximumNumberOfFeatures.getKey()));
+		featuresPerDirectives.addChild(new DirectivesLeafNode(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue() + IN_CLASS + maximumNumberOfFeatures.getKey(), fstModel, maximumNumberOfFeatures.getKey()));
 		// 1.1.3.2 Maximum number of features per directive:
-		featuresPerDirectives.addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue() + IN_CLASS + minimumNumberOfFeatures.getKey()));
+		featuresPerDirectives.addChild(new DirectivesLeafNode(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue() + IN_CLASS + minimumNumberOfFeatures.getKey(), fstModel, minimumNumberOfFeatures.getKey()));
 		// 1.1.3.3 Average number of features per directives:
 		featuresPerDirectives.addChild(new Parent(AVERAGE_FEATURES_PER_DIRECTIVE, averageNumberOfFeatures));
 
 		final Map.Entry<String,Integer> maxNesting = aggProject.getMaxNesting();
 		// 1.1.4 Maximum nesting of directives: 
-		project.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES + ": " + maxNesting.getValue() + IN_CLASS + maxNesting.getKey()));
+		project.addChild(new DirectivesLeafNode(MAXIMUM_NESTING_OF_DIRECTIVES, maxNesting.getValue() + IN_CLASS + maxNesting.getKey(), fstModel, maxNesting.getKey()));
 
 		addChild(project);
 		

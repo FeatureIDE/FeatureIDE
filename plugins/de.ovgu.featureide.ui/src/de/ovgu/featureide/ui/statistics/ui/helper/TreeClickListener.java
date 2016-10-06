@@ -45,14 +45,18 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ContractCountNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesLeafNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.InvariantNodeParent;
@@ -85,6 +89,7 @@ public class TreeClickListener implements IDoubleClickListener {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
+		UIPlugin.getDefault().logInfo("Team2: Team2: TreeClickListener -> doubleClick, Event: " + event.getSelection());
 		final Object[] selectedObjects = ((TreeSelection) event.getSelection()).toArray();
 
 		for (Object selected : selectedObjects) {
@@ -127,6 +132,13 @@ public class TreeClickListener implements IDoubleClickListener {
 					&& (((Parent) selected).getParent() instanceof MethodContractNodeParent || ((Parent) selected).getParent() instanceof ContractCountNodeParent)) {
 				IFile iFile = ((FSTMethod) (((Parent) selected).getValue())).getFile();
 				int line = ((FSTMethod) (((Parent) selected).getValue())).getLine();
+				openEditor(iFile, line);
+			} else if (selected instanceof DirectivesLeafNode && !((Parent) selected).hasChildren() ) {
+				DirectivesLeafNode directivesLeafNode = (DirectivesLeafNode) selected;
+				IFeatureProject iProject = directivesLeafNode.getFstModel().getFeatureProject();
+				IFile iFile = iProject.getSourceFolder().getFile(directivesLeafNode.getClassname());
+				int line = directivesLeafNode.getLine();
+				UIPlugin.getDefault().logInfo("Team2: TreeClickListener -> DoubleClick, Lines: " + line);
 				openEditor(iFile, line);
 			}
 
