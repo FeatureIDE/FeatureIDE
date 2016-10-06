@@ -364,10 +364,11 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="false" Constraints="true" Features="true" Redundant="true"/>
 		<comments>
-			<c>* Violet Model File */</c>
-			<c> constraints</c>
-			<c> formatting</c>
+			<c>* Violet Model File *</c>
+			<c>constraints</c>
+			<c>formatting</c>
 			<c>Exit {out="ExitV"}</c>
 			<c>ClassD {out="ClassDiagram"}</c>
 			<c>SequenceD {out="SequenceDiagram"}</c>
@@ -380,4 +381,5 @@
 			<c>ExtendRelationshipEdge {out="UseCaseExtendRelationEdge"}</c>
 			<c>IncludeRelationshipEdge {out="UseCaseIncludeRelationEdge"}</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>
