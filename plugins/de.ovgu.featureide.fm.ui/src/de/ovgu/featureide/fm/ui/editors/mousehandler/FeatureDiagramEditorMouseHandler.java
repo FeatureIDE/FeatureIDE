@@ -74,8 +74,10 @@ public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, Mou
 				Dimension difference = currentMousePosition.getDifference(positionAtClick);
 				int xPosition = figureCanvas.getViewport().getViewLocation().x - difference.width;
 				int yPosition = figureCanvas.getViewport().getViewLocation().y - difference.height;
-				figureCanvas.scrollTo(xPosition, yPosition);
+				figureCanvas.scrollToX(xPosition);
+				figureCanvas.scrollToY(yPosition);
 				positionAtClick = new Point(e.x, e.y);
+
 			}
 		};
 	}
@@ -89,8 +91,8 @@ public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, Mou
 			} else if (e.stateMask == stateMask && e.count < 0) {
 				mouseWheelDownAction.run();
 			}
-		// Perform horizontal scroll when Shift is pressed while scrolling
-		} else if (mouseWheelDownAction == null && mouseWheelUpAction == null && figureCanvas != null && figureCanvas.getViewport() != null) { 
+			// Perform horizontal scroll when Shift is pressed while scrolling
+		} else if (mouseWheelDownAction == null && mouseWheelUpAction == null && figureCanvas != null && figureCanvas.getViewport() != null) {
 			if (e.stateMask == stateMask && e.count > 0) {
 				figureCanvas.scrollTo(figureCanvas.getViewport().getViewLocation().x + 200, figureCanvas.getViewport().getViewLocation().y);
 			} else if (e.stateMask == stateMask && e.count < 0) {
