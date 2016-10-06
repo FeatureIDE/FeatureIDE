@@ -104,7 +104,7 @@ public class ImportFeatureHouseProjectWizard extends BasicNewProjectResourceWiza
 //			return true;
 //		}
 //		return false;
-		return true;
+		return page.finish();
 	}
 
 }

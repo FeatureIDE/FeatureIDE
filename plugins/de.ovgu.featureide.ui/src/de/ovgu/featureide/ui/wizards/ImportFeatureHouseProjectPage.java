@@ -20,51 +20,27 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD;
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PATH_EQUALS_CONFIGURATIONS_PATH_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PATH_RESTRICTION_ANDROID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG_PATH_RESTRICTION_ANDROID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATES_A_FEATUREIDE_PROJECT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATIONS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSITION_ENGINES_INSTALLED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_SPECIFIED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_VALID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_COMPOSER;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_COMPOSED_FILES_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_CONFIGURATIONFILES_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_FEATUREFOLDERS_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_EQUALS_BUILD_PATH_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_RESTRICTION_ANDROID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.THE_BUILD_PATH_IS_SET_TO_THE_JAVA_PROJECTS_SOURCE_PATH_AUTOMATICALLY;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.internal.core.JavaProject;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.util.BidiUtils;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -74,17 +50,33 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.dialogs.WizardResourceImportPage;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.FileSystemElement;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.ide.dialogs.RelativePathVariableGroup;
-import org.eclipse.ui.internal.ide.filesystem.FileSystemStructureProvider;
 import org.eclipse.ui.internal.wizards.datatransfer.DataTransferMessages;
 import org.eclipse.ui.internal.wizards.datatransfer.WizardFileSystemResourceImportPage1;
+import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.core.builder.ComposerExtensionManager;
-import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
-import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
 /**
  * TODO description
@@ -142,6 +134,8 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	protected Label buildLabel;
 	private boolean canFlipToNextPage = true;
 	
+	private IStructuredSelection selection;
+	
 
     /**
      *	Creates an instance of this class
@@ -152,6 +146,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
     public ImportFeatureHouseProjectPage(IWorkbench aWorkbench,
             IStructuredSelection selection) {
         this("featureHouseImportPge", aWorkbench, selection);//$NON-NLS-1$
+        this.selection = selection;
       //this.project = project;
       	setTitle("Select FileSystem for Import");
       	setDescription("Import FeatureHouse Project into JavaProject");
@@ -519,7 +514,166 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		return super.getFolderProvider();
 	}
 	
+
+	@SuppressWarnings({ "rawtypes" })
+	@Override 
+	public boolean finish(){
+		if (!ensureSourceIsValid()) {
+			return false;
+		}
+
+
+        Iterator resourcesEnum = super.getSelectedResources().iterator();
+        List fileSystemObjects = new ArrayList();
+        
+//        while (resourcesEnum.hasNext()) {
+//            fileSystemObjects.add(((FileSystemElement) resourcesEnum.next())
+//                    .getFileSystemObject());
+//            
+//        }
+        
+//      while (resourcesEnum.hasNext()) {
+//      if(((FileSystemElement) resourcesEnum.next()).getFileNameExtension().equals("model")){
+//    	  String path = ((FileSystemElement) resourcesEnum).
+//    	  
+//      }
+      
+        
+        
+        
+		List<FileSystemElement> files = new ArrayList<FileSystemElement>();
+		while (resourcesEnum.hasNext()) {
+			FileSystemElement element = (FileSystemElement) resourcesEnum.next();
+			if (element.getFileNameExtension().equals("m")) {
+				System.out.println("Es ist ein Model1 " + element.getFileNameExtension());
+				System.out.println(element);
+				File file = (File) element.getFileSystemObject();
+				//String path = file.getAbsolutePath();
+
+				IFeatureModel featureModel = null;
+
+				//IFeatureProject featureProject = null;
+
+				final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
+				//final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
+				//			if(res != null){
+				//				 featureProject = res.getProject();
+				//			}
+
+				//			featureModel.getSourceFile().getPath();
+				//			featureProject.get
+
+				URI locationUri = featureProject.getModelFile().getLocationURI();
+
+				//URI locationUri3 = featureProject.
+
+				final GuidslFormat guidslFormat = new GuidslFormat();
+				try {
+					featureModel = FMFactoryManager.getFactory(file.getAbsolutePath(), guidslFormat).createFeatureModel();
+				} catch (NoSuchExtensionException e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+
+				if (featureModel != null) {
+					final ProblemList errors = FileHandler.load(file.toPath(), featureModel, guidslFormat).getErrors();
+					if (!errors.isEmpty()) {
+						final StringBuilder sb = new StringBuilder("Error while loading file: \n");
+						for (Problem problem : errors) {
+							sb.append("Line ");
+							sb.append(problem.getLine());
+							sb.append(": ");
+							sb.append(problem.getMessage());
+							sb.append("\n");
+						}
+						MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
+					} else {
+						FileHandler.save(Paths.get(locationUri), featureModel, new XmlFeatureModelFormat());
+						try {
+							openFileInEditor(featureProject.getModelFile());
+						} catch (PartInitException e) {
+							FMUIPlugin.getDefault().logError(e);
+						}
+					}
+				}
+
+				//        	GuidslReader guidslReader = new GuidslReader();
+				//        	try {
+				//        		System.out.println(file);
+				//				System.out.println(file.getAbsolutePath());
+				//        		
+				//        		guidslReader.parseInputStream(featureModel, file.getAbsolutePath());
+				//				
+				//			} catch (UnsupportedModelException e1) {
+				//				// TODO Auto-generated catch block
+				//				e1.printStackTrace();
+				//			}
+
+				BufferedReader reader = null;
+				//GuidslReader guidslReader = new GuidslReader();
+				try {
+					reader = new BufferedReader(new FileReader(file.getPath()));
+
+					int num = 0;
+					char ch;
+					while ((num = reader.read()) != -1) {
+						ch = (char) num;
+						System.out.print(ch);
+
+						//GuidslReader guidslReader = new GuidslReader();
+						//guidslReader.parseInputStream(featureModel, );
+
+					}
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				//        	GuidslReader guidslReader = new GuidslReader();
+				//        	guidslReader.parseInputStream(featureModel, source);
+
+			}
+
+			//        	if(element.getFileNameExtension() == "model"){
+			//            	System.out.println("Es ist ein Model2 " + element.getFileNameExtension());
+			//            	
+			//            	}
+			//        	
+			//        	System.out.println(element.getFileNameExtension());
+
+		}
+
+		//        GuidslReader guidslReader = new GuidslReader();
+		//        
+		//
+		//        if (fileSystemObjects.size() > 0) {
+		//			return super.importResources(fileSystemObjects);
+		//		}
+
+		return false;
+	}
 	
+	
+	/**
+	 * Opens the imported model in a new editor. If it is already open, the
+	 * editor will be closed first.
+	 * 
+	 * @throws PartInitException
+	 */
+	private void openFileInEditor(IFile outputFile) throws PartInitException {
+		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		final IEditorInput editorInput = new FileEditorInput(outputFile);
+		final IEditorReference[] refs = page.getEditorReferences();
+		for (int i = 0; i < refs.length; i++) {
+			if (refs[i].getEditorInput().equals(editorInput)) {
+				page.closeEditor(refs[i].getEditor(false), false);
+				break;
+			}
+
+		}
+		IDE.openEditor(page, outputFile);
+	}
+
 	
 	
 	
