@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * Operation with functionality to expand only features of this constraint. Enables undo/redo
  * functionality. Enables undo/redo functionality.
  * 
- * @author Maximilian Kühl
+ * @author Maximilian Kï¿½hl
  * @author Christopher Sontag
  */
 public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
@@ -66,7 +66,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 			p = p.getParent();
 		}
 		p.setCollapsed(false);
-		featureModel.fireEvent(new FeatureIDEEvent(p.getFeature(), EventType.COLLAPSED_CHANGED));
+		featureModel.fireEvent(new FeatureIDEEvent(p.getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint));
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		for (IFeature feature : iConstraint.getContainedFeatures()) {
 			expandParents(feature);
 		}
-		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED);
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint);
 	}
 	
 	@Override
@@ -91,7 +91,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		for (IFeature f : affectedFeatureList) {
 			expandFeature(f.getStructure());
 		}
-		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED);
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint);
 	}
 	
 	/**
@@ -111,6 +111,6 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	private void expandFeature(IFeatureStructure featureStructure) {
 		featureStructure.setCollapsed(false);
-		featureModel.fireEvent(new FeatureIDEEvent(featureStructure.getFeature(), EventType.COLLAPSED_CHANGED));
+		featureModel.fireEvent(new FeatureIDEEvent(featureStructure.getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint));
 	}
 }

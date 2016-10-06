@@ -137,6 +137,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.Tautol
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -859,7 +860,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 							featureStructure.setCollapsed(true);
 						}
 					}
-					fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED));
+					fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED, null, null));
 				}
 				//Draws the connections
 				if (parent.getStructure().hasChildren()) {
@@ -1014,47 +1015,44 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
-			final Map<?, ?> registryCollapsed = getEditPartRegistry();
-			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
-				registryCollapsed.remove(f);
-				registryCollapsed.remove(f.getSourceConnection());
-				registryCollapsed.remove(f.getTargetConnections());
-			}
-			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
-				registryCollapsed.remove(f);
-			}
 			graphicalFeatureModel.init();
 			setContents(graphicalFeatureModel);
 			analyzeFeatureModel();
 
 			//Get EditPart registry
 			final Map<?, ?> editPartRegistry = getEditPartRegistry();
-			//Get selected feature
-			IFeature selectedFeature = (IFeature) event.getSource();
-			IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(selectedFeature);
-			final Object featureEditPart = editPartRegistry.get(graphFeature);
-			if (featureEditPart instanceof FeatureEditPart) {
-				getSelectionManager().deselectAll();
-				getSelectionManager().appendSelection((FeatureEditPart) featureEditPart);
+			
+			FMUIPlugin.getDefault().logInfo(""+event.getNewValue());
+			//when performing COLLAPSED_CHANGED while selecting IConstraint the getNewValue will be an iConstraint
+			if(event.getNewValue() != null)
+			{
+				IConstraint selectedConstraint = (IConstraint) event.getNewValue();
+				IGraphicalConstraint graphConstraint = graphicalFeatureModel.getGraphicalConstraint(selectedConstraint);
+				final Object constraintEditPart = editPartRegistry.get(graphConstraint);
+				if (constraintEditPart instanceof ConstraintEditPart) {
+					getSelectionManager().deselectAll();
+					getSelectionManager().appendSelection((ConstraintEditPart) constraintEditPart);
+				}
+			}
+			else
+			{
+				//Reselect the current selected feature if getNewValue is null  
+				IFeature selectedFeature = (IFeature) event.getSource();
+				IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(selectedFeature);
+				final Object featureEditPart = editPartRegistry.get(graphFeature);
+				if (featureEditPart instanceof FeatureEditPart) {
+					getSelectionManager().deselectAll();
+					getSelectionManager().appendSelection((FeatureEditPart) featureEditPart);
+				}
 			}
 			featureModelEditor.setPageModified(true);
 			internRefresh(true);
-
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			try {
 				Iterator<IFeature> feautureModelIterator = (Iterator<IFeature>) event.getSource();
 				while (feautureModelIterator.hasNext()) {
 					FeatureUIHelper.getGraphicalFeature(feautureModelIterator.next(), graphicalFeatureModel).update(event);
-				}
-				// clear registry
-				final Map<?, ?> registryCollapsedAll = getEditPartRegistry();
-				for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
-					registryCollapsedAll.remove(f);
-					registryCollapsedAll.remove(f.getSourceConnection());
-				}
-				for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
-					registryCollapsedAll.remove(f);
 				}
 				graphicalFeatureModel.init();
 				setContents(graphicalFeatureModel);

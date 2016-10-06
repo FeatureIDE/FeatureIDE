@@ -84,7 +84,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 
 			if (newParent.getObject().getStructure().isCollapsed()) {
 				newParent.getObject().getStructure().setCollapsed(false);
-				feature.getGraphicalModel().getFeatureModel().fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.COLLAPSED_CHANGED));
+				feature.getGraphicalModel().getFeatureModel().fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.COLLAPSED_CHANGED, null, null));
 			}
 		} else {
 			newInnerOrder(newPos);

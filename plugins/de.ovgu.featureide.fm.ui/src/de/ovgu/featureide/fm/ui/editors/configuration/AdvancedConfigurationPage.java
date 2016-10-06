@@ -135,7 +135,6 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		tree.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				//Gänseblümchen
 				if (e.button == 1 || e.button == 3) {
 					TreeItem item = tree.getItem(new Point(e.x, e.y));
 					if (item != null) {

@@ -63,7 +63,7 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 				feature.getStructure().setCollapsed(collapse);
 			}
 		}
-		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, !collapse, collapse);
+		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 		for (IFeature f : affectedFeatureList) {
 			f.getStructure().setCollapsed(!collapse);
 		}
-		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, !collapse, collapse);
+		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
 
 	}
 
