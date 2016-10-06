@@ -129,9 +129,7 @@ public class FmOutlinePageContextMenu {
 	
 	private void initContextMenu() {
 		initActions();
-		addListeners();
-		
-		
+		addListeners();		
 		initMenuManager();
 	}
 
@@ -158,7 +156,7 @@ public class FmOutlinePageContextMenu {
 		setFeatureColorAction.addColorChangedListener(new IEventListener() {
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
-				viewer.refresh();				
+				viewer.refresh();	
 			}			
 		});
 		mAction = new MandatoryAction(viewer, fInput);
@@ -330,6 +328,7 @@ public class FmOutlinePageContextMenu {
 		manager.add(setFeatureColorAction);
 	}
 
+
 	/**
 	 * @param iToolBarManager
 	 */
@@ -337,7 +336,11 @@ public class FmOutlinePageContextMenu {
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
 	}
-
+	
+	public SetFeatureColorAction getSetFeatureAction(){
+		return setFeatureColorAction;
+	}
+	
 	public FeatureModelEditor getFeatureModelEditor(){
 		return fTextEditor;
 	}
