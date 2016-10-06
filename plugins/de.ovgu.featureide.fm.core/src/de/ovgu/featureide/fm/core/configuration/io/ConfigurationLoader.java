@@ -70,8 +70,7 @@ public class ConfigurationLoader {
 	}
 
 	private List<Configuration> loadConfigurations(IFeatureModel featureModel, Path path, Filter<? super Path> filter) {
-		final Configuration c = new Configuration(featureModel);
-		final FileHandler<Configuration> r = new FileHandler<>(c);
+		final FileHandler<Configuration> fileHandler = new FileHandler<>();
 		final List<Configuration> configs = new ArrayList<>();
 
 		if (callback != null)
@@ -79,10 +78,14 @@ public class ConfigurationLoader {
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
 			for (Path configPath : directoryStream) {
-				r.read(configPath, ConfigurationManager.getFormat(configPath.toString()));
-				configs.add(c);
+				Configuration currentConfiguration = new Configuration(featureModel);
+				
+				fileHandler.setObject(currentConfiguration);
+				fileHandler.read(configPath, ConfigurationManager.getFormat(configPath.toString()));
+				
+				configs.add(currentConfiguration);
 				if (callback != null)
-					callback.onConfigurationLoaded(c);
+					callback.onConfigurationLoaded(currentConfiguration, configPath);
 			}
 		} catch (IOException e) {
 			Logger.logError(e);

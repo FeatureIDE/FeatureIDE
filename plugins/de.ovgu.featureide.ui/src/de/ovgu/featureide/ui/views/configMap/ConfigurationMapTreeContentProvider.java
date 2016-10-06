@@ -40,15 +40,11 @@ import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
  * @author Antje Moench
  */
 public class ConfigurationMapTreeContentProvider implements ITreeContentProvider {
-	private ConfigurationLoader loader;
-	private List<Configuration> configurations;
 
 	private IFeatureProject featureProject;
 	private Object[] featureRoots;
 
-	public ConfigurationMapTreeContentProvider() {
-		loader = new ConfigurationLoader();
-	}
+	public ConfigurationMapTreeContentProvider() {}
 
 	/**
 	 * @param featureProject
@@ -56,7 +52,6 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	public void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
 			this.featureProject = featureProject;
-			configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
 			List<IFeature> featureRootList = new ArrayList<>();
 			for (IFeature feature : featureProject.getFeatureModel().getFeatures()) {
 				if (feature.getStructure().getParent() == null)

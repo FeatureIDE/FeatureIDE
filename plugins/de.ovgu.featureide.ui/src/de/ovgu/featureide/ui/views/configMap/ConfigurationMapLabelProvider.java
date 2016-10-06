@@ -20,41 +20,143 @@
  */
 package de.ovgu.featureide.ui.views.configMap;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
+import java.util.List;
+
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ITableColorProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * TODO description
  * 
  * @author gruppe40
  */
-public class ConfigurationMapLabelProvider extends ColumnLabelProvider {
+public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITableColorProvider {
+
+	private ConfigurationMap configurationMap;
+
+	/**
+	 * 
+	 */
+	public ConfigurationMapLabelProvider(ConfigurationMap configurationMap) {
+		this.configurationMap = configurationMap;
+	}
+
 	@Override
-	public Color getBackground(Object element) {
+	public boolean isLabelProperty(Object element, String property) {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITableColorProvider#getForeground(java.lang.Object, int)
+	 */
+	@Override
+	public Color getForeground(Object element, int columnIndex) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITableColorProvider#getBackground(java.lang.Object, int)
+	 */
+	@Override
+	public Color getBackground(Object element, int columnIndex) {
 		if (element instanceof IFeature) {
-		FeatureColor fColor = FeatureColorManager.getColor((IFeature) element);
-		return fColor.toSwtColor();
+			IFeature feature = (IFeature) element;
+			FeatureColor featureColor = FeatureColorManager.getColor(feature);
+			return featureColor.toSwtColor();
 		}
-		return super.getBackground(element);
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+	 */
+	@Override
+	public Image getColumnImage(Object element, int columnIndex) {
+		int offset = configurationMap.getConfigurationColumnsOffset();
+
+		if (columnIndex >= offset) {
+			IFeature feature = (IFeature) element;
+			Configuration config = configurationMap.getConfigurations().get(columnIndex - offset);
+			ConfigFeatureSelectionState state = getStateOf(feature, config);
+
+			return state.getImage();
+		}
+
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+	 */
+	@Override
+	public String getColumnText(Object element, int columnIndex) {
+		if (columnIndex < configurationMap.getConfigurationColumnsOffset())
+			return element == null ? "NULL" : element.toString();//$NON-NLS-1$
+		return "";
+	}
+
+	private ConfigFeatureSelectionState getStateOf(IFeature feature, Configuration configuration) {
+		IFeatureStructure struct = feature.getStructure();
+
+		if (struct.hasChildren()) {
+			List<IFeatureStructure> childStructs = struct.getChildren();
+
+			boolean allSelected = true;
+			boolean allUnselected = true;
+
+			for (IFeatureStructure childStruct : childStructs) {
+				IFeature child = childStruct.getFeature();
+				ConfigFeatureSelectionState childsState = getStateOf(child, configuration);
+
+				switch (childsState) {
+
+				case Selected:
+					allUnselected = false;
+					break;
+
+				case PartlySelected:
+					allUnselected = false;
+				case Unselected:
+					allSelected = false;
+					break;
+
+				default:
+					break;
+				}
+			}
+
+			if (allSelected)
+				return ConfigFeatureSelectionState.Selected;
+			else if (allUnselected)
+				return ConfigFeatureSelectionState.Unselected;
+			else
+				return ConfigFeatureSelectionState.PartlySelected;
+		}
+
+		if (configuration.getSelectedFeatures().contains(feature))
+			return ConfigFeatureSelectionState.Selected;
+		else
+			return ConfigFeatureSelectionState.Unselected;
 	}
 
 	@Override
-	public Color getForeground(Object element) {
-		return super.getForeground(element);
+	public void addListener(ILabelProviderListener listener) {
 	}
 
 	@Override
-	public Image getImage(Object element) {
-		return super.getImage(element);
+	public void removeListener(ILabelProviderListener listener) {
 	}
 
 	@Override
-	public String getText(Object element) {
-		return element == null ? "NULL" : element.toString();//$NON-NLS-1$
+	public void dispose() {
 	}
 }

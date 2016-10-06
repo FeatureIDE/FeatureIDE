@@ -18,22 +18,38 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.configuration.io;
+package de.ovgu.featureide.ui.views.configMap;
 
-import java.io.IOException;
-import java.nio.file.Path;
+import org.eclipse.swt.graphics.Image;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * TODO description
  * 
  * @author gruppe40
  */
-public interface IConfigurationLoaderCallback {
-	public void onLoadingStarted();
+public enum ConfigFeatureSelectionState {
+	Unselected, Selected, PartlySelected;
 	
-	public void onConfigurationLoaded(Configuration configuration, Path path);
-	
-	public void onLoadingError(IOException exception);
+	public Image getImage() {
+		String imgPath = null;
+		
+		switch(this) {
+		case Selected:
+			imgPath = "aselected.ico";
+			break;
+			
+		case Unselected:
+			imgPath = "undefined.ico";
+			break;
+			
+		case PartlySelected:
+		default:
+			imgPath = "adeselected.ico";
+			break;
+		}
+		
+		return FMUIPlugin.getImage(imgPath);
+	}
 }
