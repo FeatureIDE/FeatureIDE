@@ -64,7 +64,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 public class FeatureMakeComposer extends PPComposerExtensionClass {
 
@@ -230,12 +230,13 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 		prepareFullBuild(config);
 		IFeatureModel model = CorePlugin.getFeatureProject(config).getFeatureModel();
 		Configuration cfg = new Configuration(model);
-		final FileReader<de.ovgu.featureide.fm.core.configuration.Configuration> reader = new FileReader<>(Paths.get(config.getLocationURI()), cfg,
+		/*final FileReader<de.ovgu.featureide.fm.core.configuration.Configuration> reader = new FileReader<>(Paths.get(config.getLocationURI()), cfg,
 				ConfigurationManager.getFormat(config.getName()));
 		reader.read();
+		*/
+		FileHandler.load(Paths.get(config.getLocationURI()), cfg, ConfigurationManager.getFormat(config.getName()));
 		
 		createProjectDefinitionsByFeatures(cfg.getSelectedFeatures(), "source/");
-
 		
 		annotationChecking();
 	}
