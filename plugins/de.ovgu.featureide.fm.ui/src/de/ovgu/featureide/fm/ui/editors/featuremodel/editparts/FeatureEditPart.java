@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
@@ -121,11 +122,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			if (feature.getStructure().isRoot() || !feature.getStructure().getParent().isAnd()) {
-				return;
-			}
-
-			SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel.getFeatureModel());
+			SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel.getFeatureModel());
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {
