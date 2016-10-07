@@ -281,6 +281,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		}
 	}
 
+	
 	public void refreshCollapsedDecorator()
 	{
 		final IGraphicalFeature f = getFeature();
@@ -293,8 +294,9 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 				Point parentLocation = new Point(featureFigure.getParent().getBounds().x, featureFigure.getParent().getBounds().y);
 				Point featureLocation = new Point(featureFigure.getLocation().x + featureFigure.getBounds().width/2, featureFigure.getLocation().y + featureFigure.getBounds().height);
 
-				collapsedDecoration.setLocation(new Point(parentLocation.x + featureLocation.x, parentLocation.y + featureLocation.y));
+				collapsedDecoration.setLocation(new Point(featureFigure.getBounds().x,featureFigure.getBounds().y));
 				featureFigure.getParent().add(collapsedDecoration);
+				featureFigure.SetCollapseDecorator(collapsedDecoration);
 			}			
 		}
 	}

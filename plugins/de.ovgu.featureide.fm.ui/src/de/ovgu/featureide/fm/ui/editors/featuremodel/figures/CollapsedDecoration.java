@@ -60,15 +60,12 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 
 		childrenCount.setFont(DEFAULT_FONT);
 		setDecoratorText("" + parent.getObject().getStructure().getChildrenCount());
-		
-		FMUIPlugin.getDefault().logInfo("" + parent.getObject().getName() + "|" + (counter++));
 		add(childrenCount);
 	}
 
 	@Override
 	public void setLocation(Point p) {
-//		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
-		super.setLocation(p);
+		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
 	}
 
 	public void setDecoratorText(String newText) {
