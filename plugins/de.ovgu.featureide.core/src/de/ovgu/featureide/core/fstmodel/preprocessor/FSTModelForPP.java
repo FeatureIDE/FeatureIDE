@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,14 +25,14 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
  * 
- * @author Reimar Schröter
+ * @author Reimar Schroeter
  */
 public class FSTModelForPP extends FSTModel {
 
 	public FSTModelForPP(IFeatureProject featureProject) {
 		super(featureProject);
 	}
-	
+
 	private FSTModel extendedFst;
 
 	public FSTModel getExtendedFst() {
@@ -42,5 +42,4 @@ public class FSTModelForPP extends FSTModel {
 	public void setExtendedFst(FSTModel extendedFst) {
 		this.extendedFst = extendedFst;
 	}
-
 }

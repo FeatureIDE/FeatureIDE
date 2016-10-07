@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SVG_EXPORT_FAI
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.draw2d.IFigure;
@@ -48,9 +49,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
@@ -65,8 +64,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 public class GraphicsExporter {
 
 	public static boolean exportAs(IFeatureModel featureModel, FeatureDiagramEditor diagramEditor) {
-		boolean succ = false;
-		File file = null;
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
@@ -78,23 +75,15 @@ public class GraphicsExporter {
 		if (filePath == null)
 			return false;
 
-		file = new File(filePath);
-		if (filePath.endsWith(".m")) {
-			new GuidslWriter(featureModel).writeToFile(file);
-			succ = true;
-		} else if (filePath.endsWith(".xml")) {
-			new XmlFeatureModelWriter(featureModel).writeToFile(file);
-			succ = true;
-		} else if (filePath.endsWith(".velvet")) {
-			new VelvetFeatureModelWriter(featureModel).writeToFile(file);
-			succ = true;
+		if (filePath.endsWith(".m") || filePath.endsWith(".xml") || filePath.endsWith(".velvet")) {
+			return FeatureModelManager.writeToFile(featureModel, Paths.get(filePath));
 		} else {
-			return GraphicsExporter.exportAs(diagramEditor, file);
+			final File file = new File(filePath);
+			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
+			GraphicsExporter.printExportMessage(file, succ);
+			return succ;
 		}
 
-		GraphicsExporter.printExportMessage(file, succ);
-
-		return succ;
 	}
 
 	public static boolean exportAs(GraphicalViewerImpl viewer) {

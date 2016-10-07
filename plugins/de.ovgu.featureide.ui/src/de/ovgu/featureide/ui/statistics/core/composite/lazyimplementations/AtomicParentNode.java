@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,13 +35,13 @@ public class AtomicParentNode extends LazyParent {
 	private final IFeatureModel model;
 
 	public AtomicParentNode(String description, IFeatureModel model) {
-		super(description, null);
+		super(description, "(expand to calculate)");
 		this.model = model;
 	}
 
 	@Override
 	protected void initChildren() {
-		List<List<IFeature>> atomicSets = model.getAnalyser().getAtomicSets();
+		final List<List<IFeature>> atomicSets = model.getAnalyser().getAtomicSets();
 
 		int i = 0;
 		for (List<IFeature> list : atomicSets) {
@@ -49,6 +49,7 @@ public class AtomicParentNode extends LazyParent {
 				addChild(new FeatureListNode("Atomic Set #" + ++i, list, list.size(), false));
 			}
 		}
+		setValue(i);
 	}
 
 }

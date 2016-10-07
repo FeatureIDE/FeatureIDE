@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,27 +27,22 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Abstract eclipse job with support for {@link JobFinishListener}.
- * This class offers convenience constructors and hides the 
- * {@link #run2(IProgressMonitor)}-method.
+ * This class offers convenience constructors and hides the {@link #run2(IProgressMonitor)}-method.
+ * 
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead to create jobs.
  * 
  * @author Sebastian Krieter
  */
+@SuppressWarnings("rawtypes")
+@Deprecated
 public abstract class AJob extends AbstractJob {
-	
+
 	public AJob(String name) {
 		super(name, Job.SHORT);
 	}
-	
+
 	public AJob(String name, int priority) {
 		super(name, priority);
 	}
-	
-	@Override
-	final boolean run2() throws Exception {
-		try {
-			return work();
-		} finally {
-			workMonitor.done();
-		}
-	}
+
 }

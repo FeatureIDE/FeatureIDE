@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,11 +26,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SPECIFIED_FILE
 import static de.ovgu.featureide.fm.core.localization.StringTable.XML;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
@@ -43,12 +41,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -60,51 +61,59 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Marcus Pinnecke
  */
 public abstract class AbstractImportHandler extends AFileHandler {
-	private IFeatureModelReader modelReader;
 
 	@Override
 	protected final void singleAction(IFile outputFile) {
-		try {
-			final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
-			fileDialog.setOverwrite(false);
-			setFilter(fileDialog);
+		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
+		fileDialog.setOverwrite(false);
+		setFilter(fileDialog);
 
-			File inputFile;
-			while (true) {
-				final String filepath = fileDialog.open();
-				if (filepath == null) {
-					return;
-				}
-				inputFile = new File(filepath);
-				if (inputFile.exists()) {
-					break;
-				}
-				MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
+		File inputFile;
+		while (true) {
+			final String filepath = fileDialog.open();
+			if (filepath == null) {
+				return;
 			}
+			inputFile = new File(filepath);
+			if (inputFile.exists()) {
+				break;
+			}
+			MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
+		}
 
-			final IFeatureModel fm = createFeatureModel();
-			modelReader = setModelReader(fm);
-			modelReader.readFromFile(inputFile);
-
-			final FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
-			fmWriter.writeToFile(outputFile);
-			outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
-			openFileInEditor(outputFile);
-		} catch (FileNotFoundException | CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
-		} catch (UnsupportedModelException e) {
-			MessageDialog.openWarning(new Shell(), "Warning!", "Error while loading file: \n " + e.getMessage());
-			FMUIPlugin.getDefault().logError(e);
+		final IFeatureModelFormat modelFormat = setModelReader();
+		IFeatureModel fm = null;
+		try {
+			fm = FMFactoryManager.getFactory(inputFile.getAbsolutePath(), modelFormat).createFeatureModel();
+		} catch (NoSuchExtensionException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		if (fm != null) {
+			final ProblemList errors = FileHandler.load(inputFile.toPath(), fm, modelFormat).getErrors();
+			if (!errors.isEmpty()) {
+				final StringBuilder sb = new StringBuilder("Error while loading file: \n");
+				for (Problem problem : errors) {
+					sb.append("Line ");
+					sb.append(problem.getLine());
+					sb.append(": ");
+					sb.append(problem.getMessage());
+					sb.append("\n");
+				}
+				MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
+			} else {
+				FileHandler.save(Paths.get(outputFile.getLocationURI()), fm, new XmlFeatureModelFormat());
+				try {
+					openFileInEditor(outputFile);
+				} catch (PartInitException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
 		}
 	}
 
 	protected void setFilter(FileDialog fileDialog) {
 		fileDialog.setFilterExtensions(new String[] { "*.xml" });
 		fileDialog.setFilterNames(new String[] { XML });
-	}
-
-	protected IFeatureModel createFeatureModel() {
-		return FMFactoryManager.getFactory().createFeatureModel();
 	}
 
 	/**
@@ -128,10 +137,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	}
 
 	/**
-	 * Returns an instance of IFeatureModelReader.
-	 * 
-	 * @param fm
-	 *            the feature model to initialize the IFeatureModelReader
+	 * Returns an instance of {@link IFeatureModelFormat}.
 	 */
-	protected abstract IFeatureModelReader setModelReader(IFeatureModel fm);
+	protected abstract IFeatureModelFormat setModelReader();
 }

@@ -86,7 +86,8 @@ public class StringTable {
 	public static final String GET_FALSE_OPTIONAL_FEATURES = "get false optional features";
 	public static final String GET_UNUSED_FEATURES = "get unused features";
 	public static final String REFESH_CONFIGURATION_FOLER = "refesh configuration foler";
-	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = "Error while loading feature model from ";
+	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL = "Error while loading feature model from ";
+	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = ERROR_WHILE_LOADING_FEATURE_MODEL + " from ";
 	public static final String THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_ = "This annotation is not supported yet - moved to the comment section.";
 	public static final String PERFORMING_FULL_BUILD = "Performing full build";
 	public static final String THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_ = "The feature module is empty. You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
@@ -94,7 +95,7 @@ public class StringTable {
 	public static final String LOAD_MODEL = "Load Model";
 	public static final String CHECKING_CONFIGURATIONS = "Checking configurations";
 	public static final String DELETE_CONFIGURATION_MARKERS = "Delete Configuration Markers";
-	public static final String CHECK_VALIDITY_OF = "Check validity of ";
+	public static final String CHECK_VALIDITY_OF = "Checking validity";
 	public static final String CONFIGURATION_ = "Configuration '";
 	public static final String NO_COMPOSER_COULD_BE_CREATED_FOR_ID = "No composer could be created for ID ";
 	public static final String REMOVE_PROJECT = "Remove project";
@@ -417,6 +418,7 @@ public class StringTable {
 	public static final String AUTO_LAYOUT_CONSTRAINTS = "Auto Layout Constraints";
 	public static final String AUTOMATED_CALCULATIONS = "Automated Calculations";
 	public static final String CALCULATE_CONSTRAINT_ERRORS = "Calculate Constraint Errors";
+	public static final String CALCULATE_DEAD_FO_CONSTRAINTS = "Calculate Constraint That Lead to Dead or False-Optional Features";
 	public static final String CALCULATE_FEATURES = "Calculate Features";
 	public static final String CALCULATE_REDUNDANT_CONSTRAINTS = "Calculate Redundant Constraints";
 	public static final String RUN_MANUAL_CALCULATIONS = "Run Manual Calculations";
@@ -424,6 +426,7 @@ public class StringTable {
 	public static final String CHANGE_DESCRIPTION = "Change Description";
 	public static final String FEATURE_DESCRIPTION = "Feature Description";
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
+	public static final String CALCULATE_DEPENDENCY = "Show Hidden Dependencies of Submodel";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
 	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
@@ -504,6 +507,7 @@ public class StringTable {
 	public static final String CALCULATING_FEATURE_DEPENDENCIES = "Calculating Feature Dependencies";
 	public static final String VELVET = "Velvet";
 	public static final String UNABLE_TO_START_GUIDSL = "Unable to start GUIDSL";
+	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
 	public static final String THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_ = "The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
 	public static final String LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_ = "The configuration editor searches for open clauses in the CNF representation of the feature model and highlights the corresponding features.";
@@ -624,7 +628,6 @@ public class StringTable {
 	public static final String DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_ = "Defines the algorithm for t-wise sampling.";
 	public static final String DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_ = "Defines how the generated produkts are ordered.";
 	public static final String SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_ = "Searches for test cases in the generated products and executes them.";
-	public static final String DEFINE_THE_T_FOR_T_WISE_SAMPLING_ = "Define the t for t-wise sampling.";
 	public static final String DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_ = "Defnies whether the products are generated into separate projects or into a folder in this project.";
 	public static final String BUILD_PRODUCTS_FOR_PROJECT = "Build products for project ";
 	public static final String ERROR_ = "-Error-";
@@ -651,12 +654,15 @@ public class StringTable {
 	public static final String REDUNDANT_CAST_TO = "redundant cast to";
 	public static final String HAS_BEEN_DEPRECATED = "has been deprecated";
 	public static final String T_WISE_CONFIGURATIONS = "T-wise configurations";
+	public static final String RANDOM_CONFIGURATIONS = "Random configurations";
 	public static final String ALL_CURRENT_CONFIGURATIONS = "All current configurations";
 	public static final String ALL_VALID_CONFIGURATIONS = "All valid configurations";
 	public static final String INTERACTIONS = "Interactions";
-	public static final String DIFFERENCE = "Difference";
+	public static final String DISSIMILARITY = "Dissimilarity";
 	public static final String CHVATAL = "Chvatal";
-	public static final String CASA = "CASA";
+	public static final String CASA = "CASA (experimental)";
+	public static final String ICPL = "ICPL";
+	public static final String INCLING = "IncLing";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";
 	public static final String COMPILER = "Compiler";
 	public static final String SYMBOL = "symbol";
@@ -726,8 +732,7 @@ public class StringTable {
 	public static final String PROJECT_BASED__ = "Project based - ";
 	public static final String CALCULATE = "Calculate ";
 	public static final String REFRESH_STATISTICS_VIEW = "Refreshing statistics view";
-	public static final String CHOOSE_WISELY = "choose wisely";
-	public static final String EXPORT_STATISTICS_INTO_CSV = "Export statistics into CSV file";
+	public static final String EXPORT_STATISTICS_INTO_CSV = "Export Statistics Into CSV File";
 	public static final String SHOW_ERRORDIALOG = "show errordialog";
 	public static final String OK = "OK";
 	public static final String DATA_WAS_SUCCESSFULLY_EXPORTED_ = "Data was successfully exported.";
@@ -736,7 +741,7 @@ public class StringTable {
 	public static final String STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String STATISTICS_OF_PRODUCT_LINE_SPECIFICATION = "Statistics of product-line specification";
 	public static final String VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL = "Valid configurations of the feature model";
-	public static final String ATOMIC_SETS_OF_THE_FEATURE_MODEL = "Atomic sets of the feature model";
+	public static final String ATOMIC_SETS_OF_THE_FEATURE_MODEL = "Number of atomic sets";
 	public static final String FEATURE_STATISTICS = "Feature statistics";
 	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
 	public static final String NUMBER_OF_FEATURES = "Number of features";
@@ -998,4 +1003,5 @@ public class StringTable {
 	public static final String CHOOSE_ACTION_ = "Choose Action:";
 	public static final String FEATURES_ = "Features:";
 	public static final String FIDECONF = "fideconf";
+	public static final String PARAMETER_IS_EXPECTED_TO_BE_NON_NULL = "The method parameter is expected to be non-null";
 }

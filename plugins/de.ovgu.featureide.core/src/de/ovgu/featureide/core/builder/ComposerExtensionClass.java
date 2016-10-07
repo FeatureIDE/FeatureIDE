@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -54,11 +54,13 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Abstract class for FeatureIDE composer extensions with default values.
@@ -329,14 +331,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			if (!folder.exists()) {
 				folder.create(true, true, null);
 			}
-			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
+			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
 			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
-			final FileWriter<Configuration> writer = new FileWriter<>(format);
-			writer.setPath(Paths.get(configurationFile.getLocationURI()));
-			writer.setObject(configuration);
-			writer.save();
+			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
-		} catch (CoreException e) {
+		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
@@ -350,10 +349,6 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public boolean canGeneratInParallelJobs() {
-		return true;
-	}
-
-	public boolean showContextFieldsAndMethods() {
 		return true;
 	}
 
@@ -373,8 +368,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 
-	public boolean hasCompositionMechanisms() {
-		return false;
+	public String[] getCompositionMechanisms() {
+		return new String[0];
 	}
 
 	public boolean createFolderForFeatures() {
@@ -414,5 +409,18 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	@Override
 	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c)  {
 		return null;
+	}
+	
+	@Override
+	public Mechanism getGenerationMechanism() {
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return true;
 	}
 }

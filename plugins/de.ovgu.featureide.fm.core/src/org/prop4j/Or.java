@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,8 +21,10 @@
 package org.prop4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A constraint that is true iff at least one of its children is true.
@@ -41,47 +43,64 @@ public class Or extends Node implements Cloneable {
 
 	@Override
 	protected Node clausify() {
-		for (int i = 0; i < children.length; i++)
+		for (int i = 0; i < children.length; i++) {
 			children[i] = children[i].clausify();
+		}
 		fuseWithSimilarChildren();
-//		LinkedList<Node> newNodes = new LinkedList<Node>();
-//		createClauseSet(newNodes, new LinkedList<Node>(), children, 0);
-//		return new And(newNodes);
 		return createCNF(children);
 	}
 	
-	private Node createCNF(Node[] nodes) {
-		LinkedList<LinkedList<Node>> clauses = new LinkedList<LinkedList<Node>>();
+	private Node createCNF(Node[] children) {
+		LinkedList<LinkedList<Node>> clauses = new LinkedList<>();
 		clauses.add(new LinkedList<Node>());
-		for (Node and : nodes) {
-			LinkedList<Node[]> newClauses = new LinkedList<Node[]>();
-			for (Node or : and instanceof And ? and.children : new Node[] {and})
-				newClauses.add(or instanceof Or ? or.children : new Node[] {or});
+		for (Node child : children) {
+			LinkedList<Node[]> newClauses = new LinkedList<>();
+			if (child instanceof And) {
+				for (Node or : child.children) {
+					if (or instanceof Or) {
+						newClauses.add(or.children);
+					} else {
+						newClauses.add(new Node[] { or });
+					}
+				}
+			} else {
+				newClauses.add(new Node[] { child });
+			}
+			
 			clauses = updateClauses(clauses, newClauses);
 		}
-		LinkedList<Node> children = new LinkedList<Node>();
-		for (LinkedList<Node> clause : clauses)
-			children.add(new Or(clause).clone());
-		return new And(children);
+		
+		final Node[] newChildren = new Node[clauses.size()];
+		int i = 0;
+		for (LinkedList<Node> clause : clauses) {
+			newChildren[i++] = new Or(clause);
+		}
+		return new And(newChildren);
 	}
 
-	private LinkedList<LinkedList<Node>> updateClauses(LinkedList<LinkedList<Node>> clauses,
-			LinkedList<Node[]> newClauses) {
-		LinkedList<LinkedList<Node>> updatedClauses = new LinkedList<LinkedList<Node>>();
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new Or(newChildren);
+	}
+
+	private LinkedList<LinkedList<Node>> updateClauses(LinkedList<LinkedList<Node>> clauses, LinkedList<Node[]> newClauses) {
+		LinkedList<LinkedList<Node>> updatedClauses = new LinkedList<>();
 		for (LinkedList<Node> clause : clauses) {
 			boolean intersection = false;
-			for (Node[] list : newClauses)
-				if (containedIn(list, clause)) {
+			for (Node[] list : newClauses) {
+				if (clause.containsAll(Arrays.asList(list))) {
 					intersection = true;
 					break;
 				}
-			if (intersection)
+			}
+			if (intersection) {
 				add(updatedClauses, clause);
-			else {
+			} else {
 				for (Node[] list : newClauses) {
 					LinkedList<Node> newClause = clone(clause);
-					for (Node node : list)
+					for (Node node : list) {
 						newClause.add(node.clone());
+					}
 					add(updatedClauses, newClause);
 				}
 			}
@@ -89,26 +108,13 @@ public class Or extends Node implements Cloneable {
 		return updatedClauses;
 	}
 
-	private void add(LinkedList<LinkedList<Node>> clauses,
-			LinkedList<Node> newClause) {
-		for (LinkedList<Node> clause : clauses)
-			if (containedIn(clause, newClause))
+	private void add(LinkedList<LinkedList<Node>> clauses, LinkedList<Node> newClause) {
+		for (LinkedList<Node> clause : clauses) {
+			if (newClause.containsAll(clause)) {
 				return;
+			}
+		}
 		clauses.add(newClause);
-	}
-
-	private boolean containedIn(LinkedList<Node> clause, LinkedList<Node> newClause) {
-		for (Node node : clause)
-			if (!newClause.contains(node))
-				return false;
-		return true;
-	}
-
-	private boolean containedIn(Node[] list, LinkedList<Node> clause) {
-		for (Node node : list)
-			if (!clause.contains(node))
-				return false;
-		return true;
 	}
 
 //	private void createClauseSet(LinkedList<Node> clauses, LinkedList<Node> clause, Node[] nodes, int i) {
@@ -178,6 +184,16 @@ public class Or extends Node implements Cloneable {
 	@Override
 	public Node clone() {
 		return new Or(clone(children));
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		for (Node child : children) {
+			if (child.getValue(map)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

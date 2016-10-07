@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -232,7 +232,10 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	@Override
 	public void replaceRoot(IFeatureStructure feature) {
+		//TODO remove all features that are no children of the new root (part of a different sub tree)
 		correspondingFeatureModel.deleteFeatureFromTable(rootFeature.getFeature());
+
+		feature.setParent(null);
 		rootFeature = feature;
 	}
 
@@ -253,6 +256,11 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasFalseOptionalFeatures() {
 		return existsFeatureWithStatus(FeatureStatus.FALSE_OPTIONAL);
+	}
+
+	@Override
+	public boolean hasDeadFeatures() {
+		return existsFeatureWithStatus(FeatureStatus.DEAD);
 	}
 
 	@Override

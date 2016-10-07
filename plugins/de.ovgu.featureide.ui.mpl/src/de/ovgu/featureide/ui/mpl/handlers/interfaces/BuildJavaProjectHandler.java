@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,13 +20,10 @@
  */
 package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.ui.handlers.base.AFolderHandler;
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
 
@@ -46,14 +43,15 @@ public class BuildJavaProjectHandler extends AFolderHandler  {
 			MPLUIPlugin.getDefault().logError(e);
 		}
 		
-		if (members != null) {
-			for (IResource resource : members) {
-				if (resource.getName().endsWith(IOConstants.EXTENSION_SOLUTION) && resource instanceof IFile) {
-					MPLPlugin.getDefault().buildJavaProject((IFile) resource, folder.getName());
-					break;
-				}
-			}
-		}		
+		// TODO Build java projects
+//		if (members != null) {
+//			for (IResource resource : members) {
+//				if (resource.getName().endsWith(IOConstants.EXTENSION_SOLUTION) && resource instanceof IFile) {
+//					MPLPlugin.getDefault().buildJavaProject((IFile) resource, folder.getName());
+//					break;
+//				}
+//			}
+//		}		
 	}
 	
 }

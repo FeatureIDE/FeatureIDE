@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,11 +22,10 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import javax.annotation.CheckForNull;
 
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
-import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Responsible to load and save all information for a feature model instance.
@@ -35,47 +34,17 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class ConfigurationManager extends AFileManager<Configuration> {
 
-	public static enum FormatType implements IFormatType<Configuration> {
-		XML_FIDE(StringTable.CONF, DefaultFormat.class), CONFIG(StringTable.CONFIG, DefaultFormat.class), FIDECONF(StringTable.FIDECONF, FeatureIDEFormat.class);
-
-		private final String suffix;
-		private final Class<? extends IPersistentFormat<Configuration>> format;
-
-		private FormatType(String suffix, Class<? extends IPersistentFormat<Configuration>> format) {
-			this.suffix = suffix;
-			this.format = format;
-		}
-
-		@Override
-		public String getSuffix() {
-			return suffix;
-		}
-
-		@Override
-		public Class<? extends IPersistentFormat<Configuration>> getFormat() {
-			return format;
-		}
-	}
-
 	public static IPersistentFormat<Configuration> getDefaultFormat() {
 		return new DefaultFormat();
 	}
 
-	public static IPersistentFormat<Configuration> getFormat(FormatType formatType) {
-		try {
-			return formatType.getFormat().newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new RuntimeException();
-		}
-	}
-
 	@CheckForNull
 	public static IPersistentFormat<Configuration> getFormat(String fileName) {
-		return AFileManager.<Configuration> getFormat(fileName, FormatType.values());
+		return ConfigFormatManager.getInstance().getFormatByFileName(fileName);
 	}
 
 	public static ConfigurationManager getInstance(Configuration configuration, String absolutePath) {
-		return getInstance(configuration, absolutePath, getFormat(absolutePath));
+		return getInstance(configuration, absolutePath, ConfigFormatManager.getInstance().getFormatByFileName(absolutePath));
 	}
 
 	public static ConfigurationManager getInstance(Configuration configuration, String absolutePath, IPersistentFormat<Configuration> format) {

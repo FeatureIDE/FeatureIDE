@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,16 +21,19 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import javax.annotation.CheckForNull;
 
-import org.eclipse.core.resources.IResource;
-
+import de.ovgu.featureide.fm.core.ExtensionManager;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
  * Responsible to load and save all information for a feature model instance.
@@ -39,44 +42,42 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
  */
 public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
-	private static enum FormatType implements IFormatType<IFeatureModel> {
-		XML_FIDE("xml", XmlFeatureModelFormat.class),
-		VELVET("velvet", VelvetFeatureModelFormat.class),
-		FIDECONF("velvet", VelvetFeatureModelFormat.class);
-
-		private final String suffix;
-		private final Class<? extends IPersistentFormat<IFeatureModel>> format;
-
-		private FormatType(String suffix, Class<? extends IPersistentFormat<IFeatureModel>> format) {
-			this.suffix = suffix;
-			this.format = format;
-		}
-
-		@Override
-		public String getSuffix() {
-			return suffix;
-		}
-
-		@Override
-		public Class<? extends IPersistentFormat<IFeatureModel>> getFormat() {
-			return format;
-		}
-	}
-
-	public static FeatureModelManager getInstance(IResource modelFile) {
-		final String path = modelFile.getLocation().toString();
-		FeatureModelManager featureModelManager = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(path);
+	public static FeatureModelManager getInstance(Path modelFile) {
+		final String path = modelFile.toAbsolutePath().toString();
+		FeatureModelManager featureModelManager = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(path);
 		if (featureModelManager == null) {
-			final IPersistentFormat<IFeatureModel> format = FeatureModelManager.getFormat(path);
-			IFeatureModel featureModel = FMFactoryManager.getFactory(format.getFactoryID()).createFeatureModel();
-			featureModelManager = FeatureModelManager.getInstance(featureModel, path, format);
+			IFeatureModelFactory factory;
+			final IFeatureModelFormat format = FeatureModelManager.getFormat(path);
+			// TODO throw exception
+			if (format == null) {
+				Logger.logError(new ExtensionManager.NoSuchExtensionException("No format found for " + path));
+				try {
+					factory = FMFactoryManager.getFactory(path);
+				} catch (Exception e) {
+					Logger.logError(e);
+					factory = FMFactoryManager.getFactory();
+				}
+			} else {
+				try {
+					factory = FMFactoryManager.getFactory(path, format);
+				} catch (Exception e) {
+					Logger.logError(e);
+					factory = FMFactoryManager.getFactory();
+				}
+			}
+			featureModelManager = FeatureModelManager.getInstance(factory.createFeatureModel(), path, format);
 		}
 		return featureModelManager;
 	}
 
 	@CheckForNull
-	public static IPersistentFormat<IFeatureModel> getFormat(String fileName) {
-		return AFileManager.<IFeatureModel>getFormat(fileName, FormatType.values());
+	public static IFeatureModelFormat getFormat(String fileName) {
+		return FMFormatManager.getInstance().getFormatByFileName(fileName);
+	}
+
+	@Override
+	public IFeatureModelFormat getFormat() {
+		return (IFeatureModelFormat) super.getFormat();
 	}
 
 	public static FeatureModelManager getInstance(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> format) {
@@ -93,6 +94,33 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	@Override
 	protected IFeatureModel copyObject(IFeatureModel oldObject) {
 		return oldObject.clone();
+	}
+
+	public static IFeatureModel readFromFile(Path path) {
+		try {
+			final String pathString = path.toAbsolutePath().toString();
+			final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
+			final IFeatureModel featureModel = FMFactoryManager.getFactory(pathString, format).createFeatureModel();
+			FileHandler.load(path, featureModel, format);
+			return featureModel;
+		} catch (NoSuchExtensionException e) {
+			Logger.logError(e);
+		}
+		return null;
+	}
+
+	public static boolean writeToFile(IFeatureModel featureModel, Path path) {
+		final String pathString = path.toAbsolutePath().toString();
+		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
+		return !FileHandler.save(path, featureModel, format).containsError();
+	}
+	
+	public static boolean convert(Path inPath, Path outPath) {
+		IFeatureModel featureModel = readFromFile(inPath);
+		if (featureModel == null) {
+			return false;
+		}
+		return writeToFile(featureModel, outPath);
 	}
 
 }

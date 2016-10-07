@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -88,9 +88,14 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 				return;
 			IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false, IResource.DEPTH_ZERO);
 			for (IMarker marker : markers) {
-				if (marker.getAttribute(IMarker.MESSAGE).equals(message) && (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
-						&& (Integer) marker.getAttribute(IMarker.SEVERITY) == severity) {
-					marker.delete();
+				// XXX Workaround for possible null pointer exception at this point
+				// TODO Fix cause of the null pointer or handle correctly
+				try {
+					if (marker.getAttribute(IMarker.MESSAGE).equals(message) && (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
+							&& (Integer) marker.getAttribute(IMarker.SEVERITY) == severity) {
+						marker.delete();
+					}
+				} catch (RuntimeException e) {
 				}
 			}
 		} catch (CoreException e) {
@@ -122,7 +127,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		try {
 			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
 			MarkerInfo info = ((Workspace)resource.getWorkspace()).getMarkerManager().findMarkerInfo(resource, marker.getId());
-			if (marker.exists()&& info == null) {
+			if (marker.exists() && info != null) {
 				marker.setAttribute(IMarker.MESSAGE, message);
 				marker.setAttribute(IMarker.SEVERITY, severity);
 				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);

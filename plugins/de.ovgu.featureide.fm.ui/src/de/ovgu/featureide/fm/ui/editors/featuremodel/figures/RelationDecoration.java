@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import java.util.List;
+
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.Shape;
@@ -27,7 +29,6 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -46,18 +47,19 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	private Point referencePoint;
 
 	private IGraphicalFeature lastChild;
-	private Tree<IGraphicalFeature> children;
+	private List<IGraphicalFeature> children;
 
 	private IGraphicalFeatureModel featureModel;
 
 	public RelationDecoration(final boolean fill, final IGraphicalFeature lastChild) {
 		super();
+		
 		this.fill = fill;
 		this.lastChild = lastChild;
 		if (lastChild == null) {
 			children = null;
 		} else {
-			children = (Tree<IGraphicalFeature>) lastChild.getTree().getParent();
+			children = FeatureUIHelper.getGraphicalSiblings(lastChild);
 		}
 		final Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
 		setForegroundColor(decoratorForgroundColor);
@@ -71,10 +73,14 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	@Override
 	public void setLocation(final Point p) {
 		if (this instanceof LegendRelationDecoration) {
-			super.setLocation(p.translate((-getBounds().width >> 1) + 1, -getBounds().height >> 1));
+			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
 		}else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
-			super.setLocation(p.translate((-getBounds().width >> 1), (-getBounds().height >> 1)));
+			if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
+				super.setLocation(p.translate(0, (-getBounds().width >> 1)));
+			} else {
+				super.setLocation(p.translate((-getBounds().width >> 1), 0));
+			}
 		}
 	}
 
@@ -92,18 +98,26 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	}
 
 	private void drawShape(final Graphics graphics) {
+		boolean verticalLayout = false; 
+		if (featureModel != null) {
+			verticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
+		}
 		double minAngle = Double.MAX_VALUE;
 		double maxAngle = Double.MIN_VALUE;
-
-		final Rectangle r = new Rectangle(getBounds()).shrink(1,  1);
-
-		final Point center = getBounds().getCenter();
+		final Rectangle r;
+		if (verticalLayout) {
+			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1,  1);
+		} else {
+			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1,  1);
+		}
+		final Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
+		
 		if (this instanceof LegendRelationDecoration) {
 			maxAngle = calculateAngle(center, getFeatureLocation());
 			minAngle = calculateAngle(center, referencePoint);
 		} else {
-			if (children != null && children.getNumberOfChildren() > 1) {
-				for (final IGraphicalFeature curChild : children.getChildrenObjects()) {
+			if (children != null && children.size() > 1) {
+				for (final IGraphicalFeature curChild : children) {
 					lastChild = curChild;
 					if (!(lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
 						final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);

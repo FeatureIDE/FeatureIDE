@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,13 +27,14 @@ import org.eclipse.draw2d.geometry.Point;
  * 
  * @author soenke
  */
-public class FeatureModelLayout implements IFeatureModelLayout {
+public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private boolean autoLayoutLegend;
 	private boolean showHiddenFeatures;
 	private boolean hasVerticalLayout;
 	private Point legendPos;
 
 	private int selectedLayoutAlgorithm;
+	private boolean showShortNames;
 	
 	public FeatureModelLayout() {
 		this.autoLayoutLegend = true;
@@ -59,6 +60,16 @@ public class FeatureModelLayout implements IFeatureModelLayout {
 	@Override
 	public boolean hasLegendAutoLayout() {
 		return autoLayoutLegend;
+	}
+	
+	@Override
+	public boolean showShortNames() {
+		return showShortNames;
+	}
+
+	@Override
+	public void setShowShortNames(boolean b) {
+		showShortNames = b;
 	}
 
 	@Override

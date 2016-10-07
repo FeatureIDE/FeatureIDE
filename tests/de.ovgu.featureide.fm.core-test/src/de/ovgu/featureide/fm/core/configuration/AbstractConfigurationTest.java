@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,89 +20,93 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Before;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
- * Abstract class that can be used for tests on configurations. 
- * Each set of configuration tests that is performed on the same model is defined 
+ * Abstract class that can be used for tests on configurations.
+ * Each set of configuration tests that is performed on the same model is defined
  * in its own subclass.
  * 
  * @author Fabian Benduhn
  */
 public abstract class AbstractConfigurationTest {
 
-	public static IFeatureModel fm; 
+	public IFeatureModel fm;
 
 	@Before
-	public void setModel(){
+	public void setModel() {
 		fm = loadModel();
 	}
-	
+
 	/**
-	 * This method is used by setModel() to initialize 
-	 * the feature model before each test case. 
+	 * This method is used by setModel() to initialize
+	 * the feature model before each test case.
 	 * For basic string input use methods loadGUIDSL or loadXML.
 	 * For file input use any FeatureModelReader.
 	 * 
 	 * @return the FeatureModel used in this test class
 	 */
-	 
+
 	abstract IFeatureModel loadModel();
-	
+
 	protected static IFeatureModel loadGUIDSL(String grammar) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		IFeatureModelReader reader = new GuidslReader(fm);
-		try {
-			reader.readFromString(grammar);
-		} catch (UnsupportedModelException e) {
-			assertTrue(false);
-		}
-		return fm;
+		return load(new GuidslFormat(), grammar);
 	}
 
 	/**
 	 * shorthand to define a featuremodel by a String and load it into a FeatureModel
-	 * @param fmXml XML representation of the feature model (without constraints -> part within first  <struct> )
-	 * @param constraintsXml XML representation of the constraints (part within  <constraints> ).
-	 *  	  
+	 * 
+	 * @param fmXml XML representation of the feature model (without constraints -> part within first <struct> )
+	 * @param constraintsXml XML representation of the constraints (part within <constraints> ).
+	 * 
 	 * @return
 	 */
-	protected static IFeatureModel loadXML(String fmXml,String constraintsXml) {
+	protected static IFeatureModel loadXML(String fmXml, String constraintsXml) {
 		String xml = "<featureModel><struct>" + fmXml;
 		xml += "</struct>";
-		if(constraintsXml!=null){	
+		if (constraintsXml != null) {
 			xml += "<constraints>";
 			xml += constraintsXml + "</constraints>";
 		}
 		xml += "</featureModel>";
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		IFeatureModelReader reader = new XmlFeatureModelReader(fm);
-		try {
-			reader.readFromString(xml);
-		} catch (UnsupportedModelException e) {
-			assertTrue(false);
-		}
-		return fm;
+
+		return load(new XmlFeatureModelFormat(), xml);
 	}
+
+	private static IFeatureModel load(IFeatureModelFormat format, String xml) {
+		try {
+			final IFeatureModel fm = FMFactoryManager.getFactory(format).createFeatureModel();
+			if (format.read(fm, xml).containsError()) {
+				fail();
+			}
+			return fm;
+		} catch (NoSuchExtensionException e) {
+			fail();
+		}
+		return null;
+	}
+
 	/**
 	 * shorthand to define a featuremodel by a String and load it into a FeatureModel
-	 * @param fmXml XML representation of the feature model (without constraints -> part within first  <struct> )
-	 * @param constraintsXml XML representation of the constraints (part within  <constraints> ).
-	 *  	  
+	 * 
+	 * @param fmXml XML representation of the feature model (without constraints -> part within first <struct> )
+	 * @param constraintsXml XML representation of the constraints (part within <constraints> ).
+	 * 
 	 * @return
 	 */
 	protected static IFeatureModel loadXML(String fmXml) {
-		return loadXML(fmXml,null);
+		return loadXML(fmXml, null);
 	}
+
 	/**
 	 * 
 	 */

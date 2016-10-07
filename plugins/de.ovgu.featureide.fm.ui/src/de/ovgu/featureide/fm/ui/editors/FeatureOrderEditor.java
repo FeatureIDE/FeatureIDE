@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -177,14 +178,14 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	@Override
 	public void createPartControl(Composite parent) {
 		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
-		hasFeatureOrder = featureModelEditor.featureModel.initFMComposerExtension(project).hasFeaureOrder();
+		hasFeatureOrder = FMComposerManager.getFMComposerExtension(project).hasFeaureOrder();
 		comp = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		comp.setLayout(layout);
 		Label label = new Label(comp, SWT.NONE);
 		if (!hasFeatureOrder) {
 			layout.numColumns = 1;
-			label.setText(featureModelEditor.featureModel.initFMComposerExtension(project).getOrderPageMessage());
+			label.setText(FMComposerManager.getFMComposerExtension(project).getOrderPageMessage());
 			featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 			featurelist.setVisible(false);
 		} else {

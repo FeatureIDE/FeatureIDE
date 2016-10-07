@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,15 +23,15 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
-import org.eclipse.core.runtime.jobs.Job;
-
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
-import de.ovgu.featureide.ui.statistics.ui.helper.jobs.StoppableTreeJob;
 
 /**
  * Parent for the actual {@link ConfigNode}s.
@@ -63,7 +63,7 @@ public class ConfigParentNode extends LazyParent {
 		 *            for the job.
 		 */
 		public void calculate(final long timeout, final int priority) {
-			Job job = new StoppableTreeJob(CALCULATING + this.description, this) {
+			LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 				private String calculateConfigs() {
 					boolean ignoreAbstract = description.equals(DESC_CONFIGS);
 					if (!ignoreAbstract && innerModel.getAnalyser().countConcreteFeatures() == 0) {
@@ -78,17 +78,18 @@ public class ConfigParentNode extends LazyParent {
 				}
 
 				@Override
-				protected boolean work() throws Exception {
+				public Boolean execute(IMonitor workMonitor) throws Exception {
 					setValue(calculateConfigs());
 					return true;
 				}
 			};
-			job.setPriority(priority);
+			LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATING + this.description, job);
+			runner.setPriority(priority);
 			JobDoneListener listener = JobDoneListener.getInstance();
 			if (listener != null) {
-				job.addJobChangeListener(listener);
+				runner.addJobChangeListener(listener);
 			}
-			job.schedule();
+			runner.schedule();
 		}
 	}
 

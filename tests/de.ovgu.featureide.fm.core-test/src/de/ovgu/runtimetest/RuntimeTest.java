@@ -320,7 +320,7 @@ public abstract class RuntimeTest {
 			clearHistory(clazz.getName(), method.getName());
 			storeHistory(clazz.getName(), method.getName(), runtimes);
 			
-			assert (runtimes.size() >= 0 && runtimes.size() <= historyConfig.maximumEntries);
+			assert (runtimes.size() <= historyConfig.maximumEntries);
 			return Result.PASSES;
 		}
 		

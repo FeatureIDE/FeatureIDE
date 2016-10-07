@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,7 +30,7 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
@@ -56,7 +56,7 @@ public abstract class FileManagerMap {
 					try {
 						Files.createDirectory(extraFolder);
 					} catch (IOException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 				}
 
@@ -90,7 +90,7 @@ public abstract class FileManagerMap {
 	 * @return
 	 */
 	public static boolean hasInstance(String path) {
-		return map.containsKey(path);
+		return map.containsKey(constructAbsolutePath(path));
 	}
 
 	/**
@@ -121,7 +121,7 @@ public abstract class FileManagerMap {
 				map.put(absolutePath, newInstance);
 				return newInstance;
 			} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 				return null;
 			}
 		}

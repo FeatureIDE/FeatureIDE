@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -37,13 +37,10 @@ public class AbstractAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.abstract";
 
-	private ObjectUndoContext undoContext;
-
 	private IFeatureModel featureModel;
 
 	public AbstractAction(Object viewer, IFeatureModel featureModel, ObjectUndoContext undoContext) {
 		super("Abstract", viewer);
-		this.undoContext = undoContext;
 		this.featureModel = featureModel;
 	}
 

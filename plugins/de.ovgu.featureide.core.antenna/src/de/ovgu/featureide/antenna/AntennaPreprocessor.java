@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -69,6 +69,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -77,6 +78,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Christoph Giesel
  * @author Marcus Kamieth
  * @author Marcus Pinnecke (Feature Interface)
+ * @author Christopher Sontag
  */
 public class AntennaPreprocessor extends PPComposerExtensionClass {
 
@@ -86,7 +88,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	private AntennaModelBuilder antennaModelBuilder;
 
 	/** pattern for replacing preprocessor commands like "//#if" */
-	static final Pattern replaceCommandPattern = Pattern.compile("//#(.+?)\\s");
+	static final Pattern replaceCommandPattern = Pattern.compile("//\\s*\\#(.+?)\\s");
 
 	public AntennaPreprocessor() {
 		super(ANTENNA);
@@ -169,6 +171,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 							if (sourceFile == null) {
 								AntennaCorePlugin.getDefault()
 										.logWarning("Source file for " + file + " not found for project " + featureProject.getProjectName());
+								continue;
 							}
 							if (!hasMarker(m, sourceFile)) {
 								IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
@@ -291,7 +294,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					// run antenna preprocessor
 					changed = preprocessor.preprocess(lines, ((IFile) res).getCharset());
 				} catch (PPException e) {
-					featureProject.createBuilderMarker(res, e.getMessage().replace("Line #" + e.getLineNumber() + " :", "Antenna:"), e.getLineNumber() + 1,
+					final int lineNumber = e.getLineNumber();
+					featureProject.createBuilderMarker(res, e.getMessage().replace("Line #" + lineNumber + " :", "Antenna:"), Math.max(lineNumber, 0) + 1,
 							IMarker.SEVERITY_ERROR);
 					AntennaCorePlugin.getDefault().logError(e);
 				}
@@ -332,42 +336,39 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			String line = lines.get(j);
 
 			// if line is preprocessor directive
-			if (line.contains("//#")) {
-				if (line.contains("//#if ") || line.contains("//#elif ") || line.contains("//#condition ") || line.contains("//#ifdef ")
-						|| line.contains("//#ifndef ") || line.contains("//#elifdef ") || line.contains("//#elifndef ") || line.contains("//#else")) {
+			if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|elifdef|elifndef|if|else|elif")) {
 
-					// if e1, elseif e2, ..., elseif en  ==  if -e1 && -e2 && ... && en
-					// if e1, elseif e2, ..., else  ==  if -e1 && -e2 && ...
-					if (line.contains("//#elif ") || line.contains("//#elifdef ") || line.contains("//#elifndef ") || line.contains("//#else")) {
-						if (!expressionStack.isEmpty()) {
-							Node lastElement = new Not(expressionStack.pop().clone());
-							expressionStack.push(lastElement);
-						}
-					} else if (line.contains("//#if ") || line.contains("//#ifdef ") || line.contains("//#ifndef ")) {
-						ifelseCountStack.push(0);
+				// if e1, elseif e2, ..., elseif en  ==  if -e1 && -e2 && ... && en
+				// if e1, elseif e2, ..., else  ==  if -e1 && -e2 && ...
+				if (containsPreprocessorDirective(line, "elifdef|elifndef|else|elif")) {
+					if (!expressionStack.isEmpty()) {
+						Node lastElement = new Not(expressionStack.pop().clone());
+						expressionStack.push(lastElement);
 					}
-
-					if (!ifelseCountStack.empty() && !line.contains("//#else")) {
-						ifelseCountStack.push(ifelseCountStack.pop() + 1);
-					}
-
-					setMarkersContradictionalFeatures(line, res, j + 1);
-
-					setMarkersNotConcreteFeatures(line, res, j + 1);
-				} else if (line.contains("//#endif")) {
-					while (!ifelseCountStack.empty()) {
-						if (ifelseCountStack.peek() == 0)
-							break;
-
-						if (!expressionStack.isEmpty())
-							expressionStack.pop();
-
-						ifelseCountStack.push(ifelseCountStack.pop() - 1);
-					}
-
-					if (!ifelseCountStack.empty())
-						ifelseCountStack.pop();
+				} else if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|if")) {
+					ifelseCountStack.push(0);
 				}
+
+				if (!ifelseCountStack.empty() && !containsPreprocessorDirective(line, "else")) {
+					ifelseCountStack.push(ifelseCountStack.pop() + 1);
+				}
+
+				setMarkersContradictionalFeatures(line, res, j + 1);
+
+				setMarkersNotConcreteFeatures(line, res, j + 1);
+			} else if (containsPreprocessorDirective(line, "endif")) {
+				while (!ifelseCountStack.empty()) {
+					if (ifelseCountStack.peek() == 0)
+						break;
+
+					if (!expressionStack.isEmpty())
+						expressionStack.pop();
+
+					ifelseCountStack.push(ifelseCountStack.pop() - 1);
+				}
+
+				if (!ifelseCountStack.empty())
+					ifelseCountStack.pop();
 			}
 		}
 	}
@@ -388,7 +389,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @param lineNumber line number of given line
 	 */
 	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber) {
-		if (line.contains("//#else")) {
+		if (containsPreprocessorDirective(line, "else")) {
 			if (!expressionStack.isEmpty()) {
 				Node[] nestedExpressions = new Node[expressionStack.size()];
 				nestedExpressions = expressionStack.toArray(nestedExpressions);
@@ -401,8 +402,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			return;
 		}
 
-		boolean conditionIsSet = line.contains("//#condition ");
-		boolean negative = line.contains("//#ifndef ") || line.contains("//#elifndef ");
+		boolean conditionIsSet = containsPreprocessorDirective(line, "condition");
+		boolean negative = containsPreprocessorDirective(line, "ifndef|elifndef");
 
 		// remove "//#if ", "//ifdef", ...
 		line = replaceCommandPattern.matcher(line).replaceAll("");
@@ -420,17 +421,17 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		Node ppExpression = nodereader.stringToNode(line, featureList);
 
 		if (ppExpression != null) {
-			if (negative)
+			if (negative) {
 				ppExpression = new Not(ppExpression.clone());
-
-			if (!conditionIsSet)
-				expressionStack.push(ppExpression);
+			}
+			expressionStack.push(ppExpression);
 
 			checkExpressions(ppExpression, lineNumber, res);
 		} else {
 			// if generating of expression failed, generate expression "true"
-			if (!conditionIsSet)
+			if (!conditionIsSet) {
 				expressionStack.push(new Literal(NodeCreator.varTrue));
+			}
 		}
 
 	}
@@ -443,14 +444,25 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @param lineNumber line number of given line
 	 */
 	private void setMarkersNotConcreteFeatures(String line, IFile res, int lineNumber) {
-		String[] splitted = line.split(AntennaModelBuilder.OPERATORS, 0);
+		String[] splitted = line.replaceAll("\\s+#", "#").split(AntennaModelBuilder.OPERATORS, 0);
 
 		for (int i = 0; i < splitted.length; ++i) {
 			final String linePart = splitted[i];
-			if (!linePart.isEmpty() && !linePart.contains("//#")) {
+			if (!linePart.isEmpty() && !containsPreprocessorDirective(linePart, ".*")) {
 				setMarkersOnNotExistingOrAbstractFeature(linePart, lineNumber, res);
 			}
 		}
+	}
+
+	/**
+	 * Checks whether the text contains the specified directive or not
+	 * 
+	 * @param text text to check
+	 * @param directives directives splitted by |
+	 * @return true - if the specified directive is contained
+	 */
+	protected static boolean containsPreprocessorDirective(String text, String directives) {
+		return Pattern.compile("//\\s*\\#(" + directives + ")").matcher(text).find();
 	}
 
 	@Override
@@ -545,6 +557,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		if (length > 0) {
 			featureList.deleteCharAt(length - 1);
 		}
+
+		featureModel = AdvancedNodeCreator.createNodes(configuration.getFeatureModel());
+
 		// add source files
 		try {
 			// add activated features as definitions to preprocessor
@@ -567,14 +582,16 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				// for folders do recursively 
 				preprocessSourceFiles((IFolder) res, preprocessor, null);
 			} else if (res instanceof IFile) {
-				if (res.getName().equals(congurationName + getConfigurationExtension())) {
+				if (res.getName().equals(congurationName + "." + getConfigurationExtension())) {
 					continue;
 				}
 				// get all lines from file
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
 
 				// do checking and some stuff
-				processLinesOfFile(lines, (IFile) res);
+				if (featureModel != null) {// TODO check why the FM is null when generating products
+					processLinesOfFile(lines, (IFile) res);
+				}
 				boolean changed = false;
 				try {
 					// run antenna preprocessor
@@ -628,11 +645,12 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				if (res instanceof IFolder) {
 					postProcess((IFolder) res);
 				} else if (res instanceof IFile) {
-					if (res.getFileExtension().equals(getConfigurationExtension())) {
+					final String fileExtension = res.getFileExtension();
+					if (fileExtension != null && fileExtension.equals(getConfigurationExtension())) {
 						continue;
 					}
 					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));
-							final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")))) {
+							final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
 						String line = null;
 						final StringBuilder content = new StringBuilder();
 						boolean hasAnnotations = false;
@@ -677,10 +695,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 */
 	// TODO use regex
 	private boolean isAnnotation(String line) {
-		if (line.trim().startsWith("//#")) {
-			return true;
-		}
-		if (line.trim().startsWith("//@")) {
+		if (line.matches(".*//\\s*(\\#|\\@).*")) {
 			return true;
 		}
 		return false;

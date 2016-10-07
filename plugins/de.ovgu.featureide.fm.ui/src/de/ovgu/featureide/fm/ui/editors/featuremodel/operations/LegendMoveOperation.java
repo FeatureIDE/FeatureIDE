@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -66,7 +67,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 		layout.setLegendPos(newLocation.x, newLocation.y);
 		layout.setLegendAutoLayout(false);
 		graphicalFeatureModel.handleLegendLayoutChanged();
-		return null;
+		return new FeatureIDEEvent(featureModel, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
@@ -76,7 +77,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 		layout.setLegendPos(oldLocation.x, oldLocation.y);
 		layout.setLegendAutoLayout(wasAutoLayout);
 		graphicalFeatureModel.handleLegendLayoutChanged();
-		return null;
+		return new FeatureIDEEvent(featureModel, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 }

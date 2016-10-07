@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,8 +34,8 @@ import javax.annotation.CheckForNull;
 
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -55,15 +55,15 @@ public class ExtendedFeatureModel extends FeatureModel {
 		private final String modelName;
 		private final String varName;
 		private final int type;
-		
+
 		private String prefix;
-		
+
 		public UsedModel(UsedModel usedModel, String parentName) {
 			this.modelName = usedModel.modelName;
 			this.varName = parentName + usedModel.varName;
 			this.type = usedModel.type;
 		}
-		
+
 		public UsedModel(String modelName, String varName, int type) {
 			this.modelName = modelName;
 			this.varName = varName;
@@ -73,19 +73,19 @@ public class ExtendedFeatureModel extends FeatureModel {
 		public String getModelName() {
 			return modelName;
 		}
-		
+
 		public String getVarName() {
 			return varName;
 		}
-		
+
 		public int getType() {
 			return type;
 		}
-		
+
 		public String getPrefix() {
 			return prefix;
 		}
-		
+
 		public void setPrefix(String prefix) {
 			this.prefix = prefix;
 		}
@@ -95,17 +95,32 @@ public class ExtendedFeatureModel extends FeatureModel {
 			return modelName + " " + varName;
 		}
 	}
+
+	protected final List<String> imports = new LinkedList<String>();
+
 	protected final FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
 	protected final FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
 	protected final FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
 	protected final LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
-	
+
 	protected final Map<String, UsedModel> usedModels = new HashMap<String, UsedModel>();
 	protected final List<IConstraint> ownConstraints = new LinkedList<IConstraint>();
-	
+
 	protected IFeatureModel mappingModel = null;
-	
+
 	private boolean isInterface = false;
+
+	public ExtendedFeatureModel(String factoryID) {
+		super(factoryID);
+	}
+
+	public List<String> getImports() {
+		return imports;
+	}
+
+	public void addImport(String imp) {
+		imports.add(imp.replace(".", "\\"));
+	}
 
 	@Override
 	protected FeatureModelAnalyzer createAnalyser() {
@@ -141,15 +156,15 @@ public class ExtendedFeatureModel extends FeatureModel {
 	public boolean addInterface(final String varType, final String varName) {
 		return addModel(varType, varName, ExtendedFeature.TYPE_INTERFACE);
 	}
-	
+
 	public boolean addInstance(final String varType, final String varName) {
 		return addModel(varType, varName, ExtendedFeature.TYPE_INSTANCE);
 	}
-	
+
 	public boolean addInheritance(final String varType, final String varName) {
 		return addModel(varType, varName, ExtendedFeature.TYPE_INHERITED);
 	}
-	
+
 	public boolean addExternalModel(final UsedModel model) {
 		if (usedModels.containsKey(model.varName)) {
 			return false;
@@ -158,7 +173,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 			return true;
 		}
 	}
-	
+
 	private boolean addModel(final String varType, final String varName, int modelType) {
 		if (usedModels.containsKey(varName)) {
 			return false;
@@ -167,7 +182,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 			return true;
 		}
 	}
-	
+
 	public UsedModel getExternalModel(String varName) {
 		return usedModels.get(varName);
 	}
@@ -183,14 +198,15 @@ public class ExtendedFeatureModel extends FeatureModel {
 	public FeatureAttributeMap<Integer> getIntegerAttributes() {
 		return this.integerAttributes;
 	}
-	
+
 	public FeatureAttributeMap<String> getStringAttributes() {
 		return this.stringAttributes;
 	}
-	
+
 	public boolean isMultiProductLineModel() {
 		return !usedModels.isEmpty();
 	}
+
 	/**
 	 * Check if the feature model contains instance features.
 	 * 
@@ -232,8 +248,9 @@ public class ExtendedFeatureModel extends FeatureModel {
 	public void reset() {
 		super.reset();
 		usedModels.clear();
+		imports.clear();
 	}
-	
+
 	/**
 	 * @return the mappingModel
 	 */
@@ -254,26 +271,26 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	public void runTests() {
 		final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(this);
-		FMCorePlugin.getDefault().logInfo(VELVET_FEATUREMODEL_IMPORTED);
+		Logger.logInfo(VELVET_FEATUREMODEL_IMPORTED);
 
 		try {
-			FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? VALID : INVALID);
+			Logger.logInfo(analyzer.isValid() ? VALID : INVALID);
 			StringBuilder sb = new StringBuilder("Dead Features: ");
 			for (IFeature deadFeature : analyzer.getDeadFeatures()) {
 				sb.append(deadFeature.getName() + ", ");
 			}
-			FMCorePlugin.getDefault().logInfo(sb.toString());
+			Logger.logInfo(sb.toString());
 			sb.delete(0, sb.length());
 			sb.append("FO Features: ");
 			for (IFeature deadFeature : analyzer.getFalseOptionalFeatures()) {
 				sb.append(deadFeature.getName() + ", ");
 			}
-			FMCorePlugin.getDefault().logInfo(sb.toString());
-		} catch (final TimeoutException e ) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logInfo(sb.toString());
+		} catch (final TimeoutException e) {
+			Logger.logError(e);
 		}
 	}
-	
+
 	@Override
 	@CheckForNull
 	public IFeature getFeature(CharSequence name) {
@@ -281,17 +298,20 @@ public class ExtendedFeatureModel extends FeatureModel {
 		if (feature != null) {
 			return feature;
 		}
-		return null;
-		// TODO MPL: Search for possible right feature
-//		return super.getFeature(parentModel + "." + name);
+
+		if (name.toString().contains(".")) {
+			return super.getFeature(this.getStructure().getRoot().getFeature().getName() + "." + name);
+		} else {
+			return null;
+		}
 	}
-	
+
 	public boolean isInterface() {
 		return isInterface;
 	}
-	
+
 	public void setInterface(boolean isInterface) {
 		this.isInterface = isInterface;
 	}
-	
+
 }

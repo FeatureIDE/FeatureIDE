@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,7 +27,8 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
  * Operation with functionality to move features. Provides redo/undo support.
@@ -47,30 +48,37 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 		this.newPos = newPos;
 		this.oldPos = oldPos;
 		setEditor(editor);
-		setEventId(FeatureIDEEvent.STRUCTURE_CHANGED);
 	}
 
 	public void newInnerOrder(Point newPos) {
-		FeatureUIHelper.setLocation(data.getFeature(), newPos);
+		data.getFeature().setLocation(newPos);
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
-			newInnerOrder(newPos);
-			setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
+		final IGraphicalFeature feature = data.getFeature();
+		if (feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
+			final IGraphicalFeature oldParent = data.getOldParent();
+			final IFeatureStructure featureStructure = feature.getObject().getStructure();
+			oldParent.getObject().getStructure().removeChild(featureStructure);
+
+			final IGraphicalFeature newParent = data.getNewParent();
+			newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
+
+			if (oldParent != newParent) {
+				oldParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+				newParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+			}
 		} else {
-			data.getOldParent().getObject().getStructure().removeChild(data.getFeature().getObject().getStructure());
-			data.getNewParent().getObject().getStructure().addChildAtPosition(data.getNewIndex(), data.getFeature().getObject().getStructure());
+			newInnerOrder(newPos);
 		}
-		return null;
+		return new FeatureIDEEvent(feature, EventType.STRUCTURE_CHANGED);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
-			setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
 		} else {
 			final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
 			data.getNewParent().getObject().getStructure().removeChild(structure2);
@@ -79,7 +87,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 				structure.addChildAtPosition(data.getOldIndex(), structure2);
 			}
 		}
-		return null;
+		return new FeatureIDEEvent(data.getFeature().getGraphicalModel().getFeatureModel(), EventType.STRUCTURE_CHANGED);
 	}
 
 }

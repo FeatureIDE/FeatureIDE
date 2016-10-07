@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,27 +29,35 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SUMME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VARIANTE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VERFAHREN;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
+
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.io.IOConstants;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /** 
  * @author Sebastian Krieter
  */
-public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentationStatisticsJob.Arguments> {
+public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentationStatisticsJob.Arguments, Boolean> {
 	
 	public static class Arguments extends JobArguments {
 		private final String foldername;
+		private final IProject project;
 		
-		public Arguments(String foldername) {
+		public Arguments(String foldername, IProject project) {
 			super(Arguments.class);
 			this.foldername = foldername;
+			this.project = project;			
 		}
 	}
 	
@@ -58,21 +66,22 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 	}
 
 	@Override
-	protected boolean work() {
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+	public Boolean execute(IMonitor workMonitor) throws Exception {
+		this.workMonitor = workMonitor;
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(arguments.project);
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning(this.project.getName() + " is no FeatureIDE Project!");
+			CorePlugin.getDefault().logWarning(arguments.project.getName() + " is no FeatureIDE Project!");
 			return false;
 		}
 		
-		IFolder folder = CorePlugin.createFolder(this.project, arguments.foldername);
+		IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername);
 		try {
 			folder.delete(true, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 			return false;
 		}
-		CorePlugin.createFolder(this.project, arguments.foldername);
+		CorePlugin.createFolder(arguments.project, arguments.foldername);
 		
 		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
 		if (projectSignatures == null) {
@@ -86,7 +95,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 			featureIDs[i++] = projectSignatures.getFeatureID(string);
 		}
 
-		workMonitor.setMaxAbsoluteWork(2 * featureIDs.length + 5);
+		workMonitor.setRemainingWork(2 * featureIDs.length + 5);
 
 		int[] statisticDataChars = new int[5];
 		int[] statisticDataTags = new int[5];
@@ -175,7 +184,11 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		}
 		sb.append(sum2);
 		sb.append('\n');
-		IOConstants.writeToFile(folder.getFile("statistics.csv"), sb.toString());
+		try {
+			FileSystem.write(Paths.get(folder.getFile("statistics.csv").getLocationURI()), sb.toString().getBytes(Charset.forName("UTF-8")));
+		} catch (IOException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 		workMonitor.worked();
 		
 		StringBuilder sb2 = new StringBuilder();
@@ -204,7 +217,11 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		sb2.append((int)(100 * ((double)sum2)/((double)statisticDataTags[0])));
 		sb2.append("\\% \\\\\n");
 
-		IOConstants.writeToFile(folder.getFile("latexTab.txt"), sb2.toString());
+		try {
+			FileSystem.write(Paths.get(folder.getFile("latexTab.txt").getLocationURI()), sb2.toString().getBytes(Charset.forName("UTF-8")));
+		} catch (IOException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 		workMonitor.worked();
 		
 		StringBuilder sb3 = new StringBuilder("Feature0;Feature1;New;SumFeature;General0;General1;SumGeneral;SumAll\n");
@@ -213,7 +230,11 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 //			sb3.append(';');						
 //		}
 		sb3.setCharAt(sb3.length() - 1, '\n');
-		IOConstants.writeToFile(folder.getFile("numComments.txt"), sb3.toString());
+		try {
+			FileSystem.write(Paths.get(folder.getFile("numComments.txt").getLocationURI()), sb3.toString().getBytes(Charset.forName("UTF-8")));
+		} catch (IOException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 		workMonitor.worked();
 		
 		CorePlugin.getDefault().logInfo(BUILT_DOCUMENTATION_STATISTICS);

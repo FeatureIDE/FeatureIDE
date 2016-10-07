@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
@@ -39,33 +41,58 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
  * @author Patrick Haese
  */
 public abstract class LazyParent extends Parent {
+
+	public final class StatisticTreeJob extends TreeJob {
+		
+		private final boolean expand;
+
+		private StatisticTreeJob(Parent calculated, boolean expand) {
+			super(calculated);
+			this.expand = expand;
+		}
+
+		public boolean isExpand() {
+			return expand;
+		}
+
+		@Override
+		public Boolean execute(IMonitor monitor) throws Exception {
+			try {
+				initChildren();
+			} finally {
+				setCalculating(false);
+			}
+			return true;
+		}
+
+		@Override
+		public boolean cancel() {
+			return false;
+		}
+
+	}
+
 	protected boolean lazy = true;
+
+	@Override
+	public Parent[] getChildren() {
+		return calculateChidren(true);
+	}
 
 	/**
 	 * Starts a job, that calculates the children of this instance, and
 	 * registers it to the listener.
 	 */
-	@Override
-	public Parent[] getChildren() {
+	protected Parent[] calculateChidren(boolean expand) {
 		if (lazy) {
-			final TreeJob job = new TreeJob(CALCULATE + this.getClass().getName(), this) {
-				@Override
-				public boolean work() {
-					initChildren();
-					return true;
-				}
-
-				@Override
-				protected void finalWork(boolean success) {
-					setCalculating(false);
-				}
-			};
-			setPriority(job);
+			final TreeJob job = new StatisticTreeJob(this, expand);
+			LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATE + this.getClass().getName(), job);
+			runner.setPriority(Job.SHORT);
 			final JobDoneListener listener = JobDoneListener.getInstance();
 			if (listener != null) {
-				job.addJobChangeListener(listener);
+				runner.addJobChangeListener(listener);
 			}
-			job.schedule();
+			runner.schedule();
 		}
 		lazy = false;
 		return super.getChildren();

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,28 +34,33 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Simple configuration format.</br> Lists all selected features in the
- * user-defined order (if specified).
+ * Simple configuration format.<br/>
+ * Lists all selected features in the user-defined order (if specified).
  * 
  * @author Sebastian Krieter
- * @author Marcus Pinnecke (Feature Interface)
  */
-public class DefaultFormat implements IPersistentFormat<Configuration> {
+public class DefaultFormat implements IConfigurationFormat {
+
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + DefaultFormat.class.getSimpleName();
 
 	private static final String NEWLINE = System.lineSeparator();
 
-	public List<Problem> read(Configuration configuration, CharSequence source) {
+	@Override
+	public ProblemList read(Configuration configuration, CharSequence source) {
 		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
-		final List<Problem> warnings = new LinkedList<>();
+		final ProblemList warnings = new ProblemList();
 
 		final boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
@@ -113,10 +118,10 @@ public class DefaultFormat implements IPersistentFormat<Configuration> {
 		} catch (IOException e) {
 			warnings.clear();
 			warnings.add(new Problem(e));
-			return warnings;
-		} finally {
 			configuration.setPropagate(orgPropagate);
+			return warnings;
 		}
+		configuration.setPropagate(orgPropagate);
 		configuration.update();
 		return warnings;
 	}
@@ -172,8 +177,18 @@ public class DefaultFormat implements IPersistentFormat<Configuration> {
 	}
 
 	@Override
-	public String getFactoryID() {
-		return null;
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

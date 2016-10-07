@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="F_A6D1B5506676">
+				<description>
+					Lorem ipsum dolor sit amet
+				</description>
+				<feature mandatory="true" name="F_4640AD5AB8BB">
+					<description>
+						
+					</description>
+				</feature>
+				<alt mandatory="true" name="F_1769C1B41C52">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, s
+					</description>
+					<feature mandatory="true" name="F_E19742FF52C1">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam vol
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_100B9F633962">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam volup
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_862FD9AB518D">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed d
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_6C3738847DD8">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+					</description>
+					<feature mandatory="true" name="F_71ED362684B0">
+						<description>
+							Lorem ipsum dolor sit amet, c
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_FEBDD3C9086D">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadip
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_A1AFF13E37F7">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadi
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_DF94333F6020">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, s
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_F417C77E9010">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+						</description>
+					</feature>
+				</alt>
+				<feature mandatory="true" name="F_677C2A4CE676">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_7326BEE676E7">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadi
+					</description>
+				</feature>
+				<feature name="F_844A5DF045CA">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur
+					</description>
+				</feature>
+				<feature mandatory="true" name="F_F3A4DE329322">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_1289140DEC8F">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore mag
+					</description>
+				</feature>
+				<feature name="F_477DA48AC4E3">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam er
+					</description>
+				</feature>
+				<feature name="F_A36FDFDBA2C2">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadi
+					</description>
+				</feature>
+				<feature name="F_DA2BC2641BC3">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur
+					</description>
+				</feature>
+				<feature name="F_C89F1B6DF491">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, se
+					</description>
+				</feature>
+				<feature name="F_094558DF54E4">
+					<description>
+						
+					</description>
+				</feature>
+				<feature mandatory="true" name="F_06A6F990190F">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_E0E6FF46990C">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscin
+					</description>
+				</feature>
+				<feature name="F_2994A4D5A93B">
+					<description>
+						Lorem ipsum dolor sit amet, conse
+					</description>
+				</feature>
+				<feature name="F_E600CF21575B">
+					<description>
+						Lorem ipsum dolor sit amet, conse
+					</description>
+				</feature>
+				<feature name="F_C8A22DCFE3DA">
+					<description>
+						Lorem ipsum dolor sit amet, conse
+					</description>
+				</feature>
+				<feature name="F_2A4A3F0CD628">
+					<description>
+						Lorem ipsum dolor sit amet, conset
+					</description>
+				</feature>
+				<feature name="F_872323098893">
+					<description>
+						Lorem ipsum dolor sit ame
+					</description>
+				</feature>
+				<feature name="F_CF72A5DEF625">
+					<description>
+						Lorem ipsum dolor sit amet, consetetu
+					</description>
+				</feature>
+				<feature name="F_16539673D4C1">
+					<description>
+						Lorem ipsum dolor sit amet,
+					</description>
+				</feature>
+				<feature name="F_EF35B5A8ED26">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, se
+					</description>
+				</feature>
+				<feature name="F_183CA5A34D89">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipsc
+					</description>
+				</feature>
+				<feature name="F_ED6AE35AAA50">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, se
+					</description>
+				</feature>
+				<feature mandatory="true" name="F_5829BF18605B">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A9262FC12247">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing e
+					</description>
+				</feature>
+				<feature mandatory="true" name="F_C97AC7FD3E10">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_53CCFF0DC062">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy e
+					</description>
+				</feature>
+				<or name="F_D3147CE13AC0">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="F_6A6F03ABF46E">
+						<description>
+							Lorem ipsum dolor sit amet, con
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_D5F3188459F0">
+						<description>
+							Lorem ipsum dolor sit amet, con
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_B418AA8AAC6B">
+						<description>
+							Lorem ipsum dolor sit amet, con
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_21C7D84A6575">
+						<description>
+							Lorem ipsum dolor sit amet, con
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_0A46D6A92A8D">
+						<description>
+							Lorem ipsum dolor sit amet, cons
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_3AF178604769">
+						<description>
+							Lorem ipsum dolor sit amet, cons
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_CA739DCB90C7">
+						<description>
+							Lorem ipsum dolor sit amet, cons
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_B0769AA199FD">
+						<description>
+							Lorem ipsum dolor sit amet, cons
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_52215B3448AC">
+						<description>
+							Lorem ipsum dolor sit amet, con
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_63B7D556CE52">
+						<description>
+							Lorem ipsum dolor sit amet, con
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_F1FCA3AFAA9C">
+						<description>
+							Lorem ipsum dolor sit amet, con
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_7CA24A08AC82">
+						<description>
+							Lorem ipsum dolor sit amet, con
+						</description>
+					</feature>
+				</or>
+				<feature mandatory="true" name="F_F2086C0F1FD0">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_11F37575B401">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing eli
+					</description>
+				</feature>
+				<alt name="F_FF6357CF02F6">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed di
+					</description>
+					<feature mandatory="true" name="F_735542C99DF0">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_0609E78A5599">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_CE856AA0437F">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam non
+						</description>
+					</feature>
+				</alt>
+				<or name="F_DF4FB3AEEFD2">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+					</description>
+					<feature mandatory="true" name="F_33A21731000A">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invi
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_11D862C3DB48">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempo
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_CF48F3BCFB26">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempo
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_2D921A4097DB">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempo
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_41FDD62CC58C">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5E11BF1FAECA">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_ED76D00FABD9">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor inv
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_248886F97E8C">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invid
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_D09A1126FF10">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscin
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_5C35E07FCE2A">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temp
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_6FEC7C59E6E7">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+						</description>
+					</feature>
+				</or>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<disj>
+						<var>F_100B9F633962</var>
+						<var>F_862FD9AB518D</var>
+					</disj>
+					<var>F_7326BEE676E7</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_862FD9AB518D</var>
+					<var>F_844A5DF045CA</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E19742FF52C1</var>
+					<not>
+						<var>F_1289140DEC8F</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<not>
+						<var>F_1289140DEC8F</var>
+					</not>
+					<not>
+						<var>F_477DA48AC4E3</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E19742FF52C1</var>
+					<not>
+						<var>F_477DA48AC4E3</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_862FD9AB518D</var>
+					<var>F_A36FDFDBA2C2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E19742FF52C1</var>
+					<not>
+						<var>F_DA2BC2641BC3</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_100B9F633962</var>
+					<var>F_C89F1B6DF491</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_862FD9AB518D</var>
+					<var>F_C89F1B6DF491</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E19742FF52C1</var>
+					<var>F_C89F1B6DF491</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>F_E600CF21575B</var>
+						<var>F_C8A22DCFE3DA</var>
+					</disj>
+					<not>
+						<var>F_2994A4D5A93B</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>F_2994A4D5A93B</var>
+						<var>F_C8A22DCFE3DA</var>
+					</disj>
+					<not>
+						<var>F_E600CF21575B</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>F_2994A4D5A93B</var>
+						<var>F_E600CF21575B</var>
+					</disj>
+					<not>
+						<var>F_C8A22DCFE3DA</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_862FD9AB518D</var>
+					<var>F_A9262FC12247</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E19742FF52C1</var>
+					<not>
+						<var>F_FF6357CF02F6</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_71ED362684B0</var>
+					<not>
+						<var>F_DF4FB3AEEFD2</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E19742FF52C1</var>
+					<var>F_71ED362684B0</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_100B9F633962</var>
+					<var>F_0609E78A5599</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_862FD9AB518D</var>
+					<var>F_CE856AA0437F</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E0E6FF46990C</var>
+					<var>F_33A21731000A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_2994A4D5A93B</var>
+					<var>F_11D862C3DB48</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E600CF21575B</var>
+					<var>F_CF48F3BCFB26</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_C8A22DCFE3DA</var>
+					<var>F_2D921A4097DB</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_2A4A3F0CD628</var>
+					<var>F_41FDD62CC58C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_872323098893</var>
+					<var>F_5E11BF1FAECA</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_CF72A5DEF625</var>
+					<var>F_ED76D00FABD9</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_16539673D4C1</var>
+					<var>F_248886F97E8C</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_EF35B5A8ED26</var>
+					<var>F_5C35E07FCE2A</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_183CA5A34D89</var>
+					<var>F_6FEC7C59E6E7</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -137,14 +137,17 @@ public class AntennaModelBuilder extends PPModelBuilder {
 					directive.setExpression(line);
 					directive.setStartLine(i, 0);
 					directive.setId(id++);
-
+					if (command == FSTDirectiveCommand.CONDITION) {
+						directive.setEndLine(lines.size());
+						directive.setEndLine(lines.size(), 0);
+					}
 					if (directivesStack.isEmpty()) {
 						directivesList.add(directive);
 					} else {
 						directivesStack.peek().addChild(directive);
 					}
 
-					if (command != FSTDirectiveCommand.DEFINE && command != FSTDirectiveCommand.UNDEFINE && command != FSTDirectiveCommand.CONDITION)
+					if (command != FSTDirectiveCommand.DEFINE && command != FSTDirectiveCommand.UNDEFINE)
 						directivesStack.push(directive);
 				}
 			}
@@ -177,6 +180,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 	protected List<String> getFeatureNames(String expression) {
 		String exp = expression.replaceAll("[()]", "");
 		exp = exp.replaceAll("&&", "");
+		exp = exp.replaceAll("!", "");
 		exp = exp.replaceAll("\\|\\|", "");
 		exp = exp.replaceAll("\\^", "");
 		List<String> featureNameList = new LinkedList<String>();

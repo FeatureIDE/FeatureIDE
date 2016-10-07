@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -31,6 +31,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolTip;
 
+import de.ovgu.featureide.fm.core.FMComposerManager;
+import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -75,10 +77,13 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 						createTooltip(IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME + oldValue + " to " + value + ".",
 								SWT.ICON_WARNING);
 						// TODO #455 wrong usage of extension
-					} else if ((!featureModel.getFMComposerExtension().isValidFeatureName(value))) {
-						createTooltip(featureModel.getFMComposerExtension().getErroMessage(), SWT.ICON_ERROR);
-					} else if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(value)) {
-						createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
+					} else {
+						final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(null);
+						if ((!fmComposerExtension.isValidFeatureName(value))) {
+							createTooltip(fmComposerExtension.getErroMessage(), SWT.ICON_ERROR);
+						} else if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(value)) {
+							createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
+						}
 					}
 				}
 			}

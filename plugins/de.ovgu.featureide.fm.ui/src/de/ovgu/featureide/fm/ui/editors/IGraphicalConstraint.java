@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,7 +33,12 @@ public interface IGraphicalConstraint extends IGraphicalElement {
 	IConstraint getObject();
 
 	boolean isFeatureSelected();
+	
+	boolean isImplicit();
 
 	void setFeatureSelected(boolean selected);
+	
+	void setConstraintImplicit(boolean selected);
 
+	IGraphicalConstraint clone();
 }

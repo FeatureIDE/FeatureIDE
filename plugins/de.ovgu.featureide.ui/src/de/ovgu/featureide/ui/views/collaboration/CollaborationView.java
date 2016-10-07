@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -113,7 +113,9 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
@@ -733,9 +735,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		refreshButton = new Action() {
 			public void run() {
 				disableToolbarFilterItems();
-				Job refreshJob = new AStoppableJob(REFRESH_COLLABORATION_VIEW) {
+				LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 					@Override
-					protected boolean work() throws Exception {
+					public Boolean execute(IMonitor workMonitor) throws Exception {
 						if (!refreshButton.isEnabled())
 							return true;
 						refreshButton.setEnabled(false);
@@ -749,8 +751,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						return true;
 					}
 				};
-				refreshJob.setPriority(Job.SHORT);
-				refreshJob.schedule();
+				LongRunningJob<Boolean> runner = new LongRunningJob<>(REFRESH_COLLABORATION_VIEW, job);
+				runner.setPriority(Job.SHORT);
+				runner.schedule();
 			}
 		};
 	}
@@ -791,7 +794,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		return false;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter) || ViewPart.class.equals(adapter))

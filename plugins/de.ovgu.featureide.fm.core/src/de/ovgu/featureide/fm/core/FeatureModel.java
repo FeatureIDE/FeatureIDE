@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import static de.ovgu.featureide.fm.core.base.FeatureUtils.convert;
+import static de.ovgu.featureide.fm.core.base.FeatureUtilsLegacy.convert;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -38,9 +38,9 @@ import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.FeatureUtilsLegacy;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -52,7 +52,8 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem, Cloneable {
+@Deprecated
+public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem, Cloneable {
 
 	public IFeatureModel model;
 
@@ -72,33 +73,36 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return model.getAnalyser();
 	}
 
-	@Override
+	/**
+	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation
+	 * on the {@link FeatureModel}.
+	 */
 	public FeatureModelAnalyzer getAnalyser() {
 		return model.getAnalyser();
 	}
 
 	@Override
 	public IFeatureModelLayout getLayout() {
-//		return model.getLayout();
+		//		return model.getLayout();
 		return null;
 	}
 
 	public ColorschemeTable getColorschemeTable() {
-//		return model.getGraphicRepresenation().getColorschemeTable();
+		//		return model.getGraphicRepresenation().getColorschemeTable();
 		return null;
 	}
 
 	@Override
 	public FMComposerManager getFMComposerManager(final IProject project) {
-		return model.getFMComposerManager(project);
+		return (FMComposerManager) FMComposerManager.getFMComposerExtension(null);
 	}
 
 	public IFMComposerExtension initFMComposerExtension(final IProject project) {
-		return model.initFMComposerExtension(project);
+		return FMComposerManager.getFMComposerExtension(null);
 	}
 
 	public IFMComposerExtension getFMComposerExtension() {
-		return model.getFMComposerExtension();
+		return FMComposerManager.getFMComposerExtension(null);
 	}
 
 	@Override
@@ -110,6 +114,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		FeatureUtils.reset(model);
 	}
 
+	/**
+	 * Creates a default {@link FeatureModel} with a root feature named as the project and a
+	 * child feature named base.
+	 * 
+	 * @param projectName The name of the project
+	 */
 	public void createDefaultValues(String projectName) {
 		FeatureUtils.createDefaultValues(model, projectName);
 	}
@@ -134,42 +144,60 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public Collection<Feature> getFeatures() {
-		return Functional.toList(Functional.map(FeatureUtils.getFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getFeatures(model), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
 	}
 
+	/**
+	 * @return The {@link Feature} with the given name or {@code null} if there is no feature with this name.
+	 */
 	@CheckForNull
 	public Feature getFeature(String name) {
-		return convert(FeatureUtils.getFeature(model, name));
+		return FeatureUtilsLegacy.convert(FeatureUtils.getFeature(model, name));
 	}
 
+	/**
+	 * 
+	 * @return A list of all concrete features. This list is in preorder of the tree.
+	 */
 	@Nonnull
 	public Collection<Feature> getConcreteFeatures() {
-		return Functional.toList(Functional.map(FeatureUtils.getConcreteFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getConcreteFeatures(model), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
 	}
 
+	/**
+	 * 
+	 * @return A list of all concrete feature names. This list is in preorder of the tree.
+	 */
 	@Nonnull
 	public List<String> getConcreteFeatureNames() {
 		return Functional.toList(FeatureUtils.getConcreteFeatureNames(model));
 	}
 
 	public Collection<Feature> getFeaturesPreorder() {
-		return Functional.toList(Functional.map(FeatureUtils.getFeaturesPreorder(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getFeaturesPreorder(model), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
 	}
 
 	public List<String> getFeatureNamesPreorder() {
 		return FeatureUtils.getFeatureNamesPreorder(model);
 	}
 
+	/**
+	 * @return <code>true</code> if a feature with the given name exists and is concrete.
+	 * @deprecated Will be removed in a future release. Use {@link #getFeature(String)}.isConcrete() instead.
+	 */
 	@Deprecated
 	public boolean isConcrete(String featureName) {
 		return FeatureUtils.isConcrete(model, featureName);
 	}
 
+	/**
+	 * @return the featureTable
+	 */
 	protected Map<String, Feature> getFeatureTable() {
 		Map<String, Feature> result = new HashMap<>();
 		final Map<String, IFeature> map = FeatureUtils.getFeatureTable(model);
 		for (String key : map.keySet())
-			result.put (key, convert(map.get(key)));				
+			result.put(key, convert(map.get(key)));
 		return result;
 	}
 
@@ -194,7 +222,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void setConstraints(final LinkedList<Constraint> constraints) {
-		FeatureUtils.setConstraints(model, Functional.map(Functional.toIterator(constraints), FeatureUtils.CONSTRAINT_TO_ICONSTRANT));
+		FeatureUtils.setConstraints(model, Functional.map(Functional.toIterator(constraints), FeatureUtilsLegacy.CONSTRAINT_TO_ICONSTRANT));
 	}
 
 	public void addPropositionalNode(Node node) {
@@ -202,15 +230,15 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void addConstraint(Constraint constraint) {
-		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint));
+		FeatureUtils.addConstraint(model, convert(constraint));
 	}
 
 	public void addPropositionalNode(Node node, int index) {
 		FeatureUtils.addPropositionalNode(model, node, index);
 	}
-
+	
 	public void addConstraint(Constraint constraint, int index) {
-		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint), index);
+		FeatureUtils.addConstraint(model, convert(constraint), index);
 	}
 
 	public List<Node> getPropositionalNodes() {
@@ -222,11 +250,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public List<Constraint> getConstraints() {
-		return Functional.toList(Functional.map(FeatureUtils.getConstraints(model), FeatureUtils.ICONSTRAINT_TO_CONSTRANT));
+		return Functional.toList(Functional.map(FeatureUtils.getConstraints(model), FeatureUtilsLegacy.ICONSTRAINT_TO_CONSTRANT));
 	}
 
 	public int getConstraintIndex(Constraint constraint) {
-		return FeatureUtils.getConstraintIndex(model, FeatureUtils.convert(constraint));
+		return FeatureUtils.getConstraintIndex(model, convert(constraint));
 	}
 
 	public void removePropositionalNode(Node node) {
@@ -234,7 +262,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void removeConstraint(Constraint constraint) {
-		FeatureUtils.removeConstraint(model, FeatureUtils.convert(constraint));
+		FeatureUtils.removeConstraint(model, FeatureUtilsLegacy.convert(constraint));
 	}
 
 	public void removeConstraint(int index) {
@@ -293,6 +321,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		FeatureUtils.refreshContextMenu(model);
 	}
 
+	/**
+	 * Refreshes the diagram colors.
+	 */
 	public void redrawDiagram() {
 		FeatureUtils.redrawDiagram(model);
 	}
@@ -302,10 +333,28 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return new FeatureModel(model.clone());
 	}
 
+	/**
+	 * Will return the value of clone(true).
+	 * 
+	 * @return a deep copy from the feature model
+	 * 
+	 * @see #clone(boolean)
+	 */
 	public FeatureModel deepClone() {
 		return (FeatureModel) model.clone();
 	}
 
+	/**
+	 * Clones the feature model.
+	 * Makes a deep copy from all fields in the model.</br>
+	 * Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)} are {@code false} in every case.
+	 * 
+	 * @param complete If {@code false} the fields annotations, comments, colorschemeTable and layout
+	 *            are set to {@code null} for a faster cloning process.
+	 * @return a deep copy from the feature model
+	 * 
+	 * @see #clone()
+	 */
 	public FeatureModel deepClone(boolean complete) {
 		return (FeatureModel) model.clone();
 	}
@@ -326,6 +375,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return FeatureUtils.hasAlternativeGroup(model);
 	}
 
+	/**
+	 * @return true if feature model contains or group otherwise false
+	 */
 	public boolean hasOrGroup() {
 		return FeatureUtils.hasOrGroup(model);
 	}
@@ -338,6 +390,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return FeatureUtils.hasConcrete(model);
 	}
 
+	/**
+	 * @return number of or groups contained in the feature model
+	 */
 	public int numOrGroup() {
 		return FeatureUtils.numOrGroup(model);
 	}
@@ -346,6 +401,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return FeatureUtils.numAlternativeGroup(model);
 	}
 
+	/**
+	 * 
+	 * @return <code>true</code> if the feature model contains a hidden feature
+	 */
 	public boolean hasHidden() {
 		return FeatureUtils.hasHidden(model);
 	}
@@ -379,11 +438,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void setUndoContext(Object undoContext) {
-//		FeatureUtils.setUndoContext(model, undoContext);
+		//		FeatureUtils.setUndoContext(model, undoContext);
 	}
 
 	public Object getUndoContext() {
-//		return FeatureUtils.getUndoContext(model);
+		//		return FeatureUtils.getUndoContext(model);
 		return null;
 	}
 
@@ -404,12 +463,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public boolean isFeatureOrderInXML() {
-//		return FeatureUtils.isFeatureOrderInXML(model);
+		//		return FeatureUtils.isFeatureOrderInXML(model);
 		return false;
 	}
 
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-//		FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
+		//		FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
 	}
 
 	@Override

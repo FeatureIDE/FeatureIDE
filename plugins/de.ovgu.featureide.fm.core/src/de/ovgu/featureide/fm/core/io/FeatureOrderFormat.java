@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
@@ -35,11 +34,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 	
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + FeatureOrderFormat.class.getSimpleName();
+	
 	@Override
-	public List<Problem> read(IFeatureModel object, CharSequence source) {
+	public ProblemList read(IFeatureModel object, CharSequence source) {
 		String[] lines = source.toString().split("[\n|\r]+");
 		object.setFeatureOrderList(Arrays.asList(lines));
-		return Collections.emptyList();
+		return new ProblemList();
 	}
 
 	@Override
@@ -73,8 +74,18 @@ public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 	}
 
 	@Override
-	public String getFactoryID() {
-		return null;
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -104,7 +104,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 */
 	private void compile(String confName) {
 		LinkedList<IFile> files = getJavaFiles(generator.builder.folder.getFolder(confName));
-		final LinkedList<String> options = new LinkedList<String>();
+		final LinkedList<String> options = new LinkedList<>();
 		for (IFile file : files) {
 			options.add(setupPath(file));
 		}
@@ -135,19 +135,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * Adds quotation marks to the path name if it contains white spaces.
 	 */
 	private String setupPath(String location) {
-		String[] split = location.split("[\\\\]");
-		StringBuilder path = new StringBuilder();
-		for (String loc : split) {
-			path.append("\\");
-			if (loc.contains(" ")) {
-				path.append("\"");
-				path.append(loc);
-				path.append("\"");
-			} else {
-				path.append(loc);
-			}
-		}
-		return path.substring(1);
+		return location.contains(" ") ? "\"" + location + "\"" : location;
 	}
 
 	private String process(AbstractList<String> command) {
@@ -159,7 +147,9 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 
 		String output = null;
 		try (StringWriter writer = new StringWriter()) {
-			BatchCompiler.compile(sb.toString(), new PrintWriter(System.out), new PrintWriter(writer), null);
+			final String params = sb.toString();
+			
+			BatchCompiler.compile(params, new PrintWriter(System.out), new PrintWriter(writer), null);
 			output = writer.toString();
 		} catch (IOException e) {
 			UIPlugin.getDefault().logError(e);
@@ -180,16 +170,16 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 		if (output.isEmpty()) {
 			return errorFiles;
 		}
-		TreeMap<String, IFile> sourcePaths = new TreeMap<String, IFile>();
+		TreeMap<String, IFile> sourcePaths = new TreeMap<>();
 		for (IFile file : files)
-			sourcePaths.put(file.getRawLocation().toOSString(), file);
+			sourcePaths.put(file.getLocation().toOSString(), file);
 
 		try (Scanner scanner = new Scanner(output)) {
 			String currentLine;
 			while (scanner.hasNextLine()) {
 				currentLine = scanner.nextLine();
 				// \S*\s(\w+)\sin\s(\w:[\w,\\,.,\s]*.java)\s[(]at line (\d+)[)]
-				Pattern pattern = Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S:[\\s,\\S]*.java)\\s[(]at line (\\d+)[)]");
+				Pattern pattern = Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S.*[.]java)\\s[(]at line (\\d+)[)]");
 				Matcher matcher = pattern.matcher(currentLine);
 				if (!matcher.find()) {
 					continue;
@@ -209,7 +199,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 				// get error message in from the next lines
 				while (scanner.hasNextLine()) {
 					currentLine = scanner.nextLine();
-					Pattern messagePattern = Pattern.compile("\\w+[\\w\\W]*");
+					Pattern messagePattern = Pattern.compile("\\w.*");
 					Matcher m = messagePattern.matcher(currentLine);
 					boolean found = m.matches();
 					if (found) {
@@ -222,7 +212,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 				//				errorMessage = parseCannotFindSymbolMessage(scanner);
 				//			}
 				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) || errorMessage.contains(ERROR_IGNOR_SERIIZABLE)
-						|| errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT) || errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
+						|| (errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT) && !errorMessage.contains("cannot be resolved")) || errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
 					continue;
 				}
 				if (!errorFiles.contains(currentFile)) {

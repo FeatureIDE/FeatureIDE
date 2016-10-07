@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -41,6 +42,8 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Sebastian Krieter
  */
 public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
+	
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) {
@@ -68,6 +71,12 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		} else if (showHidden.equals(FALSE)) {
 			object.getLayout().showHiddenFeatures(false);
 		}
+		String showShort = eElement.getAttribute(SHOW_SHORT_NAMES);
+		if (showShort.equals(TRUE)) {
+			object.getLayout().setShowShortNames(true);
+		} else if (showShort.equals(FALSE)) {
+			object.getLayout().setShowShortNames(false);
+		}
 	}
 
 	private void parseStruct(NodeList struct) {
@@ -79,7 +88,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	private void parseFeatures(NodeList nodeList) {
 		Iterator<IGraphicalFeature> iterator = object.getFeatures().iterator();
 		for (Element e : getElements(nodeList)) {
-			String nodeName = e.getNodeName();
+//			String nodeName = e.getNodeName();
 			if (!iterator.hasNext()) {
 				break;
 			}
@@ -123,7 +132,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	private void parseConstraint(NodeList nodeList) {
 		Iterator<IGraphicalConstraint> iterator = object.getConstraints().iterator();
 		for (Element e : getElements(nodeList)) {
-			String nodeName = e.getNodeName();
+//			String nodeName = e.getNodeName();
 			if (!iterator.hasNext()) {
 				break;
 			}
@@ -170,6 +179,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		if (!object.getLayout().showHiddenFeatures()) {
 			root.setAttribute(SHOW_HIDDEN_FEATURES, FALSE);
 		}
+		if (object.getLayout().showShortNames()) {
+			root.setAttribute(SHOW_SHORT_NAMES, TRUE);
+		}
 
 		doc.appendChild(root);
 
@@ -205,8 +217,17 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	}
 
 	@Override
-	public String getFactoryID() {
-		return null;
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

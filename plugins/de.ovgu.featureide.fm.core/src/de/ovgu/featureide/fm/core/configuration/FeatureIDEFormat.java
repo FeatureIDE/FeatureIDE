@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,30 +28,33 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_CONFIGUR
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.LinkedList;
-import java.util.List;
 
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Extended configuration format for FeatureIDE projects.</br> Lists all
- * features and indicates the manual and automatic selection.
+ * Extended configuration format for FeatureIDE projects.</br>
+ * Lists all features and indicates the manual and automatic selection.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureIDEFormat implements IPersistentFormat<Configuration> {
+public class FeatureIDEFormat implements IConfigurationFormat {
+
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + FeatureIDEFormat.class.getSimpleName();
 
 	public static final String EXTENSION = StringTable.FIDECONF;
 
 	private static final String NEWLINE = System.lineSeparator();
 
 	@Override
-	public List<Problem> read(Configuration configuration, CharSequence source) {
+	public ProblemList read(Configuration configuration, CharSequence source) {
 		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
-		final List<Problem> warnings = new LinkedList<>();
+		final ProblemList warnings = new ProblemList();
 
 		final boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
@@ -95,7 +98,7 @@ public class FeatureIDEFormat implements IPersistentFormat<Configuration> {
 							break;
 						}
 					} catch (NumberFormatException e) {
-						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber));
+						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber, e));
 					}
 
 					final String name = renamingsManager.getNewName(line.substring(2));
@@ -108,7 +111,7 @@ public class FeatureIDEFormat implements IPersistentFormat<Configuration> {
 							configuration.setManual(feature, manual);
 							configuration.setAutomatic(feature, automatic);
 						} catch (SelectionNotPossibleException e) {
-							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber));
+							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber, e));
 						}
 					}
 				}
@@ -166,8 +169,18 @@ public class FeatureIDEFormat implements IPersistentFormat<Configuration> {
 	}
 
 	@Override
-	public String getFactoryID() {
-		return null;
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

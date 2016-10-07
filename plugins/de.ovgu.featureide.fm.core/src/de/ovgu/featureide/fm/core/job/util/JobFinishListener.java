@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,6 +32,6 @@ import de.ovgu.featureide.fm.core.job.IJob;
  * @see IJob
  * @see JobSequence
  */
-public interface JobFinishListener extends EventListener {
-	void jobFinished(IJob finishedJob, boolean success);
+public interface JobFinishListener<T> extends EventListener {
+	void jobFinished(IJob<T> finishedJob);
 }

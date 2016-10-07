@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -60,6 +60,8 @@ import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -108,10 +110,10 @@ public class FeatureStubsGenerator {
 //			FeatureHouseCorePlugin.getDefault().logError(e1);
 //		}
 		
-		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
-		efsj.addJobFinishedListener(new JobFinishListener() {
+		IRunner<ProjectSignatures> efsj = LongRunningWrapper.getRunner(new ExtendedFujiSignaturesJob(featureProject));
+		efsj.addJobFinishedListener(new JobFinishListener<ProjectSignatures>() {
 			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
+			public void jobFinished(IJob<ProjectSignatures> finishedJob) {
 				getFeatures(featureProject.getFSTModel().getProjectSignatures());
 			}
 			

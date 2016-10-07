@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.base.event;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Default implementation of {@link IEventManager}.
@@ -43,15 +43,8 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
-		if (event.isPersistent() || event.getEditor() == null) {
-			for (final IEventListener listener : listenerList) {
-				callListener(event, listener);
-			}
-		} else {
-			final int listenerIndex = listenerList.indexOf(event.getEditor());
-			if (listenerIndex >= 0) {
-				callListener(event, listenerList.get(listenerIndex));
-			}
+		for (final IEventListener listener : listenerList) {
+			callListener(event, listener);
 		}
 	}
 
@@ -59,7 +52,7 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 		try {
 			listener.propertyChange(event);
 		} catch (Throwable e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 

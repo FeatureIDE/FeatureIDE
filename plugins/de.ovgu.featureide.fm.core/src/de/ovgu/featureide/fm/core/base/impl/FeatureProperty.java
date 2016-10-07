@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * All additional properties of an {@link IFeature}.
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke * 
  */
-public class FeatureProperty implements IFeatureProperty, PropertyConstants {
+public class FeatureProperty implements IFeatureProperty {
 
 	protected final IFeature correspondingFeature;
 
@@ -101,7 +101,7 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
 		this.status = stat;
 		if (fire) {
-			correspondingFeature.fireEvent(new FeatureIDEEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+			correspondingFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 	}
 

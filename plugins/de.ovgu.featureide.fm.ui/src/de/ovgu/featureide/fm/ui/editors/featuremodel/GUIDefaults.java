@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -110,6 +110,9 @@ public interface GUIDefaults {
 	public static final Border CONSTRAINT_BORDER = new LineBorder(CONSTRAINT_BORDER_COLOR, 0);
 	public static final Color CONSTRAINT_SELECTED_BORDER_COLOR = GUIBasics.createBorderColor(CONSTRAINT_BACKGROUND);
 	public static final Border CONSTRAINT_SELECTED_BORDER = new LineBorder(CONSTRAINT_SELECTED_BORDER_COLOR, 3);
+	public static final Color IMPLICIT_CONSTRAINT = GUIBasics.createColor(1.0, 0.0, 0.0);
+	public static final Border IMPLICIT_CONSTRAINT_BORDER = new LineBorder(IMPLICIT_CONSTRAINT, 2);
+
 
 	//false constraints
 

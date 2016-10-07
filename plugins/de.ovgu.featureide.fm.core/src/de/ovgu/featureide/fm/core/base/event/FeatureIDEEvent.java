@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,47 +20,176 @@
  */
 package de.ovgu.featureide.fm.core.base.event;
 
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+
 /**
  * Event triggered by changes to a feature model or its elements.
+ * <br/>
+ * <br/>
+ * Each event contains the following information:
+ * <ul>
+ * <li>an event type which determine the kind of event</li>
+ * <li>the sender (source) of this event, i.e., which object fired this event</li>
+ * <li>the old value (if available), and the new value</li>
+ * </ul>
+ * <br/>
+ * <br/>
+ * This events are intended to be processed by {@link IEventListener} instances.
+ * <br/>
+ * <br/>
+ * For usage to fire <code>FeatureIDEEvent</code>s, see {@link FeatureModel#fireEvent(FeatureIDEEvent)}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class FeatureIDEEvent {
 
-	public static final String CONSTRAINT_MOVE = "CONSTRAINT_MOVE";
-	public static final String CONSTRAINT_MODIFY = "CONSTRAINT_MODIFY";
-	public static final String CONSTRAINT_DELETE = "CONSTRAINT_DELETE";
-	public static final String CONSTRAINT_ADD = "CONSTRAINT_ADD";
-	public static final String FEATURE_MODIFY = "FEATURE_MODIFY";
-	public static final String FEATURE_DELETE = "FEATURE_DELETE";
-	public static final String FEATURE_ADD = "FEATURE_ADD";
-	public static final String STRUCTURE_CHANGED = "STRUCTURE_CHANGED";
-	public static final String LEGEND_LAYOUT_CHANGED = "LEGEND_LAYOUT_CHANGED";
-	public static final String MODEL_LAYOUT_CHANGED = "MODEL_LAYOUT_CHANGED";
-	public static final String MODEL_DATA_CHANGED = "MODEL_DATA_CHANGED";
-	public static final String MODEL_DATA_SAVED  = "MODEL_DATA_SAVED";
-	public static final String MODEL_DATA_LOADED = "MODEL_DATA_LOADED";
-
+	/**
+	 * Typing of the event instance. This type have to be used in order to
+	 * distinguish of the event kind.
+	 */
+	public enum EventType {
+		/**
+		 * The constraint was moved
+		 */
+		CONSTRAINT_MOVE,
+		/**
+		 * A constraint was modified
+		 */
+		CONSTRAINT_MODIFY,
+		/**
+		 * A constraint was deleted
+		 */
+		CONSTRAINT_DELETE,
+		/**
+		 * A constraint was added
+		 */
+		CONSTRAINT_ADD,
+		/**
+		 * A constraint was selected
+		 */
+		CONSTRAINT_SELECTED,
+		/**
+		 * A feature was modified
+		 */
+		FEATURE_MODIFY,
+		/**
+		 * A feature was deleted
+		 */
+		FEATURE_DELETE,
+		/**
+		 * A feature was added above another feature
+		 */
+		FEATURE_ADD_ABOVE,
+		/**
+		 * A feature was added
+		 */
+		FEATURE_ADD,
+		/**
+		 * A feature's name was changed
+		 */
+		FEATURE_NAME_CHANGED,
+		/**
+		 * All features changed their name representation
+		 */
+		ALL_FEATURES_CHANGED_NAME_TYPE,
+		/**
+		 * A color was changed
+		 */
+		COLOR_CHANGED,
+		/**
+		 * A hidden feature was changed
+		 */
+		HIDDEN_CHANGED,
+		/**
+		 * The location of an object was
+		 */
+		LOCATION_CHANGED,
+		/**
+		 * A feature attributed (e.g., the "is dead" flag) changed 
+		 */
+		ATTRIBUTE_CHANGED,
+		/**
+		 * A group type changed (e.g., from "or" to "xor")
+		 */
+		GROUP_TYPE_CHANGED,
+		/**
+		 * A feature parent changed
+		 */
+		PARENT_CHANGED,
+		/**
+		 * The mandatory state changed
+		 */
+		MANDATORY_CHANGED,
+		/**
+		 * The feature structure changed
+		 */
+		STRUCTURE_CHANGED,
+		/**
+		 * The legend layout was changed
+		 */
+		LEGEND_LAYOUT_CHANGED,
+		/**
+		 * The model layout was changed (e.g., from vertical to horizontal)
+		 */
+		MODEL_LAYOUT_CHANGED,
+		/**
+		 * The model data changed (i.e., the underlying model file was changed)
+		 */
+		MODEL_DATA_CHANGED,
+		/**
+		 * The model data was saved to file
+		 */
+		MODEL_DATA_SAVED,
+		/**
+		 * The model data was loaded from file
+		 */
+		MODEL_DATA_LOADED,
+		/**
+		 * The diagram was redrawn
+		 */
+		REDRAW_DIAGRAM,
+		/**
+		 * The refresh action command was triggered
+		 */
+		REFRESH_ACTIONS, 
+		/**
+		 * The children of a feature changed
+		 */
+		CHILDREN_CHANGED,
+		/**
+		 * The dependency for a subtree was calculated 
+		 */
+		DEPENDENCY_CALCULATED,
+	}
+	
+	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];
+	static {
+		for (EventType e : EventType.values()) {
+			defaultEvents[e.ordinal()] = new FeatureIDEEvent(e);
+		}
+	}
+	
+	public static FeatureIDEEvent getDefault(final EventType e) {
+		return defaultEvents[e.ordinal()];
+	}
+	
 	private final Object source;
-	private final Object editor;
-	private final boolean persistent;
-	private final String propertyName;
+	private final EventType eventType;
 	private final Object oldValue;
 	private final Object newValue;
 
-	public FeatureIDEEvent(Object source, String propertyName) {
-		this(source, null, false, propertyName, null, null);
+	private FeatureIDEEvent(EventType e) {
+		this(null, e);
+	}
+	
+	public FeatureIDEEvent(Object source, EventType eventType) {
+		this(source, eventType, null, null);
 	}
 
-	public FeatureIDEEvent(Object source, String propertyName, Object oldValue, Object newValue) {
-		this(source, null, false, propertyName, oldValue, newValue);
-	}
-
-	public FeatureIDEEvent(Object source, Object editor, boolean persistent, String propertyName, Object oldValue, Object newValue) {
+	public FeatureIDEEvent(Object source, EventType eventType, Object oldValue, Object newValue) {
 		this.source = source;
-		this.editor = editor;
-		this.persistent = persistent;
-		this.propertyName = propertyName;
+		this.eventType = eventType;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 	}
@@ -69,16 +198,8 @@ public class FeatureIDEEvent {
 		return source;
 	}
 
-	public Object getEditor() {
-		return editor;
-	}
-
-	public boolean isPersistent() {
-		return persistent;
-	}
-
-	public String getPropertyName() {
-		return propertyName;
+	public EventType getEventType() {
+		return eventType;
 	}
 
 	public Object getOldValue() {
@@ -89,4 +210,10 @@ public class FeatureIDEEvent {
 		return newValue;
 	}
 
+	@Override
+	public String toString() {
+		return "FeatureIDEEvent [source=" + source + ", eventType=" + eventType + ", oldValue=" + oldValue
+				+ ", newValue=" + newValue + "]";
+	}
+	
 }

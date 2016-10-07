@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,7 +22,7 @@ package de.ovgu.featureide.core.signature.documentation;
 
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
 import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
-import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Modul-Comment merger for context interfaces.

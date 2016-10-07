@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -37,8 +37,10 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 
 /**
  * Creates configurations for missing configurations.
@@ -57,14 +59,14 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				if (project != null) {
-					WorkMonitor monitor2 = new WorkMonitor();
-					monitor2.setMonitor(monitor);
-					monitor2.begin("Cover unused features");
-					monitor2.createSubTask("collect unused features");
-					final Collection<String> unusedFeatures = project.getUnusedConfigurationFeatures();
-					monitor2.createSubTask("create configurations");
-					monitor2.setMaxAbsoluteWork(unusedFeatures.size());
-					createConfigurations(unusedFeatures, monitor2, false);
+					IMonitor monitor2 = new ProgressMonitor("Cover unused features", monitor);
+					monitor2.setRemainingWork(2);
+					IMonitor subTask = monitor2.subTask(1);
+					subTask.setTaskName("Collect unused features");
+					final Collection<String> unusedFeatures = project.getFalseOptionalConfigurationFeatures();
+					subTask.step();
+					subTask.done();
+					createConfigurations(unusedFeatures, monitor2.subTask(1), false);
 					monitor2.done();
 				}
 				return Status.OK_STATUS;
@@ -73,9 +75,11 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 		job.schedule();
 	}
 
-	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final WorkMonitor monitor, boolean collect) {
+	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
+		monitor.setTaskName("Create configurations");
+		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
-		final FileWriter<Configuration> writer = new FileWriter<>(ConfigurationManager.getDefaultFormat());
+		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
 		Configuration configuration = new Configuration(featureModel, false);
 		try {
 			List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, true);
@@ -90,13 +94,9 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 					confs.add(configuration);
 				} else {
 					final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
-					writer.setObject(configuration);
-					writer.setPath(Paths.get(configurationFile.getLocationURI()));
-					writer.save();
+					writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
 				}
-
 			}
-
 		} catch (TimeoutException e1) {
 			e1.printStackTrace();
 		}
@@ -113,6 +113,7 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 	 */
 	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
 		this.featureModel = fm;
-		return createConfigurations(falseOptionalFeatures, new WorkMonitor(), true);
+		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
 	}
+
 }

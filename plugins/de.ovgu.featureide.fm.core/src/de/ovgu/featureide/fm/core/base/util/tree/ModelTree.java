@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base.util.tree;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,6 +30,8 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Tree element.
+ * 
+ * TODO remove this class as it seems to be redundant to the feature structure and needs to be updated all the time.S
  * 
  * @author Sebastian Krieter
  * 
@@ -123,17 +126,29 @@ public class ModelTree<M, E> implements Iterable<E> {
 		newChild.parent = this;
 		children.add(newChild);
 	}
+	
+	public void addNodeAtIndex(E newChildObject, int index) {
+		ModelTree<M, E> newChild = new ModelTree<>(newChildObject, this.treeModel);
+		newChild.parent = this;
+		children.add(index, newChild);
+	}
 
 	public void addSubTree(ModelTree<M, E> newChild) {
 		newChild.parent = this;
 		children.add(newChild);
 	}
+	
+	public void addSubTreeAtIndex(int index, ModelTree<M, E> newChild) {
+		newChild.parent = this;
+		children.add(index, newChild);
+	}
 
 	public void removeSubTree(ModelTree<M, E> child) {
-		for (TreeIterator<E> it = iterator(); it.hasNext();) {
-			if (it.next().equals(child)) {
-				it.removeSubtree();
-				break;
+		for (Iterator<ModelTree<M, E>> it = children.iterator(); it.hasNext();) {
+			final ModelTree<M, E> next = it.next();
+			if (next.equals(child)) {
+				it.remove();
+				return;
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,6 +23,9 @@ package de.ovgu.featureide.core.job;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,6 +33,7 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -49,15 +53,17 @@ import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
 import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder;
 import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
-import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.io.IOConstants;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
@@ -66,20 +72,22 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments> {
+public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments, Boolean> {
 	
 	public static class Arguments extends JobArguments {
 		private final String foldername, featureName;
 		private final String[] options;
+		private final IProject project;
 		
 		private final ADocumentationCommentMerger merger;
 		
-		public Arguments(String foldername, String[] options, ADocumentationCommentMerger merger, String featureName) {
+		public Arguments(String foldername, String[] options, ADocumentationCommentMerger merger, String featureName, IProject project) {
 			super(Arguments.class);
 			this.foldername = foldername;
 			this.options = options;
 			this.merger = merger;
 			this.featureName = featureName;
+			this.project = project;			
 		}
 	}
 	
@@ -88,10 +96,11 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 	}
 
 	@Override
-	protected boolean work() {		
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+	public Boolean execute(IMonitor workMonitor) throws Exception {
+		this.workMonitor = workMonitor;	
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(arguments.project);
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning(this.project.getName() + " is no FeatureIDE Project!");
+			CorePlugin.getDefault().logWarning(arguments.project.getName() + " is no FeatureIDE Project!");
 		}
 		
 		if (!deleteOldFolder()) {
@@ -113,11 +122,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 					Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
-				final FileReader<Configuration> reader = new FileReader<>();
-				reader.setPath(Paths.get(file.getLocationURI()));
-				reader.setFormat(ConfigurationManager.getFormat(file.getName()));
-				reader.setObject(conf);
-				reader.read();
+				FileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigurationManager.getFormat(file.getName()));
 			} catch (Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;
@@ -146,23 +151,20 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				}
 			}
 
-//			filters.add(new FeatureFilter(validFeatureIDs));
 			final Node[] nodes = new Node[conf.getFeatures().size() + 1];
-			nodes[0] = NodeCreator.createNodes(conf.getFeatureModel());
+			nodes[0] = AdvancedNodeCreator.createCNF(conf.getFeatureModel());
 			int i = 1;
 			for (SelectableFeature feature : conf.getFeatures()) {
 				Selection selection = feature.getSelection();
-				nodes[i++] = selection == Selection.UNDEFINED ? new Literal("true") : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue) : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
 			}
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
 			
 			arguments.merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
 		} else if (arguments.merger instanceof ContextMerger) {
-			
-//			filters.add(new ContextFilter(arguments.featureName, projectSignatures));
 			final Node[] nodes = new Node[2];
-			nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+			nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
 			nodes[1] = new Literal(arguments.featureName, true);
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
@@ -174,7 +176,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			
 			if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
 				final Node[] nodes = new Node[2];
-				nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+				nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
 				nodes[1] = new Literal(arguments.featureName, true);
 				signatureFilters.add(new ConstraintFilter(nodes));
 				commentFilters.add(new ConstraintFilter(nodes));
@@ -207,7 +209,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 	protected String folderPath = null;
 	
 	private boolean deleteOldFolder() {
-		final IFolder folder = CorePlugin.createFolder(this.project, arguments.foldername);
+		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername);
 		folderPath = folder.getLocation().toOSString();
 		
 		try {
@@ -222,15 +224,15 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 	private void buildJavaDoc(final SignatureIterator it) {
 		final String extFoldername = arguments.foldername + "/src/";
 		
-		CorePlugin.createFolder(this.project, extFoldername);
+		CorePlugin.createFolder(arguments.project, extFoldername);
 		
 		final HashSet<String> packageSet = new HashSet<String>();
 		final LinkedList<String> classList = new LinkedList<String>();
 		final ProjectStructure structure = new ProjectStructure(it);
-		final String docOutput = folderPath + "\\doc\\";
-		final String srcOutput = folderPath + "\\src\\";
+		final String docOutput = folderPath + File.separator + "doc" + File.separator;
+		final String srcOutput = folderPath + File.separator + "src" + File.separator;
 		
-		workMonitor.setMaxAbsoluteWork(structure.getClasses().size() + 2);
+		workMonitor.setRemainingWork(structure.getClasses().size() + 2);
 		
 		for (AbstractClassFragment javaClass : structure.getClasses()) {
 			String packagename = javaClass.getSignature().getPackage();
@@ -238,18 +240,21 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			String path = extFoldername + packagename.replace('.', '/');
 			
 			if (packagename.isEmpty()) {
-				classList.add(srcOutput + javaClass.getSignature().getName() + IOConstants.EXTENSION_JAVA);
+				classList.add(srcOutput + javaClass.getSignature().getName() + ".java");
 			} else {
 				packageSet.add(packagename);
 			}
 			
-			final IFolder folder = CorePlugin.createFolder(project, path);
-			IOConstants.writeToFile(
-					folder.getFile(javaClass.getSignature().getName() + IOConstants.EXTENSION_JAVA),
-					javaClass.toString());
+			final IFolder folder = CorePlugin.createFolder(arguments.project, path);
+			IFile file = folder.getFile(javaClass.getSignature().getName() + ".java");
+			try {
+				FileSystem.write(Paths.get(file.getLocationURI()), javaClass.toString().getBytes(Charset.forName("UTF-8")));
+			} catch (IOException e) {
+				CorePlugin.getDefault().logError(e);
+			}
 			workMonitor.worked();
 		}
-		final IFolder folder = CorePlugin.createFolder(project, arguments.foldername + "/doc/");
+		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername + "/doc/");
 		
 		final int defaultArguments = 4;
 		int numDefaultArguments = defaultArguments;

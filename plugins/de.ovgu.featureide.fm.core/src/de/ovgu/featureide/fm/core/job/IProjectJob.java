@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,9 +25,13 @@ import org.eclipse.core.resources.IProject;
 /**
  * Interface for a project job.
  * 
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br/>
+ * A {@link IProject project} must be specified via a normal parameter.
+ * 
  * @author Sebastian Krieter
  */
-public interface IProjectJob extends IStoppableJob {
+@Deprecated
+public interface IProjectJob<T> extends IJob<T> {
 	IProject getProject();
 	void setProject(IProject interfaceProject);
 }

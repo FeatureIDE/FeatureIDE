@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_4229289184__F_5C639A59D8B1">
+				<description>
+					Lorem ip
+				</description>
+				<alt mandatory="true" name="F_31AD51151438">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
+					</description>
+					<feature mandatory="true" name="F_6568A02945E2">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_EC9FE4BE6638">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sa
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_90D960F78BB7">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sa
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_B4617EE7137D">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipsci
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_FA8164E2DB3A">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
+					</description>
+					<feature mandatory="true" name="F_6BF26AC45B87">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_C7D8FB02278B">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_F49335EC0111">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+					</description>
+					<feature mandatory="true" name="F_E41A7535E143">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_41D7125CBF75">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_269DC19B10BE">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_0159D3B32FA9">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_65E0AC3A2F9F">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_8F12D6E995A2">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_9387CA27F8F9">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita ka
+					</description>
+					<feature mandatory="true" name="F_C44AB3A987CC">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_847383088B78">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_B815D457494F">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_1253AA5AA62E">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dol
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

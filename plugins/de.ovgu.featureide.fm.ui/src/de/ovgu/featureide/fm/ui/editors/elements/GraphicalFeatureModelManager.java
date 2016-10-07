@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,6 @@ import javax.annotation.CheckForNull;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
-import de.ovgu.featureide.fm.core.io.manager.IFormatType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -35,32 +34,9 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeatureModel> {
 
-
-	private static enum IOType implements IFormatType<IGraphicalFeatureModel> {
-		XML_FIDE("xml", GraphicalFeatureModelFormat.class);
-
-		private final String suffix;
-		private final Class<? extends IPersistentFormat<IGraphicalFeatureModel>> format;
-
-		private IOType(String suffix, Class<? extends IPersistentFormat<IGraphicalFeatureModel>> format) {
-			this.suffix = suffix;
-			this.format = format;
-		}
-
-		@Override
-		public String getSuffix() {
-			return suffix;
-		}
-
-		@Override
-		public Class<? extends IPersistentFormat<IGraphicalFeatureModel>> getFormat() {
-			return format;
-		}
-	}
-
 	@CheckForNull
 	public static IPersistentFormat<IGraphicalFeatureModel> getFormat(String fileName) {
-		return AFileManager.<IGraphicalFeatureModel>getFormat(fileName, IOType.values());
+		return new GraphicalFeatureModelFormat();
 	}
 
 	public static GraphicalFeatureModelManager getInstance(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {

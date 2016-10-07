@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,7 +32,8 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 public class ContextFilter implements IFilter<AbstractSignature> {
 
@@ -47,7 +48,7 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 
 	public ContextFilter(Node[] constraints, ProjectSignatures projectSignatures) {
 		this.projectSignatures = projectSignatures;
-		fmNode = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+		fmNode = AdvancedNodeCreator.createNodes(projectSignatures.getFeatureModel());
 		selcetedFeatures = new boolean[projectSignatures.getFeatureModel().getNumberOfFeatures()];
 
 		init(constraints);

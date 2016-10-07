@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_3143329948__F_BB9A57486700">
+				<description>
+					
+				</description>
+				<feature name="F_81C2126087A4">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F1ECB703C721">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_5EF9696F01A8">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_0FF95294632D">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_E81FDFED50BF">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_921C2EB03BFC">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A9F61EAD47B2">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_AC38F6BEAAC1">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_309070A778FE">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_8B3A2F2C4D22">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_DB0D0C571EA9">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_1BA8F14FE553">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_FD35F4346912">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_EBB17478005E">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F8CFAA50253A">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_6B4DA7BB15CA">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_BC23AA52443F">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_AF89345C6576">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_C806F766AECA">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_02FC21F2DDE4">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_ADC9E30029B5">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_001A88C6FCE7">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_9E376E73D49C">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A74DFA1E7CAD">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_9CED6BD3A70B">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A242F47CBE6B">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F2E10811D942">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_0296F2131C22">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_0B5570330B54">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_E424CB5EE1C5">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F1C3C2273A30">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_CD6A754E8A50">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_EC053AC4C95A">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_C177060178FB">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_E7D6299548C1">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F64CE8B2767F">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F74B99D25EB1">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_B9D4BAD384B1">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_EDD413007B92">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_EA711900BA93">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_E87859388210">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A429A18DA3D3">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_491483EA4027">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_B0ED174A3F21">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_F5AD8C7727D0">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A81186C92AC2">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_2761F607140B">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_9E56CA647579">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_682C3600B41F">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_3232DE52CAED">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_3F3412EFD441">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_5119D5D1C5ED">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_D7E50AF1A69E">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_4990F079086F">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_726A90C895F5">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_8E39D5FF0882">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_3ED4CE13C600">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

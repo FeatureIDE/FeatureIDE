@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -84,7 +84,7 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 
 				return ar;
 			} else {
-				return new String[] { "loading..." };
+				return new String[] { "Feature Context Outline is not supported" };
 			}
 		} else {
 			return new String[] { "no feature project" };

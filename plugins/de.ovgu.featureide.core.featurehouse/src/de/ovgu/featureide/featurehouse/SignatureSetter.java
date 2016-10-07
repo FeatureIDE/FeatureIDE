@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,6 +25,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -32,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * 
  * @author Sebastian Krieter
  */
-public class SignatureSetter implements JobFinishListener {
+public class SignatureSetter implements JobFinishListener<Object> {
 	private final FujiSignaturesCreator sigCreator = new FujiSignaturesCreator();
 	
 	private FSTModel fstModel = null;
@@ -56,8 +57,8 @@ public class SignatureSetter implements JobFinishListener {
 	}
 
 	@Override
-	public void jobFinished(IJob finishedJob, boolean success) {
-		if (success) {
+	public void jobFinished(IJob<Object> finishedJob) {
+		if (finishedJob.getStatus() == JobStatus.OK) {
 			ProjectSignatures sigs = sigCreator.createSignatures(fp, ast);
 			synchronized (this) {
 				this.signatures = sigs;

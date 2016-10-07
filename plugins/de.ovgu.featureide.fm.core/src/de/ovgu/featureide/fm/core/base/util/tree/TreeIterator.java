@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,9 +23,10 @@ package de.ovgu.featureide.fm.core.base.util.tree;
 import java.util.Iterator;
 
 /**
- * TODO description
+ * Iterates through a tree.<br/>
+ * Defines additional methods on the tree.
  * 
- * @author skrieter
+ * @author Sebastian Krieter
  */
 public interface TreeIterator<E> extends Iterator<E>, Iterable<E> {
 

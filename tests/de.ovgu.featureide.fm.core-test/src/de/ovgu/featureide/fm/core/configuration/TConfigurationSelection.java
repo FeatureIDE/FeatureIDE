@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -45,7 +45,6 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	public void testSelection1() 
 	{
 		Configuration c = new Configuration(fm, true);
-//		Configuration c = new Configuration(fm, false);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.isValid());
 		assertEquals(2, c.number());
@@ -63,7 +62,6 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	public void testSelection3() 
 	{
 		Configuration c = new Configuration(fm, true);
-//		Configuration c = new Configuration(fm, false);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.isValid());
@@ -80,8 +78,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	}
 
 	@Test
-	public void testSelection5() 
-	{
+	public void testSelection5() {
 		Configuration c = new Configuration(fm, true);
 		boolean exception = false;
 		try {
@@ -91,6 +88,5 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 		}
 		assertTrue(exception);
 	}
-
 
 }

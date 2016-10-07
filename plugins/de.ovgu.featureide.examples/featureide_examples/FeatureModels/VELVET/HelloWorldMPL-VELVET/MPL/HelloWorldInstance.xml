@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="HelloWorld">
+				<description>
+					
+				</description>
+				<feature name="Hello">
+					<description>
+						
+					</description>
+				</feature>
+				<alt abstract="true" name="Feature">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="Beautiful">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="Wonderful">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<feature mandatory="true" name="World">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

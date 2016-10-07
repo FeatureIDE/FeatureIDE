@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,53 +20,29 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.jobs.Job;
 
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
- * This class implements support for {@link IProject}-based eclipse jobs.
+ * This class implements support for Eclipse jobs.
  * The {@link JobArguments} object should be extended to add constructor 
  * parameters, and can be used to conveniently start several {@link AProjectJob}s.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AProjectJob<T extends JobArguments> extends AStoppableJob implements IProjectJob {
-	
-	protected IProject project = null;
+public abstract class AProjectJob<T extends JobArguments, R> implements LongRunningMethod<R> {
+
 	protected final T arguments;
 	
+	protected IMonitor workMonitor;
 	
-	/**
-	 * Constructor.
-	 * 
-	 * @param name the name of the job
-	 * @param priority the jobs priority. This can be omitted, default is {@link Job#SHORT}
-	 * @param arguments {@link JobArguments}
-	 * 
-	 *	@see AProjectJob
-	 */
-	protected AProjectJob(String name, int priority, T arguments) {
-		super(name, priority);
+	protected AProjectJob(T arguments) {
 		this.arguments = arguments;
 	}
 	
-	/**
-	 * Calls {@link #AProjectJob(String, int, JobArguments)} with {@link Job#SHORT} as priority.
-	 */
 	protected AProjectJob(String name, T arguments) {
-		this(name, Job.SHORT, arguments);
+		this.arguments = arguments;
 	}
 
-	@Override
-	public final IProject getProject() {
-		return project;
-	}
-
-	@Override
-	public final void setProject(IProject project) {
-		this.project = project;
-		setName(getName() + " - " + project.getName());
-	}
 }

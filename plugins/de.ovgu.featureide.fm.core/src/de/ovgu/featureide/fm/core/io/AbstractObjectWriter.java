@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,15 +25,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Default writer to be extended for each feature model format.
  * 
  * If IFile support is needed, the {@link FeatureModelWriterIFileWrapper} has to be used.
  * 
+ * @deprecated Use {@link IPersistentFormat} and {@link FileHandler} instead.
+ * 
  * @author Thomas Thuem
  */
+@Deprecated
 public abstract class AbstractObjectWriter<T> {
 
 	/**
@@ -54,7 +58,7 @@ public abstract class AbstractObjectWriter<T> {
 			output.write(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
 			output.flush();
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 

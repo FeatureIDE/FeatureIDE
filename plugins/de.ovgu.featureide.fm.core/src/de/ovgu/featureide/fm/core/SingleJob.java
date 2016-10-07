@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.jobs.Job;
  */
 public abstract class SingleJob extends Job {
 
-	private static final FMCorePlugin LOGGER = FMCorePlugin.getDefault();
 	private boolean running = false;
 	
 	public SingleJob(String name) {
@@ -49,7 +48,7 @@ public abstract class SingleJob extends Job {
 				try {
 					execute(monitor);
 				} catch (Exception e){
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 				}
 			}
 			
@@ -73,7 +72,7 @@ public abstract class SingleJob extends Job {
 			thread.start();
 			thread.join();
 		} catch (InterruptedException e) {
-			LOGGER.logError(e);
+			Logger.logError(e);
 		} finally {
 			running = false;
 		}

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-	<extension-point id="de.ovgu.featureide.ui.views.outline" name="Outline" schema="schema/de.ovgu.featureide.ui.views.outline.exsd"/>     
-
+	<extension-point id="de.ovgu.featureide.ui.views.outline" name="Outline" schema="schema/de.ovgu.featureide.ui.views.outline.exsd"/>
 	<extension
 			point="org.eclipse.ui.newWizards">
 		<wizard
@@ -1114,6 +1113,20 @@
 				</visibleWhen>
 			</command>
 			<command
+					commandId="de.ovgu.featureide.ui.commands.buildFeatureGraph"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.fm.ui.actions.buildFeatureGraph"
+					label="Build Feature Graph"
+					tooltip="Builds a graph with all non-core features and computes the transitive hull."
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
 					commandId="de.ovgu.featureide.ui.commands.setConfiguration"
 					icon="icons/currentconfiguration.gif"
 					id="de.ovgu.featureide.fm.ui.actions.setConfiguration"
@@ -1146,33 +1159,6 @@
 					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.fm.ui.menus.popupMenuNoFP"
 					label="FeatureIDE">
-				<visibleWhen
-						checkEnabled="false">
-					<with
-							variable="activeMenuSelection">
-						<iterate ifEmpty="false"
-								operator="or">
-							<test
-									args="de.ovgu.featureide.core.featureProjectNature"
-									property="de.ovgu.featureide.fm.ui.properties.nature"
-									value="false">
-							</test>
-						</iterate>
-					</with>
-				</visibleWhen>
-				<command
-						commandId="de.ovgu.featureide.ui.commands.Conversion"
-						icon="icons/FeatureIconSmall.ico"
-						id="de.ovgu.featureide.fm.ui.actions.addFeatureIDENature"
-						label="Add FeatureIDE Nature"
-						style="push">
-					<visibleWhen
-							checkEnabled="false">
-						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-						</reference>
-					</visibleWhen>
-				</command>
 			</menu>
 		</menuContribution>
 		<menuContribution
@@ -1186,6 +1172,36 @@
          style="toggle">
 			</command>
 		</menuContribution>
+  <menuContribution
+        allPopups="false"
+        locationURI="popup:org.eclipse.ui.projectConfigure">
+     <command
+           commandId="de.ovgu.featureide.ui.commands.Conversion"
+           icon="icons/FeatureIconSmall.ico"
+           id="de.ovgu.featureide.fm.ui.actions.addFeatureIDENature"
+           label="Convert to FeatureIDE Project..."
+           style="push">
+        <visibleWhen
+              checkEnabled="false">
+           <and>
+              <reference
+                    definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+              </reference>
+              <with
+                      variable="activeMenuSelection">
+                <iterate ifEmpty="false"
+                            operator="or">
+                      <test
+                                  args="de.ovgu.featureide.core.featureProjectNature"
+                                  property="de.ovgu.featureide.fm.ui.properties.nature"
+                                  value="false">
+                      </test>
+                </iterate>
+          </with>
+           </and>
+        </visibleWhen>
+     </command>
+  </menuContribution>
 	</extension>
 	<extension
 			point="org.eclipse.ui.commands">
@@ -1209,6 +1225,10 @@
 		<command
 				id="de.ovgu.featureide.ui.commands.productGenerator"
 				name="Product Generator">
+		</command>
+		<command
+				id="de.ovgu.featureide.ui.commands.buildFeatureGraph"
+				name="Build Feature Graph">
 		</command>
 		<command
 				id="de.ovgu.featureide.ui.mpl.commands.javadoc.context"
@@ -1248,6 +1268,10 @@
 		<handler
 				class="de.ovgu.featureide.ui.handlers.BuildProductsHandler"
 				commandId="de.ovgu.featureide.ui.commands.productGenerator">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.ui.handlers.BuildFeatureGraphHandler"
+				commandId="de.ovgu.featureide.ui.commands.buildFeatureGraph">
 		</handler>
 	  <handler
 	        class="de.ovgu.featureide.ui.handlers.VariantDocumentationHandler"

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -132,6 +132,8 @@ public class PPModelBuilder {
 	private void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
 		for (FSTDirective d : list) {
 			for (String featureName : d.getFeatureNames()) {
+				if(!featureNames.contains(featureName))
+					continue;
 				FSTRole role = model.addRole(featureName, className, res);//addRole(getFeatureName(d.getExpression()), res.getName(), res);
 				role.add(d);
 				addDirectivesToModel(d.getChildrenList(), res, className);

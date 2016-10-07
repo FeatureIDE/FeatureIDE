@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -108,7 +108,10 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 			if (fileName.contains("*"))
 				return;
 
-			IFolder buildFolder = CorePlugin.getFeatureProject(classModel.getRoles().getFirst().getFile()).getBuildFolder();
+			final LinkedList<FSTRole> roles = classModel.getRoles();
+			
+			IFile roleFile = roles.getFirst().getFile();
+			IFolder buildFolder = CorePlugin.getFeatureProject(roleFile).getBuildFolder();
 			IFile file = buildFolder.getFile(fileName);
 			try {
 				if (!file.exists())
