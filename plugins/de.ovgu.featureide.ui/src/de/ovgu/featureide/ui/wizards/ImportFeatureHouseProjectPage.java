@@ -25,9 +25,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_V
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -38,6 +42,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -79,6 +84,7 @@ import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
@@ -643,35 +649,49 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 			Iterable<IFeature> features = featureModel.getFeatures();
 			
 			
-			for(IFeature thisFeature: features){
 			
-			//while (features.iterator().hasNext()) {	
-				
-				String featureName = thisFeature.getName();
-				
-				
-				for(File fileElement: fileSystemObjects2){
-					
-					//FileSystemElement fileElement = (FileSystemElement) resourcesEnum2.next();
-					
-					//File element = (File) fileElement.getFileSystemObject();
-
-					
-					
-					if(featureName.equals(fileElement.getParentFile().getName())){
-						
-						System.out.println("Parent" + featureName + " FileName: " +  fileElement.getName());
-						
-					}
-					
-					
-					
-					
-					//				element.getP
-					//				FileSystemElement parent = (FileSystemElement) element.getParent().getFileSystemObject();
-
-				}
-			}
+			
+//			for(IFeature thisFeature: features){
+//			
+//			//while (features.iterator().hasNext()) {	
+//				
+//				String featureName = thisFeature.getName();
+//				
+//				
+//				for(File fileElement: fileSystemObjects2){
+//					
+//					//FileSystemElement fileElement = (FileSystemElement) resourcesEnum2.next();
+//					
+//					//File element = (File) fileElement.getFileSystemObject();
+//
+////					if(featureName.equals(fileElement.getParentFile().getName())){
+////						
+////						System.out.println("Parent" + featureName + " FileName: " +  fileElement.getName());
+////						
+////						String path = featureProject.getSourcePath();
+////						String newPath = path + ("/" + featureName + "/" + fileElement.getName());
+////						
+//////						IPath newPath = path.append("/" +  featureName);
+//////						
+//////						String stringPath = newPath.toString();
+////						
+////						
+////						fileElement.renameTo(new File(newPath));
+////						
+//////						try {
+//////							featureProject.getSourceFolder().touch(null);
+//////						} catch (CoreException e) {
+//////							// TODO Auto-generated catch block
+//////							e.printStackTrace();
+//////						}
+////						
+////						
+////					}
+//						
+//						
+//
+//				}
+//			}
 
 			System.out.println(featureProject.getFeaturestubPath());
 			System.out.println(featureProject.getSourcePath());
