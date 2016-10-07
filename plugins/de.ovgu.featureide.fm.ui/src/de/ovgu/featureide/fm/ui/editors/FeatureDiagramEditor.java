@@ -1028,6 +1028,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 			graphicalFeatureModel.init();
 			setContents(graphicalFeatureModel);
+			internRefresh(true);
 			
 			//when performing COLLAPSED_CHANGED while selecting IConstraint the getNewValue will be an iConstraint
 			if(event.getNewValue() != null)
@@ -1048,11 +1049,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				final Object featureEditPart = registryCollapsed.get(graphFeature);
 				if (featureEditPart instanceof FeatureEditPart) {
 					getSelectionManager().deselectAll();
-					getSelectionManager().appendSelection((FeatureEditPart) featureEditPart);
+					FeatureEditPart editPart = (FeatureEditPart) featureEditPart;
+					getSelectionManager().appendSelection(editPart);
+					FMUIPlugin.getDefault().logInfo("x: " + editPart.getFigure().getBounds().x + "\ty:" + editPart.getFigure().getBounds().y);
+					centerPointOnScreen(editPart.getFigure().getBounds().x, editPart.getFigure().getBounds().y);
 				}
 			}
 			featureModelEditor.setPageModified(true);
-			internRefresh(true);
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			try {
@@ -1092,6 +1095,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		for (IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
 			page.propertyChange(event);
 		}
+	}
+	
+	/**
+	 * Scrolls to the given points and center the view
+	 * @param centerFeature 
+	 */
+	private void centerPointOnScreen(int x, int y)
+	{
+		getFigureCanvas().scrollTo(x - (getFigureCanvas().getViewport().getBounds().width/2), y - (getFigureCanvas().getViewport().getBounds().height/2));
 	}
 
 	private void refreshAll() {
