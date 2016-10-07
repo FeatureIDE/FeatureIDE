@@ -70,6 +70,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -485,7 +487,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	@Override
 	protected void createSourceGroup(Composite parent) {
 		
-		//CheckButton TODO: AL Checkbutton only show configuration when checked
+		//CheckButton TODO: Max Checkbutton only show configuration when checked
 	    checkButton = new Button(parent, SWT.CHECK | SWT.RIGHT);
 	    checkButton.setText("Add existing FileSystem to Project");
 	    checkButton.addSelectionListener(new SelectionAdapter() {
@@ -526,7 +528,16 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		}
 
 		Iterator resourcesEnum = super.getSelectedResources().iterator();
-		List fileSystemObjects = new ArrayList();
+		//List fileSystemObjects = new ArrayList();
+		
+		
+		Iterator resourcesEnum2 = super.getSelectedResources().iterator();
+		List<File> fileSystemObjects2 = new ArrayList<File>();
+
+		        while (resourcesEnum2.hasNext()) {
+		            File thisFileElement = (File) ((FileSystemElement) (resourcesEnum2.next())).getFileSystemObject();
+		            fileSystemObjects2.add(thisFileElement);       
+		        }
 
 		//        while (resourcesEnum.hasNext()) {
 		//            fileSystemObjects.add(((FileSystemElement) resourcesEnum.next())
@@ -627,18 +638,40 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 			}
 			
-			Iterator resourcesEnum2 = super.getSelectedResources().iterator();
 			
-			while (resourcesEnum.hasNext()) {
+			
+			Iterable<IFeature> features = featureModel.getFeatures();
+			
+			
+			for(IFeature thisFeature: features){
+			
+			//while (features.iterator().hasNext()) {	
 				
+				String featureName = thisFeature.getName();
+				
+				
+				for(File fileElement: fileSystemObjects2){
+					
+					//FileSystemElement fileElement = (FileSystemElement) resourcesEnum2.next();
+					
+					//File element = (File) fileElement.getFileSystemObject();
 
-				File element = (File) resourcesEnum.next();
-//				element.getP
-//				FileSystemElement parent = (FileSystemElement) element.getParent().getFileSystemObject();
-				
-			
+					
+					
+					if(featureName.equals(fileElement.getParentFile().getName())){
+						
+						System.out.println("Parent" + featureName + " FileName: " +  fileElement.getName());
+						
+					}
+					
+					
+					
+					
+					//				element.getP
+					//				FileSystemElement parent = (FileSystemElement) element.getParent().getFileSystemObject();
+
+				}
 			}
-			
 
 			System.out.println(featureProject.getFeaturestubPath());
 			System.out.println(featureProject.getSourcePath());
