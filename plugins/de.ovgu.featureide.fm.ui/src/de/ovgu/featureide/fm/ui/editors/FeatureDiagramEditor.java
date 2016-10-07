@@ -126,6 +126,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseFeaturesAction;
+
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
@@ -177,6 +179,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
 	private CollapseAction collapseAction;
+	private CollapseFeaturesAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private CollapseAllAction expandAllAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
@@ -369,6 +372,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		hiddenAction = new HiddenAction(this, featureModel);
 
 		collapseAction = new CollapseAction(this, featureModel);
+		collapseFeaturesAction = new CollapseFeaturesAction(this, featureModel);
 		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
 
@@ -538,6 +542,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(abstractAction);
 			menu.add(hiddenAction);
 			menu.add(collapseAction);
+			menu.add(collapseFeaturesAction);
 			menu.add(changeFeatureDescriptionAction);
 			menu.add(new Separator());
 			menu.add(subMenuLayout);
@@ -634,6 +639,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return abstractAction;
 		if (CollapseAction.ID.equals(workbenchActionID))
 			return collapseAction;
+		if (CollapseFeaturesAction.ID.equals(workbenchActionID))
+			return collapseFeaturesAction;
 		if (AbstractAction.ID.equals(workbenchActionID))
 			return abstractAction;
 		if (HiddenAction.ID.equals(workbenchActionID))
