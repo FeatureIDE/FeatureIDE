@@ -1015,6 +1015,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
+			final Map<?,?> registryE = getEditPartRegistry();
+			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+				registryE.remove(f);
+				registryE.remove(f.getSourceConnection());
+				registryE.remove(f.getTargetConnections());
+			}
+			for (IGraphicalConstraint igg : graphicalFeatureModel.getConstraints()) {
+				registryE.remove(igg);
+			}
 			graphicalFeatureModel.init();
 			setContents(graphicalFeatureModel);
 			analyzeFeatureModel();
