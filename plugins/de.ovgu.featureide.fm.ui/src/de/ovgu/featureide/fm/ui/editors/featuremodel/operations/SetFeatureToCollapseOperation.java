@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * 
  * @author Joshua Sprey
  * @author Enis Belli
+ * @author Christopher Sontag
  */
 public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation {
 
@@ -64,8 +65,11 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		feature.getStructure().setCollapsed(!feature.getStructure().isCollapsed());
-		return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, null, null);
+		if (feature.getStructure().hasChildren()) {
+			feature.getStructure().setCollapsed(!feature.getStructure().isCollapsed());
+			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, null, null);
+		}
+		return new FeatureIDEEvent(feature, EventType.DEFAULT);
 	}
 
 	@Override

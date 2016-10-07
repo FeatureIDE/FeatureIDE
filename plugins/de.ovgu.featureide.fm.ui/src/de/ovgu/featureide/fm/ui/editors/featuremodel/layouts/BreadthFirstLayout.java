@@ -55,8 +55,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void layout(IGraphicalFeature root) {
-		final HiddenFilter hiddenFilter = new HiddenFilter();
-		if (root == null || !hiddenFilter.isValid(root)) {
+		if (root == null || root.getObject().getStructure().isHidden()) {
 			return;
 		}
 		LinkedList<IGraphicalFeature> list = new LinkedList<>();

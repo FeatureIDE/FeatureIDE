@@ -36,7 +36,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * 
  * @author Joshua Sprey
  * @author Enis Belli
- * @author Maximilian K�hl
+ * @author Maximilian Kühl
+ * @author Christopher Sontag
  */
 public class CollapseAllOperation extends AbstractFeatureModelOperation {
 
@@ -57,10 +58,12 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 		while (feautureModelIterator.hasNext()) {
 			IFeature feature = feautureModelIterator.next();
 			if (!feature.getStructure().isRoot() || !collapse) {
-				if (feature.getStructure().isCollapsed() != collapse) {
-					affectedFeatureList.add(feature);
+				if (feature.getStructure().hasChildren()) {
+					if (feature.getStructure().isCollapsed() != collapse) {
+						affectedFeatureList.add(feature);
+					}
+					feature.getStructure().setCollapsed(collapse);
 				}
-				feature.getStructure().setCollapsed(collapse);
 			}
 		}
 		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
