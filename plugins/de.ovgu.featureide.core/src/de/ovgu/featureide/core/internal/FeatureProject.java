@@ -851,7 +851,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		IPath modelPath = modelFile.getModelFile().getFullPath();
 		if (checkModelChange(event.getDelta().findMember(modelPath)))
-			return;
+			buildRelevantChanges = true;
 
 		try {
 			List<IFile> configs = getAllConfigurations();

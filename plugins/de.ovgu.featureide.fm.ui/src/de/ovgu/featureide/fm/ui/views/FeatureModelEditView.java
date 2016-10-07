@@ -59,7 +59,6 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  * A view to calculate the category an edit. Given an open feature model editor
  * the current editing version is compared to the last saved model.
  * 
- *TODO: Task Performance
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -142,9 +141,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part instanceof IEditorPart)
-				
 				setFeatureModelEditor(part);
-			    refresh();
+			refresh();
 		}
 
 		public void partActivated(IWorkbenchPart part) {
@@ -155,12 +153,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	};
 
 	private IEventListener modelListener = new IEventListener() {
-		//TODO: filter proper events to handle
 		public void propertyChange(FeatureIDEEvent evt) {
 			boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
 			if (isVisible && evt.getEventType() != EventType.STRUCTURE_CHANGED && evt.getEventType() != EventType.MODEL_LAYOUT_CHANGED)
-				System.out.println("Team2: ModelEdit " + evt.getEventType());
-				System.out.println("Team2: FeatureModelEdit isVisible: " + isVisible + ", Part: " + getSite().getPart().getTitle());
 			    refresh();
 		}
 	};
@@ -296,20 +291,10 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 							contentProvider.defaultContent();
 						} else if (isActivatorChecked()) {
 							contentProvider.defaultManualContent();
-							System.out.println("MODELEDIT: " + isActivatorChecked() + ": Not Calculating " );
 						} else {
-							IWorkbenchPage page = getSite().getPage();
-							
-							
-							System.out.println("Team2: Is part visible: " + page.isPartVisible(getSite().getPart()) + ", Part: " + getSite().getPart().getTitle());
-							System.out.println("Team2: FeatureModelEditView: In else Schleife");
-							
+							IWorkbenchPage page = getSite().getPage();							
 							if(page.isPartVisible(getSite().getPart())){
-							
-								System.out.println("Team2: FeatureModelEditView: isActivatorChecked: " + isActivatorChecked() + ": isCalculating" );
 								contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
-							
-							
 							}
 						}
 						return Status.OK_STATUS;
