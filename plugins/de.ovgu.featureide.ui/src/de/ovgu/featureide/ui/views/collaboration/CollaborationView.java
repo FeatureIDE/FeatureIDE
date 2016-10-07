@@ -114,15 +114,11 @@ import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
@@ -173,7 +169,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	private GraphicalViewerImpl viewer;
 	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
-	private FeatureModelEditor featureModelEditor;
 	private IWorkbenchPart currentEditor;
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
@@ -220,7 +215,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			
 			boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
 			
-			
 			if (configurations.isEmpty()) {
 				refreshButton.setEnabled(true);
 				return Status.OK_STATUS;
@@ -233,7 +227,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			
 			if (isVisible) {
 				final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
-				UIPlugin.getDefault().logInfo("Team2: Aufruf updateGUIJob!");
 		
 				if (model == null) {
 					refreshButton.setEnabled(true);
@@ -297,22 +290,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		this.cursorPosition = new Point(x, y);
 	}
-	 
-	/** 
-	 * Refreshes the Collaboration Diagram when model changed
-	 *
-	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
-		if (isVisible && event.getEventType() != EventType.STRUCTURE_CHANGED && event.getEventType() != EventType.MODEL_LAYOUT_CHANGED) {
-			// TODO: Filter proper events to handle
-			updateGUIJob.setPriority(Job.LONG);
-			updateGUIJob.schedule();
-			UIPlugin.getDefault().logInfo("Team2: CollaborationDiagram -> PropertyChanged");
-			UIPlugin.getDefault().logInfo("Team2: PropertyChanged -> EventType: " + event.getEventType().name());
-		}
-	} 
-	*/
 	
 	private IPartListener editorListener = new IPartListener() {
 
@@ -332,7 +309,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part == getSite().getPart()) {
-				UIPlugin.getDefault().logInfo("Team2: " + part.getTitle() + "-> partBroughtToTop");
 				updateGUIJob.setPriority(Job.LONG);
 				updateGUIJob.schedule();
 				
@@ -518,10 +494,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				content.refresh();
 			}
 		} else {
-			/*featureModelEditor = (FeatureModelEditor) getSite().getPage().getActiveEditor();
-			if(featureModelEditor != null) {
-				featureModelEditor.getFeatureModel().addListener(this); // IEventListener
-			}*/
 			updateGuiAfterBuild(featureProject, null);
 		}
 	}
@@ -805,14 +777,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
-		if (featureProject != null && featureProject.equals(project)) {
+		if (featureProject != null) {
 			if (configurationFile == null) {
 				configurations.add(project.getCurrentConfiguration());
 			} else {
 				configurations.add(configurationFile);
 			}
 			if (getSite().getPage().isPartVisible(getSite().getPart())) {
-				UIPlugin.getDefault().logInfo("Team2: Collaboration Diagram -> updateGUIAfterBuild");
 				updateGUIJob.setPriority(Job.LONG);
 				updateGUIJob.schedule();
 			}
@@ -853,7 +824,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	public void refresh() {
 		refreshActionBars();
-		UIPlugin.getDefault().logInfo("Team2: Collaboration Diagram -> refresh");
 
 		final FSTModel model = builder.buildCollaborationModel(featureProject);
 

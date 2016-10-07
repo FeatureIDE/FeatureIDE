@@ -48,11 +48,7 @@ import org.eclipse.ui.part.ViewPart;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.ContentProvider;
@@ -89,7 +85,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 		ColumnViewerToolTipSupport.enableFor(viewer);
 
 		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
-		UIPlugin.getDefault().logInfo("Team2: StatisticsView -> addBuildListeners");
 		
 		//TODO: Task Performance
 		getSite().getPage().addPartListener(editorListener);
@@ -140,18 +135,14 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
-			UIPlugin.getDefault().logInfo("part: " + part.getTitle() + ", getSite()...: " + getSite().getPart().getTitle());
 			boolean partOf = part instanceof ViewPart;
-			UIPlugin.getDefault().logInfo("Is Part instance of ViewPart: " + partOf);
 			if (partOf && part == getSite().getPart()) {
-				UIPlugin.getDefault().logInfo("Team2: FeatureStatistics -> partBroughtToTop, part: " + getSite().getPart().getTitle());
 				refresh(true);
 			}
 		}
 
 		public void partActivated(IWorkbenchPart part) {
 			if (part instanceof IEditorPart) {
-				UIPlugin.getDefault().logInfo("Team2: FeatureStatistics -> partActivated");
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
 				setEditor((IEditorPart) part);
 			}
@@ -162,21 +153,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-
-	/**
-	 * Listener that refreshes the view every time the model has been edited.
-	 * TODO: Task Performance
-	 *
-	private IEventListener modelListener = new IEventListener() {
-		//TODO: filter proper events to handle
-		public void propertyChange(FeatureIDEEvent evt) {
-			UIPlugin.getDefault().logInfo("Team2: PropertyChanged -> Event = " + evt.getEventType().name());
-			boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
-			if ( isVisible  && (evt.getEventType() == EventType.MODEL_DATA_SAVED)) {
-				refresh(true);
-			}
-		}
-	};*/
 
 	private Job job = null;
 
@@ -192,7 +168,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 		 * This job waits for the calculation job to finish and starts
 		 * immediately a new one
 		 */
-		if(getSite().getPage().isPartVisible(getSite().getPart())){ // Team2
+		if(getSite().getPage().isPartVisible(getSite().getPart())){ 
 			Job waiter = new Job(UPDATING_FEATURESTATISTICSVIEW) {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
@@ -217,8 +193,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 							} else {
 								IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
 								//TODO is refresh really necessary? -> true?
-
-								UIPlugin.getDefault().logInfo("Team2: FeatureStatistics -> refresh");
 
 								if (force || currentInput == null || !anyFile.getProject().equals(currentInput.getProject())) {
 									contentProvider.calculateContent(anyFile, true);
@@ -262,10 +236,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 			if (currentEditor == newEditor) {
 				return;
 			}
-
-			//if (currentEditor instanceof FeatureModelEditor) {
-			//	((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
-			//}
 		}
 		boolean force = true;
 		if (newEditor != null && currentEditor != null) {
@@ -282,9 +252,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 			}
 		}
 		currentEditor = newEditor;
-		//if (newEditor instanceof FeatureModelEditor) {
-		//	((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
-		//}
 		refresh(force);
 	}
 
@@ -296,10 +263,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 		boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
 		
 		if (isVisible) {
-			UIPlugin.getDefault().logInfo("Team2: StatisticsView -> updateGuiAfterBuild");
-		
 			if (project != null && configurationFile != null) {
-				UIPlugin.getDefault().logInfo("Team2: StatisticsView -> updateGuiAfterBuild -> refresh");
 				refresh(true);
 			}
 		}
