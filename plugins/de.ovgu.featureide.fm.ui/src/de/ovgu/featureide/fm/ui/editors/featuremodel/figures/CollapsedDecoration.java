@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
@@ -65,7 +64,12 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 
 	@Override
 	public void setLocation(Point p) {
-		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+		if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
+			//left to right layout 
+			super.setLocation(p.translate(GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, -getBounds().height / 2));
+		} else {
+			super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+		}
 	}
 
 	public void setDecoratorText(String newText) {

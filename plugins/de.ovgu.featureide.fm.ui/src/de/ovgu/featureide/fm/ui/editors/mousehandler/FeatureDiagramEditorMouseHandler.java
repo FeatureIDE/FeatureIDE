@@ -74,6 +74,7 @@ public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, Mou
 				Dimension difference = currentMousePosition.getDifference(positionAtClick);
 				int xPosition = figureCanvas.getViewport().getViewLocation().x - difference.width;
 				int yPosition = figureCanvas.getViewport().getViewLocation().y - difference.height;
+				//Don´t change this. The two seprate commands are necessary to prevent lag in huge feature models
 				figureCanvas.scrollToX(xPosition);
 				figureCanvas.scrollToY(yPosition);
 				positionAtClick = new Point(e.x, e.y);

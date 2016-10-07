@@ -471,15 +471,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		subMenuCalculations.add(new DeadFOCalculationsAction(this, getFeatureModel()));
 
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
-		
+
 		if (!getSelectedEditParts().isEmpty()) {
 			if (getSelectedEditParts().get(0) instanceof FeatureEditPart) {
-			FeatureEditPart f = (FeatureEditPart) getSelectedEditParts().get(0);
-			if (f.getFeature().getObject().getStructure().hasChildren()) {
-				collapseAction.setEnabled(true);
-			} else {
-				collapseAction.setEnabled(false);
-			}
+				FeatureEditPart f = (FeatureEditPart) getSelectedEditParts().get(0);
+				if (f.getFeature().getObject().getStructure().hasChildren()) {
+					collapseAction.setEnabled(true);
+				} else {
+					collapseAction.setEnabled(false);
+				}
 			}
 		}
 
@@ -1022,24 +1022,23 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
-			
+
 			// clear registry		
-			final Map<?, ?> registryCollapsed = getEditPartRegistry();		
-			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {		
-				registryCollapsed.remove(f);		
+			final Map<?, ?> registryCollapsed = getEditPartRegistry();
+			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+				registryCollapsed.remove(f);
 				registryCollapsed.remove(f.getSourceConnection());
 				registryCollapsed.remove(f.getTargetConnections());
-			}		
-			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {		
-				registryCollapsed.remove(f);		
+			}
+			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
+				registryCollapsed.remove(f);
 			}
 			graphicalFeatureModel.init();
 			setContents(graphicalFeatureModel);
 			internRefresh(true);
-			
+
 			//when performing COLLAPSED_CHANGED while selecting IConstraint the getNewValue will be an iConstraint
-			if(event.getNewValue() != null)
-			{
+			if (event.getNewValue() != null) {
 				IConstraint selectedConstraint = (IConstraint) event.getNewValue();
 				IGraphicalConstraint graphConstraint = graphicalFeatureModel.getGraphicalConstraint(selectedConstraint);
 				final Object constraintEditPart = registryCollapsed.get(graphConstraint);
@@ -1047,9 +1046,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					getSelectionManager().deselectAll();
 					getSelectionManager().appendSelection((ConstraintEditPart) constraintEditPart);
 				}
-			}
-			else
-			{
+			} else {
 				//Reselect the current selected feature if getNewValue is null  
 				IFeature selectedFeature = (IFeature) event.getSource();
 				IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(selectedFeature);
@@ -1058,7 +1055,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					getSelectionManager().deselectAll();
 					FeatureEditPart editPart = (FeatureEditPart) featureEditPart;
 					getSelectionManager().appendSelection(editPart);
-					centerPointOnScreen(editPart.getFigure().getBounds().x, editPart.getFigure().getBounds().y);
+					centerPointOnScreen(editPart.getFigure().getBounds().x, editPart.getFigure().getBounds().y, editPart.getFigure().getBounds().width / 2,
+							editPart.getFigure().getBounds().height / 2);
 				}
 			}
 			featureModelEditor.setPageModified(true);
@@ -1102,14 +1100,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			page.propertyChange(event);
 		}
 	}
-	
+
 	/**
 	 * Scrolls to the given points and center the view
-	 * @param centerFeature 
+	 * 
+	 * @param centerFeature
 	 */
-	private void centerPointOnScreen(int x, int y)
-	{
-		getFigureCanvas().scrollTo(x - (getFigureCanvas().getViewport().getBounds().width/2), y - (getFigureCanvas().getViewport().getBounds().height/2));
+	private void centerPointOnScreen(int x, int y, int offsetX, int offsetY) {
+		getFigureCanvas().getViewport().setViewLocation((int) (zoomManager.getZoom() * x - getFigureCanvas().getViewport().getBounds().width / 2 - offsetX),
+				(int) (zoomManager.getZoom() * y - getFigureCanvas().getViewport().getBounds().height / 2 - offsetY));
 	}
 
 	private void refreshAll() {

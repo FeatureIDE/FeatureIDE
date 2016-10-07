@@ -87,7 +87,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		final FeatureFigure featureFigure = new FeatureFigure(f, f.getGraphicalModel());
 		sourceAnchor = featureFigure.getSourceAnchor();
 		targetAnchor = featureFigure.getTargetAnchor();
-		
+
 		return featureFigure;
 	}
 
@@ -174,7 +174,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		super.deactivate();
 		getFeatureFigure().setVisible(false);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#refresh()
 	 */
@@ -237,11 +237,11 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			break;
 		case FEATURE_NAME_CHANGED:
 			String displayName = getFeature().getObject().getProperty().getDisplayName();
-			
-			if(getFeature().getGraphicalModel().getLayout().showShortNames()){
+
+			if (getFeature().getGraphicalModel().getLayout().showShortNames()) {
 				int lastIndexOf = displayName.lastIndexOf(".");
 				displayName = displayName.substring(++lastIndexOf);
-			}	
+			}
 			getFeatureFigure().setName(displayName);
 			getFeature().setSize(getFeatureFigure().getSize());
 			break;
@@ -262,7 +262,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
-			connectionEditPart.refreshParent();			
+			connectionEditPart.refreshParent();
 			break;
 		case HIDDEN_CHANGED:
 		case COLLAPSED_CHANGED:
@@ -278,25 +278,20 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		}
 	}
 
-	
-	public void refreshCollapsedDecorator()
-	{
+	public void refreshCollapsedDecorator() {
 		final IGraphicalFeature f = getFeature();
 		final FeatureFigure featureFigure = (FeatureFigure) getFigure();
-		if(f.getObject().getStructure().hasChildren() && f.getObject().getStructure().isCollapsed() && !f.getObject().getStructure().hasCollapsedParent())
-		{
-			if(featureFigure.getParent() != null)
-			{
+		if (f.getObject().getStructure().hasChildren() && f.getObject().getStructure().isCollapsed() && !f.getObject().getStructure().hasCollapsedParent()) {
+			if (featureFigure.getParent() != null) {
 				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
-				Point parentLocation = new Point(featureFigure.getParent().getBounds().x, featureFigure.getParent().getBounds().y);
-				Point featureLocation = new Point(featureFigure.getLocation().x + featureFigure.getBounds().width/2, featureFigure.getLocation().y + featureFigure.getBounds().height);
-
-				collapsedDecoration.setLocation(new Point(featureFigure.getBounds().x,featureFigure.getBounds().y));
-				featureFigure.getParent().add(collapsedDecoration);
-				featureFigure.SetCollapseDecorator(collapsedDecoration);
-			}			
+				collapsedDecoration.setLocation(new Point(featureFigure.getBounds().x, featureFigure.getBounds().y));
+				if (featureFigure.SetCollapsedDecorator(collapsedDecoration)) {
+					featureFigure.getParent().add(collapsedDecoration);
+				}
+			}
 		}
 	}
+
 	private static boolean equals(final IGraphicalFeature newTarget, final IGraphicalFeature target) {
 		return newTarget == null ? target == null : newTarget.equals(target);
 	}

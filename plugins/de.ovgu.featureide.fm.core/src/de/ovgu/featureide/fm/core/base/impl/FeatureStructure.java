@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -166,6 +165,17 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public List<IFeatureStructure> getChildren() {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 		return children;
+	}
+	
+	@Override
+	public boolean hasVisibleChildren(boolean showHiddenFeature) {
+		boolean check = false;
+		for (IFeatureStructure child: children) {
+			if (!child.hasCollapsedParent() && (!child.hasHiddenParent() || showHiddenFeature)) {
+				check = true;
+			}
+		}
+		return check;
 	}
 
 	@Override

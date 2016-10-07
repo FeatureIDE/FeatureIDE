@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -408,7 +409,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public IGraphicalFeature getFeature() {
 		return feature;
 	}
-	
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.draw2d.Figure#setLocation(org.eclipse.draw2d.geometry.Point)
@@ -417,14 +417,26 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public void setLocation(Point p) {
 		// TODO Auto-generated method stub
 		super.setLocation(p);
-		if(collapseDecoration != null)
-		{
-			collapseDecoration.setLocation(new Point(p.x + getBounds().width/2, p.y + getBounds().height));
+		if (collapseDecoration != null) {
+			if (getFeature().getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
+				//left To Right Layout
+				collapseDecoration.setLocation(new Point(p.x + getBounds().width, p.y + getBounds().height / 2));
+			} else {
+				collapseDecoration.setLocation(new Point(p.x + getBounds().width / 2, p.y + getBounds().height));
+			}
 		}
 	}
-	
-	public void SetCollapseDecorator(CollapsedDecoration decoration)
-	{
-		collapseDecoration = decoration; 
+
+	public boolean SetCollapsedDecorator(CollapsedDecoration decoration) {
+		if (collapseDecoration == null) {
+			collapseDecoration = decoration;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public CollapsedDecoration GetCollapsedDecorator() {
+		return collapseDecoration;
 	}
 }
