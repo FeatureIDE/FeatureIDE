@@ -32,9 +32,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,6 +45,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -66,9 +71,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FileSystemElement;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.ide.dialogs.RelativePathVariableGroup;
+import org.eclipse.ui.internal.ide.filesystem.FileSystemStructureProvider;
 import org.eclipse.ui.internal.wizards.datatransfer.DataTransferMessages;
 import org.eclipse.ui.internal.wizards.datatransfer.WizardFileSystemResourceImportPage1;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -96,6 +103,8 @@ import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
  */
 @SuppressWarnings(RESTRICTION)
 public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImportPage1{
+	
+	private FileSystemStructureProvider fileSystemStructureProvider = new FileSystemStructureProvider();
 	
 	protected Combo sourceNameField;
 
@@ -534,6 +543,8 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		}
 
 		Iterator resourcesEnum = super.getSelectedResources().iterator();
+		
+		
 		//List fileSystemObjects = new ArrayList();
 		
 		
@@ -544,6 +555,8 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		            File thisFileElement = (File) ((FileSystemElement) (resourcesEnum2.next())).getFileSystemObject();
 		            fileSystemObjects2.add(thisFileElement);       
 		        }
+		        
+		       
 
 		//        while (resourcesEnum.hasNext()) {
 		//            fileSystemObjects.add(((FileSystemElement) resourcesEnum.next())
@@ -566,7 +579,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 			FileSystemElement element = (FileSystemElement) resourcesEnum.next();
 
-			if (element.getFileNameExtension().equals("m")) {
+			if (element.getFileNameExtension().equals("m") || element.getFileNameExtension().equals("model")) {
 
 				System.out.println("Es ist ein Model1 " + element.getFileNameExtension());
 				System.out.println(element);
@@ -575,18 +588,26 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 				modelFile = (File) element.getFileSystemObject();
 
+				resourcesEnum.remove();
+				
 				break;
 
 			}
 		}
+		
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
+		
 
+		/*
+		 * If a model file exists the model.xml can be created from it 
+		 */
 		if (modelFile != null) {
 
 			IFeatureModel featureModel = null;
 
 			//IFeatureProject featureProject = null;
 
-			final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
+			
 			//final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
 			//			if(res != null){
 			//				 featureProject = res.getProject();
@@ -626,27 +647,29 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 					}
 				}
 			}
+			
+			
 
-			IProject project = null;
-			final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
-			if (res != null) {
-				project = res.getProject();
-
-				try {
-
-					project.close(null);
-					project.open(null);
-
-				} catch (CoreException e) {
-
-					e.printStackTrace();
-				}
-
-			}
+//			IProject project = null;
+//			final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
+//			if (res != null) {
+//				project = res.getProject();
+//
+//				try {
+//
+//					project.close(null);
+//					project.open(null);
+//
+//				} catch (CoreException e) {
+//
+//					e.printStackTrace();
+//				}
+//
+//			}
 			
 			
 			
-			Iterable<IFeature> features = featureModel.getFeatures();
+			//Iterable<IFeature> features = featureModel.getFeatures();
 			
 			
 			
@@ -693,11 +716,13 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 //				}
 //			}
 
-			System.out.println(featureProject.getFeaturestubPath());
-			System.out.println(featureProject.getSourcePath());
-			System.out.println(featureProject.getSourceFolder());
+//			System.out.println(featureProject.getFeaturestubPath());
+//			System.out.println(featureProject.getSourcePath());
+//			System.out.println(featureProject.getSourceFolder());
 
 		}
+		
+		importFileSystem(fileSystemObjects2, featureProject);
 		
 
 
@@ -728,8 +753,72 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		
 		
 	}
-
 	
+	/**
+     *  Import the resources with extensions as specified by the user
+     */
+    protected boolean importFileSystem(List fileSystemObjects, IFeatureProject featureProject) {
+        ImportOperation operation;
+
+		//File sourceDirectory = getSourceDirectory();
+        File sourceDirectory = getSourceDirectory();
+        
+		
+
+//        if (shouldImportTopLevelFoldersRecursively)
+//            operation = new ImportOperation(getContainerFullPath(),
+//                    sourceDirectory, fileSystemStructureProvider,
+//                    this, Arrays.asList(new File[] {getSourceDirectory()}));
+        //else
+        
+      
+        System.out.println(sourceDirectory);
+        
+        
+        IPath path = getContainerFullPath().append(featureProject.getSourceFolder().getName());
+        System.out.println(path);
+        
+        	operation = new ImportOperation(path,
+                sourceDirectory, fileSystemStructureProvider,
+                this, fileSystemObjects);
+        	
+        	operation.setCreateContainerStructure(false);
+
+        operation.setContext(getShell());
+        return executeImportOperation(operation);
+    }
+
+    
+    
+	
+    
+    /**
+     *	Execute the passed import operation.  Answer a boolean indicating success.
+     */
+    @Override
+    protected boolean executeImportOperation(ImportOperation op) {
+        //initializeOperation(op);
+
+        try {
+            getContainer().run(true, true, op);
+        } catch (InterruptedException e) {
+            return false;
+        } catch (InvocationTargetException e) {
+            displayErrorDialog(e.getTargetException());
+            return false;
+        }
+
+        IStatus status = op.getStatus();
+        if (!status.isOK()) {
+            ErrorDialog
+                    .openError(getContainer().getShell(), DataTransferMessages.FileImport_importProblems,
+                            null, // no special message
+                            status);
+            return false;
+        }
+
+        return true;
+    }
 	
 	
 	
