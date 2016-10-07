@@ -1051,7 +1051,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					getSelectionManager().deselectAll();
 					FeatureEditPart editPart = (FeatureEditPart) featureEditPart;
 					getSelectionManager().appendSelection(editPart);
-					FMUIPlugin.getDefault().logInfo("x: " + editPart.getFigure().getBounds().x + "\ty:" + editPart.getFigure().getBounds().y);
 					centerPointOnScreen(editPart.getFigure().getBounds().x, editPart.getFigure().getBounds().y);
 				}
 			}
