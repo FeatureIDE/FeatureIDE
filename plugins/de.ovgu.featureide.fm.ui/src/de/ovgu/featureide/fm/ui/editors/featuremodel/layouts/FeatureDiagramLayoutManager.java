@@ -45,18 +45,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 abstract public class FeatureDiagramLayoutManager {
 
-	protected static final class HiddenFilter implements IFilter<IGraphicalFeature> {
-		@Override
-		public boolean isValid(IGraphicalFeature object) {
-			if (!object.getObject().getStructure().isHidden() || !object.getObject().getStructure().hasCollapsedParent() ) {
-				
-			}
-			return !object.getObject().getStructure().isHidden();
-		}
-	}
-
-	protected static final HiddenFilter hiddenFilter = new HiddenFilter();
-
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden;
@@ -150,7 +138,7 @@ abstract public class FeatureDiagramLayoutManager {
 		 * update lowest, highest, most left, most right coordinates
 		 * for features
 		 */
-		Iterable<IGraphicalFeature> nonHidden = showHidden ? featureModel.getFeatures() : Functional.filter(featureModel.getFeatures(), new HiddenFilter());
+		Iterable<IGraphicalFeature> nonHidden = featureModel.getFeatures();
 		for (IGraphicalFeature feature : nonHidden) {
 			Rectangle position = FeatureUIHelper.getBounds(feature);
 			if (position.x < min.x)
@@ -278,10 +266,6 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
-		if (showHidden) {
-			return FeatureUIHelper.getGraphicalChildren(feature);
-		} else {
-			return Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), hiddenFilter));
-		}
+		return FeatureUIHelper.getGraphicalChildren(feature);
 	}
 }

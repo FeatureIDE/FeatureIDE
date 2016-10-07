@@ -168,7 +168,11 @@ public class FeatureIDEEvent {
 		/**
 		 * The dependency for a subtree was calculated 
 		 */
-		DEPENDENCY_CALCULATED
+		DEPENDENCY_CALCULATED, 
+		/**
+		 * Default, do nothing
+		 */
+		DEFAULT
 	}
 	
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];

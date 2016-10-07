@@ -95,7 +95,8 @@ public class FeatureUIHelper {
 		final List<IFeatureStructure> children = feature.getStructure().getChildren();
 		final List<IGraphicalFeature> graphicalChildren = new ArrayList<>(children.size());
 		for (final IFeatureStructure child : children) {
-			graphicalChildren.add(getGraphicalFeature(child, model));			
+			if (!child.hasCollapsedParent() && (!child.hasHiddenParent() || model.getLayout().showHiddenFeatures()))
+					graphicalChildren.add(getGraphicalFeature(child, model));			
 		}
 		return graphicalChildren;		
 	}

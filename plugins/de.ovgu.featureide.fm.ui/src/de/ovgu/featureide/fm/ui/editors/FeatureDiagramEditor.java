@@ -1015,19 +1015,27 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
+			
+			// clear registry		
+			final Map<?, ?> registryCollapsed = getEditPartRegistry();		
+			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {		
+				registryCollapsed.remove(f);		
+				registryCollapsed.remove(f.getSourceConnection());
+				registryCollapsed.remove(f.getTargetConnections());
+			}		
+			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {		
+				registryCollapsed.remove(f);		
+			}
+			
 			graphicalFeatureModel.init();
 			setContents(graphicalFeatureModel);
-			analyzeFeatureModel();
-
-			//Get EditPart registry
-			final Map<?, ?> editPartRegistry = getEditPartRegistry();
-
+			
 			//when performing COLLAPSED_CHANGED while selecting IConstraint the getNewValue will be an iConstraint
 			if(event.getNewValue() != null)
 			{
 				IConstraint selectedConstraint = (IConstraint) event.getNewValue();
 				IGraphicalConstraint graphConstraint = graphicalFeatureModel.getGraphicalConstraint(selectedConstraint);
-				final Object constraintEditPart = editPartRegistry.get(graphConstraint);
+				final Object constraintEditPart = registryCollapsed.get(graphConstraint);
 				if (constraintEditPart instanceof ConstraintEditPart) {
 					getSelectionManager().deselectAll();
 					getSelectionManager().appendSelection((ConstraintEditPart) constraintEditPart);
@@ -1038,7 +1046,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				//Reselect the current selected feature if getNewValue is null  
 				IFeature selectedFeature = (IFeature) event.getSource();
 				IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(selectedFeature);
-				final Object featureEditPart = editPartRegistry.get(graphFeature);
+				final Object featureEditPart = registryCollapsed.get(graphFeature);
 				if (featureEditPart instanceof FeatureEditPart) {
 					getSelectionManager().deselectAll();
 					getSelectionManager().appendSelection((FeatureEditPart) featureEditPart);
@@ -1074,6 +1082,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case DEPENDENCY_CALCULATED:
 			featureModelEditor.setPageModified(false);
+			break;
+		case DEFAULT:
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");

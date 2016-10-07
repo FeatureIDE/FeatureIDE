@@ -54,7 +54,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private int depthFirstLayout(IGraphicalFeature feature, int level, int x) {
-		if (isHidden(feature)) {
+		if (feature.getObject().getStructure().hasHiddenParent()) {
 			return 0;
 		}
 		feature.setLocation(new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
