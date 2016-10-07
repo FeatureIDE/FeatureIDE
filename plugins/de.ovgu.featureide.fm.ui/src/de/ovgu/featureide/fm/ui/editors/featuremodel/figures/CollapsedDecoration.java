@@ -28,6 +28,7 @@ import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.w3c.dom.css.Rect;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -55,7 +56,7 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		graphicalFeature = parent;
 		setLayoutManager(layout);
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
-		setBorder(FMPropertyManager.getFeatureBorder(false));
+		//setBorder(FMPropertyManager.getFeatureBorder(false));
 
 		childrenCount.setFont(DEFAULT_FONT);
 		setDecoratorText("" + parent.getObject().getStructure().getChildrenCount());
@@ -118,7 +119,13 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 	 */
 	@Override
 	protected void outlineShape(Graphics graphics) {
-
+		int x = getBounds().x+1;
+		int y = getBounds().y+1;
+		int width = getBounds().width-2;
+		int height = getBounds().height-2;
+		graphics.setLineWidth(1);
+		graphics.setForegroundColor(FMPropertyManager.getFeatureBorderColor());
+		graphics.drawRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
 	}
 
 }
