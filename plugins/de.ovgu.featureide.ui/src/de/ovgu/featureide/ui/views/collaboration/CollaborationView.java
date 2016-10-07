@@ -446,8 +446,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				activeEditor = page.getActiveEditor();
 			}
 		}
-
-		
 		
 		if (activeEditor != null && activeEditor.getEditorInput() instanceof FileEditorInput) {
 			// case: open editor

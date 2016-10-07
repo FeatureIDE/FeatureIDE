@@ -86,7 +86,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 
 		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
 		
-		//TODO: Task Performance
 		getSite().getPage().addPartListener(editorListener);
 		setEditor(getSite().getPage().getActiveEditor());
 		currentInput = (currentEditor == null) ? null : ResourceUtil.getResource((currentEditor.getEditorInput()));
@@ -192,7 +191,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 								contentProvider.defaultContent();
 							} else {
 								IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
-								//TODO is refresh really necessary? -> true?
 
 								if (force || currentInput == null || !anyFile.getProject().equals(currentInput.getProject())) {
 									contentProvider.calculateContent(anyFile, true);

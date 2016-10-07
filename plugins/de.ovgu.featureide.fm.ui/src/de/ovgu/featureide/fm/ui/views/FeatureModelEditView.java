@@ -59,7 +59,6 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  * A view to calculate the category an edit. Given an open feature model editor
  * the current editing version is compared to the last saved model.
  * 
- *TODO: Task Performance
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
