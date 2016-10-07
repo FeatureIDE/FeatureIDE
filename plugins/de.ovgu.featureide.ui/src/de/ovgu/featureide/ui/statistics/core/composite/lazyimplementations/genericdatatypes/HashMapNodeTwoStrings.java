@@ -26,39 +26,95 @@ import java.util.HashMap;
  * Node in the statistics view to show lines of code. 
  * 
  * @author Schleicher Miro
+ * @author Maximilian Homann
+ * @author Philipp Kuhn
  */
 public class HashMapNodeTwoStrings extends AbstractSortModeNode {
 
-	private HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
-	private HashMap<String, Integer> count = new HashMap<String, Integer>();
-	private int side;
+	protected HashMap<String, Integer> extensionFeatureLOCList = new HashMap<String, Integer>();
+	protected HashMap<String, Integer> locCount = new HashMap<String, Integer>();
+	protected HashMap<String, Integer> extensionFileLOCList = new HashMap<String, Integer>();
+	/* 
+	 * child 1: LOC by extension
+	 * child 2: LOC by feature
+	 * child 3: LOC by file
+	 */
+	protected int childIndex;
 
-	public HashMapNodeTwoStrings(String description, int side, HashMap<String, Integer> extList) {
+	/**
+	 * Create a new <> to display either a <br>
+	 * LOC by extension tree entry (child index 1)<br>
+	 * LOC by feature tree entry (child index 2)<br>
+	 * LOC by file tree entry (child index 3)
+	 * @param description
+	 * @param childIndex specifies the type of entry
+	 * @param extList 
+	 * @param extensionFileLOCList
+	 */
+	public HashMapNodeTwoStrings(String description, int childIndex, HashMap<String, Integer> extList,
+			HashMap<String, Integer> extensionFileLOCList) {
 		super(description);
-		featureExtensionLOCList = extList;
-		this.side = side;
+		extensionFeatureLOCList = extList;
+		this.childIndex = childIndex;
+		this.extensionFileLOCList = extensionFileLOCList;
+	}
+	
+	/**
+	 * Create a new <> to display either a <br>
+	 * LOC by extension tree entry (child index 1)<br>
+	 * LOC by feature tree entry (child index 2)<br>
+	 * LOC by file tree entry (child index 3)
+	 * @param description
+	 * @param locCount legacy super constructor
+	 * @param childIndex specifies the type of entry
+	 * @param extList 
+	 * @param extensionFileLOCList
+	 */
+	public HashMapNodeTwoStrings(String description, int locCount, int childIndex, HashMap<String, Integer> extList,
+			HashMap<String, Integer> extensionFileLOCList) {
+		super(description, locCount);
+		extensionFeatureLOCList = extList;
+		this.childIndex = childIndex;
+		this.extensionFileLOCList = extensionFileLOCList;
 	}
 
 	@Override
 	protected void initChildren() {
-		for (String name : featureExtensionLOCList.keySet()) {
-			if (side == 1) {
-				if (!count.containsKey(name.split("#")[0])) {
-					count.put(name.split("#")[0], featureExtensionLOCList.get(name));
+		//LOC by extension
+		if (childIndex == 1) {
+			for (String extAndFeature : extensionFeatureLOCList.keySet()) {
+				String extensionName = extAndFeature.split("#")[0];
+				if (!locCount.containsKey(extensionName)) {
+					locCount.put(extensionName, extensionFeatureLOCList.get(extAndFeature));
 				} else {
-					count.put(name.split("#")[0], count.get(name.split("#")[0]) + featureExtensionLOCList.get(name));
+					locCount.put(extensionName, locCount.get(extensionName) + extensionFeatureLOCList.get(extAndFeature));
 				}
-			} else if (side == 2) {
-				if (!count.containsKey(name.split("#")[1])) {
-					count.put(name.split("#")[1], featureExtensionLOCList.get(name));
+			}
+		//LOC by feature
+		} else if (childIndex == 2) {
+			for (String extAndFeature : extensionFeatureLOCList.keySet()) {
+				String featureName = extAndFeature.split("#")[1];
+				if (!locCount.containsKey(featureName)) {
+					locCount.put(featureName, extensionFeatureLOCList.get(extAndFeature));
 				} else {
-					count.put(name.split("#")[1], count.get(name.split("#")[1]) + featureExtensionLOCList.get(name));
+					locCount.put(featureName, locCount.get(featureName) + extensionFeatureLOCList.get(extAndFeature));
+				}
+			}
+		//LOC by file	
+		} else if (childIndex == 3) {
+			for (String extAndFile: extensionFileLOCList.keySet()) {
+				String fileName = extAndFile.split("#")[0];
+				
+				if(!locCount.containsKey(fileName)) {
+					locCount.put(fileName, extensionFileLOCList.get(extAndFile));
+				} else {
+					locCount.put(fileName, locCount.get(fileName) + extensionFileLOCList.get(extAndFile));
 				}
 			}
 		}
-
-		for (String name : count.keySet()) {
-			addChild(new HashMapNodeTwoStringsSub(name, count.get(name), featureExtensionLOCList, side));
+		
+		for (String key : locCount.keySet()) {
+			addChild(new HashMapNodeTwoStringsSub(key, locCount.get(key), childIndex, extensionFeatureLOCList, extensionFileLOCList));
 		}
 
 	}

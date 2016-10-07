@@ -3,9 +3,9 @@
  *
  * This file is part of FeatureIDE.
  * 
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * FeatureIDE is free software: you can redistrisFeatureOrPreprocessorProjectt and/or modify
+ * it under the terms of theisFeatureOrPreprocessorProjectsser GeneisFeatureOrPreprocessorProjectlic License as published by
+ * isFeatureOrPreprocessorProjecte Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
  * FeatureIDE is distributed in the hope that it will be useful,
@@ -20,15 +20,14 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -36,13 +35,19 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
 /**
  * TreeNode who stores the number of classes, roles, fields and methods of a
@@ -50,20 +55,40 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  * This node should only be used for a feature oriented project.
  * 
  * @author Schleicher Miro
+ * @author Maximilian Homann
+ * @author Philipp Kuhn
  */
 public class StatisticsProgramSizeNew extends LazyParent {
 
 	private final static String[] ignoredExtensions = { "jpg", "jpeg", "raw", "hdr", "tiff", "bmp", "jpe", "dib", "gif", "pdf", "png", "zip", "wav", "mp3",
 			"avi", "flv", "midi" };
 
-	private final HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
 	private final FSTModel fstModel;
-
+	private final FileFeatureLOCMapper fileFeatLOCMapper;
 	private int numberOfLines = 0;
-
-	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
+	private boolean isPPProject = false;
+	private boolean isFeatureOrPreprocessorProject = false;
+	private IFeatureProject project;
+	
+	public StatisticsProgramSizeNew(String description, FSTModel fstModel, IFeatureProject project) {
 		super(description);
 		this.fstModel = fstModel;
+		this.project = project;
+		this.fileFeatLOCMapper = new FileFeatureLOCMapper(project.getSourceFolder());
+		this.isFeatureOrPreprocessorProject = true;
+	}
+	/**
+	 * Constructor for AspectOrientated projects
+	 * @param description
+	 * @param project
+	 */
+	
+	public StatisticsProgramSizeNew(String description, IFeatureProject project) {
+		super(description);
+		this.fstModel = null;
+		this.project = project;
+		this.isFeatureOrPreprocessorProject = false;
+		this.fileFeatLOCMapper = new FileFeatureLOCMapper(project.getSourceFolder());
 	}
 
 	@Override
@@ -76,43 +101,50 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int numberOfMethods = 0;
 		int numberOfUniMethods = 0;
 
-		for (FSTClass fstClass : fstModel.getClasses()) {
-			final List<List<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
-			final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
-			final HashSet<FSTField> fieldHelper = new HashSet<FSTField>();
-
-			for (List<FSTClassFragment> linkedList : allFrag) {
-				numberOfRoles += linkedList.size();
-
-				for (FSTClassFragment fstClassFragment : linkedList) {
-					methHelper.addAll(fstClassFragment.getMethods());
-					fieldHelper.addAll(fstClassFragment.getFields());
-
-					numberOfMethods += fstClassFragment.getMethods().size();
-					numberOfFields += fstClassFragment.getFields().size();
+		if(isFeatureOrPreprocessorProject) {
+			for (FSTClass fstClass : fstModel.getClasses()) {
+				final List<List<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
+				final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
+				final HashSet<FSTField> fieldHelper = new HashSet<FSTField>();
+	
+				for (List<FSTClassFragment> linkedList : allFrag) {
+					numberOfRoles += linkedList.size();
+	
+					for (FSTClassFragment fstClassFragment : linkedList) {
+						methHelper.addAll(fstClassFragment.getMethods());
+						fieldHelper.addAll(fstClassFragment.getFields());
+	
+						numberOfMethods += fstClassFragment.getMethods().size();
+						numberOfFields += fstClassFragment.getFields().size();
+					}
 				}
-			}
-
-			numberOfUniFields += fieldHelper.size();
-			numberOfUniMethods += methHelper.size();
-			numberOfClasses += allFrag.size();
-		}
-
-		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
-			try {
-				checkLOC();
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
+	
+				numberOfUniFields += fieldHelper.size();
+				numberOfUniMethods += methHelper.size();
+				numberOfClasses += allFrag.size();
 			}
 		}
+		
+		try {
+			checkLOC();
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
 
-		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
-				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
-		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
-				fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
-		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
-				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
-		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
+		if (project.getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
+			addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
+					SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
+			addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
+					fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
+			addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
+					fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
+		}
+		boolean isPreprocessor = false;
+		if (project.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
+			isPreprocessor = true;
+			isFeatureOrPreprocessorProject = true;
+		}
+		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, isPreprocessor));
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {
@@ -125,7 +157,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	}
 
 	public void checkLOC() throws CoreException {
-		fstModel.getFeatureProject().getSourceFolder().accept(new IResourceVisitor() {
+		project.getSourceFolder().accept(new IResourceVisitor() {
 
 			@Override
 			public boolean visit(IResource resource) throws CoreException {
@@ -143,6 +175,8 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						case "c":
 						case "h":
 						case "jj":
+						case "aj":
+						case "cpp":
 						case "jak":
 							oneLineComment = "//";
 							moreLineStart = "/*";
@@ -168,25 +202,23 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							moreLineEnd = "#|#|#";
 							break;
 						}
-
+						
 						try {
-							numberOfLinesInThisFile = countLOC(file, oneLineComment, moreLineStart, moreLineEnd/*, nested, nestedCounter*/);
-
+							numberOfLinesInThisFile = countLOC(file, oneLineComment, moreLineStart, moreLineEnd);
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-
-						String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf(FEATURES) + 9, file.getFullPath()
-								.toString().length() - 1)).split("/")[0];
-
-						if (!featureExtensionLOCList.containsKey(file.getFileExtension() + "#" + feat)) {
-							featureExtensionLOCList.put(file.getFileExtension() + "#" + feat, numberOfLinesInThisFile);
-						} else {
-							featureExtensionLOCList.put(file.getFileExtension() + "#" + feat, featureExtensionLOCList.get(file.getFileExtension() + "#" + feat)
-									+ numberOfLinesInThisFile);
+						
+						Mechanism mecha = project.getComposer().getGenerationMechanism();
+						if (mecha == Mechanism.PREPROCESSOR) {
+							isPPProject = true;
+							numberOfLinesInThisFile += getDirectiveStatementLOC(file);
 						}
+						//File with loc > Mapper
+						fileFeatLOCMapper.addEntry(file, numberOfLinesInThisFile);
+						
 					}
 				}
 				numberOfLines += numberOfLinesInThisFile;
@@ -195,39 +227,135 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 
 		});
+		if(isFeatureOrPreprocessorProject) {
+			fillMapper();
+		}
 	}
 	
-	public static int countLOC(final IFile file, String oneLineComment, String moreLineStart, String moreLineEnd) throws FileNotFoundException, IOException {
+	/**
+	 * Fills the map inside the FileFeatureLOCMapper with features and lines of code. 
+	 */
+	private void fillMapper() {
+		for (FSTClass fstClass: fstModel.getClasses()) {
+			for (FSTRole role: fstClass.getRoles()) {
+				FSTFeature currentFeat = role.getFeature();
+				IFile file = role.getFile();
+				if (isPPProject) {
+					int loc = countLOCOfDirectives(role.getDirectives());
+					fileFeatLOCMapper.addSingleLOCMapEntry(file, currentFeat, loc);
+				} else {
+					int loc = fileFeatLOCMapper.getLOCByFile(file);
+					fileFeatLOCMapper.addSingleLOCMapEntry(file, currentFeat, loc);
+				}
+				
+			}
+		}
+	}
+	
+	/**
+	 * Counts the lines of code of all directives and adds them to the File Feature LOC Mapper.
+	 * @param directives in this file
+	 * @return the LOC in all directives
+	 */
+	private int countLOCOfDirectives(TreeSet<FSTDirective> directives) {
+		Iterator<FSTDirective> iterator = directives.iterator();
+		int locOfDirectiveBody = 0;
+		while (iterator.hasNext()) {
+			FSTDirective directive = iterator.next();
+			
+			int childrenLOC = countChildrenLOC(directive);
+			locOfDirectiveBody += directive.getEndLine() - directive.getStartLine() -1; //From start to end without end command
+			locOfDirectiveBody -= childrenLOC;
+		}
+		return locOfDirectiveBody;
+	}
+	
+	/**
+	 * Recursively counts all command lines of code of a directive and its children
+	 * @param directive to count the command code
+	 * @param loc recursive variable
+	 * @return
+	 */
+	private int countChildrenLOC(FSTDirective directive) {
+		int childrenLoc = 0;
+		if (directive.hasChildren()) {
+			for (FSTDirective child: directive.getChildren()) {
+				childrenLoc += child.getEndLine() - child.getStartLine() +1;
+			}
+		} 
+		return childrenLoc;
+	}
+	
+	/**
+	 * Counts the lines of code in file.
+	 * 
+	 * @param file
+	 * @param oneLineComment
+	 * @param moreLineStart
+	 * @param moreLineEnd
+	 * @return the lines of code in file
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public int countLOC(final IFile file, String oneLineComment, String moreLineStart, String moreLineEnd) throws FileNotFoundException, IOException {
 		FileReader fr = new FileReader(file.getLocation().toString());
 		BufferedReader br = new BufferedReader(fr);
-		return countLineNumber(oneLineComment, moreLineStart, moreLineEnd, br);
-	}
-	
-	public static int countLineNumber(String oneLineComment, String moreLineStart, String moreLineEnd, BufferedReader br) throws IOException {
 		int numberOfLinesInThisFile = 0;
-		String s;
+		String line;
 		boolean isInComment = false;
-		while ((s = br.readLine()) != null) {
-			s = s.trim();
-			if (!s.equals("") && !s.startsWith(oneLineComment) && !isInComment) {
-				if (s.startsWith(moreLineStart)) {
-					isInComment = true;
-				} else
-					numberOfLinesInThisFile++;
+		while ((line = br.readLine()) != null) {
+			line = line.trim();
+			//No empty line
+			if (!line.equals("")) {
+				//Line is no regular comment
+				if (!line.startsWith(oneLineComment)) {
+					//Line is not part of a multiple line comment
+					if (!isInComment) {
+						if (line.startsWith(moreLineStart)) {
+							isInComment = true;
+						} else {
+							numberOfLinesInThisFile++;
+						}
+					
+						if (line.contains(moreLineEnd)) {
+							isInComment = false;
+						}
+			
+						//Theres another comment in the line
+						if (line.contains(moreLineStart) && !line.startsWith(moreLineStart))
+							isInComment = true;
+					} else {
+						if (line.contains(moreLineEnd)) {
+							isInComment = false;
+						}
+					}
+				}
 			}
-
-			if (s.contains(moreLineEnd)) {
-
-				isInComment = false;
-				if (!s.endsWith(moreLineEnd))
-					numberOfLinesInThisFile++;
-			}
-
-			if (s.contains(moreLineStart) && !s.startsWith("/*"))
-				isInComment = true;
 		}
 		br.close();
 		return numberOfLinesInThisFile;
 	}
-
+	
+	/**
+	 * Counts the lines of code of all directive commands.
+	 * @param file
+	 * @return
+	 */
+	private int getDirectiveStatementLOC(IFile file) {
+		int loc = 0;
+		for (FSTClass fstClass: fstModel.getClasses()) {
+			for (FSTRole role: fstClass.getRoles()) {
+				if (role.getFile().equals(file)) {
+					for (FSTDirective directive: role.getDirectives()) {
+						if (!directive.hasChildren() && directive.getParent() == null) {
+							loc += 2;
+						} else if (directive.hasChildren() && directive.getParent() == null) {
+							loc += countChildrenLOC(directive);
+						}
+					}
+				}
+			}
+		}
+		return loc;
+	}
 }

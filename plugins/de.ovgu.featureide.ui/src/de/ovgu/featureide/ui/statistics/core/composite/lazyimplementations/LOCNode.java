@@ -23,30 +23,53 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
 
-import java.util.HashMap;
-
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNodeTwoStrings;
+import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
 /**
  * Node for aggregated LOC.
  * 
  * @author Schleicher Miro
+ * @author Maximilian Homann
+ * @author Philipp Kuhn
  */
 public class LOCNode extends LazyParent {
+	
+	private final FileFeatureLOCMapper fileFeatureLOCMapper;
+	private boolean isPreprocessor = false;
 
-	private final HashMap<String, Integer> featureExtensionLOCList;
-
-	LOCNode(String description, HashMap<String, Integer> fExList) {
+	LOCNode(String description, boolean isPreprocessor) {
 		super(description);
-		featureExtensionLOCList = fExList;
+		this.fileFeatureLOCMapper = null;
+		this.isPreprocessor = isPreprocessor;
+	}
+	
+	public LOCNode(String description, FileFeatureLOCMapper ffLOCMapper, boolean isPreprocessor) {
+		super(description);
+		this.fileFeatureLOCMapper = ffLOCMapper;
+		this.isPreprocessor = isPreprocessor;
 	}
 
 	@Override
 	protected void initChildren() {
-		addChild(new HashMapNodeTwoStrings(LOC_BY_EXTENSION, 1, featureExtensionLOCList));
-		addChild(new HashMapNodeTwoStrings(LOC_BY_FEATURE, 2, featureExtensionLOCList));
-
+		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper));
+		if (isPreprocessor) {
+			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper));
+			int locWithoutFeat = fileFeatureLOCMapper.locWithoutFeatures();
+			int preProcessorLOC = fileFeatureLOCMapper.getFeatures().size()*2;
+			
+			int nonVariableCode = locWithoutFeat - preProcessorLOC;
+			int VariableLOC = fileFeatureLOCMapper.allLinesOfCode() - locWithoutFeat + preProcessorLOC;
+			
+			addChild(new Parent("Non-Variable lines of code", nonVariableCode));
+			if(VariableLOC == 0) {
+				addChild(new Parent("Variable lines of code (includes PreProcessor statements) (This may not be accurate.)", VariableLOC));
+			} else {
+				addChild(new Parent("Variable lines of code (includes PreProcessor statements)", VariableLOC));
+			}
+			addChild(new Parent("Preprocessor lines of code", preProcessorLOC ));
+		}
 	}
 
 }
