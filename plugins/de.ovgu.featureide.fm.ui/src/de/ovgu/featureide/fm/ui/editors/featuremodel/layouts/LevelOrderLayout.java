@@ -27,6 +27,8 @@ import java.util.List;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -80,7 +82,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void layoutLevelInX(LinkedList<IGraphicalFeature> level) {
 		for (IGraphicalFeature feature : level)
-			if (feature.getObject().getStructure().hasChildren()) {
+			if (feature.getObject().getStructure().hasVisibleChildren(feature.getGraphicalModel().getLayout().showHiddenFeatures())) {
 				centerAboveChildren(feature);
 			}
 
@@ -95,7 +97,8 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private int layoutFeatureInX(LinkedList<IGraphicalFeature> level, int j, int moveWidth, IGraphicalFeature lastFeature) {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
-		if (!feature.getObject().getStructure().hasChildren())
+		
+		if (!feature.getObject().getStructure().hasVisibleChildren(feature.getGraphicalModel().getLayout().showHiddenFeatures()))
 			nextToLeftSibling(feature, lastFeature);
 		else {
 			if (lastFeature != null)
@@ -107,7 +110,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				firstCompound = false;
 				boolean compoundSibling = false;
 				for (int k = j - 1; k >= 0; k--)
-					if (level.get(k).getObject().getStructure().hasChildren())
+					if (level.get(k).getObject().getStructure().hasVisibleChildren(feature.getGraphicalModel().getLayout().showHiddenFeatures()))
 						compoundSibling = true;
 				if (!compoundSibling)
 					for (int k = j - 1; k >= 0; k--)
@@ -128,7 +131,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				l = k + 1;
 				break;
 			}
-			if (sibling.getObject().getStructure().hasChildren()) {
+			if (sibling.getObject().getStructure().hasVisibleChildren(feature.getGraphicalModel().getLayout().showHiddenFeatures())) {
 				l = k + 1;
 				right = false;
 				space = getBounds(feature).x - getBounds(sibling).right() - width;
