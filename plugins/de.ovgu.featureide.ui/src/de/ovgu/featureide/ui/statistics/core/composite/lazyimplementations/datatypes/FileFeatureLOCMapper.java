@@ -21,7 +21,6 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;

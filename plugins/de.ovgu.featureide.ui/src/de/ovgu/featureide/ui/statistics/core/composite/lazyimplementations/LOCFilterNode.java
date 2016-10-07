@@ -20,20 +20,16 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
+
+import java.util.HashMap;
+
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.fm.core.localization.StringTable;
-
-import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FILE;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.eclipse.core.resources.IFile;
 
 /**
  * Replaces the old HashMapNodeTwoStrings class. <br>

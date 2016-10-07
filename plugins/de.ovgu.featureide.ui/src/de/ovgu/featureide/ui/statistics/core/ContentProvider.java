@@ -50,12 +50,15 @@ import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 
 /**
  * Content provider for the {@link TreeViewer}.
+ * Creates the top level of the statistics view
  * 
  * @see ContentProvider#calculateContent(IResource)
  * @see ITreeContentProvider
  * 
  * @author Dominik Hamann
  * @author Patrick Haese
+ * @author Philipp Kuhn
+ * @author Maximilian Homann
  */
 public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
@@ -180,7 +183,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 			}
 			
 		} else {
-			godfather.addChild(new Parent("Statistics not supported without composer"));
+			godfather.addChild(new Parent(COMPOSER_NOT_INSTALLED));
 		}
 		
 		refresh();

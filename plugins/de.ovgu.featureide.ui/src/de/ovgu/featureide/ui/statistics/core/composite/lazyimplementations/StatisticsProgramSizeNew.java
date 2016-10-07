@@ -319,8 +319,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 					
 						if (line.contains(moreLineEnd)) {
 							isInComment = false;
-//							if (!line.endsWith(moreLineEnd))
-//								numberOfLinesInThisFile++;
 						}
 			
 						//Theres another comment in the line

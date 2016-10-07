@@ -108,6 +108,7 @@ public interface StatisticsIds {
 	public static final String NUMBER_METHOD_U = NUMBER_OF_UNIQUE_METHODS;
 	public static final String NUMBER_FIELD_U = NUMBER_OF_UNIQUE_FIELDS;
 	public static final String NUMBER_OF_CODELINES = LINES_OF_CODE;
+	public static final String COMPOSER_NOT_INSTALLED = "Composer not installed. Statistics not supported.";
 	
 	public static final String NUMBER_PROJECT_METHOD_CONTRACT = NUMBER_OF_METHOD_CONTRACTS_IN_PROJECT;
 	public static final String NUMBER_PROJECT_INVARIANT = NUMBER_OF_CLASS_INVARIANTS_IN_PROJECT;

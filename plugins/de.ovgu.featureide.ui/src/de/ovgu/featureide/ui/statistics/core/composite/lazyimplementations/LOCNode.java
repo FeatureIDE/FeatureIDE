@@ -22,14 +22,10 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FILE;
-
-import java.util.HashMap;
 
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNodeTwoStrings;
 
 /**
  * Node for aggregated LOC.
