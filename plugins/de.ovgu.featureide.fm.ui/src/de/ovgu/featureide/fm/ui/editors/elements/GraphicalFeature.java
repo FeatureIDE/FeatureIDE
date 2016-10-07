@@ -142,7 +142,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 		list.add(getSourceConnection());
 		return (list);
 	}
-	
+
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
@@ -196,7 +196,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void update(FeatureIDEEvent event) {
 		if (uiObject != null) {

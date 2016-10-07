@@ -47,9 +47,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
@@ -57,10 +55,12 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -68,10 +68,10 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * An editpart for connections between features and their parents. Creates the
  * source decoration dependent on the mandatory property.
  * 
- * @author Thomas Thuem
- * @author Marcus Pinnecke
+ * @author Christopher Sontag
+ * @author Maximilian Kühl
  */
-public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyChangeListener {
+public class UnderlyingFeaturesConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyChangeListener {
 
 	private static final DirectEditPolicy ROLE_DIRECT_EDIT_POLICY = new DirectEditPolicy() {
 		@Override
@@ -86,7 +86,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	private Figure toolTipContent = new Figure();
 
-	ConnectionEditPart(Object connection) {
+	UnderlyingFeaturesConnectionEditPart(Object connection) {
 		super();
 		setModel(connection);
 	}
@@ -120,30 +120,30 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	@Override
 	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			final boolean success = changeMandatory(request);
+			final boolean success = changeCollapsed(request);
 			if (success) {
 				return;
 			}
-			changeConnectionType();
+			refreshVisuals();
 		}
 	}
 
 	/**
-	 * Change the mandatory type is the circle decoration was selected.
+	 * Change the collapsed state
 	 */
-	private boolean changeMandatory(Request request) {
+	private boolean changeCollapsed(Request request) {
 		final IFeature feature = getConnectionModel().getSource().getObject();
 		if (feature.getStructure().getParent().isAnd()) {
 			final List<?> decorators = getConnectionFigure().getChildren();
 			if (!decorators.isEmpty()) {
 				Object child = decorators.get(0);
-				if (child instanceof CircleDecoration) {
-					final Rectangle decoratorBounds = new Rectangle(((CircleDecoration) child).getBounds());
+				if (child instanceof CollapsedDecoration) {
+					final Rectangle decoratorBounds = new Rectangle(((CollapsedDecoration) child).getBounds());
 					if (request instanceof SelectionRequest) {
 						final Point requestLocation = ((SelectionRequest) request).getLocation();
 						if (decoratorBounds.contains(requestLocation)) {
 							final IFeatureModel featureModel = feature.getFeatureModel();
-							final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);
+							final SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
 							try {
 								PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 							} catch (ExecutionException e) {
@@ -158,37 +158,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		return false;
 	}
 
-	private void changeConnectionType() {
-		if (connectsExternFeatures()) {
-			return;
-		}
-
-		IFeature feature = getConnectionModel().getTarget().getObject();
-		IFeatureModel featureModel = feature.getFeatureModel();
-
-		int groupType;
-
-		if (feature.getStructure().isAlternative()) {
-			groupType = ChangeFeatureGroupTypeOperation.AND;
-		} else if (feature.getStructure().isAnd()) {
-			groupType = ChangeFeatureGroupTypeOperation.OR;
-		} else {
-			groupType = ChangeFeatureGroupTypeOperation.ALTERNATIVE;
-		}
-
-		ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(groupType, feature, featureModel);
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-	}
-
 	@Override
 	protected void refreshVisuals() {
-		refreshSourceDecoration();
 		refreshParent();
+		refreshSourceDecoration();
 		refreshTargetDecoration();
 		refreshToolTip();
 	}
@@ -199,6 +172,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		setTarget(newEditPart);
 		getFigure().setVisible(getTarget() != null);
 	}
+
 
 	public void refreshSourceDecoration() {
 		IFeature source = getConnectionModel().getSource().getObject();
@@ -218,39 +192,32 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd())
-				&& !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
-				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
+//				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
 			}
 		}
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
 	}
-
-	private static CircleDecoration createClearDecoration() {
+	
+	private static CollapsedDecoration createClearDecoration() {
 		return null;
 	}
-
-	private static CircleDecoration getSourceDecoration(boolean mandatory) {
-		return new CircleDecoration(mandatory);
-	}
+//	private static CollapsedDecoration getSourceDecoration(boolean mandatory) {
+//		return new CollapsedDecoration(mandatory);
+//	}
 
 	public void refreshTargetDecoration() {
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
-		IGraphicalFeature source = connectionModel.getSource();
-
-		RotatableDecoration targetDecoration = createClearDecoration();
-		final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		if (target == null || target.getObject().getStructure().hasCollapsedParent()) {
 			return;
 		}
-		if (target.getObject().getStructure().isCollapsed()) {
-			connection.setTargetDecoration(new CollapsedDecoration(target));
-			return;
-		}
+		RotatableDecoration targetDecoration = createClearDecoration();
+		final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		if (target.getObject().getStructure().getChildrenCount() > 1) {
+			IGraphicalFeature source = connectionModel.getSource();
 			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
 			final IGraphicalFeature object = graphicalChildren.get(0);
 			final IFeatureStructure structure = target.getObject().getStructure();
@@ -269,7 +236,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 					targetDecoration = createClearDecoration();
 				}
 			}
-			connection.setTargetDecoration(targetDecoration);
+			connection.setTargetDecoration(targetDecoration);	
 		} else {
 			connection.setTargetDecoration(createClearDecoration());
 		}
@@ -284,8 +251,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IFeature target = graphicalTarget.getObject();
 		toolTipContent.removeAll();
 		toolTipContent.setLayoutManager(new GridLayout());
-		toolTipContent.add(
-				new Label(" Connection type: \n" + (target.getStructure().isAnd() ? " And" : (target.getStructure().isMultiple() ? " Or" : " Alternative"))));
+		toolTipContent.add(new Label(" Connection type: \n\t Collapsed Features"));
 
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
@@ -330,8 +296,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			return false;
 		}
 		final IFeature target = graphicalTarget.getObject();
-		return (source instanceof ExtendedFeature && ((ExtendedFeature) source).isFromExtern() && target instanceof ExtendedFeature
-				&& ((ExtendedFeature) target).isFromExtern());
+		return (source instanceof ExtendedFeature && ((ExtendedFeature) source).isFromExtern()
+				&& target instanceof ExtendedFeature && ((ExtendedFeature) target).isFromExtern());
 	}
 
 }

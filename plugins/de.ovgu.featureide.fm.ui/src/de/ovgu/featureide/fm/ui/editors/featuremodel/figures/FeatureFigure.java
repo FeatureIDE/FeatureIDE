@@ -79,7 +79,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private final ConnectionAnchor targetAnchor;
 
 	private IGraphicalFeature feature;
-
+	private CollapsedDecoration collapseDecoration;
 	private static GridLayout gl = new GridLayout();
 
 	private static String ABSTRACT = " Abstract";
@@ -104,9 +104,9 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		label.setFont(DEFAULT_FONT);
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
-		
+
 		String displayName = feature.getObject().getName();
-		if(featureModel.getLayout().showShortNames()){
+		if (featureModel.getLayout().showShortNames()) {
 			int lastIndexOf = displayName.lastIndexOf(".");
 			displayName = displayName.substring(++lastIndexOf);
 		}
@@ -126,7 +126,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		if (!featureModel.getLayout().showHiddenFeatures() && feature.getObject().getStructure().hasHiddenParent()) {
 			setSize(new Dimension(0, 0));
 		}
-		
+
 		if (feature.getObject().getStructure().hasCollapsedParent()) {
 			setSize(new Dimension(0, 0));
 		}
@@ -142,14 +142,13 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		IFeature feature = this.feature.getObject();
 		List<String> explanation = new ArrayList<String>();
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
-		
+
 		boolean hasExpl = false;
-		if (feature.getProperty().getFeatureStatus() == FeatureStatus.DEAD || 
-				feature.getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL || 
-				feature.getStructure().isRoot() && !analyser.valid()) {
+		if (feature.getProperty().getFeatureStatus() == FeatureStatus.DEAD || feature.getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL
+				|| feature.getStructure().isRoot() && !analyser.valid()) {
 			hasExpl = true;
 		}
-		
+
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
 			// only color if the active profile is not the default profile
 			FeatureColor color = FeatureColorManager.getColor(feature);
@@ -168,7 +167,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 				explanation = analyser.deadFeatureExpl.get(feature); // get explanation for void feature model
-			//	toolTip.append(VOID);
+				//	toolTip.append(VOID);
 			} else {
 				if (feature.getStructure().isConcrete()) {
 					if (!hasExpl) {
@@ -197,14 +196,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 						explanation = analyser.deadFeatureExpl.get(feature); // get explanation for dead feature
-					//	toolTip.append(DEAD);
+						//	toolTip.append(DEAD);
 					}
 					break;
 				case FALSE_OPTIONAL:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
 					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
 					explanation = analyser.falseOptFeatureExpl.get(feature); // get explanation for false optional feature
-			//		toolTip.append(FALSE_OPTIONAL);
+					//		toolTip.append(FALSE_OPTIONAL);
 					break;
 				case INDETERMINATE_HIDDEN:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
@@ -241,7 +240,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
 		if (!contraints.isEmpty()) {
-			String c = hasExpl? "\nConstraints:\n" : "\n\nConstraints:\n";
+			String c = hasExpl ? "\nConstraints:\n" : "\n\nConstraints:\n";
 			toolTip.append(c);
 			toolTip.append(contraints + "\n");
 		}
@@ -408,5 +407,24 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	 */
 	public IGraphicalFeature getFeature() {
 		return feature;
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.draw2d.Figure#setLocation(org.eclipse.draw2d.geometry.Point)
+	 */
+	@Override
+	public void setLocation(Point p) {
+		// TODO Auto-generated method stub
+		super.setLocation(p);
+		if(collapseDecoration != null)
+		{
+			collapseDecoration.setLocation(new Point(p.x + getBounds().width/2, p.y + getBounds().height));
+		}
+	}
+	
+	public void SetCollapseDecorator(CollapsedDecoration decoration)
+	{
+		collapseDecoration = decoration; 
 	}
 }
