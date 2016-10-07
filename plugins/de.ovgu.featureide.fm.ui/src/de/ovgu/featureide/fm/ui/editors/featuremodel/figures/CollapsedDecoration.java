@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
@@ -28,6 +29,7 @@ import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -66,7 +68,8 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 
 	@Override
 	public void setLocation(Point p) {
-		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+//		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+		super.setLocation(p);
 	}
 
 	public void setDecoratorText(String newText) {
@@ -100,7 +103,6 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 	 */
 	@Override
 	public void setReferencePoint(Point p) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -109,15 +111,6 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 	 */
 	@Override
 	protected void fillShape(Graphics graphics) {
-		final Rectangle bounds = new Rectangle(getBounds());
-		if (graphicalFeature.getObject().getStructure().isAbstract()) {
-			graphics.setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-		} else if (graphicalFeature.getObject().getStructure().isHidden()) {
-			graphics.setBackgroundColor(FMPropertyManager.getHiddenFeatureBackgroundColor());
-		} else if (graphicalFeature.getObject().getStructure().isConcrete()) {
-			graphics.setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
-		}
-		graphics.fillRectangle(bounds);
 	}
 
 	/* (non-Javadoc)
@@ -125,7 +118,6 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 	 */
 	@Override
 	protected void outlineShape(Graphics graphics) {
-		// TODO Auto-generated method stub
 
 	}
 

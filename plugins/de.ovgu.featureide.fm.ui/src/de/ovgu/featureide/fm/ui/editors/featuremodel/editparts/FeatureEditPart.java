@@ -27,6 +27,7 @@ import java.util.Map;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
@@ -49,6 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
@@ -84,6 +86,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		final FeatureFigure featureFigure = new FeatureFigure(f, f.getGraphicalModel());
 		sourceAnchor = featureFigure.getSourceAnchor();
 		targetAnchor = featureFigure.getTargetAnchor();
+		
 		return featureFigure;
 	}
 
@@ -173,6 +176,16 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	public void deactivate() {
 		super.deactivate();
 		getFeatureFigure().setVisible(false);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#refresh()
+	 */
+	@Override
+	public void refresh() {
+		// TODO Auto-generated method stub
+		super.refresh();
+		refreshCollapsedDecorator();
 	}
 
 	@Override
@@ -268,6 +281,23 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		}
 	}
 
+	public void refreshCollapsedDecorator()
+	{
+		final IGraphicalFeature f = getFeature();
+		final FeatureFigure featureFigure = (FeatureFigure) getFigure();
+		if(f.getObject().getStructure().hasChildren() && f.getObject().getStructure().isCollapsed() && !f.getObject().getStructure().hasCollapsedParent())
+		{
+			if(featureFigure.getParent() != null)
+			{
+				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
+				Point parentLocation = new Point(featureFigure.getParent().getBounds().x, featureFigure.getParent().getBounds().y);
+				Point featureLocation = new Point(featureFigure.getLocation().x + featureFigure.getBounds().width/2, featureFigure.getLocation().y + featureFigure.getBounds().height);
+
+				collapsedDecoration.setLocation(new Point(parentLocation.x + featureLocation.x, parentLocation.y + featureLocation.y));
+				featureFigure.getParent().add(collapsedDecoration);
+			}			
+		}
+	}
 	private static boolean equals(final IGraphicalFeature newTarget, final IGraphicalFeature target) {
 		return newTarget == null ? target == null : newTarget.equals(target);
 	}
