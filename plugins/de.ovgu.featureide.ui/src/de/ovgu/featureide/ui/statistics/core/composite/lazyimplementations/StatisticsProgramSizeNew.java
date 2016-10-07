@@ -230,6 +230,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		if(isFeatureOrPreprocessorProject) {
 			fillMapper();
 		}
+		fileFeatLOCMapper.printTableToConsole();
 	}
 	
 	/**
@@ -265,7 +266,9 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			
 			int childrenLOC = countChildrenLOC(directive);
 			locOfDirectiveBody += directive.getEndLine() - directive.getStartLine() -1; //From start to end without end command
-			locOfDirectiveBody -= childrenLOC;
+			if (locOfDirectiveBody - childrenLOC >= 0)
+				locOfDirectiveBody -= childrenLOC;
+			System.out.println(" dir: "+ directive.getExpression() + " -- locDirBody: "+ locOfDirectiveBody +" -- childrenLOC: "+ childrenLOC);
 		}
 		return locOfDirectiveBody;
 	}
@@ -280,6 +283,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int childrenLoc = 0;
 		if (directive.hasChildren()) {
 			for (FSTDirective child: directive.getChildren()) {
+				System.out.println("    Child of "+ directive.getExpression() + " is ~~ "+ child.getExpression());
 				childrenLoc += child.getEndLine() - child.getStartLine() +1;
 			}
 		} 
