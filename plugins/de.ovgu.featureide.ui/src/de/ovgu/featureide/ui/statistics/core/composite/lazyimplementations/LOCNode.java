@@ -68,9 +68,9 @@ public class LOCNode extends LazyParent {
 			
 			addChild(new Parent("Non-Variable lines of code", nonVariableCode));
 			if(VariableLOC == 0) {
-				addChild(new Parent("Variable lines of code (This may not be accurate.)", VariableLOC));
+				addChild(new Parent("Variable lines of code (includes PreProcessor statements) (This may not be accurate.)", VariableLOC));
 			} else {
-				addChild(new Parent("Variable lines of code", VariableLOC));
+				addChild(new Parent("Variable lines of code (includes PreProcessor statements)", VariableLOC));
 			}
 			addChild(new Parent("Preprocessor lines of code", preProcessorLOC ));
 		}

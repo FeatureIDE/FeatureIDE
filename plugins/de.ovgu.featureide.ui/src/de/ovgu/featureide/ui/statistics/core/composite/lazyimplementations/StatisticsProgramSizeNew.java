@@ -214,7 +214,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						Mechanism mecha = project.getComposer().getGenerationMechanism();
 						if (mecha == Mechanism.PREPROCESSOR) {
 							isPPProject = true;
-							numberOfLinesInThisFile += getDirectiveCommandLOC(file);
+							numberOfLinesInThisFile += getDirectiveStatementLOC(file);
 						}
 						//File with loc > Mapper
 						fileFeatLOCMapper.addEntry(file, numberOfLinesInThisFile);
@@ -241,7 +241,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 				FSTFeature currentFeat = role.getFeature();
 				IFile file = role.getFile();
 				if (isPPProject) {
-					
 					int loc = countLOCOfDirectives(role.getDirectives());
 					fileFeatLOCMapper.addSingleLOCMapEntry(file, currentFeat, loc);
 				} else {
@@ -260,15 +259,15 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	 */
 	private int countLOCOfDirectives(TreeSet<FSTDirective> directives) {
 		Iterator<FSTDirective> iterator = directives.iterator();
-		int locForDirectives = 0;
+		int locOfDirectiveBody = 0;
 		while (iterator.hasNext()) {
 			FSTDirective directive = iterator.next();
-			int subDirectiveLOC = 0;
-			countDirectiveChildrenCommandLOC(directive, subDirectiveLOC);
-			locForDirectives += directive.getEndLine() - directive.getStartLine() -1; //From start to end without end command
-			locForDirectives -= subDirectiveLOC;
+			
+			int childrenLOC = countChildrenLOC(directive);
+			locOfDirectiveBody += directive.getEndLine() - directive.getStartLine() -1; //From start to end without end command
+			locOfDirectiveBody -= childrenLOC;
 		}
-		return locForDirectives;
+		return locOfDirectiveBody;
 	}
 	
 	/**
@@ -277,16 +276,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	 * @param loc recursive variable
 	 * @return
 	 */
-	private int countDirectiveChildrenCommandLOC(FSTDirective directive, int loc) {
+	private int countChildrenLOC(FSTDirective directive) {
+		int childrenLoc = 0;
 		if (directive.hasChildren()) {
 			for (FSTDirective child: directive.getChildren()) {
-				loc += countDirectiveChildrenCommandLOC(child, loc);
-				return loc;
+				childrenLoc += child.getEndLine() - child.getStartLine() +1;
 			}
-		} else {
-			return 2;
-		}
-		return 0;
+		} 
+		return childrenLoc;
 	}
 	
 	/**
@@ -308,22 +305,34 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		boolean isInComment = false;
 		while ((line = br.readLine()) != null) {
 			line = line.trim();
-			if (!line.equals("") && !line.startsWith(oneLineComment) && !isInComment) {
-				if (line.startsWith(moreLineStart)) {
-					isInComment = true;
-				} else {
-					numberOfLinesInThisFile++;
+			//No empty line
+			if (!line.equals("")) {
+				//Line is no regular comment
+				if (!line.startsWith(oneLineComment)) {
+					//Line is not part of a multiple line comment
+					if (!isInComment) {
+						if (line.startsWith(moreLineStart)) {
+							isInComment = true;
+						} else {
+							numberOfLinesInThisFile++;
+						}
+					
+						if (line.contains(moreLineEnd)) {
+							isInComment = false;
+//							if (!line.endsWith(moreLineEnd))
+//								numberOfLinesInThisFile++;
+						}
+			
+						//Theres another comment in the line
+						if (line.contains(moreLineStart) && !line.startsWith(moreLineStart))
+							isInComment = true;
+					} else {
+						if (line.contains(moreLineEnd)) {
+							isInComment = false;
+						}
+					}
 				}
 			}
-
-			if (line.contains(moreLineEnd)) {
-				isInComment = false;
-				if (!line.endsWith(moreLineEnd))
-					numberOfLinesInThisFile++;
-			}
-
-			if (line.contains(moreLineStart) && !line.startsWith("/*"))
-				isInComment = true;
 		}
 		br.close();
 		return numberOfLinesInThisFile;
@@ -334,7 +343,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	 * @param file
 	 * @return
 	 */
-	private int getDirectiveCommandLOC(IFile file) {
+	private int getDirectiveStatementLOC(IFile file) {
 		int loc = 0;
 		for (FSTClass fstClass: fstModel.getClasses()) {
 			for (FSTRole role: fstClass.getRoles()) {
@@ -343,7 +352,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						if (!directive.hasChildren() && directive.getParent() == null) {
 							loc += 2;
 						} else if (directive.hasChildren() && directive.getParent() == null) {
-							countDirectiveChildrenCommandLOC(directive, loc);
+							loc += countChildrenLOC(directive);
 						}
 					}
 				}
