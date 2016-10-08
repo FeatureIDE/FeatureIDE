@@ -7,6 +7,7 @@
             allPopups="false"
             locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
          <menu
+               icon="icons/FeatureIconSmall.ico"
                id="popup:de.ovgu.featureide.fm.ui.menus.popupMenu.visualisations"
                label="Visualisation">
                				<visibleWhen

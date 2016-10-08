@@ -31,6 +31,8 @@ public class ShowFeatureCoocurrenceCommandHandler extends ASelectionHandler {
 			if (element instanceof IAdaptable) {
 				project = ((IAdaptable) element).getAdapter(IProject.class);
 			}
+		} else {
+			project = (IProject)element;
 		}
 		boolean[][] matrix = null;
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
