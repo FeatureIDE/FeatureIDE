@@ -27,13 +27,13 @@ import org.prop4j.analyses.PairWiseConfigurationGenerator;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
+import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
@@ -50,31 +50,31 @@ public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 	}
 
 	@Override
-	public Void execute(WorkMonitor monitor) throws Exception {
-		callConfigurationGenerator(featureModel, (int)builder.configurationNumber, monitor);
+	public Void execute(IMonitor monitor) throws Exception {
+		callConfigurationGenerator(featureModel, (int) builder.configurationNumber, monitor);
 		return null;
 	}
 	
-	private void callConfigurationGenerator(IFeatureModel fm, int solutionCount, WorkMonitor monitor) {
-		final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm);
+	private void callConfigurationGenerator(IFeatureModel fm, int solutionCount, IMonitor monitor) {
+		final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm, new AbstractFeatureFilter());
 		advancedNodeCreator.setCnfType(CNFType.Regular);
 		advancedNodeCreator.setIncludeBooleanValues(false);
 
 		Node createNodes = advancedNodeCreator.createNodes();
-		SatInstance solver = new SatInstance(createNodes, FeatureUtils.getFeatureNamesPreorder(fm));
-		PairWiseConfigurationGenerator gen = getGenerator(solver, solutionCount);
-		exec(solver, gen, monitor);
+		SatInstance satInstance = new SatInstance(createNodes);
+		PairWiseConfigurationGenerator gen = getGenerator(satInstance, solutionCount);
+		exec(satInstance, gen, monitor);
 	}
-	
+
 	protected PairWiseConfigurationGenerator getGenerator(SatInstance solver, int solutionCount) {
 		return new PairWiseConfigurationGenerator(solver, solutionCount);
 	}
-	
-	protected void exec(final SatInstance satInstance, final PairWiseConfigurationGenerator as, WorkMonitor monitor) {
+
+	protected void exec(final SatInstance satInstance, final PairWiseConfigurationGenerator as, IMonitor monitor) {
 		final Thread consumer = new Thread() {
 			@Override
 			public void run() {
-				int foundConfigurations = 0; 
+				int foundConfigurations = 0;
 				while (true) {
 					try {
 						generateConfiguration(satInstance.convertToString(as.q.take().getModel()));

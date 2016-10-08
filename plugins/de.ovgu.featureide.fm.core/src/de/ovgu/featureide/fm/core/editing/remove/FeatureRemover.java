@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 import de.ovgu.featureide.fm.core.editing.cnf.ICNFSolver;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
@@ -165,7 +165,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		}
 	}
 
-	public Node execute(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+	public Node execute(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		// Collect all features in the prop node and remove TRUE and FALSE
 		init();
 
@@ -179,7 +179,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		}
 	}
 
-	public Node handleSingleClause(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+	public Node handleSingleClause(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		for (Node clauseChildren : fmNode.getChildren()) {
 			final Literal literal = (Literal) clauseChildren;
 			if (features.contains(literal.var)) {
@@ -190,11 +190,11 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		return fmNode.clone();
 	}
 
-	public Node handleSingleLiteral(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+	public Node handleSingleLiteral(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		return (features.contains(((Literal) fmNode).var)) ? (includeBooleanValues ? new Literal(NodeCreator.varTrue) : new And()) : fmNode.clone();
 	}
 
-	public Node handleComplexFormula(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+	public Node handleComplexFormula(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		final Node[] andChildren = fmNode.getChildren();
 
 		relevantClauseList = new ArrayList<>(andChildren.length);
@@ -228,7 +228,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 		createSolver();
 
-		workMonitor.setMaxAbsoluteWork(heuristic.size() + 1);
+		workMonitor.setRemainingWork(heuristic.size() + 1);
 
 		final double localFactor = 1.2;
 		final double globalFactor = 1.5;
@@ -239,9 +239,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		relevantNegIndex = relevantClauseList.size();
 
 		while (heuristic.hasNext()) {
-			if (workMonitor.step()) {
-				return null;
-			}
+			workMonitor.checkCancel();
 			final DeprecatedFeature next = heuristic.next();
 			final String curFeature = next.getFeature();
 			final int curFeatureID = idMap.get(curFeature);

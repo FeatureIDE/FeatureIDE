@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -34,9 +33,7 @@ import org.junit.Test;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Tests for {@link FeatureModelAnalyzer} 
@@ -112,16 +109,12 @@ public class TFeatureModelAnalyzer {
 	}
 	
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		IFeatureModel fm = null;
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
-				try {
-					new XmlFeatureModelReader(fm).readFromFile(f);
+				fm = FeatureModelManager.readFromFile(f.toPath());
+				if (fm!= null) {
 					break;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (UnsupportedModelException e) {
-					e.printStackTrace();
 				}
 			}
 		}

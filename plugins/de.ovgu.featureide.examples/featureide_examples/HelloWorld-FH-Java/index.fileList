@@ -1,0 +1,11 @@
+.classpath
+.project
+.settings/org.eclipse.jdt.core.prefs
+configs/BeautifulWorld.config
+configs/HelloWorld.config
+configs/WonderfulWorld.config
+features/Beautiful/Main.java
+features/Hello/Main.java
+features/Wonderful/Main.java
+features/World/Main.java
+model.xml

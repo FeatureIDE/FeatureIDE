@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public interface IJob {
+public interface IJob<T> {
 
 	public enum JobStatus {
 		/**
@@ -72,13 +72,15 @@ public interface IJob {
 	 */
 	JobStatus getStatus();
 
+	T getResults();
+
 	/**
 	 * Adds a {@link JobFinishListener} to this job.
 	 * 
 	 * @param listener the listener to add
 	 * @see #removeJobFinishedListener
 	 */
-	void addJobFinishedListener(JobFinishListener listener);
+	void addJobFinishedListener(JobFinishListener<T> listener);
 
 	/**
 	 * Removes a certain {@link JobFinishListener} from this job.
@@ -86,7 +88,7 @@ public interface IJob {
 	 * @param listener the listener to remove
 	 * @see #addJobFinishedListener
 	 */
-	void removeJobFinishedListener(JobFinishListener listener);
+	void removeJobFinishedListener(JobFinishListener<T> listener);
 
 	/**
 	 * {@link org.eclipse.core.runtime.jobs.Job#cancel()}

@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) {

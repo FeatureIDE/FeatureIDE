@@ -85,10 +85,12 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	 */
 	@Override
 	public Collection<IFeature> getContainedFeatures() {
-		if (containedFeatureList.isEmpty()) {
-			setContainedFeatures();
+		synchronized (containedFeatureList) {
+			if (containedFeatureList.isEmpty()) {
+				setContainedFeatures();
+			}
+			return containedFeatureList;
 		}
-		return containedFeatureList;
 	}
 
 	@Override
@@ -152,9 +154,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	 */
 	@Override
 	public void setContainedFeatures() {
-		containedFeatureList.clear();
-		for (final String featureName : propNode.getContainedFeatures()) {
-			containedFeatureList.add(featureModel.getFeature(featureName));
+		synchronized (containedFeatureList) {
+			containedFeatureList.clear();
+			for (final String featureName : propNode.getContainedFeatures()) {
+				containedFeatureList.add(featureModel.getFeature(featureName));
+			}
 		}
 	}
 

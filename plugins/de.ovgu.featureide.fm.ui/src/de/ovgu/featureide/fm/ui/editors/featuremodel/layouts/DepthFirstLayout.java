@@ -61,7 +61,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		int newX = x;
 		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
 			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();
-		for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
+		for (IGraphicalFeature child : getChildren(feature)) {
 			newX = depthFirstLayout(child, level + 1, newX);
 		}
 		return Math.max(newX, x + feature.getSize().width + FMPropertyManager.getFeatureSpaceX());

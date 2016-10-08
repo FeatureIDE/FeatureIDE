@@ -20,12 +20,17 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import de.ovgu.featureide.fm.core.job.monitor.SyncMonitor;
+
 /**
  * Control object for {@link IJob}s.
  * Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
+ * @deprecated Use {@link SyncMonitor} instead.
+ * 
  * @author Sebastian Krieter
  */
+@Deprecated
 public final class SyncWorkMonitor extends AWorkMonitor {
 	
 	public SyncWorkMonitor(AWorkMonitor oldMonitor) {

@@ -43,7 +43,7 @@ import java.util.ArrayList;
 
 import javax.annotation.CheckForNull;
 
-import org.eclipse.core.internal.runtime.InternalPlatform;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -62,7 +62,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Text;
-import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -91,16 +90,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String TOOL_TIP_T_ORDER = "Define the T for odering by interactions.";
 	private static final String TOOL_TIP_PROJECT = DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
 
-	private static boolean JUNIT_INSTALLED = false;
-	static {
-		final Bundle[] bundles = InternalPlatform.getDefault().getBundleContext().getBundles();
-		for (Bundle bundle : bundles) {
-			if ("org.junit".equals(bundle.getSymbolicName())) {
-				JUNIT_INSTALLED = true;
-				break;
-			}
-		}
-	}
+	private static boolean JUNIT_INSTALLED = Platform.getBundle("org.junit") != null;
 	
 	@CheckForNull
 	private IFeatureProject project;

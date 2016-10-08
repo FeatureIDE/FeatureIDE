@@ -20,33 +20,47 @@
  */
 package org.prop4j.analyses;
 
-import java.util.ArrayList;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_00;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_01;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_10;
+import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_11;
+
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.analyses.ImplicationSetsAnalysis.Relationship;
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Creates a complete implication graph.
  * 
  * @author Sebastian Krieter
  */
-public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relationship, Relationship>> {
+public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>> {
+
+	public ImplicationSetsAnalysis(ISatSolver solver) {
+		super(solver);
+	}
 
 	public ImplicationSetsAnalysis(SatInstance satInstance) {
 		super(satInstance);
 	}
 
 	public static class Relationship implements Comparable<Relationship> {
+		
+		public static final byte BIT_11 = 1 << 3;
+		public static final byte BIT_10 = 1 << 2;
+		public static final byte BIT_01 = 1 << 1;
+		public static final byte BIT_00 = 1 << 0;
 
 		private final int featureID1, featureID2;
 
@@ -105,10 +119,6 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 		}
 	}
 
-	private static final byte BIT_11 = 1 << 3;
-	private static final byte BIT_10 = 1 << 2;
-	private static final byte BIT_01 = 1 << 1;
-	private static final byte BIT_00 = 1 << 0;
 	private static final byte BIT_CHECK = 1 << 6;
 	private static final byte BITS_POSITIVE_IMPLY = BIT_11 | BIT_10;
 	private static final byte BITS_NEGATIVE_IMPLY = BIT_01 | BIT_00;
@@ -118,26 +128,23 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 	private byte[] recArray = new byte[0];
 	private int numVariables = 0;
 
-	private final Collection<int[]> solutions = new ArrayList<>();
 	private final Deque<Integer> parentStack = new LinkedList<>();
 
 	private final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 	@Override
-	public HashMap<Relationship, Relationship> analyze(WorkMonitor monitor) throws Exception {
+	public Set<Relationship> analyze(IMonitor monitor) throws Exception {
 		relationSet.clear();
 		parentStack.clear();
-		solutions.clear();
 
+		solver.initSolutionList(Math.min(solver.getSatInstance().getNumberOfVariables(), ISatSolver.MAX_SOLUTION_BUFFER));
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		solver.isSatisfiable();
-		int[] model1 = getModel(solutions);
+		int[] model1 = solver.findModel();
 
 		// satisfiable?
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			solver.isSatisfiable();
-			int[] model2 = getModel(solutions);
+			int[] model2 = solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
@@ -148,20 +155,19 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
-					solver.getAssignment().push(-varX);
+					solver.assignmentPush(-varX);
 					//					solver.shuffleOrder();
 					switch (solver.isSatisfiable()) {
 					case FALSE:
 						core[i] = (byte) (varX > 0 ? 1 : -1);
-						solver.getAssignment().pop().unsafePush(varX);
+						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.getAssignment().pop();
-						model2 = getModel(solutions);
-						SatInstance.updateModel(model1Copy, model2);
+						solver.assignmentPop();
+						SatInstance.updateModel(model1Copy, solver.getModel());
 						solver.shuffleOrder();
 						break;
 					}
@@ -169,7 +175,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 			}
 			numVariables = model1.length;
 			combinations = new byte[numVariables * numVariables];
-			
+
 			outer: for (Node clause : solver.getSatInstance().getCnf().getChildren()) {
 				final Node[] literals = clause.getChildren();
 				int childrenCount = literals.length;
@@ -209,7 +215,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 			}
 
 			boolean incomplete;
-			
+
 			do {
 				incomplete = false;
 				for (int x1 = 0; x1 < model1Copy.length; x1++) {
@@ -253,7 +259,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 				testVariable();
 			}
 		}
-		return relationSet;
+		return relationSet.keySet();
 	}
 
 	private boolean testVariable2() {
@@ -313,7 +319,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 			recArray[i] |= compareB;
 
 			int[] xModel1 = null;
-			for (int[] solution : solutions) {
+			for (int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
 					xModel1 = solution;
 					break;
@@ -325,17 +331,15 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 
 			int c = 0;
 
-			solver.getAssignment().push(mx1);
+			solver.assignmentPush(mx1);
 			final int rowIndex = i * numVariables;
 
 			inner1: for (int j = i + 1; j < xModel1.length; j++) {
 				final byte b = combinations[rowIndex + j];
-				if (core[j] == 0 
-						&& (b & BIT_CHECK) != 0 
-						&& ((positive && (b & BITS_POSITIVE_IMPLY) == 0) || (!positive && (b & BITS_NEGATIVE_IMPLY) == 0))) {
+				if (core[j] == 0 && (b & BIT_CHECK) != 0 && ((positive && (b & BITS_POSITIVE_IMPLY) == 0) || (!positive && (b & BITS_NEGATIVE_IMPLY) == 0))) {
 
 					final int my1 = xModel1[j];
-					for (int[] solution : solutions) {
+					for (int[] solution : solver.getSolutionList()) {
 						final int mxI = solution[i];
 						final int myI = solution[j];
 						if ((mx1 == mxI) && (my1 != myI)) {
@@ -343,7 +347,7 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 						}
 					}
 
-					solver.getAssignment().push(-my1);
+					solver.assignmentPush(-my1);
 					solver.setSelectionStrategy((c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
 					switch (solver.isSatisfiable()) {
@@ -352,36 +356,25 @@ public class ImplicationSetsAnalysis extends SingleThreadAnalysis<HashMap<Relati
 							addRelation(mx0, my1);
 						}
 						parentStack.push(my1);
-						solver.getAssignment().pop().pop();
+						solver.assignmentPop();
+						solver.assignmentPop();
 						testVariable();
-						solver.getAssignment().push(mx1);
+						solver.assignmentPush(mx1);
 						break;
 					case TIMEOUT:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						break;
 					case TRUE:
-						final int[] model = solver.getModel();
-						if (model != null) {
-							solutions.add(model);
-						}
 						solver.shuffleOrder();
-						solver.getAssignment().pop();
-//						combinations[rowIndex + j] &= ~BIT_CHECK;
+						solver.assignmentPop();
+						//						combinations[rowIndex + j] &= ~BIT_CHECK;
 						break;
 					}
 				}
 			}
-			solver.getAssignment().pop();
+			solver.assignmentPop();
 		}
 		parentStack.pop();
-	}
-
-	private int[] getModel(final Collection<int[]> solutions) {
-		final int[] model = solver.getModel();
-		if (model != null) {
-			solutions.add(model);
-		}
-		return model;
 	}
 
 	private void addRelation(final int mx0, final int my0) {

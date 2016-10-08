@@ -164,9 +164,6 @@ public class CNFSolver implements ICNFSolver {
 		solver.reset();
 	}
 
-	/**
-	 * @param mainClause
-	 */
 	public void addClause(DeprecatedClause mainClause) {
 		final int[] literals = mainClause.literals;
 		final int[] unitClauses = new int[literals.length];

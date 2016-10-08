@@ -30,8 +30,7 @@ import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -40,32 +39,26 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Fabian Benduhn
  */
-public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
+public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 
 	/**
 	 * @param file
-	 * @throws UnsupportedModelException 
+	 * @throws UnsupportedModelException
 	 */
 	public TSXFMReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
-		super(fm,s);
+		super(fm, s);
 	}
 
 	@Override
-	protected IFeatureModelWriter getWriter(IFeatureModel fm) {
-		return new SXFMWriter(fm);
+	protected IFeatureModelFormat getFormat() {
+		return new SXFMFormat();
 	}
 
 	@Override
-	protected IFeatureModelReader getReader(IFeatureModel fm) {
-		return new SXFMReader(fm);
+	public void testFeatureHidden() {
+
 	}
 
-	
-	@Override
-	public void testFeatureHidden(){
-		
-	}
-	
 	@Test
 	public void testPropNodes() {
 		for (IConstraint constraint : newFm.getConstraints()) {
@@ -81,24 +74,24 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
 				}
 			}
 			// case: feature1 or feature2 or feature3 ...
-			assertTrue(n + " is no Or Node",n instanceof Or);
+			assertTrue(n + " is no Or Node", n instanceof Or);
 			isCnf(n);
 		}
 	}
-	
+
 	private void isCnf(Node node) {
 		for (Node n : node.getChildren()) {
 			if (n instanceof Not) {
 				assertTrue("Not statement has to much children", n.getChildren().length == 1);
-				assertTrue(n + "is not a Literal after Not",n.getChildren()[0] instanceof Literal);
-			} else if (n instanceof Or) { 
+				assertTrue(n + "is not a Literal after Not", n.getChildren()[0] instanceof Literal);
+			} else if (n instanceof Or) {
 				isCnf(n);
 			} else {
-				assertTrue(n + " is no Literal",n instanceof Literal);
+				assertTrue(n + " is no Literal", n instanceof Literal);
 			}
 		}
 	}
-	
+
 	@Override
 	public void testDescription() {
 		// description not implemented

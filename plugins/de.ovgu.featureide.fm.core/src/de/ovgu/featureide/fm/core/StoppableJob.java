@@ -65,7 +65,7 @@ public abstract class StoppableJob extends Job {
 				try {
 					execute(monitor);
 				} catch (Exception e){
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 				}
 			}
 			
@@ -81,7 +81,7 @@ public abstract class StoppableJob extends Job {
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return Status.OK_STATUS; 
 	}

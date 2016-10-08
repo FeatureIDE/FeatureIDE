@@ -36,8 +36,7 @@ import org.prop4j.Node;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -45,10 +44,10 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.base.OrFilter;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Updates a configuration.
@@ -59,7 +58,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class CanBeValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean execute(WorkMonitor monitor) {
+		public Boolean execute(IMonitor monitor) {
 			if (rootNode == null) {
 				return false;
 			}
@@ -78,7 +77,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			try {
 				return new SatSolver(new And(allFeatures), TIMEOUT).isSatisfiable();
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 			return false;
 		}
@@ -86,7 +85,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class Resolve implements LongRunningMethod<Void> {
 		@Override
-		public Void execute(WorkMonitor workMonitor) throws Exception {
+		public Void execute(IMonitor workMonitor) throws Exception {
 			if (rootNode == null) {
 				return null;
 			}
@@ -100,7 +99,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				}
 			}
 
-			workMonitor.setMaxAbsoluteWork(oldManualSelected.size() + configuration.features.size() + 1);
+			workMonitor.setRemainingWork(oldManualSelected.size() + configuration.features.size() + 1);
 
 			final SatSolver manualSolver = new SatSolver(rootNode, ConfigurationPropagator.TIMEOUT);
 
@@ -145,7 +144,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 							}
 						}
 					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 				}
 				workMonitor.invoke(feature);
@@ -168,7 +167,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Long execute(WorkMonitor monitor) {
+		public Long execute(IMonitor monitor) {
 			if (rootNode == null) {
 				return 0L;
 			}
@@ -194,7 +193,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			this.featureList = featureList;
 		}
 
-		public List<Node> execute(WorkMonitor workMonitor) {
+		public List<Node> execute(IMonitor workMonitor) {
 			if (rootNode == null) {
 				return Collections.emptyList();
 			}
@@ -216,12 +215,10 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			final Node[] clauses = rootNodeWithoutHidden.getChildren();
 			final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
-			workMonitor.setMaxAbsoluteWork(clauses.length);
+			workMonitor.setRemainingWork(clauses.length);
 
 			for (int i = 0; i < clauses.length; i++) {
-				if (workMonitor.checkCancel()) {
-					return Collections.emptyList();
-				}
+				workMonitor.checkCancel();
 				final Node clause = clauses[i];
 				literalMap.clear();
 				if (clause instanceof Literal) {
@@ -283,7 +280,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public LinkedList<List<String>> execute(WorkMonitor monitor) throws TimeoutException {
+		public LinkedList<List<String>> execute(IMonitor monitor) throws TimeoutException {
 			if (rootNode == null) {
 				return null;
 			}
@@ -294,7 +291,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class IsValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean execute(WorkMonitor monitor) {
+		public Boolean execute(IMonitor monitor) {
 			if (rootNode == null) {
 				return false;
 			}
@@ -307,7 +304,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			try {
 				return new SatSolver(new And(allFeatures), TIMEOUT).isSatisfiable();
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 			return false;
 		}
@@ -319,7 +316,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	 */
 	public class IsValidNoHiddenMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean execute(WorkMonitor monitor) {
+		public Boolean execute(IMonitor monitor) {
 			if (rootNode == null) {
 				return false;
 			}
@@ -339,7 +336,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			try {
 				return new SatSolver(new And(allFeatures), TIMEOUT).isSatisfiable();
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 			return false;
 		}
@@ -349,6 +346,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		private static final int DEFAULT_MODE = -1;
 
 		private final List<SelectableFeature> featureList;
+		@SuppressWarnings("unused")
 		private final int mode;
 
 		public LeadToValidConfiguration(List<SelectableFeature> featureList) {
@@ -361,24 +359,17 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Void execute(WorkMonitor monitor) throws Exception {
-			if (mode == DEFAULT_MODE) {
-				if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
-					leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES, monitor);
-				} else {
-					leadToValidConfiguration(featureList, Preferences.defaultCompletion, monitor);
-				}
-			} else {
-				leadToValidConfiguration(featureList, mode, monitor);
-			}
+		public Void execute(IMonitor monitor) throws Exception {
+			leadToValidConfig2(featureList, monitor);
 			return null;
 		}
 
-		private void leadToValidConfig1(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+		@SuppressWarnings("unused")
+		private void leadToValidConfig1(List<SelectableFeature> featureList, IMonitor workMonitor) {
 			if (rootNode == null) {
 				return;
 			}
-			workMonitor.setMaxAbsoluteWork(featureList.size() + 1);
+			workMonitor.setRemainingWork(featureList.size() + 1);
 			final Map<String, Literal> featureMap = new HashMap<String, Literal>(configuration.features.size() << 1);
 			final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
 
@@ -389,9 +380,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 					featureMap.put(featureName, new Literal(featureName, selectableFeature.getSelection() == Selection.SELECTED));
 				}
 			}
-			if (workMonitor.checkCancel()) {
-				return;
-			}
+			workMonitor.checkCancel();
 
 			final Literal[] literals = new Literal[featureList.size()];
 
@@ -415,9 +404,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			int j = 0;
 			workMonitor.worked();
 			for (SelectableFeature feature : featureList) {
-				if (workMonitor.checkCancel()) {
-					return;
-				}
+				workMonitor.checkCancel();
 				final Literal l = literals[j++].clone();
 				l.positive = !l.positive;
 
@@ -436,7 +423,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				try {
 					result = solver.isSatisfiable(literals);
 				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 					result = false;
 				}
 
@@ -464,7 +451,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			}
 		}
 
-		private void leadToValidConfig2(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+		private void leadToValidConfig2(List<SelectableFeature> featureList, IMonitor workMonitor) {
 			final boolean[] results = new boolean[featureList.size()];
 			if (rootNode == null) {
 				return;
@@ -482,18 +469,14 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				selectableFeature.clearOpenClauses();
 			}
 
-			if (workMonitor.checkCancel()) {
-				return;
-			}
+			workMonitor.checkCancel();
 
 			final Node[] clauses = rootNodeWithoutHidden.getChildren();
 			final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
-			workMonitor.setMaxAbsoluteWork(clauses.length);
+			workMonitor.setRemainingWork(clauses.length);
 
 			for (int i = 0; i < clauses.length; i++) {
-				if (workMonitor.checkCancel()) {
-					return;
-				}
+				workMonitor.checkCancel();
 				final Node clause = clauses[i];
 				literalMap.clear();
 				if (clause instanceof Literal) {
@@ -539,27 +522,11 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				workMonitor.worked();
 			}
 		}
-
-		private void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
-			for (SelectableFeature feature : configuration.features) {
-				feature.setRecommended(Selection.UNDEFINED);
-			}
-			switch (mode) {
-			case Preferences.COMPLETION_ONE_CLICK:
-				leadToValidConfig1(featureList, workMonitor);
-				break;
-			case Preferences.COMPLETION_OPEN_CLAUSES:
-				leadToValidConfig2(featureList, workMonitor);
-				break;
-			case Preferences.COMPLETION_NONE:
-			default:
-			}
-		}
 	}
 
 	public class LoadMethod implements LongRunningMethod<Void> {
 		@Override
-		public Void execute(WorkMonitor monitor) {
+		public Void execute(IMonitor monitor) {
 			if (rootNode != null) {
 				return null;
 			}
@@ -580,14 +547,17 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			nodeCreator1.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 			nodeCreator2.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 
-			LongRunningJob<Node> buildThread1 = LongRunningWrapper.startJob("", nodeCreator1);
-			LongRunningJob<Node> buildThread2 = LongRunningWrapper.startJob("", nodeCreator2);
+			final IRunner<Node> buildThread1 = LongRunningWrapper.getThread(nodeCreator1);
+			final IRunner<Node> buildThread2 = LongRunningWrapper.getThread(nodeCreator2);
+
+			buildThread1.schedule();
+			buildThread2.schedule();
 
 			try {
 				buildThread2.join();
 				buildThread1.join();
 			} catch (InterruptedException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 
 			rootNodeWithoutHidden = buildThread1.getResults();
@@ -606,11 +576,11 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public List<String> execute(WorkMonitor workMonitor) {
+		public List<String> execute(IMonitor workMonitor) {
 			if (rootNode == null) {
 				return null;
 			}
-			workMonitor.setMaxAbsoluteWork(configuration.features.size() + 1);
+			workMonitor.setRemainingWork(configuration.features.size() + 1);
 
 			configuration.resetAutomaticValues();
 
@@ -645,7 +615,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 							iterator.remove();
 						}
 					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					} finally {
 						l.positive = !l.positive;
 					}
@@ -679,7 +649,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			return null;
 		}
 
-		private void updateAllFeatures(final SatSolver automaticSolver, Iterator<SelectableFeature> it, WorkMonitor workMonitor, List<Node> manualSelected,
+		private void updateAllFeatures(final SatSolver automaticSolver, Iterator<SelectableFeature> it, IMonitor workMonitor, List<Node> manualSelected,
 				SatSolver manualSolver, HashMap<SelectableFeature, Selection> possibleRedundantManual) {
 			final Node[] manualSelectedArray = createNodeArray(manualSelected);
 			int i = 0;
@@ -703,7 +673,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 							}
 						}
 					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 				} else {
 					Literal l = (Literal) manualSelectedArray[i++];
@@ -716,7 +686,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 							feature.setAutomatic(l.positive ? Selection.UNSELECTED : Selection.SELECTED);
 						}
 					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					} finally {
 						l.positive = !l.positive;
 					}
@@ -767,7 +737,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
 	 */
-	public List<List<String>> coverFeatures(final Collection<String> features, final boolean selection, WorkMonitor monitor) throws TimeoutException {
+	public List<List<String>> coverFeatures(final Collection<String> features, final boolean selection, IMonitor monitor) throws TimeoutException {
 		if (rootNode == null) {
 			return null;
 		}
@@ -785,10 +755,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		final List<List<String>> solutions = new LinkedList<>();
 		while (!features.isEmpty()) {
 			solutions.add(satSolver.coverFeatures(features, selection, monitor));
-			if (monitor.checkCancel()) {
-				break;
-			}
-			monitor.createSubTask(features.size() + " features to cover.");
+			monitor.checkCancel();
+			monitor.setRemainingWork(features.size());
 		}
 		return solutions;
 	}

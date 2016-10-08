@@ -20,6 +20,7 @@
  */
 package org.prop4j.solver;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -28,84 +29,43 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
-import org.sat4j.minisat.core.Heap;
-import org.sat4j.minisat.core.IOrder;
-import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 import org.sat4j.minisat.core.Solver;
 import org.sat4j.minisat.orders.NegativeLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.PositiveLiteralSelectionStrategy;
+import org.sat4j.minisat.orders.RSATPhaseSelectionStrategy;
 import org.sat4j.minisat.orders.RandomLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
+import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
  * Finds certain solutions of propositional formulas.
  * 
  * @author Sebastian Krieter
  */
-public class BasicSolver implements Cloneable {
-
-	public static enum SatResult {
-		TRUE, FALSE, TIMEOUT
-	}
-
-	public static enum SelectionStrategy {
-		ORG, POSITIVE, NEGATIVE, RANDOM
-	}
-
-	private class VarOrderHeap2 extends VarOrderHeap {
-
-		private static final long serialVersionUID = 1L;
-
-		public VarOrderHeap2(IPhaseSelectionStrategy strategy) {
-			super(strategy);
-		}
-
-		@Override
-		public void init() {
-			int nlength = this.lits.nVars() + 1;
-			if (this.activity == null || this.activity.length < nlength) {
-				this.activity = new double[nlength];
-			}
-			this.phaseStrategy.init(nlength);
-			this.activity[0] = -1;
-			this.heap = new Heap(this.activity);
-			this.heap.setBounds(nlength);
-			nlength--;
-			for (int i = 0; i < nlength; i++) {
-				final int x = order[i];
-				this.activity[x] = 0.0;
-				if (this.lits.belongsToPool(x)) {
-					this.heap.insert(x);
-				}
-			}
-		}
-	}
+public class BasicSolver implements ISatSolver {
 
 	protected final SatInstance satInstance;
 	protected final Solver<?> solver;
-	protected final IOrder orgSolverOrder;
 	protected final int[] order;
 	protected final VecInt assignment;
-
-	protected boolean keepHot = false;
+	protected RingList<int[]> solutionList = null;
 
 	public BasicSolver(SatInstance satInstance) throws ContradictionException {
 		this.satInstance = satInstance;
-		this.order = new int[satInstance.intToVar.length - 1];
-		this.assignment = new VecInt();
+		final int numberOfVariables = satInstance.getNumberOfVariables();
+		this.order = new int[numberOfVariables];
+		this.assignment = new VecInt(numberOfVariables);
 
 		solver = initSolver();
 		addVariables();
-
-		orgSolverOrder = solver.getOrder();
-		orgSolverOrder.init();
 	}
 
 	protected BasicSolver(BasicSolver oldSolver) {
@@ -118,11 +78,9 @@ public class BasicSolver implements Cloneable {
 		try {
 			addVariables();
 		} catch (ContradictionException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			throw new RuntimeException();
 		}
-
-		orgSolverOrder = solver.getOrder();
 	}
 
 	private void addVariables() throws ContradictionException {
@@ -130,6 +88,7 @@ public class BasicSolver implements Cloneable {
 		solver.setExpectedNumberOfClauses(satInstance.getCnf().getChildren().length);
 		addCNF(satInstance.getCnf().getChildren());
 		fixOrder();
+		solver.getOrder().init();
 	}
 
 	protected Solver<?> initSolver() {
@@ -140,6 +99,7 @@ public class BasicSolver implements Cloneable {
 		return solver;
 	}
 
+	@Override
 	public List<IConstr> addClauses(Node constraint) throws ContradictionException {
 		return addCNF(constraint.getChildren());
 	}
@@ -158,48 +118,59 @@ public class BasicSolver implements Cloneable {
 		return result;
 	}
 
+	@Override
 	public int[] findModel() {
 		return isSatisfiable() == SatResult.TRUE ? solver.model() : null;
 	}
 
-	public IVecInt getAssignment() {
-		return assignment;
+	@Override
+	public void assignmentPop() {
+		assignment.pop();
 	}
 
-	public List<String> getAssignmentString() {
-		return satInstance.convertToString(assignment);
+	@Override
+	public void assignmentPush(int x) {
+		assignment.push(x);
 	}
 
+	@Override
+	public void assignmentClear(int size) {
+		assignment.shrinkTo(size);
+	}
+
+	@Override
 	public int[] getModel() {
 		return solver.model();
 	}
 
+	@Override
 	public SatInstance getSatInstance() {
 		return satInstance;
 	}
 
-	public Solver<?> getInternalSolver() {
+	@Override
+	public ISolver getInternalSolver() {
 		return solver;
 	}
 
+	@Override
 	public SatResult isSatisfiable() {
 		try {
-			return (solver.isSatisfiable(assignment, false)) ? SatResult.TRUE : SatResult.FALSE;
+			if (solver.isSatisfiable(assignment, false)) {
+				if (solutionList != null) {
+					solutionList.add(solver.model());
+				}
+				return SatResult.TRUE;
+			} else {
+				return SatResult.FALSE;
+			}
 		} catch (TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
 	}
 
-	public boolean isKeepHot() {
-		return keepHot;
-	}
-
-	public void setKeepHot(boolean keepHot) {
-		this.keepHot = keepHot;
-		solver.setKeepSolverHot(keepHot);
-	}
-
+	@Override
 	public void setOrder(List<IFeature> orderList) {
 		int i = -1;
 		for (IFeature feature : orderList) {
@@ -207,40 +178,31 @@ public class BasicSolver implements Cloneable {
 		}
 	}
 
+	public int[] getOrder() {
+		return order;
+	}
+
+	@Override
 	public void setSelectionStrategy(SelectionStrategy strategy) {
 		switch (strategy) {
 		case NEGATIVE:
-			final VarOrderHeap2 negativeHeap = new VarOrderHeap2(new NegativeLiteralSelectionStrategy());
-			solver.setOrder(negativeHeap);
-			if (keepHot) {
-				negativeHeap.init();
-			}
+			solver.setOrder(new VarOrderHeap2(new NegativeLiteralSelectionStrategy(), order));
 			break;
 		case ORG:
-			solver.setOrder(orgSolverOrder);
-			if (keepHot) {
-				orgSolverOrder.init();
-			}
+			solver.setOrder(new VarOrderHeap(new RSATPhaseSelectionStrategy()));
 			break;
 		case POSITIVE:
-			final VarOrderHeap2 positiveHeap = new VarOrderHeap2(new PositiveLiteralSelectionStrategy());
-			solver.setOrder(positiveHeap);
-			if (keepHot) {
-				positiveHeap.init();
-			}
+			solver.setOrder(new VarOrderHeap2(new PositiveLiteralSelectionStrategy(), order));
 			break;
 		case RANDOM:
-			final VarOrderHeap2 randomHeap = new VarOrderHeap2(new RandomLiteralSelectionStrategy());
-			solver.setOrder(randomHeap);
-			if (keepHot) {
-				randomHeap.init();
-			}
+			solver.setOrder(new VarOrderHeap2(new RandomLiteralSelectionStrategy(), order));
 			break;
 		default:
 			break;
 		}
 	}
 
+	@Override
 	public void shuffleOrder() {
 		final Random rnd = new Random();
 		for (int i = order.length - 1; i >= 0; i--) {
@@ -251,14 +213,49 @@ public class BasicSolver implements Cloneable {
 		}
 	}
 
+	@Override
 	public void fixOrder() {
 		for (int i = 0; i < order.length; i++) {
 			order[i] = i + 1;
 		}
 	}
 
+	@Override
 	public BasicSolver clone() {
 		return new BasicSolver(this);
+	}
+
+	@Override
+	public int getNumberOfSolutions() {
+		if (solutionList == null) {
+			return 0;
+		}
+		return solutionList.size();
+	}
+
+	@Override
+	public RingList<int[]> getSolutionList() {
+		return solutionList;
+	}
+
+	@Override
+	public void assignmentReplaceLast(int x) {
+		assignment.pop().unsafePush(x);
+	}
+
+	@Override
+	public IVecInt getAssignment() {
+		return assignment;
+	}
+
+	@Override
+	public int[] getAssignmentArray(int from, int to) {
+		return Arrays.copyOfRange(assignment.toArray(), from, to);
+	}
+
+	@Override
+	public void initSolutionList(int size) {
+		solutionList = new RingList<>(size);
 	}
 
 }

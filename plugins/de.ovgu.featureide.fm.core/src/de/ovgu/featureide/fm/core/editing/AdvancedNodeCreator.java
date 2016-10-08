@@ -29,6 +29,7 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
+import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -42,7 +43,8 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
@@ -65,16 +67,29 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return nodeCreator.createNodes();
 	}
 
-	public static Node createCNFWithoutAbstract(IFeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new AbstractFeatureFilter());
-		nodeCreator.setCnfType(CNFType.Compact);
+	public static Node createRegularCNF(IFeatureModel featureModel) {
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(false);
 		return nodeCreator.createNodes();
 	}
 
-	public static Node createCNFWithoutHidden(IFeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new HiddenFeatureFilter());
-		nodeCreator.setCnfType(CNFType.Compact);
-		return nodeCreator.createNodes();
+	public static SatInstance createSatInstance(IFeatureModel featureModel) {
+		return createSatInstance(new AdvancedNodeCreator(featureModel));
+	}
+
+	public static SatInstance createSatInstance(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
+		return createSatInstance(new AdvancedNodeCreator(featureModel, featureFilter));
+	}
+
+	public static SatInstance createSatInstance(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
+		return createSatInstance(new AdvancedNodeCreator(featureModel, excludedFeatureNames));
+	}
+
+	private static SatInstance createSatInstance(AdvancedNodeCreator nodeCreator) {
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(false);
+		return new SatInstance(nodeCreator.createNodes());
 	}
 
 	public static Node createNodes(IFeatureModel featureModel) {
@@ -91,16 +106,6 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
 	}
 
-	public static Node createNodesWithoutAbstract(IFeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new AbstractFeatureFilter());
-		return nodeCreator.createNodes();
-	}
-
-	public static Node createNodesWithoutHidden(IFeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, (new HiddenFeatureFilter()));
-		return nodeCreator.createNodes();
-	}
-
 	private Literal getVariable(IFeature feature, boolean positive) {
 		final String oldName = useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
 		return new Literal(oldName, positive);
@@ -115,7 +120,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * Default values is {@code true} (values will be included).
 	 */
 	private boolean includeBooleanValues = true;
-	
+
 	private boolean useOldNames = true;
 
 	private boolean optionalRoot = false;
@@ -147,7 +152,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		setFeatureModel(featureModel, excludedFeatureNames);
 	}
 
-	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
+	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType,
+			boolean includeBooleanValues) {
 		this.cnfType = cnfType;
 		this.modelType = modelType;
 		this.includeBooleanValues = includeBooleanValues;
@@ -169,7 +175,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		default:
 			for (IConstraint constraint : featureModel.getConstraints()) {
 				final Node cnfNode = Node.buildCNF(constraint.getNode());
-//				final Node cnfNode = constraint.getNode().toCNF();
+				//				final Node cnfNode = constraint.getNode().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
 						clauses.add((compact || (andChild instanceof Or)) ? andChild : new Or(andChild));
@@ -184,6 +190,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public Node createNodes() {
+		return createNodes(new NullMonitor());
+	}
+
+	public Node createNodes(IMonitor monitor) {
 		if (featureModel == null) {
 			final Or emptyNode = includeBooleanValues ? new Or(new Literal(NodeCreator.varTrue), new Literal(NodeCreator.varFalse, false)) : new Or();
 			switch (cnfType) {
@@ -196,6 +206,16 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			}
 		}
 
+		monitor.setRemainingWork(10);
+		final Node[] basicFormula = createFormula(monitor.subTask(1));
+		final Node newFormula = removeFeatures(basicFormula, monitor.subTask(9));
+
+		return newFormula;
+	}
+
+	private Node[] createFormula(IMonitor monitor) {
+		monitor.setTaskName("Creating Formula");
+		monitor.setRemainingWork(2);
 		final Node[] andChildren1;
 		final Node[] andChildren2;
 
@@ -217,6 +237,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			andChildren2 = new Node[0];
 			break;
 		}
+		monitor.step();
 
 		final int length = andChildren1.length + andChildren2.length;
 		final Node[] nodeArray;
@@ -240,9 +261,15 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		}
 		System.arraycopy(andChildren1, 0, nodeArray, 0, andChildren1.length);
 		System.arraycopy(andChildren2, 0, nodeArray, andChildren1.length, andChildren2.length);
+		monitor.step();
 
+		return nodeArray;
+	}
+
+	private Node removeFeatures(final Node[] nodeArray, IMonitor monitor) {
 		if (excludedFeatureNames != null && !excludedFeatureNames.isEmpty()) {
-			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular));
+			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular),
+					monitor);
 		} else {
 			return new And(nodeArray);
 		}
@@ -312,8 +339,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	@Override
-	public Node execute(WorkMonitor monitor) throws Exception {
-		return createNodes();
+	public Node execute(IMonitor monitor) throws Exception {
+		return createNodes(monitor);
 	}
 
 	public CNFType getCnfType() {
@@ -344,7 +371,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	public void setCnfType(CNFType cnfType) {
 		this.cnfType = cnfType;
 	}
-	
+
 	public void setUseOldNames(boolean useOldNames) {
 		this.useOldNames = useOldNames;
 	}

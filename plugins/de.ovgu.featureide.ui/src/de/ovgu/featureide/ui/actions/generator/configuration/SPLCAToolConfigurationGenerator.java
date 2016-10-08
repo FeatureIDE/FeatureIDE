@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -36,7 +37,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 import no.sintef.ict.splcatool.CoveringArray;
@@ -63,7 +64,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	}
 	
 	@Override
-	public Void execute(WorkMonitor monitor) throws Exception {
+	public Void execute(IMonitor monitor) throws Exception {
 		runSPLCATool();
 		return null;
 	}
@@ -72,7 +73,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	private void runSPLCATool() {
 		CoveringArray ca = null;
 		try {
-			if (algorithm.equals(CASA)) {
+			if (algorithm.equals(CASA.substring(0, CASA.indexOf(" ")))) {
 				URL url = BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
 				try {
 					url = FileLocator.toFileURL(url);
@@ -87,7 +88,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 			if (ca == null) {
 				return;
 			}
-			ca.generate(100, maxConfigs());
+			ca.generate();
 		} catch (FeatureModelException e) {
 			UIPlugin.getDefault().logError(e);
 		} catch (TimeoutException e) {
@@ -95,7 +96,13 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 		} catch (CoveringArrayGenerationException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		final List<List<String>> solutions = removeDuplicates(ca);
+
+		List<List<String>> solutions = Collections.emptyList();
+		try{
+			solutions = removeDuplicates(ca);
+		}catch(Exception e){
+			UIPlugin.getDefault().logWarning("Problems occurred during the execution of " + algorithm);
+		}
 		builder.configurationNumber = solutions.size();
 		for (final List<String> solution : solutions) {
 			configuration.resetValues();

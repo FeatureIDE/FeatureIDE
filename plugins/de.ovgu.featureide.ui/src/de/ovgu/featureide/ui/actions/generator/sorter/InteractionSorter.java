@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
@@ -62,9 +63,11 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 	 * @return number of configurations
 	 */
 	@Override
-	public int sort(final WorkMonitor monitor) {
+	public int sort(final IMonitor monitor) {
 		for (final BuilderConfiguration c : configurations) {
-			if (monitor.checkCancel()) {
+			try {
+				monitor.checkCancel();
+			} catch (MethodCancelException e) {
 				configurations.clear();
 				return 0;
 			}
@@ -75,7 +78,9 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 		
 		final LinkedList<BuilderConfiguration> sorted = new LinkedList<BuilderConfiguration>();
 		while (!interactions.isEmpty()) {
-			if (monitor.checkCancel()) {
+			try {
+				monitor.checkCancel();
+			} catch (MethodCancelException e) {
 				configurations.clear();
 				return 0;
 			}

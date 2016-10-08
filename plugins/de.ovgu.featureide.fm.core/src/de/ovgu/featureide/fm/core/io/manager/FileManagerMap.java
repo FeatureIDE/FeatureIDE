@@ -30,7 +30,7 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
@@ -56,7 +56,7 @@ public abstract class FileManagerMap {
 					try {
 						Files.createDirectory(extraFolder);
 					} catch (IOException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 				}
 
@@ -121,7 +121,7 @@ public abstract class FileManagerMap {
 				map.put(absolutePath, newInstance);
 				return newInstance;
 			} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 				return null;
 			}
 		}

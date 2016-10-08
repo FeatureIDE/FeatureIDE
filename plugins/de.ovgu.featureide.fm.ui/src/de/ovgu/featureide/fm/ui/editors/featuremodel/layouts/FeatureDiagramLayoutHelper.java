@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.LONG_NAMES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANUAL_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHORT_NAMES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LONG_NAMES;
 
 import java.util.LinkedList;
 import java.util.List;

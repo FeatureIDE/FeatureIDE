@@ -34,4 +34,8 @@ public interface IFactoryWorkspaceProvider {
 
 	void addFactoryWorkspace(String path, FactoryWorkspace workspace);
 
+	void save();
+
+	boolean load();
+
 }

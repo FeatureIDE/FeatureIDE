@@ -29,7 +29,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
 /**
@@ -45,7 +46,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 
 	protected IFeatureModel featuremodel;
 
-	protected XmlFeatureModelWriter writer;
+	protected IFeatureModelFormat writer;
 
 	protected String featuretext;
 
@@ -67,8 +68,8 @@ public abstract class AbstractConstraintEditorAction extends Action {
 	}
 
 	public void run() {
-		writer = new XmlFeatureModelWriter(featuremodel);
-		featuretext = writer.writeToString();
+		writer = new XmlFeatureModelFormat();
+		featuretext = writer.write(featuremodel);
 	}
 
 	protected void openEditor(IConstraint constraint) {

@@ -24,7 +24,6 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -81,11 +80,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 				setLocation(feature, new Point(xoffset, yoffset));
 				xoffset += feature.getSize().width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
-				if (showHidden) {
-					list.addAll(FeatureUIHelper.getGraphicalChildren(feature));
-				} else {
-					list.addAll(Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), hiddenFilter)));
-				}
+				list.addAll(getChildren(feature));
 			}
 			yoffset += FMPropertyManager.getFeatureSpaceY();
 		}

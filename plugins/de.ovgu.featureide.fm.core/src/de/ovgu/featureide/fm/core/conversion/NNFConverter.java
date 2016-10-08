@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class NNFConverter implements IConverterStrategy {
 	/** Feature model factory */
-	protected static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	protected IFeatureModelFactory factory;
 	/** Working feature model */
 	protected IFeatureModel fm;
 	/** Preserving configuration semantics */
@@ -223,6 +223,7 @@ public class NNFConverter implements IConverterStrategy {
 	@Override
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
 		this.fm = fm.clone();
+		this.factory = FMFactoryManager.getFactory(fm);
 		this.preserve = preserve;
 		
 		if(nodes.isEmpty())

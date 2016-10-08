@@ -25,7 +25,7 @@ import java.util.Arrays;
 import de.ovgu.featureide.fm.core.conf.AFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 public class DFSThread extends AWorkerThread<String> {
 
@@ -35,23 +35,23 @@ public class DFSThread extends AWorkerThread<String> {
 
 		public SharedObjects(MatrixFeatureGraph featureGraph) {
 			this.featureGraph = featureGraph;
-			this.complete = new boolean[featureGraph.getFeatureArray().length];
+			this.complete = new boolean[featureGraph.getSatInstance().getNumberOfVariables()];
 		}
 	}
 
 	private final byte[] visited;
 	private final SharedObjects sharedObjects;
 
-	public DFSThread(MatrixFeatureGraph featureGraph, WorkMonitor workMonitor) {
+	public DFSThread(MatrixFeatureGraph featureGraph, IMonitor workMonitor) {
 		super(workMonitor);
 		sharedObjects = new SharedObjects(featureGraph);
-		visited = new byte[featureGraph.getFeatureArray().length];
+		visited = new byte[featureGraph.getSatInstance().getNumberOfVariables()];
 	}
 
 	private DFSThread(DFSThread oldThread) {
 		super(oldThread);
 		this.sharedObjects = oldThread.sharedObjects;
-		visited = new byte[oldThread.sharedObjects.featureGraph.getFeatureArray().length];
+		visited = new byte[oldThread.sharedObjects.featureGraph.getSatInstance().getNumberOfVariables()];
 	}
 
 	@Override
