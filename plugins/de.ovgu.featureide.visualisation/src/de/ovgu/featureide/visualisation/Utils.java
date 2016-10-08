@@ -15,6 +15,11 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
+/**
+ * Utils for visualisations
+ * 
+ * @author jabier.martinez
+ */
 public class Utils {
 
 	public static File getFileFromPlugin(String pluginId, String relativePath) {

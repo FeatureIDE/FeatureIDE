@@ -17,11 +17,6 @@
 					</reference>
 				</visibleWhen>
             <command
-                  commandId="de.ovgu.featureide.visualisation.command.cooccurrence"
-                  label="Features Co-occurrence"
-                  style="push">
-            </command>
-            <command
                   commandId="de.ovgu.featureide.visualisation.command.featurerelations"
                   label="Feature Relations Graph"
                   style="push">
@@ -32,14 +27,9 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="de.ovgu.featureide.visualisation.ShowFeatureCoocurrenceCommandHandler"
-            id="de.ovgu.featureide.visualisation.command.cooccurrence"
-            name="Show Feature Co-occurrence">
-      </command>
-      <command
             defaultHandler="de.ovgu.featureide.visualisation.ShowFeatureRelationsGraphCommandHandler"
             id="de.ovgu.featureide.visualisation.command.featurerelations"
-            name="Show Feature Relations Graph">
+            name="Feature Relations Graph">
       </command>
    </extension>
 
