@@ -247,6 +247,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
+		case COLLAPSED_CHANGED:
 			getFeatureFigure().setProperties();
 			break;
 		case MANDATORY_CHANGED:
@@ -264,8 +265,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshParent();
 			break;
-		case HIDDEN_CHANGED:
-		case COLLAPSED_CHANGED:
+		 case HIDDEN_CHANGED:
 			getFeatureFigure().setProperties();
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();

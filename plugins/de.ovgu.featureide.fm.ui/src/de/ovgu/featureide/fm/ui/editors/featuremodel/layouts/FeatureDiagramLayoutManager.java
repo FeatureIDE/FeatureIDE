@@ -28,9 +28,11 @@ import java.util.Map.Entry;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.ui.internal.UIPlugin;
 
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -53,7 +55,6 @@ abstract public class FeatureDiagramLayoutManager {
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		layoutFeatureModel(featureModel);
-		layoutHidden(featureModel);
 		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {
 			entry.getKey().setLocation(entry.getValue());
 		}
@@ -73,19 +74,6 @@ abstract public class FeatureDiagramLayoutManager {
 			return (feature.getObject().getStructure().isHidden() || isHidden(FeatureUIHelper.getGraphicalParent(feature)));
 		else
 			return feature.getObject().getStructure().isHidden();
-	}
-
-	/**
-	 * the location of hidden features is set to (0,0) temporary
-	 * (not the position that is saved in model.xml)
-	 */
-	void layoutHidden(IGraphicalFeatureModel featureModel) {
-		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			if (isHidden(feature) && !feature.getObject().getStructure().isRoot()) {
-				// TODO does nothing
-//				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
-			}
-		}
 	}
 
 	protected abstract void layoutFeatureModel(IGraphicalFeatureModel featureModel);
@@ -150,7 +138,7 @@ abstract public class FeatureDiagramLayoutManager {
 			if (position.y + position.height > max.y)
 				max.y = position.bottom();
 		}
-
+		
 		/*
 		 * update lowest, highest, most left, most right coordinates
 		 * for constraints
