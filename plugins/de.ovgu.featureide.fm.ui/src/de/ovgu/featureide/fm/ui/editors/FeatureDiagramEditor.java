@@ -1107,8 +1107,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 * @param centerFeature
 	 */
 	private void centerPointOnScreen(int x, int y, int offsetX, int offsetY) {
-		getFigureCanvas().getViewport().setViewLocation((int) (zoomManager.getZoom() * x - getFigureCanvas().getViewport().getBounds().width / 2 - offsetX),
-				(int) (zoomManager.getZoom() * y - getFigureCanvas().getViewport().getBounds().height / 2 - offsetY));
+		int xCenter = (int) (zoomManager.getZoom() * x - (getFigureCanvas().getViewport().getSize().width / 2) + (zoomManager.getZoom() * offsetX));
+		int yCenter = (int) (zoomManager.getZoom() * y - (getFigureCanvas().getViewport().getSize().height / 2) + (zoomManager.getZoom() * offsetY));
+		getFigureCanvas().getViewport().setViewLocation(xCenter, yCenter);
 	}
 
 	private void refreshAll() {
