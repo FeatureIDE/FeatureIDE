@@ -47,8 +47,7 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	private IFeatureModel featureModel;
 
 	/**
-	 *  Checks if the parent is AND, if not, it must be an ALTERNATIVE or an OR, 
-	 *  and enables the collapse-siblings-button only for ALTERNATIVE and OR.
+	 *  Collapse siblings should not be accessible for root.
 	 */
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -56,7 +55,7 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 			setEnabled(isValidSelection(selection));
 			if (isValidSelection(selection)) {
 				if (selection.getFirstElement() instanceof FeatureEditPart) {
-					if (!getSelectedFeature().getStructure().isRoot() && getSelectedFeature().getStructure().getParent().isAnd()) {
+					if (getSelectedFeature().getStructure().isRoot() || getSelectedFeature().getStructure().getParent().getChildrenCount() == 1) {
 						setEnabled(false);
 					} else {
 						setEnabled(true);
