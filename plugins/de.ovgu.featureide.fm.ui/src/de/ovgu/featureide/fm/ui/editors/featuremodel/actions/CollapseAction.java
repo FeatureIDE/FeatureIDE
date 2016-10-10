@@ -46,18 +46,7 @@ public class CollapseAction extends SingleSelectionAction {
 	public static final String ID = "de.ovgu.featureide.collapse";
 
 	private IFeatureModel featureModel;
-
-	public CollapseAction(Object viewer, IFeatureModel featureModel) {
-		super(COLLAPSE_FEATURE, viewer);
-		this.featureModel = featureModel;
-		setEnabled(false);
-		if (viewer instanceof GraphicalViewerImpl) {
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
-		} else {
-			((TreeViewer) viewer).addSelectionChangedListener(listener);
-		}
-	}
-
+	
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -73,6 +62,17 @@ public class CollapseAction extends SingleSelectionAction {
 			}
 		}
 	};
+
+	public CollapseAction(Object viewer, IFeatureModel featureModel) {
+		super(COLLAPSE_FEATURE, viewer);
+		this.featureModel = featureModel;
+		setEnabled(false);
+		if (viewer instanceof GraphicalViewerImpl) {
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+		} else {
+			((TreeViewer) viewer).addSelectionChangedListener(listener);
+		}
+	}
 
 	@Override
 	public void run() {
