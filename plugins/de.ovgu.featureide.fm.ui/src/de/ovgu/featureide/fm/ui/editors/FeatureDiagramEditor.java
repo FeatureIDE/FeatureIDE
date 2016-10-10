@@ -1019,9 +1019,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			refreshAll();
 			break;
 		case COLLAPSED_CHANGED:
-			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
-				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
-			}
+			reload();
 
 			// clear registry		
 			final Map<?, ?> registryCollapsed = getEditPartRegistry();
