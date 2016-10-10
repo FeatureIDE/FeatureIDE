@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
 /**
@@ -40,8 +40,8 @@ public class LOCFilterChildNode extends LOCFilterNode {
 	 * @param description
 	 * @param fileFeatureLOCMapper
 	 */
-	public LOCFilterChildNode(String description, String parentNodeName, FileFeatureLOCMapper fileFeatureLOCMapper) {
-		super(description, fileFeatureLOCMapper);
+	public LOCFilterChildNode(String description, String parentNodeName, FileFeatureLOCMapper fileFeatureLOCMapper, IFeatureProject project) {
+		super(description, fileFeatureLOCMapper, project);
 		this.parentNodeName = parentNodeName;
 	}
 
@@ -63,8 +63,7 @@ public class LOCFilterChildNode extends LOCFilterNode {
 				if (path.length > 1) {
 					prettyPath = path[1];
 				}
-				
-				addChild(new Parent(prettyPath, filesWithLOC.get(file)));
+				addChild(new DirectivesLeafNode(prettyPath, filesWithLOC.get(file), project, prettyPath));
 			}
 		}
 	}

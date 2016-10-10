@@ -89,7 +89,6 @@ public class TreeClickListener implements IDoubleClickListener {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-		UIPlugin.getDefault().logInfo("Team2: Team2: TreeClickListener -> doubleClick, Event: " + event.getSelection());
 		final Object[] selectedObjects = ((TreeSelection) event.getSelection()).toArray();
 
 		for (Object selected : selectedObjects) {
@@ -135,10 +134,8 @@ public class TreeClickListener implements IDoubleClickListener {
 				openEditor(iFile, line);
 			} else if (selected instanceof DirectivesLeafNode && !((Parent) selected).hasChildren() ) {
 				DirectivesLeafNode directivesLeafNode = (DirectivesLeafNode) selected;
-				IFeatureProject iProject = directivesLeafNode.getFstModel().getFeatureProject();
-				IFile iFile = iProject.getSourceFolder().getFile(directivesLeafNode.getClassname());
+				IFile iFile = directivesLeafNode.getFeatureProject().getSourceFolder().getFile(directivesLeafNode.getClassname());
 				int line = directivesLeafNode.getLine();
-				UIPlugin.getDefault().logInfo("Team2: TreeClickListener -> DoubleClick, Lines: " + line);
 				openEditor(iFile, line);
 			}
 

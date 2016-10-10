@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import org.eclipse.ui.internal.UIPlugin;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
@@ -34,7 +35,7 @@ public class DirectivesLeafNode extends Parent {
 	
 	final String classname;
 	
-	final FSTModel fstModel;
+	IFeatureProject project;
 
 	final int lineToJump;
 	
@@ -48,10 +49,10 @@ public class DirectivesLeafNode extends Parent {
 	 * @param className
 	 * 			corresponding class
 	 */
-	public DirectivesLeafNode(String description, FSTModel fstModel, String classname) {
+	public DirectivesLeafNode(String description, IFeatureProject project, String classname) {
 		super(description);
 		this.classname = classname;
-		this.fstModel = fstModel;
+		this.project = project;
 		lineToJump = 1;
 	}
 	
@@ -67,10 +68,10 @@ public class DirectivesLeafNode extends Parent {
 	 * @param className
 	 * 			corresponding class
 	 */
-	public DirectivesLeafNode(String description, Object value, FSTModel fstModel, String classname) {
+	public DirectivesLeafNode(String description, Object value, IFeatureProject project, String classname) {
 		super(description, value);
+		this.project = project;
 		this.classname = classname;
-		this.fstModel = fstModel;
 		lineToJump = 1;
 	}
 	
@@ -88,16 +89,15 @@ public class DirectivesLeafNode extends Parent {
 	 * @param line
 	 * 			desired line to jump to when Node is clicked
 	 */
-	public DirectivesLeafNode(String description, Object value, FSTModel fstModel, String classname, int line) {
+	public DirectivesLeafNode(String description, Object value, IFeatureProject project , String classname, int line) {
 		super(description, value);
+		this.project = project;
 		this.classname = classname;
-		this.fstModel = fstModel;
 		lineToJump = line;
 	}
 	
-	public FSTModel getFstModel() {
-		return fstModel;
-		
+	public IFeatureProject getFeatureProject() {
+		return project;
 	}
 	
 	public String getClassname() {

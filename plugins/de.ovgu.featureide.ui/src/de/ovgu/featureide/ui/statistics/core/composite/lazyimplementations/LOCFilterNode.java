@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE
 
 import java.util.HashMap;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -47,6 +48,7 @@ public class LOCFilterNode extends AbstractSortModeNode {
 
 	protected final FileFeatureLOCMapper fileFeatureLOCMapper;
 	protected final String nodeType;
+	protected final IFeatureProject project;
 
 	/**
 	 * Creates a new LOCFilterNode.<br>
@@ -58,10 +60,11 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	 * @param description
 	 * @param fileFeatureLOCMapper
 	 */
-	public LOCFilterNode(String description, FileFeatureLOCMapper fileFeatureLOCMapper) {
+	public LOCFilterNode(String description, FileFeatureLOCMapper fileFeatureLOCMapper, IFeatureProject project) {
 		super(description);
 		this.nodeType = description;
 		this.fileFeatureLOCMapper = fileFeatureLOCMapper;
+		this.project = project;
 	}
 	
 	/**
@@ -76,10 +79,11 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	 * @param nodeType
 	 * @param fileFeatureLOCMapper
 	 */
-	public LOCFilterNode(String description, int loc, String nodeType, FileFeatureLOCMapper fileFeatureLOCMapper) {
+	public LOCFilterNode(String description, int loc, String nodeType, FileFeatureLOCMapper fileFeatureLOCMapper, IFeatureProject project) {
 		super(description, loc);
 		this.nodeType = nodeType;
 		this.fileFeatureLOCMapper = fileFeatureLOCMapper;
+		this.project = project;
 	}
 
 	/* (non-Javadoc)
@@ -92,7 +96,7 @@ public class LOCFilterNode extends AbstractSortModeNode {
 			for (String extension: extAndCount.keySet()) {
 				if (extension != null) {
 					int LOC = extAndCount.get(extension).intValue();
-					addChild(new LOCFilterChildNode(extension + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper));
+					addChild(new LOCFilterChildNode(extension + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper, project));
 				}
 			}
 		} else if (nodeType.equals(LOC_BY_FEATURE)) {

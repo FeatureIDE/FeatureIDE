@@ -61,7 +61,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datat
 public class StatisticsProgramSizeNew extends LazyParent {
 
 	private final static String[] ignoredExtensions = { "jpg", "jpeg", "raw", "hdr", "tiff", "bmp", "jpe", "dib", "gif", "pdf", "png", "zip", "wav", "mp3",
-			"avi", "flv", "midi" };
+			"avi", "flv", "midi", "WAV" };
 
 	private final FSTModel fstModel;
 	private final FileFeatureLOCMapper fileFeatLOCMapper;
@@ -144,7 +144,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			isPreprocessor = true;
 			isFeatureOrPreprocessorProject = true;
 		}
-		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, isPreprocessor));
+		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, project, isPreprocessor));
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {
@@ -268,7 +268,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			locOfDirectiveBody += directive.getEndLine() - directive.getStartLine() -1; //From start to end without end command
 			if (locOfDirectiveBody - childrenLOC >= 0)
 				locOfDirectiveBody -= childrenLOC;
-			System.out.println(" dir: "+ directive.getExpression() + " -- locDirBody: "+ locOfDirectiveBody +" -- childrenLOC: "+ childrenLOC);
 		}
 		return locOfDirectiveBody;
 	}
@@ -283,7 +282,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int childrenLoc = 0;
 		if (directive.hasChildren()) {
 			for (FSTDirective child: directive.getChildren()) {
-				System.out.println("    Child of "+ directive.getExpression() + " is ~~ "+ child.getExpression());
 				childrenLoc += child.getEndLine() - child.getStartLine() +1;
 			}
 		} 
