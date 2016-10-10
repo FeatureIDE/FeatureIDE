@@ -34,6 +34,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -64,14 +65,20 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBelowOperation;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.handlers.ImportFeatureHouseProjectHandler;
 
@@ -304,19 +311,14 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		
 		
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
+		IFeatureModel featureModel = null; 
 		
-
 		/*
 		 * If a model file exists the model.xml can be created from it 
 		 */
 		if (modelFile != null) {
-
-			IFeatureModel featureModel = null;
-
-			URI locationUri = featureProject.getModelFile().getLocationURI();
-
-
 			final GuidslFormat guidslFormat = new GuidslFormat();
+			URI locationUri = featureProject.getModelFile().getLocationURI();
 			try {
 				featureModel = FMFactoryManager.getFactory(modelFile.getAbsolutePath(), guidslFormat).createFeatureModel();
 			} catch (NoSuchExtensionException e) {
@@ -345,8 +347,6 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 				}
 			}
 			
-			
-
 //			IProject project = null;
 //			final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
 //			if (res != null) {
@@ -369,9 +369,38 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		
 		importFileSystem(selectedFilesForImport, featureProject);
 		
-
-
-
+		if (modelFile == null) {
+			if (featureModel == null) {
+				featureModel = featureProject.getFeatureModel();
+			}
+			IFeature rootFeature = featureModel.getFeature("Root");
+			
+			//Remove default features
+			for (IFeature feature: featureModel.getFeatures()) {
+				featureModel.deleteFeature(feature);
+			}
+			if (rootFeature.getStructure().hasChildren()) {
+				for (IFeatureStructure child: rootFeature.getStructure().getChildren()) {
+					rootFeature.getStructure().removeChild(child);
+				}
+			}
+			
+			try {
+				for (IResource member: featureProject.getSourceFolder().members()) {
+					if (member.getType() == IResource.FOLDER) {
+						IFeature newFeature = new Feature(featureModel, member.getName());
+						newFeature.getStructure().setParent(featureModel.getStructure().getRoot());
+						rootFeature.getStructure().addChild(newFeature.getStructure());
+						featureModel.addFeature(newFeature);
+					}
+					
+				}
+				FileHandler.save(Paths.get(featureProject.getModelFile().getLocationURI()), featureModel, new XmlFeatureModelFormat());
+				openFileInEditor(featureProject.getModelFile());				
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
 		return true;
 	}
 	
