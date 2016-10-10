@@ -29,6 +29,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -58,7 +59,7 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		setBorder(FMPropertyManager.getFeatureBorder(false));
 
 		childrenCount.setFont(DEFAULT_FONT);
-		setDecoratorText("" + parent.getObject().getStructure().getChildrenCount());
+		setDecoratorText("" + GetAllChildren(parent.getObject().getStructure()));
 		add(childrenCount);
 	}
 
@@ -70,6 +71,15 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		} else {
 			super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
 		}
+	}
+	
+	public int GetAllChildren(IFeatureStructure parent)
+	{
+		int count = 0;
+		for (IFeatureStructure iterable_element : parent.getChildren()) {
+			count += 1 + GetAllChildren(iterable_element);			
+		}
+		return count;
 	}
 
 	public void setDecoratorText(String newText) {
