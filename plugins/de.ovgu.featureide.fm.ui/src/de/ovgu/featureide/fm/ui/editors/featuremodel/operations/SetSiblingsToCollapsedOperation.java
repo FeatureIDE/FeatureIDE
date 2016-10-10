@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * 
  * @author Maximilian Kühl
  */
-public class SetFeaturesToCollapsedOperation extends AbstractFeatureModelOperation {
+public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperation {
 
 	private IFeature feature;
 
@@ -49,7 +49,7 @@ public class SetFeaturesToCollapsedOperation extends AbstractFeatureModelOperati
 	 *            feature on which this operation will be executed
 	 * 
 	 */
-	public SetFeaturesToCollapsedOperation(IFeature feature, IFeatureModel featureModel) {
+	public SetSiblingsToCollapsedOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
 		this.feature = feature;
 	}

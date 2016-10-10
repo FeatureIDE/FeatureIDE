@@ -126,7 +126,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseFeaturesAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
@@ -179,7 +179,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
 	private CollapseAction collapseAction;
-	private CollapseFeaturesAction collapseFeaturesAction;
+	private CollapseSiblingsAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private CollapseAllAction expandAllAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
@@ -372,7 +372,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		hiddenAction = new HiddenAction(this, featureModel);
 
 		collapseAction = new CollapseAction(this, featureModel);
-		collapseFeaturesAction = new CollapseFeaturesAction(this, featureModel);
+		collapseFeaturesAction = new CollapseSiblingsAction(this, featureModel);
 		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
 
@@ -639,7 +639,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return abstractAction;
 		if (CollapseAction.ID.equals(workbenchActionID))
 			return collapseAction;
-		if (CollapseFeaturesAction.ID.equals(workbenchActionID))
+		if (CollapseSiblingsAction.ID.equals(workbenchActionID))
 			return collapseFeaturesAction;
 		if (AbstractAction.ID.equals(workbenchActionID))
 			return abstractAction;
