@@ -28,6 +28,7 @@ import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.SWT;
 import org.w3c.dom.css.Rect;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -48,6 +49,7 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 	private final Label childrenCount = new Label();
 	//	private static GridLayout gl = new GridLayout();
 	private static final FreeformLayout layout = new FreeformLayout();
+	public static final boolean drawConnenctionLines = true;
 
 	private IGraphicalFeature graphicalFeature;
 
@@ -95,7 +97,10 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 			if (!oldSize.equals(0, 0)) {
 				bounds.x += (oldSize.width - bounds.width) >> 1;
 			}
+			//			setBounds(bounds);
+			bounds.height += 30;
 			setBounds(bounds);
+
 		}
 	}
 
@@ -119,13 +124,57 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 	 */
 	@Override
 	protected void outlineShape(Graphics graphics) {
-		int x = getBounds().x+1;
-		int y = getBounds().y+1;
-		int width = getBounds().width-2;
-		int height = getBounds().height-2;
+		int x = getBounds().x + 1;
+		int y = getBounds().y + 1;
+		int width = getBounds().width - 2;
+		if (width % 2 == 1) {
+			width += 1;
+			setBounds(new Rectangle(getBounds().x, getBounds().y, getBounds().width + 1, getBounds().height));
+		}
+		int height = getBounds().height - 32;
 		graphics.setLineWidth(1);
 		graphics.setForegroundColor(FMPropertyManager.getFeatureBorderColor());
 		graphics.drawRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
+
+		if (drawConnenctionLines) {
+			graphics.setLineWidth(1);
+			graphics.setLineStyle(SWT.LINE_DASH);
+			int childrenCount = graphicalFeature.getObject().getStructure().getChildrenCount();
+			Point origin = new Point(getBounds().x + width / 2 + 1, getBounds().y + height + 1);
+			if (childrenCount != 0) {
+				double angle = 90 / (double) (childrenCount + 1);
+				for (int i = 0; i < childrenCount; i++) {
+					double ownAngle = angle * (i + 1);
+					Point target = getPoint(ownAngle, origin);
+					graphics.setLineWidth(1);
+					graphics.setLineStyle(SWT.LINE_SOLID);
+					graphics.drawOval(new Rectangle(new Point(target.x - 1, target.y - 1), new Dimension(2, 2)));
+					graphics.setLineWidth(1);
+					graphics.setLineStyle(SWT.LINE_DASH);
+					graphics.drawLine(origin, target);
+				}
+			}
+			graphics.setLineStyle(SWT.LINE_SOLID);
+		}
+	}
+
+	private Point getPoint(double gamma, Point origin) {
+		boolean appendOffsetRight = false;
+		if (gamma > 45) {
+			appendOffsetRight = true;
+			gamma -= 45;
+		} else {
+			gamma = 45 - gamma;
+		}
+		double alpha = 90 - gamma;
+		double b = 15;
+		double a = Math.sin(Math.toRadians(alpha)) * b;
+		double c = Math.cos(Math.toRadians(alpha)) * b;
+		if (appendOffsetRight) {
+			return new Point((int) (origin.x + Math.abs(c)), (int) (origin.y + Math.abs(a)));
+		} else {
+			return new Point((int) (origin.x - Math.abs(c)), (int) (origin.y + Math.abs(a)));
+		}
 	}
 
 }
