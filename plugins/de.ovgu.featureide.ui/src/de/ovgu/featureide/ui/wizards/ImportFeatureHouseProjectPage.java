@@ -20,24 +20,42 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONTAINER_DOES_NOT_EXIST_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_SPECIFIED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_VALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.apache.tools.ant.util.FileUtils;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.SWT;
@@ -64,13 +82,16 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.handlers.ImportFeatureHouseProjectHandler;
@@ -128,7 +149,137 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	}
 	
 	public void createControl(Composite parent) {
-		super.createControl(parent);		
+		super.createControl(parent);	
+		
+//		Composite composite = new Composite(parent, SWT.NULL);
+//      composite.setLayout(new GridLayout());
+//      composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL
+//              | GridData.HORIZONTAL_ALIGN_FILL));
+//      composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+//      composite.setFont(parent.getFont());
+
+      //createSourceGroup(composite);
+      
+     
+		
+//		Composite container = new Composite(parent, SWT.NULL);
+//	    final GridLayout gridLayout = new GridLayout();
+//	    gridLayout.numColumns = 1;
+//	    container.setLayout(gridLayout);
+	    //setControl(composite);
+//	    
+//	    
+//	    //CheckButton TODO: AL Checkbutton only show configuration when checked
+//	    checkButton = new Button(container, SWT.CHECK | SWT.RIGHT);
+//	    checkButton.setText("Add existing FileSystem to Project");
+//	    checkButton.addSelectionListener(new SelectionAdapter() {
+//	    	
+//		});
+//	    
+//	    Group toolGroup = new Group(container, SWT.NONE);
+//		toolGroup.setText("File Selection");
+//		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		GridLayout projGridLayout = new GridLayout();
+//		projGridLayout.numColumns = 2;
+//		toolGroup.setLayout(projGridLayout);
+//		
+//		final Label helloLabel = new Label(toolGroup, SWT.NONE);
+//		GridData gridData = new GridData(GridData.FILL_BOTH);
+//		gridData.horizontalSpan = 2;
+//		helloLabel.setLayoutData(gridData);
+//		helloLabel.setText(PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_);
+//		
+//	    Label label = new Label(toolGroup, SWT.NONE);
+//	    label.setText("Composers:");
+//	    toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+//	    toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
+//	    
+//	    final Label descriptionLabel = new Label(toolGroup, SWT.NONE);
+//	    GridData gridData2 = new GridData(GridData.FILL_BOTH);
+//		gridData2.horizontalSpan = 2;
+//	    descriptionLabel.setLayoutData(gridData2);
+//	    
+//	    StringBuilder descriptionStringBuilder = new StringBuilder();
+//	    descriptionStringBuilder.append("Possible choices are:\n\n");
+//	    List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
+//	    extensions = new IComposerExtensionBase[composerExtensions.size()]; 
+//	    composerExtensions.toArray(extensions);
+//	    Arrays.sort(extensions, new Comparator<IComposerExtensionBase> () {
+//			public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
+//				return arg0.getName().compareTo(arg1.getName());
+//			}
+//	    });
+//	    
+//		for (IComposerExtensionBase composerExtension : extensions) {
+////			descriptionStringBuilder.append(composerExtension.getName());
+////			descriptionStringBuilder.append(": ");
+////			descriptionStringBuilder.append(composerExtension.getDescription());
+////			descriptionStringBuilder.append("\n");
+//			toolCB.add(composerExtension.getName());
+//		}
+//		
+////		String descriptionString = descriptionStringBuilder.toString();
+//		if (composerExtensions.isEmpty()) {
+////			descriptionString = NO_COMPOSITION_ENGINES_INSTALLED_;
+////			setDescription(descriptionString);
+//			toolCB.setEnabled(false);
+//		}
+////		descriptionLabel.setText(descriptionString);
+//		toolCB.addModifyListener(new ModifyListener() {
+//			public void modifyText(ModifyEvent e) {
+//				composerExtension = extensions[toolCB.getSelectionIndex()];
+//			}
+//		});
+//		toolCB.select(0);
+//		
+//		//Path Group Import File
+//		importGroup = new Group(container, SWT.NONE);
+//		layoutImportFile.numColumns =1;
+//		layoutImportFile.verticalSpacing = 9;
+//		importGroup.setText("Select FileSystem for Import");
+//		//importGroup.setLayoutData(gd);
+//		importGroup.setLayout(layoutImportFile);
+//		
+//		
+//		
+//		
+//		//Path Group
+//		pathGroup = new Group(container, SWT.NONE);
+//		layout.numColumns = 2;
+//		layout.verticalSpacing = 9;
+//		pathGroup.setText("Path Specification:");
+//		pathGroup.setLayoutData(gd);
+//		pathGroup.setLayout(layout);
+//		
+//		String tooltip = SETS_THE_PATH_OF_COMPOSED_FILES_;
+//		buildLabel = new Label(pathGroup, SWT.NULL);
+//		buildLabel.setText("&Source Path:");
+//		buildLabel.setToolTipText(tooltip);
+//		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+//		buildPath.setLayoutData(gd);
+//		buildPath.setText("src");
+//		buildPath.setToolTipText(tooltip);
+//		
+//		tooltip = SETS_THE_PATH_OF_FEATUREFOLDERS_;
+//		label = new Label(pathGroup, SWT.NULL);
+//		label.setText("&Feature Path:");
+//		label.setToolTipText(tooltip);
+//		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+//		sourcePath.setLayoutData(gd);
+//		sourcePath.setText(FEATURES);
+//		sourcePath.setToolTipText(tooltip);
+//		
+//		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
+//		label = new Label(pathGroup, SWT.NULL);
+//		label.setText("&Configurations Path:");
+//		label.setToolTipText(tooltip);
+//		configsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+//		configsPath.setLayoutData(gd);
+//		configsPath.setText("configs");
+//		configsPath.setToolTipText(tooltip);
+
+		
+		//addListeners();
 	}	
 
     /*
@@ -258,17 +409,28 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		Iterator resourcesEnum = super.getSelectedResources().iterator();
 		
 		
+		
 		//List fileSystemObjects = new ArrayList();
 		
 		
 		Iterator resourcesEnum2 = super.getSelectedResources().iterator();
 		List<File> selectedFilesForImport = new ArrayList<File>();
-
+		
+		
+		
 		        while (resourcesEnum2.hasNext()) {
 		            File thisFileElement = (File) ((FileSystemElement) (resourcesEnum2.next())).getFileSystemObject();
 		            selectedFilesForImport.add(thisFileElement);       
 		        }
 		        
+		        
+		 Iterator resourcesEnum3 = super.getSelectedResources().iterator();
+		 List<FileSystemElement> selectedFilesForImport2 = new ArrayList<FileSystemElement>();
+		
+		        while (resourcesEnum3.hasNext()) {
+		            FileSystemElement thisFileElement2 = ((FileSystemElement) resourcesEnum3.next());
+		            selectedFilesForImport2.add(thisFileElement2);       
+		        }
 		       
 
 		//        while (resourcesEnum.hasNext()) {
@@ -301,6 +463,8 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 			}
 		}
+		
+		
 		
 		
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
@@ -345,7 +509,61 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 				}
 			}
 			
+		
+				
+				
+				
+				
+			}
+		
+		for(FileSystemElement f: selectedFilesForImport2){
 			
+			if(f.getFileNameExtension().equals("features")){
+				
+				
+				
+				
+				File file = (File) f.getFileSystemObject();		
+				
+				final IFolder configFolder = featureProject.getConfigFolder();
+				final String fileName = file.getName();
+				String name = fileName.replace(".features", ".config");
+				
+				
+				
+				
+		
+				try {
+					doFinish(configFolder, name, file);
+				} catch (CoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				selectedFilesForImport.remove(file);
+				selectedFilesForImport.remove(modelFile);
+//				final IRunnableWithProgress op = new IRunnableWithProgress() {
+//					public void run(IProgressMonitor monitor) throws InvocationTargetException {
+//						try {
+//							doFinish(configFolder, fileName, monitor);
+//						} catch (CoreException e) {
+//							throw new InvocationTargetException(e);
+//						} finally {
+//							monitor.done();
+//						}
+//					}
+//				};	
+//				
+//				try {
+//					getContainer().run(true, false, op);
+//				} catch (InterruptedException e) {
+//					//return false;
+//				} catch (InvocationTargetException e) {
+//					Throwable realException = e.getTargetException();
+//					MessageDialog.openError(getShell(), "Error", realException.getMessage());
+//					//return false;
+//				}
+			}
 
 //			IProject project = null;
 //			final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
@@ -368,8 +586,51 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		}
 		
 		importFileSystem(selectedFilesForImport, featureProject);
-		
 
+//		if (modelFile != null) {
+//			IFolder folder = featureProject.getSourceFolder();
+//			
+//			List<IFeature> projectFeatures = new ArrayList<IFeature>();
+//            for (IFeature feature : featureProject.getFeatureModel().getFeatures()) {
+//            	projectFeatures.add(feature);		
+//			}
+//		
+//			try {
+//				for(IResource member: folder.members()){
+//					if(!projectFeatures.contains(member)){
+//						Path oldPath = (Path) member.getFullPath();
+//						System.out.println("Location " + featureProject.getProject().getLocation());
+//						System.out.println("Name" + featureProject.getProjectName());
+//						System.out.println("Full Path" + featureProject.getProject().getFullPath());
+//						System.out.println("RelativePath" + featureProject.getProject().getProjectRelativePath());
+//						
+//						Path newPath =  (Path) featureProject.getProject().getProjectRelativePath();
+//					
+////						CopyOption op = CopyOption.REPLACE_EXISTING; 
+////						
+////						
+////						
+////						Files.copy(oldPath, newPath, op);
+////					
+////						Files.move(oldPath, newPath, CopyOption.ATOMIC_MOVE );
+//					}
+//					
+//					
+//					
+//				}
+//			} catch (CoreException e) {
+//
+//				e.printStackTrace();
+//			}
+//
+//			for (IFeature feature : featureProject.getFeatureModel().getFeatures()) {
+//				
+//			}
+
+				
+//		
+//		}
+		
 
 
 		return true;
@@ -393,6 +654,48 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 		}
 		IDE.openEditor(page, outputFile);
+	}
+	
+	private void doFinish(IContainer container, String fileName, File configFile) throws CoreException {
+		// create a sample file
+		//monitor.beginTask(CREATING + fileName, 2);
+		
+		final IFile file = container.getFile(new Path(fileName));
+		try{
+			FileInputStream fileInputStream = new FileInputStream(configFile);
+			
+			if(!file.exists()){
+				file.create(fileInputStream, true, null);
+				
+			}
+			fileInputStream.close();
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+		
+//		monitor.worked(1);
+//		monitor.setTaskName("opening");
+		
+//		getShell().getDisplay().asyncExec(new Runnable() {
+//			public void run() {
+//				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//				try {
+//					IDE.openEditor(page, file, true);
+//				} catch (PartInitException e) {
+//				}
+//			}
+//		});
+//		monitor.worked(1);
+				
+		
+	}
+	
+	/**
+	 * We will initialize file contents with a sample text.
+	 */
+	private InputStream openContentStream() {
+		String contents = "";
+		return new ByteArrayInputStream(contents.getBytes(Charset.availableCharsets().get("UTF-8")));
 	}
 	
 	/**
