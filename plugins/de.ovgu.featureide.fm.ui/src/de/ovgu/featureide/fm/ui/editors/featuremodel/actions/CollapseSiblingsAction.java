@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_SIBLINGS;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -33,38 +33,48 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetSiblingsToCollapsedOperation;
 
 /**
- * collapse the current selected feature
+ * Collapses all siblings of the selected feature if the parent is either an OR or an ALTERNATIVE.
  * 
- * @author Joshua Sprey
- * @author Enis Belli
+ * @author Maximilian Kühl
  */
-public class CollapseAction extends SingleSelectionAction {
+public class CollapseSiblingsAction extends SingleSelectionAction {
 
-	public static final String ID = "de.ovgu.featureide.collapse";
+	public static final String ID = "de.ovgu.featureide.collapsefeatures";
 
 	private IFeatureModel featureModel;
-	
+
+	/**
+	 *  Checks if the parent is AND, if not, it must be an ALTERNATIVE or an OR, 
+	 *  and enables the collapse-siblings-button only for ALTERNATIVE and OR.
+	 */
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 			if (isValidSelection(selection)) {
 				if (selection.getFirstElement() instanceof FeatureEditPart) {
-					setEnabled(true);
-				} else {
-					setEnabled(false);
+					if (getSelectedFeature().getStructure().getParent().isAnd()) {
+						setEnabled(false);
+					} else {
+						setEnabled(true);
+					}
 				}
-			} else {
-				setEnabled(false);
 			}
 		}
 	};
 
-	public CollapseAction(Object viewer, IFeatureModel featureModel) {
-		super(COLLAPSE_FEATURE, viewer);
+	/**
+	 * @param label
+	 *            Description of this operation to be used in the menu
+	 * @param feature
+	 *            feature on which this operation will be executed
+	 * 
+	 */
+	public CollapseSiblingsAction(Object viewer, IFeatureModel featureModel) {
+		super(COLLAPSE_SIBLINGS, viewer);
 		this.featureModel = featureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
@@ -77,8 +87,7 @@ public class CollapseAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		setChecked(feature.getStructure().isCollapsed());
-		SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
+		SetSiblingsToCollapsedOperation op = new SetSiblingsToCollapsedOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -91,8 +100,5 @@ public class CollapseAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		setEnabled(true);
-		setChecked(feature.getStructure().isCollapsed());
 	}
-
 }

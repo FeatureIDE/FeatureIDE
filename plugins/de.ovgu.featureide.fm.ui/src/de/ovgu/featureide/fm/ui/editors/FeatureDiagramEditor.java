@@ -126,6 +126,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
+
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
@@ -177,6 +179,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
 	private CollapseAction collapseAction;
+	private CollapseSiblingsAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private CollapseAllAction expandAllAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
@@ -369,6 +372,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		hiddenAction = new HiddenAction(this, featureModel);
 
 		collapseAction = new CollapseAction(this, featureModel);
+		collapseFeaturesAction = new CollapseSiblingsAction(this, featureModel);
 		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
 
@@ -538,6 +542,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(abstractAction);
 			menu.add(hiddenAction);
 			menu.add(collapseAction);
+			menu.add(collapseFeaturesAction);
 			menu.add(changeFeatureDescriptionAction);
 			menu.add(new Separator());
 			menu.add(subMenuLayout);
@@ -634,6 +639,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return abstractAction;
 		if (CollapseAction.ID.equals(workbenchActionID))
 			return collapseAction;
+		if (CollapseSiblingsAction.ID.equals(workbenchActionID))
+			return collapseFeaturesAction;
 		if (AbstractAction.ID.equals(workbenchActionID))
 			return abstractAction;
 		if (HiddenAction.ID.equals(workbenchActionID))
@@ -1100,8 +1107,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 * @param centerFeature
 	 */
 	private void centerPointOnScreen(int x, int y, int offsetX, int offsetY) {
-		getFigureCanvas().getViewport().setViewLocation((int) (zoomManager.getZoom() * x - getFigureCanvas().getViewport().getBounds().width / 2 - offsetX),
-				(int) (zoomManager.getZoom() * y - getFigureCanvas().getViewport().getBounds().height / 2 - offsetY));
+		int xCenter = (int) (zoomManager.getZoom() * x - (getFigureCanvas().getViewport().getSize().width / 2) + (zoomManager.getZoom() * offsetX));
+		int yCenter = (int) (zoomManager.getZoom() * y - (getFigureCanvas().getViewport().getSize().height / 2) + (zoomManager.getZoom() * offsetY));
+		getFigureCanvas().getViewport().setViewLocation(xCenter, yCenter);
 	}
 
 	private void refreshAll() {
