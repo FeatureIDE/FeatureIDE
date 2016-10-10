@@ -60,6 +60,9 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureProjectWizard";
 	
 	protected NewFeatureProjectPage page;
+	protected ImportFeatureHouseProjectPage page2;
+	
+	private ImportFeatureHouseProjectWizard importFeatureHouseProjectWizard = null;
 	private DefaultNewFeatureProjectWizardExtension wizardExtension = null;
 	
 	@Override
@@ -72,6 +75,13 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		}
 		addPage(page);
 		super.addPages();
+		
+		
+		
+//		page2 = new ImportFeatureHouseProjectPage();
+//		addPage(page2);
+		
+		
 	}
 	
 	@Override

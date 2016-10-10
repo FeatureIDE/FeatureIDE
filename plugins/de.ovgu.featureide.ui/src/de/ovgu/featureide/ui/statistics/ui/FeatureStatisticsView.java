@@ -150,11 +150,11 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 		}
 
 		public void partActivated(IWorkbenchPart part) {
-			/*if (part instanceof IEditorPart) {
+			if (part instanceof IEditorPart) {
 				UIPlugin.getDefault().logInfo("Team2: FeatureStatistics -> partActivated");
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
 				setEditor((IEditorPart) part);
-			}*/
+			}
 		}
 	};
 
@@ -192,6 +192,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults, ICur
 		 * This job waits for the calculation job to finish and starts
 		 * immediately a new one
 		 */
+		UIPlugin.getDefault().logInfo("Team2: is Visible " + getSite().getPage().isPartVisible(getSite().getPart()));
 		if(getSite().getPage().isPartVisible(getSite().getPart())){ // Team2
 			Job waiter = new Job(UPDATING_FEATURESTATISTICSVIEW) {
 				@Override
