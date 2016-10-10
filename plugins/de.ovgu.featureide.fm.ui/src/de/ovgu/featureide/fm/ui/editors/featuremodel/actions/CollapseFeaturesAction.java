@@ -51,23 +51,14 @@ public class CollapseFeaturesAction extends SingleSelectionAction {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 			if (isValidSelection(selection)) {
-			if (selection.getFirstElement() instanceof FeatureEditPart) {
-				if (getSelectedFeature().getStructure().getParent().isAnd()) {
-					setEnabled(false);
-				} else {
-					setEnabled(true);
+				if (selection.getFirstElement() instanceof FeatureEditPart) {
+					if (getSelectedFeature().getStructure().getParent().isAnd()) {
+						setEnabled(false);
+					} else {
+						setEnabled(true);
+					}
 				}
 			}
-			}
-			//				if (isValidSelection(selection)) {
-			//					if (selection.getFirstElement() instanceof FeatureEditPart || selection.getFirstElement() instanceof IFeature) {
-			//						setEnabled(true);
-			//					} else {
-			//						setEnabled(false);
-			//					}
-			//				} else {
-			//					setEnabled(false);
-			//				}
 		}
 	};
 
@@ -92,12 +83,10 @@ public class CollapseFeaturesAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		//			setChecked(feature.getStructure().getParent().getChildren().isCollapsed());
 		SetFeaturesToCollapsedOperation op = new SetFeaturesToCollapsedOperation(feature, featureModel);
 
 		try {
-//			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			op.execute(null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
@@ -105,11 +94,7 @@ public class CollapseFeaturesAction extends SingleSelectionAction {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction#updateProperties()
-	 */
 	@Override
 	protected void updateProperties() {
-		//			setEnabled(feature.getStructure().getParent().isAlternative() || feature.getStructure().getParent().isOr());
 	}
 }
