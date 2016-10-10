@@ -11,14 +11,5 @@
             nature="de.ovgu.featureide.core.composer.framework">
       </composer>
    </extension>
-   <extension
-         point="de.ovgu.featureide.core.wizard">
-      <newProjectWizard
-            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
-            composerid="de.ovgu.featureide.core.composer.framework"
-            id="de.ovgu.featureide.core.framework.newProjectWizard"
-            name="Default">
-      </newProjectWizard>
-   </extension>
 
 </plugin>
