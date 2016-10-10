@@ -3,9 +3,9 @@
  *
  * This file is part of FeatureIDE.
  * 
- * FeatureIDE is free software: you can redistributeinitialSelectedColor/or modify
- * it under the terms of the GNU LinitialSelectedColoreneral PuinitialSelectedColorcense as published by
- * the FreinitialSelectedColorare Foundation, either version 3 of the License, or
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
  * FeatureIDE is distributed in the hope that it will be useful,
@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
 import static de.ovgu.featureide.fm.core.functional.Functional.toList;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE;
@@ -68,9 +68,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * Sets the color of the features in the feature diagram.
  * The color is chosen in the dialog.
  * 
- * @author Christian Elzholz, Marcus Schmelz
+ * @author Christian Elzholz
+ * @author Marcus Schmelz
  * @author Marcus Pinnecke
- * @author Niklas Lehnfeld, Paul Maximilian Bittner, Antje Moench
+ * @author Paul Maximilian Bittner
+ * @author Niklas Lehnfeld
+ * @author Antje Moench
  */
 public class SetFeatureColorDialog extends Dialog {
 
@@ -102,9 +105,9 @@ public class SetFeatureColorDialog extends Dialog {
 	}
 
 	/**
-	 * @param newshell
+	 * Sets the minimal size and the text in the title of the dialog.
 	 * 
-	 *            Sets the minimal size and the text in the title of the dialog.
+	 * @param newshell          
 	 */
 	protected void configureShell(Shell newShell) {
 		newShell.setMinimumSize(new Point(500, 500));
@@ -118,9 +121,9 @@ public class SetFeatureColorDialog extends Dialog {
 	}
 
 	/**
-	 * @param parent
+	 * Creates the general layout of the dialog.
 	 * 
-	 *            Creates the general layout of the dialog.
+	 * @param parent     
 	 */
 	protected Control createDialogArea(Composite parent) {
 		final Composite container = (Composite) super.createDialogArea(parent);
@@ -135,7 +138,7 @@ public class SetFeatureColorDialog extends Dialog {
 		Label actionLabel = new Label(container, SWT.NONE);
 		actionLabel.setLayoutData(gridData);
 		actionLabel.setBackground(WHITE);
-		actionLabel.setText(CHOOSE_ACTION_);
+		actionLabel.setText(CHOOSE_ACTION);
 
 		final Combo actionDropDownMenu = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		final String[] actionDropDownItems = { SELECTED_FEATURE, SELECTED_FEATURE_DIRECT_CHILDREN, SELECTED_FEATURE_ALL_CHILDREN, SELECTED_FEATURE_SIBLINGS };
@@ -145,7 +148,7 @@ public class SetFeatureColorDialog extends Dialog {
 		Label chooseColorLabel = new Label(container, SWT.NONE);
 		chooseColorLabel.setLayoutData(gridData);
 		chooseColorLabel.setBackground(WHITE);
-		chooseColorLabel.setText(CHOOSE_COLOR_);
+		chooseColorLabel.setText(CHOOSE_COLOR);
 
 		colorDropDownMenu = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		final String[] colorDropDownItems = new String[FeatureColor.values().length];
@@ -206,8 +209,6 @@ public class SetFeatureColorDialog extends Dialog {
 				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
 					for (IFeature feature : featureListBuffer) {
 						if (!feature.getStructure().isRoot()) {
-							//affectedFeatures.addAll(
-							//		FeatureUIHelper.getGraphicalChildren(feature.getStructure().getParent().getFeature(), model));
 							for (IFeatureStructure featureStructure : feature.getStructure().getParent().getChildren()) {
 								affectedFeatures.add(featureStructure.getFeature());
 							}
@@ -234,7 +235,6 @@ public class SetFeatureColorDialog extends Dialog {
 			}
 
 			private List<IFeature> findChildren(IFeature parent) {
-				//return toList(FeatureUIHelper.getGraphicalChildren(parent));
 				List<IFeature> children = new ArrayList<>();
 				for (IFeatureStructure childStructure : parent.getStructure().getChildren()) {
 					children.add(childStructure.getFeature());
@@ -291,8 +291,9 @@ public class SetFeatureColorDialog extends Dialog {
 	}
 
 	/**
+	 * Colors the background of the table items to show a preview of the changed colors
+	 * 
 	 * @param featureTable
-	 *            Colors the background of the table items to show a preview of the changed colors
 	 */
 	private void colorPreview(final Table featureTable) {
 		for (int i = 0; i < featureListBuffer.size(); i++) {

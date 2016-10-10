@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="First FeatureIDE Project" id="de.ovgu.featureide.ui.doc.setup">
+	<intro
+       href="/de.ovgu.featureide.ui.doc/html/fosd.html">
+		<description>
+<b>Welcome to the FeatureIDE tutorial</b><br/><br/>
+This tutorial will help you to build your first FeatureIDE project. After you have finished this tutorial, you will have a simple <b>Hello World software product line</b>.<br/><br/>
+
+The first step for your product line is domain engineering. Here you think about what features to provide for your product. For further information about software product line engineering use the help button. This picture will show you the basic idea between domain engineering and application engineering.<br/><br/>
+<b>Let&apos;s start!</b><br/><br/><br/>
+
+<b>Any problems?</b> If you have problems at a certain step, you can get the final result using <b>File-&gt; New-&gt; Example</b> in Eclipse&apos;s menu bar where you can find all Hello World projects.<br/><br/>
+</description>
+</intro>
+
+
+	<item
+       href="/org.eclipse.platform.doc.user/concepts/concepts-4.htm"
+       skip="true"
+       title="Open the FeatureIDE Perspective">
+		<action
+			pluginId="org.eclipse.ui.cheatsheets"
+			class="org.eclipse.ui.internal.cheatsheets.actions.OpenPerspective"
+			param1="de.ovgu.featureide.ui.FeatureIDEperspective"/>
+		<description>
+     When using FeatureIDE it is best to activate the FeatureIDE perspective. Thus, the first Next, create a new project. You can find the <b>Feature IDE Project</b> wizard under <b>File-&amp;gt; New</b>. On the next page, choose a project name. For example &amp;quot;HelloWorld&amp;quot;. Then, close the wizard by clicking Finish.<br/><br/>
+In the wizard you can select <b>different composition engines</b>. You can choose any composition engine but <b>remember your decision</b>. Because each composition engine is slight different in use, you have to choose your selection later in this tutorial.<br/><br/><br/><b>Info</b>: You can find a short introduction to alternative composition engines at the end of this cheat sheet.e first step is to switch the active perspective to the <b>FeatureIDE Perspective</b>. You can use the button on the upper right corner of the workbench or  <b>Window / Open Perspective / Others...</b> and select <b>Feature IDE</b>.
+        
+  </description>
+</item>
+ 
+ <item title="Create a new FeatureIDE Project">
+    		
+    <description>
+Next, create a new project. You can find the <b>FeatureProject</b> wizard under File-&gt; New. You can also start the wizard by clicking on the button below (Click to perform).<br/><br/>
+In the wizard you can select different composition engines. You can choose any composition engine but remember your decision for later steps in this tutorial.<br/>
+(You can find a short introduction to alternative composition engines at the end of this cheat sheet)<br/>
+On the next page, choose a project name. For example &quot;HelloWorld&quot;. Then, close the wizard by clicking Finish.
+    </description>
+    <command
+          required="false"
+          serialization="org.eclipse.ui.newWizard(newWizardId=de.ovgu.featureide.ui.FeatureProjectWizard)"/>
+ </item>
+ 
+</cheatsheet>

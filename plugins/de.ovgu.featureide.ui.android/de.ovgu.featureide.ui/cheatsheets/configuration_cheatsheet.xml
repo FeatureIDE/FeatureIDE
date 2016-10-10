@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="Configuration" id="de.ovgu.featureide.ui.doc.cheatsheet.configuration">
+	<intro
+       href="/de.ovgu.featureide.ui.doc/html/fosd.html">
+		<description>
+In this part of the tutorial you will create your first configuration.
+</description>
+</intro>
+	 <item title="Configuration File">
+     <description>
+       After you designed your feature model, and source code, you want to <b>generate a variant</b> which is a product of your product line. To <b>specify</b> a variant, you have to provide a <b>feature selection</b>. This is done in a per-variant <b>configuration file</b> <br/><br/>
+Create a new configuration file with the according wizard.
+    </description>
+    <subitem
+          label="Open the configuration file and select the features you want to activate for your variant. After you have saved the file, FeatureIDE will compose your features and compile the generated Java code.">
+    </subitem>
+ </item>
+ <item
+       title="Start your application">
+    <description>
+       Now it&apos;s time to start your application. Right click on the project in package explorer and choose <b>&quot;Run As&gt;Java Application&quot;</b>. Choose a class name without &quot;$$&quot; in the name and enjoy your Hello Beautiful Wonderful Word application! The next time you want to start your application simply use the run button in the eclipse tool bar.
+    </description>
+ </item>
+
+</cheatsheet>

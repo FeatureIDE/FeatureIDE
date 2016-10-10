@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<compositeCheatsheet name="First FeatureIDE Project">
+   <taskGroup kind="set" name="First FeatureIDE Project" skip="false">
+      <intro>
+         <b>Welcome to the FeatureIDE tutorial.</b><br/><br/>This tutorial will help you to build your first FeatureIDE project. After you have finished this tutorial, you will have a simple Hello World software product line. If you have problemes at a certain step, you can get the <b>final result</b> using <b>File-&gt; New-&gt; Example</b> in Eclipse&apos;s main menu.<br/><br/>The first step for your product line is <b>domain engineering</b>. Here you think about what features to provide for your product.<br/><br/><b>More Information</b>: For further information about software product line engineering use the help button. This picture will show you the basic idea between domain engineering and application engineering.<br/><br/><b>Let&apos;s start!</b>
+      </intro>
+      <onCompletion>
+         Great! You have completed the tutorial!
+      </onCompletion>
+      <task kind="cheatsheet" name="Creating a FeatureIDE project" skip="false">
+         <intro>
+            This tutorial guides you through the creation of FeatureIDE project.
+         </intro>
+         <onCompletion>
+            You have created your first FeatureIDE project.
+         </onCompletion>
+         <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.setup">
+         </param>
+      </task>
+      <task kind="cheatsheet" name="Creating a feature model" skip="false">
+         <intro>
+            This tutorial guides you through the creation a feature model.
+         </intro>
+         <onCompletion>
+            You have created your first feature model.
+         </onCompletion>
+         <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.model">
+         </param>
+      </task>
+      <taskGroup kind="choice" name="Implementing features" skip="false">
+         <intro>
+            &lt;description&gt;
+Choose a composer and implement the features.
+&lt;/description&gt;
+         </intro>
+         <onCompletion>
+            Great! You have implemented features!
+         </onCompletion>
+         <task kind="cheatsheet" name="AHEAD" skip="false">
+            <intro>
+               This tutorial guides you through the implementation of features using AHEAD.
+            </intro>
+            <onCompletion>
+               You have implemented your first FeatureIDE project using AHEAD.
+            </onCompletion>
+            <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.implementation.ahead">
+            </param>
+         </task>
+         <task kind="cheatsheet" name="FeatureC++" skip="false">
+            <intro>
+               This tutorial guides you through the implementation of features using FeatureC++
+            </intro>
+            <onCompletion>
+               You have implemented your first FeatureIDE project using FeatureC++.
+            </onCompletion>
+            <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.implementation.cpp">
+            </param>
+         </task>
+         <task kind="cheatsheet" name="FeatureHouse" skip="false">
+            <intro>
+               This tutorial guides you through the implementation of features using FeatureHouse
+            </intro>
+            <onCompletion>
+               You have implemented your first FeatureIDE project using FeatureHouse.
+            </onCompletion>
+            <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.implementation.featurehouse">
+            </param>
+         </task>
+         <task kind="cheatsheet" name="AspectJ" skip="false">
+            <intro>
+               This tutorial guides you through the implementation of features using AspectJ
+            </intro>
+            <onCompletion>
+               You have implemented your first FeatureIDE project using AspectJ
+            </onCompletion>
+            <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.implementation.aspectj">
+            </param>
+         </task>
+         <task kind="cheatsheet" name="Munge" skip="false">
+            <intro>
+               This tutorial guides you through the implementation of features using Munge
+            </intro>
+            <onCompletion>
+               You have implemented your first FeatureIDE project using Munge
+            </onCompletion>
+            <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.implementation.munge">
+            </param>
+         </task>
+         <task kind="cheatsheet" name="Antenna" skip="false">
+            <intro>
+               This tutorial guides you through the implementation of features using Antenna
+            </intro>
+            <onCompletion>
+               You have implemented your first FeatureIDE project using Antenna
+            </onCompletion>
+            <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.implementation.antenna">
+            </param>
+         </task>
+      </taskGroup>
+      <task kind="cheatsheet" name="Creating a configuration" skip="false">
+         <intro>
+            This tutorial guides you through the creation of a configuration.
+         </intro>
+         <onCompletion>
+            You have created your first FeatureIDE configuration.
+         </onCompletion>
+         <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.configuration">
+         </param>
+      </task>
+      <task kind="cheatsheet" name="What next?" skip="false">
+         <intro>
+            What can you do to learn more about FeatureIDE?.
+         </intro>
+         <onCompletion>
+         </onCompletion>
+         <param name="id" value="de.ovgu.featureide.ui.doc.cheatsheet.whatnext">
+         </param>
+      </task>
+   </taskGroup>
+</compositeCheatsheet>

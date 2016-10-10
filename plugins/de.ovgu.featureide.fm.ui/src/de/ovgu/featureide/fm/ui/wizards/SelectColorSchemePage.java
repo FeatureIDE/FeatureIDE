@@ -40,10 +40,11 @@ import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
- * TODO description
+ * The main page of the SelectColorSchemeWizard. It allows selecting a
+ * color scheme and creating new ones.
  * 
- * @author Niklas Lehnfeld
  * @author Paul Maximilian Bittner
+ * @author Niklas Lehnfeld
  */
 
 public class SelectColorSchemePage extends WizardPage {
@@ -136,8 +137,8 @@ public class SelectColorSchemePage extends WizardPage {
 			if (clrscm.isDefault())
 				continue;
 			
-			TableItem articleDeTableau = new TableItem(colorSchemeTable, SWT.NULL);
-			articleDeTableau.setText(clrscm.getName());
+			TableItem item = new TableItem(colorSchemeTable, SWT.NULL);
+			item.setText(clrscm.getName());
 			
 			if (clrscm.isCurrent()) {
 				colorSchemeTable.select(i);
@@ -155,8 +156,8 @@ public class SelectColorSchemePage extends WizardPage {
 		if (newSchemeName != null && !newSchemeName.isEmpty()) {
 			FeatureColorManager.newColorScheme(featureModel, newSchemeName);
 			
-			TableItem articleDeTableau = new TableItem(colorSchemeTable, SWT.NULL);
-			articleDeTableau.setText(newSchemeName);
+			TableItem item = new TableItem(colorSchemeTable, SWT.NULL);
+			item.setText(newSchemeName);
 			
 			colorSchemeNameText.setText("");
 		}

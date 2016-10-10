@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="First FeatureIDE Project" id="de.ovgu.featureide.ui.doc.setup">
+	<intro>
+		<description>
+It is now time to implement the features. The implementation details depend on the composer you have chosen. Please select the task that explains the implementation for the composer you have chosen during project creation. 
+</description>
+</intro>
+	
+ <item
+       title="Create new cpp files">
+    <description>
+After you have <b>saved</b> your feature model, FeatureIDE will create directories for each feature. In these directories you can create cpp-Files.<br/><br/>
+Start with creating a new cpp-file in the directory Hello: <b>Right click</b> on the <b>directory</b> and use the item <b>New -&gt; FeatureIDE File</b>. Choose the <b>identifier &quot;Main&quot;</b> for the class name and press the <b>Finish</b> button.<br/><br/>
+FeatureIDE opens the file and you can write the following code:<br/><br/>
+#include &quot;stdio.h&quot;<br/>
+class Main {&quot;<br/>
+public:&quot;<br/>
+	int run() { &quot;<br/>
+		printf(&quot;Hello&quot;);<br/>
+		return 0;<br/>
+	}<br/>
+};<br/>
+
+int main() {<br/>
+
+	//create instance of &quot;Main&quot;<br/>
+	Main myHello;<br/>
+<br/>
+	//run Main::run as entry-point of the app<br/>
+	return myHello.run();<br/>
+}<br/>
+    </description>
+    <subitem
+          label="Now create more cpp files, one in each of the directories &quot;Beautiful&quot;, &quot;Wonderful&quot; and &quot;World&quot;. In these cases,  activate the option &quot;Refines&quot; in the Wizard. Furthermore, all the cpp files must have the same name Main.">
+    </subitem>
+ </item>
+ <item
+       title="Source code for the cpp files">
+    <description>
+       Now edit the remaining cpp-Files. Every feature will refine the method <b>print()</b> in the class Main.<br/><br/> Now insert the following code in your world feature: <br/> <br/>
+       
+refines class Main {<br/>
+public:<br/>
+	int run() { <br/>
+		int res = super::run(); <br/>
+		if (res!=0)<br/>
+			return res;<br/>
+<br/>
+		printf(&quot; World!&quot;);<br/>
+		return 0;<br/>
+	}<br/>
+};<br/><br/><br/>
+In the other files you can insert the same code and just change the print method.<br/>
+<br/><br/><b>Example:</b><br/>
+printf(&quot; wonderful&quot;); in feature &quot;Wonderful&quot;.<br/>printf(&quot; beautiful&quot;); in feature &quot;Beautiful&quot;.
+    </description>
+ </item>
+ 
+</cheatsheet>

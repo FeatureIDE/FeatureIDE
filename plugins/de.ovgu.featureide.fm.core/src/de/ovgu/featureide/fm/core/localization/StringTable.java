@@ -999,8 +999,8 @@ public class StringTable {
 	public static final String SELECTED_FEATURE_ALL_CHILDREN = "Children (all)";
 	public static final String SELECTED_FEATURE_SIBLINGS = "Current selection and all siblings";
 	public static final String COLORATION_DIALOG = "Set Feature Colors";
-	public static final String CHOOSE_COLOR_ = "Choose Color:";
-	public static final String CHOOSE_ACTION_ = "Choose Action:";
+	public static final String CHOOSE_COLOR = "Choose Color:";
+	public static final String CHOOSE_ACTION = "Choose Action:";
 	public static final String FEATURES_ = "Features:";
 	public static final String FIDECONF = "fideconf";
 	public static final String PARAMETER_IS_EXPECTED_TO_BE_NON_NULL = "The method parameter is expected to be non-null";

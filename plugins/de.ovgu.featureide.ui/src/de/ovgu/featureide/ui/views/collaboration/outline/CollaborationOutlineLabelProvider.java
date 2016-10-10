@@ -305,13 +305,17 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			if (colorID != FeatureColor.NO_COLOR.getValue()) {
 				item.setBackground(new Color(null, ColorPalette.getRGB(colorID, 0.5f)));
 			}
-			else item.setBackground(null);
+			else {
+				item.setBackground(null);
+			}
 		} else if (data instanceof FSTRole) {
 			int colorID = ((FSTRole) data).getFeature().getColor();
 			if (colorID != FeatureColor.NO_COLOR.getValue()) {
 				item.setBackground(new Color(null, ColorPalette.getRGB(colorID, 0.5f)));
 			}
-			else item.setBackground(null);
+			else {
+				item.setBackground(null);
+			}
 		} else {
 			final IRoleElement element = (IRoleElement) data;
 			for (FSTRole role : element.getRole().getFSTClass().getRoles()) {

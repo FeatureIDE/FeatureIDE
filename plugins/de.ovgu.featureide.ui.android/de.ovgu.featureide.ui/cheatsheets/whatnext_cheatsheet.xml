@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="First FeatureIDE Project" >
+	<intro>
+		<description>
+You have succesfully created and implemented your first FeatureIDE project. Now you can learn to use one of the other composers by restarting the tutorial and choosing a different composition tool. If you want to take a look at further examples. You can also take a look into this overview of composition tools.
+
+
+</description>
+</intro>
+ <item
+       title="Checkout our examples">
+    <description>
+      You can access our examples using 
+
+<br/>- <b>New -&gt; Examples...</b> in package explorer or via 
+<br/>- <b>File -&gt; New -&gt; Others</b> in Eclipse main menu by selecting <b>Feature IDE / Feature IDE Examples</b> under the node <b>Examples</b> the dialog&apos;s tree control. <br/><br/>We provide an HelloWorld example for every FeatureIDE extension, which may help to create projects in other languages and with other composition mechanisms.
+    </description>
+ </item>
+ <item
+ 	title="Composer Overview">
+ 	<description>
+ 	You have already learned how to create a FeatureIDE project that uses the AHEAD composer. In FeatureIDE you can also use FeatureC++, FeatureHouse, AspectJ, DeltaJ, Munge, and Antenna. The following section gives a short introduction to each of them.
+
+<br/><br/>
+<b>AHEAD</b> 
+You have already used the AHEAD composer in the FeatureIDE tutorial. It supports composition of Jak files. Jak extends Java with keywords for Feature-Oriented-Programming. Keywords: refines: used to specify refinements of an existing class. Super(): used to call a refined method . Example: public refines class Main { public void print() { Super().print(); System.out.print(&quot; world!&quot;); } } 
+
+<br/><br/>
+<b>FeatureC++</b> 
+FeatureC++ is a C++ language extension to support Feature-Oriented Programming (FOP). The extension of C++ is similar to the Java extension (Jak) by AHEAD. Keywords: refines: used to specify refinements of an existing class. super: used to call a refined method . Example: refines class Main { public: int run() { int res = super::run(); if (res!=0) return res; printf(&quot; World!&quot;); return 0; } }; 
+
+<br/><br/>
+<b>FeatureHouse</b> 
+FeatureHouse is language-independent in that software artifacts written in various languages can be composed, e.g., source code, test cases, models, documentation, makefiles. Currently, FeatureHouse provides support for the composition of software artifacts written in Java, C#, C, Haskell, JavaCC, Alloy and UML. Keywords: original(): used to call a refined method. Example: (Java) public class Main { protected void print() { original(); System.out.print(&quot; World!&quot;); } } 
+
+<br/><br/>
+<b>AspectJ </b> 
+AspectJ is a aspect-oriented extension of Java. In FeatureIDE each feature corresponds to one aspect. Example: public aspect Wonderful { after(): call(void Main.print()) { System.out.print(&quot; wonderful&quot;); } } 
+
+<br/><br/>
+<b>DeltaJ </b>  
+DeltaJ is a Java-like language supporting Delta-Oriented-Programming. Delta-Oriented-Programming is similar to Feature-Oriented-Programming but each project contains of one core module and a set of delta modules. A core module is a simple collection of classes, while a delta module is a set of operations that allow to add a new class and modify or remove classes declared in other delta or core modules. Keywords: modifies: used to specify a refined class or method original(): used to call a refined method delta: used to specify a delta module core: used to specify a core module after: used to specify module dependencies (the current module depends on the list of modules following the after keyword) Example: delta Wonderful after Beautiful when Wonderful{ modifies class Main{ modifies void print() { original(); new SystemOutWrapper().print(&quot; wonderful&quot;); } } } NOTE: a core module includes a lines specifying features and configurations. In FeatureIDE these lines are modified automatically. 
+
+<br/><br/>
+<b>Munge</b> 
+Munge is a purposely-simple Java preprocessor. When using Munge you can use Munge-style Java comments to specify the mapping between parts of code and features. Example: public class Main { public static void main(String[] args){ /*if[Hello]*/ System.out.print(&quot;Hello&quot;); /*end[Hello]*/ /*if[Beautiful]*/ System.out.print(&quot; beautiful&quot;); /*end[Beautiful]*/ /*if[Wonderful]*/ System.out.print(&quot; wonderful&quot;); /*end[Wonderful]*/ /*if[World]*/ System.out.print(&quot; world!&quot;); /*end[World]*/ } } 
+
+<br/><br/>
+<b>Antenna </b> 
+Antenna is a Java preprocessor. You can use Antenna-style Java comments to specify the mapping between parts of code and features. Example: //#if Hello System.out.print(&quot;Hello&quot;); //#endif //#if Beautiful System.out.print(&quot; beautiful&quot;); //#endif //#if Wonderful System.out.print(&quot; wonderful&quot;); //#endif //#if World System.out.print(&quot; world!&quot;); //#endif }
+ 	</description>
+ 	</item>
+ 
+ 
+</cheatsheet>

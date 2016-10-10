@@ -567,11 +567,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		if (isNotEmpty && selection instanceof StructuredSelection) {
 			StructuredSelection selectionAsStructuredSelection = (StructuredSelection) selection;
 
-			Iterator<?> foreachWarAnscheinendZuViel = selectionAsStructuredSelection.iterator();
+			Iterator<?> iterator = selectionAsStructuredSelection.iterator();
 			Object selectedItem = null;
 			boolean onlyCollaborations = true;
 
-			while (foreachWarAnscheinendZuViel.hasNext() && (selectedItem = foreachWarAnscheinendZuViel.next()) != null) {
+			while (iterator.hasNext() && (selectedItem = iterator.next()) != null) {
 				if (!(selectedItem instanceof CollaborationEditPart)) {
 					onlyCollaborations = false;
 					break;

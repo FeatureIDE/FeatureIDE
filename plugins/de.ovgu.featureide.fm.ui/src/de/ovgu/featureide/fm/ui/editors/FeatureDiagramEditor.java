@@ -470,11 +470,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			ExtendedFeatureModel ext = (ExtendedFeatureModel) getFeatureModel();
 			mplModel = ext.isMultiProductLineModel();
 		}
-		/*
-		// only allow coloration if the active profile is not the default profile
-		if (FeatureColorManager.isDefault(getFeatureModel())) {
-			colorSelectedFeatureAction.setEnabled(false);
-		}*/
+		
 		if (mplModel) {
 			menu.add(subMenuLayout);
 			menu.add(subMenuNameType);
@@ -726,8 +722,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 	}
-
-	int count = 5;
 
 	/**
 	 * Refreshes the colors of the feature model.

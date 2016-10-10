@@ -42,9 +42,10 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorAnnotationModel;
 
 /**
- * TODO description
+ * Opens a new SetFeatureColorDialog for the Feature which is at the current cursor line
  * 
- * @author gruppe40
+ * @author Paul Maximilian Bittner
+ * @author Niklas Lehnfeld
  */
 public class ColorSchemeHandler extends AbstractHandler {
 
@@ -77,9 +78,8 @@ public class ColorSchemeHandler extends AbstractHandler {
 		}
 
 		if (colormodel != null) {
-			IStructuredSelection strucki = new StructuredSelection(colormodel.getFeature(line));
-			SetFeatureColorAction sfca = new SetFeatureColorAction(strucki, colormodel.getFeatureModel());
-			//UIPlugin.getDefault().logInfo(colorModel.getFe);
+			IStructuredSelection structuredSelection = new StructuredSelection(colormodel.getFeature(line));
+			SetFeatureColorAction sfca = new SetFeatureColorAction(structuredSelection, colormodel.getFeatureModel());
 			sfca.run();
 			return true;
 		}

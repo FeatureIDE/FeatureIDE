@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="First FeatureIDE Project" id="de.ovgu.featureide.ui.doc.setup">
+	<intro>
+		<description>
+It is now time to implement the features. The implementation details depend on the composer you have chosen. Please select the task that explains the implementation for the composer you have chosen during project creation. 
+</description>
+</intro>
+	
+ <item
+       title="Create a new base program">
+    <description>
+    AspectJ is a aspect-oriented extension of Java. In FeatureIDE <b>each feature</b> corresponds to <b>one aspect</b>. <br/><br/>First create the Java files for your base program. The aspects for each feature are created automatically.
+Start with creating a <b>new Java-file</b> in the <b>src-directory</b> by right clicking on the directory and choose to create a new Java class. Choose the <b>identifier &quot;Main&quot;</b> for the class name and press <b>Finish</b> button.<br/><br/>
+FeatureIDE opens the file and you can write the following code:<br/><br/>
+public void print(){<br/>
+  System.out.print(&quot;Hello&quot;);<br/>
+}<br/>
+public static void main(String[] args) {<br/>
+  new Main().print();<br/>
+}
+    </description>
+ 
+ </item>
+ <item
+       title="Source code for the aspects">
+    <description>
+       Now edit the existing aspects (.aj) for each feature. Every feature will refine the method print() in the class Main.<br/><br/> Now insert the following code in your world feature: <br/> <br/>
+public aspect Wonderful {<br/>
+	after(): call(void Main.print()) {<br/>
+		System.out.print(&quot; wonderful&quot;);<br/>
+	}<br/>
+	}<br/>
+	In the other files you can insert the same code and just change the print method.<br/><br/>
+<b>Example:</b><br/>
+System.out.print(&quot; wonderful&quot;); // in the &quot;Wonderful&quot; feature.<br/>System.out.print(&quot; beautiful&quot;); // in the &quot;Beautiful&quot; feature.
+    </description>
+ </item>
+ 
+</cheatsheet>

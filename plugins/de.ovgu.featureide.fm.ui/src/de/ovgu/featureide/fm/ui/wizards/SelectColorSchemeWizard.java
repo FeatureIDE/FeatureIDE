@@ -27,10 +27,11 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * TODO description
+ * A simple wizard for selecting a color scheme and applying it.
+ * If necessary, new color schemes can be created.
  * 
- * @author Niklas Lehnfeld
  * @author Paul Maximilian Bittner
+ * @author Niklas Lehnfeld
  */
 public class SelectColorSchemeWizard extends Wizard {
 

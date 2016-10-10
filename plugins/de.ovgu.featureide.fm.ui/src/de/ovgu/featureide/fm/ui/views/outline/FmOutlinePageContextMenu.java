@@ -83,7 +83,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureCo
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
- * @author Niklas Lehnfeld, Mohammed Mahhouk, Paul Maximilian Bittner
+ * @author Paul Maximilian Bittner
+ * @author Niklas Lehnfeld
+ * @authora Mohammed Mahhouk
  */
 public class FmOutlinePageContextMenu {
 

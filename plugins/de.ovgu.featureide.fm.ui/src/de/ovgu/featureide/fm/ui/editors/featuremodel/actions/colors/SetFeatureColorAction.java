@@ -55,9 +55,13 @@ import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
  * ColorSelectedFeatureAction is the action that opens the ColorSelectedFeatureDialog
  * with the selected features in the feature diagram.
  * 
- * @author Christian Elzholz, Marcus Schmelz
+ * @author Christian Elzholz
+ * @author Marcus Schmelz
  * @author Marcus Pinnecke
- * @author Paul Maximilian Bittner, Niklas Lehnfeld, Antje Moench, Mohammed Mahhouk
+ * @author Paul Maximilian Bittner
+ * @author Niklas Lehnfeld
+ * @author Mohammed Mahhouk
+ * @author Antje Moench
  */
 public class SetFeatureColorAction extends Action {
 
@@ -65,8 +69,6 @@ public class SetFeatureColorAction extends Action {
 	private List<IEventListener> colorChangedListeners;
 	protected List<IFeature> featureList = new ArrayList<>();
 	private IFeatureModel featureModel;
-	
-	public static final String hartkot = "KeyVon3";
 
 	private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -133,8 +135,9 @@ public class SetFeatureColorAction extends Action {
 	}
 
 	/**
-	 * @param selection
-	 *            Creates a featureList with the selected features of the feature diagram.
+	 * Creates a featureList with the selected features of the feature diagram.
+	 * 
+	 * @param selection 
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {

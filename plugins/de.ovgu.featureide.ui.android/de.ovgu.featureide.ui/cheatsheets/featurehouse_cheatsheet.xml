@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="First FeatureIDE Project" id="de.ovgu.featureide.ui.doc.setup">
+	<intro>
+		<description>
+It is now time to implement the features. The implementation details depend on the composer you have chosen. Please select the task that explains the implementation for the composer you have chosen during project creation. 
+</description>
+</intro>
+	
+ <item
+       title="Create new Java files">
+    <description>
+FeatureHouse is language-independent in that software artifacts written in various languages can be composed, e.g., source code, test cases, models, documentation, makefiles.
+Currently, FeatureHouse provides support for the composition of software artifacts written in Java, C#, C, Haskell, JavaCC, Alloy and UML.<br/> <br/> In this tutorial you will use Java.<br/> <br/>  
+After you have <b>saved</b> your feature model, FeatureIDE will <b>create directories for each feature automatically</b>. In these directories you can create Java-Files.<br/><br/>
+<b>Start</b> with creating a <b>new Java-file</b> in the directory <b>Hello</b> by right clicking on the directory and use the context-item <b>New -&gt; FeatureIDE File</b>. Choose the <b>identifier &quot;Main&quot;</b> for the class name and press <b>Finish</b> button.<br/><br/>
+FeatureIDE opens the file and you can write the following code:
+<br/><br/>
+public class Main {<br/>
+<br/>
+	protected void print() {<br/>
+		System.out.print(&quot;Hello&quot;);<br/>
+	}<br/>
+	<br/>
+	public static void main(String[] args){<br/>
+		new Main().print();<br/>
+	}<br/>
+}<br/>
+    </description>
+    <subitem
+          label="Now create more Java files. Create one in each of the directories &quot;Beautiful&quot;, &quot;Wonderful&quot;; and &quot;World&quot;;. In these cases,  activate the option &quot;Refines&quot;; in the Wizard. Furthermore, all the Java files must have the same name Main.">
+    </subitem>
+    
+
+    </item>
+   <item
+         title="Source code for the Java files">
+      <description>
+         Now edit the remaining java-Files. Every feature will refine the method print() in the class Main.<br/><br/> Now insert the following code in your world feature: <br/> <br/>
+<br/>
+public class Main {<br/>
+	<br/>
+	protected void print() {<br/>
+		original();<br/>
+		System.out.print(&quot; World!&quot;);<br/>
+	}<br/>
+}<br/><br/>In the other files you can insert the same code and just change the print method.<br/><br/>
+<b>Example:</b><br/>
+System.out.print(&quot; wonderful&quot;); // in feature &quot;Wonderful&quot;.<br/>System.out.print(&quot;beautiful&quot;); // in feature &quot;Beautiful&quot;.
+      </description>
+   </item>
+ 
+</cheatsheet>

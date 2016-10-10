@@ -109,35 +109,36 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				featureProject.getComposer().buildFSTModel();
 				model = featureProject.getFSTModel();
 			}
-
-			if (composer.hasFeatureFolder() && !composer.getName().equals("AHEAD")) {
-				if (element instanceof IFolder) {
-					IFolder folder = (IFolder) element;
-					//folder inSourceFolder but not SourceFolder itself
-					if (folder.getParent().equals(featureProject.getSourceFolder())) {
-						getFeatureFolderColors(folder, elementColors, featureProject);
-						return DrawImageForProjectExplorer.getFOPModuleImage(new ArrayList<Integer>(elementColors));
-					} else if (isInSourceFolder(folder)) {
-						return DrawImageForProjectExplorer.getPackageImage();
+			if(!composer.getName().equals("AHEAD")) {
+				if (composer.hasFeatureFolder()) {
+					if (element instanceof IFolder) {
+						IFolder folder = (IFolder) element;
+						//folder inSourceFolder but not SourceFolder itself
+						if (folder.getParent().equals(featureProject.getSourceFolder())) {
+							getFeatureFolderColors(folder, elementColors, featureProject);
+							return DrawImageForProjectExplorer.getFOPModuleImage(new ArrayList<Integer>(elementColors));
+						} else if (isInSourceFolder(folder)) {
+							return DrawImageForProjectExplorer.getPackageImage();
+						}
 					}
 				}
-			}
-
-			if (composer.hasSourceFolder() && !composer.hasFeatureFolder() && !composer.getName().equals("AHEAD")) {
-				if (element instanceof IFolder) {
-					IFolder folder = (IFolder) element;
-					if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder()) && !composer.getName().equals("AHEAD")) {
-						getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
-						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), null, superImage);
+	
+				if (composer.hasSourceFolder() && !composer.hasFeatureFolder()) {
+					if (element instanceof IFolder) {
+						IFolder folder = (IFolder) element;
+						if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
+							getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+							return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), null, superImage);
+						}
 					}
-				}
-				if (element instanceof IFile) {
-					IFile file = (IFile) element;
-					IContainer folder = file.getParent();
-					if (folder instanceof IFolder) {
-						if (isInSourceFolder(file)) {
-							getPackageColors((IFolder) folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
-							return DrawImageForProjectExplorer.drawExplorerImage(isJavaFile(file) ? ExplorerObject.JAVA_FILE : ExplorerObject.FILE, new ArrayList<Integer>(elementColors), null, superImage);
+					if (element instanceof IFile) {
+						IFile file = (IFile) element;
+						IContainer folder = file.getParent();
+						if (folder instanceof IFolder) {
+							if (isInSourceFolder(file)) {
+								getPackageColors((IFolder) folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+								return DrawImageForProjectExplorer.drawExplorerImage(isJavaFile(file) ? ExplorerObject.JAVA_FILE : ExplorerObject.FILE, new ArrayList<Integer>(elementColors), null, superImage);
+							}
 						}
 					}
 				}
@@ -169,16 +170,17 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			}
 			
 			Set<Integer> parentColors = null;
-			if(cu.getParent() instanceof PackageFragment && !composer.getName().equals("AHEAD")){
-				parentColors = new HashSet<Integer>(); 				
-				getPackageColors((IFolder) cu.getParent().getResource(), parentColors, model,  !composer.hasFeatureFolder() && !composer.hasSourceFolder());
-			}
-			
-			
+						
 			if(!composer.getName().equals("AHEAD")) {
-				getColors(elementColors, myfile, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+				if(cu.getParent() instanceof PackageFragment){
+					parentColors = new HashSet<Integer>(); 				
+					getPackageColors((IFolder) cu.getParent().getResource(), parentColors, model,  !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+				}
 				
-				return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors), new ArrayList<Integer>(parentColors),superImage);
+	
+					getColors(elementColors, myfile, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					
+					return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors), new ArrayList<Integer>(parentColors),superImage);
 			}
 		}
 

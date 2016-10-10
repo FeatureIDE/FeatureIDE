@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="First FeatureIDE Project" id="de.ovgu.featureide.ui.doc.setup">
+	<intro>
+		<description>
+It is now time to implement the features. The implementation details depend on the composer you have chosen. Please select the task that explains the implementation for the composer you have chosen during project creation. 
+</description>
+</intro>
+
+ <item
+       title="Implement your Antenna product line">
+	<description>
+ 	<b>Antenna</b><br/><br/>
+ 	Antenna is a Java preprocessor. You can use Antenna-style Java comments to specify the mapping between parts of code and features.<br/><br/>
+ 	<b>Example:</b><br/><br/>
+ 			//#if Hello<br/>
+		System.out.print(&quot;Hello&quot;);<br/>
+		//#endif<br/>
+		//#if Beautiful<br/>
+		System.out.print(&quot; beautiful&quot;);<br/>
+		//#endif<br/>
+		//#if Wonderful<br/>
+		System.out.print(&quot; wonderful&quot;);	<br/>
+		//#endif<br/>
+		//#if World<br/>
+		System.out.print(&quot; world!&quot;);<br/>
+		//#endif<br/>
+	}<br/>
+ 
+ 	</description>
+ </item>
+ 
+</cheatsheet>
