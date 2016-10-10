@@ -549,11 +549,11 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		
 		
 		Iterator resourcesEnum2 = super.getSelectedResources().iterator();
-		List<File> fileSystemObjects2 = new ArrayList<File>();
+		List<File> selectedFilesForImport = new ArrayList<File>();
 
 		        while (resourcesEnum2.hasNext()) {
 		            File thisFileElement = (File) ((FileSystemElement) (resourcesEnum2.next())).getFileSystemObject();
-		            fileSystemObjects2.add(thisFileElement);       
+		            selectedFilesForImport.add(thisFileElement);       
 		        }
 		        
 		       
@@ -576,15 +576,9 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 		while (resourcesEnum.hasNext()) {
 			
-
 			FileSystemElement element = (FileSystemElement) resourcesEnum.next();
 
 			if (element.getFileNameExtension().equals("m") || element.getFileNameExtension().equals("model")) {
-
-				System.out.println("Es ist ein Model1 " + element.getFileNameExtension());
-				System.out.println(element);
-
-				//File file = (File) element.getFileSystemObject();
 
 				modelFile = (File) element.getFileSystemObject();
 
@@ -595,6 +589,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 			}
 		}
 		
+		
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
 		
 
@@ -604,17 +599,6 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		if (modelFile != null) {
 
 			IFeatureModel featureModel = null;
-
-			//IFeatureProject featureProject = null;
-
-			
-			//final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
-			//			if(res != null){
-			//				 featureProject = res.getProject();
-			//			}
-
-			//			featureModel.getSourceFile().getPath();
-			//			featureProject.get
 
 			URI locationUri = featureProject.getModelFile().getLocationURI();
 
@@ -667,62 +651,10 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 //
 //			}
 			
-			
-			
-			//Iterable<IFeature> features = featureModel.getFeatures();
-			
-			
-			
-			
-//			for(IFeature thisFeature: features){
-//			
-//			//while (features.iterator().hasNext()) {	
-//				
-//				String featureName = thisFeature.getName();
-//				
-//				
-//				for(File fileElement: fileSystemObjects2){
-//					
-//					//FileSystemElement fileElement = (FileSystemElement) resourcesEnum2.next();
-//					
-//					//File element = (File) fileElement.getFileSystemObject();
-//
-////					if(featureName.equals(fileElement.getParentFile().getName())){
-////						
-////						System.out.println("Parent" + featureName + " FileName: " +  fileElement.getName());
-////						
-////						String path = featureProject.getSourcePath();
-////						String newPath = path + ("/" + featureName + "/" + fileElement.getName());
-////						
-//////						IPath newPath = path.append("/" +  featureName);
-//////						
-//////						String stringPath = newPath.toString();
-////						
-////						
-////						fileElement.renameTo(new File(newPath));
-////						
-//////						try {
-//////							featureProject.getSourceFolder().touch(null);
-//////						} catch (CoreException e) {
-//////							// TODO Auto-generated catch block
-//////							e.printStackTrace();
-//////						}
-////						
-////						
-////					}
-//						
-//						
-//
-//				}
-//			}
-
-//			System.out.println(featureProject.getFeaturestubPath());
-//			System.out.println(featureProject.getSourcePath());
-//			System.out.println(featureProject.getSourceFolder());
 
 		}
 		
-		importFileSystem(fileSystemObjects2, featureProject);
+		importFileSystem(selectedFilesForImport, featureProject);
 		
 
 
