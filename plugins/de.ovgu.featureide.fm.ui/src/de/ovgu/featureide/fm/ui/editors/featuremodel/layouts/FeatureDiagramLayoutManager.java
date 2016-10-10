@@ -117,7 +117,8 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	void layout(int yoffset, List<IGraphicalConstraint> constraints) {
-		int y = yoffset + FMPropertyManager.getConstraintSpace();
+		//Added offset to avoid colliding with the collapse decorator
+		int y = yoffset + FMPropertyManager.getConstraintSpace() + 20;
 		boolean depthFirst = this instanceof DepthFirstLayout;
 		for (IGraphicalConstraint constraint : constraints) {
 			Dimension size = constraint.getSize();
