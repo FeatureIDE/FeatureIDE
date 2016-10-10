@@ -1,3 +1,4 @@
+
 import javax.microedition.lcdui.Image;
 
 public class Option {

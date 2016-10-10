@@ -1,6 +1,7 @@
 package de.ovgu.featureide.fm.core.io;
 
 import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.fm.core.io.FileSystem.IFileSystem;
+
 
 public class EclipseFileSystem implements IFileSystem {
 

@@ -48,6 +48,8 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  * extension point the real composition algorithm is given, that builds the
  * compiled files.
  * 
+ * TODO: AL
+ * 
  * @author Tom Brosch
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)

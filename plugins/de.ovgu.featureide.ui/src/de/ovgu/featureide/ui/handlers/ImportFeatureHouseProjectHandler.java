@@ -23,6 +23,11 @@ package de.ovgu.featureide.ui.handlers;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
@@ -34,7 +39,25 @@ import de.ovgu.featureide.ui.wizards.ImportFeatureHouseProjectWizard;
  * 
  * @author Anna-Liisa
  */
-public class ImportFeatureHouseProjectHandler extends ASelectionHandler{
+public class ImportFeatureHouseProjectHandler extends ASelectionHandler implements SelectionListener{
+
+	private Composite widgetSelectedParent;
+	
+	/**
+	 * Default empty constructor
+	 */
+	public ImportFeatureHouseProjectHandler() {
+	}
+	
+	/**
+	 * Creates a specific instance of this handler.
+	 * This constructor is used for the implementation of the
+	 * Selection Listener interface
+	 * @param parent
+	 */
+	public ImportFeatureHouseProjectHandler(Composite parent) {
+		this.widgetSelectedParent = parent;
+	}
 	
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
@@ -52,6 +75,39 @@ public class ImportFeatureHouseProjectHandler extends ASelectionHandler{
 	 */
 	@Override
 	protected void singleAction(Object element) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+	 */
+	@Override
+	public void widgetSelected(SelectionEvent e) {
+		Button checkBox = (Button) e.getSource();
+		if (checkBox.getSelection()) {
+			for (Control child: widgetSelectedParent.getChildren()) {
+				child.setVisible(true);
+			}		
+		} else {
+			for (Control child: widgetSelectedParent.getChildren()) {
+				if (child instanceof Button) {
+					Button childButton = (Button) child;
+					if (!childButton.equals(checkBox)) {
+						child.setVisible(false);
+					}
+				} else {
+					child.setVisible(false);
+				}
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+	 */
+	@Override
+	public void widgetDefaultSelected(SelectionEvent e) {
 		// TODO Auto-generated method stub
 		
 	}

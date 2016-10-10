@@ -48,6 +48,8 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
  * This builder builds the JakProjectModel, by extracting features, 
  * methods and fields from classes to build. 
  * 
+ * TODO: AL
+ * 
  * @author Tom Brosch
  * @author Constanze Adler
  * @author Jens Meinicke

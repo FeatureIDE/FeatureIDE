@@ -1,3 +1,4 @@
+
 import javax.microedition.rms.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -108,4 +109,3 @@ public class Record {
 		return recorde;
 	}
 }
-

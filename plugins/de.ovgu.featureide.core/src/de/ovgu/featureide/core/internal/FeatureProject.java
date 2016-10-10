@@ -117,6 +117,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 /**
  * Class that encapsulates any data and method related to FeatureIDE projects.
  * 
+ *
+ * 
  * @author Marcus Leich
  * @author Thomas Thuem
  * @author Tom Brosch
@@ -128,6 +130,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private static final String FEATURE_MODULE_MARKER = "de.ovgu.featureide.core.featureModuleMarker";
 
+	//TODO: Task Performance
 	public class FeatureModelChangeListner implements IEventListener {
 		/**
 		 * listens to changed feature names
