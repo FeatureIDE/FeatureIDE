@@ -29,18 +29,18 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * TODO description
+ * Operation with functionality to set all siblings to collapsed. Enables
+ * undo/redo functionality.
  * 
- * @author Max
+ * @author Maximilian Kühl
  */
-public class SetFeaturesToCollapsedOperation extends AbstractFeatureModelOperation {
+public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperation {
 
 	private IFeature feature;
 
-	private LinkedList<IFeatureStructure> affectedFeatureList = new LinkedList<IFeatureStructure>();
+	private LinkedList<Boolean> collapseStates = new LinkedList<Boolean>();
 
 	/**
 	 * @param label
@@ -49,7 +49,7 @@ public class SetFeaturesToCollapsedOperation extends AbstractFeatureModelOperati
 	 *            feature on which this operation will be executed
 	 * 
 	 */
-	public SetFeaturesToCollapsedOperation(IFeature feature, IFeatureModel featureModel) {
+	public SetSiblingsToCollapsedOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
 		this.feature = feature;
 	}
@@ -65,7 +65,7 @@ public class SetFeaturesToCollapsedOperation extends AbstractFeatureModelOperati
 	@Override
 	protected FeatureIDEEvent operation() {
 		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
-			affectedFeatureList.add(f);
+			collapseStates.add(f.isCollapsed());
 			if (!f.equals(feature.getStructure())) {
 				f.setCollapsed(true);
 			}
@@ -75,11 +75,11 @@ public class SetFeaturesToCollapsedOperation extends AbstractFeatureModelOperati
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		for (IFeatureStructure f : affectedFeatureList) {
-			f.setCollapsed(f.isCollapsed());
+		int i = 0;
+		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
+			f.setCollapsed(collapseStates.get(i++));
 		}
 		return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);
-		//		return operation();
 	}
 
 }

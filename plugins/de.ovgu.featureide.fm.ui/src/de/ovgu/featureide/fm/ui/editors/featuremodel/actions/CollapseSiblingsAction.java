@@ -33,41 +33,36 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeaturesToCollapsedOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetSiblingsToCollapsedOperation;
 
 /**
  * Collapses all siblings of the selected feature if the parent is either an OR or an ALTERNATIVE.
  * 
  * @author Maximilian Kühl
  */
-public class CollapseFeaturesAction extends SingleSelectionAction {
+public class CollapseSiblingsAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.collapsefeatures";
 
 	private IFeatureModel featureModel;
 
+	/**
+	 *  Checks if the parent is AND, if not, it must be an ALTERNATIVE or an OR, 
+	 *  and enables the collapse-siblings-button only for ALTERNATIVE and OR.
+	 */
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 			if (isValidSelection(selection)) {
-			if (selection.getFirstElement() instanceof FeatureEditPart) {
-				if (getSelectedFeature().getStructure().getParent().isAnd()) {
-					setEnabled(false);
-				} else {
-					setEnabled(true);
+				if (selection.getFirstElement() instanceof FeatureEditPart) {
+					if (getSelectedFeature().getStructure().getParent().isAnd()) {
+						setEnabled(false);
+					} else {
+						setEnabled(true);
+					}
 				}
 			}
-			}
-			//				if (isValidSelection(selection)) {
-			//					if (selection.getFirstElement() instanceof FeatureEditPart || selection.getFirstElement() instanceof IFeature) {
-			//						setEnabled(true);
-			//					} else {
-			//						setEnabled(false);
-			//					}
-			//				} else {
-			//					setEnabled(false);
-			//				}
 		}
 	};
 
@@ -78,7 +73,7 @@ public class CollapseFeaturesAction extends SingleSelectionAction {
 	 *            feature on which this operation will be executed
 	 * 
 	 */
-	public CollapseFeaturesAction(Object viewer, IFeatureModel featureModel) {
+	public CollapseSiblingsAction(Object viewer, IFeatureModel featureModel) {
 		super(COLLAPSE_SIBLINGS, viewer);
 		this.featureModel = featureModel;
 		setEnabled(false);
@@ -92,12 +87,10 @@ public class CollapseFeaturesAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		//			setChecked(feature.getStructure().getParent().getChildren().isCollapsed());
-		SetFeaturesToCollapsedOperation op = new SetFeaturesToCollapsedOperation(feature, featureModel);
+		SetSiblingsToCollapsedOperation op = new SetSiblingsToCollapsedOperation(feature, featureModel);
 
 		try {
-//			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			op.execute(null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
@@ -105,11 +98,7 @@ public class CollapseFeaturesAction extends SingleSelectionAction {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction#updateProperties()
-	 */
 	@Override
 	protected void updateProperties() {
-		//			setEnabled(feature.getStructure().getParent().isAlternative() || feature.getStructure().getParent().isOr());
 	}
 }
