@@ -39,7 +39,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		} else {
 			project = (IProject) element;
 		}
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		Shell shell = new Shell(Display.getCurrent());
 		shell.setText("Select feature");
 		shell.setSize(400, 200);
