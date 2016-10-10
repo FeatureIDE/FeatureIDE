@@ -499,18 +499,20 @@ public class FileFeatureLOCMapper {
 	/**
 	 * Prints the table in an ugly way to the console
 	 */
-	public void printTableToConsole() {
-
-		System.out.println("IFile       |  LOC  |  Map<Feat, LOC>");
+	@Override
+	public String toString() {
+		String string = "";
+		string = string.concat("IFile       |  LOC  |  Map<Feat, LOC> \n");
 		for (TableRow row: table) {
-			System.out.print(row.getFile().getName() + "  |  ");
-			System.out.print(row.getLocInFile() + "  |  ");
+			string = string.concat(row.getFile().getName() + "  |  ");
+			string = string.concat(row.getLocInFile() + "  |  ");
 			for (FSTFeature feat: row.getLocByFeatMap().keySet()) {
-				System.out.print("                    ");
-				System.out.println(feat.getName() + ", " + row.getLocByFeatMap().get(feat));
+				string = string.concat("                    ");
+				string = string.concat(feat.getName() + ", " + row.getLocByFeatMap().get(feat) + "\n");
 			}
-			System.out.println("");
+			string = string.concat("");
 		}
+		return string;
 	}
 	
 	/**
