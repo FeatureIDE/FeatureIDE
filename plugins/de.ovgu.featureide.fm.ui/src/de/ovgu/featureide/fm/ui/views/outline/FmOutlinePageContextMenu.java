@@ -53,6 +53,8 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.IPageSite;
 
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -153,7 +155,6 @@ public class FmOutlinePageContextMenu {
 	}
 
 	private void initActions() {
-		
 		setFeatureColorAction = new SetFeatureColorAction(viewer, getFeatureModel());
 		setFeatureColorAction.addColorChangedListener(new IEventListener() {
 			@Override
@@ -255,8 +256,8 @@ public class FmOutlinePageContextMenu {
 	 * @param manager
 	 */
 	protected void fillContextMenu(IMenuManager manager) {
-		Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-		
+		Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();		
+		setFeatureColorAction.setFeatureModel(fInput);
 		
 		if (sel instanceof FmOutlineGroupStateStorage) {
 			IFeature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
@@ -315,6 +316,19 @@ public class FmOutlinePageContextMenu {
 			if (sel.equals(CONSTRAINTS))
 				manager.add(ccAction);
 
+		if (sel instanceof FSTRole) {
+			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			List<IFeature> featureList = new ArrayList<>();	
+			
+			for(Object obj : ((IStructuredSelection) viewer.getSelection()).toArray()){
+				FSTRole role = (FSTRole) obj;
+				FSTFeature feature = role.getFeature();
+				featureList.add(fInput.getFeature(feature.getName()));
+			}
+
+			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));
+		}
+		
 		if (sel instanceof FSTDirective){
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			List<IFeature> featureList = new ArrayList<>();			
@@ -327,6 +341,7 @@ public class FmOutlinePageContextMenu {
 			}
 			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));
 		}
+		
 		manager.add(setFeatureColorAction);
 	}
 
