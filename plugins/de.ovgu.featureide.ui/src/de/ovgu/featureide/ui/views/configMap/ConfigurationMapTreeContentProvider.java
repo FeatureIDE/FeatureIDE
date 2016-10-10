@@ -3,9 +3,8 @@
  *
  * This file is part of FeatureIDE.
  * 
- * FeatureIDE is free software: you can redistributefeatureRoots/or modify
- * it under the terms of the GNU LfeatureRootseneral PufeatureRootscense as published by
- * the FrefeatureRootsare Foundation, either version 3 of the License, or
+ * FeatureIDE is free software: you can redistributefiltersRoots/or modify
+ * it under the terms of the filtersatureRootfilters PufeatureRootscense as publishefilters the FrefeatureRootsare Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
  * FeatureIDE is distributed in the hope that it will be useful,
@@ -30,8 +29,6 @@ import org.eclipse.jface.viewers.Viewer;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
 
 /**
  * TODO description
@@ -39,12 +36,44 @@ import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
-public class ConfigurationMapTreeContentProvider implements ITreeContentProvider {
+public class ConfigurationMapTreeContentProvider implements ITreeContentProvider, IConfigurationMapFilterable {
 
 	private IFeatureProject featureProject;
 	private Object[] featureRoots;
 
-	public ConfigurationMapTreeContentProvider() {}
+	private ConfigurationMap configurationMap;
+	private List<IConfigurationMapFilter> filters;
+
+	public ConfigurationMapTreeContentProvider(ConfigurationMap configurationMap) {
+		this.configurationMap = configurationMap;
+		this.filters = new ArrayList<>();
+	}
+
+	@Override
+	public boolean addFilter(IConfigurationMapFilter filter) {
+		if (this.filters.add(filter)) {
+			filter.initialize(this.configurationMap);
+			updateElements();
+			return true;
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean removeFilter(IConfigurationMapFilter filter) {
+		if (this.filters.remove(filter)) {
+			updateElements();
+			return true;
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean hasFilter(IConfigurationMapFilter filter) {
+		return this.filters.contains(filter);
+	}
 
 	/**
 	 * @param featureProject
@@ -52,13 +81,27 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	public void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
 			this.featureProject = featureProject;
-			List<IFeature> featureRootList = new ArrayList<>();
-			for (IFeature feature : featureProject.getFeatureModel().getFeatures()) {
-				if (feature.getStructure().getParent() == null)
-					featureRootList.add(feature);
-			}
-			featureRoots = featureRootList.toArray();
+			for (IConfigurationMapFilter filter : this.filters)
+				filter.initialize(this.configurationMap);
+			updateElements();
 		}
+	}
+
+	private void updateElements() {
+		if (featureProject == null)
+			return;
+
+		List<Object> featureRootList = new ArrayList<>();
+
+		//add Features
+		for (IFeature feature : featureProject.getFeatureModel().getFeatures())
+			// getParent(feature) == null <=> With the used filter, this feature is a root (although originally it may be not).
+			if (filter(feature) && (feature.getStructure().isRoot() || getParent(feature) == null))
+				featureRootList.add(feature);
+
+		featureRoots = featureRootList.toArray();
+		
+		this.configurationMap.updateTree();
 	}
 
 	/**
@@ -92,12 +135,17 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 		if (parentElement instanceof IFeature) {
 			IFeature f = (IFeature) parentElement;
 			List<IFeatureStructure> childStructures = f.getStructure().getChildren();
-			Object[] children = new Object[childStructures.size()];
-			int i = 0;
-			for (IFeatureStructure struct : childStructures)
-				children[i++] = struct.getFeature();
-			return children;
+
+			List<Object> children = new ArrayList<>();
+			for (IFeatureStructure struct : childStructures) {
+				IFeature child = struct.getFeature();
+				if (filter(child))
+					children.add(child);
+			}
+
+			return children.toArray();
 		}
+
 		return null;
 	}
 
@@ -113,8 +161,13 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	 */
 	public Object getParent(Object element) {
 		if (element instanceof IFeature) {
-			IFeature f = (IFeature) element;
-			return f.getStructure().getParent().getFeature();
+			IFeature feature = (IFeature) element;
+			IFeatureStructure parentStructure = feature.getStructure().getParent();
+			if (parentStructure != null) {
+				IFeature parent = parentStructure.getFeature();
+				if (filter(parent))
+					return parent;
+			}
 		}
 		return null;
 	}
@@ -134,8 +187,26 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	public boolean hasChildren(Object element) {
 		if (element instanceof IFeature) {
 			IFeature f = (IFeature) element;
-			return f.getStructure().hasChildren();
+
+			for (IFeatureStructure childStruct : f.getStructure().getChildren()) {
+				IFeature child = childStruct.getFeature();
+
+				// If at least one child is valid, the feature has children.
+				if (filter(child))
+					return true;
+			}
 		}
+
+		return false;
+	}
+
+	private boolean filter(IFeature feature) {
+		// OR
+		for (IConfigurationMapFilter filter : filters) {
+			if (filter.test(this.configurationMap, feature))
+				return true;
+		}
+
 		return false;
 	}
 
@@ -144,13 +215,12 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 	 */
 	@Override
-	public void dispose() {}
+	public void dispose() {
+	}
 }

@@ -18,38 +18,39 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.configMap;
+package de.ovgu.featureide.ui.views.configMap.actions;
 
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
+import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilterable;
 
 /**
  * TODO description
  * 
  * @author gruppe40
  */
-public enum ConfigFeatureSelectionState {
-	Unselected, Selected, PartlySelected;
+public class ConfigMapFilterAction extends Action {
+	private IConfigurationMapFilter filter;
+	private IConfigurationMapFilterable filterable;
 	
-	public Image getImage() {
-		String imgPath = null;
-		
-		switch(this) {
-		case Selected:
-			imgPath = "aselected.ico";
-			break;
-			
-		case Unselected:
-			imgPath = "undefined.ico";
-			break;
-			
-		case PartlySelected:
-		default:
-			imgPath = "adeselected.ico";
-			break;
-		}
-		
-		return FMUIPlugin.getImage(imgPath);
+	public ConfigMapFilterAction(IConfigurationMapFilter filter, IConfigurationMapFilterable filterable) {
+		super(filter.getName(), Action.AS_CHECK_BOX);
+		this.filter = filter;
+		this.filterable = filterable;
+		setChecked(filter.isDefault());
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#setChecked(boolean)
+	 */
+	@Override
+	public void setChecked(boolean checked) {
+		super.setChecked(checked);
+		if (checked)
+			this.filterable.addFilter(this.filter);
+		else
+			this.filterable.removeFilter(this.filter);
+	}
+
 }

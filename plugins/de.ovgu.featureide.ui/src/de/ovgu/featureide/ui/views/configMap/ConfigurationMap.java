@@ -26,11 +26,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
@@ -44,6 +50,14 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
 import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
+import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
+import de.ovgu.featureide.ui.views.configMap.filters.CoreFeatureFilter;
+import de.ovgu.featureide.ui.views.configMap.filters.DeadFeatureFilter;
+import de.ovgu.featureide.ui.views.configMap.filters.FeatureIsFalseOptionalFilter;
+import de.ovgu.featureide.ui.views.configMap.filters.FeatureUnusedFilter;
+import de.ovgu.featureide.ui.views.configMap.filters.NotAnyFilterFiltersFeatureFilter;
+import de.ovgu.featureide.ui.views.configMap.header.CustomTreeColumnStyle;
+import de.ovgu.featureide.ui.views.configMap.header.CustomTreeHeader;
 
 /**
  * TODO description
@@ -52,14 +66,15 @@ import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
  * @author Antje Moench
  */
 public class ConfigurationMap extends ViewPart {
-	// DEFAULT VALUES
-	private static final int COLUMN_WIDTH = 150;
+	private int featureColumnWidth, defaultColumnWidth;
 
 	// VIEW
 	private Tree tableTree;
 	private TreeViewer tree;
+	private CustomTreeHeader header;
 	private List<TreeColumn> configurationColumns;
 	private int configColumnsOffset = 0;
+	private int gridColumns;
 
 	private ConfigurationMapTreeContentProvider treeViewerContentProvider;
 	private ConfigurationMapLabelProvider labelProvider;
@@ -67,6 +82,9 @@ public class ConfigurationMap extends ViewPart {
 
 	private ConfigurationLoader loader;
 	private List<Configuration> configurations;
+	
+	private List<IConfigurationMapFilter> filters;
+	private ConfigMapFilterMenuAction filterMenu;
 
 	// MODEL
 	private IFeatureProject featureProject;
@@ -87,28 +105,50 @@ public class ConfigurationMap extends ViewPart {
 			 */
 			@Override
 			public void onConfigurationLoaded(Configuration configuration, Path path) {
-				if (tableTree == null) return;
-				
+				if (tableTree == null)
+					return;
+
 				String configFileName = path.getFileName().toString();
-				System.err.println(configFileName);
 				String[] configFileNameParts = configFileName.split("\\.");
 				String configName = configFileNameParts[0];
 
-				TreeColumn column = new TreeColumn(tableTree, SWT.LEFT);
+				TreeColumn column = new TreeColumn(tableTree, SWT.CENTER);
 				column.setAlignment(SWT.CENTER);
+				column.setWidth(defaultColumnWidth);
 				column.setText(configName);
-				column.setWidth(COLUMN_WIDTH); //Magic number
-				
+
 				configurationColumns.add(column);
 			}
 
 			@Override
-			public void onLoadingError(IOException exception) {}
+			public void onLoadingError(IOException exception) {
+			}
 
 		};
+
+		this.loader = new ConfigurationLoader(configLoaderCallback);
+		this.configurationColumns = new ArrayList<>();
 		
-		loader = new ConfigurationLoader(configLoaderCallback);
-		configurationColumns = new ArrayList<>();
+		this.filters = new ArrayList<>();
+		createFilters();
+
+		this.featureColumnWidth = 200;
+		this.defaultColumnWidth = 40;
+	}
+	
+	/**
+	 * If you want to add filters to the view, do it here.
+	 * The gui elements will be created automatically.
+	 */
+	private void createFilters() {
+		filters.add(new CoreFeatureFilter(true));
+		filters.add(new FeatureUnusedFilter(true));
+		filters.add(new FeatureIsFalseOptionalFilter(true));
+		filters.add(new DeadFeatureFilter(true));
+		
+		List<IConfigurationMapFilter> previousFiltersCopy = new ArrayList<>(filters);
+		
+		filters.add(new NotAnyFilterFiltersFeatureFilter("everything else", true, previousFiltersCopy));
 	}
 
 	/* (non-Javadoc)
@@ -116,31 +156,55 @@ public class ConfigurationMap extends ViewPart {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-		tableTree = new Tree(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tree = new TreeViewer(tableTree);
+		this.gridColumns = 1;
 
-		tableTree.setHeaderVisible(true);
+		GridLayout layout = new GridLayout(gridColumns, true);
+		layout.verticalSpacing = 0;
+		layout.horizontalSpacing = 0;
+		parent.setLayout(layout);
+
+		// HEADER
+		header = new CustomTreeHeader(parent, SWT.FILL);
+		tableTree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+
+		GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		headerGridData.horizontalSpan = gridColumns;
+		header.setLayoutData(headerGridData);
+		header.setBackground(header.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		header.setGlobalRotation((float) CustomTreeHeader.toRadians(-70));
+		header.setLinesVisible(true);
+
+		// TREE
+		GridData tableTreeGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		tableTreeGridData.horizontalSpan = gridColumns;
+		tableTree.setLayoutData(tableTreeGridData);
+		tableTree.setHeaderVisible(false);
 		tableTree.setLinesVisible(true);
 
-		TreeColumn featuresColumn = new TreeColumn(tableTree, SWT.CENTER);
+		tree = new TreeViewer(tableTree);
+		
+		labelProvider = new ConfigurationMapLabelProvider(this);
+		treeViewerContentProvider = new ConfigurationMapTreeContentProvider(this);
+
+		TreeColumn featuresColumn = new TreeColumn(tableTree, SWT.LEFT);
 		featuresColumn.setAlignment(SWT.CENTER);
 		featuresColumn.setText("Features");
-		featuresColumn.setWidth(300); //Magic number
-		
+		featuresColumn.setWidth(featureColumnWidth);
+
 		// There is one column before the configuration columns
 		configColumnsOffset = 1;
 
-		treeViewerContentProvider = new ConfigurationMapTreeContentProvider();
-		labelProvider = new ConfigurationMapLabelProvider(this);
-		
 		tree.setContentProvider(treeViewerContentProvider);
 		tree.setLabelProvider(labelProvider);
 
 		// init
 		IWorkbenchPage page = getSite().getPage();
 		page.addPartListener(new IPartListener() {
-			public void partOpened(IWorkbenchPart part) {}
-			public void partDeactivated(IWorkbenchPart part) {}
+			public void partOpened(IWorkbenchPart part) {
+			}
+
+			public void partDeactivated(IWorkbenchPart part) {
+			}
 
 			public void partClosed(IWorkbenchPart part) {
 				if (part == currentEditor)
@@ -156,20 +220,80 @@ public class ConfigurationMap extends ViewPart {
 					setEditor((IEditorPart) part);
 			}
 		});
-		
-		setEditor(page.getActiveEditor());
-	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {}
+		setEditor(page.getActiveEditor());
+		
+		createToolbar();
+	}
+	
+	private void createToolbar() {
+		IActionBars bars = getViewSite().getActionBars();
+		IToolBarManager toolbarManager = bars.getToolBarManager();
+		toolbarManager.removeAll();
+		if (filterMenu == null) {
+			IConfigurationMapFilter[] filtersArray = new IConfigurationMapFilter[this.filters.size()];
+			this.filters.toArray(filtersArray);
+			filterMenu = new ConfigMapFilterMenuAction(treeViewerContentProvider, filtersArray);
+		}
+		toolbarManager.add(filterMenu);
+	}
 
 	private void loadConfigurations() {
 		// Callback will handle creating columns
 		this.configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
+		// update header
+		TreeColumn[] columns = tableTree.getColumns();
+		List<CustomTreeColumnStyle> styles = new ArrayList<>(columns.length);
+		
+		Display display = header.getDisplay();
+		Color[] alternatingColors = new Color[] {
+				new Color(display, 237, 237, 255),
+				new Color(display, 221, 221, 237)
+		};
+		
+		int offset = getConfigurationColumnsOffset();
+		
+		for (int i = 0; i < columns.length; i++) {
+			TreeColumn col = columns[i];
+
+			CustomTreeColumnStyle style = new CustomTreeColumnStyle(col.getText(), defaultColumnWidth);
+			style.setVerticalAlignment(SWT.BOTTOM);
+			
+			if (i < offset) {
+				style.setHorizontalAlignment(SWT.LEFT);
+				style.setWidth(featureColumnWidth);
+			}
+			
+			style.setBackground(alternatingColors[i % alternatingColors.length]);
+
+			styles.add(style);
+		}
+
+		header.setColumnStyles(styles);
+
+		// refresh gui
+		updateHeaderHeight();
+		updateTree();
+	}
+	
+	void updateTree() {
 		tree.refresh();
+		tree.expandAll();
+	}
+
+	private void updateHeaderHeight() {
+		GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		headerGridData.horizontalSpan = gridColumns;
+		headerGridData.heightHint = header.calculateFittingHeight();
+		header.setLayoutData(headerGridData);
+	}
+
+	@Override
+	public void setFocus() {
+	}
+
+	protected CustomTreeHeader getHeader() {
+		return this.header;
 	}
 
 	public IFeatureProject getFeatureProject() {
@@ -201,16 +325,17 @@ public class ConfigurationMap extends ViewPart {
 				}
 
 				tree.setInput(newInput);
+				updateTree();
 			}
 		}
 
 		this.currentEditor = newEditor;
 	}
-	
+
 	public List<Configuration> getConfigurations() {
 		return this.configurations;
 	}
-	
+
 	public int getConfigurationColumnsOffset() {
 		return configColumnsOffset;
 	}

@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.ui.views.configMap;
 
-import java.util.List;
-
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -29,30 +27,29 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * TODO description
+ * The Label Provider for the Configuration Map.
  * 
- * @author gruppe40
+ * @author Paul Maximilian Bittner
  */
 public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITableColorProvider {
-
+	private final static String imgSelectedPath = "aselected.ico";
+	private final static String imgUnselectedPath = "adeselected.ico";
+	
 	private ConfigurationMap configurationMap;
 
-	/**
-	 * 
-	 */
 	public ConfigurationMapLabelProvider(ConfigurationMap configurationMap) {
 		this.configurationMap = configurationMap;
 	}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
-		return true;
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -81,14 +78,19 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	 */
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
-		int offset = configurationMap.getConfigurationColumnsOffset();
-
-		if (columnIndex >= offset) {
+		if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
-			Configuration config = configurationMap.getConfigurations().get(columnIndex - offset);
-			ConfigFeatureSelectionState state = getStateOf(feature, config);
+			int offset = configurationMap.getConfigurationColumnsOffset();
 
-			return state.getImage();
+			if (columnIndex >= offset) {// && columnIndex < configurationMap.end) {
+				Configuration config = configurationMap.getConfigurations().get(columnIndex - offset);
+
+				String imgPath = imgUnselectedPath;
+				if (config.getSelectedFeatures().contains(feature))
+					imgPath = imgSelectedPath;
+
+				return FMUIPlugin.getImage(imgPath);
+			}
 		}
 
 		return null;
@@ -98,54 +100,13 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
 	 */
 	@Override
-	public String getColumnText(Object element, int columnIndex) {
-		if (columnIndex < configurationMap.getConfigurationColumnsOffset())
-			return element == null ? "NULL" : element.toString();//$NON-NLS-1$
-		return "";
-	}
-
-	private ConfigFeatureSelectionState getStateOf(IFeature feature, Configuration configuration) {
-		IFeatureStructure struct = feature.getStructure();
-
-		if (struct.hasChildren()) {
-			List<IFeatureStructure> childStructs = struct.getChildren();
-
-			boolean allSelected = true;
-			boolean allUnselected = true;
-
-			for (IFeatureStructure childStruct : childStructs) {
-				IFeature child = childStruct.getFeature();
-				ConfigFeatureSelectionState childsState = getStateOf(child, configuration);
-
-				switch (childsState) {
-
-				case Selected:
-					allUnselected = false;
-					break;
-
-				case PartlySelected:
-					allUnselected = false;
-				case Unselected:
-					allSelected = false;
-					break;
-
-				default:
-					break;
-				}
-			}
-
-			if (allSelected)
-				return ConfigFeatureSelectionState.Selected;
-			else if (allUnselected)
-				return ConfigFeatureSelectionState.Unselected;
-			else
-				return ConfigFeatureSelectionState.PartlySelected;
+	public String getColumnText(Object element, int columnIndex) {		
+		if (columnIndex < configurationMap.getConfigurationColumnsOffset()) {
+			if (element instanceof IFeature)
+				return element.toString();
 		}
-
-		if (configuration.getSelectedFeatures().contains(feature))
-			return ConfigFeatureSelectionState.Selected;
-		else
-			return ConfigFeatureSelectionState.Unselected;
+		
+		return null;
 	}
 
 	@Override
