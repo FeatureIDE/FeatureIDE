@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * Operation with functionality to set all siblings to collapsed. Enables
  * undo/redo functionality.
  * 
- * @author Maximilian Kühl
+ * @author Maximilian KÃ¼hl
  */
 public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperation {
 

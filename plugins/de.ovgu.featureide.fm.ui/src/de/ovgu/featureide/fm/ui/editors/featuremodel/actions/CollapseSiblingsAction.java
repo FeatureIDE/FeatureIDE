@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetSiblingsToCol
 /**
  * Collapses all siblings of the selected feature if the parent is either an OR or an ALTERNATIVE.
  * 
- * @author Maximilian Kühl
+ * @author Maximilian KÃ¼hl
  */
 public class CollapseSiblingsAction extends SingleSelectionAction {
 
@@ -56,7 +56,7 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 			setEnabled(isValidSelection(selection));
 			if (isValidSelection(selection)) {
 				if (selection.getFirstElement() instanceof FeatureEditPart) {
-					if (getSelectedFeature().getStructure().getParent().isAnd()) {
+					if (!getSelectedFeature().getStructure().isRoot() && getSelectedFeature().getStructure().getParent().isAnd()) {
 						setEnabled(false);
 					} else {
 						setEnabled(true);
