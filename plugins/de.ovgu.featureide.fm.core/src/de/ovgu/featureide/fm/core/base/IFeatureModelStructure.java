@@ -47,6 +47,8 @@ public interface IFeatureModelStructure {
 	boolean hasConcrete();
 
 	boolean hasHidden();
+	
+	boolean hasCollapsed();
 
 	boolean hasIndetHidden();
 
@@ -77,5 +79,7 @@ public interface IFeatureModelStructure {
 	boolean hasRedundantConstraints();
 
 	boolean hasDeadFeatures();
+
+	void setShowHiddenFeatures(boolean showHiddenFeatures);
 
 }

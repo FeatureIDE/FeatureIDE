@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeaturesToCol
 /**
  * Collapses all siblings of the selected feature if the parent is either an OR or an ALTERNATIVE.
  * 
- * @author Maximilian Kühl
+ * @author Maximilian KÃ¼hl
  */
 public class CollapseFeaturesAction extends SingleSelectionAction {
 

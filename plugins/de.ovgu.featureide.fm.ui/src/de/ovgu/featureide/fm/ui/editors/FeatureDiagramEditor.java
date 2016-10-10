@@ -1016,7 +1016,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 			internRefresh(true);
 			analyzeFeatureModel();
-			refreshAll();
 			break;
 		case COLLAPSED_CHANGED:
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
@@ -1060,6 +1059,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				}
 			}
 			featureModelEditor.setPageModified(true);
+			refreshAll();
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			try {
