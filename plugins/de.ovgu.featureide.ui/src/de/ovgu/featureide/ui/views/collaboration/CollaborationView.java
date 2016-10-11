@@ -88,10 +88,12 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
@@ -202,10 +204,17 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private IToolBarManager toolbarManager;
 
 	private final Vector<IFile> configurations = new Vector<IFile>();
+	
+	/**
+	 * updates the GUI when CollaborationView is visible
+	 */
 	private final Job updateGUIJob = new AWaitingJob(UPDATE_COLLABORATION_VIEW) {
 
 		public IStatus execute(IProgressMonitor monitor) {
 			disableToolbarFilterItems();
+			
+			boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
+			
 			if (configurations.isEmpty()) {
 				refreshButton.setEnabled(true);
 				return Status.OK_STATUS;
@@ -215,33 +224,39 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			if (configurationFile != null && CollaborationModelBuilder.editorFile != null) {
 				builder.configuration = configurationFile;
 			}
-			final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
-			if (model == null) {
-				refreshButton.setEnabled(true);
-				return Status.OK_STATUS;
-			}
-
-			if (!configurations.isEmpty()) {
-				return Status.OK_STATUS;
-			}
-			UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					viewer.setContents(model);
-					EditPart part = viewer.getContents();
-					if (part != null) {
-						part.refresh();
-					}
+			
+			if (isVisible) {
+				final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
+		
+				if (model == null) {
 					refreshButton.setEnabled(true);
-					search.refreshSearchContent();
 					return Status.OK_STATUS;
 				}
-			};
-			uiJob.setPriority(Job.SHORT);
-			uiJob.schedule();
-			try {
-				uiJob.join();
-			} catch (InterruptedException e) {
-				UIPlugin.getDefault().logError(e);
+
+				if (!configurations.isEmpty()) {
+					return Status.OK_STATUS;
+				}
+			
+				UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						viewer.setContents(model);
+						EditPart part = viewer.getContents();
+						if (part != null) {
+							part.refresh();
+						}
+				
+						refreshButton.setEnabled(true);
+						search.refreshSearchContent();
+						return Status.OK_STATUS;
+					}
+				};
+				uiJob.setPriority(Job.SHORT);
+				uiJob.schedule();
+				try {
+					uiJob.join();
+				} catch (InterruptedException e) {
+					UIPlugin.getDefault().logError(e);
+				}
 			}
 			return Status.OK_STATUS;
 		}
@@ -275,15 +290,15 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		this.cursorPosition = new Point(x, y);
 	}
-
+	
 	private IPartListener editorListener = new IPartListener() {
 
 		public void partOpened(IWorkbenchPart part) {
 
 		}
 
-		public void partDeactivated(IWorkbenchPart part) {
-
+		public void partDeactivated(IWorkbenchPart part) {			
+			
 		}
 
 		public void partClosed(IWorkbenchPart part) {
@@ -293,10 +308,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart) {
-				setEditorActions(part);
+			if (part == getSite().getPart()) {
+				updateGUIJob.setPriority(Job.LONG);
+				updateGUIJob.schedule();
+				
 			}
-
 		}
 
 		public void partActivated(IWorkbenchPart part) {
@@ -321,7 +337,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		viewer = new ScrollingGraphicalViewer();
 		viewer.createControl(parent);
 		viewer.getControl().setBackground(DIAGRAM_BACKGROUND);
-
+		
 		getSite().getPage().addPartListener(editorListener); // EditorListener
 		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
 
@@ -430,7 +446,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				activeEditor = page.getActiveEditor();
 			}
 		}
-
+		
 		if (activeEditor != null && activeEditor.getEditorInput() instanceof FileEditorInput) {
 			// case: open editor
 			final IFile inputFile = ((FileEditorInput) activeEditor.getEditorInput()).getFile();
@@ -759,14 +775,16 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
-		if (featureProject != null && featureProject.equals(project)) {
+		if (featureProject != null) {
 			if (configurationFile == null) {
 				configurations.add(project.getCurrentConfiguration());
 			} else {
 				configurations.add(configurationFile);
 			}
-			updateGUIJob.setPriority(Job.LONG);
-			updateGUIJob.schedule();
+			if (getSite().getPage().isPartVisible(getSite().getPart())) {
+				updateGUIJob.setPriority(Job.LONG);
+				updateGUIJob.schedule();
+			}
 		}
 	}
 
@@ -815,7 +833,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			public void run() {
 				viewer.setContents(model);
 				viewer.getContents().refresh();
-				search.refreshSearchContent();
+				search.refreshSearchContent();	
 			}
 		});
 	}

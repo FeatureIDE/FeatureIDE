@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DISABLE_AUTOMA
 import static de.ovgu.featureide.fm.core.localization.StringTable.START_CALCULATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_EDITS;
 
+import org.eclipse.core.internal.runtime.Log;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -74,6 +75,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private static final String MANUAL_CALCULATION_TEXT = START_CALCULATION;
 
 	private static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+	
+	
 
 	private TreeViewer viewer;
 
@@ -123,9 +126,12 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private IPartListener editorListener = new IPartListener() {
 
 		public void partOpened(IWorkbenchPart part) {
+	
 		}
 
 		public void partDeactivated(IWorkbenchPart part) {
+			
+			
 		}
 
 		public void partClosed(IWorkbenchPart part) {
@@ -136,6 +142,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part instanceof IEditorPart)
 				setFeatureModelEditor(part);
+			refresh();
 		}
 
 		public void partActivated(IWorkbenchPart part) {
@@ -147,8 +154,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	private IEventListener modelListener = new IEventListener() {
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType()))
-				refresh();
+			boolean isVisible = getSite().getPage().isPartVisible(getSite().getPart());
+			if (isVisible && evt.getEventType() != EventType.STRUCTURE_CHANGED && evt.getEventType() != EventType.MODEL_LAYOUT_CHANGED)
+			    refresh();
 		}
 	};
 
@@ -277,13 +285,17 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						activatorAction.setEnabled(true);
 						activatorAction.setChecked(isActivatorChecked());
 						manualAction.setEnabled(isActivatorChecked());
+						
 
 						if (featureModelEditor == null) {
 							contentProvider.defaultContent();
 						} else if (isActivatorChecked()) {
 							contentProvider.defaultManualContent();
 						} else {
-							contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+							IWorkbenchPage page = getSite().getPage();							
+							if(page.isPartVisible(getSite().getPart())){
+								contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+							}
 						}
 						return Status.OK_STATUS;
 					}
