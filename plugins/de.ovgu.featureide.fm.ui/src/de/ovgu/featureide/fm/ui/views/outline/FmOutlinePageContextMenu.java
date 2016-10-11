@@ -320,11 +320,12 @@ public class FmOutlinePageContextMenu {
 			if (sel.equals(CONSTRAINTS))
 				manager.add(ccAction);
 
-		if (sel instanceof RoleElement) {
+		if (sel instanceof RoleElement && !(sel instanceof FSTDirective)) {
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			List<IFeature> featureList = new ArrayList<>();	
 			
 			for(Object obj : ((IStructuredSelection) viewer.getSelection()).toArray()){
+				@SuppressWarnings("rawtypes")
 				RoleElement method = (RoleElement) obj;
 				ITreeContentProvider contentProvider = (ITreeContentProvider) viewer.getContentProvider();
 				for(Object role : contentProvider.getChildren(method)){
@@ -336,7 +337,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(setFeatureColorAction);
 		}
 		
-		if (sel instanceof FSTRole) {
+		else if (sel instanceof FSTRole) {
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			List<IFeature> featureList = new ArrayList<>();	
 			
@@ -350,7 +351,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(setFeatureColorAction);
 		}
 		
-		if (sel instanceof FSTDirective){
+		else if (sel instanceof FSTDirective){
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			List<IFeature> featureList = new ArrayList<>();			
 			
