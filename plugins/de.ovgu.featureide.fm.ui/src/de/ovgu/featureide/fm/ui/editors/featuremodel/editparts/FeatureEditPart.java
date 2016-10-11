@@ -53,7 +53,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLa
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
 /**
@@ -286,7 +285,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			if (featureFigure.getParent() != null) {
 				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
 				collapsedDecoration.setLocation(new Point(featureFigure.getBounds().x, featureFigure.getBounds().y));
-				if (featureFigure.SetCollapsedDecorator(collapsedDecoration)) {
+				if (featureFigure.getCollapsedDecorator() == null && featureFigure.setCollapsedDecorator(collapsedDecoration)) {
 					featureFigure.getParent().add(collapsedDecoration);
 				}
 			}

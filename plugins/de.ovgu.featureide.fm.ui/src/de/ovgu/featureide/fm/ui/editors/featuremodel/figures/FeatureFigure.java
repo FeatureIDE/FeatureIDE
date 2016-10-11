@@ -54,7 +54,6 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -427,7 +426,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 	}
 
-	public boolean SetCollapsedDecorator(CollapsedDecoration decoration) {
+	public boolean setCollapsedDecorator(CollapsedDecoration decoration) {
 		if (collapseDecoration == null) {
 			collapseDecoration = decoration;
 			return true;
@@ -436,7 +435,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 	}
 
-	public CollapsedDecoration GetCollapsedDecorator() {
+	public CollapsedDecoration getCollapsedDecorator() {
 		return collapseDecoration;
 	}
 }
