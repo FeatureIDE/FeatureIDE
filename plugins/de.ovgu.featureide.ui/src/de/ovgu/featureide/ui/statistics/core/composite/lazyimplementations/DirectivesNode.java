@@ -124,9 +124,7 @@ public class DirectivesNode extends LazyParent {
 					final int pIndex = className.lastIndexOf('/');
 					className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
 					Parent p = new Parent(className, aggProject.getDirectiveCountForClass(c.getName()));
-					//-------------------
 					int line = aggProject.getLineFromNesting(aggProject.getNestingCountForClass(c.getName()));
-					//-------------------
 					p.addChild(new DirectivesLeafNode(MAXIMUM_NESTING_OF_DIRECTIVES, aggProject.getNestingCountForClass(c.getName()), fstModel.getFeatureProject(), c.getName(), line));
 					addChild(p);
 				}
