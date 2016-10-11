@@ -164,6 +164,10 @@ public class FeatureUIHelper {
 	public static void showHiddenFeatures(boolean show, IGraphicalFeatureModel featureModel) {
 		featureModel.getLayout().showHiddenFeatures(show);
 	}
+	
+	public static void showCollapsedConstraints(boolean show, IGraphicalFeatureModel featureModel) {
+		featureModel.getLayout().showCollapsedConstraints(show);
+	}
 
 	public static void setLegendSize(IGraphicalFeatureModel featureModel, Dimension dim) {
 		legendSize.put(featureModel, dim);

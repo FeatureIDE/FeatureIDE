@@ -137,7 +137,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public List<IGraphicalConstraint> getConstraints() {
 		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(correspondingFeatureModel.getConstraintCount());
-		for (IConstraint c: correspondingFeatureModel.getConstraints()) {
+		for (IConstraint c: correspondingFeatureModel.getVisibleConstraints(getLayout().showCollapsedConstraints())) {
 			constraintList.add(getGraphicalConstraint(c));
 		}
 		return constraintList;

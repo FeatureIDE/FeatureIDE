@@ -29,8 +29,6 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -47,11 +45,13 @@ abstract public class FeatureDiagramLayoutManager {
 
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
-	protected boolean showHidden;
+	protected boolean showHidden, showCollapsedConstraints;
 	
 	public final void layout(IGraphicalFeatureModel featureModel) {
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
+		showCollapsedConstraints = featureModel.getLayout().showCollapsedConstraints();
+		FeatureUIHelper.showCollapsedConstraints(showCollapsedConstraints, featureModel);
 		layoutFeatureModel(featureModel);
 		layoutHidden(featureModel);
 		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {

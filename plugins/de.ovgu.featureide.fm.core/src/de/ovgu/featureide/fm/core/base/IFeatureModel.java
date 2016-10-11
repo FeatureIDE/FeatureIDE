@@ -425,6 +425,28 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @return All constraints stored in this feature model.
 	 */
 	List<IConstraint> getConstraints();
+	
+	/**
+	 * Returns the list of not collapsed constraints stored in this feature model.
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.3
+	 * 
+	 * @return All not collapsed constraints stored in this feature model.
+	 */
+	List<IConstraint> getVisibleConstraints(boolean showCollapsedConstraints);
 
 	/**
 	 * Returns the feature with the given <code>name</code> stored in this feature model, or <code>null</code> if no features can be found. The given
@@ -529,13 +551,13 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * <pre>
 	 * import static de.ovgu.featureide.fm.core.functional.Functional.*;
 	 * 
-	 * Set<String> featureNames = new HashSet<>(toList(mapToString(fm.getFeatures())))
+	 * Set<String> featureNames = new HashSet<>(toList(mapToString(fm.getVisibleFeatures())))
 	 * </pre>
 	 * </code>
 	 * If modification is required, use the related
 	 * constructor for collection implementations, e.g.,
 	 * <br/>
-	 * <code><pre>List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));</pre></code>
+	 * <code><pre>List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getVisibleFeatures()));</pre></code>
 	 * <br/>
 	 * <b>Note</b>: Many operations of features in feature models runs over iteration. This method returns
 	 * an iterator rather than a collection for <i>lazy evaluation</i> purposes.
@@ -548,7 +570,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #getNumberOfFeatures()
 	 * @see #reset()
 	 * 
-	 * @since 3.0
+	 * @since 3.3
 	 * 
 	 * @return A iterable of IFeatures, which are not hidden and not collapsed
 	 */
