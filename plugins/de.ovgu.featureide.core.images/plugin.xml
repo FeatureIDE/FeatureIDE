@@ -11,14 +11,5 @@
             nature="de.ovgu.featureide.core.images.composer">
       </composer>
    </extension>
-   <extension
-         point="de.ovgu.featureide.core.wizard">
-      <newProjectWizard
-            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
-            composerid="de.ovgu.featureide.core.images.composer"
-            id="de.ovgu.featureide.core.images.newProjectWizard"
-            name="Default">
-      </newProjectWizard>
-   </extension>
 
 </plugin>

@@ -54,5 +54,7 @@
 				</conj>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

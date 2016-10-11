@@ -11,15 +11,6 @@
             nature="de.ovgu.featureide.core.composer.runtime">
 		</composer>
 	</extension>
-	<extension
-         point="de.ovgu.featureide.core.wizard">
-		<newProjectWizard
-            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
-            composerid="de.ovgu.featureide.core.composer.runtime"
-            id="de.ovgu.featureide.core.runtime.newProjectWizard"
-            name="Default">
-		</newProjectWizard>
-	</extension>
 	<extension point = "org.eclipse.debug.core.launchConfigurationTypes">
 		<launchConfigurationType
          delegate="de.ovgu.featureide.core.runtime.RuntimeLaunchConfigurationDelegate"
