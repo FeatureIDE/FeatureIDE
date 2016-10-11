@@ -46,15 +46,14 @@ abstract public class FeatureDiagramLayoutManager {
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden, showCollapsedConstraints;
-	
+
 	public final void layout(IGraphicalFeatureModel featureModel) {
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		showCollapsedConstraints = featureModel.getLayout().showCollapsedConstraints();
 		FeatureUIHelper.showCollapsedConstraints(showCollapsedConstraints, featureModel);
 		layoutFeatureModel(featureModel);
-		layoutHidden(featureModel);
-		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {
+		for (Entry<IGraphicalFeature, Point> entry : newLocations.entrySet()) {
 			entry.getKey().setLocation(entry.getValue());
 		}
 		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
@@ -73,19 +72,6 @@ abstract public class FeatureDiagramLayoutManager {
 			return (feature.getObject().getStructure().isHidden() || isHidden(FeatureUIHelper.getGraphicalParent(feature)));
 		else
 			return feature.getObject().getStructure().isHidden();
-	}
-
-	/**
-	 * the location of hidden features is set to (0,0) temporary
-	 * (not the position that is saved in model.xml)
-	 */
-	void layoutHidden(IGraphicalFeatureModel featureModel) {
-		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			if (isHidden(feature) && !feature.getObject().getStructure().isRoot()) {
-				// TODO does nothing
-//				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
-			}
-		}
 	}
 
 	protected abstract void layoutFeatureModel(IGraphicalFeatureModel featureModel);
@@ -172,7 +158,7 @@ abstract public class FeatureDiagramLayoutManager {
 		if (legendSize == null) {
 			return;
 		}
-		
+
 		boolean topRight = true;
 		boolean topLeft = true;
 		boolean botLeft = true;
@@ -240,16 +226,16 @@ abstract public class FeatureDiagramLayoutManager {
 			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		}
 	}
-	
+
 	/**
 	 * Stores locations separately to {@link IGraphicalFeature}.
 	 */
 	protected Map<IGraphicalFeature, Point> newLocations = new HashMap<>();
-	
-	protected void setLocation(IGraphicalFeature feature , Point location) {
+
+	protected void setLocation(IGraphicalFeature feature, Point location) {
 		newLocations.put(feature, location);
 	}
-	
+
 	protected Point getLocation(IGraphicalFeature feature) {
 		Point location = newLocations.get(feature);
 		if (location == null) {
@@ -257,7 +243,7 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 		return location;
 	}
-	
+
 	protected Rectangle getBounds(IGraphicalFeature feature) {
 		if (getLocation(feature) == null || feature.getSize() == null) {
 			// UIHelper not set up correctly, refresh the feature model

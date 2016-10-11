@@ -62,15 +62,26 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		setDecoratorText("" + GetAllChildren(parent.getObject().getStructure()));
 		add(childrenCount);
 	}
+	
+	public CollapsedDecoration() {
+		super();
+		setLayoutManager(layout);
+		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
+		setBorder(FMPropertyManager.getFeatureBorder(false));
+
+		childrenCount.setFont(DEFAULT_FONT);
+		setDecoratorText("n");
+		add(childrenCount);
+	}
 
 	@Override
 	public void setLocation(Point p) {
-		if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
+		if (graphicalFeature != null)
+			if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
 			//left to right layout 
 			super.setLocation(p.translate(GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, -getBounds().height / 2));
-		} else {
-			super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
-		}
+			}
+		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
 	}
 	
 	public int GetAllChildren(IFeatureStructure parent)

@@ -30,10 +30,16 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.RotatableDecoration;
+import org.eclipse.draw2d.RoundedRectangle;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -60,7 +66,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	/**
 	 * Height of each Row (should not be smaller than height of symbols)
 	 */
-	private static final int ROW_HEIGHT = 15;
+	private static final int ROW_HEIGHT = 17;
 	/**
 	 * Distance between left border and label in each row (should be larger than
 	 * width of biggest symbol)
@@ -96,6 +102,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String INTERFACED_TOOLTIP = "Interface feature:\n\nThis feature is a feature from an interface.";
 	private static final String CONCRETE_TOOLTIP = "Concrete feature:\n\nThis feature has impact at implementation level.";
 	private static final String HIDDEN_TOOLTIP = "Hidden feature:\n\nThis feature will not be shown in the configuration editor.\n Non-hidden features should determine when to select the feature automatically.";
+	private static final String COLLAPSED_TOOLTIP = "Collapsed feature:\n\nThe features under this parent will not be shown in the feature model editor.";
 	private static final String DEAD_TOOLTIP = "Dead feature:\n\nThis feature cannot be selected in any valid configuration.";
 	private static final String FALSE_OPT_TOOLTIP = "False optional feature:\n\nThis feature is declared optional, but is always selected\n if the parent feature is selected.";
 	private static final String INDET_HIDDEN_TOOLTIP = "Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
@@ -118,6 +125,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int INHERITED = 9;
 	private static final int INTERFACED = 10;
 	private static final int IMPLICIT = 11;
+	private static final int COLLAPSED = 12;
 
 
 	private static final XYLayout layout = new XYLayout();
@@ -132,6 +140,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean _abstract;
 	private boolean concrete;
 	private boolean hidden;
+	private boolean collapsed;
 	private boolean dead;
 	private boolean showHidden;
 	private boolean falseoptional;
@@ -155,6 +164,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
 
 		final IFeatureModelStructure fmStructure = featureModel.getStructure();
+		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
+		fmStructure.setShowHiddenFeatures(showHidden);
+		
 		mandatory = fmStructure.hasMandatoryFeatures();
 		optional = fmStructure.hasOptionalFeatures();
 		alternative = fmStructure.hasAlternativeGroup();
@@ -162,9 +174,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		_abstract = fmStructure.hasAbstract();
 		concrete = fmStructure.hasConcrete();
 		hidden = fmStructure.hasHidden();
+		collapsed = fmStructure.hasCollapsed();
 		dead = fmStructure.hasDeadFeatures();
 		
-		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
+		
 		falseoptional = fmStructure.hasFalseOptionalFeatures();
 		indetHidden = fmStructure.hasIndetHidden();
 
@@ -199,7 +212,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void setLegendSize() {
 		width = LEGEND_WIDTH;
-		int height = ROW_HEIGHT * 2 - 5;
+		int height = ROW_HEIGHT * 2;
 		if (mandatory) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getMandatory());
@@ -237,6 +250,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (hidden && showHidden) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getHidden());
+		}
+		if (collapsed) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getCollapsed());
 		}
 		if (dead) {
 			height = height + ROW_HEIGHT;
@@ -320,6 +337,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		}
 		if (hidden && showHidden) {
 			createRowHidden(row++);
+		}
+		if (collapsed) {
+			createRowCollapsed(row++);
 		}
 		if (dead) {
 			createRowDead(row++);
@@ -465,6 +485,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Label labelHidden = createLabel(row, language.getHidden(), HIDDEN_FOREGROUND, HIDDEN_TOOLTIP);
 		add(labelHidden);
 	}
+	
+	private void createRowCollapsed(int row) {
+		createCollapsedSymbol(row, COLLAPSED_TOOLTIP);
+		Label labelCollapsed = createLabel(row, language.getCollapsed(), FMPropertyManager.getFeatureForgroundColor(), COLLAPSED_TOOLTIP);
+		add(labelCollapsed);
+	}
 
 	private void createRowDead(int row) {
 		createSymbol(row, DEAD, true, DEAD_TOOLTIP);
@@ -563,6 +589,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			toolTipText = OPTIONAL_TOOLTIP;
 		p.setToolTip(createToolTipContent(toolTipText));
 		return p;
+	}
+	
+	private void createCollapsedSymbol(int row, String toolTip) {
+		final CollapsedDecoration collapsedDecoration = new CollapsedDecoration();
+		Point target = new Point(5 + SYMBOL_SIZE / 2, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE/5);
+		collapsedDecoration.setToolTip(createToolTipContent(toolTip));
+		collapsedDecoration.setLocation(target);
+		this.add(collapsedDecoration);
 	}
 
 	private void createSymbol(int row, int type, boolean feature, String toolTip) {

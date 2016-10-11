@@ -536,6 +536,7 @@ public class StringTable {
 	public static final String VON_INTERFACE = "von Interface";
 	public static final String KONKRET = "Konkret";
 	public static final String VERSTECKT = "Versteckt";
+	public static final String EINGEKLAPPT = "Eingeklappt";
 	public static final String FALSCH_OPTIONALES_FEATURE = "Falsch-optionales Feature";
 	public static final String ODER = "Oder";
 	public static final String UNBESTIMMBAR_VERSTECKTES_FEATURE = "Unbestimmbar verstecktes Feature";

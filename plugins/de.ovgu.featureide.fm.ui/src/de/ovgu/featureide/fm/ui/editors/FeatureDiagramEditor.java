@@ -213,7 +213,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private CreateConstraintWithAction createConstraintWithAction;
 	private ExpandConstraintAction expandConstraintAction;
 
-
 	private ReverseOrderAction reverseOrderAction;
 
 	private List<LayoutSelectionAction> setLayoutActions;
@@ -407,7 +406,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		legendAction = new LegendAction(this, featureModel);
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this, graphicalFeatureModel);
 		showCollapsedConstraintsAction = new ShowCollapsedConstraintsAction(this, graphicalFeatureModel);
-		
+
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
 
@@ -784,7 +783,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 						graphicalFeatureModel.getGraphicalFeature(f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}
-					for (IConstraint c : featureModelEditor.getFeatureModel().getVisibleConstraints(graphicalFeatureModel.getLayout().showCollapsedConstraints())) {
+					for (IConstraint c : featureModelEditor.getFeatureModel()
+							.getVisibleConstraints(graphicalFeatureModel.getLayout().showCollapsedConstraints())) {
 						c.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 						graphicalFeatureModel.getGraphicalConstraint(c).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}
@@ -1025,11 +1025,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 			internRefresh(true);
 			analyzeFeatureModel();
-			refreshAll();
 			break;
 		case COLLAPSED_CHANGED:
 			reload();
-
 			// clear registry		
 			final Map<?, ?> registryCollapsed = getEditPartRegistry();
 			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
@@ -1040,6 +1038,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
 				registryCollapsed.remove(f);
 			}
+
 			graphicalFeatureModel.init();
 			setContents(graphicalFeatureModel);
 			internRefresh(true);
@@ -1067,6 +1066,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				}
 			}
 			featureModelEditor.setPageModified(true);
+			refreshAll();
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			try {
@@ -1082,6 +1082,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			} catch (Exception e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
+			refreshAll();
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
