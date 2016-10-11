@@ -20,16 +20,14 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import org.eclipse.ui.internal.UIPlugin;
-
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * Node which enables jumping to the corresponding file
+ * Node which enables jumping to the corresponding file and line
  * 
  * @author Oliver Urbaniak
+ * @author Philipp Kuhn
  */
 public class DirectivesLeafNode extends Parent {
 	

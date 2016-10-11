@@ -230,7 +230,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		if(isFeatureOrPreprocessorProject) {
 			fillMapper();
 		}
-		fileFeatLOCMapper.printTableToConsole();
 	}
 	
 	/**
