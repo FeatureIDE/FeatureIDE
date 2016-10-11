@@ -136,6 +136,7 @@ public interface GUIDefaults {
 	public static final int COLLAPSED_DECORATOR_X_SPACE = 3;
 	public static final int COLLAPSED_DECORATOR_Y_SPACE = 2;
 	public static final int COLLAPSED_DECORATOR_FEATURE_SPACE = -1;
+	public static final int COLLAPSED_DECORATOR_ARC_RADIUS = 5;
 
 	//legend
 	public static final int LEGEND_WIDTH = 105;
