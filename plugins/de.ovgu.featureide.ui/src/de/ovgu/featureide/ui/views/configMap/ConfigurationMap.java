@@ -58,7 +58,9 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
 import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorSchemeAction;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
 import de.ovgu.featureide.ui.views.configMap.filters.CoreFeatureFilter;
@@ -76,6 +78,9 @@ import de.ovgu.featureide.ui.views.configMap.header.CustomTreeHeader;
  * @author Antje Moench
  */
 public class ConfigurationMap extends ViewPart {
+	
+	public static final String ID = UIPlugin.PLUGIN_ID + ".view1";
+	
 	private int featureColumnWidth, defaultColumnWidth;
 
 	private SetFeatureColorAction setFeatureColor;
