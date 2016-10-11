@@ -31,14 +31,19 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
@@ -54,11 +59,15 @@ import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
 import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
+import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapRefreshAction;
 import de.ovgu.featureide.ui.views.configMap.filters.CoreFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.DeadFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.FeatureIsFalseOptionalFilter;
@@ -74,9 +83,14 @@ import de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionL
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
+
 public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSelectionListener {
+	public static final String ID = UIPlugin.PLUGIN_ID + ".view1";
+
 	private int featureColumnWidth, defaultColumnWidth;
 
+	private SetFeatureColorAction setFeatureColor;
+	
 	// VIEW
 	private Composite parent;
 	private Tree tableTree;
@@ -100,7 +114,8 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	
 	private List<IConfigurationMapFilter> filters;
 	private ConfigMapFilterMenuAction filterMenu;
-	
+
+	private ConfigMapRefreshAction refresh;
 
 	// MODEL
 	private IFeatureProject featureProject;
@@ -249,22 +264,36 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 		setEditor(page.getActiveEditor());
 		
+		setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
+		setFeatureColor.addColorChangedListener(new IEventListener(){
+			@Override
+			public void propertyChange(FeatureIDEEvent event) {
+				if(event.getEventType() == FeatureIDEEvent.EventType.COLOR_CHANGED)
+					updateTree();			
+			}			
+		});
+		
 		createToolbar();
+		createContextMenu();
 	}
 	
 	private void createToolbar() {
 		IActionBars bars = getViewSite().getActionBars();
 		IToolBarManager toolbarManager = bars.getToolBarManager();
-		toolbarManager.removeAll();
+		toolbarManager.removeAll();;
 		if (filterMenu == null) {
 			IConfigurationMapFilter[] filtersArray = new IConfigurationMapFilter[this.filters.size()];
 			this.filters.toArray(filtersArray);
 			filterMenu = new ConfigMapFilterMenuAction(treeViewerContentProvider, filtersArray);
 		}
 		toolbarManager.add(filterMenu);
+
+		if (refresh == null) 
+			refresh = new ConfigMapRefreshAction(this);
+		toolbarManager.add(refresh);
 	}
 
-	private void loadConfigurations() {
+	public void loadConfigurations() {
 		// Callback will handle creating columns
 		this.configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
 		// update header
@@ -304,6 +333,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		updateTree();
 	}
 	
+
 	void updateTree() {
 		tree.refresh();
 		tree.expandAll();
@@ -359,6 +389,32 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		}
 
 		this.currentEditor = newEditor;
+	}
+	
+	public void createContextMenu() {
+		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager m) {
+				fillContextMenu(m);
+			}
+		});
+		Control control = tree.getControl();
+		Menu menu = menuMgr.createContextMenu(control);
+		control.setMenu(menu);
+		getSite().registerContextMenu(menuMgr, tree);
+
+	}
+	
+	private void fillContextMenu(IMenuManager menuMgr) {
+		if (featureProject == null) 
+			return;
+		boolean isNotEmpty = !tree.getSelection().isEmpty();
+		setFeatureColor.setFeatureModel(featureProject.getFeatureModel());
+		
+		setFeatureColor.setEnabled(isNotEmpty);
+		menuMgr.add(setFeatureColor);		
 	}
 
 	public List<Configuration> getConfigurations() {
