@@ -106,6 +106,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOperation;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -774,6 +775,15 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 					((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 				}
+				if (syncCollapsedFeaturesToggle && viewer.getContentProvider() instanceof FmTreeContentProvider) {
+					for (IFeature f : ((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures()) {
+						if (!f.getStructure().isRoot()) {
+							f.getStructure().setCollapsed(true);
+						}
+					}
+					((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().fireEvent(new FeatureIDEEvent(
+							((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
+				}
 			}
 		};
 		collapseAllAction.setToolTipText(COLLAPSE_ALL);
@@ -786,6 +796,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				// call this function
 				if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 					((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
+				}
+				if (syncCollapsedFeaturesToggle && viewer.getContentProvider() instanceof FmTreeContentProvider) {
+					for (IFeature f : ((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures()) {
+						f.getStructure().setCollapsed(false);
+					}
+					((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().fireEvent(new FeatureIDEEvent(
+							((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
 				}
 			}
 		};

@@ -248,6 +248,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
 		case COLLAPSED_CHANGED:
+		case COLLAPSED_ALL_CHANGED:
 			getFeatureFigure().setProperties();
 			break;
 		case MANDATORY_CHANGED:
