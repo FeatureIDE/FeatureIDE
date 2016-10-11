@@ -232,7 +232,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
 			featureModelEditor.fmManager.addListener(this);
 		} else {
-			extraPath = "";
+			extraPath = null;
 		}
 		createControl(container);
 		initializeGraphicalViewer();
@@ -744,9 +744,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	public void setLayout() {
-
-		FeatureDiagramLayoutManager layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(),
-				graphicalFeatureModel);
+		FeatureDiagramLayoutManager layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(), graphicalFeatureModel);
 
 		int previousLayout = graphicalFeatureModel.getLayout().getLayoutAlgorithm();
 
@@ -839,7 +837,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 			internRefresh(true);
 			reload();
-			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			if (extraPath != null) {
+				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			}
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
@@ -894,6 +894,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				registry.remove(f);
 			}
 			graphicalFeatureModel.init();
+			if (extraPath != null) {
+				FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
+			}
 			setContents(graphicalFeatureModel);
 			reload();
 			featureModelEditor.setPageModified(true);
@@ -917,7 +920,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			reload();
-			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			if (extraPath != null) {
+				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			}
 			break;
 		case REDRAW_DIAGRAM:
 			getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
@@ -1019,7 +1024,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-
+		if (extraPath != null) {
+			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+		}
 	}
 
 	@Override
