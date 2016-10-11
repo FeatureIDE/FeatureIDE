@@ -61,7 +61,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datat
 public class StatisticsProgramSizeNew extends LazyParent {
 
 	private final static String[] ignoredExtensions = { "jpg", "jpeg", "raw", "hdr", "tiff", "bmp", "jpe", "dib", "gif", "pdf", "png", "zip", "wav", "mp3",
-			"avi", "flv", "midi" };
+			"avi", "flv", "midi", "WAV" };
 
 	private final FSTModel fstModel;
 	private final FileFeatureLOCMapper fileFeatLOCMapper;
@@ -265,7 +265,8 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			
 			int childrenLOC = countChildrenLOC(directive);
 			locOfDirectiveBody += directive.getEndLine() - directive.getStartLine() -1; //From start to end without end command
-			locOfDirectiveBody -= childrenLOC;
+			if (locOfDirectiveBody - childrenLOC >= 0)
+				locOfDirectiveBody -= childrenLOC;
 		}
 		return locOfDirectiveBody;
 	}
