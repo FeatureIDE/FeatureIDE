@@ -117,7 +117,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
      */
     public ImportFeatureHouseProjectPage(IWorkbench aWorkbench,
             IStructuredSelection selection) {
-        this("featureHouseImportPge", aWorkbench, selection);//$NON-NLS-1$
+        this("featureHouseImportPage", aWorkbench, selection);//$NON-NLS-1$
         this.selection = selection;
       //this.project = project;
       	setTitle("Select FileSystem for Import");
