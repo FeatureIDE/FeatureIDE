@@ -64,6 +64,7 @@ abstract public class FeatureDiagramLayoutManager {
 		layoutFeatureModel(featureModel);
 		layoutHidden(featureModel);
 		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {
+			entry.getKey().setLocation(new Point(0,0));
 			entry.getKey().setLocation(entry.getValue());
 		}
 		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {

@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import org.eclipse.draw2d.geometry.Point;
-
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -41,9 +39,7 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			final Point location = feature.getLocation();
-			feature.setLocation(new Point(0,0));
-			feature.setLocation(location);
+			setLocation(feature, feature.getLocation());
 		}
 		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
 			constraint.setLocation(constraint.getLocation());
