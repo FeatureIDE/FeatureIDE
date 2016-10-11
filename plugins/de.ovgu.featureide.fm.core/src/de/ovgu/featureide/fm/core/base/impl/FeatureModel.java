@@ -284,6 +284,18 @@ public class FeatureModel implements IFeatureModel {
 	public List<IConstraint> getConstraints() {
 		return Collections.unmodifiableList(constraints);
 	}
+	
+	@Override
+	public List<IConstraint> getVisibleConstraints(boolean showCollapsedConstraints) {
+		if (showCollapsedConstraints) return getConstraints();
+		List<IConstraint> constraints = new ArrayList<IConstraint>();
+		for (IConstraint c : getConstraints()) {
+			if (!c.isCollapsed()) {
+				constraints.add(c);
+			}
+		}
+		return Collections.unmodifiableList(constraints);
+	}
 
 	@Override
 	public IFeature getFeature(CharSequence name) {

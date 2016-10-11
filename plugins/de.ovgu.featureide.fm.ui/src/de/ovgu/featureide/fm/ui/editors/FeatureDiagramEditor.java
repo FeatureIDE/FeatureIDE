@@ -126,6 +126,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
@@ -197,6 +198,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private MoveAction moveLeftAction;
 
 	private ShowHiddenFeaturesAction showHiddenFeaturesAction;
+	private ShowCollapsedConstraintsAction showCollapsedConstraintsAction;
 
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
@@ -210,6 +212,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private CreateConstraintAction createConstraintAction;
 	private CreateConstraintWithAction createConstraintWithAction;
 	private ExpandConstraintAction expandConstraintAction;
+
 
 	private ReverseOrderAction reverseOrderAction;
 
@@ -403,7 +406,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		legendLayoutAction = new LegendLayoutAction(this, graphicalFeatureModel);
 		legendAction = new LegendAction(this, featureModel);
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this, graphicalFeatureModel);
-
+		showCollapsedConstraintsAction = new ShowCollapsedConstraintsAction(this, graphicalFeatureModel);
+		
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
 
@@ -471,6 +475,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		subMenuCalculations.add(new DeadFOCalculationsAction(this, getFeatureModel()));
 
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
+		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());
 
 		if (!getSelectedEditParts().isEmpty()) {
 			if (getSelectedEditParts().get(0) instanceof FeatureEditPart) {
@@ -570,6 +575,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			menu.add(collapseAllAction);
 			menu.add(expandAllAction);
+			menu.add(new Separator());
 			menu.add(subMenuLayout);
 			menu.add(subMenuCalculations);
 			menu.add(new Separator());
@@ -580,6 +586,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
+		}
+		if (featureModelEditor.getFeatureModel().getStructure().hasCollapsedConstraint()) {
+			menu.add(showCollapsedConstraintsAction);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -775,7 +784,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 						graphicalFeatureModel.getGraphicalFeature(f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}
-					for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+					for (IConstraint c : featureModelEditor.getFeatureModel().getVisibleConstraints(graphicalFeatureModel.getLayout().showCollapsedConstraints())) {
 						c.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 						graphicalFeatureModel.getGraphicalConstraint(c).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}

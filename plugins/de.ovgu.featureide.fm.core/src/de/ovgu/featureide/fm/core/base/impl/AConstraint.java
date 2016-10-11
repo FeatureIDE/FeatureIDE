@@ -140,6 +140,16 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean isCollapsed() {
+		for (final IFeature f : getContainedFeatures()) {
+			if (!f.getStructure().hasCollapsedParent()) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	@Override
 	public void setConstraintAttribute(ConstraintAttribute attribute, boolean notifyListeners) {

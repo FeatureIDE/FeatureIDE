@@ -176,6 +176,16 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean hasCollapsedConstraint() {
+		for (final IConstraint f : correspondingFeatureModel.getConstraints()) {
+			if (f.isCollapsed()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public boolean hasMandatoryFeatures() {

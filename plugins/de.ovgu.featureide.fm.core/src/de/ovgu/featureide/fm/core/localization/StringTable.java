@@ -440,6 +440,7 @@ public class StringTable {
 	public static final String REVERSE_FEATURE_ORDER = "Reverse Feature Order";
 	public static final String SELECTION = "Selection";
 	public static final String SHOW_HIDDEN_FEATURES = "Show Hidden Features";
+	public static final String SHOW_COLLAPSED_CONSTRAINTS = "Show Collapsed Constraints";
 	public static final String RENAMING_FEATURE = "Renaming feature ";
 	public static final String IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME = "It is not recommended to change upper and lower case. You currently try to rename ";
 	public static final String THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_ = "This name is already used for another feature.";
