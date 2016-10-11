@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -63,6 +64,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureCo
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorSchemeAction;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
+import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapRefreshAction;
 import de.ovgu.featureide.ui.views.configMap.filters.CoreFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.DeadFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.FeatureIsFalseOptionalFilter;
@@ -102,6 +104,7 @@ public class ConfigurationMap extends ViewPart {
 	
 	private List<IConfigurationMapFilter> filters;
 	private ConfigMapFilterMenuAction filterMenu;
+	private ConfigMapRefreshAction refresh;
 
 	// MODEL
 	private IFeatureProject featureProject;
@@ -256,16 +259,20 @@ public class ConfigurationMap extends ViewPart {
 	private void createToolbar() {
 		IActionBars bars = getViewSite().getActionBars();
 		IToolBarManager toolbarManager = bars.getToolBarManager();
-		toolbarManager.removeAll();
+		toolbarManager.removeAll();;
 		if (filterMenu == null) {
 			IConfigurationMapFilter[] filtersArray = new IConfigurationMapFilter[this.filters.size()];
 			this.filters.toArray(filtersArray);
 			filterMenu = new ConfigMapFilterMenuAction(treeViewerContentProvider, filtersArray);
 		}
 		toolbarManager.add(filterMenu);
+
+		if (refresh == null) 
+			refresh = new ConfigMapRefreshAction(this);
+		toolbarManager.add(refresh);
 	}
 
-	private void loadConfigurations() {
+	public void loadConfigurations() {
 		// Callback will handle creating columns
 		this.configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
 		// update header
@@ -303,6 +310,7 @@ public class ConfigurationMap extends ViewPart {
 		updateTree();
 	}
 	
+
 	void updateTree() {
 		tree.refresh();
 		tree.expandAll();
