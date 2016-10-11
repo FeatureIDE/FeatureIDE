@@ -41,7 +41,7 @@ public class CoreFeatureFilter extends ConfigurationMapFilter {
 	 * @param name
 	 */
 	public CoreFeatureFilter(boolean isDefault) {
-		super("core", isDefault);
+		super("core features", isDefault);
 	}
 
 	@Override

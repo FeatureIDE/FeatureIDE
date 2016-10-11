@@ -36,7 +36,7 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 
 	public FeatureIsFalseOptionalFilter(boolean isDefault) {
-		super("false optional", isDefault);
+		super("false optional features", isDefault);
 	}
 
 	/* (non-Javadoc)

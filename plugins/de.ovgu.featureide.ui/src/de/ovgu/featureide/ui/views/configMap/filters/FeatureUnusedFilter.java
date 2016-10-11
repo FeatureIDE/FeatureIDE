@@ -36,7 +36,7 @@ import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 public class FeatureUnusedFilter extends ConfigurationMapFilter {
 
 	public FeatureUnusedFilter(boolean isDefault) {
-		super("unused", isDefault);
+		super("unused features", isDefault);
 	}
 	
 	/* (non-Javadoc)

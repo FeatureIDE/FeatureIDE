@@ -65,7 +65,9 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	 */
 	@Override
 	public Color getBackground(Object element, int columnIndex) {
-		if (element instanceof IFeature) {
+		if (columnIndex - configurationMap.getConfigurationColumnsOffset() == configurationMap.getSelectedColumnIndex()) {
+			return configurationMap.getColumnHighlightColor();
+		} else if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
 			FeatureColor featureColor = FeatureColorManager.getColor(feature);
 			return featureColor.toSwtColor();

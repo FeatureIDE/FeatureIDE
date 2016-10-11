@@ -23,9 +23,14 @@ package de.ovgu.featureide.ui.views.configMap;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -37,11 +42,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
@@ -50,14 +57,16 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
 import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
 import de.ovgu.featureide.ui.views.configMap.filters.CoreFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.DeadFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.FeatureIsFalseOptionalFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.FeatureUnusedFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.NotAnyFilterFiltersFeatureFilter;
-import de.ovgu.featureide.ui.views.configMap.header.CustomTreeColumnStyle;
-import de.ovgu.featureide.ui.views.configMap.header.CustomTreeHeader;
+import de.ovgu.featureide.ui.views.configMap.header.CustomColumnStyle;
+import de.ovgu.featureide.ui.views.configMap.header.CustomTableHeader;
+import de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionListener;
 
 /**
  * TODO description
@@ -65,26 +74,33 @@ import de.ovgu.featureide.ui.views.configMap.header.CustomTreeHeader;
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
-public class ConfigurationMap extends ViewPart {
+public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSelectionListener {
 	private int featureColumnWidth, defaultColumnWidth;
 
 	// VIEW
+	private Composite parent;
 	private Tree tableTree;
 	private TreeViewer tree;
-	private CustomTreeHeader header;
+	private CustomTableHeader header;
+	private Color headerBackground;
+	private Color columnHighlightColor;
 	private List<TreeColumn> configurationColumns;
 	private int configColumnsOffset = 0;
 	private int gridColumns;
+	private int selectedColumnIndex;
 
 	private ConfigurationMapTreeContentProvider treeViewerContentProvider;
 	private ConfigurationMapLabelProvider labelProvider;
 	private IEditorPart currentEditor;
+	private IPartListener partListener;
 
 	private ConfigurationLoader loader;
 	private List<Configuration> configurations;
+	private Map<Configuration, Path> configPaths;
 	
 	private List<IConfigurationMapFilter> filters;
 	private ConfigMapFilterMenuAction filterMenu;
+	
 
 	// MODEL
 	private IFeatureProject featureProject;
@@ -98,6 +114,7 @@ public class ConfigurationMap extends ViewPart {
 				for (TreeColumn column : configurationColumns)
 					column.dispose();
 				configurationColumns.clear();
+				configPaths.clear();
 			}
 
 			/**
@@ -118,6 +135,7 @@ public class ConfigurationMap extends ViewPart {
 				column.setText(configName);
 
 				configurationColumns.add(column);
+				configPaths.put(configuration, path);
 			}
 
 			@Override
@@ -128,12 +146,14 @@ public class ConfigurationMap extends ViewPart {
 
 		this.loader = new ConfigurationLoader(configLoaderCallback);
 		this.configurationColumns = new ArrayList<>();
+		this.configPaths = new HashMap<>();
 		
 		this.filters = new ArrayList<>();
 		createFilters();
 
 		this.featureColumnWidth = 200;
 		this.defaultColumnWidth = 40;
+		selectedColumnIndex = -1;
 	}
 	
 	/**
@@ -142,13 +162,13 @@ public class ConfigurationMap extends ViewPart {
 	 */
 	private void createFilters() {
 		filters.add(new CoreFeatureFilter(true));
-		filters.add(new FeatureUnusedFilter(true));
 		filters.add(new FeatureIsFalseOptionalFilter(true));
+		filters.add(new FeatureUnusedFilter(true));
 		filters.add(new DeadFeatureFilter(true));
 		
 		List<IConfigurationMapFilter> previousFiltersCopy = new ArrayList<>(filters);
 		
-		filters.add(new NotAnyFilterFiltersFeatureFilter("everything else", true, previousFiltersCopy));
+		filters.add(new NotAnyFilterFiltersFeatureFilter("remaining features", true, previousFiltersCopy));
 	}
 
 	/* (non-Javadoc)
@@ -157,6 +177,8 @@ public class ConfigurationMap extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		this.gridColumns = 1;
+		this.parent = parent;
+		columnHighlightColor = new Color(parent.getDisplay(), 255, 188, 0);
 
 		GridLayout layout = new GridLayout(gridColumns, true);
 		layout.verticalSpacing = 0;
@@ -164,15 +186,18 @@ public class ConfigurationMap extends ViewPart {
 		parent.setLayout(layout);
 
 		// HEADER
-		header = new CustomTreeHeader(parent, SWT.FILL);
+		header = new CustomTableHeader(parent, SWT.FILL);
 		tableTree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-
+		headerBackground = header.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		
 		GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		headerGridData.horizontalSpan = gridColumns;
 		header.setLayoutData(headerGridData);
-		header.setBackground(header.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		header.setGlobalRotation((float) CustomTreeHeader.toRadians(-70));
+		header.setBackground(headerBackground);
+		header.setGlobalRotation((float) CustomTableHeader.toRadians(-70));
 		header.setLinesVisible(true);
+		header.setHighlightColor(columnHighlightColor);
+		header.addColumnSelectionListener(this);
 
 		// TREE
 		GridData tableTreeGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -199,7 +224,7 @@ public class ConfigurationMap extends ViewPart {
 
 		// init
 		IWorkbenchPage page = getSite().getPage();
-		page.addPartListener(new IPartListener() {
+		this.partListener = new IPartListener() {
 			public void partOpened(IWorkbenchPart part) {
 			}
 
@@ -219,7 +244,8 @@ public class ConfigurationMap extends ViewPart {
 				if (part instanceof IEditorPart)
 					setEditor((IEditorPart) part);
 			}
-		});
+		};
+		page.addPartListener(this.partListener);
 
 		setEditor(page.getActiveEditor());
 		
@@ -243,7 +269,7 @@ public class ConfigurationMap extends ViewPart {
 		this.configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
 		// update header
 		TreeColumn[] columns = tableTree.getColumns();
-		List<CustomTreeColumnStyle> styles = new ArrayList<>(columns.length);
+		List<CustomColumnStyle> styles = new ArrayList<>(columns.length);
 		
 		Display display = header.getDisplay();
 		Color[] alternatingColors = new Color[] {
@@ -256,15 +282,17 @@ public class ConfigurationMap extends ViewPart {
 		for (int i = 0; i < columns.length; i++) {
 			TreeColumn col = columns[i];
 
-			CustomTreeColumnStyle style = new CustomTreeColumnStyle(col.getText(), defaultColumnWidth);
+			CustomColumnStyle style = new CustomColumnStyle(col.getText(), defaultColumnWidth);
 			style.setVerticalAlignment(SWT.BOTTOM);
+			style.setBackground(alternatingColors[i % alternatingColors.length]);
 			
 			if (i < offset) {
 				style.setHorizontalAlignment(SWT.LEFT);
 				style.setWidth(featureColumnWidth);
+				style.setRotated(false);
+				style.setSelectable(false);
+				style.setBackground(headerBackground);
 			}
-			
-			style.setBackground(alternatingColors[i % alternatingColors.length]);
 
 			styles.add(style);
 		}
@@ -284,15 +312,16 @@ public class ConfigurationMap extends ViewPart {
 	private void updateHeaderHeight() {
 		GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		headerGridData.horizontalSpan = gridColumns;
-		headerGridData.heightHint = header.calculateFittingHeight();
+		headerGridData.heightHint = header.getHeight();
 		header.setLayoutData(headerGridData);
+		parent.layout();
 	}
 
 	@Override
 	public void setFocus() {
 	}
 
-	protected CustomTreeHeader getHeader() {
+	protected CustomTableHeader getHeader() {
 		return this.header;
 	}
 
@@ -337,6 +366,77 @@ public class ConfigurationMap extends ViewPart {
 	}
 
 	public int getConfigurationColumnsOffset() {
-		return configColumnsOffset;
+		return this.configColumnsOffset;
+	}
+
+	public int getSelectedColumnIndex() {
+		return this.selectedColumnIndex;
+	}
+
+	Color getColumnHighlightColor() {
+		return this.columnHighlightColor;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionListener#onColumnSelectionChanged(int)
+	 */
+	@Override
+	public void onColumnSelectionChanged(int columnIndex) {
+		this.selectedColumnIndex = columnIndex - getConfigurationColumnsOffset();
+		updateTree();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionListener#onColumnDoubleClicked()
+	 */
+	@Override
+	public void onColumnDoubleClicked() {
+		openConfiguration(this.selectedColumnIndex);
+	}
+	
+	private void openConfiguration(int configIndex) {
+		Configuration config = this.configurations.get(configIndex);
+		IFile file = this.featureProject.getConfigFolder().getFile(configPaths.get(config).getFileName().toString());
+		try {
+			openEditor(file);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
+		IContentType contentType = null;
+		
+		IContentDescription description = file.getContentDescription();
+		if (description != null)
+			contentType = description.getContentType();
+			
+		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
+	}
+
+	private void openEditor(IFile file) throws CoreException {
+		IWorkbenchPage page = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if (page == null) return;
+
+		String editorId = "org.eclipse.ui.DefaultTextEditor";
+
+		IEditorDescriptor desc = getDescriptor(file);
+		if (desc != null)
+			editorId = desc.getId();
+		
+		page.openEditor(new FileEditorInput(file), editorId);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+		IWorkbenchPage page = getSite().getPage();
+		page.removePartListener(this.partListener);
+		header.removeColumnSelectionListener(this);
+		header.dispose();
+		columnHighlightColor.dispose();
+		super.dispose();
 	}
 }

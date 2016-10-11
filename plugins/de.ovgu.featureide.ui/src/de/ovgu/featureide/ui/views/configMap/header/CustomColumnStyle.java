@@ -28,79 +28,83 @@ import org.eclipse.swt.graphics.Color;
  * 
  * @author gruppe40
  */
-public class CustomTreeColumnStyle {
+public class CustomColumnStyle {
 	private String title;
 	private int width;
-	private int x, y;
 	private Color backgroundColor, foregroundColor;
 	private int verticalAlignment, horizontalAlignment;
-	
-	public CustomTreeColumnStyle(String title, int width) {
-		x = y = 0;
+	private boolean isRotated, isSelectable;
+
+	public CustomColumnStyle(String title, int width) {
 		this.title = title;
 		this.width = width;
-		backgroundColor = foregroundColor = null;
-		verticalAlignment = SWT.TOP;
-		horizontalAlignment = SWT.CENTER;
+		this.backgroundColor = this.foregroundColor = null;
+		this.verticalAlignment = SWT.TOP;
+		this.horizontalAlignment = SWT.CENTER;
+		this.isRotated = true;
+		this.isSelectable = true;
 	}
-	
-	public int getX() {
-		return this.x;
-	}
-	
-	public int getY() {
-		return this.y;
-	}
-	
-	public void setLocation(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-	
+
 	public int getWidth() {
 		return this.width;
 	}
-	
+
 	public void setWidth(int width) {
 		this.width = width;
 	}
-	
+
 	public void setVerticalAlignment(int alignment) {
 		this.verticalAlignment = alignment;
 	}
-	
+
 	public int getVerticalAlignment() {
 		return this.verticalAlignment;
 	}
-	
+
 	public void setHorizontalAlignment(int alignment) {
 		this.horizontalAlignment = alignment;
 	}
-	
+
 	public int getHorizontalAlignment() {
 		return this.horizontalAlignment;
 	}
-	
+
+	public void setRotated(boolean isRotated) {
+		this.isRotated = isRotated;
+	}
+
+	public boolean isRotated() {
+		return isRotated;
+	}
+
+	public void setSelectable(boolean isSelectable) {
+		this.isSelectable = isSelectable;
+	}
+
+	public boolean isSelectable() {
+		return isSelectable;
+	}
+
 	public String getTitle() {
 		return this.title;
 	}
-	
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
 	public Color getForeground() {
 		return this.foregroundColor;
 	}
-	
+
 	public void setForeground(Color foregroundColor) {
 		this.foregroundColor = foregroundColor;
 	}
-	
+
 	public Color getBackground() {
 		return this.backgroundColor;
 	}
-	
+
 	public void setBackground(Color backgroundColor) {
 		this.backgroundColor = backgroundColor;
 	}

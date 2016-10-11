@@ -41,7 +41,7 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 	 * @param name
 	 */
 	public DeadFeatureFilter(boolean isDefault) {
-		super("dead", isDefault);
+		super("dead features", isDefault);
 	}
 	
 	@Override
