@@ -45,6 +45,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -54,7 +55,10 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.IPageSite;
 
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -316,6 +320,22 @@ public class FmOutlinePageContextMenu {
 			if (sel.equals(CONSTRAINTS))
 				manager.add(ccAction);
 
+		if (sel instanceof RoleElement) {
+			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			List<IFeature> featureList = new ArrayList<>();	
+			
+			for(Object obj : ((IStructuredSelection) viewer.getSelection()).toArray()){
+				RoleElement method = (RoleElement) obj;
+				ITreeContentProvider contentProvider = (ITreeContentProvider) viewer.getContentProvider();
+				for(Object role : contentProvider.getChildren(method)){
+					FSTFeature fst = ((FSTRole) role).getFeature();
+					featureList.add(fInput.getFeature(fst.getName()));
+				}
+			}
+			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));
+			manager.add(setFeatureColorAction);
+		}
+		
 		if (sel instanceof FSTRole) {
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			List<IFeature> featureList = new ArrayList<>();	
@@ -327,6 +347,7 @@ public class FmOutlinePageContextMenu {
 			}
 
 			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));
+			manager.add(setFeatureColorAction);
 		}
 		
 		if (sel instanceof FSTDirective){
@@ -339,10 +360,9 @@ public class FmOutlinePageContextMenu {
 				IFeature feature = fInput.getFeature(featureName);
 				featureList.add(feature);
 			}
-			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));
+			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));			
+			manager.add(setFeatureColorAction);
 		}
-		
-		manager.add(setFeatureColorAction);
 	}
 
 
