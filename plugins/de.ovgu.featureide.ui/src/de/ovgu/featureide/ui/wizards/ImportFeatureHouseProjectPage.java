@@ -232,7 +232,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	 */
 	@Override
 	protected void createSourceGroup(Composite parent) {
-		//CheckButton TODO: Max Checkbutton only show configuration when checked
+		
 	    checkButton = new Button(parent, SWT.CHECK | SWT.RIGHT);
 	    checkButton.setText(ADD_EXISTING_FOLDERS);
 	    
@@ -346,59 +346,47 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		importFileSystem(selectedFilesForImport, featureProject);
 				
 		if (modelFile == null) {
-			if (featureModel == null) {
-				featureModel = featureProject.getFeatureModel();
-			}
-			IFeature rootFeature = featureModel.getFeature("Root");
-			
-			//Remove default features
-			for (IFeature feature: featureModel.getFeatures()) {
-				featureModel.deleteFeature(feature);
-			}
-			if (rootFeature.getStructure().hasChildren()) {
-				for (IFeatureStructure child: rootFeature.getStructure().getChildren()) {
-					rootFeature.getStructure().removeChild(child);
-				}
-			}
-			
-			try {
-				for (IResource member: featureProject.getSourceFolder().members()) {
-					if (member.getType() == IResource.FOLDER) {
-						IFeature newFeature = new Feature(featureModel, member.getName());
-						newFeature.getStructure().setParent(featureModel.getStructure().getRoot());
-						rootFeature.getStructure().addChild(newFeature.getStructure());
-						featureModel.addFeature(newFeature);
-					}
-					
-				}
-				FileHandler.save(Paths.get(featureProject.getModelFile().getLocationURI()), featureModel, new XmlFeatureModelFormat());
-				openFileInEditor(featureProject.getModelFile());				
-			} catch (CoreException e) {
-				e.printStackTrace();
+			fillModelwithFeatures(featureProject, featureModel);
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param featureProject
+	 * @param featureModel
+	 */
+	private void fillModelwithFeatures(final IFeatureProject featureProject, IFeatureModel featureModel) {
+		if (featureModel == null) {
+			featureModel = featureProject.getFeatureModel();
+		}
+		IFeature rootFeature = featureModel.getFeature("Root");
+		
+		//Remove default features
+		for (IFeature feature: featureModel.getFeatures()) {
+			featureModel.deleteFeature(feature);
+		}
+		if (rootFeature.getStructure().hasChildren()) {
+			for (IFeatureStructure child: rootFeature.getStructure().getChildren()) {
+				rootFeature.getStructure().removeChild(child);
 			}
 		}
-//				final IRunnableWithProgress op = new IRunnableWithProgress() {
-//					public void run(IProgressMonitor monitor) throws InvocationTargetException {
-//						try {
-//							doFinish(configFolder, fileName, monitor);
-//						} catch (CoreException e) {
-//							throw new InvocationTargetException(e);
-//						} finally {
-//							monitor.done();
-//						}
-//					}
-//				};	
-//				
-//				try {
-//					getContainer().run(true, false, op);
-//				} catch (InterruptedException e) {
-//					//return false;
-//				} catch (InvocationTargetException e) {
-//					Throwable realException = e.getTargetException();
-//					MessageDialog.openError(getShell(), "Error", realException.getMessage());
-//					//return false;
-//				}
-		return true;
+		
+		try {
+			for (IResource member: featureProject.getSourceFolder().members()) {
+				if (member.getType() == IResource.FOLDER) {
+					IFeature newFeature = new Feature(featureModel, member.getName());
+					newFeature.getStructure().setParent(featureModel.getStructure().getRoot());
+					rootFeature.getStructure().addChild(newFeature.getStructure());
+					featureModel.addFeature(newFeature);
+				}
+				
+			}
+			FileHandler.save(Paths.get(featureProject.getModelFile().getLocationURI()), featureModel, new XmlFeatureModelFormat());
+			openFileInEditor(featureProject.getModelFile());				
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
