@@ -144,7 +144,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			isPreprocessor = true;
 			isFeatureOrPreprocessorProject = true;
 		}
-		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, isPreprocessor));
+		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, project, isPreprocessor));
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {

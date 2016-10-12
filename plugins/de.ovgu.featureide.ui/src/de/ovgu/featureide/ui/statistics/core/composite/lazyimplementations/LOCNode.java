@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
@@ -38,24 +39,27 @@ public class LOCNode extends LazyParent {
 	
 	private final FileFeatureLOCMapper fileFeatureLOCMapper;
 	private boolean isPreprocessor = false;
+	private IFeatureProject project;
 
-	LOCNode(String description, boolean isPreprocessor) {
+	LOCNode(String description, IFeatureProject project, boolean isPreprocessor) {
 		super(description);
 		this.fileFeatureLOCMapper = null;
+		this.project = project;
 		this.isPreprocessor = isPreprocessor;
 	}
 	
-	public LOCNode(String description, FileFeatureLOCMapper ffLOCMapper, boolean isPreprocessor) {
+	public LOCNode(String description, FileFeatureLOCMapper ffLOCMapper, IFeatureProject project, boolean isPreprocessor) {
 		super(description);
 		this.fileFeatureLOCMapper = ffLOCMapper;
+		this.project = project;
 		this.isPreprocessor = isPreprocessor;
 	}
 
 	@Override
 	protected void initChildren() {
-		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper));
+		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper, project));
 		if (isPreprocessor) {
-			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper));
+			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper, project));
 			int locWithoutFeat = fileFeatureLOCMapper.locWithoutFeatures();
 			int preProcessorLOC = fileFeatureLOCMapper.getFeatures().size()*2;
 			

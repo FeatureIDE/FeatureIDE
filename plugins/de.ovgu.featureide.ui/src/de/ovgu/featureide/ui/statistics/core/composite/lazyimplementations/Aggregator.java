@@ -48,9 +48,13 @@ public class Aggregator {
 	public static class AggregatorResult{
 		private int nesting;
 		private Map<String,Integer> directives = new HashMap<String, Integer>();
+		private Map<String, FSTDirective> IdToDirective = new HashMap<String, FSTDirective>();
 		
 		public int getNesting() {
 			return nesting;
+		}
+		public Map<String, FSTDirective> getIdToDirective() {
+			return IdToDirective;
 		}
 		public Map<String, Integer> getDirectives() {
 			return directives;
@@ -116,6 +120,9 @@ public class Aggregator {
 					calculateNestingCount(dir);
 					String identifier = role.getFSTClass().getName() + dir.getExpression() + dir.getEndLine();
 					
+					//get mapping from id to directives
+					result.getIdToDirective().put(identifier, dir);
+					
 					if (directives.containsKey(identifier)){
 						int amount = directives.get(identifier);
 						directives.put(identifier, amount + 1);
@@ -129,6 +136,35 @@ public class Aggregator {
 				result.setDirectives(directives);
 				this.class_to_directives.put(role.getFSTClass().getName(), result);
 			}
+		}
+	}
+	
+	/**
+	 * Iterates through all aggregator results searching for the FSTDirective with maximum nesting
+	 * 
+	 * @param maxNesting, maximum number of nestings of all files
+	 * @return line which corresponds to the directive with maximum nesting
+	 */
+	public int getLineFromNesting(int maxNesting) {	
+		List<Integer> lineList = new ArrayList<>();
+		// get identifier of a entry with maxNesting
+		for(Map.Entry<String, AggregatorResult> aggEntry : this.class_to_directives.entrySet()) {
+			// A maximum nesting was found 
+			if(maxNesting == aggEntry.getValue().getNesting()) {
+				AggregatorResult res = aggEntry.getValue();
+				// search the directive for the identifier corresponding to nesting count 
+				for(Map.Entry<String, Integer> directiveEntry : res.getDirectives().entrySet()) {
+					if (aggEntry.getValue().getNesting() == maxNesting) {
+						FSTDirective dir = res.getIdToDirective().get(directiveEntry.getKey());
+						lineList.add(dir.getStartLine());
+					}
+				}
+			}
+		}
+		if (!lineList.isEmpty()) {
+			return (Collections.min(lineList) + 1);
+		} else {
+			return 1;
 		}
 	}
 	
@@ -240,7 +276,8 @@ public class Aggregator {
 				if(maxNumber < innerentry.getValue()){
 					maxNumber = innerentry.getValue();
 					className = entry.getKey();
-				} 
+				}
+				
 			}
 		}
 		return new AbstractMap.SimpleEntry<String,Integer>(className, maxNumber);
