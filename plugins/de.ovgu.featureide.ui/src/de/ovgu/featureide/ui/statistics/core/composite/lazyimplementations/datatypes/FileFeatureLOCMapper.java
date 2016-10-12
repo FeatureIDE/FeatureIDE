@@ -279,6 +279,14 @@ public class FileFeatureLOCMapper {
 		return features;
 	}
 	
+	public int getFeatureCount() {
+		int loc = 0;
+		for (TableRow row: table) {
+			loc += row.getFeatures().size();
+		}
+		return loc;
+	}
+	
 	/**
 	 * Returns a HashMap of all FSTFeatures in this table with the lines of code per feature
 	 * @return

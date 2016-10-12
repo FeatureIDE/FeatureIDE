@@ -117,9 +117,12 @@ public class LOCFilterNode extends AbstractSortModeNode {
 		} else if(nodeType.equals(PP_LOC)) {
 			ArrayList<String> ext = fileFeatureLOCMapper.getAllExtensions();
 			HashMap<String, Integer> extAndCount = new HashMap<>();
+			int statementsPerFeature= 0; 
 			for(String extension : ext) {
 				HashMap<FSTFeature, Integer> featuresPerExt = fileFeatureLOCMapper.getFeaturesByExtensionWithLOC(extension);
-				int statementsPerFeature = featuresPerExt.size()*2; //TODO not always right
+				statementsPerFeature += featuresPerExt.size()*2; //TODO not always right
+				//example expr1 && expre2 or if features have same name 
+				System.out.println("PP Code: " + statementsPerFeature);
 				extAndCount.put(extension, statementsPerFeature);
 			}	
 			addExtensionChild(extAndCount);
