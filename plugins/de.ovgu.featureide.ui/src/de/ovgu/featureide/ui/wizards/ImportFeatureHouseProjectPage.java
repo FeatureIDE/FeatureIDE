@@ -125,8 +125,8 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
         this("featureHouseImportPage", aWorkbench, selection);//$NON-NLS-1$
         this.selection = selection;
       //this.project = project;
-      	setTitle("Select FileSystem for Import");
-      	setDescription("Import FeatureHouse Project into JavaProject");
+      	setTitle("Select Filesystem for Import");
+      	setDescription("Import existing FeatureHouse Project into workspace");
     }
 	
 	/**
@@ -233,10 +233,10 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	@Override
 	protected void createSourceGroup(Composite parent) {
 		
-	    checkButton = new Button(parent, SWT.CHECK | SWT.RIGHT);
-	    checkButton.setText(ADD_EXISTING_FOLDERS);
-	    
-	    checkButton.addSelectionListener(new ImportFeatureHouseProjectHandler(parent));
+//	    checkButton = new Button(parent, SWT.CHECK | SWT.RIGHT);
+//	    checkButton.setText(ADD_EXISTING_FOLDERS);
+//	    
+//	    checkButton.addSelectionListener(new ImportFeatureHouseProjectHandler(parent));
 
 	    super.createRootDirectoryGroup(parent);
         super.createFileSelectionGroup(parent);

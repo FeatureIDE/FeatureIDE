@@ -1140,6 +1140,19 @@
 					</reference>
 				</visibleWhen>
 			</command>
+   <command
+         commandId="de.ovgu.featureide.ui.commands.ImportFeatureHouseProject"
+         icon="icons/FeatureIconSmall.ico"
+         id="de.ovgu.featureide.fm.ui.actions.importFeatureHouseProject"
+         label="Import FeatureHouse Project..."
+         style="push">
+      <visibleWhen
+            checkEnabled="false">
+         <reference
+               definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+         </reference>
+      </visibleWhen>
+   </command>
    <dynamic
          class="de.ovgu.featureide.ui.actions.DynamicProfileMenu"
          id="de.ovgu.featureide.ui.ProfileSchemeMenu">
@@ -1199,19 +1212,6 @@
                 </iterate>
           </with>
            </and>
-        </visibleWhen>
-     </command>
-     <command
-           commandId="de.ovgu.featureide.ui.commands.ImportFeatureHouseProject"
-           icon="icons/FeatureIconSmall.ico"
-           id="de.ovgu.featureide.fm.ui.actions.importFeatureHouseProject"
-           label="Import FeatureHouse Project..."
-           style="push">
-        <visibleWhen
-              checkEnabled="false">
-           <reference
-                 definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-           </reference>
         </visibleWhen>
      </command>
      
