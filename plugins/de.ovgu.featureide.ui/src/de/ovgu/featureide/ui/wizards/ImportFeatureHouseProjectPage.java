@@ -47,8 +47,6 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -83,11 +81,11 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
-import de.ovgu.featureide.ui.handlers.ImportFeatureHouseProjectHandler;
 
 /**
+ * 
  * This class creates the import page for the {@link ImportFeatureHouseProjectWizard} and
- * also provides the import functions necessary to build the feature model, corresponding to
+ * also provides the import functions necessary to build the feature model corresponding to a given modelfile in guidslformat or to 
  * the file structure.
  * 
  * @author Anna-Liisa Ahola
@@ -99,7 +97,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	private FileSystemStructureProvider fileSystemStructureProvider = new FileSystemStructureProvider();
 
     protected static final String SOURCE_EMPTY_MESSAGE = DataTransferMessages.FileImport_sourceEmpty;
-	private static final String ADD_EXISTING_FOLDERS = "Add existing folders to selected project";
+	
 	protected IComposerExtensionBase composerExtension = null;
 	protected IComposerExtensionBase[] extensions = null;
 	
@@ -107,7 +105,6 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	protected Text configsPath;
 	protected Text buildPath;
 	
-	private Button checkButton;
 	
 	//Group for import File dialog
 	private boolean canFlipToNextPage = true;
