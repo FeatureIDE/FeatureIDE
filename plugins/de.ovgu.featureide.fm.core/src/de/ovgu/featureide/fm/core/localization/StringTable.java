@@ -4,6 +4,8 @@ package de.ovgu.featureide.fm.core.localization;
  * @author Marcus Pinnecke
  */
 public class StringTable {
+	public static final String IMPORT_FEATUREHOUSE_PROJECT_WORKSPACE = "Import existing FeatureHouse Project into workspace";
+	public static final String SELECTED_FILESYSTEM_IMPORT = "Select Filesystem for Import";
 	public static final String THE_REQUIRED_BUNDLE = "The required bundle ";
 	public static final String IS_NOT_INSTALLED_ = " is not installed.";
 	public static final String PREPROCESSOR_ANNOTATION_CHECKING = "preprocessor annotation checking";

@@ -23,6 +23,8 @@ package de.ovgu.featureide.ui.wizards;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_SPECIFIED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_VALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILESYSTEM_IMPORT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATUREHOUSE_PROJECT_WORKSPACE;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -122,8 +124,8 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
         this("featureHouseImportPage", aWorkbench, selection);//$NON-NLS-1$
         this.selection = selection;
       //this.project = project;
-      	setTitle("Select Filesystem for Import");
-      	setDescription("Import existing FeatureHouse Project into workspace");
+      	setTitle(SELECTED_FILESYSTEM_IMPORT);
+      	setDescription(IMPORT_FEATUREHOUSE_PROJECT_WORKSPACE);
     }
 	
 	/**
@@ -229,11 +231,6 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	 */
 	@Override
 	protected void createSourceGroup(Composite parent) {
-		
-//	    checkButton = new Button(parent, SWT.CHECK | SWT.RIGHT);
-//	    checkButton.setText(ADD_EXISTING_FOLDERS);
-//	    
-//	    checkButton.addSelectionListener(new ImportFeatureHouseProjectHandler(parent));
 
 	    super.createRootDirectoryGroup(parent);
         super.createFileSelectionGroup(parent);
@@ -266,7 +263,6 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		}
 
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
-
 		
 		//In the Wizard selected resources for import
 		Iterator selecetedRessources = super.getSelectedResources().iterator();
@@ -279,7 +275,6 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 
 		File modelFile = null;
 
-		
 		//Searches if their exists a .model or .m file in the for import selected file system
 		for (FileSystemElement element : selectedFilesForImport) {
 			if (element.getFileNameExtension().equals("m") || element.getFileNameExtension().equals("model")) {
@@ -343,17 +338,21 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		importFileSystem(selectedFilesForImport, featureProject);
 				
 		if (modelFile == null) {
-			fillModelwithFeatures(featureProject, featureModel);
+			fillModelWithFeatures(featureProject, featureModel);
 		}
 
 		return true;
 	}
 
 	/**
-	 * @param featureProject
-	 * @param featureModel
+	 * Removes the default features from the feature model first and then
+	 * fills it again. The new features are generated off the folder names
+	 * in the source folder and are added as children to the root feature.
+	 * 
+	 * @param featureProject the feature model exists in
+	 * @param featureModel to fill
 	 */
-	private void fillModelwithFeatures(final IFeatureProject featureProject, IFeatureModel featureModel) {
+	private void fillModelWithFeatures(final IFeatureProject featureProject, IFeatureModel featureModel) {
 		if (featureModel == null) {
 			featureModel = featureProject.getFeatureModel();
 		}
