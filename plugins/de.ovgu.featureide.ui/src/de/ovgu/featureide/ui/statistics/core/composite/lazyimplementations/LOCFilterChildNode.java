@@ -21,12 +21,17 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABLE_LOC;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NON_VARIABLE_LOC;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PP_LOC;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
 /**
@@ -41,7 +46,7 @@ public class LOCFilterChildNode extends LOCFilterNode {
 	 * @param fileFeatureLOCMapper
 	 */
 	public LOCFilterChildNode(String description, String parentNodeName, FileFeatureLOCMapper fileFeatureLOCMapper, IFeatureProject project) {
-		super(description, fileFeatureLOCMapper, project);
+		super(description, fileFeatureLOCMapper, project, description);
 		this.parentNodeName = parentNodeName;
 	}
 
@@ -49,23 +54,45 @@ public class LOCFilterChildNode extends LOCFilterNode {
 	 * @see de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.LOCFilterNode#initChildren()
 	 */
 	@Override
-	protected void initChildren() {
-		if (parentNodeName.equals(LOC_BY_EXTENSION)) {
+	protected void initChildren() {	
+		if (parentNodeName.equals(LOC_BY_EXTENSION)) {		
 			String extension = description.split(SEPARATOR)[0];
 			HashMap<IFile, Integer> filesWithLOC = fileFeatureLOCMapper.getFilesWithLOCByExtension(extension);
-
+			String prettyPath = "";
 			for (IFile file: filesWithLOC.keySet()) {
-				String sourceFolder = fileFeatureLOCMapper.getSourceFolder().getName() + "/";
-				String filePath = file.getFullPath().toString();
-				
-				String[] path = filePath.split(sourceFolder);
-				String prettyPath = path[0];
-				if (path.length > 1) {
-					prettyPath = path[1];
-				}
+				prettyPath = constructPrettyPath(file);
 				addChild(new DirectivesLeafNode(prettyPath, filesWithLOC.get(file), project, prettyPath));
 			}
+		} else if(parentNodeName.equals(NON_VARIABLE_LOC)) {
+			
+		} else if(parentNodeName.equals(VARIABLE_LOC)) {
+			String extension = description.split(SEPARATOR)[0];
+			HashMap<IFile, Integer> filesWithLOC = fileFeatureLOCMapper.getFilesWithLOCByExtension(extension);
+			String prettyPath = "";
+			for (IFile file: filesWithLOC.keySet()) {
+				prettyPath = constructPrettyPath(file);
+				int loc = 0;
+				int ppStatementsPerFeature = 2;
+				HashMap<FSTFeature, Integer> locByFeatMap = fileFeatureLOCMapper.getLOCByFeatMap(file);
+				for(Map.Entry<FSTFeature, Integer> entry: locByFeatMap.entrySet()) {
+					loc += entry.getValue() + ppStatementsPerFeature;
+				}
+				addChild(new DirectivesLeafNode(prettyPath, loc, project, prettyPath));
+			}
+		} else if(parentNodeName.equals(PP_LOC)) {
+			
 		}
+	}
+	
+	private String constructPrettyPath(IFile file) {
+		String sourceFolder = fileFeatureLOCMapper.getSourceFolder().getName() + "/";
+		String filePath = file.getFullPath().toString();				
+		String[] path = filePath.split(sourceFolder);
+		String prettyPath = path[0];
+		if (path.length > 1) {
+			prettyPath = path[1];
+		}
+		return prettyPath;
 	}
 
 }

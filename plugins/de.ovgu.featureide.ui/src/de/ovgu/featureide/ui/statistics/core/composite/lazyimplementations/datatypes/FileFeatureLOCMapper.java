@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.data
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -178,6 +179,70 @@ public class FileFeatureLOCMapper {
 		}
 		
 		return extAndNumber;
+	}
+	
+	/**
+	 * Returns a map of all extensions with the variable lines of code per extension
+	 * @return
+	 */
+	public HashMap<String, Integer> getVariableLOCByExtension() {
+		HashMap<String, Integer> extAndNumber = new HashMap<>();
+		
+		for (TableRow row: table) {
+			String fileExt = row.getFile().getFileExtension();
+			HashMap<FSTFeature, Integer> locByFeatMap = row.getLocByFeatMap();
+			int locHere = 0;
+			for(Map.Entry<FSTFeature, Integer> entry: locByFeatMap.entrySet()) {
+				locHere += entry.getValue();
+			}
+			Integer oldValue = extAndNumber.putIfAbsent(fileExt, locHere); 
+			if (oldValue != null) {
+				extAndNumber.put(fileExt, oldValue.intValue() + locHere);
+			}
+		}
+		
+		return extAndNumber;
+	}
+	
+	/**
+	 * Returns a map of all extensions with the non-variable lines of code per extension
+	 * @return
+	 */
+	public HashMap<String, Integer> getNonVariableLOCByExtension() {
+		HashMap<String, Integer> extAndNumber = new HashMap<>();
+		
+		for (TableRow row: table) {
+			String fileExt = row.getFile().getFileExtension();
+			HashMap<FSTFeature, Integer> locByFeatMap = row.getLocByFeatMap();
+			int currentLOC = row.getLocInFile();
+			int ppLOC = 0;
+			int ppStatementsPerFeature = 2;
+			for(Map.Entry<FSTFeature, Integer> entry: locByFeatMap.entrySet()) {			
+					ppLOC += entry.getValue() + ppStatementsPerFeature;
+			}
+			int locHere = currentLOC - ppLOC;
+			Integer oldValue = extAndNumber.putIfAbsent(fileExt, locHere); 
+			if (oldValue != null) {
+				extAndNumber.put(fileExt, oldValue.intValue() + locHere);
+			}
+		}
+		
+		return extAndNumber;
+	}
+	
+	/**
+	 * Returns a List of extensions in this map
+	 * @return
+	 */
+	public ArrayList<String> getAllExtensions() {
+		ArrayList<String> ext = new ArrayList<>();	
+		for (TableRow row: table) {
+			String extension = row.getFile().getFileExtension();
+			if(!ext.contains(extension)) {
+				ext.add(extension);
+			}
+		}
+		return ext;
 	}
 	
 	/**
@@ -387,6 +452,7 @@ public class FileFeatureLOCMapper {
 		}
 		return loc;
 	}
+	
 	
 	/**
 	 * Returns the lines of code of one file
@@ -652,5 +718,18 @@ public class FileFeatureLOCMapper {
 			this.locByFeatMap = locByFeat;
 		}
 		
+	}
+
+	/**
+	 * @return
+	 */
+	public int getCompleteFeatureLOC() {
+		int loc = 0;
+		for (TableRow row: table) {
+			for(Map.Entry<FSTFeature, Integer> entry : row.getLocByFeatMap().entrySet()) {
+				loc += entry.getValue();
+			}
+		}
+		return loc;
 	}
 }

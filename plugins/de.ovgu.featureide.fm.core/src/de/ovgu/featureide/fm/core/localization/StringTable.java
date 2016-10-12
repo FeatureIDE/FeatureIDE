@@ -729,6 +729,10 @@ public class StringTable {
 	public static final String DOUBLE_CLICK_TO_SORT_BY_VALUE_IN_DESCENDING_ORDER = "Double-click to sort by value in descending order";
 	public static final String LOC_BY_EXTENSION = "LOC by extension";
 	public static final String LOC_BY_FEATURE = "LOC by feature";
+	public static final String NON_VARIABLE_LOC = "Non-Variable LOC";
+	public static final String VARIABLE_LOC = "Variable LOC (excludes preprocessor statements)";
+	public static final String VARIABLE_LOC_WARNING = " (This may not be accurate.)";
+	public static final String PP_LOC = "Preprocessor statements LOC";
 	public static final String LOC_BY_FILE = "LOC by file";
 	public static final String PROJECT_BASED__ = "Project based - ";
 	public static final String CALCULATE = "Calculate ";

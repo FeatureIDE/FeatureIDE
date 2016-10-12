@@ -22,7 +22,11 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABLE_LOC;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NON_VARIABLE_LOC;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PP_LOC;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -60,9 +64,9 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	 * @param description
 	 * @param fileFeatureLOCMapper
 	 */
-	public LOCFilterNode(String description, FileFeatureLOCMapper fileFeatureLOCMapper, IFeatureProject project) {
+	public LOCFilterNode(String description, FileFeatureLOCMapper fileFeatureLOCMapper, IFeatureProject project, String type) {
 		super(description);
-		this.nodeType = description;
+		this.nodeType = type;
 		this.fileFeatureLOCMapper = fileFeatureLOCMapper;
 		this.project = project;
 	}
@@ -79,9 +83,9 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	 * @param nodeType
 	 * @param fileFeatureLOCMapper
 	 */
-	public LOCFilterNode(String description, int loc, String nodeType, FileFeatureLOCMapper fileFeatureLOCMapper, IFeatureProject project) {
+	public LOCFilterNode(String description, int loc, String nodeType, FileFeatureLOCMapper fileFeatureLOCMapper, IFeatureProject project, String type) {
 		super(description, loc);
-		this.nodeType = nodeType;
+		this.nodeType = type;
 		this.fileFeatureLOCMapper = fileFeatureLOCMapper;
 		this.project = project;
 	}
@@ -92,13 +96,8 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	@Override
 	protected void initChildren() {
 		if (nodeType.equals(LOC_BY_EXTENSION)) {
-			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getExtensionsWithLOC(); 
-			for (String extension: extAndCount.keySet()) {
-				if (extension != null) {
-					int LOC = extAndCount.get(extension).intValue();
-					addChild(new LOCFilterChildNode(extension + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper, project));
-				}
-			}
+			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getExtensionsWithLOC();
+			addExtensionChild(extAndCount);
 		} else if (nodeType.equals(LOC_BY_FEATURE)) {
 			HashMap<FSTFeature, Integer> featAndCount = fileFeatureLOCMapper.getFeaturesWithLOC();
 			if(featAndCount.size()== 0) { 
@@ -109,7 +108,31 @@ public class LOCFilterNode extends AbstractSortModeNode {
 					addChild(new Parent(feature.getName(), LOC));
 				}
 			}
-		} 
+		} else if (nodeType.equals(NON_VARIABLE_LOC)) {
+			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getNonVariableLOCByExtension();
+			addExtensionChild(extAndCount);
+		} else if (nodeType.equals(VARIABLE_LOC)) {
+			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getVariableLOCByExtension();
+			addExtensionChild(extAndCount);			
+		} else if(nodeType.equals(PP_LOC)) {
+			ArrayList<String> ext = fileFeatureLOCMapper.getAllExtensions();
+			HashMap<String, Integer> extAndCount = new HashMap<>();
+			for(String extension : ext) {
+				HashMap<FSTFeature, Integer> featuresPerExt = fileFeatureLOCMapper.getFeaturesByExtensionWithLOC(extension);
+				int statementsPerFeature = featuresPerExt.size()*2; //TODO not always right
+				extAndCount.put(extension, statementsPerFeature);
+			}	
+			addExtensionChild(extAndCount);
+		}
+	}
+	
+	public void addExtensionChild(HashMap<String, Integer> extAndCount) {
+		for (String extension: extAndCount.keySet()) {
+			if (extension != null) {
+				int LOC = extAndCount.get(extension).intValue();
+				addChild(new LOCFilterChildNode(extension + SEPARATOR + LOC, nodeType, fileFeatureLOCMapper, project));
+			}
+		}
 	}
 
 }

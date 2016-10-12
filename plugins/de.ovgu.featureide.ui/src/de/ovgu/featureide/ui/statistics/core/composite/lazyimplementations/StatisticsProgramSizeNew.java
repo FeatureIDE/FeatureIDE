@@ -305,6 +305,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		String line;
 		boolean isInComment = false;
 		while ((line = br.readLine()) != null) {
+			String configAt ="@";
 			line = line.trim();
 			//No empty line
 			if (!line.equals("")) {
@@ -330,7 +331,11 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							isInComment = false;
 						}
 					}
+				// //@ is a keyword in antenna projects
+				} else if(line.startsWith(oneLineComment + configAt)) {
+						numberOfLinesInThisFile++;
 				}
+				
 			}
 		}
 		br.close();
