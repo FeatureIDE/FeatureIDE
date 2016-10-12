@@ -23,6 +23,10 @@ package de.ovgu.featureide.ui.views.configMap.header;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -41,7 +45,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  * @author gruppe40
  */
-public class CustomTableHeader extends Canvas implements PaintListener, MouseListener {
+public class CustomTableHeader extends Canvas implements PaintListener, MouseListener, ISelectionProvider {
 	private List<CustomColumnStyle> columnStyles;
 	private Transform transform;
 	private Parallelogram hitbox;
@@ -165,13 +169,13 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 	}
 
 	private void updateSelection(float ex, float ey) {
-		int offset = 0, index = 0;
+		int offset = 0, index = 0, selectedIndex = -1;
 		for (CustomColumnStyle col : columnStyles) {
 			if (col.isSelectable()) {
 				hitbox.setWidth(col.getWidth());
 				hitbox.setLocation(offset, 0);
 				if (hitbox.containsPoint(ex, height - ey)) {
-					setSelectedColumn(index);
+					selectedIndex = index;
 					break;
 				}
 			}
@@ -179,6 +183,8 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 			offset += col.getWidth();
 			index++;
 		}
+		
+		setSelectedColumn(selectedIndex);
 
 		redraw();
 	}
@@ -308,4 +314,21 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 	public static double toRadians(double degrees) {
 		return (Math.PI * degrees) / 180.0;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	@Override
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {}
+
+	@Override
+	public ISelection getSelection() {
+		return new StructuredSelection(selectedColumn);
+	}
+
+	@Override
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {}
+
+	@Override
+	public void setSelection(ISelection selection) {}
 }

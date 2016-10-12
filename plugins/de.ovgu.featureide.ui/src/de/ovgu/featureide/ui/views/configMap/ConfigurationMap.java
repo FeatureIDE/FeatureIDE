@@ -56,7 +56,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
-
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -68,6 +67,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureCo
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapRefreshAction;
+import de.ovgu.featureide.ui.views.configMap.actions.OpenFileAction;
 import de.ovgu.featureide.ui.views.configMap.filters.CoreFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.DeadFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.FeatureIsFalseOptionalFilter;
@@ -116,6 +116,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	private ConfigMapFilterMenuAction filterMenu;
 
 	private ConfigMapRefreshAction refresh;
+	private OpenFileAction openFileAction;
 
 	// MODEL
 	private IFeatureProject featureProject;
@@ -159,16 +160,18 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 		};
 
+		this.featureColumnWidth = 200;
+		this.defaultColumnWidth = 40;
+		selectedColumnIndex = -1;
+
+		openFileAction = new OpenFileAction("Open");
+		
 		this.loader = new ConfigurationLoader(configLoaderCallback);
 		this.configurationColumns = new ArrayList<>();
 		this.configPaths = new HashMap<>();
 		
 		this.filters = new ArrayList<>();
 		createFilters();
-
-		this.featureColumnWidth = 200;
-		this.defaultColumnWidth = 40;
-		selectedColumnIndex = -1;
 	}
 	
 	/**
@@ -296,6 +299,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	public void loadConfigurations() {
 		// Callback will handle creating columns
 		this.configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
+		
 		// update header
 		TreeColumn[] columns = tableTree.getColumns();
 		List<CustomColumnStyle> styles = new ArrayList<>(columns.length);
@@ -404,7 +408,24 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		Menu menu = menuMgr.createContextMenu(control);
 		control.setMenu(menu);
 		getSite().registerContextMenu(menuMgr, tree);
-
+		
+		
+		MenuManager headerMenu = new MenuManager("#HeaderPopup");
+		headerMenu.setRemoveAllWhenShown(true);		
+		headerMenu.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager m) {
+				fillHeaderMenu(m);
+			}
+		});
+		header.setMenu(headerMenu.createContextMenu(header));
+		getSite().registerContextMenu(headerMenu, header);		
+	}
+	
+	private void fillHeaderMenu(IMenuManager menuMgr){
+		if (featureProject == null) 
+			return;
+		openFileAction.setFile(getFileOfConfiguration(selectedColumnIndex));
+		menuMgr.add(openFileAction);
 	}
 	
 	private void fillContextMenu(IMenuManager menuMgr) {
@@ -432,6 +453,11 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	Color getColumnHighlightColor() {
 		return this.columnHighlightColor;
 	}
+	
+	private IFile getFileOfConfiguration(int selectedConfigIndex){
+		Configuration config = this.configurations.get(selectedConfigIndex);
+		return this.featureProject.getConfigFolder().getFile(configPaths.get(config).getFileName().toString());
+	}
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionListener#onColumnSelectionChanged(int)
@@ -446,42 +472,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	 * @see de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionListener#onColumnDoubleClicked()
 	 */
 	@Override
-	public void onColumnDoubleClicked() {
-		openConfiguration(this.selectedColumnIndex);
+	public void onColumnDoubleClicked() {		
+		openFileAction.setFile(getFileOfConfiguration(selectedColumnIndex));
+		openFileAction.run();
 	}
+
 	
-	private void openConfiguration(int configIndex) {
-		Configuration config = this.configurations.get(configIndex);
-		IFile file = this.featureProject.getConfigFolder().getFile(configPaths.get(config).getFileName().toString());
-		try {
-			openEditor(file);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
-		IContentType contentType = null;
-		
-		IContentDescription description = file.getContentDescription();
-		if (description != null)
-			contentType = description.getContentType();
-			
-		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
-	}
-
-	private void openEditor(IFile file) throws CoreException {
-		IWorkbenchPage page = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		if (page == null) return;
-
-		String editorId = "org.eclipse.ui.DefaultTextEditor";
-
-		IEditorDescriptor desc = getDescriptor(file);
-		if (desc != null)
-			editorId = desc.getId();
-		
-		page.openEditor(new FileEditorInput(file), editorId);
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
