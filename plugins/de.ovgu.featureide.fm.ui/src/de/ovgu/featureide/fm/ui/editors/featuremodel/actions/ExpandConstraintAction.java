@@ -42,7 +42,7 @@ import java.util.Iterator;
 /**
  * Expands up to the level of the features of this constraint and collapses all other features.
  * 
- * @author Maximilian Kühl
+ * @author Maximilian KÃ¼hl
  * @author Christopher Sontag
  */
 public class ExpandConstraintAction extends Action {

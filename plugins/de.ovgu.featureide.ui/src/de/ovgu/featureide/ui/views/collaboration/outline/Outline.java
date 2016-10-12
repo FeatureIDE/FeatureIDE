@@ -1053,7 +1053,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		 */
 		@Override
 		public void treeCollapsed(TreeExpansionEvent event) {
-			if (viewer.getContentProvider() instanceof FmTreeContentProvider && syncCollapsedFeaturesToggle) {
+			if (viewer.getContentProvider() instanceof FmTreeContentProvider && syncCollapsedFeaturesToggle && event.getElement() instanceof IFeature) {
 				((IFeature) event.getElement()).getStructure().setCollapsed(true);
 				featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
 			}
@@ -1071,7 +1071,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				 */
 				((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 			}
-			if (viewer.getContentProvider() instanceof FmTreeContentProvider && syncCollapsedFeaturesToggle) {
+			if (viewer.getContentProvider() instanceof FmTreeContentProvider && syncCollapsedFeaturesToggle && event.getElement() instanceof IFeature) {
 				((IFeature) event.getElement()).getStructure().setCollapsed(false);
 				featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
 			}

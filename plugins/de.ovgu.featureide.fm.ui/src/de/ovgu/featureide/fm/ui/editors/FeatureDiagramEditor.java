@@ -902,9 +902,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFeatureFigure()), getFeatureModel())
 						.show();
 
-			} else {
-				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
-			}
+			} 
+//			else {
+//				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
+//			}
 			analyzeFeatureModel();
 			break;
 		case FEATURE_NAME_CHANGED:
