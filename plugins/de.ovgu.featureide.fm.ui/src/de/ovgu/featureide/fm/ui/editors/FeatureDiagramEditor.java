@@ -894,6 +894,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				// open the renaming command
 				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFeatureFigure()), getFeatureModel())
 						.show();
+
 			} else {
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
@@ -985,6 +986,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 			deletedFeature.update(event);
 			oldParent = (IFeature) event.getOldValue();
+
+			graphicalFeatureModel.init();
+			setContents(graphicalFeatureModel);
 			internRefresh(true);
 			if (oldParent == null) {
 				FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel).update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
