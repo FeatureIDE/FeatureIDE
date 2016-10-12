@@ -427,12 +427,8 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	}
 
 	public boolean setCollapsedDecorator(CollapsedDecoration decoration) {
-		if (collapseDecoration == null) {
 			collapseDecoration = decoration;
 			return true;
-		} else {
-			return false;
-		}
 	}
 
 	public CollapsedDecoration getCollapsedDecorator() {

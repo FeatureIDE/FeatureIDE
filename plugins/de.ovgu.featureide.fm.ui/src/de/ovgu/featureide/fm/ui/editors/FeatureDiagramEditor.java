@@ -885,6 +885,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					}
 				}
 			}
+			
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) getEditPartRegistry().get(newGraphicalFeature);
 			if (newEditPart != null) {// TODO move to FeatureEditPart
@@ -985,6 +986,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 			deletedFeature.update(event);
 			oldParent = (IFeature) event.getOldValue();
+
 			internRefresh(true);
 			if (oldParent == null) {
 				FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel).update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
@@ -1078,6 +1080,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				setContents(graphicalFeatureModel);
 				reload();
 				featureModelEditor.setPageModified(true);
+				
+				//after collapse/expand all operation focus view on root
+				centerPointOnScreen(rootEditPart.getFigure().getBounds().x, rootEditPart.getFigure().getBounds().y, rootEditPart.getFigure().getBounds().width / 2,
+						rootEditPart.getFigure().getBounds().height / 2);
+				
+				
 				internRefresh(true);
 			} catch (Exception e) {
 				FMUIPlugin.getDefault().logError(e);
