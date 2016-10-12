@@ -867,7 +867,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IFeature newFeature = (IFeature) event.getNewValue();
 			IFeature parent = (IFeature) event.getOldValue();
 			IFeatureModel fm = (IFeatureModel) event.getSource();
-			if (parent != null) {
+			if (parent != null && parent != newFeature) {
 				// Uncollapse if collapsed
 				if (parent.getStructure().isCollapsed()) {
 					parent.getStructure().setCollapsed(false);
@@ -879,6 +879,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED, null, null));
 				}
 				//Draws the connections
+				if (parent.getStructure().hasChildren()) {
+					for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
+						child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+					}
+				}
+			} else if (parent != null && parent == newFeature) {
 				if (parent.getStructure().hasChildren()) {
 					for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
 						child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));

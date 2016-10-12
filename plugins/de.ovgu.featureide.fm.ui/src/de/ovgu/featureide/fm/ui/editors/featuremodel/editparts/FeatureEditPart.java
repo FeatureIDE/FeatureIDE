@@ -190,6 +190,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		FeatureConnection sourceConnection;
 		switch (prop) {
 		case CHILDREN_CHANGED:
+			getFeatureFigure().setLocation(getFeature().getLocation());
 			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
@@ -197,6 +198,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 					connectionEditPart.refresh();
 				}
 			}
+			refreshCollapsedDecorator();
 			break;
 		case LOCATION_CHANGED:
 			getFeatureFigure().setLocation(getFeature().getLocation());
@@ -243,6 +245,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 			getFeatureFigure().setName(displayName);
 			getFeature().setSize(getFeatureFigure().getSize());
+			refreshCollapsedDecorator();
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
@@ -263,6 +266,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			refreshCollapsedDecorator();
 			connectionEditPart.refreshVisuals();
 			break;
 		case HIDDEN_CHANGED:
@@ -270,6 +274,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			refreshCollapsedDecorator();
 			connectionEditPart.refreshSourceDecoration();
 			break;
 		default:
@@ -284,11 +289,11 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		if (f.getObject().getStructure().hasChildren() && f.getObject().getStructure().isCollapsed() && !f.getObject().getStructure().hasCollapsedParent()) {
 			if (featureFigure.getParent() != null) {
 				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
-				collapsedDecoration.setLocation(new Point(featureFigure.getBounds().x, featureFigure.getBounds().y));
 				if (featureFigure.getCollapsedDecorator() == null && featureFigure.setCollapsedDecorator(collapsedDecoration)) {
 					featureFigure.getParent().add(collapsedDecoration);
 				}
 			}
+			getFeatureFigure().setLocation(getFeature().getLocation());
 		}
 	}
 
