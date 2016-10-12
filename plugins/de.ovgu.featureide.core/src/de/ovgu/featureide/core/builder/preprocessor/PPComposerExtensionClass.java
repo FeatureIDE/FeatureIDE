@@ -517,4 +517,14 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param folder The folder containing the preprocessed files
 	 */
 	public void postProcess(IFolder folder) {}
+
+	/**
+	 * @param folder
+	 * @param performFullBuild
+	 * @throws CoreException
+	 */
+	public void myProcessMethod(IFolder folder, boolean performFullBuild) throws CoreException {
+		// TODO Auto-generated method stub
+		
+	}
 }

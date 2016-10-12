@@ -700,5 +700,44 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		}
 		return false;
 	}
+	
+	@Override
+	public void myProcessMethod(IFolder folder, boolean performFullBuild) throws CoreException{
+		for(final IResource res: folder.members()){
+			if (res instanceof IFolder) {
+				// for folders do recursively 
+				
+				myProcessMethod((IFolder) res, performFullBuild);
+				
+				
+			} else if (res instanceof IFile) {
+				final Vector<String> lines = loadStringsFromFile((IFile) res);
+				
+				LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
+				
+				IFile file = (IFile) res;
+				
+				antennaModelBuilder.addDirectivesToModel(directives, file, directives.getClass().getName());
+				
+				//antennaModelBuilder.addRoleElementsToDirectives2(directives, file, directives.getClass().getName());
+				
+				antennaModelBuilder.getModel();
+				
+				//antennaModelBuilder.buildModel();
+				
+				
+				//ppModelBuilder.buildModel();
+				
+				
+				//for(FSTDirective fstd: fstDirectives){
+//					System.out.println(fstd.getRole().getFeature().getName());
+//				}
+					
+				
+			}
+	
+			
+			
+		}}
 
 }
