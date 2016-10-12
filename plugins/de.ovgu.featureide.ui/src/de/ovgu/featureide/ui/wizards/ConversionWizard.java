@@ -60,35 +60,26 @@ public class ConversionWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		if (page.hasCompositionTool() && project.isOpen()) {
 			CorePlugin.setupProject(project, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(), page.getBuildPath());
-			
-            final IFeatureProject featureProject=  CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
-			
+            final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
 			IComposerExtension composerExtension = ComposerExtensionManager.getInstance().getComposerById(page.getCompositionTool().getId());
 			
-			
-			
-			IComposerExtensionClass composerExtensionClass =composerExtension.getComposerByProject(featureProject);
-			
-			PPComposerExtensionClass ppComposerExtensionClass = (PPComposerExtensionClass) composerExtensionClass;
-			
-			//composerExtensionClass.get
-			
-			try {
+			if (featureProject != null) {
+				IComposerExtensionClass composerExtensionClass = composerExtension.getComposerByProject(featureProject);
+				PPComposerExtensionClass ppComposerExtensionClass = (PPComposerExtensionClass) composerExtensionClass;
+	
+				try {
+					ppComposerExtensionClass.readFeatureModelFromFolder(featureProject.getBuildFolder());
+	//				PPModelBuilder ppModelBuilder = new PPModelBuilder(featureProject);
+	//				ppModelBuilder.addDirectivesToModelPublic(fstDirectives, res, className);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
 				
-				
-				ppComposerExtensionClass.myProcessMethod(featureProject.getBuildFolder(), true);
-				
-//				PPModelBuilder ppModelBuilder = new PPModelBuilder(featureProject);
-//				
-//				ppModelBuilder.addDirectivesToModelPublic(fstDirectives, res, className);
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, project.getFile("model.xml"));
+				return true;
+			} else {
+				System.err.println(" FeatureProject not found");
 			}
-			
-			
-			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, project.getFile("model.xml"));
-			return true;
 		}
 		return false;
 	}

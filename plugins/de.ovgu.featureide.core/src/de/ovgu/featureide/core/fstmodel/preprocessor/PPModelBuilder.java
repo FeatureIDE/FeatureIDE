@@ -146,10 +146,32 @@ public class PPModelBuilder {
 	public void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
 		for (FSTDirective d : list) {
 			for (String featureName : d.getFeatureNames()) {
-				if(featureNames.contains(featureName))
+				if(!featureNames.contains(featureName))
 					continue;
 				
 				FSTRole role = model.addRole(featureName, className, res);//addRole(getFeatureName(d.getExpression()), res.getName(), res);
+				role.add(d);
+				addDirectivesToModel(d.getChildrenList(), res, className);
+			}
+			
+		}
+	}
+	
+	/**
+	 * Adds all non existing directives to the FSTModelForPP instance.
+	 * @param list
+	 * @param res
+	 * @param className
+	 */
+	public void addNonExistingDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
+		for (FSTDirective d : list) {
+			for (String featureName : d.getFeatureNames()) {
+				if(featureNames.contains(featureName))
+					continue;
+				
+//				featureProject.getFeatureModel().addFeature(feature)
+				FSTRole role = model.addRole(featureName, className, res);
+				//addRole(getFeatureName(d.getExpression()), res.getName(), res);
 				role.add(d);
 				addDirectivesToModel(d.getChildrenList(), res, className);
 			}

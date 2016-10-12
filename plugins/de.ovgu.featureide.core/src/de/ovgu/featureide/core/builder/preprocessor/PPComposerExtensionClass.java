@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEFINED_AS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,12 +50,21 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
  * Abstract class for FeatureIDE preprocessor composer extensions with
@@ -523,8 +533,45 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param performFullBuild
 	 * @throws CoreException
 	 */
-	public void myProcessMethod(IFolder folder, boolean performFullBuild) throws CoreException {
-		// TODO Auto-generated method stub
+	public void readFeatureModelFromFolder(IFolder folder) throws CoreException{
+		for(final IResource res: folder.members()){
+			if (res instanceof IFolder) {
+				// for folders do recursively 
+				readFeatureModelFromFolder((IFolder) res);
+			} else if (res instanceof IFile) {
+				IFile file = (IFile) res;
+				final Vector<String> lines = loadStringsFromFile(file);
+				LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
+				PPModelBuilder ppModelBuilder = new PPModelBuilder(featureProject);
+				
+				ppModelBuilder.addNonExistingDirectivesToModel(directives, file, directives.getClass().getName());
+				
+			}
+		}
+		fillModelWithFeatures();
+	}
+	
+	/**
+	 * @param featureProject
+	 * @param featureModel
+	 */
+	private void fillModelWithFeatures() {
+		IFeatureModel featureModel = featureProject.getFeatureModel();
+		IFeature rootFeature = featureModel.getFeature(featureProject.getProjectName());
+		FSTModel fstModel = featureProject.getFSTModel();
+	
+		//Remove default features
+		if (featureModel.getFeature("Base") != null) {
+			featureModel.deleteFeature(featureModel.getFeature("Base"));
+		}
 		
+		for (FSTFeature feature: fstModel.getFeatures()) {
+			IFeature newFeature = new Feature(featureModel, feature.getName());
+			rootFeature.getStructure().addChild(newFeature.getStructure());
+			newFeature.getStructure().setParent(rootFeature.getStructure());
+			featureModel.addFeature(newFeature);
+		}
+		
+		FileHandler.save(Paths.get(featureProject.getModelFile().getLocationURI()), featureModel, new XmlFeatureModelFormat());	
 	}
 }
