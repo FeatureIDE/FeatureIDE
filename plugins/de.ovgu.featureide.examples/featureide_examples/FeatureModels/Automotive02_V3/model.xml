@@ -45674,9 +45674,7 @@
 				</imp>
 			</rule>
 		</constraints>
-		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
-		<comments>
-			<c/>
-		</comments>
+		<calculations Auto="false" Constraints="true" Features="true" Redundant="true"/>
+		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

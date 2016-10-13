@@ -90,9 +90,6 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		return list;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#createChild(java.lang.Object)
-	 */
 	@Override
 	public EditPart createChild(Object model) {
 		return super.createChild(model);

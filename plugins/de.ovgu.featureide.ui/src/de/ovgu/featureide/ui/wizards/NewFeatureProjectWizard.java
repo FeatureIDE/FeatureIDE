@@ -147,7 +147,8 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		}
 		
 		if (wizardExtension == null) {
-			return false;
+			wizardExtension = new DefaultNewFeatureProjectWizardExtension();
+			wizardExtension.setWizard(this);
 		} 
 		
 		if (wizardExtension.performOwnFinish()) {
