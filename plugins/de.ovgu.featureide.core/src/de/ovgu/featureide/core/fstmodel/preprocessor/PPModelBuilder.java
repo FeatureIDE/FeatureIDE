@@ -63,19 +63,6 @@ public class PPModelBuilder {
 	protected final IFeatureProject featureProject;
 
 	protected FSTModelForPP model;
-	/**
-	 * @return the model
-	 */
-	public FSTModelForPP getModel() {
-		return model;
-	}
-
-	/**
-	 * @param model the model to set
-	 */
-	public void setModel(FSTModelForPP model) {
-		this.model = model;
-	}
 
 	protected FSTModel modelOutline;
 	protected Collection<String> featureNames = Collections.emptyList();
@@ -106,6 +93,20 @@ public class PPModelBuilder {
 	}
 	
 	protected IFile currentFile = null;
+	
+	/**
+	 * @return the model
+	 */
+	public FSTModelForPP getModel() {
+		return model;
+	}
+
+	/**
+	 * @param model the model to set
+	 */
+	public void setModel(FSTModelForPP model) {
+		this.model = model;
+	}
 
 	/**
 	 * @param folder
@@ -161,7 +162,6 @@ public class PPModelBuilder {
 	 * Adds all non existing directives to the FSTModelForPP instance.
 	 * @param list
 	 * @param res
-	 * @param className
 	 */
 	public void addNonExistingDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
 		for (FSTDirective d : list) {
@@ -169,11 +169,9 @@ public class PPModelBuilder {
 				if(featureNames.contains(featureName))
 					continue;
 				
-//				featureProject.getFeatureModel().addFeature(feature)
 				FSTRole role = model.addRole(featureName, className, res);
-				//addRole(getFeatureName(d.getExpression()), res.getName(), res);
 				role.add(d);
-				addDirectivesToModel(d.getChildrenList(), res, className);
+				addNonExistingDirectivesToModel(d.getChildrenList(), res, className);
 			}
 			
 		}

@@ -529,11 +529,13 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	public void postProcess(IFolder folder) {}
 
 	/**
+	 * Reads the features from a folder containing files.
 	 * @param folder
 	 * @param performFullBuild
 	 * @throws CoreException
 	 */
-	public void readFeatureModelFromFolder(IFolder folder) throws CoreException{
+	public void readFeatureModelFromFolder(IFolder folder) throws CoreException {
+		PPModelBuilder ppModelBuilder = new PPModelBuilder(featureProject);
 		for(final IResource res: folder.members()){
 			if (res instanceof IFolder) {
 				// for folders do recursively 
@@ -542,13 +544,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 				IFile file = (IFile) res;
 				final Vector<String> lines = loadStringsFromFile(file);
 				LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
-				PPModelBuilder ppModelBuilder = new PPModelBuilder(featureProject);
-				
 				ppModelBuilder.addNonExistingDirectivesToModel(directives, file, directives.getClass().getName());
-				
 			}
 		}
 		fillModelWithFeatures();
+		FileHandler.save(Paths.get(featureProject.getModelFile().getLocationURI()), featureProject.getFeatureModel(), new XmlFeatureModelFormat());	
 	}
 	
 	/**
@@ -556,6 +556,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param featureModel
 	 */
 	private void fillModelWithFeatures() {
+		System.err.println(" Filling");
 		IFeatureModel featureModel = featureProject.getFeatureModel();
 		IFeature rootFeature = featureModel.getFeature(featureProject.getProjectName());
 		FSTModel fstModel = featureProject.getFSTModel();
@@ -571,7 +572,5 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			newFeature.getStructure().setParent(rootFeature.getStructure());
 			featureModel.addFeature(newFeature);
 		}
-		
-		FileHandler.save(Paths.get(featureProject.getModelFile().getLocationURI()), featureModel, new XmlFeatureModelFormat());	
 	}
 }
