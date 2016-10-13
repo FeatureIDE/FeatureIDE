@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIO
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_TO_EDITOR;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -187,6 +188,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private CollapseAllAction expandAllAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
+	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private HiddenAction hiddenAction;
 	private AndAction andAction;
 	private OrAction orAction;
@@ -290,43 +292,40 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container, IFeatureModel fm) {
 		this(featureModelEditor, container, fm, false);
 	}
-	
+
 	/**
 	 * Checks if the combined width including the spaces between features fits the editor's size.
 	 * Based on the selected layout algorithm.
 	 * 
 	 * @param list all features from a single level.
-	 * @param levelNumber the number of the checked level beginning at the root with 1.
 	 * @return true if the level fits in the editor.
 	 */
 	public boolean isLevelSizeOverLimit(List<IFeature> list) {
-		int editorWidth = getFigureCanvas().getViewport().getSize().width;
-		int editorHeight = getFigureCanvas().getViewport().getSize().height;
-		boolean isVertical = getGraphicalFeatureModel().getLayout().getLayoutAlgorithm() == 4;
-		if (isVertical) {
-			for (IFeature f : list) {
-				IGraphicalFeature g = graphicalFeatureModel.getGraphicalFeature(f);
-				if (g.getLocation().x > editorWidth || g.getLocation().x < 0) {
-					return true;
-				}
-				if (g.getLocation().y > editorHeight || g.getLocation().y < 0) {
-					return true;
-				}
+		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
+		double editorWidth = getFigureCanvas().getViewport().getSize().width / zoomManager.getZoom();
+		double editorHeight = getFigureCanvas().getViewport().getSize().height / zoomManager.getZoom();
+
+		double rootMidX = root.getLocation().x + root.getSize().width/2;
+		double rootMidY = root.getLocation().y - 10;
+
+		double borderLeft = rootMidX - editorWidth/2;
+		double borderRight = rootMidX + editorWidth/2;
+
+		for (IFeature f : list) {
+			IGraphicalFeature g = graphicalFeatureModel.getGraphicalFeature(f);
+			if ((g.getLocation().x + g.getSize().width) > borderRight || g.getLocation().x < borderLeft) {
+				getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int)borderLeft, (int)rootMidY));
+				return true;
 			}
-		} else {
-			for (IFeature f : list) {
-				IGraphicalFeature g = graphicalFeatureModel.getGraphicalFeature(f);
-				if ((g.getLocation().x + g.getSize().width) > editorWidth || g.getLocation().x < 0) {
-					return true;
-				}
-				if ((g.getLocation().y+g.getSize().height) > editorHeight || g.getLocation().y < 0) {
-					return true;
-				}
+			if ((g.getLocation().y + g.getSize().height) > editorHeight || g.getLocation().y < 0) {
+				getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int)borderLeft, (int)rootMidY));
+				return true;
 			}
 		}
 		return false;
-	} 
+	}
 
+	
 	public void initializeGraphicalViewer() {
 		getControl().addControlListener(new ControlListener() {
 
@@ -426,7 +425,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
-
+		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, featureModel, ADJUST_MODEL_TO_EDITOR);
 		moveStopAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.STOP);
 		moveUpAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.UP);
 		moveRightAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.RIGHT);
@@ -943,10 +942,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFeatureFigure()), getFeatureModel())
 						.show();
 
-			} 
-//			else {
-//				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
-//			}
+			}
+			//			else {
+			//				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
+			//			}
 			analyzeFeatureModel();
 			break;
 		case FEATURE_NAME_CHANGED:

@@ -89,7 +89,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		}
 		LinkedList<IFeature> lastLevel = levels.getFirst();
 		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
-		int levelNo = 1;
 		for (LinkedList<IFeature> level : levels) {
 			/* if the last level is not null AND the level exceeds
 			 * neither the width nor the height of the editor
@@ -100,11 +99,40 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 				break;
 			}
 			lastLevel = level;
-			levelNo++;
-			for(IFeature f : level)
-			{
+
+			//expand next level
+			for (IFeature f : level) {
 				f.getStructure().setCollapsed(false);
 			}
+			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+			((FeatureDiagramEditor) getEditor()).internRefresh(true);
+		}
+
+		LinkedList<IFeature> maxChilds = new LinkedList<IFeature>();
+		for (IFeature f : lastLevel) {
+			//Expand and relayout parent
+			f.getStructure().setCollapsed(false);
+			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+			((FeatureDiagramEditor) getEditor()).internRefresh(true);
+
+
+			LinkedList<IFeature> testChild = new LinkedList<IFeature>();
+			for (IFeatureStructure child : f.getStructure().getChildren()) {
+				testChild.add(child.getFeature());
+			}
+			if (testChild.size() != 0 && !featureDiagramEditor.isLevelSizeOverLimit(testChild)) {
+				if (testChild.size() >= maxChilds.size()) {
+					maxChilds = testChild;
+				}
+			}
+			//collapse and relayout parent
+			f.getStructure().setCollapsed(true);
+			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+			((FeatureDiagramEditor) getEditor()).internRefresh(true);
+		}
+
+		if (maxChilds.size() > 0) {
+			maxChilds.get(0).getStructure().getParent().setCollapsed(false);
 			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 			((FeatureDiagramEditor) getEditor()).internRefresh(true);
 		}
