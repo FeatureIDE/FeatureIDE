@@ -50,6 +50,7 @@ import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassSubNodeParent;
@@ -108,6 +109,14 @@ public class TreeClickListener implements IDoubleClickListener {
 				};
 				job.setPriority(Job.INTERACTIVE);
 				job.schedule();
+			} else if (selected instanceof LazyParent && (((LazyParent) selected).hasChildren() || ((LazyParent) selected).isLazy())) {
+				LazyParent lParent = (LazyParent) selected;
+				if (lParent.isLazy()) {
+					lParent.setTreeViewer(view);
+					lParent.calculateChildren(true);
+				} else{
+					view.setExpandedState(lParent, !view.getExpandedState(lParent));
+				}
 			} else if (selected instanceof Parent && ((Parent) selected).hasChildren()) {
 				view.setExpandedState(selected, !view.getExpandedState(selected));
 			} else if (selected instanceof FieldSubNodeParent) {

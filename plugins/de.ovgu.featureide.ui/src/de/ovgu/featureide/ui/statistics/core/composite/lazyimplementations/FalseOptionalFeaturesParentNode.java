@@ -37,7 +37,7 @@ public class FalseOptionalFeaturesParentNode extends LazyParent {
 	public FalseOptionalFeaturesParentNode(String description, IFeatureModel model) {
 		super(description, null);
 		this.model = model;
-		calculateChidren(false);
+		calculateChildren(false);
 	}
 
 	@Override

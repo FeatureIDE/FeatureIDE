@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
+import de.ovgu.featureide.ui.statistics.ui.helper.LazyJobListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 /**
@@ -50,7 +51,7 @@ public abstract class LazyParent extends Parent {
 			super(calculated);
 			this.expand = expand;
 		}
-
+		
 		public boolean isExpand() {
 			return expand;
 		}
@@ -73,24 +74,29 @@ public abstract class LazyParent extends Parent {
 	}
 
 	protected boolean lazy = true;
+	
+	protected TreeViewer viewer = null;
 
 	@Override
 	public Parent[] getChildren() {
-		return calculateChidren(true);
+		return calculateChildren(true);
 	}
 
 	/**
 	 * Starts a job, that calculates the children of this instance, and
 	 * registers it to the listener.
 	 */
-	protected Parent[] calculateChidren(boolean expand) {
+	public Parent[] calculateChildren(boolean expand) {
 		if (lazy) {
 			final TreeJob job = new StatisticTreeJob(this, expand);
 			LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATE + this.getClass().getName(), job);
 			runner.setPriority(Job.SHORT);
 			final JobDoneListener listener = JobDoneListener.getInstance();
-			if (listener != null) {
+			final LazyJobListener lazyListener = new LazyJobListener(this, viewer);
+			//lazyListener waits for the Calculation to finish and expands the node
+			if (listener != null && lazyListener != null) {
 				runner.addJobChangeListener(listener);
+				runner.addJobChangeListener(lazyListener);
 			}
 			runner.schedule();
 		}
@@ -106,6 +112,14 @@ public abstract class LazyParent extends Parent {
 	 */
 	protected void setPriority(Job job) {
 		job.setPriority(Job.SHORT);
+	}
+	
+	public void setTreeViewer(TreeViewer viewer) {
+		this.viewer = viewer;
+	}
+	
+	public TreeViewer getTreeViewer() {
+		return this.viewer;
 	}
 	
 	public boolean isLazy() {
