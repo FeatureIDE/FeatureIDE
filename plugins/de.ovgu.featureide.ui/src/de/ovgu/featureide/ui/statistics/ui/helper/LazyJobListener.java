@@ -33,6 +33,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 /**
  * listener which reacts to a LazyParent finishing calculation
  * 
+ * @author Oliver Urbaniak
  */
 public class LazyJobListener extends JobChangeAdapter {
 
