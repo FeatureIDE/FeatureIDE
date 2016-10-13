@@ -48,10 +48,7 @@ public class DirectivesLeafNode extends Parent {
 	 * 			corresponding class
 	 */
 	public DirectivesLeafNode(String description, IFeatureProject project, String classname) {
-		super(description);
-		this.classname = classname;
-		this.project = project;
-		lineToJump = 1;
+		this(description, "", project, classname, 1);
 	}
 	
 	/**
@@ -67,10 +64,7 @@ public class DirectivesLeafNode extends Parent {
 	 * 			corresponding class
 	 */
 	public DirectivesLeafNode(String description, Object value, IFeatureProject project, String classname) {
-		super(description, value);
-		this.project = project;
-		this.classname = classname;
-		lineToJump = 1;
+		this(description, value, project, classname, 1);
 	}
 	
 	/**
