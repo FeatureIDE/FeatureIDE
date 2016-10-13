@@ -40,27 +40,30 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datat
 public class LOCNode extends LazyParent {
 	
 	private final FileFeatureLOCMapper fileFeatureLOCMapper;
-	private boolean isPreprocessor = false;
+	private boolean isPreprocessor;
 	private IFeatureProject project;
+	private boolean isColligens;
 
-	LOCNode(String description, IFeatureProject project, boolean isPreprocessor) {
+	LOCNode(String description, IFeatureProject project, boolean isPreprocessor, boolean isColligns) {
 		super(description);
 		this.fileFeatureLOCMapper = null;
 		this.project = project;
 		this.isPreprocessor = isPreprocessor;
+		this.isColligens= isColligns;
 	}
 	
-	public LOCNode(String description, FileFeatureLOCMapper ffLOCMapper, IFeatureProject project, boolean isPreprocessor) {
+	public LOCNode(String description, FileFeatureLOCMapper ffLOCMapper, IFeatureProject project, boolean isPreprocessor, boolean isColligns) {
 		super(description);
 		this.fileFeatureLOCMapper = ffLOCMapper;
 		this.project = project;
 		this.isPreprocessor = isPreprocessor;
+		this.isColligens = isColligns;
 	}
 
 	@Override
 	protected void initChildren() {
 		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper, project, LOC_BY_EXTENSION));
-		if (isPreprocessor) {
+		if (isPreprocessor && !isColligens) {
 			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper, project, LOC_BY_FEATURE));
 		
 			int allLOC = fileFeatureLOCMapper.allLinesOfCode();

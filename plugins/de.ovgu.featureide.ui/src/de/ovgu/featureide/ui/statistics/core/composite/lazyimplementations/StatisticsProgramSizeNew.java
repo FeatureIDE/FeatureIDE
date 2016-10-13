@@ -140,11 +140,15 @@ public class StatisticsProgramSizeNew extends LazyParent {
 					fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 		}
 		boolean isPreprocessor = false;
+		boolean isColligens = false;	
 		if (project.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
 			isPreprocessor = true;
 			isFeatureOrPreprocessorProject = true;
 		}
-		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, project, isPreprocessor));
+		if (project.getComposer().getName().equals("Colligens")) {
+			isColligens = true;
+		}
+		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, project, isPreprocessor, isColligens));
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {
