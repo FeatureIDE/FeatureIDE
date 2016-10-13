@@ -82,7 +82,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	 * @param description
 	 * @param project
 	 */
-	
 	public StatisticsProgramSizeNew(String description, IFeatureProject project) {
 		super(description);
 		this.fstModel = null;
@@ -93,13 +92,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-
 		int numberOfClasses = 0;
 		int numberOfRoles = 0;
 		int numberOfFields = 0;
 		int numberOfUniFields = 0;
 		int numberOfMethods = 0;
 		int numberOfUniMethods = 0;
+		boolean isPreprocessor = false;
+		boolean isColligens = false;
 
 		if(isFeatureOrPreprocessorProject) {
 			for (FSTClass fstClass : fstModel.getClasses()) {
@@ -139,8 +139,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 					fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 		}
-		boolean isPreprocessor = false;
-		boolean isColligens = false;	
+	
 		if (project.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
 			isPreprocessor = true;
 			isFeatureOrPreprocessorProject = true;
@@ -151,6 +150,11 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fileFeatLOCMapper, project, isPreprocessor, isColligens));
 	}
 
+	/**
+	 * check if the given extension is a ignored extension
+	 * @param fileExtension the extension which will be checked
+	 * @return
+	 */
 	private static boolean isIgnoredExtension(String fileExtension) {
 		for (String extension : ignoredExtensions) {
 			if (extension.equals(fileExtension)) {
@@ -160,6 +164,10 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		return false;
 	}
 
+	/**
+	 * Sets the comments syntax for the individual language and calls countLOC() to count the LOC
+	 * @throws CoreException
+	 */
 	public void checkLOC() throws CoreException {
 		project.getSourceFolder().accept(new IResourceVisitor() {
 
@@ -219,15 +227,15 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						int ppStatementLOC = countPPStatementLoc(file);
 						if (mecha == Mechanism.PREPROCESSOR) {
 							isPPProject = true;
-							numberOfLinesInThisFile += ppStatementLOC;
+							//preprocessor statements are like comments => not counted yet => add them
+							numberOfLinesInThisFile += ppStatementLOC; 
 						}
-						//File with loc and statement loc -> Mapper
+						//Fill file with loc and statement loc into mapper
 						fileFeatLOCMapper.addEntry(file, numberOfLinesInThisFile);
 						fileFeatLOCMapper.addPPStatementLOC(file, ppStatementLOC);
 					}
 				}
 				numberOfLines += numberOfLinesInThisFile;
-
 				return false;
 			}
 
@@ -282,6 +290,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	 * @param loc recursive variable
 	 * @return
 	 */
+	//TODO isn't working recursively 
 	private int countChildrenLOC(FSTDirective directive) {
 		int childrenLoc = 0;
 		if (directive.hasChildren()) {

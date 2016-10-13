@@ -29,7 +29,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Oliver Urbaniak
  * @author Philipp Kuhn
  */
-public class DirectivesLeafNode extends Parent {
+public class JumpNode extends Parent {
 	
 	final String classname;
 	
@@ -47,7 +47,7 @@ public class DirectivesLeafNode extends Parent {
 	 * @param className
 	 * 			corresponding class
 	 */
-	public DirectivesLeafNode(String description, IFeatureProject project, String classname) {
+	public JumpNode(String description, IFeatureProject project, String classname) {
 		this(description, "", project, classname, 1);
 	}
 	
@@ -63,7 +63,7 @@ public class DirectivesLeafNode extends Parent {
 	 * @param className
 	 * 			corresponding class
 	 */
-	public DirectivesLeafNode(String description, Object value, IFeatureProject project, String classname) {
+	public JumpNode(String description, Object value, IFeatureProject project, String classname) {
 		this(description, value, project, classname, 1);
 	}
 	
@@ -81,7 +81,7 @@ public class DirectivesLeafNode extends Parent {
 	 * @param line
 	 * 			desired line to jump to when Node is clicked
 	 */
-	public DirectivesLeafNode(String description, Object value, IFeatureProject project , String classname, int line) {
+	public JumpNode(String description, Object value, IFeatureProject project , String classname, int line) {
 		super(description, value);
 		this.project = project;
 		this.classname = classname;

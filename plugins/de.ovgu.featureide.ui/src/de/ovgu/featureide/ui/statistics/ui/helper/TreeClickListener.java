@@ -57,7 +57,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Class
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ContractCountNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesLeafNode;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.JumpNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.InvariantNodeParent;
@@ -141,8 +141,8 @@ public class TreeClickListener implements IDoubleClickListener {
 				IFile iFile = ((FSTMethod) (((Parent) selected).getValue())).getFile();
 				int line = ((FSTMethod) (((Parent) selected).getValue())).getLine();
 				openEditor(iFile, line);
-			} else if (selected instanceof DirectivesLeafNode && !((Parent) selected).hasChildren() ) {
-				DirectivesLeafNode directivesLeafNode = (DirectivesLeafNode) selected;
+			} else if (selected instanceof JumpNode && !((Parent) selected).hasChildren() ) {
+				JumpNode directivesLeafNode = (JumpNode) selected;
 				IFile iFile = directivesLeafNode.getFeatureProject().getSourceFolder().getFile(directivesLeafNode.getClassname());
 				int line = directivesLeafNode.getLine();
 				openEditor(iFile, line);

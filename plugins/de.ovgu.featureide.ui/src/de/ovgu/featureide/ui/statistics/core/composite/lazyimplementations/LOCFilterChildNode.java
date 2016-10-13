@@ -35,12 +35,13 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
 /**
+ * Adds the third layer after Lines of Code in statistics
  * @author Maximilian Homann
  * @author Philipp Kuhn
  */
 public class LOCFilterChildNode extends LOCFilterNode {
-
 	private String parentNodeName;
+	
 	/**
 	 * @param description
 	 * @param fileFeatureLOCMapper
@@ -58,10 +59,11 @@ public class LOCFilterChildNode extends LOCFilterNode {
 		String extension = description.split(SEPARATOR)[0];
 		HashMap<IFile, Integer> filesWithLOC = fileFeatureLOCMapper.getFilesWithLOCByExtension(extension);
 		String prettyPath = "";
+		
 		if (parentNodeName.equals(LOC_BY_EXTENSION)) {		
 			for (IFile file: filesWithLOC.keySet()) {
 				prettyPath = constructPrettyPath(file);
-				addChild(new DirectivesLeafNode(prettyPath, filesWithLOC.get(file), project, prettyPath));
+				addChild(new JumpNode(prettyPath, filesWithLOC.get(file), project, prettyPath));
 			}
 		} else if(parentNodeName.equals(NON_VARIABLE_LOC)) {
 			for (IFile file: filesWithLOC.keySet()) {
@@ -77,7 +79,7 @@ public class LOCFilterChildNode extends LOCFilterNode {
 				
 				int loc = fileFeatureLOCMapper.getLOCByFile(file) - (varLOC + ppLOC);
 				
-				addChild(new DirectivesLeafNode(prettyPath, loc, project, prettyPath));
+				addChild(new JumpNode(prettyPath, loc, project, prettyPath));
 			}
 		} else if(parentNodeName.equals(VARIABLE_LOC)) {	
 			for (IFile file: filesWithLOC.keySet()) {
@@ -87,17 +89,22 @@ public class LOCFilterChildNode extends LOCFilterNode {
 				for(Map.Entry<FSTFeature, Integer> entry: locByFeatMap.entrySet()) {
 					loc += entry.getValue();
 				}
-				addChild(new DirectivesLeafNode(prettyPath, loc, project, prettyPath));
+				addChild(new JumpNode(prettyPath, loc, project, prettyPath));
 			}
 		} else if(parentNodeName.equals(PP_LOC)) {
 			for (IFile file: filesWithLOC.keySet()) {
 				prettyPath = constructPrettyPath(file);
 				int loc = fileFeatureLOCMapper.getPPStatementLOCByFile(file);
-				addChild(new DirectivesLeafNode(prettyPath, loc, project, prettyPath));
+				addChild(new JumpNode(prettyPath, loc, project, prettyPath));
 			}
 		}
 	}
 	
+	/**
+	 * searches the path to the given file
+	 * @param file the file which path is searched
+	 * @return the path to the file
+	 */
 	private String constructPrettyPath(IFile file) {
 		String sourceFolder = fileFeatureLOCMapper.getSourceFolder().getName() + "/";
 		String filePath = file.getFullPath().toString();				

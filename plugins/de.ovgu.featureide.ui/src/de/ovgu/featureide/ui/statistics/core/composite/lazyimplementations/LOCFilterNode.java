@@ -30,36 +30,23 @@ import java.util.HashMap;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
- * Replaces the old HashMapNodeTwoStrings class. <br>
- * <p>
- * This class is intended to act as the parent Node for the following
- * categories of LOC statistics:<br>
- * - LOC by extension <br>
- * - LOC by feature <br>
- * - LOC by file <br>
- * </p>
+ * Adds the second layer after Lines of Code in statistics.
+ * Replaces the old HashMapNodeTwoStrings class.
  * @author Maximilian Homann
  * @author Philipp Kuhn
  */
 public class LOCFilterNode extends AbstractSortModeNode {
-
 	protected final FileFeatureLOCMapper fileFeatureLOCMapper;
 	protected final String nodeType;
 	protected final IFeatureProject project;
 
 	/**
 	 * Creates a new LOCFilterNode.<br>
-	 * There are currently three possible types for this node: <br>
-	 *  - LOC_BY_EXTENSION <br>
-	 *  - LOC_BY_FEATURE <br>
-	 *  - LOC_BY_FILE <br>
-	 * These types exist in the {@link StringTable}
 	 * @param description
 	 * @param fileFeatureLOCMapper
 	 */
@@ -72,11 +59,6 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	
 	/**
 	 * Creates a new LOCFilterNode.<br>
-	 * There are currently three possible types for this node: <br>
-	 *  - LOC_BY_EXTENSION <br>
-	 *  - LOC_BY_FEATURE <br>
-	 *  - LOC_BY_FILE <br>
-	 * These types exist in the {@link StringTable}
 	 * @param description
 	 * @param loc
 	 * @param nodeType
@@ -94,19 +76,15 @@ public class LOCFilterNode extends AbstractSortModeNode {
 	 */
 	@Override
 	protected void initChildren() {
-		if (nodeType.equals(LOC_BY_EXTENSION)) {
+		if (nodeType.equals(LOC_BY_EXTENSION)) { 
 			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getExtensionsWithLOC();
 			addExtensionChild(extAndCount);
 		} else if (nodeType.equals(LOC_BY_FEATURE)) {
 			HashMap<FSTFeature, Integer> featAndCount = fileFeatureLOCMapper.getFeaturesWithLOC();
-			if(featAndCount.size()== 0) { 
-				addChild(new Parent("No feature LOC count available for this composer."));
-			} else {
-				for (FSTFeature feature: featAndCount.keySet()) {
-					int LOC = featAndCount.get(feature).intValue(); 
-					addChild(new Parent(feature.getName(), LOC));
-				}
-			}
+			for (FSTFeature feature: featAndCount.keySet()) {
+				int LOC = featAndCount.get(feature).intValue(); 
+				addChild(new Parent(feature.getName(), LOC));
+			}		
 		} else if (nodeType.equals(NON_VARIABLE_LOC)) {
 			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getNonVariableLOCByExtension();
 			addExtensionChild(extAndCount);
@@ -119,6 +97,10 @@ public class LOCFilterNode extends AbstractSortModeNode {
 		}
 	}
 	
+	/**
+	 * Adds a child for each extension found
+	 * @param extAndCount A Hashmap which has the loc for each extension saved.
+	 */
 	public void addExtensionChild(HashMap<String, Integer> extAndCount) {
 		for (String extension: extAndCount.keySet()) {
 			if (extension != null) {

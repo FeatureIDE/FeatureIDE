@@ -24,21 +24,19 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_EXTENSI
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOC_BY_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NON_VARIABLE_LOC;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABLE_LOC;
-import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABLE_LOC_WARNING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PP_LOC;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
 /**
- * Node for aggregated LOC.
+ * Adds the first layer after Lines of Code in statistics.
  * 
  * @author Schleicher Miro
  * @author Maximilian Homann
  * @author Philipp Kuhn
  */
-public class LOCNode extends LazyParent {
-	
+public class LOCNode extends LazyParent {	
 	private final FileFeatureLOCMapper fileFeatureLOCMapper;
 	private boolean isPreprocessor;
 	private IFeatureProject project;
@@ -64,21 +62,15 @@ public class LOCNode extends LazyParent {
 	protected void initChildren() {
 		addChild(new LOCFilterNode(LOC_BY_EXTENSION, fileFeatureLOCMapper, project, LOC_BY_EXTENSION));
 		if (isPreprocessor && !isColligens) {
-			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper, project, LOC_BY_FEATURE));
-		
+			//calculate values
 			int allLOC = fileFeatureLOCMapper.allLinesOfCode();
 			int preProcessorLOC = fileFeatureLOCMapper.getPPStatementLOC();
 			int variableLOC = fileFeatureLOCMapper.getCompleteFeatureLOC();
 			int nonVariableCode = allLOC - (preProcessorLOC + variableLOC) ;
-			
+			//add children
+			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper, project, LOC_BY_FEATURE));
 			addChild(new LOCFilterNode(NON_VARIABLE_LOC + SEPARATOR + nonVariableCode, fileFeatureLOCMapper, project, NON_VARIABLE_LOC));
-			
-			if(variableLOC == 0) {
-				addChild(new LOCFilterNode(VARIABLE_LOC +  VARIABLE_LOC_WARNING  + SEPARATOR + variableLOC, fileFeatureLOCMapper, project, VARIABLE_LOC));
-			} else {
-				addChild(new LOCFilterNode(VARIABLE_LOC  + SEPARATOR + variableLOC, fileFeatureLOCMapper, project, VARIABLE_LOC));
-			}
-			
+			addChild(new LOCFilterNode(VARIABLE_LOC  + SEPARATOR + variableLOC, fileFeatureLOCMapper, project, VARIABLE_LOC));
 			addChild(new LOCFilterNode(PP_LOC + SEPARATOR + preProcessorLOC, fileFeatureLOCMapper, project, PP_LOC));			
 		}
 	}
