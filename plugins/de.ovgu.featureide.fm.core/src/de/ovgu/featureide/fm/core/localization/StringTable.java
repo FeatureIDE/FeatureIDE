@@ -1012,4 +1012,6 @@ public class StringTable {
 	public static final String SET_FEATURE_COLLAPSED = "Set Feature Collapsed";
 	public static final String SET_FEATURE_EXPANDED = "Set Feature Expanded";
 	public static final String COLLAPSE_SIBLINGS = "Collapse siblings";
+	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust model to editor size";
+	
 }
