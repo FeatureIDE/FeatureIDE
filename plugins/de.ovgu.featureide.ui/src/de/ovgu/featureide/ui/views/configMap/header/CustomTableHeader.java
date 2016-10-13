@@ -106,8 +106,12 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 		this.drawLines = drawLines;
 	}
 	
-	private void setSelectedColumn(int index) {
+	public void setSelectedColumn(int index) {
+		if (0 <= index && index < columnStyles.size())
+			if (!columnStyles.get(index).isSelectable())
+				index = -1;
 		this.selectedColumn = index;
+		redraw();
 		for (ICustomTableHeaderSelectionListener listener : listeners)
 			listener.onColumnSelectionChanged(index);
 	}
@@ -300,7 +304,7 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 				columnOffset += width;
 
 				//draw line
-				if (drawLines) {
+				if (drawLines && col.isDrawingLine()) {
 					this.transform.identity();
 					gc.setTransform(transform);
 					gc.drawLine(columnOffset, height, columnOffset + skew, 0);

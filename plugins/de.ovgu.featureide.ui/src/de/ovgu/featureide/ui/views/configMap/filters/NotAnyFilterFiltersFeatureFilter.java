@@ -42,6 +42,7 @@ public class NotAnyFilterFiltersFeatureFilter extends ConfigurationMapFilter {
 	public NotAnyFilterFiltersFeatureFilter(String name, boolean isDefault, List<IConfigurationMapFilter> filters) {
 		super(name, isDefault);
 		this.filters = filters;
+		setImagePath(Image_Empty);
 	}
 	
 	/* (non-Javadoc)

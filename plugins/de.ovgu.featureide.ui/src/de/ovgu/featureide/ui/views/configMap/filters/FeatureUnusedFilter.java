@@ -37,6 +37,7 @@ public class FeatureUnusedFilter extends ConfigurationMapFilter {
 
 	public FeatureUnusedFilter(boolean isDefault) {
 		super("unused features", isDefault);
+		setImagePath(Image_Minus);
 	}
 	
 	/* (non-Javadoc)

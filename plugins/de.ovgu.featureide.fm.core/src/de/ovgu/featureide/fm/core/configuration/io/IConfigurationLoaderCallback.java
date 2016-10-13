@@ -35,5 +35,7 @@ public interface IConfigurationLoaderCallback {
 	
 	public void onConfigurationLoaded(Configuration configuration, Path path);
 	
+	public void onLoadingFinished();
+	
 	public void onLoadingError(IOException exception);
 }

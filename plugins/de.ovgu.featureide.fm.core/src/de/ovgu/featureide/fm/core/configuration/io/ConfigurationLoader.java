@@ -93,6 +93,9 @@ public class ConfigurationLoader {
 				callback.onLoadingError(e);
 		}
 		
+		if (callback != null)
+			callback.onLoadingFinished();
+		
 		return configs;
 	}
 

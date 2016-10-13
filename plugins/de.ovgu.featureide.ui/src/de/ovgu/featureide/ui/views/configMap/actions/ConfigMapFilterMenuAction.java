@@ -26,6 +26,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilterable;
 
@@ -60,7 +61,11 @@ public class ConfigMapFilterMenuAction extends Action implements IMenuCreator {
 		if (filterMenu == null) {
 			filterMenu = new Menu(parent);
 			for (int i = 0; i < this.filterActions.length; i++) {
-				ActionContributionItem contributionItem = new ActionContributionItem(filterActions[i]);
+				ConfigMapFilterAction filterAction = filterActions[i];
+				filterAction.initializeImage(FMUIPlugin.getImage(filterAction.getFilter().getImagePath()));
+				
+				ActionContributionItem contributionItem = new ActionContributionItem(filterAction);
+				//contributionItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
 				contributionItem.fill(filterMenu, -1 /* means insert at end*/);
 			}
 		}

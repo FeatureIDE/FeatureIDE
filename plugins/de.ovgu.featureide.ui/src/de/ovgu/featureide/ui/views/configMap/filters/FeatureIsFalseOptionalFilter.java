@@ -37,6 +37,7 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 
 	public FeatureIsFalseOptionalFilter(boolean isDefault) {
 		super("false optional features", isDefault);
+		setImagePath(Image_Plus);
 	}
 
 	/* (non-Javadoc)

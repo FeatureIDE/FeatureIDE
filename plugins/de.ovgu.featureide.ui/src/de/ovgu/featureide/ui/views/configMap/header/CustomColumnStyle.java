@@ -34,6 +34,7 @@ public class CustomColumnStyle {
 	private Color backgroundColor, foregroundColor;
 	private int verticalAlignment, horizontalAlignment;
 	private boolean isRotated, isSelectable;
+	private boolean drawLine;
 
 	public CustomColumnStyle(String title, int width) {
 		this.title = title;
@@ -43,6 +44,7 @@ public class CustomColumnStyle {
 		this.horizontalAlignment = SWT.CENTER;
 		this.isRotated = true;
 		this.isSelectable = true;
+		this.drawLine = true;
 	}
 
 	public int getWidth() {
@@ -83,6 +85,14 @@ public class CustomColumnStyle {
 
 	public boolean isSelectable() {
 		return isSelectable;
+	}
+	
+	public void setDrawingLine(boolean drawLine) {
+		this.drawLine = drawLine;
+	}
+	
+	public boolean isDrawingLine() {
+		return drawLine;
 	}
 
 	public String getTitle() {

@@ -25,8 +25,13 @@ package de.ovgu.featureide.ui.views.configMap;
  * 
  * @author gruppe40
  */
-public abstract class ConfigurationMapFilter implements IConfigurationMapFilter{
+public abstract class ConfigurationMapFilter implements IConfigurationMapFilter {
+	protected final static String Image_Empty = "undefined.ico";
+	protected final static String Image_Plus = "aselected.ico";
+	protected final static String Image_Minus = "adeselected.ico";
+	
 	private String name;
+	private String imagePath;
 	private boolean isDefault;
 	
 	public ConfigurationMapFilter(String name) {
@@ -36,19 +41,26 @@ public abstract class ConfigurationMapFilter implements IConfigurationMapFilter{
 	public ConfigurationMapFilter(String name, boolean isDefault) {
 		this.name = name;
 		this.isDefault = isDefault;
+		this.imagePath = null;
 	}
 	
 	public void initialize(ConfigurationMap configurationMap) {
 		
 	}
 	
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
+
+	@Override
+	public String getImagePath() {
+		return imagePath;
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#getName()
-	 */
 	@Override
 	public String getName() {
 		return name;

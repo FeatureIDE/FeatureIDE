@@ -42,6 +42,7 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 	 */
 	public DeadFeatureFilter(boolean isDefault) {
 		super("dead features", isDefault);
+		setImagePath(Image_Minus);
 	}
 	
 	@Override

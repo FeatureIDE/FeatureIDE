@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITableColorProvider {
 	private final static String imgSelectedPath = "aselected.ico";
 	private final static String imgUnselectedPath = "adeselected.ico";
-	
+
 	private ConfigurationMap configurationMap;
 
 	public ConfigurationMapLabelProvider(ConfigurationMap configurationMap) {
@@ -65,7 +65,7 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	 */
 	@Override
 	public Color getBackground(Object element, int columnIndex) {
-		if (columnIndex - configurationMap.getConfigurationColumnsOffset() == configurationMap.getSelectedColumnIndex()) {
+		if (columnIndex == configurationMap.getSelectedColumnIndex()) {
 			return configurationMap.getColumnHighlightColor();
 		} else if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
@@ -82,16 +82,17 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	public Image getColumnImage(Object element, int columnIndex) {
 		if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
-			int offset = configurationMap.getConfigurationColumnsOffset();
 
-			if (columnIndex >= offset) {// && columnIndex < configurationMap.end) {
-				Configuration config = configurationMap.getConfigurations().get(columnIndex - offset);
+			if (configurationMap.isConfigColumn(columnIndex)) {// && columnIndex < configurationMap.end) {
+				Configuration config = configurationMap.getConfigurationOfColumn(columnIndex);
 
-				String imgPath = imgUnselectedPath;
-				if (config.getSelectedFeatures().contains(feature))
-					imgPath = imgSelectedPath;
+				if (config.isValid()) {
+					String imgPath = imgUnselectedPath;
+					if (config.getSelectedFeatures().contains(feature))
+						imgPath = imgSelectedPath;
 
-				return FMUIPlugin.getImage(imgPath);
+					return FMUIPlugin.getImage(imgPath);
+				}
 			}
 		}
 
@@ -102,12 +103,12 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
 	 */
 	@Override
-	public String getColumnText(Object element, int columnIndex) {		
-		if (columnIndex < configurationMap.getConfigurationColumnsOffset()) {
+	public String getColumnText(Object element, int columnIndex) {
+		if (configurationMap.getConfigColumnsOffset() > columnIndex) {
 			if (element instanceof IFeature)
 				return element.toString();
 		}
-		
+
 		return null;
 	}
 

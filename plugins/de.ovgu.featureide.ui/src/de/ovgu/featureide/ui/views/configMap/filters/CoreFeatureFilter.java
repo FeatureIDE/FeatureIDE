@@ -42,6 +42,7 @@ public class CoreFeatureFilter extends ConfigurationMapFilter {
 	 */
 	public CoreFeatureFilter(boolean isDefault) {
 		super("core features", isDefault);
+		setImagePath(Image_Plus);
 	}
 
 	@Override

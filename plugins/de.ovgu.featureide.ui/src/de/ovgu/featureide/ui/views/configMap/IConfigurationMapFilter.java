@@ -38,6 +38,8 @@ public interface IConfigurationMapFilter {
 	public boolean test(ConfigurationMap configurationMap, IFeature feature);
 	
 	public String getName();
+	
+	public String getImagePath();
 
 	/**
 	 * @return

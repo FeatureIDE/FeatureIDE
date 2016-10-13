@@ -21,6 +21,8 @@
 package de.ovgu.featureide.ui.views.configMap.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilterable;
@@ -39,6 +41,14 @@ public class ConfigMapFilterAction extends Action {
 		this.filter = filter;
 		this.filterable = filterable;
 		setChecked(filter.isDefault());
+	}
+	
+	public void initializeImage(Image image) {
+		setImageDescriptor(ImageDescriptor.createFromImage(image));
+	}
+	
+	public IConfigurationMapFilter getFilter() {
+		return filter;
 	}
 	
 	/* (non-Javadoc)
