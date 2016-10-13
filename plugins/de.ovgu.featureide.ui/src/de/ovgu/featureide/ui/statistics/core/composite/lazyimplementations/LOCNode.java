@@ -27,7 +27,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABLE_LOC;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABLE_LOC_WARNING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PP_LOC;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.datatypes.FileFeatureLOCMapper;
 
@@ -64,14 +63,10 @@ public class LOCNode extends LazyParent {
 		if (isPreprocessor) {
 			addChild(new LOCFilterNode(LOC_BY_FEATURE, fileFeatureLOCMapper, project, LOC_BY_FEATURE));
 		
-			int allLOC = fileFeatureLOCMapper.allLinesOfCode(); //TODO check allLinesOfCode for correctness
-			int preProcessorLOC = fileFeatureLOCMapper.getFeatureCount()*2; //TODO getFeatureCount() isn't always right! Example: elif , x1 && x2, if you use the same feature more times it will not counted			
+			int allLOC = fileFeatureLOCMapper.allLinesOfCode();
+			int preProcessorLOC = fileFeatureLOCMapper.getPPStatementLOC();
 			int variableLOC = fileFeatureLOCMapper.getCompleteFeatureLOC();
 			int nonVariableCode = allLOC - (preProcessorLOC + variableLOC) ;
-			
-			System.out.println("all: " +fileFeatureLOCMapper.allLinesOfCode());
-			System.out.println("Variable LOC :" + variableLOC);
-			System.out.println("ppLOC: " + preProcessorLOC);
 			
 			addChild(new LOCFilterNode(NON_VARIABLE_LOC + SEPARATOR + nonVariableCode, fileFeatureLOCMapper, project, NON_VARIABLE_LOC));
 			

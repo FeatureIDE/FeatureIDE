@@ -212,13 +212,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						}
 						
 						Mechanism mecha = project.getComposer().getGenerationMechanism();
+						int ppStatementLOC = countPPStatementLoc(file);
 						if (mecha == Mechanism.PREPROCESSOR) {
 							isPPProject = true;
-							numberOfLinesInThisFile += getDirectiveStatementLOC(file);
+							numberOfLinesInThisFile += ppStatementLOC;
 						}
-						//File with loc > Mapper
+						//File with loc and statement loc -> Mapper
 						fileFeatLOCMapper.addEntry(file, numberOfLinesInThisFile);
-						
+						fileFeatLOCMapper.addPPStatementLOC(file, ppStatementLOC);
 					}
 				}
 				numberOfLines += numberOfLinesInThisFile;
@@ -333,7 +334,9 @@ public class StatisticsProgramSizeNew extends LazyParent {
 					}
 				// //@ is a keyword in antenna projects
 				} else if(line.startsWith(oneLineComment + configAt)) {
+					if(project.getComposer().getName().toString().equals("Antenna")) {
 						numberOfLinesInThisFile++;
+					}
 				}
 				
 			}
@@ -343,20 +346,21 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	}
 	
 	/**
-	 * Counts the lines of code of all directive commands.
+	 * Counts the lines of code of all directive statements.
 	 * @param file
 	 * @return
 	 */
-	private int getDirectiveStatementLOC(IFile file) {
+	private int countPPStatementLoc(IFile file) {
 		int loc = 0;
+		
 		for (FSTClass fstClass: fstModel.getClasses()) {
 			for (FSTRole role: fstClass.getRoles()) {
 				if (role.getFile().equals(file)) {
 					for (FSTDirective directive: role.getDirectives()) {
-						if (!directive.hasChildren() && directive.getParent() == null) {
-							loc += 2;
-						} else if (directive.hasChildren() && directive.getParent() == null) {
-							loc += countChildrenLOC(directive);
+						if (directive.getCommand().isOneLineStatement()) {
+							loc +=1;
+						} else {
+							loc +=2;
 						}
 					}
 				}

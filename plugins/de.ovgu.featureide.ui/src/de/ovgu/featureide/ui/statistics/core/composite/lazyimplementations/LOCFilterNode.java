@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABLE_LOC;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NON_VARIABLE_LOC;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PP_LOC;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -115,16 +114,7 @@ public class LOCFilterNode extends AbstractSortModeNode {
 			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getVariableLOCByExtension();
 			addExtensionChild(extAndCount);			
 		} else if(nodeType.equals(PP_LOC)) {
-			ArrayList<String> ext = fileFeatureLOCMapper.getAllExtensions();
-			HashMap<String, Integer> extAndCount = new HashMap<>();
-			int statementsPerFeature= 0; 
-			for(String extension : ext) {
-				HashMap<FSTFeature, Integer> featuresPerExt = fileFeatureLOCMapper.getFeaturesByExtensionWithLOC(extension);
-				statementsPerFeature += featuresPerExt.size()*2; //TODO not always right
-				//example expr1 && expre2 or if features have same name 
-				System.out.println("PP Code: " + statementsPerFeature);
-				extAndCount.put(extension, statementsPerFeature);
-			}	
+			HashMap<String, Integer> extAndCount = fileFeatureLOCMapper.getPPStatementLOCByExtension();
 			addExtensionChild(extAndCount);
 		}
 	}

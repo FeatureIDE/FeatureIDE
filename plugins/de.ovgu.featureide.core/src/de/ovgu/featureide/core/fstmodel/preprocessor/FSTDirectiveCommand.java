@@ -26,5 +26,27 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
  * @author Jens Meinicke
  */
 public enum FSTDirectiveCommand {
-	IF, IF_NOT, IFDEF, IFNDEF, ELIF, ELIFDEF, ELIFNDEF, ELSE, ELSE_NOT, CONDITION, DEFINE, UNDEFINE,CALL;
+	IF (false), 
+	IF_NOT (false), 
+	IFDEF (false), 
+	IFNDEF (false), 
+	ELIF (true), 
+	ELIFDEF (true), 
+	ELIFNDEF (true), 
+	ELSE (true), 
+	ELSE_NOT (true), 
+	CONDITION (false), //Check if one line statement 
+	DEFINE (false),  //Check if one line statement
+	UNDEFINE (false), //Check if one line statement
+	CALL (false); //Check if one line statement
+	
+	private boolean oneLineStatement;
+	
+	private FSTDirectiveCommand(boolean isOneLineStatement) {
+		this.oneLineStatement = isOneLineStatement;
+	}
+	
+	public boolean isOneLineStatement() {
+		return oneLineStatement;
+	}
 }

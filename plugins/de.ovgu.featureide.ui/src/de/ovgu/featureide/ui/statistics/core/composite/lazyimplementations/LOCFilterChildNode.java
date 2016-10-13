@@ -64,7 +64,21 @@ public class LOCFilterChildNode extends LOCFilterNode {
 				addChild(new DirectivesLeafNode(prettyPath, filesWithLOC.get(file), project, prettyPath));
 			}
 		} else if(parentNodeName.equals(NON_VARIABLE_LOC)) {
-			
+			for (IFile file: filesWithLOC.keySet()) {
+				prettyPath = constructPrettyPath(file);
+				
+				int varLOC = 0;
+				HashMap<FSTFeature, Integer> locByFeatMap = fileFeatureLOCMapper.getLOCByFeatMap(file);
+				for(Map.Entry<FSTFeature, Integer> entry: locByFeatMap.entrySet()) {
+					varLOC += entry.getValue();
+				}
+				
+				int ppLOC = fileFeatureLOCMapper.getPPStatementLOCByFile(file);
+				
+				int loc = fileFeatureLOCMapper.getLOCByFile(file) - (varLOC + ppLOC);
+				
+				addChild(new DirectivesLeafNode(prettyPath, loc, project, prettyPath));
+			}
 		} else if(parentNodeName.equals(VARIABLE_LOC)) {	
 			for (IFile file: filesWithLOC.keySet()) {
 				prettyPath = constructPrettyPath(file);
@@ -78,7 +92,7 @@ public class LOCFilterChildNode extends LOCFilterNode {
 		} else if(parentNodeName.equals(PP_LOC)) {
 			for (IFile file: filesWithLOC.keySet()) {
 				prettyPath = constructPrettyPath(file);
-				int loc = fileFeatureLOCMapper.getFeaturesByFile(file).size()*2; //not always working
+				int loc = fileFeatureLOCMapper.getPPStatementLOCByFile(file);
 				addChild(new DirectivesLeafNode(prettyPath, loc, project, prettyPath));
 			}
 		}
