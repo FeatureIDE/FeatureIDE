@@ -63,6 +63,8 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -261,7 +263,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 * Constructor. Used for a read-only feature model when calculating implicit dependencies.
 	 * 
 	 * @param featureModelEditor the FeatureModelEditor
-	 * @param container Composite which contains the faeture model
+	 * @param container Composite which contains the feature model
 	 * @param fm The feature model
 	 */
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container, IFeatureModel fm) {
@@ -466,11 +468,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
 		boolean mplModel = false;
+		
 		if (getFeatureModel() instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel ext = (ExtendedFeatureModel) getFeatureModel();
 			mplModel = ext.isMultiProductLineModel();
 		}
-		
 		if (mplModel) {
 			menu.add(subMenuLayout);
 			menu.add(subMenuNameType);
@@ -498,8 +500,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(reverseOrderAction);
 			menu.add(legendAction);
 			menu.add(new Separator());
-			menu.add(colorSelectedFeatureAction);
-			menu.add(new Separator());
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
@@ -509,44 +509,26 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(legendAction);
 		} else if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
 			connectionEntrys(menu);
-		} else {
-			menu.add(createCompoundAction);
-			createCompoundAction.setEnabled(false);
-			menu.add(createLayerAction);
-			createLayerAction.setEnabled(false);
-			menu.add(createConstraintWithAction);
-			createConstraintWithAction.setEnabled(false);
-			menu.add(renameAction);
-			renameAction.setEnabled(false);
-			menu.add(deleteAction);
-			menu.add(deleteAllAction);
-			deleteAllAction.setEnabled(false);
+		}else{		
+			menu.add(createConstraintAction);
 			menu.add(new Separator());
-			connectionEntrys(menu);
-			menu.add(mandatoryAction);
-			mandatoryAction.setEnabled(false);
-			menu.add(abstractAction);
-			abstractAction.setEnabled(false);
-			menu.add(hiddenAction);
-			hiddenAction.setEnabled(false);
-			menu.add(changeFeatureDescriptionAction);
-			changeFeatureDescriptionAction.setEnabled(false);
-			menu.add(new Separator());
-
 			menu.add(subMenuLayout);
 			menu.add(subMenuCalculations);
-
 			menu.add(new Separator());
-			menu.add(calculateDependencyAction);
-			calculateDependencyAction.setEnabled(false);
 			menu.add(reverseOrderAction);
-			menu.add(legendAction);
-			menu.add(new Separator());
-
-			menu.add(colorSelectedFeatureAction);
-			colorSelectedFeatureAction.setEnabled(false);
-			menu.add(new Separator());
+			menu.add(legendAction);				
 		}
+	
+		boolean isEmpty = true;
+		for(Object obj : ((StructuredSelection) getSelection()).toArray())
+			if(obj instanceof FeatureEditPart) isEmpty = false;
+		if(!isEmpty){
+			menu.add(new Separator());
+			menu.add(colorSelectedFeatureAction);
+		}
+	
+		
+		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
