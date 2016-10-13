@@ -20,32 +20,20 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_FEATUREIDE_NATURE;
-
-import java.util.List;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.wizards.datatransfer.FileSystemImportWizard;
-import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
-import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * TODO description
+ * Wizard for the corresponding {@link ImportFeatureHouseProjectPage}
+ * 
  * 
  * @author Anna-Liisa
  */
@@ -70,10 +58,6 @@ public class ImportFeatureHouseProjectWizard extends BasicNewProjectResourceWiza
 		this.workbench = workbench;
         this.selection = selection;
 
-//        List selectedResources = IDE.computeSelectedResources(selection);
-//        if (!selectedResources.isEmpty()) {
-//            this.selection = new StructuredSelection(selectedResources);
-//        }
 		
 		final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
 		if (res != null) {
@@ -86,7 +70,7 @@ public class ImportFeatureHouseProjectWizard extends BasicNewProjectResourceWiza
 
 	@Override
 	public void addPages() {
-		// addPage(new ConversionPage(selection));
+		
 		setWindowTitle("Import FeatureHouse Project into JavaProject");
 		page = new ImportFeatureHouseProjectPage(workbench, selection);
 		Shell shell = getShell();
@@ -94,16 +78,10 @@ public class ImportFeatureHouseProjectWizard extends BasicNewProjectResourceWiza
 			shell.setImage(colorImage);
 		}
 		addPage(page);
-		//super.addPages();
+		
 	}
 
 	public boolean performFinish() {
-//		if (page.hasCompositionTool() && project.isOpen()) {
-//			CorePlugin.setupProject(project, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(), page.getBuildPath());
-//			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, project.getFile("model.xml"));
-//			return true;
-//		}
-//		return false;
 		return page.finish();
 	}
 

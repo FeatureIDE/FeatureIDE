@@ -35,9 +35,9 @@ import de.ovgu.featureide.ui.wizards.ConversionWizard;
 import de.ovgu.featureide.ui.wizards.ImportFeatureHouseProjectWizard;
 
 /**
- * TODO description
+ * Handler for the {@link ImportFeatureHouseProjectWizard}
  * 
- * @author Anna-Liisa
+ * @author Anna-Liisa Ahola
  */
 public class ImportFeatureHouseProjectHandler extends ASelectionHandler implements SelectionListener{
 
@@ -108,7 +108,7 @@ public class ImportFeatureHouseProjectHandler extends ASelectionHandler implemen
 	 */
 	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 

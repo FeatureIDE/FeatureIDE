@@ -73,6 +73,9 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
  * @author Christoph Giesel
  * @author Marcus Kamieth
  * @author Marcus Pinnecke (Feature Interface)
+ * @author Max Homann
+ * @author Anna-Liisa Ahola
+ * 
  */
 public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
@@ -529,17 +532,37 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	public void postProcess(IFolder folder) {}
 
 	/**
-	 * Reads the features from a folder containing files.
+	 * Creates the FeatureModel from preprocessor files and creates the model.xml
+	 * 
 	 * @param folder
-	 * @param performFullBuild
+	 */
+	public void createFeatureModelFromPreprocessorFiles(IFolder folder){
+		PPModelBuilder ppModelBuilder = new PPModelBuilder(featureProject);
+		try{
+			readFeatureModelFromFolder(folder, ppModelBuilder);
+		} catch (CoreException e){
+			e.printStackTrace();
+		}
+		
+		fillModelWithFeatures();
+		
+		FileHandler.save(Paths.get(featureProject.getModelFile().getLocationURI()), featureProject.getFeatureModel(), new XmlFeatureModelFormat());
+		
+		
+	}
+	/**
+	 * Reads the FSTFeatures into a FSTModel from a Preprocessor folder containing files.
+	 * 
+	 * @param folder  where the files, which should be parsed into an FSTModel, are stored
+	 * @param ppModelBuilder
 	 * @throws CoreException
 	 */
-	public void readFeatureModelFromFolder(IFolder folder) throws CoreException {
-		PPModelBuilder ppModelBuilder = new PPModelBuilder(featureProject);
+	private void readFeatureModelFromFolder(IFolder folder, PPModelBuilder ppModelBuilder) throws CoreException {
+		
 		for(final IResource res: folder.members()){
 			if (res instanceof IFolder) {
 				// for folders do recursively 
-				readFeatureModelFromFolder((IFolder) res);
+				readFeatureModelFromFolder((IFolder) res, ppModelBuilder);
 			} else if (res instanceof IFile) {
 				IFile file = (IFile) res;
 				final Vector<String> lines = loadStringsFromFile(file);
@@ -547,16 +570,17 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 				ppModelBuilder.addNonExistingDirectivesToModel(directives, file, directives.getClass().getName());
 			}
 		}
-		fillModelWithFeatures();
-		FileHandler.save(Paths.get(featureProject.getModelFile().getLocationURI()), featureProject.getFeatureModel(), new XmlFeatureModelFormat());	
+		
+	
+			
 	}
 	
 	/**
-	 * @param featureProject
-	 * @param featureModel
+	 * Fills the FeatureModel from a given FSTModel
+	 * 
 	 */
 	private void fillModelWithFeatures() {
-		System.err.println(" Filling");
+		
 		IFeatureModel featureModel = featureProject.getFeatureModel();
 		IFeature rootFeature = featureModel.getFeature(featureProject.getProjectName());
 		FSTModel fstModel = featureProject.getFSTModel();

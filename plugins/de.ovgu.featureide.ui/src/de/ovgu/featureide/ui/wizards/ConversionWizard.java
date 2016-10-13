@@ -35,6 +35,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -46,6 +47,8 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  * @author Sebastian Krieter
+ * @author Max Homann
+ * @author Anna-Liisa Ahola
  */
 public class ConversionWizard extends Wizard implements INewWizard {
 
@@ -70,22 +73,15 @@ public class ConversionWizard extends Wizard implements INewWizard {
 				e1.printStackTrace();
 			}
             final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
-			IComposerExtension composerExtension = ComposerExtensionManager.getInstance().getComposerById(page.getCompositionTool().getId());
-			
+
 			if (featureProject == null) {
 				System.err.println(" FeatureProject not found");
-				return false;
-			}
-			
-			IComposerExtensionClass composerExtensionClass = composerExtension.getComposerByProject(featureProject);
-			PPComposerExtensionClass ppComposerExtensionClass = (PPComposerExtensionClass) composerExtensionClass;
-
-			try {
-				ppComposerExtensionClass.readFeatureModelFromFolder(featureProject.getBuildFolder());
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-			
+			} else if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
+				IComposerExtension composerExtension = ComposerExtensionManager.getInstance().getComposerById(page.getCompositionTool().getId());
+				PPComposerExtensionClass ppComposerExtensionClass = (PPComposerExtensionClass) composerExtension.getComposerByProject(featureProject);;
+	
+				ppComposerExtensionClass.createFeatureModelFromPreprocessorFiles(featureProject.getBuildFolder());
+            }
 			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, project.getFile("model.xml"));
 			return true;
 			

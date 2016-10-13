@@ -230,10 +230,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	@Override
 	protected void createSourceGroup(Composite parent) {
 		
-//	    checkButton = new Button(parent, SWT.CHECK | SWT.RIGHT);
-//	    checkButton.setText(ADD_EXISTING_FOLDERS);
-//	    
-//	    checkButton.addSelectionListener(new ImportFeatureHouseProjectHandler(parent));
+
 
 	    super.createRootDirectoryGroup(parent);
         super.createFileSelectionGroup(parent);
@@ -271,6 +268,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		//In the Wizard selected resources for import
 		Iterator selecetedRessources = super.getSelectedResources().iterator();
 		List<FileSystemElement> selectedFilesForImport = new ArrayList<FileSystemElement>();
+		List<FileSystemElement> filesToDeleteFromImportList = new ArrayList<FileSystemElement>();
 
 		while (selecetedRessources.hasNext()) {
 			FileSystemElement fileElement = ((FileSystemElement) selecetedRessources.next());
@@ -283,11 +281,8 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		//Searches if their exists a .model or .m file in the for import selected file system
 		for (FileSystemElement element : selectedFilesForImport) {
 			if (element.getFileNameExtension().equals("m") || element.getFileNameExtension().equals("model")) {
-
 				modelFile = (File) element.getFileSystemObject();
-
-				selectedFilesForImport.remove(modelFile);
-
+				filesToDeleteFromImportList.add(element);
 			}
 		}
 		
@@ -333,15 +328,26 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 				
 				try {
 					doFinish(configFolder, configFileName, configFile);
-					selectedFilesForImport.remove(configFile);
+					filesToDeleteFromImportList.add(f);
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-	
+		
+		
+		if(!(filesToDeleteFromImportList.isEmpty())){
+			for(FileSystemElement fileToRemove: filesToDeleteFromImportList){
+				selectedFilesForImport.remove(fileToRemove);
+			}
+		}
 		importFileSystem(selectedFilesForImport, featureProject);
-				
+			
+		
+	   /*
+	    * If no modelFile exists in the imported Filesystem, 
+	    * the model will be created corresponding to the structure of the imported features folders
+	    */
 		if (modelFile == null) {
 			fillModelwithFeatures(featureProject, featureModel);
 		}
@@ -350,6 +356,9 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 	}
 
 	/**
+	 * Creates a FeatureModel and the corresponding model.xml from the structure of the features folder
+	 * 
+	 * 
 	 * @param featureProject
 	 * @param featureModel
 	 */
@@ -462,10 +471,16 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		IDE.openEditor(page, outputFile);
 	}
 	
+	/**
+	 * Saves the config file
+	 * 
+	 * @param container
+	 * @param fileName
+	 * @param configFile
+	 * @throws CoreException
+	 */
 	private void doFinish(IContainer container, String fileName, File configFile) throws CoreException {
-		// create a sample file
-		//monitor.beginTask(CREATING + fileName, 2);
-		
+
 		final IFile file = container.getFile(new Path(fileName));
 		try{
 			FileInputStream fileInputStream = new FileInputStream(configFile);
@@ -478,27 +493,10 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		} catch (IOException e){
 			e.printStackTrace();
 		}
-		
-//		monitor.worked(1);
-//		monitor.setTaskName("opening");
-		
-//		getShell().getDisplay().asyncExec(new Runnable() {
-//			public void run() {
-//				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//				try {
-//					IDE.openEditor(page, file, true);
-//				} catch (PartInitException e) {
-//				}
-//			}
-//		});
-//		monitor.worked(1);
-				
-		
+	
 	}
 	
 	
-	
-
 	/**
 	 * Import the resources with extensions as specified by the user
 	 * 
@@ -516,7 +514,6 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		
 		ImportOperation operation;
 		
-
 		File sourceDirectory = getSourceDirectory();
 
 		IPath path = getContainerFullPath().append(featureProject.getSourceFolder().getName());
@@ -534,7 +531,6 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
      */
     @Override
     protected boolean executeImportOperation(ImportOperation op) {
-        //initializeOperation(op);
 
         try {
             getContainer().run(true, true, op);
