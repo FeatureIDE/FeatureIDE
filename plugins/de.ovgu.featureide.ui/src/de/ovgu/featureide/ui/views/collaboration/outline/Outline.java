@@ -98,8 +98,10 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -595,11 +597,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 													treeListener.setFeatureModel(((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel());
 													if (syncCollapsedFeaturesToggle) {
 														FmTreeContentProvider contentProvider = (FmTreeContentProvider) viewer.getContentProvider();
-														ArrayList<IFeature> expandedElements = new ArrayList<>();
+														ArrayList<Object> expandedElements = new ArrayList<>();
 														for (IFeature f : contentProvider.getFeatureModel().getFeatures()) {
 															if (f.getStructure().hasChildren() && !f.getStructure().isCollapsed())
 																expandedElements.add(f);
 														}
+														expandedElements.add("Constraints");
 														viewer.setExpandedElements(expandedElements.toArray());
 													}
 												}

@@ -586,6 +586,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	
 	private void createCollapsedSymbol(int row, String toolTip) {
 		final CollapsedDecoration collapsedDecoration = new CollapsedDecoration();
+		collapsedDecoration.setSize(collapsedDecoration.getBounds().width, collapsedDecoration.getBounds().height-1);
 		Point target = new Point(5 + SYMBOL_SIZE / 2, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE/5);
 		collapsedDecoration.setToolTip(createToolTipContent(toolTip));
 		collapsedDecoration.setLocation(target);
