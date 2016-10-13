@@ -970,8 +970,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
 			reload();
-			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
+			graphicalFeatureModel.init();
+			setContents(graphicalFeatureModel);
+			internRefresh(true);
+			featureModelEditor.setPageModified(true);
+			refreshAll();
 			break;
 		case MODEL_DATA_LOADED:
 		case MODEL_DATA_CHANGED:
