@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.views.configMap.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;

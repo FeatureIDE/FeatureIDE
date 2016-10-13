@@ -62,6 +62,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.listeners.IConfigurationChangedListener;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -295,6 +296,13 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 				if (event.getEventType() == FeatureIDEEvent.EventType.COLOR_CHANGED)
 					updateTree();
 			}
+		});		
+		
+		CorePlugin.getDefault().addConfigurationChangedListener(new IConfigurationChangedListener(){
+			@Override
+			public void configurationChanged(IFeatureProject featureProject) {
+				refresh();				
+			}			
 		});
 
 		createToolbar();
@@ -518,6 +526,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	public List<Configuration> getConfigurations() {
+		if (this.configurations == null) return this.configurations;
 		return Collections.unmodifiableList(this.configurations);
 	}
 
