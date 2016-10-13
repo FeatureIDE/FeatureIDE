@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_TO_EDITOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_TO_EDITOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DIAGRAM;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
@@ -32,7 +32,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIO
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_TO_EDITOR;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -109,6 +108,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
@@ -130,8 +130,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
-
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
@@ -186,7 +184,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private CollapseSiblingsAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private CollapseAllAction expandAllAction;
-	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private HiddenAction hiddenAction;
