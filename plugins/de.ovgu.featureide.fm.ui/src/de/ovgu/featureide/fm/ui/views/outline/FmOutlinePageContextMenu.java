@@ -320,12 +320,15 @@ public class FmOutlinePageContextMenu {
 			if (sel.equals(CONSTRAINTS))
 				manager.add(ccAction);
 
+		checkForColorableFeatures(manager, sel);
+	}
+	
+	private void checkForColorableFeatures(IMenuManager manager, Object sel){
 		if (sel instanceof RoleElement && !(sel instanceof FSTDirective)) {
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			List<IFeature> featureList = new ArrayList<>();	
 			
 			for(Object obj : ((IStructuredSelection) viewer.getSelection()).toArray()){
-				@SuppressWarnings("rawtypes")
 				RoleElement method = (RoleElement) obj;
 				ITreeContentProvider contentProvider = (ITreeContentProvider) viewer.getContentProvider();
 				for(Object role : contentProvider.getChildren(method)){
