@@ -89,7 +89,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		}
 		LinkedList<IFeature> lastLevel = levels.getFirst();
 		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
-		int levelNo = 1;
 		for (LinkedList<IFeature> level : levels) {
 			/* if the last level is not null AND the level exceeds
 			 * neither the width nor the height of the editor
@@ -100,7 +99,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 				break;
 			}
 			lastLevel = level;
-			levelNo++;
 
 			//expand next level
 			for (IFeature f : level) {
@@ -117,12 +115,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 			((FeatureDiagramEditor) getEditor()).internRefresh(true);
 
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 
 			LinkedList<IFeature> testChild = new LinkedList<IFeature>();
 			for (IFeatureStructure child : f.getStructure().getChildren()) {

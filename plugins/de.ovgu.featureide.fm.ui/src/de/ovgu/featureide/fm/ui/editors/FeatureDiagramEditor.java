@@ -300,22 +300,30 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 */
 	public boolean isLevelSizeOverLimit(List<IFeature> list) {
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
-		double editorWidth = getFigureCanvas().getViewport().getSize().width * zoomManager.getZoom();
-		double editorHeight = getFigureCanvas().getViewport().getSize().height * zoomManager.getZoom();
-		
-		
+		double editorWidth = getFigureCanvas().getViewport().getSize().width / zoomManager.getZoom();
+		double editorHeight = getFigureCanvas().getViewport().getSize().height / zoomManager.getZoom();
+
+		double rootMidX = root.getLocation().x + root.getSize().width/2;
+		double rootMidY = root.getLocation().y - 10;
+
+		double borderLeft = rootMidX - editorWidth/2;
+		double borderRight = rootMidX + editorWidth/2;
+
 		for (IFeature f : list) {
 			IGraphicalFeature g = graphicalFeatureModel.getGraphicalFeature(f);
-			if ((g.getLocation().x + g.getSize().width) > editorWidth || g.getLocation().x < 0) {
+			if ((g.getLocation().x + g.getSize().width) > borderRight || g.getLocation().x < borderLeft) {
+				getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int)borderLeft, (int)rootMidY));
 				return true;
 			}
 			if ((g.getLocation().y + g.getSize().height) > editorHeight || g.getLocation().y < 0) {
+				getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int)borderLeft, (int)rootMidY));
 				return true;
 			}
 		}
 		return false;
 	}
 
+	
 	public void initializeGraphicalViewer() {
 		getControl().addControlListener(new ControlListener() {
 
