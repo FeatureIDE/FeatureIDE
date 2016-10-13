@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AdjustModelToEdi
 /**
  * TODO description
  * 
- * @author Maximilian Kühl
+ * @author Maximilian Kühl 	
  * @author Joshua Sprey
  */
 public class AdjustModelToEditorSizeAction extends Action {
@@ -67,7 +67,7 @@ public class AdjustModelToEditorSizeAction extends Action {
 		if(editor != null && editor instanceof FeatureDiagramEditor)
 		{
 			IGraphicalFeature graphicalRoot = FeatureUIHelper.getGraphicalFeature(root, editor.getGraphicalFeatureModel());
-			editor.centerPointOnScreen(graphicalRoot.getLocation().x, graphicalRoot.getLocation().y, -graphicalRoot.getSize().width/2, -graphicalRoot.getSize().height/2);
+			editor.centerPointOnScreen(graphicalRoot.getLocation().x + graphicalRoot.getSize().width/2, graphicalRoot.getLocation().y + graphicalRoot.getSize().height/2, 0 ,0);
 		}
 	}
 
