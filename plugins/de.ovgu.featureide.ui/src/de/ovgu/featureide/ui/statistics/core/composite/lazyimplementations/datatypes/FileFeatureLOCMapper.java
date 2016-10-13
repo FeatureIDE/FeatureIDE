@@ -35,12 +35,14 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
  * <table>
   <tr>
     <th>IFile | </th>
-    <th>loc by file | <br></th>
+    <th>loc by file | </th>
+    <th>Preprocessor loc | </th>
     <th>Map&lt;FSTFeature, loc by feature&gt;<br></th>
   </tr>
   <tr>
   	<th>Hello.java
   	<th>201
+  	<th>34
   	<th>(feat1, 101), (feat2, 100)
   </tr>
   </table>
@@ -53,6 +55,11 @@ public class FileFeatureLOCMapper {
 	private ArrayList<TableRow> table = new ArrayList<TableRow>();
 	private IFolder sourceFolder = null;
 	
+	/**
+	 * Creates a new FileFeatureLOCMapper instance with the 
+	 * source folder of the project
+	 * @param sourceFolder
+	 */
 	public FileFeatureLOCMapper(IFolder sourceFolder) {
 		this.sourceFolder = sourceFolder;
 	}
@@ -101,19 +108,16 @@ public class FileFeatureLOCMapper {
 		}
 	}
 	
+	/**
+	 * Adds the lines of code of all preprocessor statements of a file to the map
+	 * @param file the file where the loc are in
+	 * @param ppStatementLOC the loc
+	 */
 	public void addPPStatementLOC(IFile file, int ppStatementLOC) {
 		TableRow existingRow = searchRow(file);
 		if (existingRow != null) {
 			existingRow.ppStatementLoc = ppStatementLOC;
 		}
-	}
-	
-	public int getPPStatementLOC() {
-		int loc = 0;
-		for (TableRow row: table) {
-			loc += row.ppStatementLoc;
-		}
-		return loc;
 	}
 	
 	/**
@@ -176,9 +180,21 @@ public class FileFeatureLOCMapper {
 		
 		return extAndNumber;
 	}
+
+	/**
+	 * Returns the preprocessor statement lines of code of all files.
+	 * @return the loc of all preprocessor statements
+	 */
+	public int getPPStatementLOC() {
+		int loc = 0;
+		for (TableRow row: table) {
+			loc += row.ppStatementLoc;
+		}
+		return loc;
+	}
 	
 	/**
-	 * Returns a map of all extensions with the lines of code per extension
+	 * Returns a map of all extensions with the lines of code, per extension
 	 * @return
 	 */
 	public HashMap<String, Integer> getExtensionsWithLOC() {
@@ -197,7 +213,7 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
-	 * Returns a map of all extensions with the variable lines of code per extension
+	 * Returns a map of all extensions with the variable lines of code, per extension
 	 * @return
 	 */
 	public HashMap<String, Integer> getVariableLOCByExtension() {
@@ -219,6 +235,10 @@ public class FileFeatureLOCMapper {
 		return extAndNumber;
 	}
 	
+	/**
+	 * Returns a HashMap of all preprocessor statement lines of code, per extension.
+	 * @return
+	 */
 	public HashMap<String, Integer> getPPStatementLOCByExtension() {
 		HashMap<String, Integer> extAndNumber = new HashMap<>();
 		
@@ -235,7 +255,7 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
-	 * Returns a map of all extensions with the non-variable lines of code per extension
+	 * Returns a map of all extensions with the non-variable lines of code, per extension
 	 * @return
 	 */
 	public HashMap<String, Integer> getNonVariableLOCByExtension() {
@@ -261,7 +281,7 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
-	 * Returns a List of extensions in this map
+	 * Returns a list of extensions in this map
 	 * @return
 	 */
 	public ArrayList<String> getAllExtensions() {
@@ -276,9 +296,9 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
-	 * Returns a HashMap of files with the lines of code per file
+	 * Returns a HashMap of files with the lines of code per file as value
 	 * @param extension to select the files
-	 * @return
+	 * @return 
 	 */
 	public HashMap<IFile, Integer> getFilesWithLOCByExtension(String extension) {
 		HashMap<IFile, Integer> filesWithLOC = new HashMap<>();
@@ -309,6 +329,10 @@ public class FileFeatureLOCMapper {
 		return features;
 	}
 	
+	/**
+	 * Returns the number of features
+	 * @return
+	 */
 	public int getFeatureCount() {
 		int loc = 0;
 		for (TableRow row: table) {
@@ -338,7 +362,7 @@ public class FileFeatureLOCMapper {
 	}
 	
 	/**
-	 * Returns all files of this table
+	 * Returns all files in this table
 	 * @return
 	 */
 	public ArrayList<IFile> getFiles() {
@@ -351,6 +375,11 @@ public class FileFeatureLOCMapper {
 		return files;
 	}
 	
+	/**
+	 * Returns all features contained in a file
+	 * @param file containing features
+	 * @return
+	 */
 	public ArrayList<FSTFeature> getFeaturesByFile(IFile file) {
 		for (TableRow row: table) {
 			if (row.getFile().equals(file)) {
@@ -366,7 +395,7 @@ public class FileFeatureLOCMapper {
 	 * @param extension
 	 * @return
 	 */
-	public HashMap<FSTFeature, Integer> getFeaturesByExtensionWithLOC(String extension) {
+	public HashMap<FSTFeature, Integer> getFeaturesWithLOCByExtension(String extension) {
 		HashMap<FSTFeature, Integer> features = new HashMap<>();
 		
 		for (TableRow row: table) {
@@ -390,7 +419,7 @@ public class FileFeatureLOCMapper {
 	 * @param feature to look for
 	 * @return
 	 */
-	public HashMap<String, Integer> getExtensionsByFeatureWithLOC(FSTFeature feature) {
+	public HashMap<String, Integer> getExtensionsWithLOCByFeature(FSTFeature feature) {
 		HashMap<String, Integer> extensionsAndLOC = new HashMap<>();
 		
 		for (TableRow row: table) {
@@ -521,11 +550,7 @@ public class FileFeatureLOCMapper {
 				files.add(row.getFile());
 			}
 		}
-		if (files.size() > 0) {
-			return files;
-		} else {
-			return null;
-		}
+		return files;
 	}
 	
 	/**
