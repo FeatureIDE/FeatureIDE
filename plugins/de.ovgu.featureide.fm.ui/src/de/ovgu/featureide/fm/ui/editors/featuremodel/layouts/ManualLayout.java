@@ -33,19 +33,17 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class ManualLayout extends FeatureDiagramLayoutManager {
 
-	/**
-	 * @param manager
-	 */
 	public ManualLayout() {
 		super();
 	}
 
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			feature.setLocation(feature.getLocation());
+			setLocation(feature, feature.getLocation());
 		}
 		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
 			constraint.setLocation(constraint.getLocation());
 		}
 	}
+
 }

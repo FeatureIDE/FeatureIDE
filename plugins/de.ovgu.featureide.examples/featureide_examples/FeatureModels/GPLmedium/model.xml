@@ -196,11 +196,13 @@
 				</imp>
 			</rule>
 		</constraints>
+        <calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
 		<comments>
-			<c>* GPL domain model March 2006 */</c>
-			<c> grammar of feature model</c>
-			<c> implementation constraints </c>
-			<c> domain constraints</c>
-			<c> formatting</c>
+			<c>* GPL domain model March 2006 *</c>
+			<c>grammar of feature model</c>
+			<c>implementation constraints</c>
+			<c>domain constraints</c>
+			<c>formatting</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>

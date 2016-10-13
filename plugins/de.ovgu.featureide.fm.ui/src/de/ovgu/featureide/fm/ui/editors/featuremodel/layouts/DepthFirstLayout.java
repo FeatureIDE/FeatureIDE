@@ -57,7 +57,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		if (feature.getObject().getStructure().hasHiddenParent()) {
 			return 0;
 		}
-		feature.setLocation(new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
+		setLocation(feature, new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
 		int newX = x;
 		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
 			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();

@@ -112,7 +112,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	public FeatureOrderEditor featureOrderEditor;
 	public FeatureModelTextEditorPage textEditor;
 
-	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<IFeatureModelEditorPage>();
+	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<>();
 	public IFeatureModel featureModel;
 
 	ModelMarkerHandler<IFile> markerHandler;
@@ -169,6 +169,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return;
 		}
 
+		diagramEditor.doSave(monitor);
 		featureOrderEditor.doSave(monitor);
 		featureModel.getRenamingsManager().performRenamings(featureModel.getSourceFile());
 		for (IFeatureModelEditorPage page : extensionPages) {

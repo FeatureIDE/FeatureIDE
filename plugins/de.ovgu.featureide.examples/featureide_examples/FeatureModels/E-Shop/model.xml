@@ -633,5 +633,7 @@
 				</disj>
 			</rule>
 		</constraints>
+		<calculations Auto="false" Constraints="true" Features="true" Redundant="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>
