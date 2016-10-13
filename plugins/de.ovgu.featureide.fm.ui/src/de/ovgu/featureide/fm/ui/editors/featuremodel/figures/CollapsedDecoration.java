@@ -54,7 +54,6 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		graphicalFeature = parent;
 		setLayoutManager(layout);
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
-		//setBorder(FMPropertyManager.getFeatureBorder(false));
 
 		childrenCount.setFont(DEFAULT_FONT);
 		setDecoratorText("" + GetAllChildren(parent.getObject().getStructure()));
@@ -65,7 +64,6 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		super();
 		setLayoutManager(layout);
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
-		setBorder(FMPropertyManager.getFeatureBorder(false));
 
 		childrenCount.setFont(DEFAULT_FONT);
 		setDecoratorText("n");
