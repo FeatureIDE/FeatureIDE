@@ -1268,6 +1268,11 @@
         id="de.ovgu.featureide.fm.ui.colorscheme"
         name="Colorscheme">
   </command>
+  <command
+        defaultHandler="de.ovgu.featureide.ui.handlers.ImportFeatureHouseProjectHandler"
+        id="de.ovgu.featureide.ui.commands.ImportFeatureHouseProject"
+        name="ImportFeatureHouseCommand">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">

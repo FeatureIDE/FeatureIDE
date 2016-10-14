@@ -66,17 +66,25 @@ public class ConversionWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		if (page.hasCompositionTool() && project.isOpen()) {
+			
+			//TODO: Listener which informs that the process of setting up the project is finished should be implemented 
 			CorePlugin.setupProject(project, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(), page.getBuildPath());
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
+				
             final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
 
+            
 			if (featureProject == null) {
 				System.err.println(" FeatureProject not found");
-			} else if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
+				
+			} 
+			
+			//TODO: implementation of conversion of other preprocessor projects - at the moment only Antenna is supported
+			else if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR && featureProject.getComposer().getName().equals("Antenna")) {
 				IComposerExtension composerExtension = ComposerExtensionManager.getInstance().getComposerById(page.getCompositionTool().getId());
 				PPComposerExtensionClass ppComposerExtensionClass = (PPComposerExtensionClass) composerExtension.getComposerByProject(featureProject);;
 	
@@ -91,7 +99,7 @@ public class ConversionWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		// addPage(new ConversionPage(selection));
+		
 		setWindowTitle(ADD_FEATUREIDE_NATURE);
 		addPage(page);
 		super.addPages();

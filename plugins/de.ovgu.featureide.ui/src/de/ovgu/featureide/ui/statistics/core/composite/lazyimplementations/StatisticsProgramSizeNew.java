@@ -368,7 +368,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		
 		for (FSTClass fstClass: fstModel.getClasses()) {
 			for (FSTRole role: fstClass.getRoles()) {
-				if (role.getFile().equals(file)) {
+				if (role.getFile() != null && role.getFile().equals(file)) {
 					for (FSTDirective directive: role.getDirectives()) {
 						if (directive.getCommand().isOneLineStatement()) {
 							loc +=1;
