@@ -43,8 +43,8 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * The main page of the SelectColorSchemeWizard. It allows selecting a
  * color scheme and creating new ones.
  * 
- * @author Paul Maximilian Bittner
  * @author Niklas Lehnfeld
+ * @author Paul Maximilian Bittner
  */
 
 public class SelectColorSchemePage extends WizardPage {

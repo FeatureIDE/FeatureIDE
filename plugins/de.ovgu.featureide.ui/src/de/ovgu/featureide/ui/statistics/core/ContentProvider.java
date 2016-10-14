@@ -64,6 +64,11 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	public Parent godfather = new Parent("godfather", null);
 	private IFeatureProject project;
 	private boolean canceled;
+	
+	public ContentProvider(TreeViewer viewer) {
+		super();
+		this.viewer = viewer;
+	}
 
 	public boolean isCanceled() {
 		return canceled;
@@ -80,11 +85,6 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	}
-
-	public ContentProvider(TreeViewer viewer) {
-		super();
-		this.viewer = viewer;
 	}
 
 	@Override

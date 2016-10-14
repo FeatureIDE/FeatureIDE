@@ -20,12 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
-import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +50,6 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.IPageSite;
 
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
@@ -91,7 +84,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureCo
  * @author Marcus Pinnecke
  * @author Paul Maximilian Bittner
  * @author Niklas Lehnfeld
- * @authora Mohammed Mahhouk
+ * @author Mohammed Mahhouk
  */
 public class FmOutlinePageContextMenu {
 
@@ -100,7 +93,7 @@ public class FmOutlinePageContextMenu {
 	private TreeViewer viewer;
 	private IFeatureModel fInput;
 
-	private SetFeatureColorAction setFeatureColorAction;	
+	private SetFeatureColorAction setFeatureColorAction;
 	private HiddenAction hAction;
 	private MandatoryAction mAction;
 	private AbstractAction aAction;
@@ -114,7 +107,7 @@ public class FmOutlinePageContextMenu {
 	private OrAction oAction;
 	private AndAction andAction;
 	private AlternativeAction altAction;
-//	private ReverseOrderAction roAction;
+	//	private ReverseOrderAction roAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
 	public IDoubleClickListener dblClickListener;
@@ -128,16 +121,17 @@ public class FmOutlinePageContextMenu {
 		this(site, viewer, fInput);
 		this.fTextEditor = fTextEditor;
 	}
+
 	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput) {
 		this.site = site;
 		this.viewer = viewer;
 		this.fInput = fInput;
 		initContextMenu();
 	}
-	
+
 	private void initContextMenu() {
 		initActions();
-		addListeners();		
+		addListeners();
 		initMenuManager();
 	}
 
@@ -146,7 +140,7 @@ public class FmOutlinePageContextMenu {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
-				fillContextMenu(manager);
+				FmOutlinePageContextMenu.this.fillContextMenu(manager);
 			}
 		});
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
@@ -161,10 +155,12 @@ public class FmOutlinePageContextMenu {
 	private void initActions() {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, getFeatureModel());
 		setFeatureColorAction.addColorChangedListener(new IEventListener() {
+
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
-				viewer.refresh();	
-			}			
+				viewer.refresh();
+			}
+
 		});
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
@@ -175,11 +171,13 @@ public class FmOutlinePageContextMenu {
 		ecAction = new EditConstraintAction(viewer, fInput);
 		cAction = new CreateCompoundAction(viewer, fInput);
 		clAction = new CreateLayerAction(viewer, fInput);
-		if(fTextEditor != null)
+
+		if (fTextEditor != null)
 			reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
+
 		oAction = new OrAction(viewer, fInput);
 		//TODO _interfaces Removed Code
-//		roAction = new ReverseOrderAction(viewer, fInput);
+		//		roAction = new ReverseOrderAction(viewer, fInput);
 		andAction = new AndAction(viewer, fInput);
 		altAction = new AlternativeAction(viewer, fInput);
 
@@ -216,6 +214,7 @@ public class FmOutlinePageContextMenu {
 	 */
 	private void addListeners() {
 		viewer.addDoubleClickListener(dblClickListener);
+
 		if(fTextEditor != null)
 			viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 				@Override
@@ -250,7 +249,6 @@ public class FmOutlinePageContextMenu {
 						view.reveal(part);
 					}
 				}
-
 		});
 	}
 
@@ -262,7 +260,7 @@ public class FmOutlinePageContextMenu {
 	protected void fillContextMenu(IMenuManager manager) {
 		Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();		
 		setFeatureColorAction.setFeatureModel(fInput);
-		
+
 		if (sel instanceof FmOutlineGroupStateStorage) {
 			IFeature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
 			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
@@ -308,6 +306,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			//TODO _interfaces Removed Code
 //			manager.add(roAction);
+			manager.add(setFeatureColorAction);
 		}
 		if (sel instanceof IConstraint) {
 			manager.add(ccAction);
@@ -369,7 +368,6 @@ public class FmOutlinePageContextMenu {
 		}
 	}
 
-
 	/**
 	 * @param iToolBarManager
 	 */
@@ -377,19 +375,19 @@ public class FmOutlinePageContextMenu {
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
 	}
-	
-	public SetFeatureColorAction getSetFeatureAction(){
+
+	public SetFeatureColorAction getSetFeatureAction() {
 		return setFeatureColorAction;
 	}
-	
-	public FeatureModelEditor getFeatureModelEditor(){
+
+	public FeatureModelEditor getFeatureModelEditor() {
 		return fTextEditor;
 	}
-	
+
 	public IFeatureModel getFeatureModel() {
 		return fInput;
 	}
-	
+
 	public void setFeatureModel(IFeatureModel fm) {
 		fInput = fm;
 	}

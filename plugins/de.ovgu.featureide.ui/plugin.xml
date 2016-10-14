@@ -110,6 +110,14 @@
 				name="FeatureIDE Statistics"
 				restorable="true">
 		</view>
+  <view
+        category="FeatureIDE"
+        class="de.ovgu.featureide.ui.views.configMap.ConfigurationMap"
+        icon="icons/FeatureIconSmall.ico"
+        id="de.ovgu.featureide.ui.views.configMap"
+        name="Configuration Map"
+        restorable="true">
+  </view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.perspectives">

@@ -3,9 +3,15 @@
  *
  * This file is part of FeatureIDE.
  * 
+<<<<<<< HEAD
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
+=======
+ * FeatureIDE is free software: you can redistributeinitialSelectedColor/or modify
+ * it under the terms of the GNU LinitialSelectedColoreneral PuinitialSelectedColorcense as published by
+ * the FreinitialSelectedColorare Foundation, either version 3 of the License, or
+>>>>>>> bs_team3_configMap
  * (at your option) any later version.
  * 
  * FeatureIDE is distributed in the hope that it will be useful,
@@ -20,7 +26,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
-import static de.ovgu.featureide.fm.core.functional.Functional.toList;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
@@ -31,9 +36,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATU
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_SIBLINGS;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
@@ -54,15 +57,9 @@ import org.eclipse.swt.widgets.TableItem;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Sets the color of the features in the feature diagram.
@@ -107,7 +104,7 @@ public class SetFeatureColorDialog extends Dialog {
 	/**
 	 * Sets the minimal size and the text in the title of the dialog.
 	 * 
-	 * @param newshell          
+	 * @param newshell
 	 */
 	protected void configureShell(Shell newShell) {
 		newShell.setMinimumSize(new Point(500, 500));
@@ -122,8 +119,8 @@ public class SetFeatureColorDialog extends Dialog {
 
 	/**
 	 * Creates the general layout of the dialog.
-	 * 
-	 * @param parent     
+
+	 * @param parent
 	 */
 	protected Control createDialogArea(Composite parent) {
 		final Composite container = (Composite) super.createDialogArea(parent);

@@ -30,8 +30,8 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  * A simple wizard for selecting a color scheme and applying it.
  * If necessary, new color schemes can be created.
  * 
- * @author Paul Maximilian Bittner
  * @author Niklas Lehnfeld
+ * @author Paul Maximilian Bittner
  */
 public class SelectColorSchemeWizard extends Wizard {
 

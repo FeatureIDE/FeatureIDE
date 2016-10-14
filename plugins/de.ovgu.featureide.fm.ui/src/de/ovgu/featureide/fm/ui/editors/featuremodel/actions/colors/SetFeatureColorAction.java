@@ -22,17 +22,15 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.internal.resources.Folder;
-import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
@@ -145,9 +143,14 @@ public class SetFeatureColorAction extends Action {
 	}
 
 	/**
+<<<<<<< HEAD
 	 * Creates a featureList with the selected features of the feature diagram.
 	 * 
 	 * @param selection
+=======
+	 * @param selection
+	 *            Creates a featureList with the selected features of the feature diagram.
+>>>>>>> bs_team3_configMap
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {
@@ -217,26 +220,16 @@ public class SetFeatureColorAction extends Action {
 					}
 				}
 
-				IFeatureProject featureProject = null;
-				for (IFeatureProject projectToFind : CorePlugin.getFeatureProjects())
-					if (projectToFind.getFeatureModel() == featureModel)
-						featureProject = projectToFind;
 				try {
-					IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(featureProject.getProjectName());
-					/*for (IResource res : project.members()) {
-						if (res.getName().contains("src")) {
-							File srcDir = new File(ResourcesPlugin.getWorkspace().getRoot().getLocation().toString() + res.getFullPath().toOSString());
-							for (final File fileEntry : srcDir.listFiles()) {
-						        if (fileEntry.isDirectory()) {
-						            listFilesForFolder(fileEntry);
-						        } else {
-						            System.out.println(fileEntry.getName());
-						        }
-						    }
-						}
-					}*/
-					project.refreshLocal(IProject.DEPTH_INFINITE, null);
-				} catch (Exception e) {
+					IPath modelPath = new Path(featureModel.getSourceFile().getCanonicalPath());
+					IPath rootPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();					
+					IPath relPath = modelPath.makeRelativeTo(rootPath);
+					
+					IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(relPath);			
+					IFolder folder =  CorePlugin.getFeatureProject(file).getSourceFolder();
+					
+					CorePlugin.getDefault().fireFeatureFolderChanged(folder);
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
