@@ -733,7 +733,7 @@ public class StringTable {
 	public static final String LOC_BY_FEATURE = "LOC by feature";
 	public static final String NON_VARIABLE_LOC = "Non-Variable LOC";
 	public static final String VARIABLE_LOC = "Variable LOC (excludes preprocessor statements)";
-	public static final String PP_LOC = "Preprocessor statements LOC";
+	public static final String PP_LOC = "Preprocessor statement LOC";
 	public static final String LOC_BY_FILE = "LOC by file";
 	public static final String PROJECT_BASED__ = "Project based - ";
 	public static final String CALCULATE = "Calculate ";
