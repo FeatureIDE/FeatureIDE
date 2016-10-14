@@ -1,3 +1,4 @@
+
 import java.util.Random;
 import java.util.Vector;
 
@@ -396,7 +397,7 @@ public class Tank extends GameObject {
 		if (this.tankRichtung != 0 && !flachHeit)
 			fahrRichtung = tankRichtung;
 
-		// �߽���
+		// ?????
 		if (x_Koordinate < 0 || x_Koordinate > tankManager.screenWidth - objWidth
 				|| y_Koordinate < 0 || y_Koordinate > tankManager.screenHeight - objHeight) {
 			x_Koordinate = alteX_Koordinate;

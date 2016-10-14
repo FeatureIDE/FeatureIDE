@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="tracing/version1/TraceMyClasses.aj|tracing/version3/Trace.aj|tracing/version2/Trace.aj|tracing/version2/TraceMyClasses.aj|tracing/lib/AbstractTrace.aj|tracing/lib/TraceMyClasses.aj|tracing/version3/TraceMyClasses.aj" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>

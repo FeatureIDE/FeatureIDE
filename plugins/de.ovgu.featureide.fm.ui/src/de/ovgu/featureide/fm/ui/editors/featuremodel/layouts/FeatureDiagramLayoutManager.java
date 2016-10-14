@@ -64,6 +64,7 @@ abstract public class FeatureDiagramLayoutManager {
 		layoutFeatureModel(featureModel);
 		layoutHidden(featureModel);
 		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {
+			entry.getKey().setLocation(new Point(0,0));
 			entry.getKey().setLocation(entry.getValue());
 		}
 		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
@@ -107,6 +108,7 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * method to center the layout on the screen (horizontal only)
 	 */
+	@Deprecated
 	void centerLayoutX(IGraphicalFeatureModel featureModel) {
 		int mostRightFeatureX = Integer.MIN_VALUE;
 		int mostLeftFeatureX = Integer.MAX_VALUE;
@@ -121,7 +123,7 @@ abstract public class FeatureDiagramLayoutManager {
 		int width = mostRightFeatureX - mostLeftFeatureX;
 		int offset = mostRightFeatureX - ((controlWidth - width) / 2);
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			feature.setLocation(new Point(feature.getLocation().getCopy().x + offset, feature.getLocation().getCopy().y));
+			setLocation(feature, new Point(feature.getLocation().getCopy().x + offset, feature.getLocation().getCopy().y));
 		}
 	}
 

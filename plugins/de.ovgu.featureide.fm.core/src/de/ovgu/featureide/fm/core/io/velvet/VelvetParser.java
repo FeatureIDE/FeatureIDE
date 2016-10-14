@@ -1,27 +1,15 @@
-// $ANTLR 3.4 Velvet.g 2016-07-17 21:07:30
+// $ANTLR 3.4 Velvet.g 2016-10-13 10:01:30
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
-import org.antlr.runtime.BaseRecognizer;
-import org.antlr.runtime.BitSet;
-import org.antlr.runtime.DFA;
-import org.antlr.runtime.EarlyExitException;
-import org.antlr.runtime.MismatchedSetException;
-import org.antlr.runtime.NoViableAltException;
-import org.antlr.runtime.Parser;
-import org.antlr.runtime.ParserRuleReturnScope;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.RecognizerSharedState;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenStream;
-import org.antlr.runtime.tree.CommonTreeAdaptor;
-import org.antlr.runtime.tree.RewriteEarlyExitException;
-import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
-import org.antlr.runtime.tree.RewriteRuleTokenStream;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.runtime.tree.TreeAdaptor;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 
-import de.ovgu.featureide.fm.core.Logger;
+import org.antlr.runtime.*;
+import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.antlr.runtime.tree.*;
 
 
 @SuppressWarnings({"all", "warnings", "unchecked"})
@@ -123,7 +111,7 @@ public TreeAdaptor getTreeAdaptor() {
 
     @Override    
     public void emitErrorMessage(String msg) {
-    	Logger.logError(new Exception(msg));
+    	FMCorePlugin.getDefault().logError(new Exception(msg));
     }
     @Override    
     public void reportError(RecognitionException e) {
@@ -349,7 +337,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: IMPORT, name
+            // elements: name, IMPORT
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -447,11 +435,11 @@ public TreeAdaptor getTreeAdaptor() {
         Tree CONCEPT8_tree=null;
         Tree ID9_tree=null;
         Tree COLON10_tree=null;
+        RewriteRuleTokenStream stream_CONCEPT=new RewriteRuleTokenStream(adaptor,"token CONCEPT");
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_CONCEPT=new RewriteRuleTokenStream(adaptor,"token CONCEPT");
-        RewriteRuleSubtreeStream stream_conceptBaseExt=new RewriteRuleSubtreeStream(adaptor,"rule conceptBaseExt");
         RewriteRuleSubtreeStream stream_instanceImports=new RewriteRuleSubtreeStream(adaptor,"rule instanceImports");
+        RewriteRuleSubtreeStream stream_conceptBaseExt=new RewriteRuleSubtreeStream(adaptor,"rule conceptBaseExt");
         RewriteRuleSubtreeStream stream_interfaceImports=new RewriteRuleSubtreeStream(adaptor,"rule interfaceImports");
         RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
         try {
@@ -589,7 +577,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: ID, definitions, interfaceImports, instanceImports, CONCEPT, conceptBaseExt
+            // elements: interfaceImports, ID, CONCEPT, conceptBaseExt, definitions, instanceImports
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -698,9 +686,9 @@ public TreeAdaptor getTreeAdaptor() {
         Tree CINTERFACE19_tree=null;
         Tree ID20_tree=null;
         Tree COLON21_tree=null;
+        RewriteRuleTokenStream stream_CINTERFACE=new RewriteRuleTokenStream(adaptor,"token CINTERFACE");
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_CINTERFACE=new RewriteRuleTokenStream(adaptor,"token CINTERFACE");
         RewriteRuleSubtreeStream stream_conceptBaseExt=new RewriteRuleSubtreeStream(adaptor,"rule conceptBaseExt");
         RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
         try {
@@ -751,7 +739,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_definitions.add(definitions23.getTree());
 
             // AST REWRITE
-            // elements: conceptBaseExt, ID, definitions, CINTERFACE
+            // elements: conceptBaseExt, definitions, CINTERFACE, ID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -837,8 +825,8 @@ public TreeAdaptor getTreeAdaptor() {
         Tree ID24_tree=null;
         Tree COMMA25_tree=null;
         Tree ID26_tree=null;
-        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
+        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
 
         try {
             // Velvet.g:114:2: ( ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) )
@@ -971,8 +959,8 @@ public TreeAdaptor getTreeAdaptor() {
         Tree ID28_tree=null;
         Tree COMMA30_tree=null;
         Tree ID31_tree=null;
-        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
+        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_IMPORTINSTANCE=new RewriteRuleTokenStream(adaptor,"token IMPORTINSTANCE");
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         try {
@@ -1034,7 +1022,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: ID, name, IMPORTINSTANCE
+            // elements: ID, IMPORTINSTANCE, name
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1127,9 +1115,9 @@ public TreeAdaptor getTreeAdaptor() {
         Tree ID34_tree=null;
         Tree COMMA36_tree=null;
         Tree ID37_tree=null;
-        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleTokenStream stream_IMPORTINTERFACE=new RewriteRuleTokenStream(adaptor,"token IMPORTINTERFACE");
+        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         try {
             // Velvet.g:124:2: ( IMPORTINTERFACE ID name ( COMMA ID name )* -> ^( IMPORTINTERFACE ( ID name )+ ) )
@@ -1190,7 +1178,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: IMPORTINTERFACE, name, ID
+            // elements: ID, name, IMPORTINTERFACE
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1209,10 +1197,10 @@ public TreeAdaptor getTreeAdaptor() {
                 stream_IMPORTINTERFACE.nextNode()
                 , root_1);
 
-                if ( !(stream_name.hasNext()||stream_ID.hasNext()) ) {
+                if ( !(stream_ID.hasNext()||stream_name.hasNext()) ) {
                     throw new RewriteEarlyExitException();
                 }
-                while ( stream_name.hasNext()||stream_ID.hasNext() ) {
+                while ( stream_ID.hasNext()||stream_name.hasNext() ) {
                     adaptor.addChild(root_1, 
                     stream_ID.nextNode()
                     );
@@ -1220,8 +1208,8 @@ public TreeAdaptor getTreeAdaptor() {
                     adaptor.addChild(root_1, stream_name.nextTree());
 
                 }
-                stream_name.reset();
                 stream_ID.reset();
+                stream_name.reset();
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -1342,8 +1330,8 @@ public TreeAdaptor getTreeAdaptor() {
 
         Tree START_C40_tree=null;
         Tree END_C42_tree=null;
-        RewriteRuleTokenStream stream_END_C=new RewriteRuleTokenStream(adaptor,"token END_C");
         RewriteRuleTokenStream stream_START_C=new RewriteRuleTokenStream(adaptor,"token START_C");
+        RewriteRuleTokenStream stream_END_C=new RewriteRuleTokenStream(adaptor,"token END_C");
         RewriteRuleSubtreeStream stream_definition=new RewriteRuleSubtreeStream(adaptor,"rule definition");
         try {
             // Velvet.g:133:2: ( START_C definition END_C -> ^( DEF ( definition )? EMPTY ) )
@@ -1836,7 +1824,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: name, USE
+            // elements: USE, name
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1925,10 +1913,10 @@ public TreeAdaptor getTreeAdaptor() {
         Tree ABSTRACT61_tree=null;
         Tree FEATURE62_tree=null;
         Tree SEMI65_tree=null;
-        RewriteRuleTokenStream stream_ABSTRACT=new RewriteRuleTokenStream(adaptor,"token ABSTRACT");
         RewriteRuleTokenStream stream_MANDATORY=new RewriteRuleTokenStream(adaptor,"token MANDATORY");
-        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
         RewriteRuleTokenStream stream_FEATURE=new RewriteRuleTokenStream(adaptor,"token FEATURE");
+        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
+        RewriteRuleTokenStream stream_ABSTRACT=new RewriteRuleTokenStream(adaptor,"token ABSTRACT");
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
         try {
@@ -2063,7 +2051,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: definitions, MANDATORY, ABSTRACT, FEATURE, name
+            // elements: MANDATORY, ABSTRACT, definitions, FEATURE, name
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2165,8 +2153,8 @@ public TreeAdaptor getTreeAdaptor() {
 
         Tree START_C67_tree=null;
         Tree END_C69_tree=null;
-        RewriteRuleTokenStream stream_END_C=new RewriteRuleTokenStream(adaptor,"token END_C");
         RewriteRuleTokenStream stream_START_C=new RewriteRuleTokenStream(adaptor,"token START_C");
+        RewriteRuleTokenStream stream_END_C=new RewriteRuleTokenStream(adaptor,"token END_C");
         RewriteRuleSubtreeStream stream_groupType=new RewriteRuleSubtreeStream(adaptor,"rule groupType");
         RewriteRuleSubtreeStream stream_feature=new RewriteRuleSubtreeStream(adaptor,"rule feature");
         try {
@@ -2642,8 +2630,8 @@ public TreeAdaptor getTreeAdaptor() {
         VelvetParser.constraintOperand_return constraintOperand82 =null;
 
 
-        RewriteRuleSubtreeStream stream_constraintOperand=new RewriteRuleSubtreeStream(adaptor,"rule constraintOperand");
         RewriteRuleSubtreeStream stream_binaryOp=new RewriteRuleSubtreeStream(adaptor,"rule binaryOp");
+        RewriteRuleSubtreeStream stream_constraintOperand=new RewriteRuleSubtreeStream(adaptor,"rule constraintOperand");
         try {
             // Velvet.g:180:2: ( constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) )
             // Velvet.g:180:4: constraintOperand ( binaryOp constraintOperand )*
@@ -2694,7 +2682,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: constraintOperand, binaryOp
+            // elements: binaryOp, constraintOperand
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2787,8 +2775,8 @@ public TreeAdaptor getTreeAdaptor() {
 
         Tree START_R84_tree=null;
         Tree END_R86_tree=null;
-        RewriteRuleTokenStream stream_END_R=new RewriteRuleTokenStream(adaptor,"token END_R");
         RewriteRuleTokenStream stream_START_R=new RewriteRuleTokenStream(adaptor,"token START_R");
+        RewriteRuleTokenStream stream_END_R=new RewriteRuleTokenStream(adaptor,"token END_R");
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         RewriteRuleSubtreeStream stream_unaryOp=new RewriteRuleSubtreeStream(adaptor,"rule unaryOp");
         RewriteRuleSubtreeStream stream_constraintDefinition=new RewriteRuleSubtreeStream(adaptor,"rule constraintDefinition");
@@ -2882,7 +2870,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: name, constraintDefinition, unaryOp
+            // elements: name, unaryOp, constraintDefinition
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2991,10 +2979,10 @@ public TreeAdaptor getTreeAdaptor() {
 
         Tree SEMI92_tree=null;
         RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
-        RewriteRuleSubtreeStream stream_intAttribute=new RewriteRuleSubtreeStream(adaptor,"rule intAttribute");
-        RewriteRuleSubtreeStream stream_stringAttribute=new RewriteRuleSubtreeStream(adaptor,"rule stringAttribute");
         RewriteRuleSubtreeStream stream_floatAttribute=new RewriteRuleSubtreeStream(adaptor,"rule floatAttribute");
+        RewriteRuleSubtreeStream stream_stringAttribute=new RewriteRuleSubtreeStream(adaptor,"rule stringAttribute");
         RewriteRuleSubtreeStream stream_boolAttribute=new RewriteRuleSubtreeStream(adaptor,"rule boolAttribute");
+        RewriteRuleSubtreeStream stream_intAttribute=new RewriteRuleSubtreeStream(adaptor,"rule intAttribute");
         try {
             // Velvet.g:189:2: ( ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? ) )
             // Velvet.g:189:4: ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI
@@ -3088,7 +3076,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: stringAttribute, floatAttribute, intAttribute, boolAttribute
+            // elements: floatAttribute, boolAttribute, stringAttribute, intAttribute
             // token labels: 
             // rule labels: retval
             // token list labels: 

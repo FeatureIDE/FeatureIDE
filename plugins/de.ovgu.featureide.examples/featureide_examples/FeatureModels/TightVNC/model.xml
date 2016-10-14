@@ -57,13 +57,15 @@
 				</imp>
 			</rule>
 		</constraints>
+        <calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
 		<comments>
-			<c> non-grammar constraints</c>
-			<c> annotations</c>
+			<c>non-grammar constraints</c>
+			<c>annotations</c>
 			<c>Type { disp="TightVNC" }</c>
 			<c>Opt { disp="Options" }</c>
 			<c>MOpt { disp="Menu Option" }</c>
 			<c>BOpt { disp="Button Option" }</c>
 			<c>OpSubFeat { disp="Hidden" }</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>

@@ -34,6 +34,8 @@ import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 /**
  * Reads / Writes a feature graph.
  * 
+ *TODO: AL
+ * 
  * @author Sebastian Krieter
  */
 public class FeatureGraphFormat implements IFeatureGraphFormat {

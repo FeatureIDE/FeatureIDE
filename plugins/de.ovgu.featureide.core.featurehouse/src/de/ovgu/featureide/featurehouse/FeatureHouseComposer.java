@@ -734,8 +734,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			IFeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
-			@SuppressWarnings("deprecation")
-			Main fuji = new Main(fujiOptions, new de.ovgu.featureide.fm.core.FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
+			Main fuji = new Main(fujiOptions, fm, FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
 			
 			Composition composition = fuji.getComposition(fuji);
 			ast = composition.composeAST();

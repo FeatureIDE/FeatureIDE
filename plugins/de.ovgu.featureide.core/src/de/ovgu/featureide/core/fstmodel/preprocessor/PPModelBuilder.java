@@ -63,6 +63,7 @@ public class PPModelBuilder {
 	protected final IFeatureProject featureProject;
 
 	protected FSTModelForPP model;
+
 	protected FSTModel modelOutline;
 	protected Collection<String> featureNames = Collections.emptyList();
 	
@@ -92,6 +93,20 @@ public class PPModelBuilder {
 	}
 	
 	protected IFile currentFile = null;
+	
+	/**
+	 * @return the model
+	 */
+	public FSTModelForPP getModel() {
+		return model;
+	}
+
+	/**
+	 * @param model the model to set
+	 */
+	public void setModel(FSTModelForPP model) {
+		this.model = model;
+	}
 
 	/**
 	 * @param folder
@@ -129,11 +144,12 @@ public class PPModelBuilder {
 		}
 	}
 
-	private void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
+	public void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
 		for (FSTDirective d : list) {
 			for (String featureName : d.getFeatureNames()) {
 				if(!featureNames.contains(featureName))
 					continue;
+				
 				FSTRole role = model.addRole(featureName, className, res);//addRole(getFeatureName(d.getExpression()), res.getName(), res);
 				role.add(d);
 				addDirectivesToModel(d.getChildrenList(), res, className);
@@ -141,7 +157,30 @@ public class PPModelBuilder {
 			
 		}
 	}
+	
+	/**
+	 * Adds all non existing directives to the FSTModelForPP instance.
+	 * @param list
+	 * @param res
+	 */
+	public void addNonExistingDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
+		for (FSTDirective d : list) {
+			for (String featureName : d.getFeatureNames()) {
+				if(featureNames.contains(featureName))
+					continue;
+				
+				FSTRole role = model.addRole(featureName, className, res);
+				role.add(d);
+				addNonExistingDirectivesToModel(d.getChildrenList(), res, className);
+			}
+			
+		}
+	}
 
+	public void addRoleElementsToDirectives2(LinkedList<FSTDirective> directives, IFile res, String className) {
+		addRoleElementsToDirectives(directives, res, className);
+	}
+	
 	private void addRoleElementsToDirectives(LinkedList<FSTDirective> directives, IFile res, String className) {
 		for (FSTDirective fstDirective : directives) {
 			List<AbstractSignature> addedSig = new ArrayList<>();
