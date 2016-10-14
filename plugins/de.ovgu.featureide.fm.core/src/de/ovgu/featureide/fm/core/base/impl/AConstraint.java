@@ -58,7 +58,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	protected Node propNode;
 	boolean featureSelected;
 	boolean isImplicit;
-
+	boolean isCollapsed;
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
@@ -100,7 +100,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	@Override
 	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers) {
-		
+
 		final Collection<IFeature> deadFeatures;
 		final Node propNode = getNode();
 		final Comparator<IFeature> featComp = new FeatureComparator(true);
@@ -140,9 +140,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean isCollapsed() {
+		if (isCollapsed)
+			return true;
 		for (final IFeature f : getContainedFeatures()) {
 			if (!f.getStructure().hasCollapsedParent()) {
 				return false;
@@ -179,6 +181,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	}
 
 	@Override
+	public void setCollapsed(boolean collapse) {
+		isCollapsed = collapse;
+	}
+
+	@Override
 	public boolean setFalseOptionalFeatures(IFeatureModel featureModel, Collection<IFeature> collection) {
 		falseOptionalFeatures.clear();
 		falseOptionalFeatures.addAll(featureModel.getAnalyser().getFalseOptionalFeatures(collection));
@@ -191,7 +198,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		falseOptionalFeatures.clear();
 		this.falseOptionalFeatures.addAll(Functional.toList(foFeatures));
 	}
-	
+
 	public void setNode(Node node) {
 		this.propNode = node;
 	}

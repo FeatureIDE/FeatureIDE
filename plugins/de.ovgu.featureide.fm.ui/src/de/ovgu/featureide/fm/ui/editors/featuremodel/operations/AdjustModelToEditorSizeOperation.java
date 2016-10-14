@@ -23,9 +23,9 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_TO_EDITOR;
 
 import java.util.LinkedList;
-
 import org.eclipse.core.commands.ExecutionException;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -79,6 +79,13 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 * @param root the root feature of the graphical feature model.
 	 */
 	public void calculateVisibleLayer(IFeature root) {
+		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
+		for (IConstraint ic : featureModel.getConstraints())
+		{
+			ic.setCollapsed(true);
+		}
+		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+		
 		LinkedList<LinkedList<IFeature>> levels = calculateLevels(root);
 		CollapseAllOperation op = new CollapseAllOperation(featureModel, true);
 		try {
@@ -87,7 +94,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			e.printStackTrace();
 		}
 		LinkedList<IFeature> lastLevel = levels.getFirst();
-		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
 		for (LinkedList<IFeature> level : levels) {
 			/* if the last level is not null AND the level exceeds
 			 * neither the width nor the height of the editor
@@ -135,6 +141,13 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 			((FeatureDiagramEditor) getEditor()).internRefresh(true);
 		}
+		
+
+		for (IConstraint ic : featureModel.getConstraints())
+		{
+			ic.setCollapsed(false);
+		}
+		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 	}
 
 	/**
