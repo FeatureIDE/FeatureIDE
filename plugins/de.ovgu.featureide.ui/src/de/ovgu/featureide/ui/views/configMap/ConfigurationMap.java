@@ -175,7 +175,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		this.defaultColumnWidth = 40;
 		selectedColumnIndex = -1;
 
-		openFileAction = new OpenFileAction("Open..");
+		openFileAction = new OpenFileAction("Open Config");
 		openFileAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("ConfigurationIcon.png")));
 
 		this.loader = new ConfigurationLoader(configLoaderCallback);
@@ -288,7 +288,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 		setEditor(page.getActiveEditor());
 
-		setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel(), this.featureProject);
+		setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
 		setFeatureColor.addColorChangedListener(new IEventListener() {
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
