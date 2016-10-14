@@ -23,6 +23,8 @@ package de.ovgu.featureide.ui.wizards;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_SPECIFIED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_VALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILESYSTEM_IMPORT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATUREHOUSE_PROJECT_WORKSPACE;
 
 import java.io.File;
 import java.io.FileInputStream;
