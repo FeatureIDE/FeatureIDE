@@ -29,9 +29,8 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 
 /**
- * TODO description
- * 
- * @author gruppe40
+ * @author Paul Maximilian Bittner
+ * @author Antje Moench
  */
 public class FeatureInAllConfigsFilter extends ConfigurationMapFilter {
 

@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * TODO description
+ * ContentProvider for the tree ConfigurationMap 
  * 
  * @author Paul Maximilian Bittner
  * @author Antje Moench

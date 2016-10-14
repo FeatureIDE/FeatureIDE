@@ -28,10 +28,9 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilterable;
 
-/**
- * TODO description
- * 
- * @author gruppe40
+/** 
+ * @author Paul Maximilian Bittner
+ * @author Antje Moench
  */
 public class ConfigMapFilterAction extends Action {
 	private IConfigurationMapFilter filter;

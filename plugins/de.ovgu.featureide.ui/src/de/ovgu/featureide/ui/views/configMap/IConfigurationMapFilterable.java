@@ -21,7 +21,7 @@
 package de.ovgu.featureide.ui.views.configMap;
 
 /**
- * TODO description
+ * Interface to allow usage of IConfigurationMapFilters.
  * 
  * @author Paul Maximilian Bittner
  */

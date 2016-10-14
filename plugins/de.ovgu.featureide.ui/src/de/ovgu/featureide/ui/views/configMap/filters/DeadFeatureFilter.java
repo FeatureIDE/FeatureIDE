@@ -29,9 +29,8 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 
 /**
- * TODO description
- * 
- * @author gruppe40
+ * @author Paul Maximilian Bittner
+ * @author Antje Moench
  */
 public class DeadFeatureFilter extends ConfigurationMapFilter {
 	private List<IFeature> deadFeatures;

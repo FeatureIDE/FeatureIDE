@@ -21,9 +21,10 @@
 package de.ovgu.featureide.ui.views.configMap;
 
 /**
- * TODO description
+ * Default implementation for IConfigurationFilter
  * 
- * @author gruppe40
+ * @author Paul Maximilian Bittner
+ * @author Antje Moench
  */
 public abstract class ConfigurationMapFilter implements IConfigurationMapFilter {
 	protected final static String Image_Empty = "undefined.ico";

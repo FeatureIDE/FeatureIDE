@@ -41,9 +41,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * TODO description
- * 
- * @author gruppe40
+ * @author Paul Maximilian Bittner
+ * @author Antje Moench
  */
 public class CustomTableHeader extends Canvas implements PaintListener, MouseListener, ISelectionProvider {
 	private List<CustomColumnStyle> columnStyles;

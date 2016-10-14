@@ -26,9 +26,11 @@ import java.nio.file.Path;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
- * TODO description
+ * Callback for ConfigurationLoader. 
+ * Gets notified for progress of loading configurations
  * 
- * @author gruppe40
+ * @author Paul Maximilian Bittner
+ * @author Antje Moench
  */
 public interface IConfigurationLoaderCallback {
 	public void onLoadingStarted();

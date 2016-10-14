@@ -36,21 +36,38 @@ import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
- * TODO description
+ * This class loads all configurations of a given IFeatureModel.
  * 
  * @author Paul Maximilian Bittner
- * @author Sebastian Krieter
  * @author Antje Moench
+ * @author Sebastian Krieter
  */
 public class ConfigurationLoader {
 	private IConfigurationLoaderCallback callback;
+	private boolean propagateConfigs;
 
 	public ConfigurationLoader() {
 		this(null);
 	}
 
 	public ConfigurationLoader(IConfigurationLoaderCallback callback) {
+		this(callback, false);
+	}
+
+	public ConfigurationLoader(IConfigurationLoaderCallback callback, boolean propagateConfigs) {
 		this.callback = callback;
+		this.propagateConfigs = propagateConfigs;
+	}
+	
+	/**
+	 * @return If the configfs should be propagated. The default value is false.
+	 */
+	public boolean isPropagatingConfigs() {
+		return propagateConfigs;
+	}
+
+	public void setPropagateConfigs(boolean propagateConfigs) {
+		this.propagateConfigs = propagateConfigs;
 	}
 
 	public List<Configuration> loadConfigurations(IFeatureModel featureModel, String path) {
@@ -78,7 +95,7 @@ public class ConfigurationLoader {
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
 			for (Path configPath : directoryStream) {
-				Configuration currentConfiguration = new Configuration(featureModel, false);
+				Configuration currentConfiguration = new Configuration(featureModel, propagateConfigs);
 				
 				fileHandler.setObject(currentConfiguration);
 				fileHandler.read(configPath, ConfigurationManager.getFormat(configPath.toString()));

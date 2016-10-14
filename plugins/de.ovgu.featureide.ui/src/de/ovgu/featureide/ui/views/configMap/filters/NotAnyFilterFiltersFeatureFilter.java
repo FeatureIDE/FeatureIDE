@@ -28,9 +28,11 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 
 /**
- * TODO description
+ * A Filter that only allows Features, that aren't allowed by any of the given
+ * Filters.
  * 
- * @author gruppe40
+ * @author Paul Maximilian Bittner
+ * @author Antje Moench
  */
 public class NotAnyFilterFiltersFeatureFilter extends ConfigurationMapFilter {
 	private List<IConfigurationMapFilter> filters;

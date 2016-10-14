@@ -30,9 +30,8 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 
 /**
- * TODO description
- * 
- * @author gruppe41
+ * @author Niklas Lehnfeld
+ * @author Mohammad Mahhouk
  */
 public class ConfigMapRefreshAction extends Action {
 	

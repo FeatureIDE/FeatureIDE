@@ -32,9 +32,10 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * TODO description
- * 
- * @author gruppe41
+ * @author Paul Maximilian Bittner
+ * @author Antje Moench
+ * @author Niklas Lehnfeld
+ * @author Mohammad Mahhouk
  */
 public class OpenFileAction extends Action {
 
