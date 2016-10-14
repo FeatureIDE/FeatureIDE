@@ -226,8 +226,7 @@ public class SetFeatureColorAction extends Action {
 					IPath relPath = modelPath.makeRelativeTo(rootPath);
 					
 					IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(relPath);			
-					IFolder folder =  CorePlugin.getFeatureProject(file).getSourceFolder();
-					
+					IFolder folder =  CorePlugin.getFeatureProject(file).getSourceFolder();					
 					CorePlugin.getDefault().fireFeatureFolderChanged(folder);
 				} catch (IOException e) {
 					e.printStackTrace();
