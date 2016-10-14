@@ -365,19 +365,20 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	 */
 	private int countPPStatementLoc(IFile file) {
 		int loc = 0;
-		
-		for (FSTClass fstClass: fstModel.getClasses()) {
-			for (FSTRole role: fstClass.getRoles()) {
-				if (role.getFile() != null && role.getFile().equals(file)) {
-					for (FSTDirective directive: role.getDirectives()) {
-						if (directive.getCommand().isOneLineStatement()) {
-							loc +=1;
-						} else {
-							loc +=2;
+		if(project.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
+			for (FSTClass fstClass: fstModel.getClasses()) {
+				for (FSTRole role: fstClass.getRoles()) {
+					if (role.getFile() != null && role.getFile().equals(file)) {
+						for (FSTDirective directive: role.getDirectives()) {
+							if (directive.getCommand().isOneLineStatement()) {
+								loc +=1;
+							} else {
+								loc +=2;
+							}
 						}
 					}
 				}
-			}
+			}			
 		}
 		return loc;
 	}
