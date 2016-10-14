@@ -29,13 +29,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.content.IContentDescription;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -50,14 +48,12 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import de.ovgu.featureide.core.CorePlugin;
@@ -83,14 +79,16 @@ import de.ovgu.featureide.ui.views.configMap.header.CustomTableHeader;
 import de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionListener;
 
 /**
- * TODO description
+ * The ConfigurationMap is an overview of all configurations
+ * of a feature project. It shows which features of the current
+ * project are used in which configurations.
  * 
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
 
 public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSelectionListener {
-	public static final String ID = UIPlugin.PLUGIN_ID + ".view1";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".views.configMap";
 
 	private int featureColumnWidth, defaultColumnWidth;
 
@@ -177,7 +175,8 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		this.defaultColumnWidth = 40;
 		selectedColumnIndex = -1;
 
-		openFileAction = new OpenFileAction("Open");
+		openFileAction = new OpenFileAction("Open..");
+		openFileAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("ConfigurationIcon.png")));
 
 		this.loader = new ConfigurationLoader(configLoaderCallback);
 		this.configurationColumns = new ArrayList<>();
@@ -289,7 +288,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 		setEditor(page.getActiveEditor());
 
-		setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
+		setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel(), this.featureProject);
 		setFeatureColor.addColorChangedListener(new IEventListener() {
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
@@ -388,14 +387,19 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		menuMgr.add(openFileAction);
 	}
 
-	private void fillContextMenu(IMenuManager menuMgr) {
+	private void fillContextMenu(IMenuManager menuMgr) {		
 		if (featureProject == null)
 			return;
+		
+		if(selectedColumnIndex >= 0)
+			fillHeaderMenu(menuMgr);
+		
 		boolean isNotEmpty = !tree.getSelection().isEmpty();
 		setFeatureColor.setFeatureModel(featureProject.getFeatureModel());
 
 		setFeatureColor.setEnabled(isNotEmpty);
 		menuMgr.add(setFeatureColor);
+		
 	}
 
 	public void loadConfigurations() {

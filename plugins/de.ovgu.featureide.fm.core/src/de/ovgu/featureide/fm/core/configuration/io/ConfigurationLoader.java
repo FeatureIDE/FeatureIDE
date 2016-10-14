@@ -78,7 +78,7 @@ public class ConfigurationLoader {
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
 			for (Path configPath : directoryStream) {
-				Configuration currentConfiguration = new Configuration(featureModel);
+				Configuration currentConfiguration = new Configuration(featureModel, false);
 				
 				fileHandler.setObject(currentConfiguration);
 				fileHandler.read(configPath, ConfigurationManager.getFormat(configPath.toString()));

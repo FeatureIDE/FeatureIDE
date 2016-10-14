@@ -82,11 +82,10 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	public Image getColumnImage(Object element, int columnIndex) {
 		if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
-
 			if (configurationMap.isConfigColumn(columnIndex)) {// && columnIndex < configurationMap.end) {
 				Configuration config = configurationMap.getConfigurationOfColumn(columnIndex);
-
-				if (config.isValid()) {
+				
+				if (!feature.getStructure().isAbstract()) {
 					String imgPath = imgUnselectedPath;
 					if (config.getSelectedFeatures().contains(feature))
 						imgPath = imgSelectedPath;

@@ -22,9 +22,15 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
@@ -40,6 +46,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -65,7 +73,8 @@ public class SetFeatureColorAction extends Action {
 	private List<IEventListener> colorChangedListeners;
 	protected List<IFeature> featureList = new ArrayList<>();
 	private IFeatureModel featureModel;
-	
+	private IFeatureProject featureProject;
+
 	public static final String hartkot = "KeyVon3";
 
 	private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
@@ -95,8 +104,17 @@ public class SetFeatureColorAction extends Action {
 	 * @param featureModel
 	 */
 	public SetFeatureColorAction(Viewer viewer, IFeatureModel featureModel) {
+		this(viewer, featureModel, null);
+	}
+
+	/**
+	 * @param viewer
+	 * @param featureModel
+	 */
+	public SetFeatureColorAction(Viewer viewer, IFeatureModel featureModel, IFeatureProject project) {
 		super(COLORATION);
 		viewer.addSelectionChangedListener(selectionListener);
+		this.featureProject = project;
 		init(featureModel);
 	}
 
@@ -109,8 +127,8 @@ public class SetFeatureColorAction extends Action {
 		viewer.addSelectionChangedListener(selectionListener);
 		init(featureModel);
 	}
-	
-	public SetFeatureColorAction(IStructuredSelection selection, IFeatureModel featureModel){
+
+	public SetFeatureColorAction(IStructuredSelection selection, IFeatureModel featureModel) {
 		super(COLORATION);
 		updateFeatureList(selection);
 		init(featureModel);
@@ -201,6 +219,15 @@ public class SetFeatureColorAction extends Action {
 				if (colorChangedListeners != null) {
 					for (IEventListener eventListener : colorChangedListeners) {
 						eventListener.propertyChange(colorChangedEvent);
+					}
+				}
+
+				if (featureProject != null) {
+					try {
+						featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			}
