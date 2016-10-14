@@ -61,6 +61,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -582,7 +583,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	private void fillModelWithFeatures() {
 		
 		IFeatureModel featureModel = featureProject.getFeatureModel();
-		IFeature rootFeature = featureModel.getFeature(featureProject.getProjectName());
+
+		
+		IFeature rootFeature = featureModel.getStructure().getRoot().getFeature();
 		FSTModel fstModel = featureProject.getFSTModel();
 	
 		//Remove default features

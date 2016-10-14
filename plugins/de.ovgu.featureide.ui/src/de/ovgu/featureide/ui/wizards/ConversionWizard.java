@@ -77,13 +77,14 @@ public class ConversionWizard extends Wizard implements INewWizard {
 				
             final IFeatureProject featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
 
+            
 			if (featureProject == null) {
 				System.err.println(" FeatureProject not found");
 				
 			} 
 			
 			//TODO: implementation of conversion of other preprocessor projects - at the moment only Antenna is supported
-			else if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR && featureProject.getComposer().getName().equals("ANTENNA")) {
+			else if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR && featureProject.getComposer().getName().equals("Antenna")) {
 				IComposerExtension composerExtension = ComposerExtensionManager.getInstance().getComposerById(page.getCompositionTool().getId());
 				PPComposerExtensionClass ppComposerExtensionClass = (PPComposerExtensionClass) composerExtension.getComposerByProject(featureProject);;
 	
