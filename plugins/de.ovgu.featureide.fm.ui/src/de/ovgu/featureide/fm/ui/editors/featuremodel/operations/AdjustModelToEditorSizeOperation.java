@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
@@ -80,12 +81,11 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 */
 	public void calculateVisibleLayer(IFeature root) {
 		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
-		for (IConstraint ic : featureModel.getConstraints())
-		{
+		for (IConstraint ic : featureModel.getConstraints()) {
 			ic.setCollapsed(true);
 		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-		
+
 		LinkedList<LinkedList<IFeature>> levels = calculateLevels(root);
 		CollapseAllOperation op = new CollapseAllOperation(featureModel, true);
 		try {
@@ -98,7 +98,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			/* if the last level is not null AND the level exceeds
 			 * neither the width nor the height of the editor
 			 */
-			if (lastLevel != null && featureDiagramEditor.isLevelSizeOverLimit(level)) {
+			if (lastLevel != null && featureDiagramEditor.isLevelSizeOverLimit()) {
 				affectedFeatureList.addAll(lastLevel);
 				collapseLayer(lastLevel);
 				break;
@@ -112,42 +112,121 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 			((FeatureDiagramEditor) getEditor()).internRefresh(true);
 		}
-
-		LinkedList<IFeature> maxChilds = new LinkedList<IFeature>();
-		for (IFeature f : lastLevel) {
-			//Expand and relayout parent
-			f.getStructure().setCollapsed(false);
-			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-			((FeatureDiagramEditor) getEditor()).internRefresh(true);
-
-
-			LinkedList<IFeature> testChild = new LinkedList<IFeature>();
-			for (IFeatureStructure child : f.getStructure().getChildren()) {
-				testChild.add(child.getFeature());
-			}
-			if (testChild.size() != 0 && !featureDiagramEditor.isLevelSizeOverLimit(testChild)) {
-				if (testChild.size() >= maxChilds.size()) {
-					maxChilds = testChild;
-				}
-			}
-			//collapse and relayout parent
-			f.getStructure().setCollapsed(true);
-			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-			((FeatureDiagramEditor) getEditor()).internRefresh(true);
-		}
-
-		if (maxChilds.size() > 0) {
-			maxChilds.get(0).getStructure().getParent().setCollapsed(false);
-			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-			((FeatureDiagramEditor) getEditor()).internRefresh(true);
-		}
 		
-
-		for (IConstraint ic : featureModel.getConstraints())
-		{
+		LinkedList<IFeature> lastStep = lastLevel;
+		do{
+			lastStep = calculateNextLevel(lastStep);
+		} while (lastStep != null && lastStep.size() != 0);
+		
+		for (IConstraint ic : featureModel.getConstraints()) {
 			ic.setCollapsed(false);
 		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+	}
+
+	public LinkedList<IFeature> calculateNextLevel(LinkedList<IFeature> lastLevel)
+	{
+		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor)getEditor();
+		
+		LinkedList<IFeature> parents = new LinkedList<IFeature>();
+		for(IFeature f : lastLevel)
+		{
+			if(f.getStructure().hasChildren())
+			{
+				parents.add(f);
+			}
+		}
+		if(parents.size() == 0)
+		{
+			return null;
+		}
+		LinkedList<IFeature> bestSolution = new LinkedList<IFeature>();
+		for(LinkedList<IFeature> parentSet : powerSet(parents))
+		{
+			LinkedList<IFeature> childList = new LinkedList<IFeature>();
+			for(IFeature f : parentSet)
+			{
+				//Expand and relayout parent
+				f.getStructure().setCollapsed(false);
+				((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+				((FeatureDiagramEditor) getEditor()).internRefresh(true);
+				
+				for(IFeatureStructure child : f.getStructure().getChildren())
+				{
+					childList.add(child.getFeature());
+				}
+			}
+
+//			FMUIPlugin.getDefault().logInfo(parentSet.toString() + "\n" + childList.toString() + ": " + childList.size()  + "\n" + featureDiagramEditor.isLevelSizeOverLimit(childList)+ "\n" + bestSolution.toString());
+			if (childList.size() != 0 && !featureDiagramEditor.isLevelSizeOverLimit()) {
+				if (childList.size() > bestSolution.size()) {
+					bestSolution = childList;
+				}
+			}
+			
+			for(IFeature f : parentSet)
+			{				
+				//collapse and relayout parent
+				f.getStructure().setCollapsed(true);
+			}
+		}
+
+		if (bestSolution.size() > 0) {
+			for(IFeature f : bestSolution)
+			{
+				f.getStructure().getParent().setCollapsed(false);
+			}
+		}
+		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+		((FeatureDiagramEditor) getEditor()).internRefresh(true);
+		return bestSolution;
+//		LinkedList<IFeature> maxChilds = new LinkedList<IFeature>();
+//		for (IFeature f : lastLevel) {
+//			//Expand and relayout parent
+//			f.getStructure().setCollapsed(false);
+//			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+//			((FeatureDiagramEditor) getEditor()).internRefresh(true);
+//
+//			LinkedList<IFeature> testChild = new LinkedList<IFeature>();
+//			for (IFeatureStructure child : f.getStructure().getChildren()) {
+//				testChild.add(child.getFeature());
+//			}
+//			if (testChild.size() != 0 && !featureDiagramEditor.isLevelSizeOverLimit(testChild)) {
+//				if (testChild.size() >= maxChilds.size()) {
+//					maxChilds = testChild;
+//				}
+//			}
+//			//collapse and relayout parent
+//			f.getStructure().setCollapsed(true);
+//			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+//			((FeatureDiagramEditor) getEditor()).internRefresh(true);
+//		}
+//
+//		if (maxChilds.size() > 0) {
+//			maxChilds.get(0).getStructure().getParent().setCollapsed(false);
+//			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+//			((FeatureDiagramEditor) getEditor()).internRefresh(true);
+//		}
+
+	}
+	
+	public static <IFeatue> LinkedList<LinkedList<IFeatue>> powerSet(LinkedList<IFeatue> originalSet) {
+		LinkedList<LinkedList<IFeatue>> sets = new LinkedList<LinkedList<IFeatue>>();
+		if (originalSet.isEmpty()) {
+			sets.add(new LinkedList<IFeatue>());
+			return sets;
+		}
+		LinkedList<IFeatue> list = new LinkedList<IFeatue>(originalSet);
+		IFeatue head = list.get(0);
+		LinkedList<IFeatue> rest = new LinkedList<IFeatue>(list.subList(1, list.size()));
+		for (LinkedList<IFeatue> set : powerSet(rest)) {
+			LinkedList<IFeatue> newSet = new LinkedList<IFeatue>();
+			newSet.add(head);
+			newSet.addAll(set);
+			sets.add(newSet);
+			sets.add(set);
+		}
+		return sets;
 	}
 
 	/**
