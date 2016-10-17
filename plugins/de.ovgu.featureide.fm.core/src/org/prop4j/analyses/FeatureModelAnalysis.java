@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.prop4j.And;
 import org.prop4j.Equals;
@@ -53,6 +54,7 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.DeadFeature;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeature;
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
@@ -76,19 +78,19 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
+	public Map<Integer, Explanation> redundantConstrExpl = new HashMap<>();
 
 	/**
 	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
+	public Map<IFeature, Explanation> deadFeatureExpl = new HashMap<>();
 
 	/**
 	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
+	public Map<IFeature, Explanation> falseOptFeatureExpl = new HashMap<>();
 
 	/**
 	 * Defines whether constraints should be included into calculations.
@@ -398,8 +400,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 							setConstraintAttribute(constraint, ConstraintAttribute.REDUNDANT);
 
 							if (calculateExplanations) {
-								RedundantConstraint redundancy = new RedundantConstraint();
-								List<String> expl = redundancy.explain(clone, constraint); //store explanation for redundant constraint
+								Explanation expl = new RedundantConstraint().explain(clone, constraint); //store explanation for redundant constraint
 								redundantConstrExpl.put(FeatureUtils.getConstraintIndex(fm, constraint), expl);
 							}
 						}
@@ -473,8 +474,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	// explain void feature model, treat root as dead feature
 	private void explainVoidFM() {
-		DeadFeature deadF = new DeadFeature();
-		List<String> expl = deadF.explain(fm, FeatureUtils.getRoot(fm), true);
+		Explanation expl = new DeadFeature().getExplanation(fm, FeatureUtils.getRoot(fm));
 		deadFeatureExpl.put(FeatureUtils.getRoot(fm), expl);
 	}
 
@@ -491,8 +491,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 				if (calculateExplanations) {
 					// explain dead features and remember explanation in map
-					DeadFeature deadF = new DeadFeature();
-					List<String> expl = deadF.explain(fm, feature, false);
+					Explanation expl = new DeadFeature().getExplanation(fm, feature);
 					deadFeatureExpl.put(feature, expl);
 
 				} else {
@@ -539,8 +538,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 			if (calculateExplanations) {
 				// explain false optional features and remember explanation in map
-				FalseOptionalFeature falseOpts = new FalseOptionalFeature();
-				List<String> expl = falseOpts.explain(fm, feature);
+				Explanation expl = new FalseOptionalFeature().explain(fm, feature);
 				falseOptFeatureExpl.put(feature, expl);
 			}
 		}

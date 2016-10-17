@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -133,7 +134,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
 		// iterate implicit constraints and generate explanations 
 		for (IConstraint redundantC : getImplicitConstraints()) {
-			List<String> expl = new RedundantConstraint().explain(completeFm, redundantC);
+			Explanation expl = new RedundantConstraint().explain(completeFm, redundantC);
 			subtreeModel.getAnalyser().redundantConstrExpl.put(FeatureUtils.getConstraintIndex(subtreeModel, redundantC), expl);
 			redundantC.setConstraintAttribute(ConstraintAttribute.IMPLICIT, false);
 			

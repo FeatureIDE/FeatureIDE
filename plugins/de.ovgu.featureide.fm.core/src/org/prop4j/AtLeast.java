@@ -21,6 +21,7 @@
 package org.prop4j;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A constraint that is true iff at least a specified number of children is
@@ -60,6 +61,20 @@ public class AtLeast extends Node {
 	@Override
 	public Node clone() {
 		return new AtLeast(min, clone(children));
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		int trueCount = 0;
+		for (final Node child : children) {
+			if (child.getValue(map)) {
+				trueCount++;
+				if (trueCount >= min) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

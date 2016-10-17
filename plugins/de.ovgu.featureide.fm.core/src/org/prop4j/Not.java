@@ -23,6 +23,7 @@ package org.prop4j;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORTED;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A constraint that is true iff the child node is false.
@@ -86,6 +87,11 @@ public class Not extends Node implements Cloneable {
 	@Override
 	public Node clone() {
 		return new Not(children[0].clone());
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		return !children[0].getValue(map);
 	}
 
 }

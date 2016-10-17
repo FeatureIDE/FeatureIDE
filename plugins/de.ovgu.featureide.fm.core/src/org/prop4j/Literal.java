@@ -39,7 +39,11 @@ public class Literal extends Node implements Cloneable {
 	//annotate each literal of a formula with an attribute for explanation. If "Up", explain child relationship
 	// to parent from feature-tree. If "Constraint", explain using cross-tree constraint.
 	public enum FeatureAttribute {
-		Undef, Up, Down, Root, Constraint
+		UNDEFINED,
+		CHILD,
+		PARENT,
+		ROOT,
+		CONSTRAINT
 	};
 
 	public int origin; // attribute encodes relevant information for generating explanations
@@ -64,7 +68,7 @@ public class Literal extends Node implements Cloneable {
 	 */
 	public Literal(Object var, FeatureAttribute a) {
 		this(var);
-		if (a == FeatureAttribute.Constraint) {
+		if (a == FeatureAttribute.CONSTRAINT) {
 			throw new InvalidParameterException("Parameter Constraint is not allowed");
 		}
 		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();  
@@ -87,8 +91,8 @@ public class Literal extends Node implements Cloneable {
 	 * @return The constraint-index
 	 */
 	public int getSourceIndex() {
-		if (getSourceAttribute() != FeatureAttribute.Constraint) {
-			throw new InternalError ("origin is not Constraint");
+		if (getSourceAttribute() != FeatureAttribute.CONSTRAINT) {
+			throw new IllegalStateException("origin is not Constraint");
 		}
 		return origin / FeatureAttribute.values().length;
 	}
@@ -114,7 +118,7 @@ public class Literal extends Node implements Cloneable {
 	 * @param constrIndex The index of a constraint
 	 */
 	public void setOriginConstraint(int constrIndex) {
-		this.origin = constrIndex * FeatureAttribute.values().length + FeatureAttribute.Constraint.ordinal();
+		this.origin = constrIndex * FeatureAttribute.values().length + FeatureAttribute.CONSTRAINT.ordinal();
 	}
 
 	public void flip() {

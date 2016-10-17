@@ -26,9 +26,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 
@@ -525,4 +527,21 @@ public abstract class Node {
 		}
 	}
 
+	/**
+	 * Returns all literals contained in this node and its children.
+	 * @return all literals contained in this node and its children
+	 */
+	public Set<Literal> getLiterals() {
+		final Set<Literal> literals = new LinkedHashSet<>();
+		if (this instanceof Literal) {
+			literals.add((Literal) this);
+		}
+		if (children == null) {
+			return literals;
+		}
+		for (int i = 0; i < children.length; i++) {
+			literals.addAll(children[i].getLiterals());
+		}
+		return literals;
+	}
 }

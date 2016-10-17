@@ -58,6 +58,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -78,19 +79,19 @@ public class FeatureModelAnalyzer {
 	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
+	public Map<Integer, Explanation> redundantConstrExpl = new HashMap<>();
 
 	/**
 	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
+	public Map<IFeature, Explanation> deadFeatureExpl = new HashMap<>();
 
 	/**
 	 * Used for tool tip: remember explanation for redundant constraint.
 	 * Key = constraintIndex, Value = explanation
 	 */
-	public HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
+	public Map<IFeature, Explanation> falseOptFeatureExpl = new HashMap<>();
 
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst

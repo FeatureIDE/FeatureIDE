@@ -95,7 +95,7 @@ public class NodeCreator {
 		IFeature root = FeatureUtils.getRoot(featureModel);
 		LinkedList<Node> nodes = new LinkedList<Node>();
 		if (root != null) {
-			nodes.add(new Literal(getVariable(root.getName(), featureModel), Literal.FeatureAttribute.Root));
+			nodes.add(new Literal(getVariable(root.getName(), featureModel), Literal.FeatureAttribute.ROOT));
 			// convert grammar rules into propositional formulas
 			createNodes(nodes, root, featureModel, true, replacingMap);
 			// add extra constraints
@@ -426,7 +426,7 @@ public class NodeCreator {
 		int i = 0;
 		for (IFeatureStructure rootChild : rootFeature.getStructure().getChildren()) {
 			String var = getVariable(rootChild.getFeature().getName(), featureModel);
-			children[i++] = new Literal(var, Literal.FeatureAttribute.Up);
+			children[i++] = new Literal(var, Literal.FeatureAttribute.CHILD);
 		}
 		Node definition = children.length == 1 ? children[0] : new Or(children);
 
@@ -437,17 +437,17 @@ public class NodeCreator {
 			for (IFeatureStructure feature : rootFeature.getStructure().getChildren())
 				if (feature.isMandatory()) {
 					String var = getVariable(feature.getFeature().getName(), featureModel);
-					manChildren.add(new Literal(var, Literal.FeatureAttribute.Up));
+					manChildren.add(new Literal(var, Literal.FeatureAttribute.CHILD));
 				}
 
 			// add constraints for all mandatory children S => (A & B)
 			if (manChildren.size() == 1)
-				nodes.add(new Implies(new Literal(s, Literal.FeatureAttribute.Down), manChildren.getFirst()));
+				nodes.add(new Implies(new Literal(s, Literal.FeatureAttribute.PARENT), manChildren.getFirst()));
 			else if (manChildren.size() > 1)
-				nodes.add(new Implies(new Literal(s, Literal.FeatureAttribute.Down), new And(manChildren)));
+				nodes.add(new Implies(new Literal(s, Literal.FeatureAttribute.PARENT), new And(manChildren)));
 
 			// add contraint (A | B | C) => S
-			nodes.add(new Implies(definition, new Literal(s, Literal.FeatureAttribute.Down)));
+			nodes.add(new Implies(definition, new Literal(s, Literal.FeatureAttribute.PARENT)));
 		} else {
 			// add constraint S <=> (A | B | C)
 			if (replacings.get(featureModel.getRenamingsManager().getOldName(rootFeature.getName())) == null)
