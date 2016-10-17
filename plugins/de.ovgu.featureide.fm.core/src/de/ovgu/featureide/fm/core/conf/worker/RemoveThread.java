@@ -63,7 +63,8 @@ public class RemoveThread extends AWorkerThread<Collection<String>> {
 	@Override
 	protected void work(Collection<String> removeFeatures) {
 		IMonitor wm = new ConsoleMonitor();
-		final Node subNode = LongRunningWrapper.runMethod(new FeatureRemover(sharedObjects.completeNode, removeFeatures), wm);
+		final FeatureRemover remover = new FeatureRemover(sharedObjects.completeNode, removeFeatures);
+		final Node subNode = remover.createNewClauseList(LongRunningWrapper.runMethod(remover, wm));
 		if (subNode.getChildren().length > 0 && !(subNode.getChildren().length == 1 && subNode.getChildren()[0].getChildren().length == 0)) {
 			addNode(subNode);
 		}

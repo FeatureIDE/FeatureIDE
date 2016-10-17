@@ -20,30 +20,38 @@
  */
 package de.ovgu.featureide.fm.core.editing.remove;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+
 /**
  * Implementation of {@link AFeatureOrderHeuristic}.
  * Returns features dependent on the current clauses in the formula.
  * 
  * @author Sebastian Krieter
  */
-public class MinimumClauseHeuristic extends AFeatureOrderHeuristic {
+public class StaticMinimumClauseHeuristic extends AFeatureOrderHeuristic {
+	
+	private LinkedList<Integer> order = new LinkedList<>();
 
-	public MinimumClauseHeuristic(DeprecatedFeature[] map, int length) {
+	public StaticMinimumClauseHeuristic(final DeprecatedFeature[] map, int length) {
 		super(map, length);
+		for (int i = 0; i < map.length; i++) {
+			if (map[i] != null) {
+				order.add(i);
+			}
+		}
+		Collections.sort(order, new Comparator<Integer>() {
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				return (int) Math.signum(map[o1].getClauseCount() - map[o2].getClauseCount());
+			}
+		});
 	}
 
 	@Override
 	protected int getNextIndex() {
-		DeprecatedFeature smallestFeature = map[1];
-		int minIndex = 1;
-		for (int i = 2; i < map.length; i++) {
-			final DeprecatedFeature next = map[i];
-			if (smallestFeature == null || (next != null && (smallestFeature.getClauseCount() - next.getClauseCount()) > 0)) {
-				smallestFeature = next;
-				minIndex = i;
-			}
-		}
-		return minIndex;
+		return order.poll();
 	}
 
 }

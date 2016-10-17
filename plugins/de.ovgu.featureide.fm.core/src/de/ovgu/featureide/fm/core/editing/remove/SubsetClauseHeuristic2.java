@@ -26,21 +26,49 @@ package de.ovgu.featureide.fm.core.editing.remove;
  * 
  * @author Sebastian Krieter
  */
-public class MinimumClauseHeuristic extends AFeatureOrderHeuristic {
+public class SubsetClauseHeuristic2 extends AFeatureOrderHeuristic {
 
-	public MinimumClauseHeuristic(DeprecatedFeature[] map, int length) {
+	public SubsetClauseHeuristic2(DeprecatedFeature[] map, int length) {
 		super(map, length);
 	}
 
 	@Override
 	protected int getNextIndex() {
-		DeprecatedFeature smallestFeature = map[1];
-		int minIndex = 1;
-		for (int i = 2; i < map.length; i++) {
+		DeprecatedFeature smallestFeature = null;
+		int minIndex = 0;
+		for (int i = 1; i < map.length; i++) {
 			final DeprecatedFeature next = map[i];
-			if (smallestFeature == null || (next != null && (smallestFeature.getClauseCount() - next.getClauseCount()) > 0)) {
-				smallestFeature = next;
-				minIndex = i;
+			if (next != null && next.getClauseCount() <= 0) {
+				if (smallestFeature == null || smallestFeature.getClauseCount() > next.getClauseCount()) {
+					smallestFeature = next;
+					minIndex = i;
+				}
+			}
+		}
+		if (minIndex > 0) {
+			return minIndex;
+		}
+		
+		for (int i = 1; i < map.length; i++) {
+			final DeprecatedFeature next = map[i];
+			if (next != null && next.getMixedCount() > 0) {
+				if (smallestFeature == null || smallestFeature.getClauseCount() > next.getClauseCount()) {
+					smallestFeature = next;
+					minIndex = i;
+				}
+			}
+		}
+		if (minIndex > 0) {
+			return minIndex;
+		}
+		
+		for (int i = 1; i < map.length; i++) {
+			final DeprecatedFeature next = map[i];
+			if (next != null) {
+				if (smallestFeature == null || smallestFeature.getClauseCount() > next.getClauseCount()) {
+					smallestFeature = next;
+					minIndex = i;
+				}
 			}
 		}
 		return minIndex;
