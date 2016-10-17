@@ -54,6 +54,8 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -136,7 +138,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		IFeature feature = this.feature.getObject();
-		List<String> explanation = new ArrayList<String>();
+		Explanation explanation = null;
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 		
 		boolean hasExpl = false;
@@ -263,9 +265,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		panel.setLayoutManager(new ToolbarLayout(false));
 
 		// only set explanation if not null or empty
-		if (explanation == null) {
-			setToolTip(toolTipContent);
-		} else if (explanation.isEmpty()) {
+		if (explanation == null || explanation.getReasons() == null || explanation.getReasons().isEmpty()) {
 			setToolTip(toolTipContent);
 		} else {
 			setToolTip(toolTipContent, panel, explanation);
@@ -311,52 +311,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	 * @param panel the panel to pass for a tool tip
 	 * @param expl the explanation within a tool tip
 	 */
-	private void setToolTip(Figure content, Panel panel, List<String> expl) {
-		for (String s : expl) {
-			if (s.contains("$")) {
-				int lastChar = s.lastIndexOf("$");
-				String text = s.substring(0, lastChar); // pure explanation without delimiter and count of explanation part
-				int occur = 1; //if non-negative, intersection, number of all occurences of expl. part
-				int allExpl = 1; // number of all explanations
-				if (lastChar < s.length() - 1) {
-					String suffix = s.substring(lastChar + 1, s.length()); // 2 (occur) /3 (allExpl)
-					String[] l = suffix.split("/");
-					if (l.length == 2) {
-						try {
-							occur = Integer.parseInt(l[0]);
-							allExpl = Integer.parseInt(l[1]);
-
-						} catch (NumberFormatException e) {
-							System.out.println(e);
-						}
-					}
-				}
-				//check validity
-				if (allExpl < 1 || occur < 1 || occur > allExpl) {
-					System.out.println("inconsistent suffix: " + occur + "/" + allExpl + ", use defaults 1/1");
-					occur = 1;
-					allExpl = 1;
-				}
-				//if we are here, occur and allExpl are both >=1 and occur <= allExpl - consistent!
-				Label tmp = new Label(text + " (" + occur + "/" + allExpl + ")");
-				if (allExpl == 1) {
-					tmp.setForegroundColor(GUIBasics.createColor(255, 0, 0));
-				} else { //allExp > 1, can divide through allExpl - 1 
-					if (occur == 1)
-						tmp.setForegroundColor(GUIBasics.createColor(0, 0, 0)); // black for explanation part which occurs once
-
-					// color gradient for remaining explanations
-					else {
-						int confidence = (int) (255.0 * (occur - 1.0) / (allExpl - 1.0) + 0.5);
-						tmp.setForegroundColor(GUIBasics.createColor(confidence, 0, 0));
-					}
-				}
-				tmp.setFont(DEFAULT_FONT);
-				panel.add(tmp);
-			} else { // if we are here, we process the header of an explanation, i.e. feature x is dead, because
-				Label tmp = new Label(s);
-				tmp.setFont(DEFAULT_FONT_BOLD);
-				panel.add(tmp);
+	private void setToolTip(Figure content, Panel panel, Explanation expl) {
+		final ExplanationWriter ew = new ExplanationWriter(expl);
+		panel.add(new Label(ew.getHeaderString()));
+		if (expl != null && expl.getReasons() != null) {
+			for (final Explanation.Reason reason : expl.getReasons()) {
+				final Label label = new Label(ew.getReasonString(reason));
+				label.setForegroundColor(GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0));
+				panel.add(label);
 			}
 		}
 		panel.add(content);

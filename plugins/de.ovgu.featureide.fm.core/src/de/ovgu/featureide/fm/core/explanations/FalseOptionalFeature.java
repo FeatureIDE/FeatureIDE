@@ -20,12 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.prop4j.And;
-import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -34,78 +31,44 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
- * The class FalseOptional generates explanations for false optional features. It uses a logic truth maintenance system (LTMS)
- * and boolean constraint propagation (BCP) which functions as an inference engine of the LTMS.
+ * Generates explanations for false-optional features using {@link LTMS}.
  * 
- * @author "Ananieva Sofia"
+ * @author Sofia Ananieva
+ * @author Timo Guenther
  */
 public class FalseOptionalFeature {
-
 	/**
-	 * The model after a change (with a constraint that makes a feature false optional).
+	 * Returns an explanation why the given feature of the given feature model is false-optional.
+	 * Sets initial truth value assumptions of the false-optional feature to false and its parent to true.
+	 * Then propagates the values until a violation in a clause occurs.
+	 * @param fm the model with the new constraint which leads to a false-optional feature
+	 * @param defectFeature the false-optional feature
+	 * @return an explanation why the given feature of the given feature model is false-optional
 	 */
-	private static IFeatureModel model;
-
-	/**
-	 * Explains false optional features using boolean constraint propagation. Sets initial truth value assumptions of false optional
-	 * features to false and propagate them until a violation in any clause occurs.
-	 * 
-	 * @param featuremodel The model with the new constraint which leads to a false optional feature
-	 * @param foFeature The false optional feature
-	 * @return explList An explanation why the feature is false optional
-	 */
-	public List<String> explain(IFeatureModel featuremodel, IFeature foFeature) {
-		List<String> explList = new ArrayList<>();
-		String property = "";
-		if (foFeature.getStructure().isConcrete()) {
-			property = "Concrete ";
-		} else if (foFeature.getStructure().isAbstract()) {
-			property = "Abtract ";
-		}
-		setFeatureModel(featuremodel);
-		Node node = NodeCreator.createNodes(model, true).toCNF();
-		Node withoutTrueClauses = eliminateTrueClauses(node); // True clauses of the form True & -False & (A|B|C|True) lead to wrong BCP results
-		Node[] clauses = withoutTrueClauses.getChildren();
-
-		IFeature parentFalseOpt = FeatureUtils.getParent(foFeature);
-		Literal falseOptional = new Literal(foFeature.getName());
-		Literal parent = new Literal(parentFalseOpt.getName());
-		explList.add("\n " + property + "Feature " + falseOptional + " is false-optional, because: ");
-		LTMS ltms = new LTMS(model);
-
-		List<String> tmpExplList = ltms.explainFalseOpsFeature(clauses, falseOptional, parent);
-		if (tmpExplList.isEmpty()) {
-			explList.add("No explanation possible");
-		} else {
-			for (String tmp : tmpExplList) {
-				explList.add(" "+ tmp);
-			}
-		}
-		return explList;
+	public Explanation explain(IFeatureModel fm, IFeature defectFeature) {
+		Node cnf = NodeCreator.createNodes(fm, true).toCNF();
+		cnf = eliminateTrueClauses(cnf);
+		final LTMS ltms = new LTMS(cnf);
+		ltms.addPremise(defectFeature.getName(), false);
+		ltms.addPremise(FeatureUtils.getParent(defectFeature).getName(), true);
+		final Explanation explanation = ltms.getExplanation();
+		explanation.setDefectFalseOptionalFeature(defectFeature);
+		explanation.setFeatureModel(fm);
+		return explanation;
 	}
-
+	
 	/**
 	 * Removes clauses which are added in Node Creator while eliminateAbstractVariables().
 	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
 	 * they are true and don't change the semantic of a formula.
-	 * 
-	 * @param node The node to remove true clauses from
-	 * @return updatedNodes A node without true clauses
+	 * @param node the node to remove true clauses from
+	 * @return a node without true clauses
 	 */
-	private Node eliminateTrueClauses(Node node) {
+	private static Node eliminateTrueClauses(Node node) {
 		LinkedList<Node> updatedNodes = new LinkedList<Node>();
 		for (Node child : node.getChildren())
 			if (!child.toString().contains("True") && !child.toString().contains("False"))
 				updatedNodes.add(child);
 		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
-	}
-
-	/**
-	 * Sets the model with the new constraint which lead to a dead feature.
-	 * 
-	 * @param model The model with the new constraint
-	 */
-	public static void setFeatureModel(IFeatureModel fm) {
-		model = fm;
 	}
 }

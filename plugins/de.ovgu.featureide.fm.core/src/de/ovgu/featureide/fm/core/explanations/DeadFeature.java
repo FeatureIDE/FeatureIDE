@@ -20,10 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
-import org.prop4j.Literal;
+import org.prop4j.And;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -31,70 +30,44 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
- * The class deadFeatures generates explanations for dead features. It uses a logic truth maintenance system (LTMS)
- * and boolean constraint propagation (BCP) which functions as an inference engine of the LTMS.
+ * Generates explanations for dead features and void feature models using {@link LTMS}.
  * 
- * @author "Ananieva Sofia"
+ * @author Sofia Ananieva
+ * @author Timo Guenther
  */
 public class DeadFeature {
-
 	/**
-	 * The model after a change (with a constraint that makes a feature dead).
+	 * Returns an explanation why the given feature of the given feature model is dead.
+	 * A dead root feature also means a void feature model.
+	 * Sets initial truth value assumptions of the dead feature to true.
+	 * Then propagates the values until a violation in a clause occurs.
+	 * @param fm the model with the new constraint which leads to a dead feature
+	 * @param defectFeature the dead feature
+	 * @return an explanation why the given feature of the given feature model is dead
 	 */
-	private static IFeatureModel model;
-
-	/**
-	 * Explains dead features or void feature models (root is equivalent to dead feature) using boolean constraint propagation. 
-	 * Sets initial truth value assumptions of dead features to true and propagates them until a violation in a clause occurs.
-	 * 
-	 * @param featuremodel The model with the new constraint which leads to a dead feature
-	 * @param deadFeature The dead features
-	 * @param isVoidFM True, if explanation is generated for a void feature model. Else, false. 
-	 * @return explList An explanation why the feature is dead
-	 */
-	public List<String> explain(IFeatureModel featuremodel, IFeature deadFeature, boolean isVoidFM) {
-		List<String> explList = new ArrayList<>();
-		String property = "";
-		
-		// add information about feature structure to explanation
-		if (deadFeature.getStructure().isConcrete()) {
-			property = "Concrete ";
-		} else if (deadFeature.getStructure().isAbstract()) {
-			property = "Abtract ";
-		}
-		
-		setFeatureModel(featuremodel);
-		Node node = NodeCreator.createNodes(model, true).toCNF();
-		Node[] clauses = node.getChildren();
-
-		// differentiate between dead feature or void feature model
-		Literal deadF = new Literal(deadFeature.getName());
-		if (isVoidFM) {
-			explList.add("\n Feature Model is void, because: ");
-		} else {
-		explList.add("\n " + property + "Feature " + deadF + " is dead, because: ");
-		}
-		LTMS ltms = new LTMS(model);
-
-		// generate explanation which stops after first violation with "used" clauses in stack
-		List<String> tmpExplList = ltms.explainDeadFeature(clauses, deadF);
-
-		if (tmpExplList.isEmpty()) {
-			explList.add("No explanation possible");
-		} else {
-			for (String tmp : tmpExplList) {
-				explList.add(" "+ tmp);
-			}
-		}
-		return explList;
+	public Explanation getExplanation(IFeatureModel fm, IFeature defectFeature) {
+		Node cnf = NodeCreator.createNodes(fm, true).toCNF();
+		cnf = eliminateTrueClauses(cnf);
+		final LTMS ltms = new LTMS(cnf);
+		ltms.addPremise(defectFeature.getName(), true);
+		final Explanation explanation = ltms.getExplanation();
+		explanation.setDefectDeadFeature(defectFeature);
+		explanation.setFeatureModel(fm);
+		return explanation;
 	}
-
+	
 	/**
-	 * Sets the model with the new constraint which lead to a dead feature.
-	 * 
-	 * @param model The model with the new constraint
+	 * Removes clauses which are added in Node Creator while eliminateAbstractVariables().
+	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
+	 * they are true and don't change the semantic of a formula.
+	 * @param node the node to remove true clauses from
+	 * @return a node without true clauses
 	 */
-	public static void setFeatureModel(IFeatureModel newModel) {
-		model = newModel;
+	private static Node eliminateTrueClauses(Node node) {
+		LinkedList<Node> updatedNodes = new LinkedList<Node>();
+		for (Node child : node.getChildren())
+			if (!child.toString().contains("True") && !child.toString().contains("False"))
+				updatedNodes.add(child);
+		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
 	}
 }
