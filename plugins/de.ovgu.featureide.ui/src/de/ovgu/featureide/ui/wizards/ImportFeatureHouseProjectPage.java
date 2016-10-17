@@ -368,7 +368,7 @@ public class ImportFeatureHouseProjectPage extends WizardFileSystemResourceImpor
 		if (featureModel == null) {
 			featureModel = featureProject.getFeatureModel();
 		}
-		IFeature rootFeature = featureModel.getFeature("Root");
+		IFeature rootFeature = featureModel.getStructure().getRoot().getFeature();
 		
 		//Remove default features
 		for (IFeature feature: featureModel.getFeatures()) {
