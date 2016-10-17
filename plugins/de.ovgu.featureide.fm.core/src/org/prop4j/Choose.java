@@ -21,6 +21,7 @@
 package org.prop4j;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A constraint that is true iff exactly a specified number of children is
@@ -59,6 +60,20 @@ public class Choose extends Node {
 	@Override
 	public Node clone() {
 		return new Choose(n, clone(children));
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		int trueCount = 0;
+		for (final Node child : children) {
+			if (child.getValue(map)) {
+				trueCount++;
+				if (trueCount == n) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }
