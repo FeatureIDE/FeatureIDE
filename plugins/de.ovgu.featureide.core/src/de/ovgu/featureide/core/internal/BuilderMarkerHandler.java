@@ -88,9 +88,14 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 				return;
 			IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false, IResource.DEPTH_ZERO);
 			for (IMarker marker : markers) {
-				if (marker.getAttribute(IMarker.MESSAGE).equals(message) && (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
-						&& (Integer) marker.getAttribute(IMarker.SEVERITY) == severity) {
-					marker.delete();
+				// XXX Workaround for possible null pointer exception at this point
+				// TODO Fix cause of the null pointer or handle correctly
+				try {
+					if (marker.getAttribute(IMarker.MESSAGE).equals(message) && (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
+							&& (Integer) marker.getAttribute(IMarker.SEVERITY) == severity) {
+						marker.delete();
+					}
+				} catch (RuntimeException e) {
 				}
 			}
 		} catch (CoreException e) {

@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.util.HashMap;
 
-import de.ovgu.featureide.fm.core.job.IStoppableJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -32,10 +32,10 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class JobSynchronizer {
 	private class JobEntry {
-		private final IStoppableJob currentJob;
+		private final IRunner<?> currentJob;
 		private Thread starterThread;
 
-		public JobEntry(IStoppableJob currentJob, Thread starterThread) {
+		public JobEntry(IRunner<?> currentJob, Thread starterThread) {
 			this.currentJob = currentJob;
 			this.starterThread = starterThread;
 		}
@@ -53,7 +53,7 @@ public class JobSynchronizer {
 
 	private final HashMap<JobEntry, JobEntry> jobMap = new HashMap<>();
 
-	public synchronized void startJob(final IStoppableJob job, final boolean cancelPreviousJob) {
+	public synchronized void startJob(final IRunner<?> job, final boolean cancelPreviousJob) {
 		if (job == null) {
 			return;
 		}

@@ -21,10 +21,11 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * Only used for legacy purposes.
+ * @deprecated. Only used for legacy purposes.
  * 
  * @author Sebastian Krieter
  */
+@Deprecated
 public class FMPoint {
 
 }

@@ -20,7 +20,8 @@ import org.junit.Assert;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 //import org.junit.runner.RunWith;
 //import org.junit.runners.Parameterized;
 //import org.junit.runners.Parameterized.Parameters;
@@ -65,6 +66,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 				return name.endsWith(".xml");
 			}
 		});
+		assert children != null;
 		Collection<Object[]> params = new ArrayList<Object[]>();
 		for (File f : children) {
 			params.add(new Object[]{f});
@@ -89,22 +91,20 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 		//
 		// read the same SPLOT file using the FeatureiDE reader
 		IFeatureModel fm_original = FMFactoryManager.getFactory().createFeatureModel();		
-		SXFMReader reader = new SXFMReader(fm_original);
-		try {
-			reader.readFromFile(modelFileOrigin);
-		} catch (UnsupportedModelException e) {
-			System.err.println("SKIPPING " + modelFile + " cause :" + e.getMessage());
-//			assertTrue("SKIPPING " + modelFile + " cause :" + e.getMessage(), false);
-			return;
+		SXFMFormat format = new SXFMFormat();
+		final ProblemList problems = FileHandler.load(modelFileOrigin.toPath(), fm_original, format);
+		if (problems.containsError()) {
+			System.err.println("SKIPPING " + modelFile + " cause :" + problems.getErrors().toString());
 		}
 		// save with the same name in the other directory (same format sxfm)
 		// using the featureidewriter
-		SXFMWriter writer = new SXFMWriter(fm_original);
 		String newPath = DESTINATION + File.separator + modelFileOrigin.getName();
 		File newFile = new File(newPath);
-		try {
-			writer.writeToFile(newFile);
-			//
+		
+
+		if (FileHandler.save(newFile.toPath(), fm_original, format).containsError()) {
+			newFile.delete();
+		} else {
 			// perform the analysis using the SPLAR reader and analyzer
 			// take the two models 
 			splar.core.fm.FeatureModel originalSplotModel = getSplotModel(origin);
@@ -116,17 +116,12 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 				System.err.println("Nodes are not equivalent @ "+ modelFile + " " + nNodes + " : " +  nNodesP);
 				return;
 			}
-//			assertTrue("Nodes are not equivalent @ "+ modelFile + " " + nNodes + " : " +  nNodesP + " ", nNodes ==  nNodesP);
 			// number of valid products
 			long splotModelNproducts = getNumberOfValidProducts(originalSplotModel);
 			long splotModelNproductsP = getNumberOfValidProducts(newSplotModel);
 			if (splotModelNproducts !=  splotModelNproductsP) {
 				System.err.println("Number of products are not equivalent @ "+ modelFile + " " + splotModelNproducts + " : " +  splotModelNproductsP);
 			}
-//			assertTrue("Number of products are not equivalent @ "+ modelFile + " " + splotModelNproducts + " : " +  splotModelNproductsP, 
-//					splotModelNproducts ==  splotModelNproductsP);
-		} finally {
-			newFile.delete();
 		}
 	}
 

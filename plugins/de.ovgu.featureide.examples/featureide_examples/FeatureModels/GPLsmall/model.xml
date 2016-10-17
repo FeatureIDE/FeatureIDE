@@ -109,12 +109,14 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
 		<comments>
 			<c>* GPL domain model February 2005 *</c>
-			<c> gramma</c>
-			<c> constraint</c>
-			<c> formattin</c>
-			<c>ShortestPath { out="Shortest" </c>
+			<c>grammar</c>
+			<c>constraint</c>
+			<c>formatting</c>
+			<c>ShortestPath { out="Shortest" }</c>
 			<c>Unweighted { out="" }</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>

@@ -30,13 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.core.resources.IProject;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.FMComposerManager;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.IFMComposerExtension;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -77,9 +74,11 @@ public class FeatureModel implements IFeatureModel {
 		return nextElementId++;
 	}
 
+	protected final String factoryID;
+
 	protected final FeatureModelAnalyzer analyser;
 	protected final List<IConstraint> constraints = new ArrayList<>();
-	
+
 	/**
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
@@ -90,8 +89,6 @@ public class FeatureModel implements IFeatureModel {
 	 * A {@link Map} containing all features.
 	 */
 	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
-
-	protected FMComposerManager fmComposerManager = null;
 
 	protected final ArrayList<IEventListener> listenerList = new ArrayList<>();
 
@@ -104,7 +101,9 @@ public class FeatureModel implements IFeatureModel {
 	protected Object undoContext = null;
 	private File sourceFile;
 
-	public FeatureModel() {
+	public FeatureModel(String factoryID) {
+		this.factoryID = factoryID;
+
 		id = getNextId();
 		featureOrderList = new LinkedList<String>();
 		featureOrderUserDefined = false;
@@ -116,7 +115,8 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
-		id = oldFeatureModel.getId();
+		factoryID = oldFeatureModel.factoryID;
+		id = oldFeatureModel.id;
 		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
@@ -128,10 +128,11 @@ public class FeatureModel implements IFeatureModel {
 		if (newRoot == null) {
 			final IFeatureStructure root = oldFeatureModel.getStructure().getRoot();
 			if (root != null) {
-			structure.setRoot(root.cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
-			for (final IConstraint constraint : oldFeatureModel.constraints) {
-				constraints.add(constraint.clone(this));
-			}}
+				structure.setRoot(root.cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
+				for (final IConstraint constraint : oldFeatureModel.constraints) {
+					constraints.add(constraint.clone(this));
+				}
+			}
 		} else {
 			structure.setRoot(newRoot.getStructure().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
@@ -255,7 +256,7 @@ public class FeatureModel implements IFeatureModel {
 			try {
 				listener.propertyChange(event);
 			} catch (Exception e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 		}
 	}
@@ -300,22 +301,6 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public Collection<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
-	}
-
-	@Override
-	public IFMComposerExtension getFMComposerExtension() {
-		return getFMComposerManager(null).getFMComposerExtension();
-	}
-
-	@Override
-	public FMComposerManager getFMComposerManager(IProject project) {
-		if (fmComposerManager == null) {
-			if (project == null) {
-				return new FMComposerManager(project);
-			}
-			fmComposerManager = new FMComposerManager(project);
-		}
-		return fmComposerManager;
 	}
 
 	@Override
@@ -373,11 +358,6 @@ public class FeatureModel implements IFeatureModel {
 	public void handleModelDataLoaded() {
 		fireEvent(EventType.MODEL_DATA_LOADED);
 
-	}
-
-	@Override
-	public IFMComposerExtension initFMComposerExtension(IProject project) {
-		return getFMComposerManager(project);
 	}
 
 	@Override
@@ -536,6 +516,11 @@ public class FeatureModel implements IFeatureModel {
 
 	public FeatureModel clone() {
 		return new FeatureModel(this, null);
+	}
+
+	@Override
+	public String getFactoryID() {
+		return factoryID;
 	}
 
 }

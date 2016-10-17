@@ -20,13 +20,10 @@
  */
 package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.ui.handlers.base.AFolderHandler;
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
 
@@ -46,14 +43,15 @@ public class BuildJavaProjectHandler extends AFolderHandler  {
 			MPLUIPlugin.getDefault().logError(e);
 		}
 		
-		if (members != null) {
-			for (IResource resource : members) {
-				if (resource.getName().endsWith(IOConstants.EXTENSION_SOLUTION) && resource instanceof IFile) {
-					MPLPlugin.getDefault().buildJavaProject((IFile) resource, folder.getName());
-					break;
-				}
-			}
-		}		
+		// TODO Build java projects
+//		if (members != null) {
+//			for (IResource resource : members) {
+//				if (resource.getName().endsWith(IOConstants.EXTENSION_SOLUTION) && resource instanceof IFile) {
+//					MPLPlugin.getDefault().buildJavaProject((IFile) resource, folder.getName());
+//					break;
+//				}
+//			}
+//		}		
 	}
 	
 }

@@ -22,32 +22,58 @@ package de.ovgu.featureide.fm.core.job;
 
 import org.eclipse.core.runtime.jobs.Job;
 
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+
 /**
  * Job that wraps the functionality of a {@link LongRunningMethod}.
  * 
  * @author Sebastian Krieter
  */
-public class LongRunningJob<T> extends AStoppableJob implements IStoppableJob {
+public class LongRunningJob<T> extends AbstractJob<T> implements IRunner<T> {
 
 	private final LongRunningMethod<T> method;
 	private T methodResult = null;
+
+	private boolean stoppable;
+	private int cancelingTimeout = -1;
 
 	public LongRunningJob(String name, LongRunningMethod<T> method) {
 		super(name, Job.LONG);
 		this.method = method;
 	}
 
-	protected boolean work() throws Exception {
-		methodResult = method.execute(workMonitor);
-		return true;
+	protected T work(IMonitor monitor) throws Exception {
+		final Executer<T> executer = stoppable ? new StoppableExecuter<>(method, cancelingTimeout) : new Executer<>(method);
+		methodResult = executer.execute(monitor);
+		return methodResult;
 	}
 
 	public T getResults() {
 		return methodResult;
 	}
 
+	public LongRunningMethod<T> getMethod() {
+		return method;
+	}
+
 	public Class<?> getImplementationClass() {
 		return method.getClass();
+	}
+	
+	public boolean isStoppable() {
+		return stoppable;
+	}
+
+	public void setStoppable(boolean stoppable) {
+		this.stoppable = stoppable;
+	}
+
+	public int getCancelingTimeout() {
+		return cancelingTimeout;
+	}
+
+	public void setCancelingTimeout(int cancelingTimeout) {
+		this.cancelingTimeout = cancelingTimeout;
 	}
 
 }

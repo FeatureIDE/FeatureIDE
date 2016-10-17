@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,7 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -43,7 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) {
@@ -86,18 +87,18 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	}
 
 	private void parseFeatures(NodeList nodeList) {
-		Iterator<IGraphicalFeature> iterator = object.getFeatures().iterator();
+		final HashMap<String, IGraphicalFeature> map = new HashMap<>();
+		for (IGraphicalFeature feature : object.getFeatures()) {
+			map.put(feature.getObject().getName(), feature);
+		}
 		for (Element e : getElements(nodeList)) {
-//			String nodeName = e.getNodeName();
-			if (!iterator.hasNext()) {
-				break;
-			}
-			IGraphicalFeature feature = iterator.next();
-
 			if (e.hasAttributes()) {
-				NamedNodeMap nodeMap = e.getAttributes();
+				final NamedNodeMap nodeMap = e.getAttributes();
+
+				IGraphicalFeature feature = null;
 				int x = 0;
 				int y = 0;
+				
 				for (int i = 0; i < nodeMap.getLength(); i++) {
 					org.w3c.dom.Node node = nodeMap.item(i);
 					String attributeName = node.getNodeName();
@@ -114,11 +115,15 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 						} catch (NumberFormatException error) {
 							// throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 						}
+					} else if (attributeName.equals("name")) {
+						feature = map.get(attributeValue);
 					} else {
 						// throwError("Unknown constraint attribute: " + attributeName, node);
 					}
 				}
-				feature.setLocation(new Point(x, y));
+				if (feature != null) {
+					feature.setLocation(new Point(x, y));
+				}
 			}
 		}
 	}
@@ -173,7 +178,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		Element constraints = doc.createElement(CONSTRAINTS);
 		root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, Integer.toString(object.getLayout().getLayoutAlgorithm()));
 
-		if (object.getLayout().verticalLayout() && !object.getLayout().hasFeaturesAutoLayout()) {
+		if (object.getLayout().verticalLayout()) {
+			root.setAttribute(HORIZONTAL_LAYOUT, FALSE);
+		} else {
 			root.setAttribute(HORIZONTAL_LAYOUT, TRUE);
 		}
 		if (!object.getLayout().showHiddenFeatures()) {

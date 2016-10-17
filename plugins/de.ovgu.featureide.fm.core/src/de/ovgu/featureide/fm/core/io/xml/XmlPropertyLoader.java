@@ -150,7 +150,7 @@ public class XmlPropertyLoader {
 				final Entry<String, Type, Object> entry = new Entry<String, IPropertyContainer.Type, Object>(key, type, value);
 				if (result.contains(entry)) {
 					for (Entry<String, Type, Object> e : result) {
-						if (e.equals(result) && (!(e.getValue().equals(entry.getValue()) && (e.getType().equals(entry.getType())))))
+						if (e.equals(entry) && (!(e.getValue().equals(entry.getValue()) && (e.getType().equals(entry.getType())))))
 							throw new IllegalStateException("Ambigous property definition for key: " + key);
 					}					
 				} else result.add(entry);

@@ -32,6 +32,6 @@ import de.ovgu.featureide.fm.core.job.IJob;
  * @see IJob
  * @see JobSequence
  */
-public interface JobFinishListener extends EventListener {
-	void jobFinished(IJob finishedJob, boolean success);
+public interface JobFinishListener<T> extends EventListener {
+	void jobFinished(IJob<T> finishedJob);
 }

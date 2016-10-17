@@ -51,12 +51,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
  * Prints feature models in the SXFM format.
@@ -64,26 +63,14 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Fabian Wielgorz
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class SXFMWriter extends AbstractFeatureModelWriter {
+public class SXFMWriter {
 
 	private final static String[] symbols = new String[] { "~", " and ", " or ", "", "", ", ", "", "", "" };
-
-	/**
-	 * Creates a new writer and sets the feature model to write out.
-	 * 
-	 * @param featureModel the structure to write
-	 */
-	public SXFMWriter(IFeatureModel featureModel) {
-		setFeatureModel(featureModel);
-	}
 	
-	@Deprecated
-	public SXFMWriter(de.ovgu.featureide.fm.core.FeatureModel featureModel) {
-		this(FeatureUtils.convert(featureModel));
-	}
+	private IFeatureModel featureModel;
 
-	//@Override
-	public String writeToString() {
+	public String writeToString(IFeatureModel featureModel) {
+		this.featureModel = featureModel;
 		//Create Empty DOM Document
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
@@ -95,7 +82,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		try {
 			db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
-			FMCorePlugin.getDefault().logError(pce);
+			Logger.logError(pce);
 		}
 		Document doc = db.newDocument();
 		//Create the Xml Representation
@@ -106,9 +93,9 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		try {
 			transfo = TransformerFactory.newInstance().newTransformer();
 		} catch (TransformerConfigurationException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		} catch (TransformerFactoryConfigurationError e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
@@ -118,7 +105,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		try {
 			transfo.transform(source, result);
 		} catch (TransformerException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return result.getWriter().toString();
 	}
@@ -136,7 +123,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
         Node featTree = doc.createElement("feature_tree");
         elem.appendChild(featTree);
         featTree.appendChild(doc.createTextNode("\n"));
-        createXmlDocRec(doc, featTree, object.getStructure().getRoot().getFeature(), false, "");
+        createXmlDocRec(doc, featTree, featureModel.getStructure().getRoot().getFeature(), false, "");
         createPropositionalConstraints(doc, elem);
     }
 
@@ -213,11 +200,11 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		FeatMod.appendChild(propConstr);
 		Node newNode = doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
-		if (object.getConstraints().isEmpty())
+		if (featureModel.getConstraints().isEmpty())
 			return;
 		// as before
 		int i = 1;
-		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(object.getConstraints())) {
+		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(featureModel.getConstraints())) {
 			// avoid use of parenthesis from the beginning
 			//			org.prop4j.Node cnf = node.clone().toCNF();
 

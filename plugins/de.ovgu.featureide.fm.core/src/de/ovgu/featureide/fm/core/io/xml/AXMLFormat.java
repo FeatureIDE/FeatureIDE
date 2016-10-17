@@ -53,7 +53,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
@@ -185,7 +185,7 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 				line = reader.readLine();
 			}
 		} catch (final IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return result.toString();
 	}
@@ -204,17 +204,16 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 			doc.getDocumentElement().normalize();
 			readDocument(doc, lastWarnings);
 		} catch (SAXException e) {
-			FMCorePlugin.getDefault().logError(e);
 			//TODO add line information, if any
-			lastWarnings.add(new Problem(e.getMessage(), 0, Severity.ERROR));
+			lastWarnings.add(new Problem(e));
 		} catch (UnsupportedModelException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			lastWarnings.add(new Problem(e.getMessage(), e.lineNumber, Severity.ERROR));
 		} catch (IOException | ParserConfigurationException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			lastWarnings.add(new Problem(e.getMessage(), 0, Severity.ERROR));
 		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			lastWarnings.add(new Problem(e.getMessage(), 0, Severity.ERROR));
 		}
 
@@ -235,7 +234,7 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 		try {
 			db = dbf.newDocumentBuilder();
 		} catch (final ParserConfigurationException pce) {
-			FMCorePlugin.getDefault().logError(pce);
+			Logger.logError(pce);
 		}
 		final Document doc = db.newDocument();
 		//Create the XML Representation
@@ -246,9 +245,9 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 		try {
 			transfo = TransformerFactory.newInstance().newTransformer();
 		} catch (final TransformerConfigurationException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		} catch (final TransformerFactoryConfigurationError e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 
 		transfo.setOutputProperty(OutputKeys.METHOD, SUFFIX);
@@ -258,7 +257,7 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 		try {
 			transfo.transform(source, result);
 		} catch (final TransformerException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 
 		return prettyPrint(result.getWriter().toString());

@@ -24,6 +24,7 @@ import org.eclipse.ui.internal.Workbench;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -41,12 +42,13 @@ public class DynamicProfileMenu extends ContributionItem {
 	private AddProfileColorSchemeAction addProfileSchemeAction;
 	private RenameProfileColorSchemeAction renameProfileSchemeAction;
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
-	private IFeatureProject myFeatureProject = getCurrentFeatureProject();
-	private IFeatureModel featureModel = myFeatureProject.getFeatureModel();
+	private final IFeatureModel featureModel; {
+		IFeatureProject curFeatureProject = getCurrentFeatureProject();
+		featureModel = curFeatureProject == null ? FMFactoryManager.getFactory().createFeatureModel() : curFeatureProject.getFeatureModel();
+	}
 	private boolean multipleSelected = isMultipleSelection();
 
 	public DynamicProfileMenu() {
-
 	}
 
 	public DynamicProfileMenu(String id) {
@@ -58,10 +60,12 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 	@Override
 	public void fill(Menu menu, int index) {
+		if (featureModel == null) {
+			return;
+		}
 		MenuManager man = new MenuManager("Color Scheme", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
 		man.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager m) {
-
 				fillContextMenu(m);
 			}
 		});
@@ -72,7 +76,6 @@ public class DynamicProfileMenu extends ContributionItem {
 
 		man.setVisible(true);
 		createActions();
-
 	}
 
 	/**
@@ -113,7 +116,6 @@ public class DynamicProfileMenu extends ContributionItem {
 		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Color Scheme", featureModel);
 		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", featureModel);
 		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Color Scheme", featureModel);
-
 	}
 
 	/**
@@ -124,7 +126,6 @@ public class DynamicProfileMenu extends ContributionItem {
 
 		ISelection selection = selectionService.getSelection();
 		return (IStructuredSelection) selection;
-
 	}
 
 	/**
@@ -150,20 +151,23 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 	private static IFeatureProject getCurrentFeatureProject() {
 		final Object element = getIStructuredCurrentSelection().getFirstElement();
-		if (element instanceof IResource) {
-			return CorePlugin.getFeatureProject((IResource) element);
-		} else if (element instanceof PackageFragmentRootContainer) {
-			IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
-			return CorePlugin.getFeatureProject(jProject.getProject());
-		} else if (element instanceof IJavaElement) {
-			return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
-		} else if (element instanceof IAdaptable) {
-			final IProject project = (IProject)((IAdaptable) element).getAdapter(IProject.class);
-			if (project != null) {
-				return CorePlugin.getFeatureProject(project);
+		if (element != null) {
+			if (element instanceof IResource) {
+				return CorePlugin.getFeatureProject((IResource) element);
+			} else if (element instanceof PackageFragmentRootContainer) {
+				IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
+				return CorePlugin.getFeatureProject(jProject.getProject());
+			} else if (element instanceof IJavaElement) {
+				return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
+			} else if (element instanceof IAdaptable) {
+				final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+				if (project != null) {
+					return CorePlugin.getFeatureProject(project);
+				}
 			}
+			throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
 		}
-		throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
+		return null;
 	}
 
 }

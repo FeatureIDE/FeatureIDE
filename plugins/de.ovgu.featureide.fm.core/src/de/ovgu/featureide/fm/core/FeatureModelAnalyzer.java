@@ -36,9 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.CheckForNull;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.prop4j.And;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
@@ -54,6 +51,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -62,7 +60,8 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
@@ -140,8 +139,7 @@ public class FeatureModelAnalyzer {
 	 */
 	private boolean cancel = false;
 
-	@CheckForNull
-	private IProgressMonitor monitor;
+	private IMonitor monitor = new NullMonitor();
 
 	private FeatureDependencies dependencies;
 
@@ -246,7 +244,7 @@ public class FeatureModelAnalyzer {
 		try {
 			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return false;
 		}
 	}
@@ -552,9 +550,8 @@ public class FeatureModelAnalyzer {
 	 * Hashing might be fast for locating features, but creating a HashSet is costly 
 	 * So LinkedLists are much faster because the number of feature in the set is usually small (e.g. dead features)
 	 */
-	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
-		final WorkMonitor workMonitor = new WorkMonitor();
-		workMonitor.setMonitor(monitor);
+	public HashMap<Object, Object> analyzeFeatureModel(IMonitor monitor) {
+		this.monitor = monitor == null ? new NullMonitor() : monitor;
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(calculateFeatures);
 		analysis.setCalculateConstraints(calculateConstraints);
@@ -562,7 +559,7 @@ public class FeatureModelAnalyzer {
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
 		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
 		analysis.setCalculateFOConstraints(calculateFOConstraints);
-		final HashMap<Object, Object> newAttributes = LongRunningWrapper.runMethod(analysis, workMonitor);
+		final HashMap<Object, Object> newAttributes = LongRunningWrapper.runMethod(analysis, this.monitor);
 		cachedValidity = analysis.isValid();
 		cachedCoreFeatures = analysis.getCoreFeatures();
 		cachedDeadFeatures = analysis.getDeadFeatures();
@@ -574,9 +571,8 @@ public class FeatureModelAnalyzer {
 	}
 
 	private void beginTask(int totalWork) {
-		if (monitor != null) {
-			monitor.beginTask(ANALYZE, totalWork);
-		}
+		monitor.setTaskName(ANALYZE);
+		monitor.setRemainingWork(totalWork);
 	}
 
 	public void updateConstraints() {
@@ -593,19 +589,12 @@ public class FeatureModelAnalyzer {
 	}
 
 	private boolean canceled() {
-		return cancel || (monitor != null ? monitor.isCanceled() : false);
+		monitor.checkCancel();
+		return cancel;
 	}
 
 	private void worked(int workDone) {
-		if (monitor != null) {
-			monitor.worked(workDone);
-		}
-	}
-
-	private void setSubTask(String name) {
-		if (monitor != null) {
-			monitor.subTask(name);
-		}
+		monitor.step();
 	}
 
 	public void updateFeatures() {
@@ -629,13 +618,14 @@ public class FeatureModelAnalyzer {
 		if (!fm.getStructure().hasHidden()) {
 			return;
 		}
-		setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
+		monitor.setTaskName(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
 		/**
 		 * First every relevant constraint of every hidden feature is checked if its form equals
 		 * HIDDEN_FEATURE <=> A
 		 * where A is an expression containing only non hidden features
 		 * If there is a constraint of that kind for a hidden feature it is added to a list.
 		 */
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
 		Collection<IFeature> list = new LinkedList<IFeature>();
 		Collection<IFeature> hiddenFeatures = getHiddenFeatures();
 		for (IFeature feature : hiddenFeatures) {
@@ -646,7 +636,7 @@ public class FeatureModelAnalyzer {
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint rightConstraint = FMFactoryManager.getFactory().createConstraint(fm, rightChild);
+						IConstraint rightConstraint = factory.createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -654,7 +644,7 @@ public class FeatureModelAnalyzer {
 						}
 					}
 					if (rightChild instanceof Literal && ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint leftConstraint = FMFactoryManager.getFactory().createConstraint(fm, leftChild);
+						IConstraint leftConstraint = factory.createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -678,7 +668,7 @@ public class FeatureModelAnalyzer {
 			if (canceled()) {
 				return;
 			}
-			setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
+			monitor.setTaskName(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
 			if (!list.contains(feature)) {
 				Collection<IFeature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;
@@ -726,8 +716,7 @@ public class FeatureModelAnalyzer {
 		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000);
 		for (IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure = feature.getStructure();
-
-			if (!FeatureUtils.getRoot(fm).toString().equals(feature.toString())) { // this might be indeed the case within the analysis for subtree dependencies
+			if (!FeatureUtils.getRoot(fm).getName().equals(feature.getName())) { // this might be indeed the case within the analysis for subtree dependencies
 				final IFeature parent = FeatureUtils.getParent(feature);
 				if (!structure.isMandatory() && parent != null && solver.isImplied(new Literal(parent.getName(), false), new Literal(feature.getName()))) {
 					falseOptionalFeatures.add(feature);

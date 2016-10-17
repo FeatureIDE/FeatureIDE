@@ -25,14 +25,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
-
-import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.ModelFileIdMap;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -167,6 +165,19 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 */
 	long getId();
+	
+	/**
+	 * A feature model is created via a feature model {@link IFeatureModelFactory factory}.
+	 * This methods returns the identifier of the factory used to create this feature model.
+	 * The factory can be used to create more feature models, features, or constraint from the same type as this feature model.
+	 * 
+	 * @return the feature model factory ID.
+	 * 
+	 * @see FMFactoryManager#getFactoryById(String)
+	 * 
+	 * @since 3.1
+	 */
+	String getFactoryID();
 
 	/**
 	 * A constraint is an additional restriction on features in the feature model.
@@ -497,21 +508,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	Iterable<IFeature> getFeatures();
 
 	/**
-	 * @since 3.0
-	 * 
-	 * @return Returns the instance of {@link IFMComposerExtension} of the underlying {@link FMComposerManager} of this feature model.
-	 */
-	IFMComposerExtension getFMComposerExtension();
-
-	/**
-	 * @since 3.0
-	 * 
-	 * @param project
-	 * @return Returns the instance of the underlying {@link FMComposerManager} of this feature model.
-	 */
-	FMComposerManager getFMComposerManager(final IProject project);
-
-	/**
 	 * Returns the number of features stored in this feature model. This call must be constistent with {@link IFeatureModel#getFeatureTable()} size.
 	 * 
 	 * @see #addFeature(IFeature)
@@ -572,14 +568,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 */
 	void handleModelDataLoaded();
-
-	/**
-	 * @since 3.0
-	 * 
-	 * @param project
-	 * @return Returns {@link #getFMComposerManager(IProject)} with the parameter <code>project</code>
-	 */
-	IFMComposerExtension initFMComposerExtension(final IProject project);
 
 	/**
 	 * @since 3.0

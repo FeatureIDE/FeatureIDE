@@ -26,7 +26,8 @@ import java.io.StringWriter;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.impl.FactoryWorkspace;
 
 /**
@@ -36,7 +37,7 @@ import de.ovgu.featureide.fm.core.base.impl.FactoryWorkspace;
  */
 public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspace> {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + FactoryWorkspaceFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + FactoryWorkspaceFormat.class.getSimpleName();
 
 	private static final String DEFAULT_KEY = "default";
 	private static final String PREFIX = "$";
@@ -73,7 +74,7 @@ public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspac
 			properties.store(writer, null);
 			return writer.toString();
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return null;
 		}
 	}

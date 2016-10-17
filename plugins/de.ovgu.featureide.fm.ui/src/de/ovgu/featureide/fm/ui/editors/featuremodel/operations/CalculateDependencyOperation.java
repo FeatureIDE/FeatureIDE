@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob.Arguments;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
 
@@ -102,8 +103,8 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		// feature model slicing 
 		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, completeFm, subtreeFeatures, true);
 		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
-		IFeatureModel slicedModel = slice.createInterface(completeFm, subtreeFeatures).clone(); // returns new feature model
-
+		IFeatureModel slicedModel = slice.sliceModel(completeFm, subtreeFeatures, new NullMonitor()).clone(); // returns new feature model
+		
 		// only replace root with selected feature if feature is core-feature
 		List<IFeature> coreFeatures = completeFm.getAnalyser().getCoreFeatures();
 		if (coreFeatures.contains(subtreeRoot)) {

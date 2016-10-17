@@ -86,7 +86,8 @@ public class StringTable {
 	public static final String GET_FALSE_OPTIONAL_FEATURES = "get false optional features";
 	public static final String GET_UNUSED_FEATURES = "get unused features";
 	public static final String REFESH_CONFIGURATION_FOLER = "refesh configuration foler";
-	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = "Error while loading feature model from ";
+	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL = "Error while loading feature model from ";
+	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = ERROR_WHILE_LOADING_FEATURE_MODEL + " from ";
 	public static final String THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_ = "This annotation is not supported yet - moved to the comment section.";
 	public static final String PERFORMING_FULL_BUILD = "Performing full build";
 	public static final String THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_ = "The feature module is empty. You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
@@ -94,7 +95,7 @@ public class StringTable {
 	public static final String LOAD_MODEL = "Load Model";
 	public static final String CHECKING_CONFIGURATIONS = "Checking configurations";
 	public static final String DELETE_CONFIGURATION_MARKERS = "Delete Configuration Markers";
-	public static final String CHECK_VALIDITY_OF = "Check validity of ";
+	public static final String CHECK_VALIDITY_OF = "Checking validity";
 	public static final String CONFIGURATION_ = "Configuration '";
 	public static final String NO_COMPOSER_COULD_BE_CREATED_FOR_ID = "No composer could be created for ID ";
 	public static final String REMOVE_PROJECT = "Remove project";
@@ -659,7 +660,7 @@ public class StringTable {
 	public static final String INTERACTIONS = "Interactions";
 	public static final String DISSIMILARITY = "Dissimilarity";
 	public static final String CHVATAL = "Chvatal";
-	public static final String CASA = "CASA";
+	public static final String CASA = "CASA (experimental)";
 	public static final String ICPL = "ICPL";
 	public static final String INCLING = "IncLing";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";

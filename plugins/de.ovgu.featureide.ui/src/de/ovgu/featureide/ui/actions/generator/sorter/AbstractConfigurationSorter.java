@@ -25,7 +25,7 @@ import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
@@ -50,13 +50,13 @@ public class AbstractConfigurationSorter {
 		concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);// TODO move to implementations
 	}
 	
-	public int sortConfigurations(final WorkMonitor monitor) {
+	public int sortConfigurations(final IMonitor monitor) {
 		int numberOfConfigurations = sort(monitor);
 		sorted = true;
 		return numberOfConfigurations;
 	}
 	
-	protected int sort(final WorkMonitor monitor) {
+	protected int sort(final IMonitor monitor) {
 		return configurations.size();
 	}
 

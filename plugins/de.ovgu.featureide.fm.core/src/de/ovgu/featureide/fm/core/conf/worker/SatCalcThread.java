@@ -26,11 +26,12 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SimpleSatSolver;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.conf.IConfigurationChanger;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * TODO description
@@ -40,17 +41,17 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 public class SatCalcThread extends AWorkerThread<Integer> {
 
 	private static class SharedObjects {
-		private final IFeatureGraph featureGraph;
 		private final IConfigurationChanger variableConfiguration;
 		private final Node fmNode;
+		private final String[] featureNames;
 
 		private List<Literal> knownLiterals = null;
 		private Literal l = null;
 
 		public SharedObjects(IFeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
-			this.featureGraph = featureGraph;
 			this.variableConfiguration = variableConfiguration;
 			this.fmNode = fmNode;
+			this.featureNames = FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
 		}
 	}
 
@@ -58,7 +59,7 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 	private final SharedObjects sharedObjects;
 
 	public SatCalcThread(IFeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
-		super(new WorkMonitor());
+		super(new NullMonitor());
 		this.sharedObjects = new SharedObjects(featureGraph, variableConfiguration, fmNode);
 		this.solver = new SimpleSatSolver(fmNode, 1000);
 	}
@@ -82,7 +83,7 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 
 	@Override
 	protected void work(Integer i) {
-		final byte value = solver.getValueOf(new Literal(sharedObjects.featureGraph.getFeatureArray()[i]));
+		final byte value = solver.getValueOf(new Literal(sharedObjects.featureNames[i]));
 		switch (value) {
 		case 1:
 			sharedObjects.variableConfiguration.setNewValue(i, Variable.TRUE, false);

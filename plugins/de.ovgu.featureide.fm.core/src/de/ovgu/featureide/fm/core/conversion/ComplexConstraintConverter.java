@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class ComplexConstraintConverter {
 	/* Feature model factory */
-	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	private IFeatureModelFactory factory;
 	/* Working feature model */
 	protected IFeatureModel fm;
 	
@@ -155,6 +155,7 @@ public class ComplexConstraintConverter {
 		
 		//Work with a clone
 		fm = model.clone();
+		factory = FMFactoryManager.getFactory(fm);
 		
 		//Basic cleaning
 		if(removeRedundncy && !prepare())

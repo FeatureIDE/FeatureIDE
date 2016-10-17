@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -33,10 +34,11 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
@@ -44,9 +46,9 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.job.ConsoleProgressMonitor;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Reads / Writes feature models in the DIMACS CNF format.
@@ -55,7 +57,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  */
 public class DIMACSFormat implements IFeatureModelFormat {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
@@ -77,10 +79,10 @@ public class DIMACSFormat implements IFeatureModelFormat {
 				lineNumber++;
 			}
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
 			problemList.add(new Problem(e, lineNumber));
 		}
-		final IFeature rootFeature = FMFactoryManager.getFactory().createFeature(featureModel, ""); 
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
+		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__"); 
 				
 		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);
@@ -92,19 +94,20 @@ public class DIMACSFormat implements IFeatureModelFormat {
 				final String[] commentLine = line.split("\\s");
 				final String id = commentLine[1].trim();
 				final String name = commentLine[2].trim();
-				names[Integer.parseInt(id)] = name;
+				try {
+					names[Integer.parseInt(id)] = name;
+				} catch (NumberFormatException e) {
+				}
 			} else {
 				break;
 			}
 		}
 
-		final ArrayList<String> abstractNames = new ArrayList<>();
+		final HashSet<String> abstractNames = new HashSet<>();
 		for (int i = 1; i < names.length; i++) {
 			final String name = names[i];
-			if (name == null) {
-				abstractNames.add("__Abstract__" + i);
-			} else {
-				final IFeature feature = FMFactoryManager.getFactory().createFeature(featureModel, name); 
+			if (name != null) {
+				final IFeature feature = factory.createFeature(featureModel, name); 
 				featureModel.addFeature(feature);
 				rootFeature.getStructure().addChild(feature.getStructure());
 			}
@@ -117,7 +120,11 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			for (int i = 0; i < clauseLine.length - 1; i++) {
 				final int varIndex = Integer.parseInt(clauseLine[i]);
 				String name = names[Math.abs(varIndex)];
-				clauseParts.add(new Literal(name != null ? name : "__Abstract__" + Math.abs(varIndex), varIndex > 0));
+				if (name == null) {
+					name = "__Abstract__" + Math.abs(varIndex);
+					abstractNames.add(name);
+				}
+				clauseParts.add(new Literal(name, varIndex > 0));
 			}
 			final Literal[] array = clauseParts.toArray(new Literal[0]);
 			final Or propNode = new Or(array);
@@ -125,11 +132,10 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			clauseParts.clear();
 		}
 		Node cnf = new And(clauses.toArray(new Or[0]));
-		final WorkMonitor workMonitor = new WorkMonitor();
-		workMonitor.setMonitor(new ConsoleProgressMonitor());
+		final IMonitor workMonitor = new ConsoleMonitor();
 		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
 		for (Node clause : cnf.getChildren()) {
-			featureModel.addConstraint(FMFactoryManager.getFactory().createConstraint(featureModel, clause));
+			featureModel.addConstraint(factory.createConstraint(featureModel, clause));
 		}
 		return problemList;
 	}
@@ -153,10 +159,10 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		string.append("p cnf ");
 		string.append(featureModel.getNumberOfFeatures());
 		string.append(' ');
-		string.append(nodes.getChildren().length - 3);
+		string.append(nodes.getChildren().length - 2);
 		string.append("\r\n");
 
-		for (Node and : nodes.getChildren()) {
+		CHILDREN : for (Node and : nodes.getChildren()) {
 			if (and instanceof Literal) {
 				if (and.toString().equals("True") || and.toString().equals("-False")) {
 					continue;
@@ -169,15 +175,10 @@ public class DIMACSFormat implements IFeatureModelFormat {
 				}
 				string.append(' ');
 			} else {
-				boolean skip = false;
 				for (Node literal : and.getChildren()) {
 					if (literal.toString().equals("True") || literal.toString().equals("-False")) {
-						skip = true;
-						break;
+						continue CHILDREN;
 					}
-				}
-				if (skip) {
-					continue;
 				}
 
 				for (Node literal : and.getChildren()) {
@@ -190,7 +191,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 					string.append(' ');
 				}
 			}
-			string.append("0");
+			string.append('0');
 			string.append(System.lineSeparator());
 		}
 

@@ -2,14 +2,26 @@
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.DFA;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.MismatchedSetException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.Parser;
+import org.antlr.runtime.ParserRuleReturnScope;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.RewriteEarlyExitException;
+import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
+import org.antlr.runtime.tree.RewriteRuleTokenStream;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.runtime.tree.TreeAdaptor;
 
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
-
-import org.antlr.runtime.tree.*;
+import de.ovgu.featureide.fm.core.Logger;
 
 
 @SuppressWarnings({"all", "warnings", "unchecked"})
@@ -111,7 +123,7 @@ public TreeAdaptor getTreeAdaptor() {
 
     @Override    
     public void emitErrorMessage(String msg) {
-    	FMCorePlugin.getDefault().logError(new Exception(msg));
+    	Logger.logError(new Exception(msg));
     }
     @Override    
     public void reportError(RecognitionException e) {

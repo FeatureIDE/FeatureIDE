@@ -20,20 +20,25 @@
  */
 package org.prop4j.analyses;
 
-import java.util.Arrays;
-
-import org.prop4j.solver.BasicSolver;
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
+import org.prop4j.solver.FixedLiteralSelectionStrategy;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
+import org.sat4j.minisat.core.Solver;
 import org.prop4j.solver.SatInstance;
+import org.prop4j.solver.VarOrderHeap2;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
  * 
  * @author Sebastian Krieter
  */
-public class CoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
+public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
+
+	public CoreDeadAnalysis(ISatSolver solver) {
+		this(solver, null);
+	}
 
 	private int[] features;
 
@@ -46,23 +51,18 @@ public class CoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
 		this.setFeatures(features);
 	}
 
-	public CoreDeadAnalysis(BasicSolver solver, int[] features) {
+	public CoreDeadAnalysis(ISatSolver solver, int[] features) {
 		super(solver);
 		this.setFeatures(features);
 	}
 
-	public int[] analyze(WorkMonitor monitor) throws Exception {
+	public int[] analyze(IMonitor monitor) throws Exception {
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findModel();
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 			int[] model2 = solver.findModel();
-
-			// if there are more negative than positive literals
-			if (model1.length - countNegative(model1) < countNegative(model2)) {
-				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-			}
 
 			if (features != null) {
 				final int[] model3 = new int[model1.length];
@@ -74,21 +74,32 @@ public class CoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
 				}
 				model1 = model3;
 			}
+
 			SatInstance.updateModel(model1, model2);
+			((Solver<?>) solver
+					.getInternalSolver())
+							.setOrder(
+									new VarOrderHeap2(
+											new FixedLiteralSelectionStrategy(model1,
+													model1.length > (AConditionallyCoreDeadAnalysis
+															.countNegative(model2)
+															+ AConditionallyCoreDeadAnalysis.countNegative(model1))),
+											solver.getOrder()));
+
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
 				if (varX != 0) {
-					solver.getAssignment().push(-varX);
+					solver.assignmentPush(-varX);
 					switch (solver.isSatisfiable()) {
 					case FALSE:
-						solver.getAssignment().pop().unsafePush(varX);
+						solver.assignmentReplaceLast(varX);
 						monitor.invoke(varX);
 						break;
 					case TIMEOUT:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						SatInstance.updateModel(model1, solver.getModel());
 						solver.shuffleOrder();
 						break;
@@ -97,15 +108,7 @@ public class CoreDeadAnalysis extends SingleThreadAnalysis<int[]> {
 			}
 		}
 
-		return Arrays.copyOf(solver.getAssignment().toArray(), solver.getAssignment().size());
-	}
-
-	private static int countNegative(int[] model) {
-		int count = 0;
-		for (int i = 0; i < model.length; i++) {
-			count += model[i] >>> (Integer.SIZE - 1);
-		}
-		return count;
+		return solver.getAssignmentArray(0, solver.getAssignment().size());
 	}
 
 	public int[] getFeatures() {

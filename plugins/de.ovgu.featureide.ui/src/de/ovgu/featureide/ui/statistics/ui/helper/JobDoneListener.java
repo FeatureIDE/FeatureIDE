@@ -34,6 +34,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.progress.UIJob;
 
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent.StatisticTreeJob;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.ITreeJob;
@@ -48,7 +51,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 public class JobDoneListener implements IJobChangeListener {
 
 	protected static JobDoneListener instance = new JobDoneListener();
-	private List<ITreeJob> runningJobs = new LinkedList<ITreeJob>();
+	private List<IJob<?>> runningJobs = new LinkedList<>();
 	protected List<TreeViewer> views = new LinkedList<TreeViewer>();
 
 	public void checkViews() {
@@ -95,10 +98,11 @@ public class JobDoneListener implements IJobChangeListener {
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					Job job = event.getJob();
 					if (job instanceof ITreeJob) {
-						final ITreeJob treeJob = (ITreeJob) job;
-						final boolean expand = (job instanceof StatisticTreeJob) && ((StatisticTreeJob)job).isExpand();
+						final LongRunningJob<?> treeJob = (LongRunningJob<?>) job;
+						LongRunningMethod<?> method = treeJob.getMethod();
+						final boolean expand = (method instanceof StatisticTreeJob) && ((StatisticTreeJob)method).isExpand();
 						runningJobs.remove(treeJob);
-						final Parent calc = treeJob.getCalculated();
+						final Parent calc = ((TreeJob)method).getCalculated();
 						calc.startCalculating(false);
 						checkViews();
 						synchronized (views) {
@@ -132,9 +136,9 @@ public class JobDoneListener implements IJobChangeListener {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				Job job = event.getJob();
 				if (job instanceof ITreeJob) {
-					ITreeJob treeJob = (ITreeJob) job;
+					final LongRunningJob<?> treeJob = (LongRunningJob<?>) job;
 					runningJobs.add(treeJob);
-					Parent calc = treeJob.getCalculated();
+					Parent calc = ((TreeJob)treeJob.getMethod()).getCalculated();
 					calc.startCalculating(true);
 					checkViews();
 					synchronized (views) {
@@ -154,7 +158,7 @@ public class JobDoneListener implements IJobChangeListener {
 	public void sleeping(IJobChangeEvent event) {}
 	
 	public void cancelAllRunningTreeJobs() {
-		for (ITreeJob job : runningJobs) {
+		for (IJob<?> job : runningJobs) {
 			job.cancel();
 		}
 	}

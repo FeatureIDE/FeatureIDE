@@ -42,14 +42,10 @@ public abstract class Preferences {
 	private static final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
 	
 	public static int defaultCompletion;
-	public static int defaultFeatureNameScheme;
 	
 	static {
 		String pref = preferences.get("configCompletion", Integer.toString(COMPLETION_ONE_CLICK));
 		defaultCompletion = castToInt(pref, COMPLETION_ONE_CLICK);
-		
-		pref = preferences.get("configFeatureNameScheme", Integer.toString(SCHEME_LONG));
-		defaultFeatureNameScheme = castToInt(pref, SCHEME_LONG);
 	}
 
 	/**
@@ -62,11 +58,6 @@ public abstract class Preferences {
 	public static void setDefaultCompletion(int defaultCompletion) {
 		Preferences.defaultCompletion = defaultCompletion;
 		store("configCompletion", defaultCompletion);
-	}
-	
-	public static void setDefaultFeatureNameFormat(int defaultFeatureNameScheme) {
-		Preferences.defaultFeatureNameScheme = defaultFeatureNameScheme;
-		store("configFeatureNameScheme", defaultFeatureNameScheme);
 	}
 	
 	private static int castToInt(String pref, int defaultValue) {
@@ -86,7 +77,7 @@ public abstract class Preferences {
 		try {
 			preferences.flush();
 		} catch (BackingStoreException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 }

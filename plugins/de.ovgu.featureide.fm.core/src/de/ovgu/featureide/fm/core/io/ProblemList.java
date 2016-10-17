@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IMarker;
-
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 
 /**
@@ -42,7 +40,7 @@ public class ProblemList extends ArrayList<Problem> {
 	 * 
 	 * @param problems The problem list.
 	 * @param minimumLevel The minimum severity level
-	 *            (one of {@link IMarker#SEVERITY_INFO}, {@link IMarker#SEVERITY_WARNING}, or {@link IMarker#SEVERITY_ERROR}).
+	 *            (one of {@link Severity#INFO}, {@link Severity#WARNING}, or {@link Severity#ERROR}).
 	 * 
 	 * @return {@code true} if the list contains a problem with severity at the given minimum level or above, {@code false} otherwise.
 	 */
