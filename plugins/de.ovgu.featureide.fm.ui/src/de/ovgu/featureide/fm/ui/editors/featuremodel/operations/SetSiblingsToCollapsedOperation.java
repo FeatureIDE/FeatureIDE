@@ -65,9 +65,12 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	@Override
 	protected FeatureIDEEvent operation() {
 		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
-			collapseStates.add(f.isCollapsed());
-			if (!f.equals(feature.getStructure())) {
-				f.setCollapsed(true);
+			if(f.hasChildren())
+			{
+				collapseStates.add(f.isCollapsed());
+				if (!f.equals(feature.getStructure())) {
+					f.setCollapsed(true);
+				}	
 			}
 		}
 		return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);

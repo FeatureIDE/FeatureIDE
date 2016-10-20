@@ -157,7 +157,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 				}
 			}
 
-//			FMUIPlugin.getDefault().logInfo(parentSet.toString() + "\n" + childList.toString() + ": " + childList.size()  + "\n" + featureDiagramEditor.isLevelSizeOverLimit(childList)+ "\n" + bestSolution.toString());
 			if (childList.size() != 0 && !featureDiagramEditor.isLevelSizeOverLimit()) {
 				if (childList.size() > bestSolution.size()) {
 					bestSolution = childList;
@@ -180,34 +179,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 		((FeatureDiagramEditor) getEditor()).internRefresh(true);
 		return bestSolution;
-//		LinkedList<IFeature> maxChilds = new LinkedList<IFeature>();
-//		for (IFeature f : lastLevel) {
-//			//Expand and relayout parent
-//			f.getStructure().setCollapsed(false);
-//			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-//			((FeatureDiagramEditor) getEditor()).internRefresh(true);
-//
-//			LinkedList<IFeature> testChild = new LinkedList<IFeature>();
-//			for (IFeatureStructure child : f.getStructure().getChildren()) {
-//				testChild.add(child.getFeature());
-//			}
-//			if (testChild.size() != 0 && !featureDiagramEditor.isLevelSizeOverLimit(testChild)) {
-//				if (testChild.size() >= maxChilds.size()) {
-//					maxChilds = testChild;
-//				}
-//			}
-//			//collapse and relayout parent
-//			f.getStructure().setCollapsed(true);
-//			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-//			((FeatureDiagramEditor) getEditor()).internRefresh(true);
-//		}
-//
-//		if (maxChilds.size() > 0) {
-//			maxChilds.get(0).getStructure().getParent().setCollapsed(false);
-//			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-//			((FeatureDiagramEditor) getEditor()).internRefresh(true);
-//		}
-
 	}
 	
 	public static <IFeatue> LinkedList<LinkedList<IFeatue>> powerSet(LinkedList<IFeatue> originalSet) {
