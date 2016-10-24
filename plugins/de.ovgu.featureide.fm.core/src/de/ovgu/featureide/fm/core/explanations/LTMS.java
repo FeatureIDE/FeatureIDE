@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.prop4j.Literal;
@@ -72,12 +73,10 @@ public class LTMS {
 	private final Map<Object, Boolean> variableValues = new LinkedHashMap<>();
 	/**
 	 * The reason for a derived truth value, represented by a node (which is clause in CNF).
+	 * The literals of this clause are the antecedents of the variable.
+	 * The antecedents are the literals whose values were referenced when deriving a new truth value.
 	 */
 	private final Map<Object, Node> reasons = new LinkedHashMap<>();
-	/**
-	 * Literals whose values were referenced when deriving a new truth value.
-	 */
-	private final Map<Object, Set<Literal>> antecedents = new LinkedHashMap<>();
 	/**
 	 * The stack to collect unit-open clauses.
 	 */
@@ -214,7 +213,6 @@ public class LTMS {
 	private void reset() {
 		variableValues.clear();
 		reasons.clear();
-		antecedents.clear();
 		derivedLiteral = null;
 		variableValues.putAll(premises);
 	}
@@ -334,13 +332,6 @@ public class LTMS {
 	 * @param cnfClause clause containing the literal
 	 */
 	private void justify(Object variable, Node cnfClause) {
-		final Set<Literal> antecedents = new LinkedHashSet<>();
-		for (final Literal literal : clauseLiterals.get(cnfClause)) { //all variables from the same clause...
-			if (!literal.var.equals(variable)) { //... which are not this variable
-				antecedents.add(literal);
-			}
-		}
-		this.antecedents.put(variable, antecedents);
 		reasons.put(variable, cnfClause);
 	}
 	
@@ -355,36 +346,40 @@ public class LTMS {
 		Literal violatedLiteral = null;
 		for (final Literal literal : clauseLiterals.get(violatedClause)) {
 			if (literal.getSourceAttribute() == FeatureAttribute.CHILD) {
-				explanation.addReasonLiteral(literal);
+				explanation.addUniqueReason(violatedClause, literal);
 			} else {
 				violatedLiteral = literal;
 			}
 		}
 		if (explanation.getReasons().isEmpty()) {
-			explanation.addReasonLiteral(violatedLiteral);
+			explanation.addUniqueReason(violatedClause, violatedLiteral);
 		}
 
 		//Get all antecedents of the derived literal.
 		if (derivedLiteral == null) { //immediate contradiction, thus no propagations, thus no antecedents
 			return explanation;
 		}
-		final Set<Literal> allAntecedents = new LinkedHashSet<>();
-		allAntecedents.add(derivedLiteral);
-		allAntecedents.addAll(getAllAntecedents(derivedLiteral));
+		final Map<Literal, Node> allAntecedents = new LinkedHashMap<>();
+		allAntecedents.put(derivedLiteral, derivedClause);
+		for (final Entry<Literal, Node> e : getAllAntecedents(derivedLiteral).entrySet()) {
+			allAntecedents.putIfAbsent(e.getKey(), e.getValue());
+		}
 		
 		//Explain every antecedent and its reason.
-		for (final Literal antecedent : allAntecedents) {
-			if (antecedent.getSourceAttribute() != FeatureAttribute.PARENT) {
-				explanation.addUniqueReasonLiteral(antecedent);
+		for (final Entry<Literal, Node> e : allAntecedents.entrySet()) {
+			final Literal antecedentLiteral = e.getKey();
+			final Node antecedentClause = e.getValue();
+			if (antecedentLiteral.getSourceAttribute() != FeatureAttribute.PARENT) {
+				explanation.addUniqueReason(antecedentClause, antecedentLiteral);
 			}
-			final Node reason = reasons.get(antecedent.var);
+			final Node reason = reasons.get(antecedentLiteral.var);
 			if (reason == null) { //premise, thus no reason to explain
 				continue;
 			}
 			for (final Literal literal : clauseLiterals.get(reason)) {
-				if (literal.var.equals(antecedent.var)) {
+				if (literal.var.equals(antecedentLiteral.var)) {
 					if (literal.getSourceAttribute() != FeatureAttribute.PARENT) {
-						explanation.addUniqueReasonLiteral(literal);
+						explanation.addUniqueReason(reason, literal);
 					}
 					break;
 				}
@@ -398,15 +393,19 @@ public class LTMS {
 	 * @param literal literal with possible antecedents
 	 * @return all antecedents of the given variable recursively
 	 */
-	private Set<Literal> getAllAntecedents(Literal literal) {
-		final Set<Literal> antecedents = this.antecedents.get(literal.var);
-		if (antecedents == null) {
-			return Collections.emptySet();
+	private Map<Literal, Node> getAllAntecedents(Literal literal) {
+		final Node reason = reasons.get(literal.var);
+		if (reason == null) {
+			return Collections.emptyMap();
 		}
-		final Set<Literal> allAntecedents = new LinkedHashSet<>();
-		for (final Literal antecedent : antecedents) {
-			if (allAntecedents.add(antecedent)) {
-				allAntecedents.addAll(getAllAntecedents(antecedent));
+		final Map<Literal, Node> allAntecedents = new LinkedHashMap<>();
+		for (final Literal antecedent : clauseLiterals.get(reason)) {
+			if (antecedent.var.equals(literal.var) || allAntecedents.containsKey(antecedent)) {
+				continue;
+			}
+			allAntecedents.put(antecedent, reason);
+			for (final Entry<Literal, Node> e : getAllAntecedents(antecedent).entrySet()) {
+				allAntecedents.putIfAbsent(e.getKey(), e.getValue());
 			}
 		}
 		return allAntecedents;

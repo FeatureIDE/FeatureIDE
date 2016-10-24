@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Literal.FeatureAttribute;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -49,15 +50,27 @@ public class Explanation implements Cloneable {
 	 * @author Sofia Ananieva
 	 */
 	public class Reason implements Cloneable {
+		/** clause containing the literal */
+		private final Node clause;
 		/** the literal of this reason */
 		private final Literal literal;
 		
 		/**
 		 * Constructs a new instance of this class.
+		 * @param clause clause containing the literal
 		 * @param literal the literal of this reason
 		 */
-		public Reason(Literal literal) {
+		public Reason(Node clause, Literal literal) {
+			this.clause = clause;
 			this.literal = literal;
+		}
+		
+		/**
+		 * Returns the clause containing the literal.
+		 * @return the clause containing the literal
+		 */
+		public Node getClause() {
+			return clause;
 		}
 		
 		/**
@@ -80,7 +93,7 @@ public class Explanation implements Cloneable {
 		
 		@Override
 		public Reason clone() {
-			return new Reason(literal);
+			return new Reason(clause, literal);
 		}
 		
 		@Override
@@ -116,6 +129,7 @@ public class Explanation implements Cloneable {
 		@Override
 		public String toString() {
 			return "Reason["
+					+ "clause=" + clause + ", "
 					+ "literal=" + literal
 					+ "]";
 		}
@@ -266,7 +280,7 @@ public class Explanation implements Cloneable {
 	}
 	
 	/**
-	 * Adds all given reason to this explanation.
+	 * Adds all given reasons to this explanation.
 	 * @param reasons reasons to add
 	 */
 	public void addReasons(Collection<Reason> reasons) {
@@ -277,20 +291,11 @@ public class Explanation implements Cloneable {
 	
 	/**
 	 * Adds a reason with the given literal to this explanation.
+	 * @param clause clause containing the literal
 	 * @param literal literal of the reason to add
 	 */
-	public void addReasonLiteral(Literal literal) {
-		addReason(new Reason(literal));
-	}
-	
-	/**
-	 * Adds a reason for each given literal to this explanation.
-	 * @param literals literals of the reasons to add
-	 */
-	public void addReasonLiterals(Collection<Literal> literals) {
-		for (final Literal literal : literals) {
-			addReasonLiteral(literal);
-		}
+	public void addReason(Node clause, Literal literal) {
+		addReason(new Reason(clause, literal));
 	}
 	
 	/**
@@ -313,20 +318,11 @@ public class Explanation implements Cloneable {
 	
 	/**
 	 * Adds a reason with the given literal to this explanation if it is not already contained.
+	 * @param clause clause containing the literal
 	 * @param literal literal of the reason to add
 	 */
-	public void addUniqueReasonLiteral(Literal literal) {
-		addUniqueReason(new Reason(literal));
-	}
-	
-	/**
-	 * Adds a reason for each given literal to this explanation if it is not already contained.
-	 * @param literals literals of the reasons to add
-	 */
-	public void addUniqueReasonLiterals(Collection<Literal> literals) {
-		for (final Literal literal : literals) {
-			addUniqueReasonLiteral(literal);
-		}
+	public void addUniqueReason(Node clause, Literal literal) {
+		addUniqueReason(new Reason(clause, literal));
 	}
 	
 	/**
