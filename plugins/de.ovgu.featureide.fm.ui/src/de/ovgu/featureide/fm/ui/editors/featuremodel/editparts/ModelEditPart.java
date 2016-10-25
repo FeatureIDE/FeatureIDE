@@ -24,11 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.FreeformLayer;
-import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.MarginBorder;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
@@ -36,6 +32,7 @@ import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ModelFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -60,10 +57,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 	}
 
 	protected IFigure createFigure() {
-		Figure fig = new FreeformLayer();
-		fig.setLayoutManager(new FreeformLayout());
-		fig.setBorder(new MarginBorder(5));
-		return fig;
+		return new ModelFigure();
 	}
 
 	@Override
