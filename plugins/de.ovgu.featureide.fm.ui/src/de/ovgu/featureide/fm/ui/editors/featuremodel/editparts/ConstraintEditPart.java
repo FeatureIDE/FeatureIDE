@@ -24,14 +24,12 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
-import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -44,7 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class ConstraintEditPart extends AbstractGraphicalEditPart implements IEventListener {
+public class ConstraintEditPart extends ModelElementEditPart {
 
 	public ConstraintEditPart(Object constraint) {
 		super();
