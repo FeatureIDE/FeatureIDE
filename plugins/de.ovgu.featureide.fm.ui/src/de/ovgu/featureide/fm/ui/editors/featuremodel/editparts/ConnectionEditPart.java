@@ -41,7 +41,6 @@ import org.eclipse.gef.editparts.AbstractConnectionEditPart;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
 import org.eclipse.gef.requests.SelectionRequest;
-import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -56,10 +55,10 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * An editpart for connections between features and their parents. Creates the
@@ -94,15 +93,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	@Override
 	protected IFigure createFigure() {
-		PolylineConnection figure = new PolylineConnection();
-		figure.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
-		FeatureConnection featureConnection = getConnectionModel();
-		if (featureConnection.getSource() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
-				&& featureConnection.getTarget() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getTarget()).isFromExtern()) {
-			figure.setLineStyle(SWT.LINE_DASH);
-		}
-
-		return figure;
+		return new ConnectionFigure(connectsExternFeatures());
 	}
 
 	@Override
