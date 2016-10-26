@@ -39,7 +39,6 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
@@ -136,8 +135,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			break;
 		case REDUNDANT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			Explanation explanationRedundant = constraint.getFeatureModel().getAnalyser().redundantConstrExpl
-					.get(FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint));
+			Explanation explanationRedundant = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraint);
 			Panel panelRedundant = new Panel();
 			panelRedundant.setLayoutManager(new ToolbarLayout(false));
 			panelRedundant.add(new Label(REDUNDANCE));
@@ -147,8 +145,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setBorder(FMPropertyManager.getImplicitConstraintBorder());
 			// set tooltip with explanation for redundant constraint
-			Explanation explanationImplicit = constraint.getFeatureModel().getAnalyser().redundantConstrExpl
-					.get(FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint));
+			Explanation explanationImplicit = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraint);
 			if (explanationImplicit != null) {
 				explanationImplicit.setImplicit(true);
 			}

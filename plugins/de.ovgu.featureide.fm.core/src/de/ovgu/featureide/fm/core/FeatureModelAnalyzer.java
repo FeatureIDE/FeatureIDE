@@ -75,20 +75,17 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 public class FeatureModelAnalyzer {
 
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint.
-	 * Key = constraintIndex, Value = explanation
+	 * Remembers explanations for redundant constraints.
 	 */
-	public Map<Integer, Explanation> redundantConstrExpl = new HashMap<>();
+	public Map<IConstraint, Explanation> redundantConstrExpl = new HashMap<>();
 
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint.
-	 * Key = constraintIndex, Value = explanation
+	 * Remembers explanations for dead features.
 	 */
 	public Map<IFeature, Explanation> deadFeatureExpl = new HashMap<>();
 
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint.
-	 * Key = constraintIndex, Value = explanation
+	 * Remembers explanations for false-optional features.
 	 */
 	public Map<IFeature, Explanation> falseOptFeatureExpl = new HashMap<>();
 
