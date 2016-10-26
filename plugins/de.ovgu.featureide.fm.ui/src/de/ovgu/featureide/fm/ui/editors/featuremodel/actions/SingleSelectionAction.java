@@ -107,8 +107,8 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 		Object part = selection.getFirstElement();
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected)
-			return ((ConnectionEditPart) part).getConnectionModel().getTarget().getObject();
-		return ((FeatureEditPart) part).getFeature().getObject();
+			return ((ConnectionEditPart) part).getModel().getTarget().getObject();
+		return ((FeatureEditPart) part).getModel().getObject();
 	}
 
 	private void selectionChanged(boolean oneSelected) {

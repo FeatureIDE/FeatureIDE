@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
@@ -44,22 +43,32 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  */
 public class ConstraintEditPart extends ModelElementEditPart {
 
-	public ConstraintEditPart(Object constraint) {
-		super();
+	public ConstraintEditPart(IGraphicalConstraint constraint) {
 		setModel(constraint);
 	}
 
 	public IGraphicalConstraint getConstraintModel() {
 		return (IGraphicalConstraint) getModel();
 	}
-
-	public ConstraintFigure getConstraintFigure() {
-		return (ConstraintFigure) getFigure();
+	
+	@Override
+	public ModelEditPart getParent() {
+		return (ModelEditPart) super.getParent();
+	}
+	
+	@Override
+	public IGraphicalConstraint getModel() {
+		return (IGraphicalConstraint) super.getModel();
+	}
+	
+	@Override
+	public ConstraintFigure getFigure() {
+		return (ConstraintFigure) super.getFigure();
 	}
 
 	@Override
-	public IFigure createFigure() {
-		return new ConstraintFigure(getConstraintModel());
+	protected ConstraintFigure createFigure() {
+		return new ConstraintFigure(getModel());
 	}
 
 	@Override
@@ -68,7 +77,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 	}
 
 	public void performRequest(Request request) {
-		final IGraphicalConstraint constraintModel = getConstraintModel();
+		final IGraphicalConstraint constraintModel = getModel();
 		if (request.getType() == RequestConstants.REQ_OPEN) {
 			new ConstraintDialog(constraintModel.getObject().getFeatureModel(), constraintModel.getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
@@ -84,7 +93,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 
 	@Override
 	public void activate() {
-		getConstraintModel().registerUIObject(this);
+		getModel().registerUIObject(this);
 		super.activate();
 	}
 
@@ -99,18 +108,18 @@ public class ConstraintEditPart extends ModelElementEditPart {
 		switch (prop) {
 		case CONSTRAINT_MOVE:
 		case LOCATION_CHANGED:
-			getConstraintFigure().setLocation(getConstraintModel().getLocation());
+			getFigure().setLocation(getModel().getLocation());
 			break;
 		case CONSTRAINT_MODIFY:
-			getConstraintFigure().setConstraintProperties();
-			getConstraintModel().setSize(getConstraintFigure().getSize());
+			getFigure().setConstraintProperties();
+			getModel().setSize(getFigure().getSize());
 			break;
 		case ATTRIBUTE_CHANGED:
 		case CONSTRAINT_SELECTED:
-			getConstraintFigure().setConstraintProperties();
+			getFigure().setConstraintProperties();
 			break;
 		default:
-			FMUIPlugin.getDefault().logWarning(event + " @ " + getConstraintModel() + " not handled.");
+			FMUIPlugin.getDefault().logWarning(event + " @ " + getModel() + " not handled.");
 			break;
 		}
 	}

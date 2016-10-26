@@ -23,10 +23,27 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ModelElementFigure;
 
 /**
  * An edit part for feature model elements, meaning features and constraints.
  * 
  * @author Timo Guenther
  */
-public abstract class ModelElementEditPart extends AbstractGraphicalEditPart implements IEventListener {}
+public abstract class ModelElementEditPart extends AbstractGraphicalEditPart implements IEventListener {
+	@Override
+	public ModelEditPart getParent() {
+		return (ModelEditPart) super.getParent();
+	}
+	
+	@Override
+	public IGraphicalElement getModel() {
+		return (IGraphicalElement) super.getModel();
+	}
+	
+	@Override
+	public ModelElementFigure getFigure() {
+		return (ModelElementFigure) super.getFigure();
+	}
+}

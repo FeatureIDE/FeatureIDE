@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
@@ -63,22 +62,28 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	private ConnectionAnchor sourceAnchor = null;
 	private ConnectionAnchor targetAnchor = null;
 
-	FeatureEditPart(Object feature) {
-		super();
+	FeatureEditPart(IGraphicalFeature feature) {
 		setModel(feature);
 	}
-
-	public IGraphicalFeature getFeature() {
-		return (IGraphicalFeature) getModel();
+	
+	@Override
+	public ModelEditPart getParent() {
+		return (ModelEditPart) super.getParent();
 	}
-
-	public FeatureFigure getFeatureFigure() {
-		return (FeatureFigure) getFigure();
+	
+	@Override
+	public IGraphicalFeature getModel() {
+		return (IGraphicalFeature) super.getModel();
+	}
+	
+	@Override
+	public FeatureFigure getFigure() {
+		return (FeatureFigure) super.getFigure();
 	}
 
 	@Override
-	protected IFigure createFigure() {
-		final IGraphicalFeature f = getFeature();
+	protected FeatureFigure createFigure() {
+		final IGraphicalFeature f = getModel();
 		final FeatureFigure featureFigure = new FeatureFigure(f, f.getGraphicalModel());
 		sourceAnchor = featureFigure.getSourceAnchor();
 		targetAnchor = featureFigure.getTargetAnchor();
@@ -87,7 +92,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	protected void createEditPolicies() {
-		final IGraphicalFeature f = getFeature();
+		final IGraphicalFeature f = getModel();
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getGraphicalModel(), f));
 	}
 
@@ -95,8 +100,8 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	public void showRenameManager() {
 		if (manager == null) {
-			final IGraphicalFeature f = getFeature();
-			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFeatureFigure()),
+			final IGraphicalFeature f = getModel();
+			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFigure()),
 					f.getGraphicalModel().getFeatureModel());
 		}
 		manager.show();
@@ -104,8 +109,8 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	public void performRequest(Request request) {
-		IFeature feature = getFeature().getObject();
-		IGraphicalFeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
+		IFeature feature = getModel().getObject();
+		IGraphicalFeatureModel featureModel = getParent().getModel();
 
 		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
 			if (constraint.isFeatureSelected()) {
@@ -136,12 +141,12 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	protected List<FeatureConnection> getModelSourceConnections() {
-		return getFeature().getSourceConnectionAsList();
+		return getModel().getSourceConnectionAsList();
 	}
 
 	@Override
 	protected List<FeatureConnection> getModelTargetConnections() {
-		return Collections.<FeatureConnection> emptyList();// getFeature().getTargetConnections();
+		return Collections.<FeatureConnection> emptyList();// getModel().getTargetConnections();
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
@@ -162,15 +167,15 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	public void activate() {
-		getFeature().registerUIObject(this);
-		getFeatureFigure().setVisible(true);
+		getModel().registerUIObject(this);
+		getFigure().setVisible(true);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getFeatureFigure().setVisible(false);
+		getFigure().setVisible(false);
 	}
 
 	@Override
@@ -179,7 +184,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		FeatureConnection sourceConnection;
 		switch (prop) {
 		case CHILDREN_CHANGED:
-			for (FeatureConnection connection : getFeature().getTargetConnections()) {
+			for (FeatureConnection connection : getModel().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
@@ -188,12 +193,12 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 			break;
 		case LOCATION_CHANGED:
-			getFeatureFigure().setLocation(getFeature().getLocation());
-			getFeatureFigure().setProperties();
-			sourceConnection = getFeature().getSourceConnection();
+			getFigure().setLocation(getModel().getLocation());
+			getFigure().setProperties();
+			sourceConnection = getModel().getSourceConnection();
 			if (sourceConnection != null) {
 				IGraphicalFeature target = sourceConnection.getTarget();
-				final IGraphicalFeature newTarget = FeatureUIHelper.getGraphicalParent(getFeature());
+				final IGraphicalFeature newTarget = FeatureUIHelper.getGraphicalParent(getModel());
 				if (!equals(newTarget, target)) {
 					sourceConnection.setTarget(newTarget);
 					Map<?, ?> registry = getViewer().getEditPartRegistry();
@@ -204,7 +209,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 				}
 			}
 
-			for (FeatureConnection connection : getFeature().getTargetConnections()) {
+			for (FeatureConnection connection : getModel().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
@@ -213,8 +218,8 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 			break;
 		case GROUP_TYPE_CHANGED:
-			getFeatureFigure().setProperties();
-			sourceConnection = getFeature().getSourceConnection();
+			getFigure().setProperties();
+			sourceConnection = getModel().getSourceConnection();
 			Map<?, ?> registry = getViewer().getEditPartRegistry();
 			ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			if (connectionEditPart != null) {
@@ -224,21 +229,21 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 			break;
 		case FEATURE_NAME_CHANGED:
-			String displayName = getFeature().getObject().getProperty().getDisplayName();
+			String displayName = getModel().getObject().getProperty().getDisplayName();
 			
-			if(getFeature().getGraphicalModel().getLayout().showShortNames()){
+			if(getModel().getGraphicalModel().getLayout().showShortNames()){
 				int lastIndexOf = displayName.lastIndexOf(".");
 				displayName = displayName.substring(++lastIndexOf);
 			}	
-			getFeatureFigure().setName(displayName);
-			getFeature().setSize(getFeatureFigure().getSize());
+			getFigure().setName(displayName);
+			getModel().setSize(getFigure().getSize());
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
-			getFeatureFigure().setProperties();
+			getFigure().setProperties();
 			break;
 		case MANDATORY_CHANGED:
-			sourceConnection = getFeature().getSourceConnection();
+			sourceConnection = getModel().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
@@ -247,20 +252,20 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			deactivate();
 			break;
 		case PARENT_CHANGED:
-			sourceConnection = getFeature().getSourceConnection();
+			sourceConnection = getModel().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshParent();			
 			break;
 		case HIDDEN_CHANGED:
-			getFeatureFigure().setProperties();
-			sourceConnection = getFeature().getSourceConnection();
+			getFigure().setProperties();
+			sourceConnection = getModel().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
 			break;
 		default:
-			FMUIPlugin.getDefault().logWarning(prop + " @ " + getFeature() + " not handled.");
+			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
 			break;
 		}
 	}

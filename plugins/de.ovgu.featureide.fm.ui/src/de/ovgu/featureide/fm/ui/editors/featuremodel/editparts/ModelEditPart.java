@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.RootEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -47,27 +47,41 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class ModelEditPart extends AbstractGraphicalEditPart {
 
-	ModelEditPart(Object featureModel) {
-		super();
+	ModelEditPart(IGraphicalFeatureModel featureModel) {
 		setModel(featureModel);
 	}
 
 	public IGraphicalFeatureModel getFeatureModel() {
 		return (IGraphicalFeatureModel) getModel();
 	}
+	
+	@Override
+	public RootEditPart getParent() {
+		return (RootEditPart) super.getParent();
+	}
+	
+	@Override
+	public IGraphicalFeatureModel getModel() {
+		return (IGraphicalFeatureModel) super.getModel();
+	}
+	
+	@Override
+	public ModelFigure getFigure() {
+		return (ModelFigure) super.getFigure();
+	}
 
-	protected IFigure createFigure() {
+	protected ModelFigure createFigure() {
 		return new ModelFigure();
 	}
 
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ModelLayoutEditPolicy(getFeatureModel()));
+		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ModelLayoutEditPolicy(getModel()));
 	}
 
 	@Override
 	protected List<Object> getModelChildren() {
-		final IGraphicalFeatureModel fm = getFeatureModel();
+		final IGraphicalFeatureModel fm = getModel();
 
 		final List<?> constraints = fm.getConstraints();
 		final Collection<?> features = Functional.toList(fm.getFeatures());

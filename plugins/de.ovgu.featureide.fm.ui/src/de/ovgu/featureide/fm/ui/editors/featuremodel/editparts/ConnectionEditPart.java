@@ -27,7 +27,6 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.GridLayout;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RotatableDecoration;
@@ -82,17 +81,22 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	private Figure toolTipContent = new Figure();
 
-	ConnectionEditPart(Object connection) {
-		super();
+	ConnectionEditPart(FeatureConnection connection) {
 		setModel(connection);
 	}
 
-	public FeatureConnection getConnectionModel() {
-		return (FeatureConnection) getModel();
+	@Override
+	public FeatureConnection getModel() {
+		return (FeatureConnection) super.getModel();
+	}
+	
+	@Override
+	public ConnectionFigure getFigure() {
+		return (ConnectionFigure) super.getFigure();
 	}
 
 	@Override
-	protected IFigure createFigure() {
+	protected ConnectionFigure createFigure() {
 		return new ConnectionFigure(connectsExternFeatures());
 	}
 
@@ -120,7 +124,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	 * Change the mandatory type is the circle decoration was selected.
 	 */
 	private boolean changeMandatory(Request request) {
-		final IFeature feature = getConnectionModel().getSource().getObject();
+		final IFeature feature = getModel().getSource().getObject();
 		if (feature.getStructure().getParent().isAnd()) {
 			final List<?> decorators = getConnectionFigure().getChildren();
 			if (!decorators.isEmpty()) {
@@ -151,7 +155,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			return;
 		}
 
-		IFeature feature = getConnectionModel().getTarget().getObject();
+		IFeature feature = getModel().getTarget().getObject();
 		IFeatureModel featureModel = feature.getFeatureModel();
 
 		int groupType;
@@ -182,7 +186,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 
 	public void refreshParent() {
-		IGraphicalFeature newModel = getConnectionModel().getTarget();
+		IGraphicalFeature newModel = getModel().getTarget();
 		FeatureEditPart newEditPart = (FeatureEditPart) getViewer().getEditPartRegistry().get(newModel);
 		setTarget(newEditPart);
 		getFigure().setVisible(getTarget() != null);
@@ -190,9 +194,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 
 	public void refreshSourceDecoration() {
-		IFeature source = getConnectionModel().getSource().getObject();
-		IFeature sourceParent = getConnectionModel().getSource().getObject();
-		final IGraphicalFeature graphicalTarget = getConnectionModel().getTarget();
+		IFeature source = getModel().getSource().getObject();
+		IFeature sourceParent = getModel().getSource().getObject();
+		final IGraphicalFeature graphicalTarget = getModel().getTarget();
 		if (graphicalTarget == null) {
 			return;
 		}
@@ -224,7 +228,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 
 	public void refreshTargetDecoration() {
-		FeatureConnection connectionModel = getConnectionModel();
+		FeatureConnection connectionModel = getModel();
 		IGraphicalFeature target = connectionModel.getTarget();
 		if (target == null) {
 			return;
@@ -259,7 +263,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 
 	public void refreshToolTip() {
-		final IGraphicalFeature graphicalTarget = getConnectionModel().getTarget();
+		final IGraphicalFeature graphicalTarget = getModel().getTarget();
 		if (graphicalTarget == null) {
 			return;
 		}
@@ -304,7 +308,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	 * @return true if both features are from an external feature model
 	 */
 	private boolean connectsExternFeatures() {
-		FeatureConnection featureConnection = getConnectionModel();
+		FeatureConnection featureConnection = getModel();
 		final IFeature source = featureConnection.getSource().getObject();
 		final IGraphicalFeature graphicalTarget = featureConnection.getTarget();
 		if (graphicalTarget == null) {

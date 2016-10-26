@@ -808,7 +808,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				newEditPart.activate();
 				select(newEditPart);
 				// open the renaming command
-				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFeatureFigure()), getFeatureModel())
+				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel())
 						.show();
 			} else {
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
