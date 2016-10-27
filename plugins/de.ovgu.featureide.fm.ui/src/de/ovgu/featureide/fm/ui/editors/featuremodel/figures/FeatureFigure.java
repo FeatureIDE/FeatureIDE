@@ -230,6 +230,10 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 				setBorder(FMPropertyManager.getInterfacedFeatureBorder());
 			}
 		}
+		
+		if (getActiveReason() != null) {
+			setBorder(GUIBasics.createLineBorder(GUIBasics.createColor(getActiveReason().getConfidence(), 0.0, 0.0), 3));
+		}
 
 		final String description = feature.getProperty().getDescription();
 		if (description != null && !description.trim().isEmpty()) {
@@ -359,6 +363,11 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
+	}
+	
+	@Override
+	public ModelFigure getParent() {
+		return (ModelFigure) super.getParent();
 	}
 
 	/**

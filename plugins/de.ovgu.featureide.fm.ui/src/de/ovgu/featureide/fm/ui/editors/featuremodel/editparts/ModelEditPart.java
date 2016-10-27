@@ -24,11 +24,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.RootEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
@@ -46,6 +51,59 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Marcus Pinnecke
  */
 public class ModelEditPart extends AbstractGraphicalEditPart {
+	/**
+	 * Listens for mouse motion events to update the active explanation.
+	 * 
+	 * @author Timo Guenther
+	 */
+	private class ActiveExplanationMouseMotionListener implements MouseMotionListener {
+		/** edit part of the listened figure */
+		private final ModelElementEditPart editPart;
+		
+		/**
+		 * Constructs a new instance of this class.
+		 * @param editPart edit part of the listened figure
+		 */
+		public ActiveExplanationMouseMotionListener(ModelElementEditPart editPart) {
+			this.editPart = editPart;
+		}
+		
+		@Override
+		public void mouseDragged(MouseEvent event) {}
+		
+		@Override
+		public void mouseEntered(MouseEvent event) {}
+		
+		@Override
+		public void mouseExited(MouseEvent event) {
+			setActiveExplanation(null);
+		}
+		
+		@Override
+		public void mouseHover(MouseEvent event) {
+			setActiveExplanation(getModel().getFeatureModel().getAnalyser().getExplanation(editPart.getModel().getObject()));
+		}
+		
+		@Override
+		public void mouseMoved(MouseEvent event) {}
+		
+		/**
+		 * Sets the currently active explanation.
+		 * @param activeExplanation new active explanation
+		 */
+		private void setActiveExplanation(Explanation activeExplanation) {
+			final Explanation oldActiveExplanation = getFigure().getActiveExplanation();
+			if (oldActiveExplanation == activeExplanation) {
+				return;
+			}
+			getFigure().setActiveExplanation(activeExplanation);
+			getModel().getFeatureModel().fireEvent(new FeatureIDEEvent(
+					editPart.getModel().getObject(),
+					EventType.ACTIVE_EXPLANATION_CHANGED,
+					oldActiveExplanation,
+					activeExplanation));
+		}
+	}
 
 	ModelEditPart(IGraphicalFeatureModel featureModel) {
 		setModel(featureModel);
@@ -100,6 +158,11 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	public EditPart createChild(Object model) {
-		return super.createChild(model);
+		final EditPart child = super.createChild(model);
+		if (child instanceof ModelElementEditPart) {
+			final ModelElementEditPart c = (ModelElementEditPart) child;
+			c.getFigure().addMouseMotionListener(new ActiveExplanationMouseMotionListener(c));
+		}
+		return child;
 	}
 }

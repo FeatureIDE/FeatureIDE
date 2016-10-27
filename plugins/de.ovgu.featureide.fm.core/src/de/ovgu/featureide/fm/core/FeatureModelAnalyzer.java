@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -770,4 +771,22 @@ public class FeatureModelAnalyzer {
 		return Collections.unmodifiableList(cachedFalseOptionalFeatures);
 	}
 
+	/**
+	 * Returns an explanation why the given feature model element is defect or null if it is not.
+	 * @param modelElement potentially defect feature model element
+	 * @return an explanation why the given feature model element is defect or null if it is not
+	 */
+	public Explanation getExplanation(IFeatureModelElement modelElement) {
+		Explanation explanation = null;
+		explanation = deadFeatureExpl.get(modelElement);
+		if (explanation != null) {
+			return explanation;
+		}
+		explanation = falseOptFeatureExpl.get(modelElement);
+		if (explanation != null) {
+			return explanation;
+		}
+		explanation = redundantConstrExpl.get(modelElement);
+		return explanation;
+	}
 }

@@ -71,6 +71,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
+import org.prop4j.Literal.FeatureAttribute;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -85,6 +86,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
@@ -959,6 +961,22 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case DEPENDENCY_CALCULATED:
 			featureModelEditor.setPageModified(false);
 			break;
+		case ACTIVE_EXPLANATION_CHANGED:
+			final boolean explanationActivated = event.getNewValue() != null;
+			final Explanation activeExplanation = (Explanation) (explanationActivated ? event.getNewValue() : event.getOldValue());
+			for (final Explanation.Reason reason : activeExplanation.getReasons()) {
+				final IGraphicalElement element;
+				if (reason.getLiteral().getSourceAttribute() == FeatureAttribute.CONSTRAINT) {
+					element = graphicalFeatureModel.getConstraints().get(reason.getLiteral().getSourceIndex());
+				} else {
+					element = graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getFeature((String) reason.getLiteral().var));
+				}
+				element.update(new FeatureIDEEvent(
+						event.getSource(),
+						EventType.ACTIVE_REASON_CHANGED,
+						explanationActivated ? null : reason,
+						explanationActivated ? reason : null));
+			}
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");
 			break;

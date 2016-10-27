@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -118,6 +119,9 @@ public class ConstraintEditPart extends ModelElementEditPart {
 		case CONSTRAINT_SELECTED:
 			getFigure().setConstraintProperties();
 			break;
+		case ACTIVE_REASON_CHANGED:
+			getFigure().setActiveReason((Explanation.Reason) event.getNewValue());
+			getFigure().setConstraintProperties();
 		default:
 			FMUIPlugin.getDefault().logWarning(event + " @ " + getModel() + " not handled.");
 			break;

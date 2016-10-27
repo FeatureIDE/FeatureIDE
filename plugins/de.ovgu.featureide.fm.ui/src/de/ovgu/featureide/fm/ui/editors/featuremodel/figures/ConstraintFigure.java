@@ -140,7 +140,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			panelRedundant.setLayoutManager(new ToolbarLayout(false));
 			panelRedundant.add(new Label(REDUNDANCE));
 			setToolTip(panelRedundant, explanationRedundant);
-			return;
+			break;
 		case IMPLICIT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setBorder(FMPropertyManager.getImplicitConstraintBorder());
@@ -154,7 +154,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			panelImplicit.setLayoutManager(new ToolbarLayout(false));
 			panelImplicit.add(new Label(REDUNDANCE));
 			setToolTip(panelImplicit, explanationImplicit);
-			return;
+			break;
 		case DEAD:
 		case FALSE_OPTIONAL:
 			final StringBuilder toolTip = new StringBuilder();
@@ -197,6 +197,10 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			break;
 		default:
 			break;
+		}
+		
+		if (getActiveReason() != null) {
+			setBorder(GUIBasics.createLineBorder(GUIBasics.createColor(getActiveReason().getConfidence(), 0.0, 0.0), 3));
 		}
 	}
 
@@ -250,5 +254,9 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
 	}
-
+	
+	@Override
+	public ModelFigure getParent() {
+		return (ModelFigure) super.getParent();
+	}
 }
