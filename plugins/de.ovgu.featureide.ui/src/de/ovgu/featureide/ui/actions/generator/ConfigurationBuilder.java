@@ -143,7 +143,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	/**
 	 * This list contains all {@link Generator} jobs.
 	 */
-	List<Generator> generatorJobs = new ArrayList<>();
+	final List<Generator> generatorJobs = new ArrayList<>();
 
 	public AbstractConfigurationSorter sorter;
 
@@ -299,6 +299,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						newgeneratorJobs(1);
 					}
 					configurationBuilderJob = LongRunningWrapper.getRunner(configurationBuilder, "Create Configurations " + id++);
+					configurationBuilderJob.schedule();
 
 					showStatistics(monitor);
 					if (!createNewProjects) {

@@ -47,6 +47,7 @@
 			<exclude name="de/ovgu/featureide/fm/core/io/FeatureModelWriterIFileWrapper.java" />
 			<exclude name="de/ovgu/featureide/fm/core/io/fama/FAMAWriter.java" />
 			<exclude name="de/ovgu/featureide/fm/core/io/manager/FileListener.java" />
+			<exclude name="de/ovgu/featureide/fm/core/io/sxfm/SXFMWriter.java" />
 			<exclude name="de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelFormat.java" />
 			<exclude name="de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelReader.java" />
 			<exclude name="de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelWriter.java" />
@@ -109,6 +110,7 @@
 		<delete file="src/de/ovgu/featureide/fm/core/io/FeatureModelWriterIFileWrapper.java" />
 		<delete file="src/de/ovgu/featureide/fm/core/io/fama/FAMAWriter.java" />
 		<delete file="src/de/ovgu/featureide/fm/core/io/manager/FileListener.java" />
+		<delete file="src/de/ovgu/featureide/fm/core/io/sxfm/SXFMWriter.java" />
 		<delete file="src/de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelFormat.java" />
 		<delete file="src/de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelReader.java" />
 		<delete file="src/de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelWriter.java" />
