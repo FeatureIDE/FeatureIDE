@@ -555,7 +555,6 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 	}
 
 	protected void release() {
-		cleanFeatures.clear();
 		newDirtyClauseList.clear();
 		newCleanClauseList.clear();
 		dirtyClauseSet.clear();
