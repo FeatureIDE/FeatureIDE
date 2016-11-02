@@ -122,6 +122,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 		case ACTIVE_REASON_CHANGED:
 			getFigure().setActiveReason((Explanation.Reason) event.getNewValue());
 			getFigure().setConstraintProperties();
+			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(event + " @ " + getModel() + " not handled.");
 			break;

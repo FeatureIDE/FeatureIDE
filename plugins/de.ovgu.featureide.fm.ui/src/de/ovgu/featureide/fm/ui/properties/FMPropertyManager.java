@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -320,12 +321,12 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		setColor(QN_CONSTRAINT, color);
 	}
 
-	public static void setConnectionForgroundColor(Color color) {
+	public static void setConnectionForegroundColor(Color color) {
 		CURRENT_CONNECTION_FOREGROUND = color;
 		setColor(QN_CONNECTION, color);
 	}
 
-	public static Color getConnectionForgroundColor() {
+	public static Color getConnectionForegroundColor() {
 		if (CURRENT_CONNECTION_FOREGROUND == null) {
 			CURRENT_CONNECTION_FOREGROUND = getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
 		}
@@ -567,15 +568,27 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return GUIBasics.createLineBorder(getDiagramBackgroundColor(), 1, SWT.LINE_DOT);
 	}
 
-	public static Color getDecoratorForgroundColor() {
+	public static Color getDecoratorForegroundColor() {
 		if (CURRENT_DECORATOR_FORGROUND_COLOR == null) {
-			CURRENT_DECORATOR_FORGROUND_COLOR = getConnectionForgroundColor();
+			CURRENT_DECORATOR_FORGROUND_COLOR = getConnectionForegroundColor();
 		}
 		return CURRENT_DECORATOR_FORGROUND_COLOR;
 	}
 
 	public static Color getDecoratorBackgroundColor() {
 		return getDiagramBackgroundColor();
+	}
+	
+	public static Border getReasonBorder(Explanation.Reason reason) {
+		return GUIBasics.createLineBorder(getReasonColor(reason), getReasonLineWidth(reason));
+	}
+	
+	public static Color getReasonColor(Explanation.Reason reason) {
+		return GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0);
+	}
+	
+	public static int getReasonLineWidth(Explanation.Reason reason) {
+		return 3;
 	}
 
 	/**

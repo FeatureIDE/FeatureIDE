@@ -21,8 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.RotatableDecoration;
-import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
@@ -36,18 +34,15 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  * @author Jens Meinicke
  */
-public class CircleDecoration extends Shape implements RotatableDecoration, GUIDefaults {
+public class CircleDecoration extends ConnectionDecoration implements GUIDefaults {
+	private final boolean fill;
 	
-	private final boolean filled;
-
 	public CircleDecoration(boolean fill) {
-		super();
-		this.filled = fill;
-		Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
-		setForegroundColor(decoratorForgroundColor);
-		setBackgroundColor(fill ? decoratorForgroundColor : FMPropertyManager.getDecoratorBackgroundColor());
+		this.fill = fill;
+		final Color decoratorForegroundColor = FMPropertyManager.getDecoratorForegroundColor();
+		setForegroundColor(decoratorForegroundColor);
+		setBackgroundColor(fill ? decoratorForegroundColor : FMPropertyManager.getDecoratorBackgroundColor());
 		setSize(SOURCE_ANCHOR_DIAMETER + 1, SOURCE_ANCHOR_DIAMETER + 1);
-
 	}
 
 	@Override
@@ -57,22 +52,25 @@ public class CircleDecoration extends Shape implements RotatableDecoration, GUID
 
 	@Override
 	protected void fillShape(Graphics graphics) {
+		if (getActiveReason() != null && fill) {
+			graphics.setBackgroundColor(FMPropertyManager.getReasonColor(getActiveReason()));
+		}
 		final Rectangle bounds = new Rectangle(getBounds());
 		bounds.shrink(1, 1);
-		graphics.setBackgroundColor(FMPropertyManager.getDecoratorForgroundColor());
-		Draw2dHelper.fillCircle(graphics, bounds);
-		if (!filled) {
-			bounds.shrink(1, 1);
-			graphics.setBackgroundColor(FMPropertyManager.getDecoratorBackgroundColor());
-			Draw2dHelper.fillCircle(graphics, bounds);
-		}
+		graphics.fillOval(bounds);
 	}
 
 	@Override
-	protected void outlineShape(Graphics graphics) {}
+	protected void outlineShape(Graphics graphics) {
+		if (getActiveReason() != null) {
+			graphics.setForegroundColor(FMPropertyManager.getReasonColor(getActiveReason()));
+			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
+		}
+		final Rectangle bounds = new Rectangle(getBounds());
+		bounds.shrink(1, 1);
+		graphics.drawOval(bounds);
+	}
 
 	@Override
-	public void setReferencePoint(Point arg0) {}
-
-
+	public void setReferencePoint(Point p) {}
 }

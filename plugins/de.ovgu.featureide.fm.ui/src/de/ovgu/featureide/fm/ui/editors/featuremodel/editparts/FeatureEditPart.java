@@ -266,8 +266,18 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			connectionEditPart.refreshSourceDecoration();
 			break;
 		case ACTIVE_REASON_CHANGED:
-			getFigure().setActiveReason((Explanation.Reason) event.getNewValue());
+			final Explanation.Reason activeReason = (Explanation.Reason) event.getNewValue();
+			getFigure().setActiveReason(activeReason);
 			getFigure().setProperties();
+			sourceConnection = getModel().getSourceConnection();
+			if (sourceConnection == null) {
+				break;
+			}
+			registry = getViewer().getEditPartRegistry();
+			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart.setActiveReason(activeReason);
+			connectionEditPart.refresh();
+			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
 			break;

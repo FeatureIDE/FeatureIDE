@@ -977,6 +977,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						explanationActivated ? null : reason,
 						explanationActivated ? reason : null));
 			}
+			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");
 			break;

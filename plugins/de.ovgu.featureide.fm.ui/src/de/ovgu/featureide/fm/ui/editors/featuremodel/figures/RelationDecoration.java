@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import java.util.List;
 
 import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.RotatableDecoration;
-import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
@@ -40,7 +38,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author Thomas Thuem
  */
-public class RelationDecoration extends Shape implements RotatableDecoration, GUIDefaults {
+public class RelationDecoration extends ConnectionDecoration implements GUIDefaults {
 
 	private final boolean fill;
 
@@ -52,8 +50,6 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	private IGraphicalFeatureModel featureModel;
 
 	public RelationDecoration(final boolean fill, final IGraphicalFeature lastChild) {
-		super();
-		
 		this.fill = fill;
 		this.lastChild = lastChild;
 		if (lastChild == null) {
@@ -61,9 +57,8 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		} else {
 			children = FeatureUIHelper.getGraphicalSiblings(lastChild);
 		}
-		final Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
-		setForegroundColor(decoratorForgroundColor);
-		setBackgroundColor(decoratorForgroundColor);
+		setForegroundColor(FMPropertyManager.getDecoratorForegroundColor());
+		setBackgroundColor(FMPropertyManager.getDecoratorForegroundColor());
 		setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
 		if (lastChild != null) {
 			featureModel = lastChild.getGraphicalModel();
@@ -98,6 +93,13 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	}
 
 	private void drawShape(final Graphics graphics) {
+		if (getActiveReason() != null) {
+			final Color reasonColor = FMPropertyManager.getReasonColor(getActiveReason());
+			graphics.setForegroundColor(reasonColor);
+			graphics.setBackgroundColor(reasonColor);
+			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
+		}
+		
 		boolean verticalLayout = false; 
 		if (featureModel != null) {
 			verticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
@@ -149,11 +151,9 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		return TARGET_ANCHOR_DIAMETER;
 	}
 
-
 	private double calculateAngle(final Point point, final Point referencePoint) {
 		int dx = referencePoint.x - point.x;
 		int dy = referencePoint.y - point.y;
 		return 360 - Math.round(Math.atan2(dy, dx) / Math.PI * 180);
 	}
-
 }

@@ -20,35 +20,34 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import org.eclipse.draw2d.PolylineConnection;
-import org.eclipse.swt.SWT;
+import org.eclipse.draw2d.RotatableDecoration;
+import org.eclipse.draw2d.Shape;
 
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 
 /**
- * A figure for connections.
+ * A decoration for a connection figure.
+ * Can be either {@link CircleDecoration} or {@link RelationDecoration}.
  * 
  * @author Timo Guenther
  */
-public class ConnectionFigure extends PolylineConnection {
+public abstract class ConnectionDecoration extends Shape implements RotatableDecoration {
+	/** the currently active reason */
+	private Reason activeReason;
+	
 	/**
-	 * Constructs a new instance of this class.
-	 * @param external whether the connection connects two external features
+	 * Returns the currently active reason.
+	 * @return the currently active reason
 	 */
-	public ConnectionFigure(boolean external) {
-		setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
-		if (external) {
-			setLineStyle(SWT.LINE_DASH);
-		}
+	public Reason getActiveReason() {
+		return activeReason;
 	}
 	
-	@Override
-	public CircleDecoration getSourceDecoration() {
-		return (CircleDecoration) super.getSourceDecoration();
-	}
-	
-	@Override
-	public RelationDecoration getTargetDecoration() {
-		return (RelationDecoration) super.getTargetDecoration();
+	/**
+	 * Sets the currently active reason.
+	 * @param activeReason new active reason
+	 */
+	public void setActiveReason(Reason activeReason) {
+		this.activeReason = activeReason;
 	}
 }

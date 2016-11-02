@@ -200,7 +200,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		}
 		
 		if (getActiveReason() != null) {
-			setBorder(GUIBasics.createLineBorder(GUIBasics.createColor(getActiveReason().getConfidence(), 0.0, 0.0), 3));
+			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
 	}
 

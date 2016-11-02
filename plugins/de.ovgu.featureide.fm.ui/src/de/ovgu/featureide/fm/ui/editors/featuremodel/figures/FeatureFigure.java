@@ -232,7 +232,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		}
 		
 		if (getActiveReason() != null) {
-			setBorder(GUIBasics.createLineBorder(GUIBasics.createColor(getActiveReason().getConfidence(), 0.0, 0.0), 3));
+			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
 
 		final String description = feature.getProperty().getDescription();

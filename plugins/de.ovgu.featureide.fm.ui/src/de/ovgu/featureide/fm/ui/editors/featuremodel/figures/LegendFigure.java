@@ -525,7 +525,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Point p3 = new Point(GROUPTYPE_PADDING, ROW_HEIGHT * row + SYMBOL_SIZE - LIFT);
 
 		PolylineConnection line = new PolylineConnection();
-		line.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
+		line.setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 
 		line.setEndpoints(p2, p3);
 		if (decoration) {
@@ -533,7 +533,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			line.setSourceDecoration(sourceDecoration);
 		}
 		PolylineConnection line2 = new PolylineConnection();
-		line2.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
+		line2.setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 
 		line2.setEndpoints(p2, p1);
 		this.add(line);
@@ -541,14 +541,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Figure toolTipContent = createToolTipContent(toolTipText);
 		line.setToolTip(toolTipContent);
 		line2.setToolTip(toolTipContent);
-		setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
+		setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 
 	}
 
 	private PolylineConnection createConnectionTypeSymbol(int row, boolean mandatory) {
 
 		PolylineConnection p = new PolylineConnection();
-		p.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
+		p.setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 		final CircleDecoration circleDecoration = new CircleDecoration(mandatory);
 		p.setSourceDecoration(circleDecoration);
 		Point source = new Point(MANDATORY_PADDING, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE / 2);
