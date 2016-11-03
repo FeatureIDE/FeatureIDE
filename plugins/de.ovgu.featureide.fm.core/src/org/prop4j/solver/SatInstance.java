@@ -35,8 +35,8 @@ import org.sat4j.specs.IteratorInt;
 
 /**
  * Represents an instance of a satisfiability problem in CNF.</br>
- * Use a {@link ISolverProvider solver provider} or the {@link #getSolver()} method
- * to get a {@link BasicSolver solver} for this problem.
+ * Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()}
+ * method to get a {@link BasicSolver solver} for this problem.
  * 
  * @author Sebastian Krieter
  */
@@ -49,6 +49,19 @@ public class SatInstance {
 			if (x != y) {
 				model1[i] = 0;
 			}
+		}
+	}
+	
+	public static void updateModel(final int[] model1, Iterable<int[]> models) {
+		for (int i = 0; i < model1.length; i++) {
+			final int x = model1[i];
+			for (int[] model2 : models) {
+				final int y = model2[i];
+				if (x != y) {
+					model1[i] = 0;
+					break;
+				}
+			}			
 		}
 	}
 
@@ -128,12 +141,27 @@ public class SatInstance {
 		return convertToInt(Arrays.asList(literals));
 	}
 
+	public int[] convertToInt(Node[] literals) {
+		final int[] resultList = new int[literals.length];
+		int i = 0;
+		for (Node node : literals) {
+			Literal literal = (Literal) node;
+			final Integer varIndex = varToInt.get(literal.var);
+			resultList[i++] = varIndex == null ? 0 : (literal.positive ? varIndex : -varIndex);
+		}
+		return resultList;
+	}
+
 	public List<Literal> convertToLiterals(int[] model) {
 		final List<Literal> resultList = new ArrayList<>();
 		for (int var : model) {
 			resultList.add(new Literal(intToVar[Math.abs(var)], (var > 0)));
 		}
 		return resultList;
+	}
+
+	public Literal convertToLiteral(int var) {
+		return new Literal(intToVar[Math.abs(var)], (var > 0));
 	}
 
 	protected List<String> convertToString(IVecInt model) {

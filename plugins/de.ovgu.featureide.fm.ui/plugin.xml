@@ -318,6 +318,12 @@
 					id="de.ovgu.featureide.fm.ui.actions.ExportFAMA"
 					label="Export model to FaMa format"
 					style="push">
+					<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
 			</command>
 			<separator
 					name="de.ovgu.featureide.fm.ui.separator9"
@@ -355,6 +361,12 @@
 					id="de.ovgu.featureide.fm.ui.actions.EliminateComplexConstraints"
 					label="Product-equivalent model with simple constraints"
 					style="push">
+					<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
 			</command>
 			<separator
 					name="de.ovgu.featureide.fm.ui.separator4"

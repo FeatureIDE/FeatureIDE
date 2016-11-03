@@ -33,30 +33,35 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.prop4j.solver.BasicSolver.SatResult;
 import org.prop4j.solver.BasicSolver;
+import org.prop4j.solver.ISatSolver.SatResult;
 import org.prop4j.solver.ModifiableSolver;
 import org.prop4j.solver.SatInstance;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.explanations.DeadFeature;
+import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeature;
+import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
@@ -68,6 +73,24 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, Object>> {
+
+	/**
+	 * Used for tool tip: remember explanation for redundant constraint.
+	 * Key = constraintIndex, Value = explanation
+	 */
+	public HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
+
+	/**
+	 * Used for tool tip: remember explanation for redundant constraint.
+	 * Key = constraintIndex, Value = explanation
+	 */
+	public HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
+
+	/**
+	 * Used for tool tip: remember explanation for redundant constraint.
+	 * Key = constraintIndex, Value = explanation
+	 */
+	public HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
 
 	/**
 	 * Defines whether constraints should be included into calculations.
@@ -85,10 +108,16 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	 */
 	public boolean calculateRedundantConstraints = true;
 
+	public boolean calculateFOConstraints = true;
+
+	public boolean calculateDeadConstraints = true;
+
 	/**
 	 * Defines whether constraints that are tautologies should be calculated.
 	 */
 	public boolean calculateTautologyConstraints = true;
+
+	public boolean calculateExplanations = true;
 
 	private final HashMap<Object, Object> changedAttributes = new HashMap<>();
 
@@ -97,12 +126,15 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	private final List<IFeature> deadFeatures;
 	private final List<IFeature> falseOptionalFeatures;
 
-	private IFeatureModel fm;
-	private WorkMonitor monitor = new WorkMonitor();
-	private AdvancedNodeCreator nodeCreator;
+	private final IFeatureModel fm;
+	private final IFeatureModelFactory factory;
+	private final AdvancedNodeCreator nodeCreator;
+
+	private IMonitor monitor = new NullMonitor();
 
 	public FeatureModelAnalysis(IFeatureModel fm) {
 		this.fm = fm;
+		this.factory = FMFactoryManager.getFactory(fm);
 
 		deadFeatures = new ArrayList<>();
 		coreFeatures = new ArrayList<>();
@@ -111,6 +143,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator = new AdvancedNodeCreator(fm);
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
+		nodeCreator.setUseOldNames(false);
 	}
 
 	public boolean isCalculateConstraints() {
@@ -161,21 +194,33 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		this.calculateTautologyConstraints = calculateTautologyConstraints;
 	}
 
+	public void setCalculateFOConstraints(boolean calculateFOConstraints) {
+		this.calculateFOConstraints = calculateFOConstraints;
+	}
+
+	public void setCalculateDeadConstraints(boolean calculateDeadConstraints) {
+		this.calculateDeadConstraints = calculateDeadConstraints;
+	}
+
+	public void setCalculateExplanations(boolean calculateExplanations) {
+		this.calculateExplanations = calculateExplanations;
+	}
+
 	/**
 	 * @return Hashmap: key entry is Feature/Constraint, value usually
 	 *         indicating the kind of attribute (non-Javadoc)
 	 */
 	@Override
-	public HashMap<Object, Object> execute(WorkMonitor monitor) throws Exception {
+	public HashMap<Object, Object> execute(IMonitor monitor) throws Exception {
 		this.monitor = monitor;
 		int work = 0;
 		if (calculateFeatures) {
 			work += 5;
 			if (calculateConstraints) {
-				work += 2 * (fm.getConstraints().size() + 1);
+				work += 2;
 			}
 		}
-		monitor.setMaxAbsoluteWork(work);
+		monitor.setRemainingWork(work);
 
 		changedAttributes.clear();
 
@@ -186,16 +231,14 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		// put root always in so it will be refreshed (void/non-void)
 		changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
 
+		valid = true;
+
 		if (calculateFeatures) {
-			if (monitor.checkCancel()) {
-				return changedAttributes;
-			}
+			monitor.checkCancel();
 			updateFeatures();
 
 			if (calculateConstraints) {
-				if (monitor.checkCancel()) {
-					return changedAttributes;
-				}
+				monitor.checkCancel();
 				updateConstraints();
 			}
 		}
@@ -234,8 +277,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		for (IConstraint constraint : constraints) {
 			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 			constraint.setContainedFeatures();
-			constraint.setFalseOptionalFeatures(Collections.<IFeature>emptyList());
-			constraint.setDeadFeatures(Collections.<IFeature>emptyList());
+			constraint.setFalseOptionalFeatures(Collections.<IFeature> emptyList());
+			constraint.setDeadFeatures(Collections.<IFeature> emptyList());
 		}
 
 		if (!calculateFeatures) {
@@ -245,53 +288,74 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		try {
 			if (valid) {
 				checkConstraintRedundant(constraints);
-				checkConstraintDeadAndFalseOptiona(constraints);
+				monitor.step();
+				checkConstraintDeadAndFalseOptional(constraints);
+				monitor.step();
 			} else {
 				checkConstraintUnsatisfiable(constraints);
+				monitor.step();
+				monitor.step();
 			}
 		} catch (ContradictionException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 
 	private boolean checkConstraintContradiction(Node constraintNode) {
-		return LongRunningWrapper.runMethod(new FindSolutionAnalysis(new SatInstance(constraintNode))) == null;
+		return LongRunningWrapper.runMethod(new ValidAnalysis(new SatInstance(constraintNode))) == null;
 	}
 
-	private void checkConstraintDeadAndFalseOptiona(final List<IConstraint> constraints) throws ContradictionException {
+	private void checkConstraintDeadAndFalseOptional(final List<IConstraint> constraints) throws ContradictionException {
+		if (!calculateFOConstraints && !calculateDeadConstraints) {
+			return;
+		}
 		nodeCreator.setModelType(ModelType.OnlyStructure);
 		final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 		final BasicSolver modSat = new BasicSolver(si);
 
 		final List<IFeature> deadList = new LinkedList<>(deadFeatures);
 		final List<IFeature> foList = new LinkedList<>(falseOptionalFeatures);
-		monitor.step();
+		monitor.checkCancel();
 
 		for (IConstraint constraint : constraints) {
 			modSat.addClauses(makeRegular(constraint.getNode()));
 
 			if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
-				final List<IFeature> newDeadFeature = checkFeatureDead2(modSat, deadList);
-				if (!newDeadFeature.isEmpty()) {
-					constraint.setDeadFeatures(newDeadFeature);
-					deadList.retainAll(newDeadFeature);
-					setConstraintAttribute(constraint, ConstraintAttribute.DEAD);
+				if (calculateDeadConstraints) {
+					final List<IFeature> newDeadFeature = checkFeatureDead2(modSat, deadList);
+					if (!newDeadFeature.isEmpty()) {
+						constraint.setDeadFeatures(newDeadFeature);
+						deadList.removeAll(newDeadFeature);
+						setConstraintAttribute(constraint, ConstraintAttribute.DEAD);
+					}
 				}
-				final List<IFeature> newFOFeature = checkFeatureFalseOptional2(modSat, foList);
-				if (!newFOFeature.isEmpty()) {
-					constraint.setFalseOptionalFeatures(newFOFeature);
-					foList.retainAll(newFOFeature);
-					if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
-						setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
+
+				if (calculateFOConstraints) {
+					final List<IFeature> newFOFeature = checkFeatureFalseOptional2(modSat, foList);
+					if (!newFOFeature.isEmpty()) {
+						constraint.setFalseOptionalFeatures(newFOFeature);
+						foList.removeAll(newFOFeature);
+						if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
+							setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
+						}
 					}
 				}
 			}
-			monitor.step();
+			monitor.checkCancel();
 		}
 	}
 
+	/**
+	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint
+	 * implies the model with the new constraint and the other way round. If this is the case, both models are
+	 * equivalent and the constraint is redundant.
+	 * If a redundant constraint has been detected, it is explained.
+	 * 
+	 * @param constraint The constraint to check whether it is redundant
+	 */
 	private void checkConstraintRedundant(final List<IConstraint> constraints) throws ContradictionException {
 		if (calculateRedundantConstraints) {
+			final IFeatureModel clone = fm.clone();
 			nodeCreator.setModelType(ModelType.OnlyStructure);
 			final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 			final ModifiableSolver redundantSat = new ModifiableSolver(si);
@@ -304,7 +368,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 				constraintMarkers.add(redundantSat.addClauses(cnf));
 			}
-			monitor.step();
+			monitor.checkCancel();
 
 			int i = -1;
 			for (IConstraint constraint : constraints) {
@@ -332,21 +396,28 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					}
 
 					if (redundant) {
+						clone.removeConstraint(constraint);
 						if (checkConstraintTautology(constraint.getNode())) {
 							setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
 						} else {
 							setConstraintAttribute(constraint, ConstraintAttribute.REDUNDANT);
+
+							if (calculateExplanations) {
+								RedundantConstraint redundancy = new RedundantConstraint();
+								List<String> expl = redundancy.explain(clone, constraint); //store explanation for redundant constraint
+								redundantConstrExpl.put(FeatureUtils.getConstraintIndex(fm, constraint), expl);
+							}
 						}
 					}
 				}
-				monitor.step();
+				monitor.checkCancel();
 			}
 		} else if (calculateTautologyConstraints) {
 			for (IConstraint constraint : constraints) {
 				if (checkConstraintTautology(constraint.getNode())) {
 					setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
 				}
-				monitor.step();
+				monitor.checkCancel();
 			}
 		}
 	}
@@ -359,8 +430,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator.setModelType(ModelType.OnlyStructure);
 		final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 		final ModifiableSolver unsat = new ModifiableSolver(si);
-		monitor.step();
-		monitor.step();
+		monitor.checkCancel();
 
 		for (IConstraint constraint : constraints) {
 			Node cnf = makeRegular(constraint.getNode());
@@ -384,30 +454,55 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 					if (checkConstraintContradiction(cnf)) {
 						setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
+						if (calculateExplanations) {
+							explainVoidFM();
+						}
 					} else {
 						setConstraintAttribute(constraint, ConstraintAttribute.VOID_MODEL);
+						if (calculateExplanations) {
+							explainVoidFM();
+						}
 					}
 				} else {
 					setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
+					if (calculateExplanations) {
+						explainVoidFM();
+					}
 				}
 			}
-			monitor.step();
-			monitor.step();
+			monitor.checkCancel();
 		}
+	}
+
+	// explain void feature model, treat root as dead feature
+	private void explainVoidFM() {
+		DeadFeature deadF = new DeadFeature();
+		List<String> expl = deadF.explain(fm, FeatureUtils.getRoot(fm), true);
+		deadFeatureExpl.put(FeatureUtils.getRoot(fm), expl);
 	}
 
 	private void checkFeatureDead(final SatInstance si) {
 		deadFeatures.clear();
 		coreFeatures.clear();
-		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si));
+		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si), monitor.subTask(0));
+		monitor.checkCancel();
 		for (int i = 0; i < solution2.length; i++) {
+			monitor.checkCancel();
 			final int var = solution2[i];
 			final IFeature feature = fm.getFeature((String) si.getVariableObject(var));
 			if (var < 0) {
-				changedAttributes.put(feature, FeatureStatus.DEAD);
+				setFeatureAttribute(feature, FeatureStatus.DEAD);
 				deadFeatures.add(feature);
-			} else {
-				coreFeatures.add(feature);
+
+				if (calculateExplanations) {
+					// explain dead features and remember explanation in map
+					DeadFeature deadF = new DeadFeature();
+					List<String> expl = deadF.explain(fm, feature, false);
+					deadFeatureExpl.put(feature, expl);
+
+				} else {
+					coreFeatures.add(feature);
+				}
 			}
 		}
 	}
@@ -420,7 +515,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		int[] deadVar = new int[deadList.size()];
 		int j = 0;
 		for (IFeature deadFeature : deadList) {
-			deadVar[j] = solver.getSatInstance().getVariable(deadFeature.getName());
+			deadVar[j++] = solver.getSatInstance().getVariable(deadFeature.getName());
 		}
 		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(solver, deadVar));
 		for (int i = 0; i < solution2.length; i++) {
@@ -436,17 +531,25 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		final List<int[]> possibleFOFeatures = new ArrayList<>();
 		for (IFeature feature : features) {
 			final IFeature parent = FeatureUtils.getParent(feature);
-			if (!feature.getStructure().isMandatory() && parent != null) {
+			if (parent != null && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
 				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
 			}
 		}
-		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(si, possibleFOFeatures));
+		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(si, possibleFOFeatures), monitor.subTask(0));
+		monitor.checkCancel();
 		falseOptionalFeatures.clear();
 		for (int[] pair : solution3) {
+			monitor.checkCancel();
 			final IFeature feature = fm.getFeature((CharSequence) si.getVariableObject(pair[1]));
-			changedAttributes.put(feature, FeatureStatus.FALSE_OPTIONAL);
-			feature.getProperty().setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
+			setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
 			falseOptionalFeatures.add(feature);
+
+			if (calculateExplanations) {
+				// explain false optional features and remember explanation in map
+				FalseOptionalFeature falseOpts = new FalseOptionalFeature();
+				List<String> expl = falseOpts.explain(fm, feature);
+				falseOptFeatureExpl.put(feature, expl);
+			}
 		}
 	}
 
@@ -459,7 +562,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		final SatInstance si = solver.getSatInstance();
 		for (IFeature feature : foList) {
 			final IFeature parent = FeatureUtils.getParent(feature);
-			if (!feature.getStructure().isMandatory() && parent != null) {
+			if (parent != null && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
 				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
 			}
 		}
@@ -488,6 +591,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		Collection<IFeature> list = new LinkedList<>();
 		Collection<IFeature> hiddenFeatures = Functional.toList(Functional.filter(features, new HiddenFeatureFilter()));
 		for (IFeature feature : hiddenFeatures) {
+			monitor.checkCancel();
 			for (IConstraint constraint : feature.getStructure().getRelevantConstraints()) {
 				Node node = constraint.getNode();
 				if (node instanceof Equals) {
@@ -495,7 +599,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint rightConstraint = FMFactoryManager.getFactory().createConstraint(fm, rightChild);
+						IConstraint rightConstraint = factory.createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -503,7 +607,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 						}
 					}
 					if (rightChild instanceof Literal && ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint leftConstraint = FMFactoryManager.getFactory().createConstraint(fm, leftChild);
+						IConstraint leftConstraint = factory.createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -523,6 +627,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		 */
 		FeatureDependencies featureDependencies = new FeatureDependencies(fm, false);
 		for (IFeature feature : hiddenFeatures) {
+			monitor.checkCancel();
 			if (!list.contains(feature)) {
 				Collection<IFeature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;
@@ -536,15 +641,14 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				}
 
 				if (!noHidden) {
-					changedAttributes.put(feature, FeatureStatus.INDETERMINATE_HIDDEN);
-					feature.getProperty().setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+					setFeatureAttribute(feature, FeatureStatus.INDETERMINATE_HIDDEN);
 				}
 			}
 		}
 	}
 
 	private void checkValidity(final SatInstance si) {
-		valid = LongRunningWrapper.runMethod(new FindSolutionAnalysis(si)) != null;
+		valid = LongRunningWrapper.runMethod(new ValidAnalysis(si)) != null;
 	}
 
 	private Node makeRegular(Node node) {
@@ -563,6 +667,11 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			regularCNFNode = new And(new Or(regularCNFNode));
 		}
 		return regularCNFNode;
+	}
+
+	private void setFeatureAttribute(IFeature feature, FeatureStatus featureAttribute) {
+		changedAttributes.put(feature, featureAttribute);
+		feature.getProperty().setFeatureStatus(featureAttribute, false);
 	}
 
 	private void setConstraintAttribute(IConstraint constraint, ConstraintAttribute constraintAttribute) {

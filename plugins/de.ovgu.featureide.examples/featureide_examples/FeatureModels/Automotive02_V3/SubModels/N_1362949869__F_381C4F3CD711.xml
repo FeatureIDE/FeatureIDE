@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_1362949869__F_381C4F3CD711">
+				<description>
+					Lorem
+				</description>
+				<feature mandatory="true" name="N_1362949869__F_39299AF64DCF">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy e
+					</description>
+				</feature>
+				<or name="F_13E1D684FB37">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna al
+					</description>
+					<feature mandatory="true" name="F_2B1D0DCD7979">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed d
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_988C739F5296">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_F423DFBF8E73">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliq
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_ABC265937F28">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+						</description>
+					</feature>
+				</or>
+				<feature mandatory="true" name="N_1362949869__F_9F7A375D67C2">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmo
+					</description>
+				</feature>
+				<feature name="F_941E0D178915">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
+					</description>
+				</feature>
+				<feature name="F_4C29DE5FB575">
+					<description>
+						Lorem ipsum dolor sit amet, consete
+					</description>
+				</feature>
+				<feature mandatory="true" name="N_1362949869__F_57D3C6B5EAEE">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia
+					</description>
+				</feature>
+				<feature name="F_BA73D0B4000C">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata s
+					</description>
+				</feature>
+				<feature name="F_298AB7378BD9">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
+					</description>
+				</feature>
+				<feature name="F_E0EDAC1B0766">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
+					</description>
+				</feature>
+				<feature name="F_C45FAA9EFC52">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+					</description>
+				</feature>
+				<feature name="F_53C4ED86721B">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+					</description>
+				</feature>
+				<feature name="F_4658CED956BD">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolo
+					</description>
+				</feature>
+				<feature mandatory="true" name="N_1362949869__F_6A2AC16AA950">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidu
+					</description>
+				</feature>
+				<feature name="F_E0BE25B9AD7D">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+					</description>
+				</feature>
+				<feature name="F_06F9B017087A">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadi
+					</description>
+				</feature>
+				<feature name="F_AA4E8BAE18CA">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur s
+					</description>
+				</feature>
+				<feature name="F_ED13EA06905B">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipsci
+					</description>
+				</feature>
+				<feature name="F_CDC96E658D49">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elit
+					</description>
+				</feature>
+				<feature name="F_D7565D42AC69">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, se
+					</description>
+				</feature>
+				<feature name="F_25B3E08AF0BF">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, se
+					</description>
+				</feature>
+				<feature name="F_99F5E615EC6C">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+					</description>
+				</feature>
+				<or name="F_98996689A198">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="F_1466A6274D0F">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_8199C75D1AD6">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_F3B7A4A31C71">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_98BA37D95350">
+						<description>
+							
+						</description>
+					</feature>
+				</or>
+				<feature name="F_A7693637D091">
+					<description>
+						
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<disj>
+						<var>F_13E1D684FB37</var>
+						<disj>
+							<var>F_BA73D0B4000C</var>
+							<disj>
+								<var>F_298AB7378BD9</var>
+								<disj>
+									<var>F_E0EDAC1B0766</var>
+									<disj>
+										<var>F_C45FAA9EFC52</var>
+										<disj>
+											<var>F_53C4ED86721B</var>
+											<var>F_4658CED956BD</var>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+					<var>F_4C29DE5FB575</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<disj>
+								<var>F_13E1D684FB37</var>
+								<disj>
+									<var>F_BA73D0B4000C</var>
+									<disj>
+										<var>F_298AB7378BD9</var>
+										<disj>
+											<var>F_E0EDAC1B0766</var>
+											<disj>
+												<var>F_C45FAA9EFC52</var>
+												<disj>
+													<var>F_53C4ED86721B</var>
+													<var>F_4658CED956BD</var>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</not>
+						<var>F_4C29DE5FB575</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_BA73D0B4000C</var>
+					<var>F_E0BE25B9AD7D</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_BA73D0B4000C</var>
+						</not>
+						<var>F_E0BE25B9AD7D</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_298AB7378BD9</var>
+					<var>F_06F9B017087A</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_298AB7378BD9</var>
+						</not>
+						<var>F_06F9B017087A</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_E0EDAC1B0766</var>
+					<var>F_AA4E8BAE18CA</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_E0EDAC1B0766</var>
+						</not>
+						<var>F_AA4E8BAE18CA</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_4C29DE5FB575</var>
+					<var>F_ED13EA06905B</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_4C29DE5FB575</var>
+						</not>
+						<var>F_ED13EA06905B</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_4658CED956BD</var>
+					<var>F_CDC96E658D49</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_4658CED956BD</var>
+						</not>
+						<var>F_CDC96E658D49</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_C45FAA9EFC52</var>
+					<var>F_D7565D42AC69</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_C45FAA9EFC52</var>
+						</not>
+						<var>F_D7565D42AC69</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_53C4ED86721B</var>
+					<var>F_25B3E08AF0BF</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_53C4ED86721B</var>
+						</not>
+						<var>F_25B3E08AF0BF</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_941E0D178915</var>
+					<var>F_99F5E615EC6C</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_941E0D178915</var>
+						</not>
+						<var>F_99F5E615EC6C</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_F423DFBF8E73</var>
+					<var>F_A7693637D091</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_F423DFBF8E73</var>
+						</not>
+						<var>F_A7693637D091</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<conj>
+								<var>F_2B1D0DCD7979</var>
+								<var>F_988C739F5296</var>
+							</conj>
+						</not>
+						<var>F_F423DFBF8E73</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_2B1D0DCD7979</var>
+					<var>F_1466A6274D0F</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_2B1D0DCD7979</var>
+						</not>
+						<var>F_1466A6274D0F</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_988C739F5296</var>
+					<var>F_8199C75D1AD6</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_988C739F5296</var>
+						</not>
+						<var>F_8199C75D1AD6</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<conj>
+						<var>F_1466A6274D0F</var>
+						<var>F_8199C75D1AD6</var>
+					</conj>
+					<var>F_F3B7A4A31C71</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<conj>
+								<var>F_1466A6274D0F</var>
+								<var>F_8199C75D1AD6</var>
+							</conj>
+						</not>
+						<var>F_F3B7A4A31C71</var>
+					</conj>
+				</not>
+			</rule>
+			<rule>
+				<imp>
+					<var>F_ABC265937F28</var>
+					<var>F_98BA37D95350</var>
+				</imp>
+			</rule>
+			<rule>
+				<not>
+					<conj>
+						<not>
+							<var>F_ABC265937F28</var>
+						</not>
+						<var>F_98BA37D95350</var>
+					</conj>
+				</not>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

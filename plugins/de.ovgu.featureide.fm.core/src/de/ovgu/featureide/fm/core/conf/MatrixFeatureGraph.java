@@ -21,10 +21,8 @@
 package de.ovgu.featureide.fm.core.conf;
 
 import java.util.Arrays;
-import java.util.Collection;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import org.prop4j.solver.SatInstance;
 
 public class MatrixFeatureGraph extends AFeatureGraph {
 
@@ -32,14 +30,13 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 
 	private byte[] adjMatrix;
 
-	public MatrixFeatureGraph(IFeatureModel featureModel, Collection<IFeature> variantfeatures, Collection<IFeature> coreFeatures, Collection<IFeature> deadFeatures) {
-		super(featureModel, variantfeatures, coreFeatures, deadFeatures);
+	public MatrixFeatureGraph(SatInstance satInstance, int[] index) {
+		super(satInstance, index);
 		adjMatrix = new byte[size * size];
 	}
-	
-	public MatrixFeatureGraph(IFeatureModel featureModel) {
-		super(featureModel);
-		adjMatrix = new byte[size * size];
+
+	public MatrixFeatureGraph() {
+		super();
 	}
 
 	@Override
@@ -58,65 +55,63 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 
 		final int newValue;
 		final byte oldValue;
-		synchronized (featureArray[from]) {
-			oldValue = adjMatrix[index];
+		oldValue = adjMatrix[index];
 
-			switch (edgeType) {
-			case EDGE_NONE:
-				newValue = EDGE_NONE;
-				break;
-			case EDGE_00Q:
-				if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
-					newValue = oldValue | EDGE_00Q;
-				} else {
-					newValue = oldValue;
-				}
-				break;
-			case EDGE_00:
-				assert !isEdge(oldValue, EDGE_01);
-				newValue = (oldValue & MASK_0_CLEAR) | EDGE_00;
-				break;
-			case EDGE_01Q:
-				if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
-					newValue = oldValue | EDGE_01Q;
-				} else {
-					newValue = oldValue;
-				}
-				break;
-			case EDGE_01:
-				assert !isEdge(oldValue, EDGE_00);
-				newValue = (oldValue & MASK_0_CLEAR) | EDGE_01;
-				break;
-
-			case EDGE_10Q:
-				if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
-					newValue = oldValue | EDGE_10Q;
-				} else {
-					newValue = oldValue;
-				}
-				break;
-			case EDGE_10:
-				assert !isEdge(oldValue, EDGE_11);
-				newValue = (oldValue & MASK_1_CLEAR) | EDGE_10;
-				break;
-			case EDGE_11Q:
-				if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
-					newValue = oldValue | EDGE_11Q;
-				} else {
-					newValue = oldValue;
-				}
-				break;
-			case EDGE_11:
-				assert !isEdge(oldValue, EDGE_10);
-				newValue = (oldValue & MASK_1_CLEAR) | EDGE_11;
-				break;
-			default:
+		switch (edgeType) {
+		case EDGE_NONE:
+			newValue = EDGE_NONE;
+			break;
+		case EDGE_00Q:
+			if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
+				newValue = oldValue | EDGE_00Q;
+			} else {
 				newValue = oldValue;
-				break;
 			}
+			break;
+		case EDGE_00:
+			assert !isEdge(oldValue, EDGE_01);
+			newValue = (oldValue & MASK_0_CLEAR) | EDGE_00;
+			break;
+		case EDGE_01Q:
+			if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
+				newValue = oldValue | EDGE_01Q;
+			} else {
+				newValue = oldValue;
+			}
+			break;
+		case EDGE_01:
+			assert !isEdge(oldValue, EDGE_00);
+			newValue = (oldValue & MASK_0_CLEAR) | EDGE_01;
+			break;
 
-			adjMatrix[index] = (byte) (0x000000ff & newValue);
+		case EDGE_10Q:
+			if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
+				newValue = oldValue | EDGE_10Q;
+			} else {
+				newValue = oldValue;
+			}
+			break;
+		case EDGE_10:
+			assert !isEdge(oldValue, EDGE_11);
+			newValue = (oldValue & MASK_1_CLEAR) | EDGE_10;
+			break;
+		case EDGE_11Q:
+			if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
+				newValue = oldValue | EDGE_11Q;
+			} else {
+				newValue = oldValue;
+			}
+			break;
+		case EDGE_11:
+			assert !isEdge(oldValue, EDGE_10);
+			newValue = (oldValue & MASK_1_CLEAR) | EDGE_11;
+			break;
+		default:
+			newValue = oldValue;
+			break;
 		}
+
+		adjMatrix[index] = (byte) (0x000000ff & newValue);
 
 		return oldValue != newValue;
 	}
@@ -134,23 +129,14 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 	}
 
 	@Override
-	public int countNeighbors(String from, boolean selected, boolean strongConnectionsOnly) {
-		Integer integer = featureMap.get(from);
-		if (integer == null) {
+	public byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected) {
+		final int internalFrom = index[fromIndex];
+		final int internalTo = index[toIndex];
+		if (internalFrom < 0 || internalTo < 0) {
 			return -1;
 		}
-		final int fromIndex = integer;
-
-		final byte countEdge = selected ? (strongConnectionsOnly ? (EDGE_10 | EDGE_11) : MASK_0_CLEAR) : (strongConnectionsOnly ? (EDGE_00 | EDGE_01) : MASK_1_CLEAR);
-
-		int count = 0;
-		for (int i = (fromIndex * size), end = i + size; i < end; i++) {
-			if (isEdge(adjMatrix[i], countEdge)) {
-				count++;
-			}
-		}
-
-		return count;
+		final int index = (internalFrom * size) + internalTo;
+		return (byte) (((fromSelected ? (adjMatrix[index] >>> 4) : adjMatrix[index])) & 0x0000000f);
 	}
 
 }

@@ -40,9 +40,10 @@ public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
 	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
 	}
-	
+
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance solver, int solutionCount) {
-		return new RandomConfigurationGenerator(solver, solutionCount);
+	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
+		return new RandomConfigurationGenerator(satInstance, solutionCount);
 	}
+
 }

@@ -38,7 +38,7 @@ public class MinimumClauseHeuristic extends AFeatureOrderHeuristic {
 		int minIndex = 1;
 		for (int i = 2; i < map.length; i++) {
 			final DeprecatedFeature next = map[i];
-			if (smallestFeature == null || (next != null && next.compareTo(smallestFeature) > 0)) {
+			if (smallestFeature == null || (next != null && (smallestFeature.getClauseCount() - next.getClauseCount()) > 0)) {
 				smallestFeature = next;
 				minIndex = i;
 			}

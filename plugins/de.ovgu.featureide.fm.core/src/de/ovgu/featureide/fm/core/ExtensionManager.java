@@ -48,7 +48,7 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 		this.extensionLoader = extensionLoader;
 	}
 
-	protected boolean addExtension(T extension) {
+	public boolean addExtension(T extension) {
 		for (T t : extensions) {
 			if (t.getId().equals(extension.getId())) {
 				return false;

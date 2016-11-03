@@ -89,6 +89,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
@@ -644,26 +645,26 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	}
 	
 	private boolean refreshContent(IFile oldFile, IFile currentFile) {
-		if (currentFile == null || CorePlugin.getFeatureProject(currentFile) == null) {
-			sortMethods.setEnabled(false);
-			hideAllFields.setEnabled(false);
-			hideAllMethods.setEnabled(false);
-			return false;
-		}
-		if (CorePlugin.getFeatureProject(currentFile).getComposer().showContextFieldsAndMethods()) {
-			sortMethods.setEnabled(true);
-			hideAllFields.setEnabled(true);
-			hideAllMethods.setEnabled(true);
-		} else {
-			sortMethods.setEnabled(false);
-			hideAllFields.setEnabled(false);
-			hideAllMethods.setEnabled(false);
-		}
-
-		if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
-			OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
-			return lp.refreshContent(oldFile, currentFile);
-		}
+		sortMethods.setEnabled(false);
+		hideAllFields.setEnabled(false);
+		hideAllMethods.setEnabled(false);
+		if (currentFile != null) {
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(currentFile);
+			if (featureProject != null) {
+				final IComposerExtensionClass composer = featureProject.getComposer();
+				if (composer != null) {
+					if (composer.showContextFieldsAndMethods()) {
+						sortMethods.setEnabled(true);
+						hideAllFields.setEnabled(true);
+						hideAllMethods.setEnabled(true);
+					}
+					if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
+						OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
+						return lp.refreshContent(oldFile, currentFile);
+					}
+				}
+			}
+		} 
 		return false;
 	}
 

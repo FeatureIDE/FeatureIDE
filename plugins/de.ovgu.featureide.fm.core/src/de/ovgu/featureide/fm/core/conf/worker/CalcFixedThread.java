@@ -28,7 +28,8 @@ import org.prop4j.MultiThreadSatSolver;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * TODO description
@@ -56,14 +57,14 @@ public class CalcFixedThread extends AWorkerThread<String> {
 	private final SharedObjects sharedObjects;
 
 	public CalcFixedThread(Node fmNode) {
-		this(fmNode, NUMBER_OF_THREADS, new WorkMonitor());
+		this(fmNode, NUMBER_OF_THREADS, new NullMonitor());
 	}
 
-	public CalcFixedThread(Node fmNode, WorkMonitor monitor) {
+	public CalcFixedThread(Node fmNode, IMonitor monitor) {
 		this(fmNode, NUMBER_OF_THREADS, monitor);
 	}
 
-	public CalcFixedThread(Node fmNode, int numberOfSolvers, WorkMonitor monitor) {
+	public CalcFixedThread(Node fmNode, int numberOfSolvers, IMonitor monitor) {
 		super(monitor);
 		sharedObjects = new SharedObjects(fmNode, numberOfSolvers);
 		this.id = sharedObjects.lastSolverID;

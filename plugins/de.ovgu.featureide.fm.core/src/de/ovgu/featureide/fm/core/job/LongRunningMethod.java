@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+
 /**
  * Interface for methods that take a long time to finish.</br>
  * Can be executed as Eclipse job with the wrapper {@link LongRunningJob}.
@@ -28,6 +30,6 @@ package de.ovgu.featureide.fm.core.job;
  */
 public interface LongRunningMethod<T> {
 
-	T execute(WorkMonitor monitor) throws Exception;
+	T execute(IMonitor monitor) throws Exception;
 
 }

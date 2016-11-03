@@ -20,19 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.conversion;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
 
 import org.junit.Test;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.NodeWriter;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
@@ -41,16 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
-import de.ovgu.featureide.fm.core.editing.Comparison;
-import de.ovgu.featureide.fm.core.editing.ModelComparator;
-import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.fama.FAMAWriter;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
-//import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * TODO description
@@ -59,7 +44,6 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  */
 public class TComplexConstraintConverter {
 	
-	private static final ModelComparator comparator = new ModelComparator(10000);
 	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
 	private static IFeatureModel fm;
 	

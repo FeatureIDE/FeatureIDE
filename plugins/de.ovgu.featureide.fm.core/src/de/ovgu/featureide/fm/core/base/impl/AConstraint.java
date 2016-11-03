@@ -57,17 +57,21 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected Node propNode;
 	boolean featureSelected;
+	boolean isImplicit;
+
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
 		this.propNode = oldConstraint.propNode;
 		this.featureSelected = oldConstraint.featureSelected;
+		this.isImplicit = oldConstraint.isImplicit;
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
 		this.propNode = propNode;
 		this.featureSelected = false;
+		this.isImplicit = false;
 	}
 
 	@Override
@@ -81,10 +85,12 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	 */
 	@Override
 	public Collection<IFeature> getContainedFeatures() {
-		if (containedFeatureList.isEmpty()) {
-			setContainedFeatures();
+		synchronized (containedFeatureList) {
+			if (containedFeatureList.isEmpty()) {
+				setContainedFeatures();
+			}
+			return containedFeatureList;
 		}
-		return containedFeatureList;
 	}
 
 	@Override
@@ -148,9 +154,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	 */
 	@Override
 	public void setContainedFeatures() {
-		containedFeatureList.clear();
-		for (final String featureName : propNode.getContainedFeatures()) {
-			containedFeatureList.add(featureModel.getFeature(featureName));
+		synchronized (containedFeatureList) {
+			containedFeatureList.clear();
+			for (final String featureName : propNode.getContainedFeatures()) {
+				containedFeatureList.add(featureModel.getFeature(featureName));
+			}
 		}
 	}
 

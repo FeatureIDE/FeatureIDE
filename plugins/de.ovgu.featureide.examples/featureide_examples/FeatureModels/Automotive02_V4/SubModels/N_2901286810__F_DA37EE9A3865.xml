@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_2901286810__F_DA37EE9A3865">
+				<description>
+					Lore
+				</description>
+				<alt mandatory="true" name="F_A26E60EDCF2B">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+					</description>
+					<feature mandatory="true" name="F_281B3C652497">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_D97ACC2C22A6">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_4E7653F57697">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="F_0598D34EDF83">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_B0E187F985AF">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_E55E32F8CA16">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="F_7DDFB875B04D">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_FBBF4FE7F31E">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="F_56EEA5D47B24">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="F_FE6734AC9862">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_396ACC1927A8">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<alt name="F_A11107388BAB">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore
+					</description>
+					<feature mandatory="true" name="F_6B85BC64D6A1">
+						<description>
+							Lorem ip
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_83244E74841C">
+						<description>
+							Lorem ipsum dolor sit amet,
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_BF139ACC369E">
+						<description>
+							Lorem ipsum dolor
+						</description>
+					</feature>
+					<feature mandatory="true" name="F_919C7307509C">
+						<description>
+							Lorem ipsum dolor sit amet, consetetur sadi
+						</description>
+					</feature>
+				</alt>
+				<feature name="F_BA7F3F30C4D8">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_B0D90777F219">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

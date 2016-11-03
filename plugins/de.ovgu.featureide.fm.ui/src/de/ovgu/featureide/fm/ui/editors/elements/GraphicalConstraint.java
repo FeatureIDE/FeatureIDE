@@ -42,6 +42,8 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	protected final IConstraint correspondingConstraint;
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 	protected boolean featureSelected = false;
+	public boolean isImplicit = false;
+
 	
 	protected Point location = new Point(0, 0);
 	protected Dimension dimension = new Dimension(10, 10);
@@ -79,12 +81,27 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	public boolean isFeatureSelected() {
 		return featureSelected;
 	}
+	
+	/**
+	 * A constraint is implicit if it has been detected during feature model slicing of a subtree feature model.
+	 */
+	@Override
+	public boolean isImplicit() {
+		return isImplicit;
+	}
 
 	@Override
 	public void setFeatureSelected(boolean selected) {
 		if (featureSelected != selected) {
 			featureSelected = selected;
 			update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+		}
+	}
+	
+	@Override
+	public void setConstraintImplicit(boolean implicit) {
+		if (isImplicit != implicit) {
+			isImplicit = implicit;
 		}
 	}
 

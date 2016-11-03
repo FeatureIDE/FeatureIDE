@@ -76,7 +76,11 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
 		}else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
-			super.setLocation(p.translate((-getBounds().width >> 1), 0));
+			if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
+				super.setLocation(p.translate(0, (-getBounds().width >> 1)));
+			} else {
+				super.setLocation(p.translate((-getBounds().width >> 1), 0));
+			}
 		}
 	}
 
@@ -94,11 +98,20 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	}
 
 	private void drawShape(final Graphics graphics) {
+		boolean verticalLayout = false; 
+		if (featureModel != null) {
+			verticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
+		}
 		double minAngle = Double.MAX_VALUE;
 		double maxAngle = Double.MIN_VALUE;
-
-		final Rectangle r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1,  1);
-		final Point center = getBounds().getTop();
+		final Rectangle r;
+		if (verticalLayout) {
+			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1,  1);
+		} else {
+			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1,  1);
+		}
+		final Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
+		
 		if (this instanceof LegendRelationDecoration) {
 			maxAngle = calculateAngle(center, getFeatureLocation());
 			minAngle = calculateAngle(center, referencePoint);

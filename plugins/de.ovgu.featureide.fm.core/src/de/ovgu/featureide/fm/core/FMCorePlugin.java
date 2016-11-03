@@ -32,7 +32,6 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -46,14 +45,17 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
-import de.ovgu.featureide.fm.core.job.IJob;
-import de.ovgu.featureide.fm.core.job.IProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
@@ -64,32 +66,38 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
  */
 public class FMCorePlugin extends AbstractCorePlugin {
 
-	public static final String PLUGIN_ID = "de.ovgu.featureide.fm.core";
-
 	private static FMCorePlugin plugin;
 
 	@Override
 	public String getID() {
-		return PLUGIN_ID;
+		return PluginID.PLUGIN_ID;
 	}
 
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 		
-		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(FMCorePlugin.PLUGIN_ID, IFeatureModelFactory.extensionPointID, IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
-		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(FMCorePlugin.PLUGIN_ID, IFeatureModelFormat.extensionPointID, IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
-		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(FMCorePlugin.PLUGIN_ID, IConfigurationFormat.extensionPointID, IConfigurationFormat.extensionID, IConfigurationFormat.class));
+		FileSystem.INSTANCE = new EclipseFileSystem();
+		LongRunningWrapper.INSTANCE = new LongRunningEclipse();
+		
+		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID, IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
+		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID, IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
+		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID, IConfigurationFormat.extensionID, IConfigurationFormat.class));
 
 //		ConfigFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
-//		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new VelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));
+//		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));
 //		FMFactoryManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
 
+		Logger.logger = new EclipseLogger();
 		FMFactoryManager.factoryWorkspaceProvider = new EclipseFactoryWorkspaceProvider();
-		FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+
+		if (!FMFactoryManager.factoryWorkspaceProvider.load()) {
+			FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+		}
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		FMFactoryManager.factoryWorkspaceProvider.save();
 		plugin = null;
 		super.stop(context);
 	}
@@ -107,28 +115,26 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	 * @return the created job or a {@link JobSequence} if more than one project is given.
 	 *         Returns {@code null} if {@code projects} is empty.
 	 */
-	public IJob startJobs(List<IProject> projects, JobArguments arguments, boolean autostart) {
-		IJob ret;
+	public LongRunningMethod<?> startJobs(List<JobArguments> projects, boolean autostart) {
+		LongRunningMethod<?> ret;
 		switch (projects.size()) {
 		case 0:
 			return null;
 		case 1:
-			IProjectJob newJob = arguments.createJob();
-			newJob.setProject(projects.get(0));
+			LongRunningMethod<?> newJob = projects.get(0).createJob();
 			ret = newJob;
 			break;
 		default:
 			final JobSequence jobSequence = new JobSequence();
 			jobSequence.setIgnorePreviousJobFail(true);
-			for (IProject p : projects) {
-				IProjectJob newSequenceJob = arguments.createJob();
-				newSequenceJob.setProject(p);
+			for (JobArguments p : projects) {
+				LongRunningMethod<?> newSequenceJob = p.createJob();
 				jobSequence.addJob(newSequenceJob);
 			}
 			ret = jobSequence;
 		}
 		if (autostart) {
-			ret.schedule();
+			LongRunningWrapper.getRunner(ret).schedule();
 		}
 		return ret;
 	}

@@ -42,9 +42,6 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	private String project;
 
-	/**
-	 * @param project
-	 */
 	public SimpleStructureProvider(String project) {
 		super();
 		this.project = project;

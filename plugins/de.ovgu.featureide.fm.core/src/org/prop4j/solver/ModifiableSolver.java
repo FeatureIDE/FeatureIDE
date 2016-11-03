@@ -33,7 +33,7 @@ import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Finds certain solutions of propositional formulas.
@@ -99,7 +99,7 @@ public class ModifiableSolver extends BasicSolver {
 		try {
 			return !solver.isSatisfiable(backbone);
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return false;
 	}

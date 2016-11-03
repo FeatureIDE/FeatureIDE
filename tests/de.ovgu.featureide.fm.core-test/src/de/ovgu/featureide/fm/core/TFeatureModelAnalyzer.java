@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -34,9 +33,7 @@ import org.junit.Test;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Tests for {@link FeatureModelAnalyzer} 
@@ -90,6 +87,16 @@ public class TFeatureModelAnalyzer {
 	private IFeature FM4_F10 = FM_test_4.getFeature("J");
 	private HashMap<Object, Object> FM4_DATA = FM_test_4.getAnalyser().analyzeFeatureModel(null);
 	
+	private IFeatureModel FM_test_7 = init("test_7.xml");
+	private IFeature FM7_F1 = FM_test_7.getFeature("H");
+	private IConstraint FM7_C1 = FM_test_7.getConstraints().get(0); 
+	private HashMap<Object, Object> FM7_DATA = FM_test_7.getAnalyser().analyzeFeatureModel(null);
+	
+	private IFeatureModel FM_test_8 = init("test_8.xml");
+	private IFeature FM8_F1 = FM_test_8.getFeature("B");
+	private IFeature FM8_F2 = FM_test_8.getFeature("C");
+	private HashMap<Object, Object> FM8_DATA = FM_test_8.getAnalyser().analyzeFeatureModel(null);
+	
 	/** 
      * @return 
 	 */ 
@@ -102,16 +109,12 @@ public class TFeatureModelAnalyzer {
 	}
 	
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		IFeatureModel fm = null;
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
-				try {
-					new XmlFeatureModelReader(fm).readFromFile(f);
+				fm = FeatureModelManager.readFromFile(f.toPath());
+				if (fm!= null) {
 					break;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (UnsupportedModelException e) {
-					e.printStackTrace();
 				}
 			}
 		}
@@ -226,6 +229,26 @@ public class TFeatureModelAnalyzer {
 	@Test
 	public void TFalseOptional_FM4_F1() {
 		assertEquals(FM4_DATA.get(FM4_F10), FeatureStatus.FALSE_OPTIONAL);
+	}
+	
+	@Test
+	public void TFalseOptional_FM7_F1() {
+		assertEquals(FM7_DATA.get(FM7_F1), FeatureStatus.FALSE_OPTIONAL);
+	}
+	
+	@Test
+	public void TRedundantConstr_FM7_C1() {
+		assertEquals(FM7_DATA.get(FM7_C1), ConstraintAttribute.REDUNDANT);
+	}
+	
+	@Test
+	public void TDead_FM8_F1() {
+		assertEquals(FM8_DATA.get(FM8_F1), FeatureStatus.DEAD);
+	}
+	
+	@Test
+	public void TDead_FM8_F2() {
+		assertEquals(FM8_DATA.get(FM8_F2), FeatureStatus.DEAD);
 	}
 	
 	@Test

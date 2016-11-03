@@ -22,8 +22,7 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.splconquerer.ConquererFMWriter;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 
@@ -38,8 +37,8 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 public class ExportConquererHandler extends AbstractExportHandler {
 
 	@Override
-	protected IFeatureModelWriter getFeatureModelWriter(IFeatureModel fm) {
-		return new ConquererFMWriter(fm);
+	protected IFeatureModelFormat getFormat() {
+		return new ConquererFMWriter();
 	}
 
 	@Override
@@ -47,4 +46,5 @@ public class ExportConquererHandler extends AbstractExportHandler {
 		super.configureFileDialog(fileDialog);
 		fileDialog.setFileName("model.xml");
 	}
+
 }

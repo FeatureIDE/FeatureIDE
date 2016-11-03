@@ -22,15 +22,15 @@ package org.prop4j.analyses;
 
 import java.util.List;
 
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Finds random solutions of propositional formulas.
  * 
  * @author Sebastian Krieter
  */
@@ -44,14 +44,12 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 	}
 
 	@Override
-	public List<List<String>> analyze(WorkMonitor monitor) throws Exception {
+	public List<List<String>> analyze(IMonitor monitor) throws Exception {
 		time = System.nanoTime();
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
 		for (int i = 0; i < maxValue; i++) {
-			if (monitor.checkCancel()) {
-				break;
-			}
+			monitor.checkCancel();
 			if (handleNewConfig(solver.findModel())) {
 				break;
 			}

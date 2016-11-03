@@ -62,52 +62,52 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BAnalyzeFeatureModel1() {
+	public final void BAnalyzeFeatureModel0001() {
 		analyze(1);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BAnalyzeFeatureModel2() {
+	public final void BAnalyzeFeatureModel0002() {
 		analyze(2);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BAnalyzeFeatureModel10() {
+	public final void BAnalyzeFeatureModel0010() {
 		analyze(10);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BAnalyzeFeatureModel20() {
+	public final void BAnalyzeFeatureModel0020() {
 		analyze(20);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BAnalyzeFeatureModel21() {
+	public final void BAnalyzeFeatureModel0021() {
 		analyze(21);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BAnalyzeFeatureModel50() {
+	public final void BAnalyzeFeatureModel0050() {
 		analyze(50);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BAnalyzeFeatureModel100() {
+	public final void BAnalyzeFeatureModel0100() {
 		analyze(100);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 3200)
-	public final void BAnalyzeFeatureModel200() {
+	public final void BAnalyzeFeatureModel0200() {
 		analyze(200);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 3500)
-	public final void BAnalyzeFeatureModel201() {
+	public final void BAnalyzeFeatureModel0201() {
 		analyze(201);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 4000)
-	public final void BAnalyzeFeatureModel500() {
+	public final void BAnalyzeFeatureModel0500() {
 		analyze(500);
 	}
 
@@ -119,52 +119,52 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BUpdateConstraints1() {
+	public final void BUpdateConstraints0001() {
 		BUpdateConstraints(1);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1350)
-	public final void BUpdateConstraints2() {
+	public final void BUpdateConstraints0002() {
 		BUpdateConstraints(2);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1100)
-	public final void BUpdateConstraints10() {
+	public final void BUpdateConstraints0010() {
 		BUpdateConstraints(10);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1050)
-	public final void BUpdateConstraints20() {
+	public final void BUpdateConstraints0020() {
 		BUpdateConstraints(20);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1050)
-	public final void BUpdateConstraints21() {
+	public final void BUpdateConstraints0021() {
 		BUpdateConstraints(21);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1050)
-	public final void BUpdateConstraints50() {
+	public final void BUpdateConstraints0050() {
 		BUpdateConstraints(50);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1050)
-	public final void BUpdateConstraints100() {
+	public final void BUpdateConstraints0100() {
 		BUpdateConstraints(100);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1150)
-	public final void BUpdateConstraints200() {
+	public final void BUpdateConstraints0200() {
 		BUpdateConstraints(201);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1250)
-	public final void BUpdateConstraints201() {
+	public final void BUpdateConstraints0201() {
 		BUpdateConstraints(201);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 2500)
-	public final void BUpdateConstraints500() {
+	public final void BUpdateConstraints0500() {
 		BUpdateConstraints(500);
 	}
 
@@ -181,52 +181,52 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1100)
-	public final void BUpdateFeatures1() {
+	public final void BUpdateFeatures0001() {
 		BUpdateFeatures(1);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1100)
-	public final void BUpdateFeatures2() {
+	public final void BUpdateFeatures0002() {
 		BUpdateFeatures(2);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1050)
-	public final void BUpdateFeatures10() {
+	public final void BUpdateFeatures0010() {
 		BUpdateFeatures(10);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1050)
-	public final void BUpdateFeatures20() {
+	public final void BUpdateFeatures0020() {
 		BUpdateFeatures(20);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1100)
-	public final void BUpdateFeatures21() {
+	public final void BUpdateFeatures0021() {
 		BUpdateFeatures(21);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1050)
-	public final void BUpdateFeatures50() {
+	public final void BUpdateFeatures0050() {
 		BUpdateFeatures(50);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1000)
-	public final void BUpdateFeatures100() {
+	public final void BUpdateFeatures0100() {
 		BUpdateFeatures(100);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1150)
-	public final void BUpdateFeatures200() {
+	public final void BUpdateFeatures0200() {
 		BUpdateFeatures(200);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 3500)
-	public final void BUpdateFeatures201() {
+	public final void BUpdateFeatures0201() {
 		BUpdateFeatures(201);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
-	public final void BUpdateFeatures500() {
+	public final void BUpdateFeatures0500() {
 		BUpdateFeatures(500);
 	}
 

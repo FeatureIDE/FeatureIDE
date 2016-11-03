@@ -33,7 +33,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -51,18 +52,20 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	}
 
 	@Override
-	public Void execute(WorkMonitor monitor) throws Exception {
+	public Void execute(IMonitor monitor) throws Exception {
 		buildCurrentConfigurations(builder.featureProject, monitor);
 		return null;
 	}
 	
-	protected void buildCurrentConfigurations(IFeatureProject featureProject, WorkMonitor monitor) {
+	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor monitor) {
 		try {
 			for (IResource configuration : featureProject.getConfigFolder().members()) {
 				if (confs >= maxConfigs()) {
 					break;
 				}
-				if (monitor.checkCancel()) {
+				try {
+					monitor.checkCancel();
+				} catch (MethodCancelException e) {
 					builder.finish();
 					return;
 				}
@@ -86,7 +89,7 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 *            The configuration file
 	 * @param monitor
 	 */
-	private void build(IResource configuration, WorkMonitor monitor) {
+	private void build(IResource configuration, IMonitor monitor) {
 		reader = new FileHandler<>(this.configuration);
 		reader.read(Paths.get(configuration.getLocationURI()), ConfigurationManager.getFormat(configuration.getName()));
 		builder.addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));

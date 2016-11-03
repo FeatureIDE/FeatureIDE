@@ -41,8 +41,10 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
  * Creates configurations where false optional features are unused.
@@ -76,14 +78,14 @@ public class QuickFixUnusedFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			IFeatureModel fm = new FeatureModel() {
+			IFeatureModel fm = new FeatureModel("") {
 				// display file name at JUnit view
 				public String toString() {
 					return f.getName();
 				};
 			};
-			XmlFeatureModelReader r = new XmlFeatureModelReader(fm);
-			r.readFromFile(f);
+			IFeatureModelFormat format = new XmlFeatureModelFormat();
+			FileHandler.load(f.toPath(), fm, format);
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);

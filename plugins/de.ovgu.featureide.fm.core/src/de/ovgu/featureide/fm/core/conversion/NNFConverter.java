@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.conversion;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,10 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.prop4j.And;
-import org.prop4j.AtLeast;
-import org.prop4j.AtMost;
-import org.prop4j.Choose;
-import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -53,7 +48,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class NNFConverter implements IConverterStrategy {
 	/** Feature model factory */
-	protected static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	protected IFeatureModelFactory factory;
 	/** Working feature model */
 	protected IFeatureModel fm;
 	/** Preserving configuration semantics */
@@ -228,6 +223,7 @@ public class NNFConverter implements IConverterStrategy {
 	@Override
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
 		this.fm = fm.clone();
+		this.factory = FMFactoryManager.getFactory(fm);
 		this.preserve = preserve;
 		
 		if(nodes.isEmpty())

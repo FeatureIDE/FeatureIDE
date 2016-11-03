@@ -21,6 +21,7 @@
 package de.ovgu.featureide.aspectj;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_CREATING_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_INSTALLED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
@@ -61,13 +62,14 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
  * Excludes unselected aspects form buildpath.
@@ -92,6 +94,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 
 	private LinkedList<String> unSelectedFeatures;
 	private IFeatureModel featureModel;
+	private IFeatureModelFactory fmFactory;
 	private boolean hadAspectJNature;
 
 	private static final LinkedHashSet<String> EXTENSIONS = createExtensions();
@@ -246,17 +249,18 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		featureModel = project.getFeatureModel();
+		fmFactory = FMFactoryManager.getFactory(featureModel);
 		try {
 			if (addAspects(project.getBuildFolder(), "")) {
 				featureModel.getStructure().getRoot().removeChild(featureModel.getFeature("Base").getStructure());
 				IFeature root = featureModel.getStructure().getRoot().getFeature();
 				root.setName("Base");
 				featureModel.getStructure().setRoot(root.getStructure());
-				featureModel.getStructure().getRoot().setAbstract(false);
-				FeatureModelWriterIFileWrapper w = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel));
-				IFile file = project.getProject().getFile("model.xml");
-				w.writeToFile(file);
-				file.refreshLocal(IResource.DEPTH_ZERO, null);
+				featureModel.getStructure().getRoot().setAbstract(false);		
+				final ProblemList problems = FileHandler.save(Paths.get(project.getProject().getFile("model.xml").getLocationURI()), featureModel, new XmlFeatureModelFormat());
+				if (problems.containsError()) {
+					CorePlugin.getDefault().logError(ERROR_WHILE_CREATING_FEATURE_MODEL + "\n" + problems.getErrors().toString(), new Exception());
+				}
 			}
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
@@ -271,7 +275,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			} else if (res instanceof IFile) {
 				String name = res.getName();
 				if (name.endsWith(".aj")) {
-					IFeature feature = FMFactoryManager.getFactory().createFeature(featureModel, folders + name.split("[.]")[0]);
+					IFeature feature = fmFactory.createFeature(featureModel, folders + name.split("[.]")[0]);
 					featureModel.getStructure().getRoot().addChild(feature.getStructure());
 					hasAspects = true;
 				}

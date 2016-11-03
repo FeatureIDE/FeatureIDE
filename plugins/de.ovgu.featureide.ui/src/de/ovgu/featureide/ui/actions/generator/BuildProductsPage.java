@@ -43,6 +43,7 @@ import java.util.ArrayList;
 
 import javax.annotation.CheckForNull;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -70,8 +71,10 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
+@SuppressWarnings("restriction")
 public class BuildProductsPage extends WizardPage implements IConfigurationBuilderBasics {
 
+	private static final String JUNIT_PLUGIN_WARNING = "Testing generated producted requires plugin \"org.junit\" which cannot be found.";
 	private static final String LABEL_GENERATE = "&Strategy:";
 	private static final String LABEL_ALGORITHM = "&Algorithm:";
 	private static final String LABEL_ORDER = "&Order:";
@@ -87,6 +90,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String TOOL_TIP_T_ORDER = "Define the T for odering by interactions.";
 	private static final String TOOL_TIP_PROJECT = DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
 
+	private static boolean JUNIT_INSTALLED = Platform.getBundle("org.junit") != null;
+	
 	@CheckForNull
 	private IFeatureProject project;
 
@@ -190,8 +195,12 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labels.add(labelAlgorithm);
 		comboAlgorithm = new Combo(groupDeriveConf, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		comboAlgorithm.setLayoutData(gd_Fill_H);
+		
 		for (TWise tWise : TWise.values()) {
-			comboAlgorithm.add(getTWiseText(tWise));
+			final String tWiseText = getTWiseText(tWise);
+			if (tWiseText != null) {
+				comboAlgorithm.add(tWiseText);
+			}
 		}
 		comboAlgorithm.setText(algorithm);
 		comboAlgorithm.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS));
@@ -297,6 +306,13 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		dialogChanged();
 
 		buttonTest.setEnabled(!buttonBuildProject.getSelection());
+		
+		if (!JUNIT_INSTALLED) {
+			buttonTest.setSelection(false);
+			buttonTest.setEnabled(false);
+			buttonTest.setToolTipText(JUNIT_PLUGIN_WARNING);
+			labelTest.setToolTipText(JUNIT_PLUGIN_WARNING);
+		}
 	}
 
 	private String getOrderText(BuildOrder order) {
@@ -318,7 +334,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private String getTWiseText(TWise tWise) {
 		switch (tWise) {
 		case CASA:
-			return CASA;
+			final boolean windowsOS = System.getProperty("os.name").startsWith("Windows");
+			return windowsOS ? CASA : null;
 		case CHVATAL:
 			return CHVATAL;
 		case ICPL:
@@ -489,6 +506,9 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				buttonTest.setEnabled(!buttonBuildProject.getSelection());
+				if (!JUNIT_INSTALLED) {
+					buttonTest.setEnabled(false);
+				}
 				dialogChanged();
 			}
 

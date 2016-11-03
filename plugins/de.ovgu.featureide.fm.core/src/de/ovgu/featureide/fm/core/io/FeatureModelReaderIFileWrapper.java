@@ -27,16 +27,22 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * This Wrapper makes it possible, to read feature models from IFiles, 
  * e.g. if working with Eclipse plugins
  * Otherwise only the classes extending {@link AbstractFeatureModelReader} are needed
  * 
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br/>
+ * {@link IFile} can be converted via {@code Paths.getPath(ifile.getLocationURI())}.
+ * 
  * @author Sönke Holthusen
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	private AbstractFeatureModelReader reader;
 
@@ -69,7 +75,7 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	public void readFromFile(IFile ifile) throws UnsupportedModelException,
 			FileNotFoundException {
 		////
-		reader.featureModel.initFMComposerExtension(ifile.getProject());
+		FMComposerManager.getFMComposerExtension(ifile.getProject());
 		/////
 		File file = ifile.getRawLocation().makeAbsolute().toFile();
 

@@ -21,18 +21,10 @@
 package de.ovgu.featureide.fm.core.conf;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.conf.nodes.Expression;
+import org.prop4j.solver.SatInstance;
 
 public interface IFeatureGraph extends Serializable {
-
-	void implies(String implyFeature, String impliedFeature);
-
-	void implies(String implyFeature, String impliedFeature, int negation);
-
-	void setEdge(String from, String to, byte edgeType);
 
 	boolean setEdge(int from, int to, byte edgeType);
 
@@ -40,20 +32,16 @@ public interface IFeatureGraph extends Serializable {
 
 	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
 
-	int getFeatureIndex(String featureName);
-
 	int getSize();
 
-	ArrayList<LinkedList<Expression>> getExpListAr();
+	int[] getIndex();
 
-	int countNeighbors(String from, boolean selected, boolean subtractReal);
+	SatInstance getSatInstance();
 
-	String[] getFeatureArray();
-
-	String[] getCoreFeatures();
-
-	String[] getDeadFeatures();
-	
 	void copyValues(IFeatureGraph otherGraph);
+
+	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
+
+	int getFeatureIndex(String name);
 
 }

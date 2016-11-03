@@ -21,10 +21,10 @@
 package de.ovgu.featureide.fm.core.io.guidsl;
 
 import static org.junit.Assert.assertTrue;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -43,13 +43,8 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter {
 	}
 
 	@Override
-	protected IFeatureModelWriter getWriter(IFeatureModel fm) {
-		return new GuidslWriter(fm);
-	}
-
-	@Override
-	protected IFeatureModelReader getReader(IFeatureModel fm) {
-		return new GuidslReader(fm);
+	protected IFeatureModelFormat getFormat() {
+		return new GuidslFormat();
 	}
 
 	//guidsl does not save concrete compound features

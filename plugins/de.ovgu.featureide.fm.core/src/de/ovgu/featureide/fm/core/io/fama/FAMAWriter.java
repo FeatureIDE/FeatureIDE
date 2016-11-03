@@ -20,56 +20,24 @@
  */
 package de.ovgu.featureide.fm.core.io.fama;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_DETERMINE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONNECTIONTYPE_OF_ROOTFEATURE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
-
-import java.io.StringWriter;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.prop4j.And;
 import org.prop4j.Literal;
-import org.prop4j.NodeWriter;
 import org.prop4j.Not;
-import org.prop4j.Or;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
  * Prints feature models in the FaMa format.
  * 
+ * @deprecated Use {@link FAMAFormat} instead.
+ * 
  * @author Alexander Knueppel
  */
+@Deprecated
 public class FAMAWriter extends AbstractFeatureModelWriter {
 	/**
 	 * 
