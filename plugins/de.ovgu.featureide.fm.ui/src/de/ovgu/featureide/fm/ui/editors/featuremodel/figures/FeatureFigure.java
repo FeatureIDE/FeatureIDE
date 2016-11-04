@@ -165,8 +165,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			if (feature.getStructure().isRoot() && !analyser.valid()) {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-				explanation = analyser.deadFeatureExpl.get(feature); // get explanation for void feature model
-			//	toolTip.append(VOID);
+				explanation = analyser.getDeadFeatureExplanation(feature);
 			} else {
 				if (feature.getStructure().isConcrete()) {
 					if (!hasExpl) {
@@ -194,15 +193,13 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 					if (analyser.valid()) {
 						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-						explanation = analyser.deadFeatureExpl.get(feature); // get explanation for dead feature
-					//	toolTip.append(DEAD);
+						explanation = analyser.getDeadFeatureExplanation(feature);
 					}
 					break;
 				case FALSE_OPTIONAL:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
 					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-					explanation = analyser.falseOptFeatureExpl.get(feature); // get explanation for false optional feature
-			//		toolTip.append(FALSE_OPTIONAL);
+					explanation = analyser.getFalseOptionalFeatureExplanation(feature);
 					break;
 				case INDETERMINATE_HIDDEN:
 					setBackgroundColor(FMPropertyManager.getWarningColor());

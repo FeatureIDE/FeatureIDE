@@ -58,6 +58,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -78,17 +79,17 @@ public class FeatureModelAnalyzer {
 	/**
 	 * Remembers explanations for redundant constraints.
 	 */
-	public Map<IConstraint, Explanation> redundantConstrExpl = new HashMap<>();
+	private Map<IConstraint, Explanation> redundantConstrExpl = new HashMap<>();
 
 	/**
 	 * Remembers explanations for dead features.
 	 */
-	public Map<IFeature, Explanation> deadFeatureExpl = new HashMap<>();
+	private Map<IFeature, Explanation> deadFeatureExpl = new HashMap<>();
 
 	/**
 	 * Remembers explanations for false-optional features.
 	 */
-	public Map<IFeature, Explanation> falseOptFeatureExpl = new HashMap<>();
+	private Map<IFeature, Explanation> falseOptFeatureExpl = new HashMap<>();
 
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
@@ -772,21 +773,85 @@ public class FeatureModelAnalyzer {
 	}
 
 	/**
-	 * Returns an explanation why the given feature model element is defect or null if it is not.
+	 * Returns an explanation why the given feature model element is defect or null if it cannot be explained.
 	 * @param modelElement potentially defect feature model element
-	 * @return an explanation why the given feature model element is defect or null if it is not
+	 * @return an explanation why the given feature model element is defect or null if it cannot be explained
 	 */
 	public Explanation getExplanation(IFeatureModelElement modelElement) {
 		Explanation explanation = null;
-		explanation = deadFeatureExpl.get(modelElement);
-		if (explanation != null) {
-			return explanation;
+		if (modelElement instanceof IFeature) {
+			final IFeature feature = (IFeature) modelElement;
+			switch (feature.getProperty().getFeatureStatus()) {
+				case DEAD:
+					explanation = getDeadFeatureExplanation(feature);
+					break;
+				case FALSE_OPTIONAL:
+					explanation = getFalseOptionalFeatureExplanation(feature);
+					break;
+				default:
+					break;
+			}
+		} else if (modelElement instanceof IConstraint) {
+			final IConstraint constraint = (IConstraint) modelElement;
+			switch (constraint.getConstraintAttribute()) {
+				case REDUNDANT:
+				case TAUTOLOGY:
+				case IMPLICIT:
+					explanation = getRedundantConstraintExplanation(constraint);
+					break;
+				default:
+					break;
+			}
 		}
-		explanation = falseOptFeatureExpl.get(modelElement);
-		if (explanation != null) {
-			return explanation;
-		}
-		explanation = redundantConstrExpl.get(modelElement);
 		return explanation;
+	}
+	
+	/**
+	 * Returns an explanation why the given feature is dead or null if it cannot be explained.
+	 * @param feature potentially dead feature
+	 * @return an explanation why the given feature is dead or null if it cannot be explained
+	 */
+	public Explanation getDeadFeatureExplanation(IFeature feature) {
+		return deadFeatureExpl.get(feature);
+	}
+	
+	/**
+	 * Returns an explanation why the given feature is false-optional or null if it cannot be explained.
+	 * @param feature potentially false-optional feature
+	 * @return an explanation why the given feature is false-optional or null if it cannot be explained
+	 */
+	public Explanation getFalseOptionalFeatureExplanation(IFeature feature) {
+		return falseOptFeatureExpl.get(feature);
+	}
+	
+	/**
+	 * Returns an explanation why the given constraint is redundant or null if it cannot be explained.
+	 * Uses the default feature model stored in this instance.
+	 * @param constraint potentially redundant constraint
+	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
+	 */
+	public Explanation getRedundantConstraintExplanation(IConstraint constraint) {
+		return redundantConstrExpl.get(constraint);
+	}
+	
+	/**
+	 * Adds an explanation why the given constraint is redundant.
+	 * Uses the given feature model, which may differ from the default feature model stored in this instance.
+	 * This is for example the case when explaining implicit constraints in subtree models.
+	 * @param fm feature model containing the constraint
+	 * @param constraint potentially redundant constraint
+	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
+	 */
+	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
+		return new RedundantConstraint().getExplanation(fm, constraint);
+	}
+	
+	/**
+	 * Clears all explanations.
+	 */
+	public void clearExplanations() {
+		deadFeatureExpl.clear();
+		falseOptFeatureExpl.clear();
+		redundantConstrExpl.clear();
 	}
 }

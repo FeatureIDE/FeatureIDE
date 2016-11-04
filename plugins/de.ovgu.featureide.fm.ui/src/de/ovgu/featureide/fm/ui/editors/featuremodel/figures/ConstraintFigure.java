@@ -135,7 +135,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			break;
 		case REDUNDANT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			Explanation explanationRedundant = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraint);
+			Explanation explanationRedundant = constraint.getFeatureModel().getAnalyser().getRedundantConstraintExplanation(constraint);
 			Panel panelRedundant = new Panel();
 			panelRedundant.setLayoutManager(new ToolbarLayout(false));
 			panelRedundant.add(new Label(REDUNDANCE));
@@ -145,7 +145,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setBorder(FMPropertyManager.getImplicitConstraintBorder());
 			// set tooltip with explanation for redundant constraint
-			Explanation explanationImplicit = constraint.getFeatureModel().getAnalyser().redundantConstrExpl.get(constraint);
+			Explanation explanationImplicit = constraint.getFeatureModel().getAnalyser().getRedundantConstraintExplanation(constraint);
 			if (explanationImplicit != null) {
 				explanationImplicit.setImplicit(true);
 			}
