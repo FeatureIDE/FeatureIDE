@@ -1,4 +1,4 @@
-<project name="lib.fm" default="compile" basedir=".">
+<project name="lib.fm" default="compile" basedir="../">
 
 	<!-- Constants -->
 	<property name="src.dir" value="src" />
