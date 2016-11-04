@@ -1,11 +1,12 @@
 How to build the fm.core library.
 
 Build:
-	Execute the file de.ovgu.featureide.fm.core build_jar.xml.launch ("Run As" in the context menu).
+	Execute the file fm.core.lib-Build.launch ("Run As" in the context menu).
 	It should also appear as external tool, which you can execute.
 	(Alternatively you can also execute the build_jar.xml as ant script. However the other method is recommended for Eclipse users.)
+	For a clean build (deleting old build folder before compiling) execute fm.core.lib-Clean_Build.launch.
 	
-	The end result should be a jar file named de.ovgu.featureide.lib.fm.jar (in the fm.core project).
+	The end result should be a jar file named de.ovgu.featureide.lib.fm.jar (in the library folder of the fm.core project).
 	
 	Please pay attention to the console output.
 
@@ -15,13 +16,13 @@ What could go wrong:
 		It must be Java 1.7 or higher.
 	
 	
-	Due to changes there are unwanted dependencies (e.g. to Eclipse API) in the source files:
+	Due to changes there are unwanted dependencies (e.g., to Eclipse API) in the source files:
 		In the build script some files are explicitly excluded from the build process.
 		These files contain dependencies to the Eclipse API (or are deprecated).
 		If other files contain such dependencies it build process fails (with a lot of confusing complier errors).
-		In this case either fix the dependency problem or, if not possible, exclude the respective file in the build script (build_jar.xml).
+		In this case either fix the dependency problem or, if not possible, add the file to the exclude list (excluded_source_files.txt).
 		
-		Since the complier errors from the build process are not helpful for this problem and do not point you the the respective file, there is a quick'n'dirty method to detect the dependency problem.
+		Since the complier errors from the build process are not helpful for this problem and do not point you the respective file, there is a quick'n'dirty method to detect the dependency problem.
 		Make a local copy of the src folder or make sure all files in it are committed to your git repository.
 		Then run the build script with the target "deleteFiles".
 		It now deletes all files that are excluded from the build process.
