@@ -126,6 +126,16 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
+	public boolean isConjunctiveNormalForm() {
+		return true;
+	}
+
+	@Override
+	public boolean isClausalNormalForm() {
+		return false;
+	}
+
+	@Override
 	protected Node eliminateNonCNFOperators(Node[] newChildren) {
 		return clone();
 	}
@@ -146,14 +156,6 @@ public class Literal extends Node implements Cloneable {
 	public void simplify() {
 		//nothing to do (recursive calls reached lowest node)
 	}
-
-	/*	@Override
-		public Literal clone() { 
-			Literal copy = new Literal (var,positive);
-			copy.setSourceIndex(this.srcIndex);
-			copy.setFeatureAttribute(this.srcAttribute);
-			return copy;
-		}*/
 
 	@Override
 	public Literal clone() {

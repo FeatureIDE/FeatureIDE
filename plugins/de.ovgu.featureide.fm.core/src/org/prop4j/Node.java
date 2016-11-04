@@ -68,6 +68,25 @@ public abstract class Node {
 		return children;
 	}
 
+	/**
+	 * Returns true iff this is in conjunctive normal form.
+	 * This is the case iff this is a conjunction of disjunctions of literals.
+	 * Note that redundant nodes may be omitted.
+	 * This means that instead of one-literal conjunctions and disjunctions, the literal alone may be stored.
+	 * @return true iff this is in conjunctive normal form.
+	 */
+	public abstract boolean isConjunctiveNormalForm();
+	
+	/**
+	 * Returns true iff this is in clausal normal form.
+	 * This is a more narrow case of conjunctive normal form.
+	 * Specifically, redundant nodes may not be omitted.
+	 * In other words, this must be a conjunction of clauses.
+	 * Each clause must in turn contain nothing but a positive amount of literals.
+	 * @return true iff this is in clausal normal form
+	 */
+	public abstract boolean isClausalNormalForm();
+
 	public Node toCNF() {
 		Node cnf = this;
 		cnf = cnf.eliminateNonCNFOperators();

@@ -36,6 +36,16 @@ public class Equals extends Node implements Cloneable {
 	}
 
 	@Override
+	public boolean isConjunctiveNormalForm() {
+		return false;
+	}
+
+	@Override
+	public boolean isClausalNormalForm() {
+		return false;
+	}
+
+	@Override
 	protected Node eliminateNonCNFOperators(Node[] newChildren) {
 		return new And(
 				new Or(new Not(newChildren[0]), newChildren[1]),

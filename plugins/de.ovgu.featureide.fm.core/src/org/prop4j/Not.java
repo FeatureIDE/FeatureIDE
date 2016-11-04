@@ -36,7 +36,17 @@ public class Not extends Node implements Cloneable {
 	public Not(Object child) {
 		children = new Node[] { getNode(child) };
 	}
-	
+
+	@Override
+	public boolean isConjunctiveNormalForm() {
+		return false;
+	}
+
+	@Override
+	public boolean isClausalNormalForm() {
+		return false;
+	}
+
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		Node node = children[0];
