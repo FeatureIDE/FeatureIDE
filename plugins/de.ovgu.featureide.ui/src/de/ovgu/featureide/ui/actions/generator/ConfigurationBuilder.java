@@ -32,6 +32,7 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -271,6 +272,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			throw new RuntimeException(buildType + " not supported");
 		}
 		jobName += StringTable.FOR + featureProject.getProjectName();
+		RemoveBaseMarkerFromSourceFolderFiles();
 		Job job = new Job(jobName) {
 
 			private IRunner<Void> configurationBuilderJob;
@@ -300,7 +302,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					}
 					configurationBuilderJob = LongRunningWrapper.getRunner(configurationBuilder, "Create Configurations " + id++);
 					configurationBuilderJob.schedule();
-
 					showStatistics(monitor);
 					if (!createNewProjects) {
 						try {
@@ -577,6 +578,23 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		((SubMonitor) globalMonitor).setWorkRemaining((int) configurationNumber - built);
 		globalMonitor.setTaskName(getTaskName());
 		globalMonitor.worked(1);
+	}
+
+
+
+	/**
+	 * Removes the base markers from every file in the source folder
+	 */
+	public void RemoveBaseMarkerFromSourceFolderFiles()
+	{
+		try {
+			IMarker[] baseMarker = featureProject.getSourceFolder().findMarkers(IMarker.MARKER, true, IResource.DEPTH_INFINITE);
+			for (IMarker iMarker : baseMarker) {
+				iMarker.delete();
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
 	}
 
 }
