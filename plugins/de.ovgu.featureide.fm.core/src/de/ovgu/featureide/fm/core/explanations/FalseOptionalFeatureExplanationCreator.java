@@ -81,6 +81,7 @@ public class FalseOptionalFeatureExplanationCreator extends ExplanationCreator {
 	 * Then propagates the values until a violation in a clause occurs.
 	 * @return an explanation why the specified feature of the specified feature model is false-optional
 	 */
+	@Override
 	public Explanation getExplanation() {
 		final LTMS ltms = new LTMS(getCNF());
 		ltms.addPremise(getFalseOptionalFeature().getName(), false);

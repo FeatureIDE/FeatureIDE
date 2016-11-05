@@ -90,6 +90,7 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	 * Finally combines all generated explanations into one.
 	 * @return an explanation why the specified constraint of the specified feature model is redundant
 	 */
+	@Override
 	public Explanation getExplanation() {
 		final Explanation explanation = new Explanation();
 		explanation.setExplanationCount(0);
