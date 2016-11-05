@@ -143,11 +143,11 @@ public class ExplanationWriter {
 				s = String.format("%s is %s of %s.", feature.getName(), getChildString(feature, parent), parent.getName());
 				break;
 			case CONSTRAINT:
-				final Node constraint = FeatureUtils.getConstraint(explanation.getFeatureModel(), reason.getLiteral().getSourceIndex()); //TODO figure out why this returns Node instead of IConstraint
+				final Node constraint = FeatureUtils.getConstraint(explanation.getFeatureModel(), reason.getLiteral().getSourceIndex());
 				s = String.format("%s is a constraint.", NodeWriter.nodeToString(constraint, NodeWriter.logicalSymbols));
 				break;
 			case ROOT:
-				s = String.format("%s is the root.", reason.getLiteral().var.toString()); //TODO replace toString() with IFeature#getName()
+				s = String.format("%s is the root.", reason.getLiteral().var.toString());
 				break;
 			default:
 				throw new IllegalStateException("Reason has unexpected source attribute");
