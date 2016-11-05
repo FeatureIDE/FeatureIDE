@@ -27,6 +27,7 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -164,19 +165,38 @@ public class LTMS {
 	
 	/**
 	 * Returns an explanation why the premises lead to a contradiction in the conjunctive normal form.
-	 * This is done by propagating the truth values until a contradiction is found.
-	 * Then, the proofs for the implications are recalled.
-	 * This is repeated several times to find a shorter (but not necessarily the shortest possible) explanation.
+	 * Generates multiple explanations and returns the shortest one among them.
+	 * Note that this may not be the shortest one possible.
 	 * @return an explanation why the premises lead to a contradiction in the conjunctive normal form
 	 */
 	public Explanation getExplanation() {
-		reset();
-		if (isContradicted()) { //If the initial truth values already lead to a contradiction...
-			return getContradictionExplanation(); //... explain immediately.
-		}
 		final Explanation cumulatedExplanation = new Explanation();
 		cumulatedExplanation.setExplanationCount(0);
 		Explanation shortestExplanation = null;
+		for (final Explanation explanation : getExplanations()) {
+			cumulatedExplanation.addExplanation(explanation); //Remember that this explanation was generated.
+			if (shortestExplanation == null || explanation.getReasonCount() < shortestExplanation.getReasonCount()) {
+				shortestExplanation = explanation; //Remember the shortest explanation.
+			}
+		}
+		shortestExplanation.setCounts(cumulatedExplanation); //Remember the reason and explanations that were generated before.
+		return shortestExplanation;
+	}
+	
+	/**
+	 * Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form.
+	 * This is done by propagating the truth values until a contradiction is found.
+	 * Then, the proofs for the implications are recalled.
+	 * This is repeated several times to find multiple explanations, some of which might be shorter than others.
+	 * @return multiple explanations why the premises lead to a contradiction in the conjunctive normal form
+	 */
+	public List<Explanation> getExplanations() {
+		reset();
+		final List<Explanation> explanations = new LinkedList<>();
+		if (isContradicted()) { //If the initial truth values already lead to a contradiction...
+			explanations.add(getContradictionExplanation()); //... explain immediately.
+			return explanations;
+		}
 		unitOpenClauses.clear();
 		pushUnitOpenClauses(); //Start iterating over the first unit-open clauses using the initial truth value assumptions.
 		while (!unitOpenClauses.isEmpty()) {
@@ -188,21 +208,16 @@ public class LTMS {
 			propagate(); //Propagate the truth values by deriving a new truth value.
 			pushUnitOpenClauses();
 			if (isContradicted()) { //If the propagation lead to a contradiction...
-				final Explanation explanation = getContradictionExplanation(); //... explain the reason for the contradiction.
+				explanations.add(getContradictionExplanation()); //... explain the reason for the contradiction.
 				/*
 				 * At this point, the found explanation could already be returned.
 				 * Instead, keep generating new explanations as there might be a shorter one among them.
 				 * To this end, reset the derived truth values (but not the premises) and keep iterating.
 				 */
-				cumulatedExplanation.addExplanation(explanation); //Remember that this explanation was generated.
-				if (shortestExplanation == null || explanation.getReasonCount() < shortestExplanation.getReasonCount()) {
-					shortestExplanation = explanation; //Remember the shortest explanation.
-				}
 				reset();
 			}
 		}
-		shortestExplanation.setCounts(cumulatedExplanation); //Remember the reason and explanations that were generated before.
-		return shortestExplanation;
+		return explanations;
 	}
 	
 	/**
