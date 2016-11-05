@@ -1,0 +1,69 @@
+<project name="lib.fm" default="compile" basedir="../">
+
+	<!-- Constants -->
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="build" />
+	<property name="lib.dir" value="lib" />
+	<property name="jar.name" value="de.ovgu.featureide.lib.fm" />
+	<property name="jar.path" value="library/${jar.name}" />
+	<property name="version.name" value="version.txt" />
+	<property name="version.path" value="${build.dir}/${version.name}" />
+	<property name="excludes.path" value="library/excluded_source_files.txt" />
+
+	<target name="clean" description="Delete the Build Folder">
+
+		<!-- Delete temp build folder -->
+		<delete dir="${build.dir}" />
+
+	</target>
+
+	<target name="compile" description="Build Jar File for FeatureIDE Library">
+
+		<!-- Get current timestamp -->
+		<tstamp>
+			<format property="timeStamp" pattern="yyyy/MM/dd HH-mm-ss" />
+		</tstamp>
+
+		<!-- Get all libraries in lib folder -->
+		<path id="classpath">
+			<fileset dir="${lib.dir}" includes="**/*.jar" />
+		</path>
+
+		<!-- Compile the src folder -->
+		<mkdir dir="${build.dir}" />
+		<javac
+			srcdir="${src.dir}"
+			destdir="${build.dir}"
+			classpathref="classpath"
+			excludesfile="${excludes.path}"
+			debug="on"
+			includeantruntime="false"
+			source="1.7"
+		/>
+
+		<!-- Calculate checksum for .class files -->
+		<checksum algorithm="SHA-256" totalproperty="build.checksum" forceoverwrite="yes">
+			<fileset dir="${build.dir}">
+				<exclude name="**/*.SHA-256" />
+				<exclude name="${version.name}" />
+			</fileset>
+		</checksum>
+		<!-- Create version file -->
+		<echo file="${version.path}" append="false">Build Time:         ${timeStamp}${line.separator}Checksum (SHA-256): ${build.checksum}</echo>
+
+		<!-- Build jar file, including source files and license file -->
+		<jar destfile="${jar.path}.jar" basedir="${build.dir}" excludes="**/*.SHA-256" compress="true">
+			<fileset dir="${src.dir}" includes="**/*.java" excludesfile="${excludes.path}" />
+			<fileset file="license.txt" />
+		</jar>
+
+	</target>
+
+	<target name="deleteFiles" description="Delete all files with eclipse dependencies (For test purposes only!)">
+		<!-- Alternative: Remove files from classpath -->
+		<delete>
+			<fileset dir="${src.dir}" includesfile="${excludes.path}" />
+		</delete>
+	</target>
+
+</project>

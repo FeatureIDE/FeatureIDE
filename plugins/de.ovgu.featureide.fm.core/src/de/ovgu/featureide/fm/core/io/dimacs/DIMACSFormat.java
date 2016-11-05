@@ -133,7 +133,8 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		}
 		Node cnf = new And(clauses.toArray(new Or[0]));
 		final IMonitor workMonitor = new ConsoleMonitor();
-		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
+		final FeatureRemover remover = new FeatureRemover(cnf, abstractNames, false);
+		cnf = remover.createNewClauseList(LongRunningWrapper.runMethod(remover, workMonitor));
 		for (Node clause : cnf.getChildren()) {
 			featureModel.addConstraint(factory.createConstraint(featureModel, clause));
 		}

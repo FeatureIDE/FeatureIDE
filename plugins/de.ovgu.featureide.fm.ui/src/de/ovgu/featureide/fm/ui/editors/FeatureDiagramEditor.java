@@ -795,7 +795,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 			}
 		case FEATURE_ADD:
-			reload();
+			((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			featureModelEditor.setPageModified(true);
 			IFeature newFeature = (IFeature) event.getNewValue();
 			if (newFeature.getStructure().hasChildren()) {
@@ -815,6 +815,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			} else {
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
+			internRefresh(true);
 			analyzeFeatureModel();
 			break;
 		case FEATURE_NAME_CHANGED:
