@@ -843,7 +843,7 @@ public class FeatureModelAnalyzer {
 	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
 	 */
 	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
-		return new RedundantConstraint().getExplanation(fm, constraint);
+		redundantConstrExpl.put(constraint, new RedundantConstraint(fm, constraint).getExplanation());
 	}
 	
 	/**

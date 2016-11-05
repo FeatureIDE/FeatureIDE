@@ -39,8 +39,7 @@ import org.prop4j.Node;
  * The class LTMS (logic truth maintenance system) records proofs for implications and constructs explanations.
  * Uses BCP (boolean constraint propagation) for managing logical implications.
  * BCP expects two parameters: initial truth values (premises) and a propositional formula in CNF (conjunctive normal form).
- * The application in a feature model context is handled in {@link DeadFeature}, {@link FalseOptionalFeature}
- * and {@link RedundantConstraint}.
+ * The application in a feature model context is handled in {@link ExplanationCreator}.
  * 
  * @author Sofia Ananieva
  * @author Timo Guenther

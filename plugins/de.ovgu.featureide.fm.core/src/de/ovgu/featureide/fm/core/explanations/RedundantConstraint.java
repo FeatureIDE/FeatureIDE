@@ -23,17 +23,14 @@ package de.ovgu.featureide.fm.core.explanations;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * Generates explanations for redundant constraints using {@link LTMS}.
@@ -41,28 +38,68 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class RedundantConstraint {
+public class RedundantConstraint extends ExplanationCreator {
+	/** the redundant constraint in the feature model */
+	private IConstraint redundantConstraint;
+	
 	/**
-	 * Returns an explanation why the given constraint of the given feature model is redundant.
-	 * Sets several initial truth value assumptions that lead to a violation of the redundant constraint.
-	 * Then propagates the values until a violation in a clause occurs.
-	 * Finally combines all generated explanations into one.
-	 * @param fm the feature model without the redundant constraint
-	 * @param defectConstraint the redundant constraint
-	 * @return an explanation why the given constraint of the given feature model is redundant
+	 * Constructs a new instance of this class.
 	 */
-	public Explanation explain(IFeatureModel fm, IConstraint defectConstraint) {
+	public RedundantConstraint() {
+		this(null);
+	}
+	
+	/**
+	 * Constructs a new instance of this class.
+	 * @param fm the feature model context
+	 */
+	public RedundantConstraint(IFeatureModel fm) {
+		this(fm, null);
+	}
+	
+	/**
+	 * Constructs a new instance of this class.
+	 * @param fm the feature model context
+	 * @param redundantConstraint the redundant constraint in the feature model
+	 */
+	public RedundantConstraint(IFeatureModel fm, IConstraint redundantConstraint) {
+		super(fm);
+		setRedundantConstraint(redundantConstraint);
+	}
+	
+	/**
+	 * Returns the redundant constraint in the feature model.
+	 * @return the redundant constraint in the feature model
+	 */
+	public IConstraint getRedundantConstraint() {
+		return redundantConstraint;
+	}
+	
+	/**
+	 * Sets the redundant constraint in the feature model.
+	 * @param redundantConstraint the redundant constraint in the feature model
+	 */
+	public void setRedundantConstraint(IConstraint redundantConstraint) {
+		this.redundantConstraint = redundantConstraint;
+	}
+	
+	/**
+	 * Returns an explanation why the specified constraint of the specified feature model is redundant.
+	 * Sets several initial truth value assumptions that lead to a violation of the redundant constraint.
+	 * Then propagates each set of values until a violation in a clause occurs.
+	 * Finally combines all generated explanations into one.
+	 * @return an explanation why the specified constraint of the specified feature model is redundant
+	 */
+	public Explanation getExplanation() {
 		final Explanation explanation = new Explanation();
 		explanation.setExplanationCount(0);
-		Node cnf = NodeCreator.createNodes(fm, true).toCNF();
-		cnf = eliminateTrueClauses(cnf);
-		final LTMS ltms = new LTMS(cnf);
-		for (final Map<Object, Boolean> assignment : getContradictingAssignments(defectConstraint.getNode())) {
+		final LTMS ltms = new LTMS(getCNF());
+		for (final Map<Object, Boolean> assignment : getContradictingAssignments(getRedundantConstraint().getNode())) {
 			ltms.setPremises(assignment);
 			explanation.addExplanation(ltms.getExplanation());
 		}
-		explanation.setDefectRedundantConstraint(defectConstraint);
-		explanation.setFeatureModel(fm);
+		explanation.setDefectRedundantConstraint(getRedundantConstraint());
+		explanation.setFeatureModel(getFeatureModel());
 		return explanation;
 	}
 	
@@ -103,20 +140,5 @@ public class RedundantConstraint {
 			assignments.add(map);
 		}
 		return assignments;
-	}
-	
-	/**
-	 * Removes clauses which are added in Node Creator while eliminateAbstractVariables().
-	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
-	 * they are true and don't change the semantic of a formula.
-	 * @param node the node to remove true clauses from
-	 * @return a node without true clauses
-	 */
-	private static Node eliminateTrueClauses(Node node) {
-		LinkedList<Node> updatedNodes = new LinkedList<Node>();
-		for (Node child : node.getChildren())
-			if (!child.toString().contains("True") && !child.toString().contains("False"))
-				updatedNodes.add(child);
-		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
 	}
 }

@@ -402,7 +402,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 							setConstraintAttribute(constraint, ConstraintAttribute.REDUNDANT);
 
 							if (calculateExplanations) {
-								Explanation expl = new RedundantConstraint().explain(clone, constraint); //store explanation for redundant constraint
+								Explanation expl = new RedundantConstraint(clone, constraint).getExplanation(); //store explanation for redundant constraint
 								redundantConstrExpl.put(constraint, expl);
 							}
 						}
@@ -474,7 +474,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	// explain void feature model, treat root as dead feature
 	private void explainVoidFM() {
-		Explanation expl = new DeadFeature().getExplanation(fm, FeatureUtils.getRoot(fm));
+		Explanation expl = new DeadFeature(fm, FeatureUtils.getRoot(fm)).getExplanation();
 		deadFeatureExpl.put(FeatureUtils.getRoot(fm), expl);
 	}
 
@@ -493,7 +493,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 				if (calculateExplanations) {
 					// explain dead features and remember explanation in map
-					Explanation expl = new DeadFeature().getExplanation(fm, feature);
+					Explanation expl = new DeadFeature(fm, feature).getExplanation();
 					deadFeatureExpl.put(feature, expl);
 
 				} else {
@@ -542,7 +542,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 			if (calculateExplanations) {
 				// explain false optional features and remember explanation in map
-				Explanation expl = new FalseOptionalFeature().explain(fm, feature);
+				Explanation expl = new FalseOptionalFeature(fm, feature).getExplanation();
 				falseOptFeatureExpl.put(feature, expl);
 			}
 		}

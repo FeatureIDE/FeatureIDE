@@ -20,14 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.util.LinkedList;
-
-import org.prop4j.And;
-import org.prop4j.Node;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * Generates explanations for dead features and void feature models using {@link LTMS}.
@@ -35,39 +29,64 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class DeadFeature {
+public class DeadFeature extends ExplanationCreator {
+	/** the dead feature in the feature model */
+	private IFeature deadFeature;
+	
 	/**
-	 * Returns an explanation why the given feature of the given feature model is dead.
-	 * A dead root feature also means a void feature model.
-	 * Sets initial truth value assumptions of the dead feature to true.
-	 * Then propagates the values until a violation in a clause occurs.
-	 * @param fm the model with the new constraint which leads to a dead feature
-	 * @param defectFeature the dead feature
-	 * @return an explanation why the given feature of the given feature model is dead
+	 * Constructs a new instance of this class.
 	 */
-	public Explanation getExplanation(IFeatureModel fm, IFeature defectFeature) {
-		Node cnf = NodeCreator.createNodes(fm, true).toCNF();
-		cnf = eliminateTrueClauses(cnf);
-		final LTMS ltms = new LTMS(cnf);
-		ltms.addPremise(defectFeature.getName(), true);
-		final Explanation explanation = ltms.getExplanation();
-		explanation.setDefectDeadFeature(defectFeature);
-		explanation.setFeatureModel(fm);
-		return explanation;
+	public DeadFeature() {
+		this(null);
 	}
 	
 	/**
-	 * Removes clauses which are added in Node Creator while eliminateAbstractVariables().
-	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
-	 * they are true and don't change the semantic of a formula.
-	 * @param node the node to remove true clauses from
-	 * @return a node without true clauses
+	 * Constructs a new instance of this class.
+	 * @param fm the feature model context
 	 */
-	private static Node eliminateTrueClauses(Node node) {
-		LinkedList<Node> updatedNodes = new LinkedList<Node>();
-		for (Node child : node.getChildren())
-			if (!child.toString().contains("True") && !child.toString().contains("False"))
-				updatedNodes.add(child);
-		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
+	public DeadFeature(IFeatureModel fm) {
+		this(fm, null);
+	}
+	
+	/**
+	 * Constructs a new instance of this class.
+	 * @param fm the feature model context
+	 * @param deadFeature the dead feature in the feature model
+	 */
+	public DeadFeature(IFeatureModel fm, IFeature deadFeature) {
+		super(fm);
+		setDeadFeature(deadFeature);
+	}
+	
+	/**
+	 * Returns the dead feature in the feature model.
+	 * @return the dead feature in the feature model
+	 */
+	public IFeature getDeadFeature() {
+		return deadFeature;
+	}
+	
+	/**
+	 * Sets the dead feature in the feature model.
+	 * @param deadFeature the dead feature in the feature model
+	 */
+	public void setDeadFeature(IFeature deadFeature) {
+		this.deadFeature = deadFeature;
+	}
+	
+	/**
+	 * Returns an explanation why the specified feature of the specified feature model is dead.
+	 * A dead root feature also means a void feature model.
+	 * Sets initial truth value assumptions of the dead feature to true.
+	 * Then propagates the values until a violation in a clause occurs.
+	 * @return an explanation why the specified feature of the specified feature model is dead
+	 */
+	public Explanation getExplanation() {
+		final LTMS ltms = new LTMS(getCNF());
+		ltms.addPremise(getDeadFeature().getName(), true);
+		final Explanation explanation = ltms.getExplanation();
+		explanation.setDefectDeadFeature(getDeadFeature());
+		explanation.setFeatureModel(getFeatureModel());
+		return explanation;
 	}
 }

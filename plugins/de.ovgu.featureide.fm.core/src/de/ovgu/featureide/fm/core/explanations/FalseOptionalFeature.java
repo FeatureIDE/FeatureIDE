@@ -20,15 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.util.LinkedList;
-
-import org.prop4j.And;
-import org.prop4j.Node;
-
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * Generates explanations for false-optional features using {@link LTMS}.
@@ -36,39 +30,64 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class FalseOptionalFeature {
+public class FalseOptionalFeature extends ExplanationCreator {
+	/** the false-optional feature in the feature model */
+	private IFeature falseOptionalFeature;
+	
 	/**
-	 * Returns an explanation why the given feature of the given feature model is false-optional.
-	 * Sets initial truth value assumptions of the false-optional feature to false and its parent to true.
-	 * Then propagates the values until a violation in a clause occurs.
-	 * @param fm the model with the new constraint which leads to a false-optional feature
-	 * @param defectFeature the false-optional feature
-	 * @return an explanation why the given feature of the given feature model is false-optional
+	 * Constructs a new instance of this class.
 	 */
-	public Explanation explain(IFeatureModel fm, IFeature defectFeature) {
-		Node cnf = NodeCreator.createNodes(fm, true).toCNF();
-		cnf = eliminateTrueClauses(cnf);
-		final LTMS ltms = new LTMS(cnf);
-		ltms.addPremise(defectFeature.getName(), false);
-		ltms.addPremise(FeatureUtils.getParent(defectFeature).getName(), true);
-		final Explanation explanation = ltms.getExplanation();
-		explanation.setDefectFalseOptionalFeature(defectFeature);
-		explanation.setFeatureModel(fm);
-		return explanation;
+	public FalseOptionalFeature() {
+		this(null);
 	}
 	
 	/**
-	 * Removes clauses which are added in Node Creator while eliminateAbstractVariables().
-	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
-	 * they are true and don't change the semantic of a formula.
-	 * @param node the node to remove true clauses from
-	 * @return a node without true clauses
+	 * Constructs a new instance of this class.
+	 * @param fm the feature model context
 	 */
-	private static Node eliminateTrueClauses(Node node) {
-		LinkedList<Node> updatedNodes = new LinkedList<Node>();
-		for (Node child : node.getChildren())
-			if (!child.toString().contains("True") && !child.toString().contains("False"))
-				updatedNodes.add(child);
-		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
+	public FalseOptionalFeature(IFeatureModel fm) {
+		this(fm, null);
+	}
+	
+	/**
+	 * Constructs a new instance of this class.
+	 * @param fm the feature model context
+	 * @param falseOptionalFeature the false-optional feature in the feature model
+	 */
+	public FalseOptionalFeature(IFeatureModel fm, IFeature falseOptionalFeature) {
+		super(fm);
+		setFalseOptionalFeature(falseOptionalFeature);
+	}
+	
+	/**
+	 * Returns the false-optional feature in the feature model.
+	 * @return the false-optional feature in the feature model
+	 */
+	public IFeature getFalseOptionalFeature() {
+		return falseOptionalFeature;
+	}
+	
+	/**
+	 * Sets the false-optional feature in the feature model.
+	 * @param falseOptionalFeature the false-optional feature in the feature model
+	 */
+	public void setFalseOptionalFeature(IFeature falseOptionalFeature) {
+		this.falseOptionalFeature = falseOptionalFeature;
+	}
+	
+	/**
+	 * Returns an explanation why the specified feature of the specified feature model is false-optional.
+	 * Sets initial truth value assumptions of the false-optional feature to false and its parent to true.
+	 * Then propagates the values until a violation in a clause occurs.
+	 * @return an explanation why the specified feature of the specified feature model is false-optional
+	 */
+	public Explanation getExplanation() {
+		final LTMS ltms = new LTMS(getCNF());
+		ltms.addPremise(getFalseOptionalFeature().getName(), false);
+		ltms.addPremise(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);
+		final Explanation explanation = ltms.getExplanation();
+		explanation.setDefectFalseOptionalFeature(getFalseOptionalFeature());
+		explanation.setFeatureModel(getFeatureModel());
+		return explanation;
 	}
 }
