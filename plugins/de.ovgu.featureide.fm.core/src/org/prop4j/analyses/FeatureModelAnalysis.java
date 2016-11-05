@@ -354,7 +354,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	 */
 	private void checkConstraintRedundant(final List<IConstraint> constraints) throws ContradictionException {
 		if (calculateRedundantConstraints) {
-			final IFeatureModel clone = fm.clone();
 			nodeCreator.setModelType(ModelType.OnlyStructure);
 			final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 			final ModifiableSolver redundantSat = new ModifiableSolver(si);
@@ -395,14 +394,13 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 					}
 
 					if (redundant) {
-						clone.removeConstraint(constraint);
 						if (checkConstraintTautology(constraint.getNode())) {
 							setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
 						} else {
 							setConstraintAttribute(constraint, ConstraintAttribute.REDUNDANT);
 
 							if (calculateExplanations) {
-								Explanation expl = new RedundantConstraintExplanationCreator(clone, constraint).getExplanation(); //store explanation for redundant constraint
+								Explanation expl = new RedundantConstraintExplanationCreator(fm, constraint).getExplanation(); //store explanation for redundant constraint
 								redundantConstrExpl.put(constraint, expl);
 							}
 						}

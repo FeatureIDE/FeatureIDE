@@ -23,11 +23,15 @@ package de.ovgu.featureide.fm.core.explanations;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Literal.FeatureAttribute;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -81,6 +85,22 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	 */
 	public void setRedundantConstraint(IConstraint redundantConstraint) {
 		this.redundantConstraint = redundantConstraint;
+	}
+	
+	@Override
+	protected Node getCNF() throws IllegalStateException {
+		final Node cnf = super.getCNF();
+		final List<Node> children = new LinkedList<>();
+		child: for (final Node child : cnf.getChildren()) {
+			for (final Literal literal : child.getLiterals()) {
+				if (literal.getSourceAttribute() == FeatureAttribute.CONSTRAINT
+						&& getFeatureModel().getConstraints().get(literal.getSourceIndex()) == redundantConstraint) {
+					continue child;
+				}
+			}
+			children.add(child);
+		}
+		return new And(children.toArray()); //CNF without clauses of the redundant constraint
 	}
 	
 	/**
