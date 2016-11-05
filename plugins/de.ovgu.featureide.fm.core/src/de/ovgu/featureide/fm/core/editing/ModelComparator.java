@@ -20,10 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.editing;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -102,9 +102,9 @@ public class ModelComparator {
 			addedFeatures = calculateAddedFeatures(oldModel, newModel);
 			deletedFeatures = calculateAddedFeatures(newModel, oldModel);
 			
-			HashMap<Object, Node> oldMap = NodeCreator
+			Map<Object, Node> oldMap = NodeCreator
 					.calculateReplacingMap(oldModel);
-			HashMap<Object, Node> newMap = NodeCreator
+			Map<Object, Node> newMap = NodeCreator
 					.calculateReplacingMap(newModel);
 			optimizeReplacingMaps(oldMap, newMap);
 
@@ -159,7 +159,7 @@ public class ModelComparator {
 		return addedFeatures;
 	}
 
-	private void optimizeReplacingMaps(HashMap<Object, Node> oldMap, HashMap<Object, Node> newMap) {
+	private void optimizeReplacingMaps(Map<Object, Node> oldMap, Map<Object, Node> newMap) {
 		List<Object> toBeRemoved = new LinkedList<Object>();
 		for (Entry<Object, Node> entry : oldMap.entrySet()) {
 			Object var = entry.getKey();
