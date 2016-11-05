@@ -58,7 +58,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
+import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -843,7 +843,7 @@ public class FeatureModelAnalyzer {
 	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
 	 */
 	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
-		redundantConstrExpl.put(constraint, new RedundantConstraint(fm, constraint).getExplanation());
+		redundantConstrExpl.put(constraint, new RedundantConstraintExplanationCreator(fm, constraint).getExplanation());
 	}
 	
 	/**

@@ -29,14 +29,14 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class DeadFeature extends ExplanationCreator {
+public class DeadFeatureExplanationCreator extends ExplanationCreator {
 	/** the dead feature in the feature model */
 	private IFeature deadFeature;
 	
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public DeadFeature() {
+	public DeadFeatureExplanationCreator() {
 		this(null);
 	}
 	
@@ -44,7 +44,7 @@ public class DeadFeature extends ExplanationCreator {
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public DeadFeature(IFeatureModel fm) {
+	public DeadFeatureExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -53,7 +53,7 @@ public class DeadFeature extends ExplanationCreator {
 	 * @param fm the feature model context
 	 * @param deadFeature the dead feature in the feature model
 	 */
-	public DeadFeature(IFeatureModel fm, IFeature deadFeature) {
+	public DeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
 		super(fm);
 		setDeadFeature(deadFeature);
 	}

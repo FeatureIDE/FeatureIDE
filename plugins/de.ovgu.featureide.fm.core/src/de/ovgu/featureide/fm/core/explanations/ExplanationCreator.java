@@ -36,9 +36,9 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * 
  * @author Timo Guenther
  * @author Sofia Ananieva
- * @see DeadFeature
- * @see FalseOptionalFeature
- * @see RedundantConstraint
+ * @see DeadFeatureExplanationCreator
+ * @see FalseOptionalFeatureExplanationCreator
+ * @see RedundantConstraintExplanationCreator
  */
 public abstract class ExplanationCreator {
 	/** The feature model context. */

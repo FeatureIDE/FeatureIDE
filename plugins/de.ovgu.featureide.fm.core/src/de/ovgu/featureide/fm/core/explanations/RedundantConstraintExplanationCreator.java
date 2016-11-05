@@ -38,14 +38,14 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class RedundantConstraint extends ExplanationCreator {
+public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	/** the redundant constraint in the feature model */
 	private IConstraint redundantConstraint;
 	
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public RedundantConstraint() {
+	public RedundantConstraintExplanationCreator() {
 		this(null);
 	}
 	
@@ -53,7 +53,7 @@ public class RedundantConstraint extends ExplanationCreator {
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public RedundantConstraint(IFeatureModel fm) {
+	public RedundantConstraintExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -62,7 +62,7 @@ public class RedundantConstraint extends ExplanationCreator {
 	 * @param fm the feature model context
 	 * @param redundantConstraint the redundant constraint in the feature model
 	 */
-	public RedundantConstraint(IFeatureModel fm, IConstraint redundantConstraint) {
+	public RedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
 		super(fm);
 		setRedundantConstraint(redundantConstraint);
 	}

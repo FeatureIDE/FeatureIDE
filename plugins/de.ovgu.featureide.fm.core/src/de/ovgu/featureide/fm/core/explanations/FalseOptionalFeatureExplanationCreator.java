@@ -30,14 +30,14 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class FalseOptionalFeature extends ExplanationCreator {
+public class FalseOptionalFeatureExplanationCreator extends ExplanationCreator {
 	/** the false-optional feature in the feature model */
 	private IFeature falseOptionalFeature;
 	
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public FalseOptionalFeature() {
+	public FalseOptionalFeatureExplanationCreator() {
 		this(null);
 	}
 	
@@ -45,7 +45,7 @@ public class FalseOptionalFeature extends ExplanationCreator {
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public FalseOptionalFeature(IFeatureModel fm) {
+	public FalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -54,7 +54,7 @@ public class FalseOptionalFeature extends ExplanationCreator {
 	 * @param fm the feature model context
 	 * @param falseOptionalFeature the false-optional feature in the feature model
 	 */
-	public FalseOptionalFeature(IFeatureModel fm, IFeature falseOptionalFeature) {
+	public FalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
 		super(fm);
 		setFalseOptionalFeature(falseOptionalFeature);
 	}
