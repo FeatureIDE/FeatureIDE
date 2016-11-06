@@ -118,9 +118,16 @@ public abstract class ExplanationCreator {
 	 * @throws IllegalStateException if the feature model is null
 	 */
 	protected Node createCNF() throws IllegalStateException {
-		Node cnf = NodeCreator.createNodes(fm).toCNF();
-		cnf = removeTautologies(cnf);
-		return cnf;
+		return createCNF(NodeCreator.createNodes(fm));
+	}
+	
+	/**
+	 * Returns a copy of the given node in CNF.
+	 * @param node node to transform
+	 * @return a copy of the given node in CNF
+	 */
+	protected Node createCNF(Node node) {
+		return removeTautologies(node.toCNF());
 	}
 	
 	/**

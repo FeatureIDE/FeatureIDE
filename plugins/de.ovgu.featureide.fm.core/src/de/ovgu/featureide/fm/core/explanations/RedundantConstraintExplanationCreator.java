@@ -30,8 +30,8 @@ import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
-import org.prop4j.Node;
 import org.prop4j.Literal.FeatureAttribute;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -85,22 +85,35 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	 */
 	public void setRedundantConstraint(IConstraint redundantConstraint) {
 		this.redundantConstraint = redundantConstraint;
+		setCNF(null); //Refresh the CNF as it depends on the redundant constraint.
 	}
 	
 	@Override
-	protected Node getCNF() throws IllegalStateException {
-		final Node cnf = super.getCNF();
-		final List<Node> children = new LinkedList<>();
-		child: for (final Node child : cnf.getChildren()) {
-			for (final Literal literal : child.getLiterals()) {
+	protected Node createCNF(Node node) {
+		return removeRedundantConstraintClauses(super.createCNF(node));
+	}
+	
+	/**
+	 * Returns a copy of the given CNF without clauses of the redundant constraint.
+	 * @param cnf CNF to check
+	 * @return a copy of the given CNF without clauses of the redundant constraint
+	 * @throws IllegalStateException if the redundant constraint is not set
+	 */
+	private Node removeRedundantConstraintClauses(Node cnf) throws IllegalStateException {
+		if (getRedundantConstraint() == null) {
+			throw new IllegalStateException("Missing redundant constraint");
+		}
+		final List<Node> clauses = new LinkedList<>();
+		clause: for (final Node clause : cnf.getChildren()) {
+			for (final Literal literal : clause.getLiterals()) {
 				if (literal.getSourceAttribute() == FeatureAttribute.CONSTRAINT
 						&& getFeatureModel().getConstraints().get(literal.getSourceIndex()) == redundantConstraint) {
-					continue child;
+					continue clause;
 				}
 			}
-			children.add(child);
+			clauses.add(clause);
 		}
-		return new And(children.toArray()); //CNF without clauses of the redundant constraint
+		return new And(clauses.toArray());
 	}
 	
 	/**
