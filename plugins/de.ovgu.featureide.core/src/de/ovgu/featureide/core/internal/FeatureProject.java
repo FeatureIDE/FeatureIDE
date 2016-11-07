@@ -281,6 +281,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							break;
 						}
 					}
+					if(addedFeatures < 10 && addedFeatures > 0)
+					{
+						message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ")+2);						
+					}
 
 					return message.toString();
 				}
