@@ -783,6 +783,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		final EventType prop = event.getEventType();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
+			getFeatureModel().getAnalyser().clearExplanations();
 			IFeature oldParent = (IFeature) event.getOldValue();
 			if (oldParent != null) {
 				final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
@@ -795,6 +796,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 			}
 		case FEATURE_ADD:
+			getFeatureModel().getAnalyser().clearExplanations();
 			((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			featureModelEditor.setPageModified(true);
 			IFeature newFeature = (IFeature) event.getNewValue();
@@ -845,11 +847,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 			break;
 		case MANDATORY_CHANGED:
+			getFeatureModel().getAnalyser().clearExplanations();
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
 		case GROUP_TYPE_CHANGED:
+			getFeatureModel().getAnalyser().clearExplanations();
 			for (IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) event.getSource(), graphicalFeatureModel)) {
 				f.update(event);
 			}
@@ -871,6 +875,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 			break;
 		case CONSTRAINT_MODIFY:
+			getFeatureModel().getAnalyser().clearExplanations();
 			final IConstraint c = (IConstraint) event.getSource();
 			final IGraphicalConstraint graphicalConstraint = graphicalFeatureModel.getGraphicalConstraint(c);
 			graphicalConstraint.update(event);
@@ -881,12 +886,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
+			getFeatureModel().getAnalyser().clearExplanations();
 			reload();
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_LOADED:
 		case MODEL_DATA_CHANGED:
+			getFeatureModel().getAnalyser().clearExplanations();
 			// clear registry
 			final Map<?, ?> registry = getEditPartRegistry();
 			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
@@ -906,6 +913,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case FEATURE_DELETE:
+			getFeatureModel().getAnalyser().clearExplanations();
 			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 			deletedFeature.update(event);
 			oldParent = (IFeature) event.getOldValue();
@@ -919,7 +927,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
-			
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			reload();
@@ -942,6 +949,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			internRefresh(false);
 			break;
 		case HIDDEN_CHANGED:
+			getFeatureModel().getAnalyser().clearExplanations();
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
