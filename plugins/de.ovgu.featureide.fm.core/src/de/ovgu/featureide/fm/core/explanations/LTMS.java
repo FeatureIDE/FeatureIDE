@@ -383,8 +383,14 @@ public class LTMS {
 		for (final Entry<Literal, Node> e : allAntecedents.entrySet()) {
 			final Literal antecedentLiteral = e.getKey();
 			final Node antecedentClause = e.getValue();
-			if (antecedentLiteral.getSourceAttribute() != FeatureAttribute.PARENT) {
-				explanation.addUniqueReason(antecedentClause, antecedentLiteral);
+			switch (antecedentLiteral.getSourceAttribute()) {
+				case CHILD:
+				case ROOT:
+				case CONSTRAINT:
+					explanation.addUniqueReason(antecedentClause, antecedentLiteral);
+					break;
+				default:
+					break;
 			}
 			final Node reason = reasons.get(antecedentLiteral.var);
 			if (reason == null) { //premise, thus no reason to explain
@@ -392,8 +398,14 @@ public class LTMS {
 			}
 			for (final Literal literal : clauseLiterals.get(reason)) {
 				if (literal.var.equals(antecedentLiteral.var)) {
-					if (literal.getSourceAttribute() != FeatureAttribute.PARENT) {
-						explanation.addUniqueReason(reason, literal);
+					switch (literal.getSourceAttribute()) {
+						case CHILD:
+						case ROOT:
+						case CONSTRAINT:
+							explanation.addUniqueReason(reason, literal);
+							break;
+						default:
+							break;
 					}
 					break;
 				}

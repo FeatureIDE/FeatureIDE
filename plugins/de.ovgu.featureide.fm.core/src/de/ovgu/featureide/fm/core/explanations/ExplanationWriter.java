@@ -126,7 +126,8 @@ public class ExplanationWriter {
 	 * Returns a user-friendly representation of the given reason.
 	 * @param reason reason to transform
 	 * @return a user-friendly representation of the given reason
-	 * @throws IllegalArgumentException if the given reason is not part of the explanation or if there is no parent despite up relationship
+	 * @throws IllegalArgumentException if the given reason is not part of the explanation
+	 * @throws IllegalStateException if there is no parent despite up relationship; if the reason's source attribute is unknown or denotes parent relationship
 	 */
 	public String getReasonString(Reason reason) throws IllegalArgumentException {
 		if (explanation == null || explanation.getReasons() == null || !explanation.getReasons().contains(reason)) {
@@ -149,6 +150,8 @@ public class ExplanationWriter {
 			case ROOT:
 				s = String.format("%s is the root.", reason.getLiteral().var.toString());
 				break;
+			case PARENT:
+				throw new IllegalStateException("Reason denotes parent relationship");
 			default:
 				throw new IllegalStateException("Reason has unexpected source attribute");
 		}
