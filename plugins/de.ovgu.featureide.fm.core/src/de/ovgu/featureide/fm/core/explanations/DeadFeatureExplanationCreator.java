@@ -83,7 +83,8 @@ public class DeadFeatureExplanationCreator extends ExplanationCreator {
 	 */
 	@Override
 	public Explanation getExplanation() {
-		final LTMS ltms = new LTMS(getCNF());
+		final LTMS ltms = getLTMS();
+		ltms.clearPremises();
 		ltms.addPremise(getDeadFeature().getName(), true);
 		final Explanation explanation = ltms.getExplanation();
 		if (explanation == null) {

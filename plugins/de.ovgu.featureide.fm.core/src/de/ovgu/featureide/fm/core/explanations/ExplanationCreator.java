@@ -43,12 +43,17 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 public abstract class ExplanationCreator {
 	/** The feature model context. */
 	private IFeatureModel fm;
-	/** 
+	/**
 	 * A formula representation of the feature model in CNF (conjunctive normal form).
 	 * The CNF is created lazily when needed and reset when the feature model changes.
 	 * This makes it possible to reuse the CNF for different defects of the same type in the same feature model.
 	 */
 	private Node cnf;
+	/**
+	 * The LTMS with the CNF as input.
+	 * The LTMS is created lazily when needed and reset when the CNF changes.
+	 */
+	private LTMS ltms;
 	
 	/**
 	 * Constructs a new instance of this class.
@@ -110,6 +115,7 @@ public abstract class ExplanationCreator {
 			throw new IllegalArgumentException("Formula is not in CNF");
 		}
 		this.cnf = cnf;
+		setLTMS(null);
 	}
 	
 	/**
@@ -124,7 +130,7 @@ public abstract class ExplanationCreator {
 	/**
 	 * Returns a copy of the given node in CNF.
 	 * @param node node to transform
-	 * @return a copy of the given node in CNF
+	 * @return a copy of the given node in CNF; not null
 	 */
 	protected Node createCNF(Node node) {
 		return removeTautologies(node.toCNF());
@@ -149,6 +155,34 @@ public abstract class ExplanationCreator {
 			cnfClauses.add(cnfClause);
 		}
 		return new And(cnfClauses.toArray());
+	}
+	
+	/**
+	 * Returns the LTMS.
+	 * Creates it first if necessary.
+	 * @return the LTMS; not null
+	 */
+	protected LTMS getLTMS() {
+		if (ltms == null) {
+			setLTMS(createLTMS());
+		}
+		return ltms;
+	}
+	
+	/**
+	 * Sets the LTMS.
+	 * @param ltms the LTMS
+	 */
+	protected void setLTMS(LTMS ltms) {
+		this.ltms = ltms;
+	}
+	
+	/**
+	 * Returns a new LTMS with the CNF.
+	 * @return a new LTMS with the CNF; not null
+	 */
+	protected LTMS createLTMS() {
+		return new LTMS(getCNF());
 	}
 	
 	/**

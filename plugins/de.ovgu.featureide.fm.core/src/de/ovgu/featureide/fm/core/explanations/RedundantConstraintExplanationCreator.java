@@ -127,7 +127,7 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	public Explanation getExplanation() {
 		final Explanation cumulatedExplanation = new Explanation();
 		cumulatedExplanation.setExplanationCount(0);
-		final LTMS ltms = new LTMS(getCNF());
+		final LTMS ltms = getLTMS();
 		for (final Map<Object, Boolean> assignment : getContradictingAssignments(getRedundantConstraint().getNode())) {
 			ltms.setPremises(assignment);
 			final Explanation explanation = ltms.getExplanation();
