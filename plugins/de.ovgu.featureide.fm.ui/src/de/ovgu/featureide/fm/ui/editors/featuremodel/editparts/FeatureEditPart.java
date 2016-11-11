@@ -265,6 +265,9 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
 			break;
+		case ACTIVE_EXPLANATION_CHANGED:
+			getFigure().setProperties();
+			break;
 		case ACTIVE_REASON_CHANGED:
 			final Explanation.Reason activeReason = (Explanation.Reason) event.getNewValue();
 			getFigure().setActiveReason(activeReason);

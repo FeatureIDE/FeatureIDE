@@ -818,15 +818,53 @@ public class FeatureModelAnalyzer {
 	}
 	
 	/**
+	 * Adds an explanation why the given feature model element is defect.
+	 * Uses the default feature model stored in this instance.
+	 * @param modelElement potentially defect feature model element
+	 */
+	public void addExplanation(IFeatureModelElement modelElement) {
+		addExplanation(fm, modelElement);
+	}
+	
+	/**
+	 * Adds an explanation why the given feature model element is defect.
+	 * Uses the given feature model, which may differ from the default feature model stored in this instance.
+	 * @param fm feature model containing the feature model element
+	 * @param modelElement potentially defect feature model element
+	 */
+	public void addExplanation(IFeatureModel fm, IFeatureModelElement modelElement) {
+		if (modelElement instanceof IFeature) {
+			final IFeature feature = (IFeature) modelElement;
+			switch (feature.getProperty().getFeatureStatus()) {
+				case DEAD:
+					addDeadFeatureExplanation(fm, feature);
+					break;
+				case FALSE_OPTIONAL:
+					addFalseOptionalFeatureExplanation(fm, feature);
+					break;
+				default:
+					break;
+			}
+		} else if (modelElement instanceof IConstraint) {
+			final IConstraint constraint = (IConstraint) modelElement;
+			switch (constraint.getConstraintAttribute()) {
+				case REDUNDANT:
+				case TAUTOLOGY:
+				case IMPLICIT:
+					addRedundantConstraintExplanation(fm, constraint);
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	
+	/**
 	 * Returns an explanation why the given feature is dead or null if it cannot be explained.
-	 * Creates it first if necessary.
 	 * @param feature potentially dead feature
 	 * @return an explanation why the given feature is dead or null if it cannot be explained
 	 */
 	public Explanation getDeadFeatureExplanation(IFeature feature) {
-		if (!deadFeatureExplanations.containsKey(feature)) {
-			addDeadFeatureExplanation(feature);
-		}
 		return deadFeatureExplanations.get(feature);
 	}
 	
@@ -852,14 +890,10 @@ public class FeatureModelAnalyzer {
 	
 	/**
 	 * Returns an explanation why the given feature is false-optional or null if it cannot be explained.
-	 * Creates it first if necessary.
 	 * @param feature potentially false-optional feature
 	 * @return an explanation why the given feature is false-optional or null if it cannot be explained
 	 */
 	public Explanation getFalseOptionalFeatureExplanation(IFeature feature) {
-		if (!falseOptionalFeatureExplanations.containsKey(feature)) {
-			addFalseOptionalFeatureExplanation(feature);
-		}
 		return falseOptionalFeatureExplanations.get(feature);
 	}
 	
@@ -885,14 +919,10 @@ public class FeatureModelAnalyzer {
 	
 	/**
 	 * Returns an explanation why the given constraint is redundant or null if it cannot be explained.
-	 * Creates it first if necessary.
 	 * @param constraint potentially redundant constraint
 	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
 	 */
 	public Explanation getRedundantConstraintExplanation(IConstraint constraint) {
-		if (!redundantConstraintExplanations.containsKey(constraint)) {
-			addRedundantConstraintExplanation(constraint);
-		}
 		return redundantConstraintExplanations.get(constraint);
 	}
 	

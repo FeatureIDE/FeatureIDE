@@ -31,6 +31,8 @@ import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.RootEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
@@ -81,7 +83,10 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		
 		@Override
 		public void mouseHover(MouseEvent event) {
-			setActiveExplanation(getModel().getFeatureModel().getAnalyser().getExplanation(editPart.getModel().getObject()));
+			final IFeatureModelElement modelElement = editPart.getModel().getObject();
+			final FeatureModelAnalyzer analyzer = getModel().getFeatureModel().getAnalyser();
+			analyzer.addExplanation(modelElement);
+			setActiveExplanation(analyzer.getExplanation(modelElement));
 		}
 		
 		@Override

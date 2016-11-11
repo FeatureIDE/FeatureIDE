@@ -973,14 +973,21 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case ACTIVE_EXPLANATION_CHANGED:
 			final boolean explanationActivated = event.getNewValue() != null;
 			final Explanation activeExplanation = (Explanation) (explanationActivated ? event.getNewValue() : event.getOldValue());
+			final IGraphicalElement defectElement;
+			if (activeExplanation.getDefectElement() instanceof IConstraint) {
+				defectElement = graphicalFeatureModel.getGraphicalConstraint((IConstraint) activeExplanation.getDefectElement());
+			} else {
+				defectElement = graphicalFeatureModel.getGraphicalFeature((IFeature) activeExplanation.getDefectElement());
+			}
+			defectElement.update(event);
 			for (final Explanation.Reason reason : activeExplanation.getReasons()) {
-				final IGraphicalElement element;
+				final IGraphicalElement reasonElement;
 				if (reason.getLiteral().getSourceAttribute() == FeatureAttribute.CONSTRAINT) {
-					element = graphicalFeatureModel.getConstraints().get(reason.getLiteral().getSourceIndex());
+					reasonElement = graphicalFeatureModel.getConstraints().get(reason.getLiteral().getSourceIndex());
 				} else {
-					element = graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getFeature((String) reason.getLiteral().var));
+					reasonElement = graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getFeature((String) reason.getLiteral().var));
 				}
-				element.update(new FeatureIDEEvent(
+				reasonElement.update(new FeatureIDEEvent(
 						event.getSource(),
 						EventType.ACTIVE_REASON_CHANGED,
 						explanationActivated ? null : reason,
