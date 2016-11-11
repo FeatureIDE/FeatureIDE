@@ -43,8 +43,16 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Timo Guenther
  */
 public class RedundantConstraintExplanationCreator extends ExplanationCreator {
-	/** the redundant constraint in the feature model */
+	/** The redundant constraint in the feature model. */
 	private IConstraint redundantConstraint;
+	/**
+	 * The CNF without the clauses of the redundant constraint.
+	 * It is later used as the input for the LTMS.
+	 * It is stored separately from the CNF so the CNF does not have to be overridden and can continue to be reused.
+	 * It is created lazily when needed and reset when any of the variables it depends on is changed:
+	 * the feature model, the feature model's CNF representation or the redundant constraint.
+	 */
+	private Node cnfWithoutRedundantConstraintClauses;
 	
 	/**
 	 * Constructs a new instance of this class.
@@ -85,12 +93,36 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	 */
 	public void setRedundantConstraint(IConstraint redundantConstraint) {
 		this.redundantConstraint = redundantConstraint;
-		setCNF(null); //Refresh the CNF as it depends on the redundant constraint.
+		setCNFWithoutRedundantConstraintClauses(null);
 	}
 	
-	@Override
-	protected Node createCNF(Node node) {
-		return removeRedundantConstraintClauses(super.createCNF(node));
+	/**
+	 * Returns the CNF without the clauses of the redundant constraint.
+	 * Creates it first if necessary.
+	 * @return the CNF without the clauses of the redundant constraint; not null
+	 */
+	protected Node getCNFWithoutRedundantConstraintClauses() {
+		if (cnfWithoutRedundantConstraintClauses == null) {
+			setCNFWithoutRedundantConstraintClauses(createCNFWithoutRedundantConstraintClauses());
+		}
+		return cnfWithoutRedundantConstraintClauses;
+	}
+	
+	/**
+	 * Sets the CNF without the clauses of the redundant constraint.
+	 * @param cnfWithoutRedundantConstraintClauses the CNF without the clauses of the redundant constraint
+	 */
+	protected void setCNFWithoutRedundantConstraintClauses(Node cnfWithoutRedundantConstraintClauses) {
+		this.cnfWithoutRedundantConstraintClauses = cnfWithoutRedundantConstraintClauses;
+		setLTMS(null);
+	}
+	
+	/**
+	 * Creates a copy of the CNF without the clauses of the redundant constraint.
+	 * @return a copy of the CNF without the clauses of the redundant constraint; not null
+	 */
+	protected Node createCNFWithoutRedundantConstraintClauses() {
+		return removeRedundantConstraintClauses(getCNF());
 	}
 	
 	/**
@@ -116,10 +148,18 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 		return new And(clauses.toArray());
 	}
 	
+	@Override
+	protected LTMS createLTMS() {
+		return new LTMS(getCNFWithoutRedundantConstraintClauses());
+	}
+	
 	/**
 	 * Returns an explanation why the specified constraint of the specified feature model is redundant.
+	 * Uses a representation of the feature model without the redundant constraint.
 	 * Sets several initial truth value assumptions that lead to a violation of the redundant constraint.
 	 * Then propagates each set of values until a violation in a clause occurs.
+	 * Since a representation of the feature model without the redundant constraint is used,
+	 * the information of the constraint must already be stored differently in the feature model, making it redundant.
 	 * Finally combines all generated explanations into one.
 	 * @return an explanation why the specified constraint of the specified feature model is redundant
 	 */
