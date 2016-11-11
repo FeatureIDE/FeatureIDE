@@ -77,21 +77,18 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelAnalyzer {
-
-	/**
-	 * Remembers explanations for redundant constraints.
-	 */
-	private Map<IConstraint, Explanation> redundantConstrExpl = new HashMap<>();
-
 	/**
 	 * Remembers explanations for dead features.
 	 */
-	private Map<IFeature, Explanation> deadFeatureExpl = new HashMap<>();
-
+	private Map<IFeature, Explanation> deadFeatureExplanations = new HashMap<>();
 	/**
 	 * Remembers explanations for false-optional features.
 	 */
-	private Map<IFeature, Explanation> falseOptFeatureExpl = new HashMap<>();
+	private Map<IFeature, Explanation> falseOptionalFeatureExplanations = new HashMap<>();
+	/**
+	 * Remembers explanations for redundant constraints.
+	 */
+	private Map<IConstraint, Explanation> redundantConstraintExplanations = new HashMap<>();
 
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
@@ -811,10 +808,10 @@ public class FeatureModelAnalyzer {
 	 * @return an explanation why the given feature is dead or null if it cannot be explained
 	 */
 	public Explanation getDeadFeatureExplanation(IFeature feature) {
-		if (!deadFeatureExpl.containsKey(feature)) {
+		if (!deadFeatureExplanations.containsKey(feature)) {
 			addDeadFeatureExplanation(feature);
 		}
-		return deadFeatureExpl.get(feature);
+		return deadFeatureExplanations.get(feature);
 	}
 	
 	/**
@@ -833,7 +830,7 @@ public class FeatureModelAnalyzer {
 	 * @param feature potentially dead feature
 	 */
 	public void addDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
-		deadFeatureExpl.put(feature, new DeadFeatureExplanationCreator(fm, feature).getExplanation());
+		deadFeatureExplanations.put(feature, new DeadFeatureExplanationCreator(fm, feature).getExplanation());
 	}
 	
 	/**
@@ -843,10 +840,10 @@ public class FeatureModelAnalyzer {
 	 * @return an explanation why the given feature is false-optional or null if it cannot be explained
 	 */
 	public Explanation getFalseOptionalFeatureExplanation(IFeature feature) {
-		if (!falseOptFeatureExpl.containsKey(feature)) {
+		if (!falseOptionalFeatureExplanations.containsKey(feature)) {
 			addFalseOptionalFeatureExplanation(feature);
 		}
-		return falseOptFeatureExpl.get(feature);
+		return falseOptionalFeatureExplanations.get(feature);
 	}
 	
 	/**
@@ -865,7 +862,7 @@ public class FeatureModelAnalyzer {
 	 * @param feature potentially false-optional feature
 	 */
 	public void addFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
-		falseOptFeatureExpl.put(feature, new FalseOptionalFeatureExplanationCreator(fm, feature).getExplanation());
+		falseOptionalFeatureExplanations.put(feature, new FalseOptionalFeatureExplanationCreator(fm, feature).getExplanation());
 	}
 	
 	/**
@@ -875,10 +872,10 @@ public class FeatureModelAnalyzer {
 	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
 	 */
 	public Explanation getRedundantConstraintExplanation(IConstraint constraint) {
-		if (!redundantConstrExpl.containsKey(constraint)) {
+		if (!redundantConstraintExplanations.containsKey(constraint)) {
 			addRedundantConstraintExplanation(constraint);
 		}
-		return redundantConstrExpl.get(constraint);
+		return redundantConstraintExplanations.get(constraint);
 	}
 	
 	/**
@@ -898,15 +895,15 @@ public class FeatureModelAnalyzer {
 	 * @param constraint potentially redundant constraint
 	 */
 	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
-		redundantConstrExpl.put(constraint, new RedundantConstraintExplanationCreator(fm, constraint).getExplanation());
+		redundantConstraintExplanations.put(constraint, new RedundantConstraintExplanationCreator(fm, constraint).getExplanation());
 	}
 	
 	/**
 	 * Clears all explanations.
 	 */
 	public void clearExplanations() {
-		deadFeatureExpl.clear();
-		falseOptFeatureExpl.clear();
-		redundantConstrExpl.clear();
+		deadFeatureExplanations.clear();
+		falseOptionalFeatureExplanations.clear();
+		redundantConstraintExplanations.clear();
 	}
 }
