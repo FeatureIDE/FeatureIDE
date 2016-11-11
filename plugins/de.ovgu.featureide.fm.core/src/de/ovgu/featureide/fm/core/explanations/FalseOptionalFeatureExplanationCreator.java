@@ -87,6 +87,9 @@ public class FalseOptionalFeatureExplanationCreator extends ExplanationCreator {
 		ltms.addPremise(getFalseOptionalFeature().getName(), false);
 		ltms.addPremise(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);
 		final Explanation explanation = ltms.getExplanation();
+		if (explanation == null) {
+			return null;
+		}
 		explanation.setDefectFalseOptionalFeature(getFalseOptionalFeature());
 		explanation.setFeatureModel(getFeatureModel());
 		return explanation;

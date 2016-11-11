@@ -86,6 +86,9 @@ public class DeadFeatureExplanationCreator extends ExplanationCreator {
 		final LTMS ltms = new LTMS(getCNF());
 		ltms.addPremise(getDeadFeature().getName(), true);
 		final Explanation explanation = ltms.getExplanation();
+		if (explanation == null) {
+			return null;
+		}
 		explanation.setDefectDeadFeature(getDeadFeature());
 		explanation.setFeatureModel(getFeatureModel());
 		return explanation;

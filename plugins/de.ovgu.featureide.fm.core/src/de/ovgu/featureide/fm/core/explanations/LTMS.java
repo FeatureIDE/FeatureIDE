@@ -179,6 +179,9 @@ public class LTMS {
 				shortestExplanation = explanation; //Remember the shortest explanation.
 			}
 		}
+		if (shortestExplanation == null) {
+			return null;
+		}
 		shortestExplanation.setCounts(cumulatedExplanation); //Remember the reason and explanations that were generated before.
 		return shortestExplanation;
 	}

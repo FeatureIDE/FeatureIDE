@@ -125,16 +125,20 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	 */
 	@Override
 	public Explanation getExplanation() {
-		final Explanation explanation = new Explanation();
-		explanation.setExplanationCount(0);
+		final Explanation cumulatedExplanation = new Explanation();
+		cumulatedExplanation.setExplanationCount(0);
 		final LTMS ltms = new LTMS(getCNF());
 		for (final Map<Object, Boolean> assignment : getContradictingAssignments(getRedundantConstraint().getNode())) {
 			ltms.setPremises(assignment);
-			explanation.addExplanation(ltms.getExplanation());
+			final Explanation explanation = ltms.getExplanation();
+			if (explanation == null) {
+				continue;
+			}
+			cumulatedExplanation.addExplanation(explanation);
 		}
-		explanation.setDefectRedundantConstraint(getRedundantConstraint());
-		explanation.setFeatureModel(getFeatureModel());
-		return explanation;
+		cumulatedExplanation.setDefectRedundantConstraint(getRedundantConstraint());
+		cumulatedExplanation.setFeatureModel(getFeatureModel());
+		return cumulatedExplanation;
 	}
 	
 	/**
