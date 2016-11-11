@@ -57,7 +57,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
@@ -563,9 +565,7 @@ public class FeatureModelAnalyzer {
 		cachedCoreFeatures = analysis.getCoreFeatures();
 		cachedDeadFeatures = analysis.getDeadFeatures();
 		cachedFalseOptionalFeatures = analysis.getFalseOptionalFeatures();
-		deadFeatureExpl = analysis.deadFeatureExpl;
-		falseOptFeatureExpl = analysis.falseOptFeatureExpl;
-		redundantConstrExpl = analysis.redundantConstrExpl;
+		clearExplanations();
 		return newAttributes;
 	}
 
@@ -578,7 +578,6 @@ public class FeatureModelAnalyzer {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(false);
 		analysis.setCalculateConstraints(true);
-		analysis.setCalculateExplanations(false);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
 		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
@@ -600,7 +599,6 @@ public class FeatureModelAnalyzer {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(true);
 		analysis.setCalculateConstraints(false);
-		analysis.setCalculateExplanations(false);
 		analysis.updateFeatures();
 		cachedValidity = analysis.isValid();
 		cachedCoreFeatures = analysis.getCoreFeatures();
@@ -808,30 +806,88 @@ public class FeatureModelAnalyzer {
 	
 	/**
 	 * Returns an explanation why the given feature is dead or null if it cannot be explained.
+	 * Creates it first if necessary.
 	 * @param feature potentially dead feature
 	 * @return an explanation why the given feature is dead or null if it cannot be explained
 	 */
 	public Explanation getDeadFeatureExplanation(IFeature feature) {
+		if (!deadFeatureExpl.containsKey(feature)) {
+			addDeadFeatureExplanation(feature);
+		}
 		return deadFeatureExpl.get(feature);
 	}
 	
 	/**
+	 * Adds an explanation why the given feature is dead.
+	 * Uses the default feature model stored in this instance.
+	 * @param feature potentially dead feature
+	 */
+	public void addDeadFeatureExplanation(IFeature feature) {
+		addDeadFeatureExplanation(fm, feature);
+	}
+	
+	/**
+	 * Adds an explanation why the given feature is dead.
+	 * Uses the given feature model, which may differ from the default feature model stored in this instance.
+	 * @param fm feature model containing the feature
+	 * @param feature potentially dead feature
+	 */
+	public void addDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
+		deadFeatureExpl.put(feature, new DeadFeatureExplanationCreator(fm, feature).getExplanation());
+	}
+	
+	/**
 	 * Returns an explanation why the given feature is false-optional or null if it cannot be explained.
+	 * Creates it first if necessary.
 	 * @param feature potentially false-optional feature
 	 * @return an explanation why the given feature is false-optional or null if it cannot be explained
 	 */
 	public Explanation getFalseOptionalFeatureExplanation(IFeature feature) {
+		if (!falseOptFeatureExpl.containsKey(feature)) {
+			addFalseOptionalFeatureExplanation(feature);
+		}
 		return falseOptFeatureExpl.get(feature);
 	}
 	
 	/**
-	 * Returns an explanation why the given constraint is redundant or null if it cannot be explained.
+	 * Adds an explanation why the given feature is false-optional.
 	 * Uses the default feature model stored in this instance.
+	 * @param feature potentially false-optional feature
+	 */
+	public void addFalseOptionalFeatureExplanation(IFeature feature) {
+		addFalseOptionalFeatureExplanation(fm, feature);
+	}
+	
+	/**
+	 * Adds an explanation why the given feature is false-optional.
+	 * Uses the given feature model, which may differ from the default feature model stored in this instance.
+	 * @param fm feature model containing the feature
+	 * @param feature potentially false-optional feature
+	 */
+	public void addFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
+		falseOptFeatureExpl.put(feature, new FalseOptionalFeatureExplanationCreator(fm, feature).getExplanation());
+	}
+	
+	/**
+	 * Returns an explanation why the given constraint is redundant or null if it cannot be explained.
+	 * Creates it first if necessary.
 	 * @param constraint potentially redundant constraint
 	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
 	 */
 	public Explanation getRedundantConstraintExplanation(IConstraint constraint) {
+		if (!redundantConstrExpl.containsKey(constraint)) {
+			addRedundantConstraintExplanation(constraint);
+		}
 		return redundantConstrExpl.get(constraint);
+	}
+	
+	/**
+	 * Adds an explanation why the given constraint is redundant.
+	 * Uses the default feature model stored in this instance.
+	 * @param constraint possibly redundant constraint
+	 */
+	public void addRedundantConstraintExplanation(IConstraint constraint) {
+		addRedundantConstraintExplanation(fm, constraint);
 	}
 	
 	/**
@@ -840,7 +896,6 @@ public class FeatureModelAnalyzer {
 	 * This is for example the case when explaining implicit constraints in subtree models.
 	 * @param fm feature model containing the constraint
 	 * @param constraint potentially redundant constraint
-	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
 	 */
 	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
 		redundantConstrExpl.put(constraint, new RedundantConstraintExplanationCreator(fm, constraint).getExplanation());

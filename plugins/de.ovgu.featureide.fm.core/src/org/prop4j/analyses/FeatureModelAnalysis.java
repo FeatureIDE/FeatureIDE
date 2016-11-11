@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.prop4j.And;
 import org.prop4j.Equals;
@@ -54,10 +53,6 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
-import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -75,22 +70,6 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, Object>> {
-
-	/**
-	 * Remembers explanations for redundant constraints.
-	 */
-	public Map<IConstraint, Explanation> redundantConstrExpl = new HashMap<>();
-
-	/**
-	 * Remembers explanations for dead features.
-	 */
-	public Map<IFeature, Explanation> deadFeatureExpl = new HashMap<>();
-
-	/**
-	 * Remembers explanations for false-optional features.
-	 */
-	public Map<IFeature, Explanation> falseOptFeatureExpl = new HashMap<>();
-
 	/**
 	 * Defines whether constraints should be included into calculations.
 	 */
@@ -115,8 +94,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	 * Defines whether constraints that are tautologies should be calculated.
 	 */
 	public boolean calculateTautologyConstraints = true;
-
-	public boolean calculateExplanations = true;
 
 	private final HashMap<Object, Object> changedAttributes = new HashMap<>();
 
@@ -199,10 +176,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	public void setCalculateDeadConstraints(boolean calculateDeadConstraints) {
 		this.calculateDeadConstraints = calculateDeadConstraints;
-	}
-
-	public void setCalculateExplanations(boolean calculateExplanations) {
-		this.calculateExplanations = calculateExplanations;
 	}
 
 	/**
@@ -398,11 +371,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 							setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
 						} else {
 							setConstraintAttribute(constraint, ConstraintAttribute.REDUNDANT);
-
-							if (calculateExplanations) {
-								Explanation expl = new RedundantConstraintExplanationCreator(fm, constraint).getExplanation(); //store explanation for redundant constraint
-								redundantConstrExpl.put(constraint, expl);
-							}
 						}
 					}
 				}
@@ -450,30 +418,15 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 					if (checkConstraintContradiction(cnf)) {
 						setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
-						if (calculateExplanations) {
-							explainVoidFM();
-						}
 					} else {
 						setConstraintAttribute(constraint, ConstraintAttribute.VOID_MODEL);
-						if (calculateExplanations) {
-							explainVoidFM();
-						}
 					}
 				} else {
 					setConstraintAttribute(constraint, ConstraintAttribute.UNSATISFIABLE);
-					if (calculateExplanations) {
-						explainVoidFM();
-					}
 				}
 			}
 			monitor.checkCancel();
 		}
-	}
-
-	// explain void feature model, treat root as dead feature
-	private void explainVoidFM() {
-		Explanation expl = new DeadFeatureExplanationCreator(fm, FeatureUtils.getRoot(fm)).getExplanation();
-		deadFeatureExpl.put(FeatureUtils.getRoot(fm), expl);
 	}
 
 	private void checkFeatureDead(final SatInstance si) {
@@ -488,15 +441,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			if (var < 0) {
 				setFeatureAttribute(feature, FeatureStatus.DEAD);
 				deadFeatures.add(feature);
-
-				if (calculateExplanations) {
-					// explain dead features and remember explanation in map
-					Explanation expl = new DeadFeatureExplanationCreator(fm, feature).getExplanation();
-					deadFeatureExpl.put(feature, expl);
-
-				} else {
-					coreFeatures.add(feature);
-				}
+			} else {
+				coreFeatures.add(feature);
 			}
 		}
 	}
@@ -537,12 +483,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			final IFeature feature = fm.getFeature((CharSequence) si.getVariableObject(pair[1]));
 			setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
 			falseOptionalFeatures.add(feature);
-
-			if (calculateExplanations) {
-				// explain false optional features and remember explanation in map
-				Explanation expl = new FalseOptionalFeatureExplanationCreator(fm, feature).getExplanation();
-				falseOptFeatureExpl.put(feature, expl);
-			}
 		}
 	}
 
