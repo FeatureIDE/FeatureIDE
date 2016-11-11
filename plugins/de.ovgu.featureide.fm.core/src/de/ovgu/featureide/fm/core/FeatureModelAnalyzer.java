@@ -80,15 +80,30 @@ public class FeatureModelAnalyzer {
 	/**
 	 * Remembers explanations for dead features.
 	 */
-	private Map<IFeature, Explanation> deadFeatureExplanations = new HashMap<>();
+	private final Map<IFeature, Explanation> deadFeatureExplanations = new HashMap<>();
 	/**
 	 * Remembers explanations for false-optional features.
 	 */
-	private Map<IFeature, Explanation> falseOptionalFeatureExplanations = new HashMap<>();
+	private final Map<IFeature, Explanation> falseOptionalFeatureExplanations = new HashMap<>();
 	/**
 	 * Remembers explanations for redundant constraints.
 	 */
-	private Map<IConstraint, Explanation> redundantConstraintExplanations = new HashMap<>();
+	private final Map<IConstraint, Explanation> redundantConstraintExplanations = new HashMap<>();
+	/**
+	 * Creates explanations for dead features.
+	 * Stored for performance so the underlying CNF is not recreated for every explanation.
+	 */
+	private final DeadFeatureExplanationCreator deadFeatureExplanationCreator = new DeadFeatureExplanationCreator();
+	/**
+	 * Creates explanations for false-optional features.
+	 * Stored for performance so the underlying CNF is not recreated for every explanation.
+	 */
+	private final FalseOptionalFeatureExplanationCreator falseOptionalFeatureExplanationCreator = new FalseOptionalFeatureExplanationCreator();
+	/**
+	 * Creates explanations for redundant constraints.
+	 * Stored for performance so the underlying CNF is not recreated for every explanation.
+	 */
+	private final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = new RedundantConstraintExplanationCreator();
 
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
@@ -104,7 +119,7 @@ public class FeatureModelAnalyzer {
 
 	private boolean cachedValidity = true;
 
-	private IFeatureModel fm;
+	private final IFeatureModel fm;
 
 	/**
 	 * Defines whether features should be included into calculations.
@@ -153,6 +168,7 @@ public class FeatureModelAnalyzer {
 
 	public FeatureModelAnalyzer(IFeatureModel fm) {
 		this.fm = fm;
+		clearExplanations();
 	}
 
 	/**
@@ -830,7 +846,8 @@ public class FeatureModelAnalyzer {
 	 * @param feature potentially dead feature
 	 */
 	public void addDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
-		deadFeatureExplanations.put(feature, new DeadFeatureExplanationCreator(fm, feature).getExplanation());
+		deadFeatureExplanationCreator.setDeadFeature(feature);
+		deadFeatureExplanations.put(feature, deadFeatureExplanationCreator.getExplanation());
 	}
 	
 	/**
@@ -862,7 +879,8 @@ public class FeatureModelAnalyzer {
 	 * @param feature potentially false-optional feature
 	 */
 	public void addFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
-		falseOptionalFeatureExplanations.put(feature, new FalseOptionalFeatureExplanationCreator(fm, feature).getExplanation());
+		falseOptionalFeatureExplanationCreator.setFalseOptionalFeature(feature);
+		falseOptionalFeatureExplanations.put(feature, falseOptionalFeatureExplanationCreator.getExplanation());
 	}
 	
 	/**
@@ -895,7 +913,8 @@ public class FeatureModelAnalyzer {
 	 * @param constraint potentially redundant constraint
 	 */
 	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
-		redundantConstraintExplanations.put(constraint, new RedundantConstraintExplanationCreator(fm, constraint).getExplanation());
+		redundantConstraintExplanationCreator.setRedundantConstraint(constraint);
+		redundantConstraintExplanations.put(constraint, redundantConstraintExplanationCreator.getExplanation());
 	}
 	
 	/**
@@ -905,5 +924,8 @@ public class FeatureModelAnalyzer {
 		deadFeatureExplanations.clear();
 		falseOptionalFeatureExplanations.clear();
 		redundantConstraintExplanations.clear();
+		deadFeatureExplanationCreator.setFeatureModel(fm);
+		falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
+		redundantConstraintExplanationCreator.setFeatureModel(fm);
 	}
 }
