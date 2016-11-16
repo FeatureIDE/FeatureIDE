@@ -52,6 +52,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
+	protected boolean collapsed;
+	
 	protected Point location = new Point(0, 0);
 
 	protected Dimension dimension = new Dimension(10, 10);
@@ -207,6 +209,16 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void registerUIObject(IEventListener listener) {
 		this.uiObject = listener;
+	}
+
+	@Override
+	public boolean isCollapsed() {
+		return collapsed;
+	}
+
+	@Override
+	public void setCollapsed(boolean collapse) {
+		collapsed = collapse;		
 	}
 
 }

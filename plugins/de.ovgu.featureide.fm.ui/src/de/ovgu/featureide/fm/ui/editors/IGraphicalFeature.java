@@ -36,6 +36,8 @@ public interface IGraphicalFeature extends IGraphicalElement {
 
 	IFeature getObject();
 
+	boolean isCollapsed();
+	
 	boolean isConstraintSelected();
 
 	void setConstraintSelected(boolean selection);
@@ -50,5 +52,7 @@ public interface IGraphicalFeature extends IGraphicalElement {
 	List<FeatureConnection> getTargetConnections();
 
 	IGraphicalFeature clone();
+	
+	void setCollapsed(boolean collapse);
 
 }
