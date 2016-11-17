@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AdjustModelToEditorSizeOperation;
 
 /**
@@ -42,23 +43,23 @@ public class AdjustModelToEditorSizeAction extends Action {
 	public static final String ID = "de.ovgu.featureide.adjustmodeltoeditor";
 
 	private FeatureDiagramEditor editor;
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	public AdjustModelToEditorSizeAction(Object viewer, IFeatureModel featureModel, String title) {
+	public AdjustModelToEditorSizeAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, String title) {
 		super(title);
 		if (viewer instanceof FeatureDiagramEditor) {
 			editor = (FeatureDiagramEditor) viewer;
 		}
-		this.featureModel = featureModel;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	@Override
 	public void run() {
-		IFeature root = featureModel.getStructure().getRoot().getFeature();
+		IFeature root = graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature();
 		if (root == null) {
 			return;
 		}
-		AdjustModelToEditorSizeOperation op = new AdjustModelToEditorSizeOperation(featureModel, editor);
+		AdjustModelToEditorSizeOperation op = new AdjustModelToEditorSizeOperation(graphicalFeatureModel, editor);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

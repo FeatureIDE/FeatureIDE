@@ -29,6 +29,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to set all features to collapsed. Enables
@@ -41,27 +43,29 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class CollapseAllOperation extends AbstractFeatureModelOperation {
 
-	Iterable<IFeature> featureModel;
+	Iterable<IGraphicalFeature> features;
 	boolean collapse;
 
-	private LinkedList<IFeature> affectedFeatureList = new LinkedList<IFeature>();
+	private LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
 
-	public CollapseAllOperation(IFeatureModel featureModel, boolean collapse) {
-		super(featureModel, COLLAPSE_ALL);
-		this.featureModel = featureModel.getFeatures();
+	public CollapseAllOperation(IGraphicalFeatureModel graphicalFeatureModel, boolean collapse) {
+		super(graphicalFeatureModel.getFeatureModel(), COLLAPSE_ALL);
+		this.features = graphicalFeatureModel.getFeatures();
 		this.collapse = collapse;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		Iterator<IFeature> feautureModelIterator = featureModel.iterator();
+		Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
 		while (feautureModelIterator.hasNext()) {
-			IFeature feature = feautureModelIterator.next();
+			IGraphicalFeature gFeature = feautureModelIterator.next();
+			IFeature feature = gFeature.getObject();
 			if (!feature.getStructure().isRoot() || !collapse) {
 				if (feature.getStructure().hasChildren()) {
 					if (feature.getStructure().isCollapsed() != collapse) {
-						affectedFeatureList.add(feature);
+						affectedFeatureList.add(gFeature);
 					}
+					gFeature.setCollapsed(collapse);
 					feature.getStructure().setCollapsed(collapse);
 				}
 			}
@@ -71,9 +75,10 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		Iterator<IFeature> feautureModelIterator = featureModel.iterator();
-		for (IFeature f : affectedFeatureList) {
-			f.getStructure().setCollapsed(!collapse);
+		Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
+		for (IGraphicalFeature f : affectedFeatureList) {
+			f.setCollapsed(!collapse);
+			f.getObject().getStructure().setCollapsed(!collapse);
 		}
 		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
 

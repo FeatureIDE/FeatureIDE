@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to edit a constraint. Enables undo/redo
@@ -42,19 +43,21 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint constraint;
 	private Node newNode;
 	private Node oldNode;
-
-	public EditConstraintOperation(IConstraint constraint, Node propNode) {
-		super(constraint.getFeatureModel(), EDIT_CONSTRAINT);
+	private IGraphicalFeatureModel graphcialFeatureModel;
+	
+	public EditConstraintOperation(IGraphicalFeatureModel graphcialFeatureModel, IConstraint constraint, Node propNode) {
+		super(graphcialFeatureModel.getFeatureModel(), EDIT_CONSTRAINT);
 		this.newNode = propNode;
 		this.oldNode = constraint.getNode();
 		this.constraint = constraint;
+		this.graphcialFeatureModel = graphcialFeatureModel;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
 		constraint.setNode(newNode);
 
-		ExpandConstraintOperation operation = new ExpandConstraintOperation(featureModel, constraint);
+		ExpandConstraintOperation operation = new ExpandConstraintOperation(graphcialFeatureModel, constraint);
 		try {
 			operation.execute(null,  null);
 		} catch (ExecutionException e) {

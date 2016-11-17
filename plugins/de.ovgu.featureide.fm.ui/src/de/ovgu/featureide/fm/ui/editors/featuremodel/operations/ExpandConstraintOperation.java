@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to expand only features of this constraint. Enables undo/redo
@@ -41,16 +42,17 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	private IConstraint iConstraint;
-
+	private IGraphicalFeatureModel graphicalFeatureModel;
 	private LinkedList<IFeature> affectedFeatureList = new LinkedList<IFeature>();
 
 	/**
 	 * @param featureModel
 	 * @param label
 	 */
-	public ExpandConstraintOperation(IFeatureModel featureModel, IConstraint iConstraint) {
-		super(featureModel, EXPAND_CONSTRAINT);
+	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint iConstraint) {
+		super(graphicalFeatureModel.getFeatureModel(), EXPAND_CONSTRAINT);
 		this.iConstraint = iConstraint;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	public void expandParents(IFeature feature) {
@@ -71,7 +73,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		getCollapsedFeatures();
-		CollapseAllOperation collapseAll = new CollapseAllOperation(featureModel, true);
+		CollapseAllOperation collapseAll = new CollapseAllOperation(graphicalFeatureModel, true);
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
 		collapseAll.operation();
@@ -85,7 +87,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		CollapseAllOperation collapseAll = new CollapseAllOperation(featureModel, true);
+		CollapseAllOperation collapseAll = new CollapseAllOperation(graphicalFeatureModel, true);
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
 		collapseAll.operation();

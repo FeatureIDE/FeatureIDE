@@ -27,6 +27,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to set a feature to collapsed. Enables
@@ -39,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation {
 
 	private IFeature feature;
+	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	/**
 	 * @param label
@@ -47,8 +50,9 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 	 *            feature on which this operation will be executed
 	 * 
 	 */
-	public SetFeatureToCollapseOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, getLabel(feature));
+	public SetFeatureToCollapseOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
+		super(graphicalFeatureModel.getFeatureModel(), getLabel(feature));
+		this.graphicalFeatureModel = graphicalFeatureModel;
 		this.feature = feature;
 	}
 
@@ -66,6 +70,10 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 	@Override
 	protected FeatureIDEEvent operation() {
 		if (feature.getStructure().hasChildren()) {
+			
+			IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+			graphicalFeature.setCollapsed(!graphicalFeature.isCollapsed());
+			
 			feature.getStructure().setCollapsed(!feature.getStructure().isCollapsed());
 			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, null, null);
 		}

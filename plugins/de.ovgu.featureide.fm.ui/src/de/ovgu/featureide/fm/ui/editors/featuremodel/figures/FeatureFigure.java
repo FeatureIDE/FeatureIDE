@@ -414,7 +414,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	 */
 	@Override
 	public void setLocation(Point p) {
-		// TODO Auto-generated method stub
 		super.setLocation(p);
 		if (collapseDecoration != null) {
 			if (getFeature().getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
@@ -426,12 +425,21 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 	}
 
-	public boolean setCollapsedDecorator(CollapsedDecoration decoration) {
+	public void setCollapsedDecorator(CollapsedDecoration decoration) {
 		collapseDecoration = decoration;
-		return true;
 	}
 
 	public CollapsedDecoration getCollapsedDecorator() {
 		return collapseDecoration;
+	}
+
+	public void RemoveCollapsedDecorator() {
+		if (collapseDecoration == null)
+			return;
+		if (collapseDecoration.getParent() != null) {
+			collapseDecoration.getParent().remove(collapseDecoration);
+			
+		}
+		collapseDecoration = null;
 	}
 }

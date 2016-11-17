@@ -32,6 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraintOperation;
@@ -47,7 +48,7 @@ import java.util.Iterator;
  */
 public class ExpandConstraintAction extends Action {
 
-	private IFeatureModel featureModel;
+	private IGraphicalFeatureModel graphcialFeatureModel;
 	private IConstraint constraint;
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -61,9 +62,9 @@ public class ExpandConstraintAction extends Action {
 	 * @param featuremodel
 	 * @param menuname
 	 */
-	public ExpandConstraintAction(Object viewer, IFeatureModel featureModel) {
+	public ExpandConstraintAction(Object viewer, IGraphicalFeatureModel graphcialFeatureModel) {
 		super(EXPAND_CONSTRAINT);
-		this.featureModel = featureModel;
+		this.graphcialFeatureModel = graphcialFeatureModel;
 		if (viewer instanceof TreeViewer) {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 		} else {
@@ -73,7 +74,7 @@ public class ExpandConstraintAction extends Action {
 
 	@Override
 	public void run() {
-		ExpandConstraintOperation op = new ExpandConstraintOperation(featureModel, constraint);
+		ExpandConstraintOperation op = new ExpandConstraintOperation(graphcialFeatureModel, constraint);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

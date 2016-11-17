@@ -32,6 +32,7 @@ import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
+import org.eclipse.gef.editparts.AbstractEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -121,7 +122,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel.getFeatureModel());
+			SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {
@@ -164,14 +165,13 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	@Override
 	public void activate() {
 		getFeature().registerUIObject(this);
-		getFeatureFigure().setVisible(true);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
+		refreshCollapsedDecorator();
 		super.deactivate();
-		getFeatureFigure().setVisible(false);
 	}
 
 	/* (non-Javadoc)
@@ -179,9 +179,9 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	 */
 	@Override
 	public void refresh() {
-		// TODO Auto-generated method stub
 		super.refresh();
 		refreshCollapsedDecorator();
+		
 	}
 
 	@Override
@@ -237,7 +237,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 			break;
 		case FEATURE_NAME_CHANGED:
-			String displayName = getFeature().getObject().getProperty().getDisplayName();
+			String displayName = getFeature().getObject().getName();
 
 			if (getFeature().getGraphicalModel().getLayout().showShortNames()) {
 				int lastIndexOf = displayName.lastIndexOf(".");
@@ -249,8 +249,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
-		case COLLAPSED_CHANGED:
 		case COLLAPSED_ALL_CHANGED:
+		case COLLAPSED_CHANGED:
 			getFeatureFigure().setProperties();
 			break;
 		case MANDATORY_CHANGED:
@@ -286,14 +286,21 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	public void refreshCollapsedDecorator() {
 		final IGraphicalFeature f = getFeature();
 		final FeatureFigure featureFigure = (FeatureFigure) getFigure();
-		if (f.getObject().getStructure().hasChildren() && f.getObject().getStructure().isCollapsed() && !f.getObject().getStructure().hasCollapsedParent()) {
+		if(f.isCollapsed() && f.getObject().getStructure().hasChildren() && !f.getObject().getStructure().hasCollapsedParent())
+		{
+			//Create collapse decorator if not existing
 			if (featureFigure.getParent() != null) {
 				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
-				if (featureFigure.getCollapsedDecorator() == null && featureFigure.setCollapsedDecorator(collapsedDecoration)) {
+				if (featureFigure.getCollapsedDecorator() == null) {
+					featureFigure.setCollapsedDecorator(collapsedDecoration);
 					featureFigure.getParent().add(collapsedDecoration);
 				}
 			}
 			getFeatureFigure().setLocation(getFeature().getLocation());
+		}
+		else if (featureFigure.getCollapsedDecorator() != null)
+		{
+			featureFigure.RemoveCollapsedDecorator();
 		}
 	}
 

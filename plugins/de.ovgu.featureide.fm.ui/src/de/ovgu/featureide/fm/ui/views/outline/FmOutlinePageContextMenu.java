@@ -103,7 +103,7 @@ public class FmOutlinePageContextMenu {
 	private OrAction oAction;
 	private AndAction andAction;
 	private AlternativeAction altAction;
-//	private ReverseOrderAction roAction;
+	//	private ReverseOrderAction roAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
 	public IDoubleClickListener dblClickListener;
@@ -121,7 +121,7 @@ public class FmOutlinePageContextMenu {
 		this.fInput = fInput;
 		initContextMenu();
 	}
-	
+
 	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures) {
 		this.site = site;
 		this.fTextEditor = fTextEditor;
@@ -157,7 +157,7 @@ public class FmOutlinePageContextMenu {
 	private void initActions() {
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
-		collapseAction = new CollapseAction(viewer, fInput);
+		//collapseAction = new CollapseAction(viewer, fInput);
 		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
 		dAction = new DeleteAction(viewer, fInput);
 		dAAction = new DeleteAllAction(viewer, fInput);
@@ -169,7 +169,7 @@ public class FmOutlinePageContextMenu {
 		reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
 		oAction = new OrAction(viewer, fInput);
 		//TODO _interfaces Removed Code
-//		roAction = new ReverseOrderAction(viewer, fInput);
+		//		roAction = new ReverseOrderAction(viewer, fInput);
 		andAction = new AndAction(viewer, fInput);
 		altAction = new AlternativeAction(viewer, fInput);
 
@@ -192,10 +192,11 @@ public class FmOutlinePageContextMenu {
 		dblClickListener = new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature))
-					if (syncCollapsedFeatures)
-						collapseAction.run();
-				else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint))
-					ecAction.run();
+					if (syncCollapsedFeatures) {
+						//collapseAction.run();
+					} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
+						ecAction.run();
+					}
 			}
 		};
 
@@ -260,7 +261,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(altAction);
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			//TODO _interfaces Removed Code
-//			manager.add(roAction);
+			//			manager.add(roAction);
 		}
 		if (sel instanceof IFeature) {
 
@@ -292,7 +293,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(hAction);
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			//TODO _interfaces Removed Code
-//			manager.add(roAction);
+			//			manager.add(roAction);
 		}
 		if (sel instanceof IConstraint) {
 			manager.add(ccAction);

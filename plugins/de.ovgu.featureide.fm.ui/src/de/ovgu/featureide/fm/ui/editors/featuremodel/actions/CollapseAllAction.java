@@ -26,6 +26,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOperation;
 
 /**
@@ -37,18 +38,18 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOpera
 public class CollapseAllAction extends Action {
 	public static final String ID = "de.ovgu.featureide.collapseall";
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 	private boolean collapse;
 
-	public CollapseAllAction(Object viewer, IFeatureModel featureModel, boolean collapse, String title) {
+	public CollapseAllAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, boolean collapse, String title) {
 		super(title);
-		this.featureModel = featureModel;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 		this.collapse = collapse;
 	}
 
 	@Override
 	public void run() {
-		CollapseAllOperation op = new CollapseAllOperation(featureModel, collapse);
+		CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, collapse);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to set all features to collapsed. Enables
@@ -47,12 +48,14 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 
 	boolean collapse;
 	private IFeatureModel fm;
+	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	private LinkedList<IFeature> affectedFeatureList = new LinkedList<IFeature>();
 
-	public AdjustModelToEditorSizeOperation(IFeatureModel featureModel, Object editor) {
-		super(featureModel, ADJUST_MODEL_TO_EDITOR);
-		this.fm = featureModel;
+	public AdjustModelToEditorSizeOperation(IGraphicalFeatureModel graphicalFeatureModel, Object editor) {
+		super(graphicalFeatureModel.getFeatureModel(), ADJUST_MODEL_TO_EDITOR);
+		this.fm = graphicalFeatureModel.getFeatureModel();
+		this.graphicalFeatureModel = graphicalFeatureModel;
 		this.editor = editor;
 	}
 
@@ -87,7 +90,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 
 		LinkedList<LinkedList<IFeature>> levels = calculateLevels(root);
-		CollapseAllOperation op = new CollapseAllOperation(featureModel, true);
+		CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, true);
 		try {
 			op.execute(null, null);
 		} catch (ExecutionException e) {

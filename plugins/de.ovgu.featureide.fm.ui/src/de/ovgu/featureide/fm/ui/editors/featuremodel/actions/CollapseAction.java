@@ -32,6 +32,8 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 
@@ -45,7 +47,7 @@ public class CollapseAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.collapse";
 
-	private IFeatureModel featureModel;
+	private IGraphicalFeatureModel graphicalFeatureModel;
 	
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -63,9 +65,9 @@ public class CollapseAction extends SingleSelectionAction {
 		}
 	};
 
-	public CollapseAction(Object viewer, IFeatureModel featureModel) {
+	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_FEATURE, viewer);
-		this.featureModel = featureModel;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -77,8 +79,10 @@ public class CollapseAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		setChecked(feature.getStructure().isCollapsed());
-		SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
+		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+		setChecked(graphicalFeature.isCollapsed());
+		//setChecked(feature.getStructure().isCollapsed());
+		SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, graphicalFeatureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -92,7 +96,10 @@ public class CollapseAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		setChecked(feature.getStructure().isCollapsed());
+		//setChecked(feature.getStructure().isCollapsed());
+
+		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+		setChecked(graphicalFeature.isCollapsed());
 	}
 
 }

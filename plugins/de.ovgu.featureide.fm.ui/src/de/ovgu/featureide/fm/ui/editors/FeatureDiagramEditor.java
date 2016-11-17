@@ -141,6 +141,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.Tautol
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
@@ -410,13 +411,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
 
-		collapseAction = new CollapseAction(this, featureModel);
+		collapseAction = new CollapseAction(this, graphicalFeatureModel);
 		collapseFeaturesAction = new CollapseSiblingsAction(this, featureModel);
-		collapseAllAction = new CollapseAllAction(this, featureModel, true, COLLAPSE_ALL);
+		collapseAllAction = new CollapseAllAction(this, graphicalFeatureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
-		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, featureModel, ADJUST_MODEL_TO_EDITOR);
+		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR);
 
-		expandAllAction = new CollapseAllAction(this, featureModel, false, EXPAND_ALL);
+		expandAllAction = new CollapseAllAction(this, graphicalFeatureModel, false, EXPAND_ALL);
 		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND); //icon for expand added
 		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
 		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
@@ -424,7 +425,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
-		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, featureModel, ADJUST_MODEL_TO_EDITOR);
+		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR);
 		moveStopAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.STOP);
 		moveUpAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.UP);
 		moveRightAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.RIGHT);
@@ -436,7 +437,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createConstraintAction = new CreateConstraintAction(this, featureModel);
 		createConstraintWithAction = new CreateConstraintWithAction(this, featureModel);
 		editConstraintAction = new EditConstraintAction(this, featureModel);
-		expandConstraintAction = new ExpandConstraintAction(this, featureModel);
+		expandConstraintAction = new ExpandConstraintAction(this, graphicalFeatureModel);
 		reverseOrderAction = new ReverseOrderAction(this, graphicalFeatureModel);
 
 		exportFeatureModelAction = new ExportFeatureModelAction(featureModelEditor);
@@ -1085,67 +1086,22 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case COLLAPSED_CHANGED:
+			//Reload editpart to notify the diagramm that the IGraphicalModel has changed
 			reload();
-			// clear registry		
-			final Map<?, ?> registryCollapsed = getEditPartRegistry();
-			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
-				registryCollapsed.remove(f);
-				registryCollapsed.remove(f.getSourceConnection());
-				registryCollapsed.remove(f.getTargetConnections());
-			}
-			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
-				registryCollapsed.remove(f);
-			}
-
-			graphicalFeatureModel.init();
-			setContents(graphicalFeatureModel);
-			internRefresh(true);
-
-			//when performing COLLAPSED_CHANGED while selecting IConstraint the getNewValue will be an iConstraint
-			if (event.getNewValue() != null) {
-				IConstraint selectedConstraint = (IConstraint) event.getNewValue();
-				IGraphicalConstraint graphConstraint = graphicalFeatureModel.getGraphicalConstraint(selectedConstraint);
-				final Object constraintEditPart = registryCollapsed.get(graphConstraint);
-				if (constraintEditPart instanceof ConstraintEditPart) {
-					getSelectionManager().deselectAll();
-					getSelectionManager().appendSelection((ConstraintEditPart) constraintEditPart);
-				}
-			} else {
-				//Reselect the current selected feature if getNewValue is null  
+			if (event.getNewValue() == null) {
 				IFeature selectedFeature = (IFeature) event.getSource();
-				IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(selectedFeature);
-				final Object featureEditPart = registryCollapsed.get(graphFeature);
-				if (featureEditPart instanceof FeatureEditPart) {
-					getSelectionManager().deselectAll();
-					FeatureEditPart editPart = (FeatureEditPart) featureEditPart;
-					getSelectionManager().appendSelection(editPart);
-					centerPointOnScreen(editPart.getFigure().getBounds().x, editPart.getFigure().getBounds().y, editPart.getFigure().getBounds().width / 2,
-							editPart.getFigure().getBounds().height / 2);
-				}
+				refreshChildAll(selectedFeature);
 			}
+			internRefresh(true);
+			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
-			refreshAll();
 			break;
 		case COLLAPSED_ALL_CHANGED:
-			try {
-				Iterator<IFeature> feautureModelIterator = (Iterator<IFeature>) event.getSource();
-				while (feautureModelIterator.hasNext()) {
-					FeatureUIHelper.getGraphicalFeature(feautureModelIterator.next(), graphicalFeatureModel).update(event);
-				}
-				graphicalFeatureModel.init();
-				setContents(graphicalFeatureModel);
-				reload();
-				featureModelEditor.setPageModified(true);
-
-				//after collapse/expand all operation focus view on root
-				centerPointOnScreen(rootEditPart.getFigure().getBounds().x, rootEditPart.getFigure().getBounds().y,
-						rootEditPart.getFigure().getBounds().width / 2, rootEditPart.getFigure().getBounds().height / 2);
-
-				internRefresh(true);
-			} catch (Exception e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
-			refreshAll();
+			reload();
+			refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			internRefresh(true);
+			analyzeFeatureModel();
+			featureModelEditor.setPageModified(true);
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
@@ -1192,8 +1148,34 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			if (!checkModification) {
 				FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(f);
 				editPart.refresh();
+
 			}
 		}
+	}
+
+	private void refreshChildAll(IFeature parent) {
+		for (IFeatureStructure f : parent.getStructure().getChildren()) {
+			//Refresh children
+			refreshChildAll(f.getFeature());
+		}
+		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(parent);
+		FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
+		
+		//return if editpart doesnt exist because feature is hidden or has collapsed parent
+		if(editPart == null) return;
+		
+		//Refresh Connection
+		for (FeatureConnection connection : graphicalFeature.getTargetConnections()) {
+			Map<?, ?> registry2 = getEditPartRegistry();
+			ConnectionEditPart connectionEditPart2 = (ConnectionEditPart) registry2.get(connection);
+			if (connectionEditPart2 != null) {
+				//FMUIPlugin.getDefault().logInfo("Refresh Connection: " + connectionEditPart2);
+				connectionEditPart2.refresh();
+			}
+		}
+		//Refresh Feature
+		//FMUIPlugin.getDefault().logInfo("Refresh Feature: " + editPart);
+		editPart.refresh();
 	}
 
 	public void setIndex(int index) {

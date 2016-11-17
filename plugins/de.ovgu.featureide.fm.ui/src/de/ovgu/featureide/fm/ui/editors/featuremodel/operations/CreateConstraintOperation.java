@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to create a new constraint. Enables undo/redo
@@ -41,23 +42,24 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint constraint;
-
+	private IGraphicalFeatureModel	graphicalFeatureModel;
 	/**
 	 * @param node
 	 *            the node representing the constraint to be added
 	 * @param featureModel
 	 *            model that will be used to add the constraint
 	 */
-	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
-		super(featureModel, CREATE_CONSTRAINT);
+	public CreateConstraintOperation(Node node, IGraphicalFeatureModel graphicalFeatureModel) {
+		super(graphicalFeatureModel.getFeatureModel(), CREATE_CONSTRAINT);
 		constraint = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, node);
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
 		featureModel.addConstraint(constraint);
 
-		ExpandConstraintOperation operation = new ExpandConstraintOperation(featureModel, constraint);
+		ExpandConstraintOperation operation = new ExpandConstraintOperation(graphicalFeatureModel, constraint);
 		try {
 			operation.execute(null,  null);
 		} catch (ExecutionException e) {
