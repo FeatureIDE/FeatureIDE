@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
  * Operation with functionality to set all features to collapsed. Enables
@@ -61,6 +62,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 
 	@Override
 	protected FeatureIDEEvent operation() {
+		// 0 is the manual layout, there is no greedy for manual layout
+		if(graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) return new FeatureIDEEvent(null, EventType.DEFAULT);
 		IFeatureStructure root = fm.getStructure().getRoot();
 		calculateVisibleLayer(root.getFeature());
 		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);

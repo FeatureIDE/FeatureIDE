@@ -1010,8 +1010,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case STRUCTURE_CHANGED:
 			reload();
 			analyzeFeatureModel();
-			graphicalFeatureModel.init();
-			setContents(graphicalFeatureModel);
+			refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			internRefresh(true);
 			featureModelEditor.setPageModified(true);
 			refreshAll();
@@ -1019,6 +1018,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case MODEL_DATA_LOADED:
 		case MODEL_DATA_CHANGED:
 			// clear registry
+			if (extraPath != null) {
+			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			}
 			final Map<?, ?> registry = getEditPartRegistry();
 			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
 				registry.remove(f);
@@ -1032,6 +1034,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
 			}
 			setContents(graphicalFeatureModel);
+			refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			reload();
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
@@ -1064,6 +1067,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 			reload();
 			refreshGraphics(null);
+			refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
@@ -1075,11 +1079,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			internRefresh(false);
 			break;
 		case HIDDEN_CHANGED:
-			reload();
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
+			reload(); //reload need to be called afterwards so that the events can apply to the to be hidden features. reload would remove the editparts that leads to errors.
+			refreshChildAll((IFeature) event.getSource());
 			legendLayoutAction.refresh();
 			featureModelEditor.setPageModified(true);
 			internRefresh(true);
@@ -1158,10 +1163,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			//Refresh children
 			refreshChildAll(f.getFeature());
 		}
-		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(parent);
+		refreshFeature(parent);
+	}
+	
+	void refreshFeature(IFeature feature)
+	{
+		if(!graphicalFeatureModel.getLayout().showHiddenFeatures() && feature.getStructure().isHidden()) return;
+		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
-		
-		//return if editpart doesnt exist because feature is hidden or has collapsed parent
 		if(editPart == null) return;
 		
 		//Refresh Connection
