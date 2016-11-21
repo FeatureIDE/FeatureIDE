@@ -22,7 +22,9 @@ package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.AssertionFailedException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
@@ -39,6 +41,10 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
 
+	private static final String NODE_FEATURE = "feature";
+	private static final String ATTRIBUTE_NAME = "name";
+	private static final String ATTRIBUTE_MANUAL = "manual";
+	private static final String ATTRIBUTE_AUTOMATIC = "automatic";
 	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
 
@@ -59,12 +65,53 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+		Element root = doc.getDocumentElement();
+		if (root.getNodeName().equals("configuration")) {
+			for (Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
+				SelectableFeature selectablefeature = object.getSelectablefeature(feature.getAttribute(ATTRIBUTE_NAME));
+				selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC)));
+				selectablefeature.setManual(getSelection(feature.getAttribute(ATTRIBUTE_MANUAL)));
+			}
+		}
+	}
+	
+	private Selection getSelection(String selection) {
+		switch (selection) {
+		case "selected":
+			return Selection.SELECTED;
+		case "undefined":
+			return Selection.UNDEFINED;
+		case "unselected":
+			return Selection.UNSELECTED;
+		default:
+			throw new AssertionFailedException(selection);
+		} 
+	}	
 
+	private String getSelectionString(Selection selection) {
+		switch (selection) {
+		case SELECTED:
+			return "selected";
+		case UNDEFINED:
+			return "undefined";
+		case UNSELECTED:
+			return "unselected";
+		default:
+			throw new RuntimeException(selection.toString());
+		} 
 	}
 
 	@Override
 	protected void writeDocument(Document doc) {
-
+		Element root = doc.createElement("configuration");
+		doc.appendChild(root);
+		for (SelectableFeature feature : object.getFeatures()) {
+			Element featureNode = doc.createElement(NODE_FEATURE);
+			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
+			featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
+			featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));
+			root.appendChild(featureNode);
+		}
 	}
 
 	@Override
