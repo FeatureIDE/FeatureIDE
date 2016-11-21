@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,14 +24,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 
 /**
  * Basic interface for all pages at feature model editor.
  * 
  * @author Jens Meinicke
  */
-public interface IFeatureModelEditorPage extends IFeatureModelListener {
+public interface IFeatureModelEditorPage extends IEventListener {
 
 	/**
 	 * 

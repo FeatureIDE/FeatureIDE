@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -42,9 +42,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 
 /**
  * Manages colors assigned to features.
@@ -52,8 +55,10 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class FeatureColorManager {
+public class FeatureColorManager implements IEventListener {
 	
+	private static final FeatureColorManager INSTANCE = new FeatureColorManager();
+
 	private static final Map<IProject, Map<String, ColorScheme>> colorSchemes = new HashMap<>();
 
 	/**
@@ -102,13 +107,13 @@ public class FeatureColorManager {
 		colorSchemes.get(project).remove(currentName);
 		final IFile file = profileFolder.getFile(currentName + ".profile");
 		if (!file.exists()) {
-			FMCorePlugin.getDefault().logWarning(file  + " does not exist");
+			Logger.logWarning(file  + " does not exist");
 			return;
 		}
 		try {
 			file.delete(true, new NullProgressMonitor());
 		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		setActive(project, DefaultColorScheme.defaultName, true);
 	}
@@ -138,9 +143,11 @@ public class FeatureColorManager {
 	 * Returns the current color scheme.
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeatureModel featureModel) {
-		IProject project = getProject(featureModel);
-		if (project == null) {
-			// bad workaround 
+		IProject project;
+		// Fix for #398
+		try {
+			project = getProject(featureModel);
+		} catch(NullPointerException e) {
 			return new DefaultColorScheme();
 		}
 		
@@ -196,7 +203,7 @@ public class FeatureColorManager {
 				}
 			}
 		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 
@@ -223,11 +230,11 @@ public class FeatureColorManager {
 					}
 					newCs.setColor(split[0], FeatureColor.valueOf(split[1]));					
 				} catch (IllegalArgumentException e) {
-					FMCorePlugin.getDefault().logError("Color not found", e);
+					Logger.logError("Color not found", e);
 				}
 			}
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 	
@@ -243,7 +250,7 @@ public class FeatureColorManager {
 			try {
 				profileFolder.create(true, true, new NullProgressMonitor());
 			} catch (CoreException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 		}
 		IFile file = profileFolder.getFile(colorScheme.getName() + ".profile");
@@ -251,7 +258,7 @@ public class FeatureColorManager {
 			try {
 				new File(file.getLocationURI()).createNewFile();
 			} catch (IOException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 		}
 		
@@ -265,7 +272,7 @@ public class FeatureColorManager {
 			
 			file.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
 		} catch (IOException | CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 
@@ -295,7 +302,7 @@ public class FeatureColorManager {
 		try {
 			return iFile.getProject();
 		} catch (NullPointerException e) {
-			FMCorePlugin.getDefault().logWarning(location.toOSString());
+			Logger.logWarning(location.toOSString());
 			throw e;
 		}
 	}
@@ -310,6 +317,7 @@ public class FeatureColorManager {
 		if (currentSchemes.containsKey(csName)) {
 			throw new RuntimeException("scheme " + csName + " already exists");
 		}
+		featureModel.getRenamingsManager().addListener(INSTANCE);
 		currentSchemes.put(csName, newColorScheme);
 	}
 
@@ -381,6 +389,13 @@ public class FeatureColorManager {
 		for (ColorScheme colorScheme : currentColorSchemes) {
 			colorScheme.renameFeature(oldName, newName);
 			writeColors(getProject(model), colorScheme);
+		}
+	}
+
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		if (event.getEventType() == EventType.FEATURE_NAME_CHANGED) {
+			renameFeature(((IFeature) event.getSource()).getFeatureModel(), (String) event.getOldValue(), (String) event.getNewValue());
 		}
 	}
 

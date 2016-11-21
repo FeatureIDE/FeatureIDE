@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,12 +22,13 @@ package de.ovgu.featureide.featurehouse.ui.handlers;
 
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
 /**
@@ -44,9 +45,9 @@ public class BuildMetaProductHandler extends AFeatureProjectHandler {
 			final FeatureHouseComposer featureHouseComposer = (FeatureHouseComposer) featureProject.getComposer();
 			featureHouseComposer.setBuildMetaProduct(!featureHouseComposer.buildMetaProduct());
 			
-			final Job job = new AStoppableJob("Build meta product for project \"" + featureProject.getProjectName() + "\".") {
+			LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 				@Override
-				protected boolean work() throws Exception {
+				public Boolean execute(IMonitor workMonitor) throws Exception {
 					try {
 						featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
 					} catch (CoreException e) {
@@ -55,8 +56,7 @@ public class BuildMetaProductHandler extends AFeatureProjectHandler {
 					return true;
 				}
 			};
-			job.setPriority(Job.LONG);
-			job.schedule();
+			LongRunningWrapper.getRunner(job, "Build meta product for project \"" + featureProject.getProjectName() + "\".").schedule();
 		}
 	}
 

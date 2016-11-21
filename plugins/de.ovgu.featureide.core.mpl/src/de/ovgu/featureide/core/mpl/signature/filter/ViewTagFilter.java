@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,7 +22,7 @@ package de.ovgu.featureide.core.mpl.signature.filter;
 
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 public class ViewTagFilter implements IFilter<AbstractSignature> {
 //	private final ViewTag viewTag;

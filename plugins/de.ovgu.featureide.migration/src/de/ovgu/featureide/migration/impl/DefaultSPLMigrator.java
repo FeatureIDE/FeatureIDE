@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -294,12 +294,12 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 		featureModel.reset();
 
-		featureModel.getStructure().setRoot(FMFactoryManager.getFactory().createFeature(featureModel, "Base").getStructure());
+		featureModel.getStructure().setRoot(FMFactoryManager.getFactory(featureModel).createFeature(featureModel, "Base").getStructure());
 		featureModel.getStructure().getRoot().changeToAlternative();
 		featureModel.getStructure().getRoot().setAbstract(true);
 
 		for (IProject project : projects)
-			featureModel.getStructure().getRoot().addChild(FMFactoryManager.getFactory().createFeature(featureModel, project.getName()).getStructure());
+			featureModel.getStructure().getRoot().addChild(FMFactoryManager.getFactory(featureModel).createFeature(featureModel, project.getName()).getStructure());
 
 		return featureModel;
 	}

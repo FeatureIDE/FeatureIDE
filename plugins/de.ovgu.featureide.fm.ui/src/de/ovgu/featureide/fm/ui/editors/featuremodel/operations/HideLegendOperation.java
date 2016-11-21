@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,7 +21,8 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -42,15 +43,13 @@ public class HideLegendOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		FMPropertyManager.setHideLegend(!FMPropertyManager.isLegendHidden());
-		// TODO _call listeners
-//		featureModel.refreshContextMenu();
-		return null;
+		return FeatureIDEEvent.getDefault(EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		return operation();
 	}
 

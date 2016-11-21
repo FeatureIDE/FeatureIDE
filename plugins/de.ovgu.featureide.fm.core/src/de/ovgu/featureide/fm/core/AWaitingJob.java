@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.jobs.Job;
  */
 public abstract class AWaitingJob extends Job {
 
-	private static final FMCorePlugin LOGGER = FMCorePlugin.getDefault();
 	private boolean waiting = false;
 	private final Job job = new Job(this.getName()) {
 		
@@ -61,7 +60,7 @@ public abstract class AWaitingJob extends Job {
 			job.join();
 			job.schedule();
 		} catch (InterruptedException e) {
-			LOGGER.logError(e);
+			Logger.logError(e);
 		} finally {
 			waiting = false;
 		}

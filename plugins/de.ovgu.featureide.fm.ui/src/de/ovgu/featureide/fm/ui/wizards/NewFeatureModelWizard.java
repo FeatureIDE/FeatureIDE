@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.ui.wizards;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
 
+import java.nio.file.Paths;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -42,10 +44,17 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.FMComposerManager;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
@@ -75,9 +84,18 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				}
 			}
 			if (!foundParent) {
-				final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
+				final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+				IFeatureModelFactory factory;
+				final String filePathString = fullFilePath.toOSString();
+				try {
+					factory = FMFactoryManager.getFactory(filePathString, format);
+				} catch (NoSuchExtensionException e) {
+					Logger.logError(e);
+					factory = FMFactoryManager.getFactory();
+				}
+				final IFeatureModel featureModel = factory.createFeatureModel();
 				featureModel.createDefaultValues("");
-				new XmlFeatureModelWriter(featureModel).writeToFile(fullFilePath.toFile());
+				FileHandler.save(Paths.get(filePathString), featureModel, format);
 			}
 		}
 		assert (fullFilePath.toFile().exists()) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
@@ -113,15 +131,22 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		if (parentProject.getLocation().isPrefixOf(fullFilePath)) {
 			final IFile file = parentProject.getFile(fullFilePath.makeRelativeTo(parentProject.getLocation()));
 
-			final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
-			featureModel.createDefaultValues("");
-			featureModel.initFMComposerExtension(file.getProject());
+			final java.nio.file.Path path = Paths.get(file.getLocationURI());
+
+			final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(path.getFileName().toString());
+			IFeatureModelFactory factory;
 			try {
-				new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(file);
-				file.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
-				FMUIPlugin.getDefault().logError(e);
+				factory = FMFactoryManager.getFactory(path.toString(), format);
+			} catch (NoSuchExtensionException e) {
+				Logger.logError(e);
+				factory = FMFactoryManager.getFactory();
 			}
+			final IFeatureModel featureModel = factory.createFeatureModel();
+			featureModel.createDefaultValues("");
+			FMComposerManager.getFMComposerExtension(file.getProject());
+			
+			FeatureModelManager.writeToFile(featureModel, path);
+
 			open(file);
 			return true;
 		}

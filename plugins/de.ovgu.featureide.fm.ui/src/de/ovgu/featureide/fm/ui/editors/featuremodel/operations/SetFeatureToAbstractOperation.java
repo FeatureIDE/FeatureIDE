@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CO
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to set a Feature abstract/concrete. Enables
@@ -65,13 +66,13 @@ public class SetFeatureToAbstractOperation extends AbstractFeatureModelOperation
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
-		return null;
+		return new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		return operation();
 	}
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,31 +25,30 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class holds information about categrory and requirements. 
+ * This class holds information about categrory and requirements.
  * Is required for CommentParser.
  * 
  * @author Alexander Dreiling
  */
-public class RequirementCategory
-{
+public class RequirementCategory {
 	String catName;
-	Map<String, String>  requirements = new HashMap<String, String>();
-	
-	public RequirementCategory (String categoryName, Map<String, String>  requirements) {
+	Map<String, String> requirements = new HashMap<String, String>();
+
+	public RequirementCategory(String categoryName, Map<String, String> requirements) {
 		this.catName = categoryName;
-		this.requirements = requirements;		
+		this.requirements = requirements;
 	}
-	
+
 	public String getCategory() {
 		return catName;
 	}
-	
+
 	public Set<String> getPluginIds() {
 		return requirements.keySet();
 	}
-	
+
 	public String getErrorMsg(String pluginId) {
 		return requirements.get(pluginId);
-	
+
 	}
 }

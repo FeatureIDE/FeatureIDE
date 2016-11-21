@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,13 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.core.resources.IProject;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.FMComposerManager;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.IFMComposerExtension;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -45,9 +42,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -61,7 +58,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Marcus Pinnecke
  * 
  */
-public class FeatureModel implements IFeatureModel, PropertyConstants {
+public class FeatureModel implements IFeatureModel {
 
 	private static long NEXT_ID = 0;
 
@@ -77,9 +74,11 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		return nextElementId++;
 	}
 
+	protected final String factoryID;
+
 	protected final FeatureModelAnalyzer analyser;
-	protected final List<IConstraint> constraints = new LinkedList<>();
-	
+	protected final List<IConstraint> constraints = new ArrayList<>();
+
 	/**
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
@@ -91,9 +90,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	 */
 	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
 
-	protected FMComposerManager fmComposerManager = null;
-
-	protected final ArrayList<IFeatureModelListener> listenerList = new ArrayList<>();
+	protected final ArrayList<IEventListener> listenerList = new ArrayList<>();
 
 	protected final IFeatureModelProperty property;
 
@@ -104,7 +101,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	protected Object undoContext = null;
 	private File sourceFile;
 
-	public FeatureModel() {
+	public FeatureModel(String factoryID) {
+		this.factoryID = factoryID;
+
 		id = getNextId();
 		featureOrderList = new LinkedList<String>();
 		featureOrderUserDefined = false;
@@ -116,7 +115,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
-		id = oldFeatureModel.getId();
+		factoryID = oldFeatureModel.factoryID;
+		id = oldFeatureModel.id;
 		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
@@ -128,10 +128,11 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		if (newRoot == null) {
 			final IFeatureStructure root = oldFeatureModel.getStructure().getRoot();
 			if (root != null) {
-			structure.setRoot(root.cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
-			for (final IConstraint constraint : oldFeatureModel.constraints) {
-				constraints.add(constraint.clone(this));
-			}}
+				structure.setRoot(root.cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
+				for (final IConstraint constraint : oldFeatureModel.constraints) {
+					constraints.add(constraint.clone(this));
+				}
+			}
 		} else {
 			structure.setRoot(newRoot.getStructure().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
@@ -172,7 +173,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void addListener(IFeatureModelListener listener) {
+	public void addListener(IEventListener listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
@@ -250,29 +251,18 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void fireEvent(FeatureModelEvent event) {
-		if (event.isPersistent() || event.getEditor() == null) {
-			for (final IFeatureModelListener listener : listenerList) {
-				try {
-					listener.propertyChange(event);
-				} catch (Exception e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
-			}
-		} else {
-			final int listenerIndex = listenerList.indexOf(event.getEditor());
-			if (listenerIndex >= 0) {
-				try {
-					listenerList.get(listenerIndex).propertyChange(event);
-				} catch (Exception e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
+	public void fireEvent(FeatureIDEEvent event) {
+		for (final IEventListener listener : listenerList) {
+			try {
+				listener.propertyChange(event);
+			} catch (Exception e) {
+				Logger.logError(e);
 			}
 		}
 	}
 
-	protected void fireEvent(final String action) {
-		fireEvent(new FeatureModelEvent(this, action, Boolean.FALSE, Boolean.TRUE));
+	protected void fireEvent(final EventType action) {
+		fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
@@ -301,32 +291,16 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public Collection<String> getFeatureOrderList() {
+	public List<String> getFeatureOrderList() {
 		if (featureOrderList.isEmpty()) {
 			return Functional.toList(Functional.mapToStringList(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter())));
 		}
-		return Collections.unmodifiableCollection(featureOrderList);
+		return Collections.unmodifiableList(featureOrderList);
 	}
 
 	@Override
 	public Collection<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
-	}
-
-	@Override
-	public IFMComposerExtension getFMComposerExtension() {
-		return getFMComposerManager(null).getFMComposerExtension();
-	}
-
-	@Override
-	public FMComposerManager getFMComposerManager(IProject project) {
-		if (fmComposerManager == null) {
-			if (project == null) {
-				return new FMComposerManager(project);
-			}
-			fmComposerManager = new FMComposerManager(project);
-		}
-		return fmComposerManager;
 	}
 
 	@Override
@@ -377,18 +351,13 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public void handleModelDataChanged() {
-		fireEvent(FeatureModelEvent.MODEL_DATA_CHANGED);
+		fireEvent(EventType.MODEL_DATA_CHANGED);
 	}
 
 	@Override
 	public void handleModelDataLoaded() {
-		fireEvent(FeatureModelEvent.MODEL_DATA_LOADED);
+		fireEvent(EventType.MODEL_DATA_LOADED);
 
-	}
-
-	@Override
-	public IFMComposerExtension initFMComposerExtension(IProject project) {
-		return getFMComposerManager(project);
 	}
 
 	@Override
@@ -408,12 +377,14 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void removeListener(IFeatureModelListener listener) {
+	public void removeListener(IEventListener listener) {
 		listenerList.remove(listener);
 	}
 
 	@Override
 	public void replaceConstraint(IConstraint constraint, int index) {
+		if (constraint == null)
+			throw new NullPointerException();
 		constraints.set(index, constraint);
 	}
 
@@ -461,57 +432,14 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public Map<String, IFeature> getFeatureTable() {
-		return featureTable;
+		return Collections.unmodifiableMap(featureTable);
 	}
 
-//	@Override
-//	public IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel clone() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel deepClone() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel deepClone(boolean complete) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public Object getUndoContext(Object undoContext) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public boolean isFeatureOrderInXML() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public void refreshContextMenu() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public void setConstraintSelected(boolean b) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
 	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
-//		this.featureOrderList.set(i, newName);
+		if (!this.featureOrderList.isEmpty()) {
+			this.featureOrderList.set(i, newName);
+		}
 	}
 
 	@Override
@@ -582,12 +510,17 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void setConstraint(int index, Constraint constraint) {
+	public void setConstraint(int index, IConstraint constraint) {
 		constraints.set(index, constraint);
 	}
 
 	public FeatureModel clone() {
 		return new FeatureModel(this, null);
+	}
+
+	@Override
+	public String getFactoryID() {
+		return factoryID;
 	}
 
 }

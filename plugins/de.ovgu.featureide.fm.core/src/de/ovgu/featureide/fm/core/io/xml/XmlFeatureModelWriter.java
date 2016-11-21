@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -50,9 +50,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Prints a feature model in XML format.
+ * 
+ * @deprecated Use {@link XmlFeatureModelFormat} and {@link FileHandler} instead.
  * 
  * @author Fabian Wielgorz
  * @author Dariusz Krolikowski
@@ -60,6 +63,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatureModel> implements IFeatureModelWriter {
 
 	public XmlFeatureModelWriter(IFeatureModel featureModel) {
@@ -199,7 +203,7 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 			} else if (feat.getStructure().isAlternative()) {
 				fnod = doc.createElement(ALT);
 			} else {
-				fnod = doc.createElement(UNKNOWN);//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
+				fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
 			String description = feat.getProperty().getDescription();
 			if (description != null) {

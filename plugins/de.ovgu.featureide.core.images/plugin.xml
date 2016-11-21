@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.core.images.ImagesComposer"
+            description="Images overlapping"
+            id="de.ovgu.featureide.core.images.composer"
+            name="Images Composer"
+            nature="de.ovgu.featureide.core.images.composer">
+      </composer>
+   </extension>
+
+</plugin>

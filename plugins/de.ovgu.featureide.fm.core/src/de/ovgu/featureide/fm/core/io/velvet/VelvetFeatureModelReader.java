@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,7 +30,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_VARIABLE_N
 import static java.lang.String.format;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,11 +60,13 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -73,6 +74,7 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -80,16 +82,20 @@ import de.ovgu.featureide.fm.core.constraint.ReferenceType;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Parses a feature model in Velvet syntax.
+ * 
+ * @deprecated Use {@link VelvetFeatureModelFormat} and {@link FileHandler} instead.
  * 
  * @author Sebastian Krieter
  * @author Matthias Strauss
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	
 	private static class ConstraintNode {
@@ -120,7 +126,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	
 	private final boolean velvetImport;
 	
-	private ModelMarkerHandler modelMarkerHandler;
+	private ModelMarkerHandler<IResource> modelMarkerHandler;
 	private ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
 	private boolean localSearch = false;
@@ -133,20 +139,17 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
-		if (modelType != ModelIOFactory.TYPE_UNKNOWN) {
-			final IFeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
-			final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
-			try {				
-				reader.readFromFile(file);
-				return fm;
-			} catch (FileNotFoundException e) {
-				FMCorePlugin.getDefault().logError(e);
-			} catch (UnsupportedModelException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}	
+		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(file.getName());
+		final IFeatureModelFactory fmFactory;
+		try {
+			fmFactory = FMFactoryManager.getFactory(file.getAbsolutePath(), format);
+		} catch (NoSuchExtensionException e) {
+			Logger.logError(e);
+			return null;
 		}
-		return null;
+		final IFeatureModel fm = fmFactory.createFeatureModel();
+		FileHandler.<IFeatureModel>load(file.toPath(), fm, format);
+		return fm;
 	}
 	
 	private boolean checkExternalModelFile(Tree curNode) {
@@ -261,7 +264,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		try {
 			antlrInputStream = new ANTLRInputStream(inputStream);
 		} catch (final IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			throw new UnsupportedModelException("Error while reading model!", 0);
 		}
 		final VelvetParser parser = new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
@@ -277,7 +280,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			parseModel(root);
 			parseAttributeConstraints();
 		} catch (final RecognitionException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			throw new UnsupportedModelException(e.getMessage(), e.line);
 		}
 		
@@ -401,7 +404,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 					return null;
 				}
 			} else {
-				FMCorePlugin.getDefault().logWarning(format("Project %s is not accessible.", name));
+				Logger.logWarning(format("Project %s is not accessible.", name));
 			}
 		}
 		
@@ -466,7 +469,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 			return file.getProject();
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return null;
 		}
 	}
@@ -485,7 +488,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 //		extFeatureModel.getLayout().showHiddenFeatures(true);
 //		extFeatureModel.getLayout().verticalLayout(false);
 		if (getProject() != null) {
-			modelMarkerHandler = new ModelMarkerHandler(getProject().getFile(getFile().getName()));
+			modelMarkerHandler = new ModelMarkerHandler<IResource>(getProject().getFile(getFile().getName()));
 			modelMarkerHandler.deleteAllModelMarkers();
 		}
 
@@ -1051,7 +1054,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		if (modelMarkerHandler != null) {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
-		FMCorePlugin.getDefault().logWarning(message + " (at line "+ curNode.getLine() + ((featureModelFile != null)?IN_FILE + featureModelFile.getName():"") + ": \"" + curNode.getText() + "\")");		
+		Logger.logWarning(message + " (at line "+ curNode.getLine() + ((featureModelFile != null)?IN_FILE + featureModelFile.getName():"") + ": \"" + curNode.getText() + "\")");		
 	}
 	
 	private Tree checkTree(Tree root) throws RecognitionException {

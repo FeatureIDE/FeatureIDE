@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,7 +23,7 @@ package de.ovgu.featureide.core.builder;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
-import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -54,10 +54,15 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
+import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Abstract class for FeatureIDE composer extensions with default values.
@@ -326,13 +331,13 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		try {
 			if (!folder.exists()) {
-				folder.create(true, false, null);
+				folder.create(true, true, null);
 			}
-			IFile configurationFile = folder.getFile(configurationName + "." + getConfigurationExtension());
-			ConfigurationWriter writer = new ConfigurationWriter(configuration);
-			writer.saveToFile(configurationFile);
+			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
+			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
+			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
-		} catch (CoreException e) {
+		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
@@ -346,10 +351,6 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public boolean canGeneratInParallelJobs() {
-		return true;
-	}
-
-	public boolean showContextFieldsAndMethods() {
 		return true;
 	}
 
@@ -369,8 +370,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 
-	public boolean hasCompositionMechanisms() {
-		return false;
+	public String[] getCompositionMechanisms() {
+		return new String[0];
 	}
 
 	public boolean createFolderForFeatures() {
@@ -420,8 +421,13 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 */
 	public IFile createTemporaryConfigrationsFile(IFile config) {
 		String configName = config.getName();
-		if (configName.contains(".")) {
-			configName = configName.substring(0, configName.lastIndexOf('.'));
+		final String orgExtension;
+		final int extIndex = configName.lastIndexOf('.');
+		if (extIndex > 0) {
+			configName = configName.substring(0, extIndex);
+			orgExtension = configName.substring(extIndex + 1);
+		} else {
+			orgExtension = "";
 		}
 		configName = configName + '.' + getConfigurationExtension();
 		CorePlugin.getDefault().logInfo("create config " + configName);
@@ -442,18 +448,32 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 		final IFile tempConfigurationFile = folder.getFile(new Path(configName));
 
-		try {
-			Configuration configuration = new Configuration(featureProject.getFeatureModel());
-			boolean success = new ConfigurationReader(configuration).readFromFile(config);
-			if (!success) {
-				CorePlugin.getDefault().logWarning("failed to read " + config);
-				return null;
-			}
-			new ConfigurationWriter(configuration).saveToFile(tempConfigurationFile);
-		} catch (CoreException | IOException e) {
-			CorePlugin.getDefault().logError(e);
+		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+
+		final IConfigurationFormat inFormat = ConfigFormatManager.getInstance().getFormatByExtension(orgExtension);
+		if (inFormat == null) {
+			CorePlugin.getDefault().logWarning("failed to read " + config);
+			return null;
 		}
 
+		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, inFormat);
+		if (problems.containsError()) {
+			CorePlugin.getDefault().logWarning("failed to read " + config);
+			return null;
+		}
+
+		FileHandler.save(Paths.get(tempConfigurationFile.getLocationURI()), configuration, new DefaultFormat());
+
 		return tempConfigurationFile;
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+		return null;
+	}
+
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return true;
 	}
 }

@@ -7,7 +7,14 @@
 				<feature name="telecom_Timing"/>
 			</and>
 		</struct>
-		<constraints/>
+		<constraints>
+		<rule>
+			<imp>
+				<var>telecom_Billing</var>
+				<var>telecom_Timing</var>
+			</imp>
+		</rule>
+		</constraints>	
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,5 +26,5 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
  * @author Jens Meinicke
  */
 public enum FSTDirectiveCommand {
-	IF, IF_NOT, IFDEF, IFNDEF, ELIF, ELIFDEF, ELIFNDEF, ELSE, ELSE_NOT, CONDITION, DEFINE, UNDEFINE;
+	IF, IF_NOT, IFDEF, IFNDEF, ELIF, ELIFDEF, ELIFNDEF, ELSE, ELSE_NOT, CONDITION, DEFINE, UNDEFINE,CALL;
 }

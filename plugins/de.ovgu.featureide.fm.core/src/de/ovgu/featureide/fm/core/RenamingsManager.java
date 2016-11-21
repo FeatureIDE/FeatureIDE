@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,22 +20,24 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
@@ -46,50 +48,53 @@ import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class RenamingsManager {
+public class RenamingsManager implements IEventManager {
 	/**
 	 * a list containing all renamings since the last save
 	 */
 	private final List<Renaming> renamings = new LinkedList<Renaming>();
 	private final IFeatureModel model;
-	
+
+	private final DefaultEventManager eventManager = new DefaultEventManager();
+
 	/* *****************************************************************
 	 * 
 	 * Renaming
 	 * 
 	 *#*****************************************************************/
-	
+
 	public RenamingsManager(IFeatureModel model) {
-		 this.model = model;
+		this.model = model;
 	}
-	
+
 	public boolean renameFeature(final String oldName, final String newName) {
 		final Map<String, IFeature> featureTable = model.getFeatureTable();
-		if (!featureTable.containsKey(oldName)
-				|| featureTable.containsKey(newName)) {
+		if (!featureTable.containsKey(oldName) || featureTable.containsKey(newName)) {
 			return false;
 		}
 		final List<IConstraint> constraints = model.getConstraints();
-		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
-		IFeature feature = featureTable.remove(oldName);
+		final IFeature feature = model.getFeature(oldName);
+		model.deleteFeatureFromTable(feature);
 		feature.setName(newName);
-		featureTable.put(newName, feature);
+		model.addFeature(feature);
 		renamings.add(new Renaming(oldName, newName));
 		for (IConstraint c : constraints) {
 			renameVariables(c.getNode(), oldName, newName);
 		}
-		
+
 		// update the feature order list
-		for (int i = 0;i < featureOrderList.size();i++) {
+
+		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
+		for (int i = 0; i < featureOrderList.size(); i++) {
 			if (featureOrderList.get(i).equals(oldName)) {
 				model.setFeatureOrderListItem(i, newName);
 				break;
 			}
 		}
-		FeatureColorManager.renameFeature(model, oldName, newName);
+		fireEvent(new FeatureIDEEvent(feature, EventType.FEATURE_NAME_CHANGED, oldName, newName));
 		return true;
 	}
-	
+
 	public boolean isRenamed() {
 		return (!renamings.isEmpty());
 	}
@@ -104,18 +109,24 @@ public class RenamingsManager {
 		renamings.clear();
 	};
 
-	public void performRenamings(IFile file) {
-		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(file.getLocation().toString());
+	public void performRenamings(File file) {
+		final String location = file.getPath();
+		performRenamings(location);
+	}
+
+	private void performRenamings(final String location) {
+		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(location);
 		if (instance == null) {
 			return;
 		}
-		instance.init();
 		final IFeatureModel projectModel = instance.getObject();
-//		final IFeatureModel projectModel = FeatureModelFile2.getInstance(file).getFeatureModel();
 		for (Renaming renaming : renamings) {
-			final FeatureModelEvent event = new FeatureModelEvent(model, PropertyConstants.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
+			// TODO check weather all these events are necessary 
+			final FeatureIDEEvent event = new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
 			model.fireEvent(event);
+			// call to FMComposerExtension
+			instance.fireEvent(event);
 		}
 		renamings.clear();
 	}
@@ -130,7 +141,7 @@ public class RenamingsManager {
 		for (Node child : node.getChildren())
 			renameVariables(child, oldName, newName);
 	}
-	
+
 	/**
 	 * Returns the current name of a feature given its name at the last save.
 	 * 
@@ -173,10 +184,22 @@ public class RenamingsManager {
 		return names;
 	}
 
-	/**
-	 * 
-	 */
 	public void clear() {
 		renamings.clear();
+	}
+
+	@Override
+	public void addListener(IEventListener listener) {
+		eventManager.addListener(listener);
+	}
+
+	@Override
+	public void fireEvent(FeatureIDEEvent event) {
+		eventManager.fireEvent(event);
+	}
+
+	@Override
+	public void removeListener(IEventListener listener) {
+		eventManager.removeListener(listener);
 	}
 }

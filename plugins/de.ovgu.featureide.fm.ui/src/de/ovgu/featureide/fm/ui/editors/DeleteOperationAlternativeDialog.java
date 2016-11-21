@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -66,8 +66,8 @@ import org.eclipse.swt.widgets.Table;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 
 /**
  * Provides a dialog for choosing an alternative {@link IFeature} for the Feature to delete.
@@ -366,7 +366,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 		for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
 			toBeDeleted = (IFeature) (alternativefeatureTable.getSelection()[i]).getData();
-			parent.executeOperation(new DeleteFeatureOperation(featureModel, toBeDeleted, alternative));
+			parent.addOperation(new DeleteFeatureOperation(featureModel, toBeDeleted, alternative));
 			delFeatures.add(toBeDeleted);
 		}
 

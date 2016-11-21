@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,132 +21,116 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
- * Responsible to load and save all information from / to a file.
+ * Responsible to load and save all information from / to a file.<br/>
+ * To get an instance use the {@link FileManagerMap}.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFileManager<T> implements IFileManager, IEventManager, IResourceChangeListener {
+public abstract class AFileManager<T> implements IFileManager, IEventManager {
+
+	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
 	private final IEventManager eventManager = new DefaultEventManager();
 
-	private final List<Problem> lastProblems = new LinkedList<>();
+	private final ProblemList lastProblems = new ProblemList();
 
 	private final Object syncObject = new Object();
+	private final Object saveSyncObject = new Object();
 
 	protected final IPersistentFormat<T> format;
 
 	protected final String absolutePath;
 	protected final Path path;
 
-	private final IPath eclipseFile;
-
 	protected T persistentObject;
 	protected T variableObject;
-
-	private boolean saveFlag = false;
 
 	public IPersistentFormat<T> getFormat() {
 		return format;
 	}
 
-	protected AFileManager(String absolutePath, IPersistentFormat<T> format) {
+	protected AFileManager(T object, String absolutePath, IPersistentFormat<T> format) {
 		this.format = format;
 		this.absolutePath = absolutePath;
 		path = Paths.get(absolutePath);
 
-		persistentObject = null;
-		variableObject = null;
-
-		eclipseFile = new org.eclipse.core.runtime.Path(absolutePath);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-	}
-
-	public void init() {
-		if (persistentObject == null && !read()) {
-			persistentObject = createNewObject();
-			variableObject = copyObject(persistentObject);
-		}
+		variableObject = object;
+		persistentObject = copyObject(variableObject);
 	}
 
 	public T getObject() {
-		return persistentObject;
+		synchronized (syncObject) {
+			return persistentObject;
+		}
 	}
 
 	public T editObject() {
-		return variableObject;
+		synchronized (saveSyncObject) {
+			return variableObject;
+		}
 	}
 
-	public List<Problem> getLastProblems() {
+	public ProblemList getLastProblems() {
 		return lastProblems;
 	}
 
-	public synchronized boolean read() {
-		if (!Files.exists(path)) {
+	public boolean read() {
+		if (!FileSystem.exists(path)) {
 			return false;
 		}
 		lastProblems.clear();
 		try {
-			final T newObject = createNewObject();
-
-			final String content = new String(Files.readAllBytes(path), Charset.availableCharsets().get("UTF-8"));
-			List<Problem> problemList = format.getInstance().read(newObject, content);
+			final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+			List<Problem> problemList;
+			synchronized (saveSyncObject) {
+				problemList = format.getInstance().read(variableObject, content);
+			}
 			if (problemList != null) {
 				lastProblems.addAll(problemList);
 			}
-
-			synchronized (syncObject) {
-				persistentObject = newObject;
-				variableObject = copyObject(newObject);
-			}
-
-			fireEvent(new FeatureModelEvent(persistentObject, FeatureModelEvent.MODEL_DATA_LOADED));
+			persist();
+			fireEvent(new FeatureIDEEvent(persistentObject, EventType.MODEL_DATA_LOADED));
 		} catch (Exception e) {
 			handleException(e);
 		}
 		return lastProblems.isEmpty();
 	}
 
-	protected abstract T createNewObject();
+	/**
+	 * Copy on write.
+	 */
+	protected void persist() {
+		synchronized (syncObject) {
+			persistentObject = copyObject(variableObject);
+		}
+	}
 
 	protected abstract T copyObject(T oldObject);
 
 	public boolean save() {
 		lastProblems.clear();
 		try {
-			synchronized (syncObject) {
-				saveFlag = true;
+			final byte[] content = format.getInstance().write(variableObject).getBytes(DEFAULT_CHARSET);
+			synchronized (saveSyncObject) {
+				FileSystem.write(path, content);
 			}
-			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
-			Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-
-			synchronized (syncObject) {
-				persistentObject = variableObject;
-				variableObject = copyObject(persistentObject);
-			}
-
-			fireEvent(new FeatureModelEvent(persistentObject, FeatureModelEvent.MODEL_DATA_SAVED));
+			persist();
+			fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
 		} catch (Exception e) {
 			handleException(e);
 		}
@@ -155,40 +139,25 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 
 	private void handleException(Exception e) {
 		lastProblems.add(new Problem(e));
-		FMCorePlugin.getDefault().logError(e);
 	}
 
 	@Override
-	public void addListener(IFeatureModelListener listener) {
+	public void addListener(IEventListener listener) {
 		eventManager.addListener(listener);
 	}
 
 	@Override
-	public void fireEvent(FeatureModelEvent event) {
+	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
 	}
 
 	@Override
-	public void removeListener(IFeatureModelListener listener) {
+	public void removeListener(IEventListener listener) {
 		eventManager.removeListener(listener);
 	}
 
 	@Override
-	public void resourceChanged(IResourceChangeEvent event) {
-		final IResourceDelta member = event.getDelta().findMember(eclipseFile);
-		if (member != null) {
-			synchronized (syncObject) {
-				if (saveFlag) {
-					saveFlag = false;
-				} else {
-					read();
-				}
-			}
-		}
-	}
-
 	public void dispose() {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 		FileManagerMap.remove(absolutePath);
 
 		persistentObject = null;

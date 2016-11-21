@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,12 +20,13 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -34,9 +35,12 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 
 /**
  * Creates configurations where false optional features are unused.
@@ -55,14 +59,14 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				if (project != null) {
-					WorkMonitor monitor2 = new WorkMonitor();
-					monitor2.setMonitor(monitor);
-					monitor2.begin("Cover unused features");
-					monitor2.createSubTask("collect unused features");
+					IMonitor monitor2 = new ProgressMonitor("Cover unused features", monitor);
+					monitor2.setRemainingWork(2);
+					IMonitor subTask = monitor2.subTask(1);
+					subTask.setTaskName("Collect unused features");
 					final Collection<String> unusedFeatures = project.getFalseOptionalConfigurationFeatures();
-					monitor2.createSubTask("create configurations");
-					monitor2.setMaxAbsoluteWork(unusedFeatures.size());
-					createConfigurations(unusedFeatures, monitor2, false);
+					subTask.step();
+					subTask.done();
+					createConfigurations(unusedFeatures, monitor2.subTask(1), false);
 					monitor2.done();
 				}
 				return Status.OK_STATUS;
@@ -71,10 +75,13 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		job.schedule();
 	}
 
-	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final WorkMonitor monitor, boolean collect) {
+	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
+		monitor.setTaskName("Create configurations");
+		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
+		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
+		Configuration configuration = new Configuration(featureModel, false);
 		try {
-			Configuration configuration = new Configuration(featureModel, false);
 			List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, false);
 			for (List<String> solution : solutions) {
 				configuration = new Configuration(featureModel, false);
@@ -86,12 +93,11 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 				if (collect) {
 					confs.add(configuration);
 				} else {
-					final ConfigurationWriter writer = new ConfigurationWriter(configuration);
-					writer.saveToFile(getConfigurationFile(project.getConfigFolder()));
+					final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
+					writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
 				}
 			}
-
-		} catch (TimeoutException | CoreException e1) {
+		} catch (TimeoutException e1) {
 			e1.printStackTrace();
 		}
 
@@ -107,6 +113,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 	 */
 	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
 		this.featureModel = fm;
-		return createConfigurations(falseOptionalFeatures, new WorkMonitor(), true);
+		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
 	}
+
 }

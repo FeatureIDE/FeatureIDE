@@ -13,7 +13,9 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.Build
 
 /**
  * Launch shortcut for integration tests<br>
- * See: Run As > Run as JUnit Integration Test
+ * See: Run As > Run as JUnit Integration Test.
+ * 
+ * @author Jens Meinicke
  */
 public class IntegrationTestLaunchShortcut implements ILaunchShortcut {
 
@@ -22,7 +24,7 @@ public class IntegrationTestLaunchShortcut implements ILaunchShortcut {
 		TreeSelection treeSelection = (TreeSelection) selection;
 		IFolder selectedFolder = (IFolder) treeSelection.toArray()[0];
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(selectedFolder);
-		new ConfigurationBuilder(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, selectedFolder.getName());
+		new ConfigurationBuilder(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, selectedFolder.getName(), 2, 1);
 	}
 
 	

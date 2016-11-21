@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,9 +21,11 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_CONSTRAINT;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to move Constraints. Provides undo/redo
@@ -47,19 +49,17 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, index);
-		return new FeatureModelEvent(constraint, FeatureModelEvent.CONSTRAINT_MOVE, oldIndex, index);
-//		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), newPos);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, oldIndex, index);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, oldIndex);
-		return new FeatureModelEvent(constraint, FeatureModelEvent.CONSTRAINT_MOVE, index, oldIndex);
-//		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), oldPos);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, index, oldIndex);
 	}
 
 }

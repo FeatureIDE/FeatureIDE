@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,14 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.ui.IWorkbenchPart;
 
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A PrintAction for the FeatureModelEditor that temporarily moves the
@@ -56,9 +57,9 @@ public class FMPrintAction extends PrintAction {
 		FeatureModelLayout layout = featureModel.getLayout();
 		int layoutOld = layout.getLayoutAlgorithm();
 
-		Tree<IGraphicalFeature> features = featureModel.getFeatures();
+		Collection<IGraphicalFeature> features = featureModel.getFeatures();
 		Iterator<IGraphicalFeature> featureIter = features.iterator();
-		Point minP = FeatureUIHelper.getLocation(featureIter.next()).getCopy();
+		Point minP = featureIter.next().getLocation().getCopy();
 
 		move(featureModel, layout, features, featureIter, minP);
 		//print
@@ -67,11 +68,11 @@ public class FMPrintAction extends PrintAction {
 		return;
 	}
 
-	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Tree<IGraphicalFeature> features, Iterator<IGraphicalFeature> featureIter, Point minP) {
+	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Collection<IGraphicalFeature> features, Iterator<IGraphicalFeature> featureIter, Point minP) {
 		layout.setLayout(0);
 		while (featureIter.hasNext()) {
 			IGraphicalFeature f = featureIter.next();
-			Point p = FeatureUIHelper.getLocation(f);
+			Point p = f.getLocation();
 			if (p.x < minP.x)
 				minP.x = p.x;
 			if (p.y < minP.y)
@@ -83,7 +84,7 @@ public class FMPrintAction extends PrintAction {
 		moveLegend(featureModel, layout, minP);
 	}
 
-	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Tree<IGraphicalFeature> features, Point minP) {
+	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Collection<IGraphicalFeature> features, Point minP) {
 		Point minPneg = new Point(-minP.x, -minP.y);
 		moveFeatures(features, minPneg);
 		moveConstraints(featureModel, minPneg);
@@ -94,21 +95,24 @@ public class FMPrintAction extends PrintAction {
 	private void moveLegend(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Point minP) {
 		Point legendPos = layout.getLegendPos();
 		Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
-		FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLegendPos);
+		
+		if (!FMPropertyManager.isLegendHidden()) {
+			FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLegendPos);
+		}
 		layout.setLegendPos(newLegendPos.x, newLegendPos.y);
 	}
 
 	private void moveConstraints(IGraphicalFeatureModel featureModel, Point minP) {
 		for (IGraphicalConstraint c : featureModel.getConstraints()) {
-			Point newPoint = new Point(FeatureUIHelper.getLocation(c).getCopy().x - minP.x, FeatureUIHelper.getLocation(c).getCopy().y - minP.y);
-			FeatureUIHelper.setLocation(c, newPoint);
+			Point newPoint = new Point(c.getLocation().x - minP.x, c.getLocation().y - minP.y);
+			c.setLocation(newPoint);
 		}
 	}
 
-	private void moveFeatures(Tree<IGraphicalFeature> features, Point minP) {
+	private void moveFeatures(Collection<IGraphicalFeature> features, Point minP) {
 		for (IGraphicalFeature f : features) {
-			Point newPoint = new Point(FeatureUIHelper.getLocation(f).getCopy().x - minP.x, FeatureUIHelper.getLocation(f).getCopy().y - minP.y);
-			FeatureUIHelper.setLocation(f, newPoint);
+			Point newPoint = new Point(f.getLocation().getCopy().x - minP.x, f.getLocation().getCopy().y - minP.y);
+			f.setLocation(newPoint);
 		}
 	}
 

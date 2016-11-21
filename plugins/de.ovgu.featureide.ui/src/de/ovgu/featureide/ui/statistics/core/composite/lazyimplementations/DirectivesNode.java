@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,11 +28,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_PER_D
 import static de.ovgu.featureide.fm.core.localization.StringTable.IN_CLASS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_FEATURES_PER_DIRECTIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_NESTING_OF_DIRECTIVES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_NUMBER_OF_DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_FEATURES_PER_DIRECTIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_NUMBER_OF_DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_STATISTICS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_NUMBER_OF_DIRECTIVES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_NUMBER_OF_DIRECTIVES;
 
 import java.util.Map;
 
@@ -89,7 +89,7 @@ public class DirectivesNode extends LazyParent {
 		// 1.1.2.1 Maximum number of directives:
 		directivesPerClass.addChild(new Parent(MAXIMUM_NUMBER_OF_DIRECTIVES + maximumSum.getValue() + IN_CLASS + maximumSum.getKey()));
 		// 1.1.2.2 Minimum number of directives:
-		directivesPerClass.addChild(new Parent(MINIMUM_NUMBER_OF_DIRECTIVES + minimumSum.getValue() + IN_CLASS + minimumSum.getKey())); // TODO: String extrahieren?
+		directivesPerClass.addChild(new Parent(MINIMUM_NUMBER_OF_DIRECTIVES + minimumSum.getValue() + IN_CLASS + minimumSum.getKey()));
 		// 1.1.2.3 Average number of directives per class:
 		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, averageSum));
 		project.addChild(directivesPerClass);

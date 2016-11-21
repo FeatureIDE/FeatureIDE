@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,22 +24,17 @@ import AST.Program;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.job.IJob;
-import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Can be run after fuji type checking to attach {@link ProjectSignatures} to an {@link FSTModel}.
  * 
  * @author Sebastian Krieter
  */
-public class SignatureSetter implements JobFinishListener {
+public class SignatureSetter {
 	private final FujiSignaturesCreator sigCreator = new FujiSignaturesCreator();
 	
 	private FSTModel fstModel = null;
 	private ProjectSignatures signatures = null;
-	
-	private IFeatureProject fp = null;
-	private Program ast = null;
 	
 	public void setFstModel(FSTModel fstModel) {
 		synchronized (this) {
@@ -51,19 +46,11 @@ public class SignatureSetter implements JobFinishListener {
 	}
 	
 	public void setFujiParameters(IFeatureProject fp, Program ast) {
-		this.ast = ast;
-		this.fp = fp;
-	}
-
-	@Override
-	public void jobFinished(IJob finishedJob, boolean success) {
-		if (success) {
-			ProjectSignatures sigs = sigCreator.createSignatures(fp, ast);
-			synchronized (this) {
-				this.signatures = sigs;
-				if (fstModel != null) {
-					assignSignatures();
-				}
+		final ProjectSignatures sigs = sigCreator.createSignatures(fp, ast);
+		synchronized (this) {
+			this.signatures = sigs;
+			if (fstModel != null) {
+				assignSignatures();
 			}
 		}
 	}

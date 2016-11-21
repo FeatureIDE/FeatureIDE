@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,19 +26,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IT_CAN_NOT_BE_
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_;
 
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -47,7 +40,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.Features;
@@ -55,10 +47,8 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -72,26 +62,19 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class ElementDeleteOperation extends AbstractFeatureModelOperation implements GUIDefaults {
+public class ElementDeleteOperation extends MultiFeatureModelOperation implements GUIDefaults {
 
 	private Object viewer;
-	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
 	public ElementDeleteOperation(Object viewer, IFeatureModel featureModel) {
 		super(featureModel, DELETE);
 		this.viewer = viewer;
 	}
 
-	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		doDelete();
-		return Status.OK_STATUS;
-	}
-
 	/**
 	 * Executes the requested delete operation.
 	 */
-	public void doDelete() {
+	public void createSingleOperations() {
 		/**
 		 * The key of the Map is the feature which could be replaced by their equivalents given at the
 		 * corresponding List.
@@ -140,11 +123,11 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 	private boolean removeConstraint(Object element) {
 		if (element instanceof ConstraintEditPart) {
 			IConstraint constraint = ((ConstraintEditPart) element).getConstraintModel().getObject();
-			executeOperation(new DeleteConstraintOperation(constraint, featureModel));
+			operations.add(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
 		} else if (element instanceof IConstraint) {
 			IConstraint constraint = ((IConstraint) element);
-			executeOperation(new DeleteConstraintOperation(constraint, featureModel));
+			operations.add(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
 		}
 		return false;
@@ -168,7 +151,7 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 			final IFeature parent = FeatureUtils.getParent(feature);
 			if (FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 				// feature can be removed because it has no relevant constraint
-				executeOperation(new DeleteFeatureOperation(featureModel, feature));
+				operations.add(new DeleteFeatureOperation(featureModel, feature));
 				alreadyDeleted.add(feature);
 			} else {
 				// check for all equivalent features
@@ -184,18 +167,6 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 			return parent;
 		}
 		return null;
-	}
-
-	/**
-	 * @param operation the operation to execute.
-	 */
-	public void executeOperation(AbstractFeatureModelOperation operation) {
-		operations.add(operation);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(operation, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
 	}
 
 	/**
@@ -257,28 +228,6 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 						+ ((notDeletable.size() != 1) ? SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_
 								: IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_), MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 		dialog.open();
-	}
-
-	@Override
-	protected FeatureModelEvent operation() {
-		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
-			AbstractFeatureModelOperation operation = it.next();
-			if (operation.canRedo()) {
-				operation.redo();
-			}
-		}
-		return null;
-	}
-
-	@Override
-	protected FeatureModelEvent inverseOperation() {
-		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
-			AbstractFeatureModelOperation operation = it.next();
-			if (operation.canUndo()) {
-				operation.undo();
-			}
-		}
-		return null;
 	}
 
 }

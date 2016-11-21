@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,19 +29,14 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -51,7 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 /**
  * Displays the tree for advanced configuration selection at the configuration editor.
  * 
- * @author Jens MeOinicke
+ * @author Jens Meinicke
  * @author Hannes Smurawsky
  * @author Marcus Pinnecke
  */
@@ -66,7 +61,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 
 		final Image image1 = getConnectionImage(feature);
 		final Image image2 = getSelectionImage(selFeature, selection);
-
+		
 		final ImageData imageData1 = image1.getImageData();
 		final ImageData imageData2 = image2.getImageData();
 
@@ -74,18 +69,12 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 
 		final Image combinedImage = combinedImages.get(imageString);
 		if (combinedImage == null) {
-			final int distance = 5;
-			final Image mergeImage = new Image(image1.getDevice(), imageData2.width * 2 + distance, imageData1.height);
+			final int distance = 3;
+			final Image mergeImage = new Image(image1.getDevice(), imageData1.width + distance + imageData2.width, imageData1.height);
 
 			final GC gc = new GC(mergeImage);
-
-			if (image1.equals(IMG_MANDATORY) || image1.equals(IMG_OPTIONAL)) {
-				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 3, 3, imageData1.width, imageData1.height);
-			} else {
-				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 0, 0, imageData1.width, imageData1.height);
-			}
+			gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 0, 0, imageData1.width, imageData1.height);
 			gc.drawImage(image2, 0, 0, imageData2.width, imageData2.height, imageData1.width + distance, 0, imageData2.width, imageData2.height);
-
 			gc.dispose();
 
 			if (feature.getStructure().isRoot()) {
@@ -194,85 +183,6 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			public void keyReleased(KeyEvent e) {
 			}
 		});
-		tree.addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void mouseMove(MouseEvent e) {
-				final TreeItem item = tree.getItem(new Point(e.x, e.y));
-				long currentTime = System.currentTimeMillis();
-				boolean changed = false;
-				if (item == null || item != tipItem) {
-					//					time = currentTime;
-					tipItem = item;
-					changed = true;
-				}
-
-				if (tip == null) {
-					if (item != null) {
-						createTooltip(item, e, currentTime);
-					}
-				} else {
-					if (item == null) {
-						disposeTooltip();
-					} else if (changed) {
-						disposeTooltip();
-						createTooltip(item, e, currentTime);
-					}
-				}
-			}
-		});
-	}
-
-	private TreeItem tipItem = null;
-	private Shell tip = null;
-
-	//	private long time = 0;
-
-	private void disposeTooltip() {
-		if (tip != null) {
-			tip.dispose();
-			tip = null;
-		}
-	}
-
-	private void createTooltip(TreeItem item, MouseEvent e, long currentTime) {
-		//		if (time + 500 > currentTime) {
-		//			return;
-		//		}
-		final Object data = item.getData();
-		if (data instanceof SelectableFeature) {
-			final SelectableFeature feature = (SelectableFeature) item.getData();
-			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature(), feature.getFeature().getFeatureModel().getConstraints());
-			final String describ = feature.getFeature().getProperty().getDescription();
-			final StringBuilder sb = new StringBuilder();
-
-			if (describ != null) {
-				sb.append("Description:\n");
-				sb.append(describ);
-			}
-			if (!relConst.isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append("Constraints:\n");
-				sb.append(relConst);
-			}
-			if (sb.length() > 0) {
-				tipItem = item;
-				tip = new Shell(tree.getShell(), SWT.ON_TOP | SWT.TOOL);
-				FillLayout fillLayout = new FillLayout();
-				fillLayout.marginHeight = 1;
-				fillLayout.marginWidth = 1;
-				tip.setLayout(fillLayout);
-				Label label = new Label(tip, SWT.NONE);
-				label.setForeground(tip.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-				label.setBackground(tip.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-				label.setText(sb.toString());
-				Point size = tip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				Point pt = tree.toDisplay(e.x, e.y);
-				tip.setBounds(pt.x, pt.y + 26, size.x, size.y);
-				tip.setVisible(true);
-			}
-		}
 	}
 
 	protected void refreshItem(TreeItem item, SelectableFeature feature) {

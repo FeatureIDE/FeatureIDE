@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -59,6 +59,7 @@ public class German implements ILanguage {
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = UNBESTIMMBAR_VERSTECKTES_FEATURE;
 	private static final String REDUNDANT = REDUNDANTES_CONSTRAINT;
+	private static final String IMPLICIT = "Implizites Constraint";
 	private static final String UNSATISFIABLE_CONST = "Unerf�llbares Constraint";
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IST_TAUTOLOGIE;
 	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerf�llbar";
@@ -66,6 +67,11 @@ public class German implements ILanguage {
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
+	}
+	
+	@Override
+	public String getImplicitConst() {
+		return IMPLICIT;
 	}
 
 	@Override

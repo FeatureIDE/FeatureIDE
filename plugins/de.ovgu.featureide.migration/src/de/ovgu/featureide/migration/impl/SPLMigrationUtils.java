@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,13 +28,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATION_OF_FO
 import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST_AFTER_CREATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FOLDER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IN_PROJECT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL_XML_DOES_NOT_EXIST;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SUCCESSFUL;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -47,8 +47,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
 
 /**
@@ -59,8 +61,7 @@ import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
  * @author Konstantin Tonscheidt
  * @author Marcus Pinnecke
  */
-public class SPLMigrationUtils
-{
+public class SPLMigrationUtils {
 	/**
 	 * Copies all folders and files from {@code source} to {@code destination}.
 	 * 
@@ -68,31 +69,24 @@ public class SPLMigrationUtils
 	 * @param destination
 	 * @throws CoreException
 	 */
-	public static void recursiveCopyFiles(IContainer source, IContainer destination)
-			throws CoreException
-	{
+	public static void recursiveCopyFiles(IContainer source, IContainer destination) throws CoreException {
 		final IResource[] members = source.members();
-		for (int i = 0; i < members.length; i++)
-		{
+		for (int i = 0; i < members.length; i++) {
 			final IResource member = members[i];
 			final IPath currentPath = new Path(member.getName());
 
-			if (member instanceof IContainer)
-			{
+			if (member instanceof IContainer) {
 				final IFolder subFolder = destination.getFolder(currentPath);
-				if (!subFolder.exists())
-				{
+				if (!subFolder.exists()) {
 					member.copy(subFolder.getFullPath(), true, null);
 					recursiveCopyFiles((IContainer) member, subFolder);
 				}
+			} else if (member instanceof IFile) {
+				final IFile copyFile = destination.getFile(currentPath);
+				if (!copyFile.exists())
+					member.copy(copyFile.getFullPath(), true, null);
 			} else
-				if (member instanceof IFile)
-				{
-					final IFile copyFile = destination.getFile(currentPath);
-					if (!copyFile.exists())
-						member.copy(copyFile.getFullPath(), true, null);
-				} else
-					assert false : ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY;
+				assert false : ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY;
 		}
 	}
 
@@ -104,27 +98,22 @@ public class SPLMigrationUtils
 	 * @param path
 	 *            a path relative to the project root.
 	 */
-	public static void createFolderInProject(IProject project, IPath path)
-	{
+	public static void createFolderInProject(IProject project, IPath path) {
 		if (path == null || path.isEmpty())
 			return;
 
 		IFolder newFolder = project.getFolder(path);
-		if (newFolder.exists())
-		{
+		if (newFolder.exists()) {
 			assert false : "Trying to create an already existing folder: " + path;
 			System.out.println(FOLDER + path + ALREADY_EXISTS);
 			return;
 		}
-		try
-		{
+		try {
 			newFolder.create(true, true, null);
 			project.refreshLocal(IProject.DEPTH_INFINITE, null);
 			System.out.println(CREATION_OF_FOLDER + path + SUCCESSFUL);
-		} catch (CoreException e)
-		{
-			System.out.println(CREATION_OF_FOLDER + path + " lead to CoreException:"
-					+ e.getMessage());
+		} catch (CoreException e) {
+			System.out.println(CREATION_OF_FOLDER + path + " lead to CoreException:" + e.getMessage());
 			e.printStackTrace();
 		}
 		if (!newFolder.exists())
@@ -143,8 +132,7 @@ public class SPLMigrationUtils
 	 * 
 	 * @see {@link #createFolderInProject(IProject, IPath)}
 	 */
-	public static void createFolderInProject(IProject project, String path)
-	{
+	public static void createFolderInProject(IProject project, String path) {
 		IPath newPath = new Path(path);
 		System.out.println(CREATING_FOLDER_AT + path + IN_PROJECT + project.getName());
 		createFolderInProject(project, newPath);
@@ -156,18 +144,14 @@ public class SPLMigrationUtils
 	 * @param projectName
 	 * @return the new {@link IProject} if successful, null if not.
 	 */
-	public static IProject createProject(String projectName)
-	{
+	public static IProject createProject(String projectName) {
 		IProject newProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		if (newProject.exists())
-			throw new IllegalArgumentException(CANNOT_CREATE_PROJECT + projectName
-					+ BECAUSE_IT_ALREADY_EXISTS_);
+			throw new IllegalArgumentException(CANNOT_CREATE_PROJECT + projectName + BECAUSE_IT_ALREADY_EXISTS_);
 
-		try
-		{
+		try {
 			newProject.create(null);
-		} catch (CoreException e)
-		{
+		} catch (CoreException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -187,8 +171,7 @@ public class SPLMigrationUtils
 	 * @throws UnsupportedEncodingException
 	 */
 	public static void createConfigFile(IProject project, String configPath, String projectName)
-			throws CoreException, UnsupportedEncodingException
-	{
+			throws CoreException, UnsupportedEncodingException {
 		final IFolder configFolder = project.getFolder(configPath);
 		final IFile configFile = configFolder.getFile(projectName + ".config");
 		InputStream defaultContent = new ByteArrayInputStream(projectName.getBytes("UTF-8"));
@@ -204,21 +187,13 @@ public class SPLMigrationUtils
 	 * @param featureProject
 	 * @param featureModel
 	 */
-	public static void writeFeatureModelToDefaultFile(IProject featureProject,
-			IFeatureModel featureModel)
-	{
-		FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(
-				new XmlFeatureModelWriter(featureModel));
-		IFile featureModelFile = featureProject.getFile("model.xml");
-
-		assert featureModelFile.exists() : MODEL_XML_DOES_NOT_EXIST;
-
-		try
-		{
-			fmWriter.writeToFile(featureModelFile);
-		} catch (CoreException e)
-		{
-			SPLMigrationPlugin.getDefault().logError(e);
+	public static void writeFeatureModelToDefaultFile(IProject featureProject, IFeatureModel featureModel) {
+		final IFeatureModelFormat format = new XmlFeatureModelFormat();
+		final ProblemList problems = FileHandler.save(Paths.get(featureProject.getFile("model.xml").getLocationURI()),
+				featureModel, format);
+		if (problems.containsError()) {
+			final ProblemList errors = problems.getErrors();
+			SPLMigrationPlugin.getDefault().logError(errors.toString(), new Exception());
 		}
 	}
 
@@ -231,16 +206,13 @@ public class SPLMigrationUtils
 	 * @return the created {@link IFolder}s {@link IPath}, or null if creation
 	 *         was not successful
 	 */
-	public static IPath setupFolder(IFolder folder)
-	{
-		try
-		{
+	public static IPath setupFolder(IFolder folder) {
+		try {
 			if (folder.exists())
 				folder.delete(true, null);
 
 			folder.create(true, true, null);
-		} catch (CoreException e)
-		{
+		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 

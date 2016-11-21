@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,9 +26,16 @@ package de.ovgu.featureide.fm.ui.wizards;
  * @author Sebastian Krieter
  */
 public abstract class WizardConstants {
-	public static final String KEY_OUT_FOLDER = "out_folder", KEY_OUT_FEATURE = "out_feature", KEY_OUT_DOCOPTIONS = "out_options",
-			KEY_OUT_CONFIGLIMIT = "out_configlimit", KEY_OUT_VIEWLEVEL = "out_viewlevel", KEY_OUT_VIEWNAME = "out_viewname", KEY_OUT_PROJECT = "out_project",
+	public static final String KEY_OUT_FOLDER = "out_folder",
+			KEY_OUT_FEATURE = "out_feature",
+			KEY_OUT_DOCOPTIONS = "out_options",
+			KEY_OUT_CONFIGLIMIT = "out_configlimit",
+			KEY_OUT_VIEWLEVEL = "out_viewlevel",
+			KEY_OUT_VIEWNAME = "out_viewname",
+			KEY_OUT_PROJECT = "out_project",
 			KEY_OUT_FEATURES = "out_features",
-
-			KEY_IN_FOLDER = "in_folder";
+			KEY_IN_FOLDER = "in_folder",
+			KEY_OUT_INPUTFORMAT = "out_informat",
+			KEY_OUT_OUTPUTFORMAT = "out_outformat",
+			KEY_IN_FEATUREMODEL = "in_featuremodel";
 }

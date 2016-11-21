@@ -10,7 +10,7 @@
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type base-type="org.eclipse.core.runtime.text"
-				file-extensions="config,equation,expression"
+				file-extensions="conf,config,equation,expression"
 				id="de.ovgu.featureide.contenttype.conf"
 				name="Configuration (for FeatureIDE projects)"
 				priority="high"/>
@@ -34,7 +34,28 @@
 				id="de.ovgu.featureide.contenttype.expression"
 				name="Expression (for non-FeatureIDE projects)"
 				priority="low">
-		</content-type>               
+		</content-type>
+  <content-type
+        base-type="org.eclipse.core.runtime.xml"
+        file-extensions="xml"
+        id="de.ovgu.featureide.fm.ui.featureModel"
+        name="Feature Model"
+        priority="high">
+     <describer
+           class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+        <parameter
+              name="element"
+              value="featureModel">
+        </parameter>
+     </describer>
+  </content-type>
+  <content-type
+        base-type="org.eclipse.core.runtime.text"
+        file-extensions="velvet"
+        id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
+        name="Extended Feature Model"
+        priority="high">
+  </content-type>
 	</extension>
 
 	<extension
@@ -64,13 +85,12 @@
 	<extension
 			point="org.eclipse.ui.editors">
 		<editor
-				class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
-				contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
-				default="true"
-
-				icon="icons/featuretree.ico"
-				id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
-				name="Feature Model Editor">
+        class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+        contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
+        default="true"
+        icon="icons/featuretree.ico"
+        id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+        name="Feature Model Editor">
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.fm.ui.featureModel">
 			</contentTypeBinding>
@@ -79,35 +99,18 @@
 			</contentTypeBinding>
 		</editor>
 		<editor
-				class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
-				default="true"
-				icon="icons/ConfigurationIcon.png"
-				id="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
-				name="Configuration Editor">
+        class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
+        default="true"
+        extensions="conf,config,equation,expression"
+        icon="icons/ConfigurationIcon.png"
+        id="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
+        name="Configuration Editor">
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.contenttype.conf">
 			</contentTypeBinding>
 		</editor>
 	</extension>
 
-	<extension point="org.eclipse.core.contenttype.contentTypes">
-		<content-type base-type="org.eclipse.core.runtime.xml"
-				file-extensions="xml"
-				id="de.ovgu.featureide.fm.ui.featureModel"
-				name="Feature Model"
-				priority="high">
-			<describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
-				<parameter name="element"
-						value="featureModel">
-				</parameter>
-			</describer>
-		</content-type>
-		<content-type file-extensions="velvet"
-				id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
-				name="Extended Feature Model"
-				priority="high">
-		</content-type>
-	</extension>  
 	<extension
 			point="org.eclipse.ui.views">
 		<category
@@ -275,6 +278,57 @@
 					</reference>
 				</visibleWhen>
 			</command>
+   <separator
+         name="de.ovgu.featureide.fm.ui.separator5"
+         visible="true">
+   </separator>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportDIMACS"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportDIMACS"
+					label="Export model to DIMACS format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ImportDimacs"
+					icon="icons/import_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ImportDimcas"
+					label="Import model from DIMACS format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator7"
+					visible="true">
+			</separator>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportFAMA"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportFAMA"
+					label="Export model to FaMa format"
+					style="push">
+					<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator9"
+					visible="true">
+			</separator>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
 					icon="icons/FeatureIconSmall.ico"
@@ -288,17 +342,26 @@
 					</reference>
 				</visibleWhen>
 			</command>
-			<separator
-					name="de.ovgu.featureide.fm.ui.separator2"
-					visible="true">
-			</separator>
-			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.actions.ExportSPLConquerer"
-					label="Export model to SPL Conquerer format"
+   <command
+         commandId="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
+         icon="icons/featuretree.ico"
+         id="de.ovgu.featureide.fm.ui.actions.FeatureModelSicing"
+         label="Slice Feature Model"
+         style="push">
+		<visibleWhen
+				checkEnabled="false">
+			<reference
+					definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+			</reference>
+		</visibleWhen>
+   </command>
+   			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
+					icon="icons/featuretree.ico"
+					id="de.ovgu.featureide.fm.ui.actions.EliminateComplexConstraints"
+					label="Product-equivalent model with simple constraints"
 					style="push">
-				<visibleWhen
+					<visibleWhen
 						checkEnabled="false">
 					<reference
 							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
@@ -309,19 +372,6 @@
 					name="de.ovgu.featureide.fm.ui.separator4"
 					visible="true">
 			</separator>
-			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.actions.FeatureDependencies"
-					label="Export feature dependency information"
-					style="push">
-				<visibleWhen
-						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
-					</reference>
-				</visibleWhen>
-			</command>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.ExportCNF"
 					icon="icons/export_wiz.gif"
@@ -336,10 +386,10 @@
 				</visibleWhen>
 			</command>
 			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.ExportDIMACS"
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer"
 					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.actions.ExportDIMACS"
-					label="Export DIMACS"
+					id="de.ovgu.featureide.fm.ui.actions.ExportSPLConquerer"
+					label="Export model to SPL Conquerer format"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
@@ -348,10 +398,39 @@
 					</reference>
 				</visibleWhen>
 			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.FeatureDependencies"
+					label="Export feature dependency information"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+   <command
+         commandId="de.ovgu.featureide.fm.ui.commands.Convert"
+         id="de.ovgu.featureide.fm.ui.actions.Convert"
+         label="Convert Feature Models"
+         style="push">
+      <visibleWhen
+            checkEnabled="false">
+         <reference
+               definitionId="de.ovgu.featureide.fm.ui.expressions.isFolder">
+         </reference>
+      </visibleWhen>
+   </command>
 		</menuContribution>
 	</extension>
 	<extension
 			point="org.eclipse.ui.commands">
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.Convert"
+				name="Convert Feature Models">
+		</command>
 		<command
 				id="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
 				name="Analyze Velvet Model">
@@ -397,12 +476,36 @@
 				name="Import model from Velvet format">
 		</command>
 		<command
+				id="de.ovgu.featureide.fm.ui.commands.ImportDimacs"
+				name="Import model from Dimacs format">
+		</command>
+		<command
 				id="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
 				name="Open with GUIDSL">
+		</command>
+  <command
+        id="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
+        name="Feature Model Slicing">
+  </command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
+				name="Eliminate complex constraints">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ExportFAMA"
+				name="Import model to FaMa format">
 		</command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.FeatureModelSlicingHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.FeatureModelConversionHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.Convert">
+		</handler>
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.AnalyzeVelvetHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet">
@@ -448,8 +551,20 @@
 				commandId="de.ovgu.featureide.fm.ui.commands.ImportVelvet">
 		</handler>
 		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ImportDIMACSHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ImportDimacs">
+		</handler>
+		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.OpenWithGUIDSLHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.openWithGuidsl">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.EliminateComplexConstraintsHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ExportFAMAHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ExportFAMA">
 		</handler>
 	</extension>
 	<extension
@@ -465,6 +580,20 @@
 							args=".xml"
 							property="de.ovgu.featureide.fm.ui.properties.file">
 					</test>
+				</iterate>
+			</with>
+		</definition>
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.isFolder">
+			<with
+					variable="activeMenuSelection">
+				<iterate
+						ifEmpty="false"
+						operator="and">
+     <test
+           property="de.ovgu.featureide.fm.ui.properties.class"
+           value="org.eclipse.core.resources.IContainer">
+     </test>
 				</iterate>
 			</with>
 		</definition>

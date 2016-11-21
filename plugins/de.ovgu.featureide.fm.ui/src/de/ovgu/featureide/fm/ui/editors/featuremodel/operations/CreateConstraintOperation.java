@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,7 +26,8 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
@@ -47,19 +48,19 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
 		super(featureModel, CREATE_CONSTRAINT);
-		constraint = FMFactoryManager.getFactory().createConstraint(featureModel, node);
+		constraint = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, node);
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		featureModel.addConstraint(constraint);
-		return new FeatureModelEvent(featureModel, FeatureModelEvent.CONSTRAINT_ADD, null, constraint);
+		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_ADD, null, constraint);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		featureModel.removeConstraint(constraint);
-		return new FeatureModelEvent(featureModel, FeatureModelEvent.CONSTRAINT_DELETE, constraint, null);
+		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_DELETE, constraint, null);
 	}
 
 }

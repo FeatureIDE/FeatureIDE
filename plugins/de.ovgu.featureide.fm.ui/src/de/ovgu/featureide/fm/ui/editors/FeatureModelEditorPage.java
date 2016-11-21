@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,7 +28,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 
 /**
  * Basic class with some default methods for feature model editor pages.
@@ -121,7 +121,7 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	}
 
 	@Override
-	public void propertyChange(FeatureModelEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 
 	}
 

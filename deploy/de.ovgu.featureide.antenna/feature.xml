@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.antenna"
       label="FeatureIDE extension for Antenna (optional)"
-      version="2.7.5.qualifier"
+      version="3.1.2.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -187,7 +187,6 @@ Library.
    </url>
 
    <requires>
-      <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="de.ovgu.featureide.core"/>
@@ -198,7 +197,7 @@ Library.
          id="de.ovgu.featureide.core.antenna"
          download-size="0"
          install-size="0"
-         version="2.7.5.qualifier"
+         version="3.1.2.qualifier"
          unpack="false"/>
 
 </feature>

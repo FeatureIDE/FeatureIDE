@@ -19,6 +19,7 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -68,6 +69,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (composer == null) {
 				return superImage;
 			}
+			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
+				return superImage;
+			}
 			FSTModel model = featureProject.getFSTModel();
 			if (model == null || model.getClasses().isEmpty()) {
 				composer.buildFSTModel();
@@ -89,6 +93,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null){
+				return superImage;
+			}
+			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return superImage;
 			}
 			FSTModel model = featureProject.getFSTModel();
@@ -144,6 +151,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (composer == null) {
 				return superImage;
 			}
+			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
+				return superImage;
+			}
 			if (model == null || model.getClasses().isEmpty()) {
 				composer.buildFSTModel();
 				model = featureProject.getFSTModel();
@@ -160,6 +170,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 	private boolean isJavaFile(final IFile file) {
 		final String fileExtension = file.getFileExtension();
+		if(fileExtension == null)
+			return false;
+		
 		return fileExtension.equals("java") || fileExtension.equals("jak");
 	}
 
@@ -269,7 +282,11 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject == null) {
 				return null;
 			}
-			if (featureProject.getComposer() == null) {
+			final IComposerExtensionClass composer = featureProject.getComposer();
+			if (composer == null) {
+				return null;
+			}
+			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return null;
 			}
 			String elementName = frag.getElementName();
@@ -288,6 +305,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject != null) {
 				IComposerExtensionClass composer = featureProject.getComposer();
 				if (composer == null) {
+					return null;
+				}
+				if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 					return null;
 				}
 				if (composer.hasFeatureFolder()) {
@@ -310,14 +330,17 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 		//text for composed files
 		if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
-
 			CompilationUnit cu = (CompilationUnit) element;
 			IResource myfile = cu.getResource();
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
 			if (featureProject == null) {
 				return null;
 			}
-			if (featureProject.getComposer() == null) {
+			IComposerExtensionClass composer = featureProject.getComposer();
+			if (composer == null) {
+				return null;
+			}
+			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return null;
 			}
 			return SPACE_STRING + myfile.getName();

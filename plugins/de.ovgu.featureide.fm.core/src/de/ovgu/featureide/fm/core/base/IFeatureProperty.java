@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,6 +33,7 @@ public interface IFeatureProperty {
 
 	String getDescription();
 
+	@Deprecated
 	String getDisplayName();
 
 	IFeature getFeature();
@@ -41,6 +42,7 @@ public interface IFeatureProperty {
 
 	void setDescription(CharSequence description);
 
+	@Deprecated
 	void setDisplayName(CharSequence name);
 
 	void setFeatureStatus(FeatureStatus status);

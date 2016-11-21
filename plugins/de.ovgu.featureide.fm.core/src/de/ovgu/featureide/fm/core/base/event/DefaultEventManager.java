@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,53 +23,46 @@ package de.ovgu.featureide.fm.core.base.event;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Default implementation of {@link IEventManager}.
  * 
  * @author Sebastian Krieter
  */
-public class DefaultEventManager implements IEventManager, IFeatureModelListener {
+public class DefaultEventManager implements IEventManager, IEventListener {
 
-	protected final List<IFeatureModelListener> listenerList = new LinkedList<>();
+	protected final List<IEventListener> listenerList = new LinkedList<>();
 
 	@Override
-	public void addListener(IFeatureModelListener listener) {
+	public void addListener(IEventListener listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
 	}
 
 	@Override
-	public void fireEvent(FeatureModelEvent event) {
-		if (event.isPersistent() || event.getEditor() == null) {
-			for (final IFeatureModelListener listener : listenerList) {
-				callListener(event, listener);
-			}
-		} else {
-			final int listenerIndex = listenerList.indexOf(event.getEditor());
-			if (listenerIndex >= 0) {
-				callListener(event, listenerList.get(listenerIndex));
-			}
+	public void fireEvent(FeatureIDEEvent event) {
+		for (final IEventListener listener : listenerList) {
+			callListener(event, listener);
 		}
 	}
 
-	protected void callListener(FeatureModelEvent event, final IFeatureModelListener listener) {
+	protected void callListener(FeatureIDEEvent event, final IEventListener listener) {
 		try {
 			listener.propertyChange(event);
 		} catch (Throwable e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 
 	@Override
-	public void removeListener(IFeatureModelListener listener) {
+	public void removeListener(IEventListener listener) {
 		listenerList.remove(listener);
 	}
 
 	@Override
-	public void propertyChange(FeatureModelEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 		fireEvent(event);
 	}
 

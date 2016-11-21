@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,23 +20,25 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import java.util.List;
+import de.ovgu.featureide.fm.core.IExtension;
 
 /**
  * Interface for saving and loading data.
  * 
  * @author Sebastian Krieter
  */
-public interface IPersistentFormat<T> {
+public interface IPersistentFormat<T> extends IExtension {
 
-	List<Problem> read(T object, CharSequence source);
+	ProblemList read(T object, CharSequence source);
 
 	String write(T object);
 
 	String getSuffix();
-	
+
 	IPersistentFormat<T> getInstance();
-	
-	String getFactoryID();
+
+	boolean supportsRead();
+
+	boolean supportsWrite();
 
 }

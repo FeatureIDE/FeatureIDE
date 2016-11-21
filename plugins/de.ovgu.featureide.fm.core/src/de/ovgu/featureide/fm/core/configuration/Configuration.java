@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -31,12 +31,13 @@ import java.util.Set;
 
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Represents a configuration and provides operations for the configuration process.
@@ -52,7 +53,7 @@ public class Configuration implements Cloneable {
 
 	final boolean ignoreAbstractFeatures;
 
-	private final IFeatureModel featureModel;
+	protected final IFeatureModel featureModel;
 	private final SelectableFeature root;
 	private final ConfigurationPropagator propagator;
 	private boolean propagate = true;
@@ -90,24 +91,22 @@ public class Configuration implements Cloneable {
 		this.propagate = false;
 		this.root = initRoot();
 
-		for (SelectableFeature f : configuration.features) {
-			try {
-				setManual(f.getName(), (f.getManual()));
-			} catch (FeatureNotFoundException e) {
+		for (SelectableFeature oldFeature : configuration.features) {
+			final SelectableFeature newFeature = table.get(oldFeature.getName());
+			if (newFeature != null) {
+				newFeature.setManual(oldFeature.getManual());
 			}
 		}
-
-		loadPropagator(configuration.propagate);
 	}
-	
+
 	public Configuration(IFeatureModel featureModel) {
 		this(featureModel, PARAM_PROPAGATE | PARAM_IGNOREABSTRACT);
 	}
-	
+
 	public Configuration(IFeatureModel featureModel, boolean propagate) {
 		this(featureModel, (propagate ? PARAM_PROPAGATE : 0) | PARAM_IGNOREABSTRACT);
 	}
-	
+
 	public Configuration(IFeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
 		this(featureModel, (propagate ? PARAM_PROPAGATE : 0) | (ignoreAbstractFeatures ? PARAM_IGNOREABSTRACT : 0));
 	}
@@ -124,22 +123,22 @@ public class Configuration implements Cloneable {
 	public Configuration(IFeatureModel featureModel, int options) {
 		this.featureModel = featureModel;
 		this.ignoreAbstractFeatures = (options & PARAM_IGNOREABSTRACT) != 0;
+		this.propagate = (options & PARAM_PROPAGATE) != 0;
 		this.propagator = new ConfigurationPropagator(this);
 		this.root = initRoot();
 
-		if ((options & PARAM_LAZY) != 0) {
-			this.propagate = (options & PARAM_PROPAGATE) != 0;
-		} else {
-			loadPropagator((options & PARAM_PROPAGATE) != 0);
+		if ((options & PARAM_LAZY) == 0) {
+			loadPropagator();
 		}
 	}
 
-    private void initFeatures(SelectableFeature sFeature, IFeature feature) {
-        if (sFeature != null && sFeature.getName() != null) {
+	private void initFeatures(SelectableFeature sFeature, IFeature feature) {
+		if (sFeature != null && sFeature.getName() != null) {
 			features.add(sFeature);
 			table.put(sFeature.getName(), sFeature);
+
 			for (IFeatureStructure child : feature.getStructure().getChildren()) {
-				SelectableFeature sChild = new SelectableFeature(this, child.getFeature());
+				SelectableFeature sChild = new SelectableFeature(child.getFeature());
 				sFeature.addChild(sChild);
 				initFeatures(sChild, child.getFeature());
 			}
@@ -147,8 +146,9 @@ public class Configuration implements Cloneable {
 	}
 
 	private SelectableFeature initRoot() {
+
 		final IFeature featureRoot = FeatureUtils.getRoot(featureModel);
-		final SelectableFeature root = new SelectableFeature(this, featureRoot);
+		final SelectableFeature root = new SelectableFeature(featureRoot);
 
 		if (featureRoot != null) {
 			initFeatures(root, featureRoot);
@@ -160,13 +160,13 @@ public class Configuration implements Cloneable {
 		return root;
 	}
 
-	private void loadPropagator(boolean propagate) {
-		this.propagator.load(new WorkMonitor());
-		this.propagate = propagate;
-		update(false, null);
+	
+	public void loadPropagator() {
+		LongRunningWrapper.runMethod(this.propagator.load());
+		update(true, null);
 	}
 
-	public ConfigurationPropagator getPropagator() {
+	public IConfigurationPropagator getPropagator() {
 		return propagator;
 	}
 
@@ -176,11 +176,11 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	void setAutomatic(SelectableFeature feature, Selection selection) {
+	public void setAutomatic(SelectableFeature feature, Selection selection) {
 		feature.setAutomatic(selection);
 	}
 
-	void setAutomatic(String name, Selection selection) {
+	public void setAutomatic(String name, Selection selection) {
 		SelectableFeature feature = table.get(name);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
@@ -189,7 +189,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public boolean canBeValid() {
-		return propagator.canBeValid(new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.canBeValid());
 	}
 
 	public IFeatureModel getFeatureModel() {
@@ -201,7 +201,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public List<SelectableFeature> getManualFeatures() {
-		final List<SelectableFeature> featureList = new LinkedList<SelectableFeature>();
+		final List<SelectableFeature> featureList = new LinkedList<>();
 		for (SelectableFeature selectableFeature : features) {
 			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 				featureList.add(selectableFeature);
@@ -228,7 +228,7 @@ public class Configuration implements Cloneable {
 		return result;
 	}
 
-    public List<IFeature> getSelectedFeatures() {
+	public List<IFeature> getSelectedFeatures() {
 		final List<IFeature> result = new ArrayList<IFeature>();
 		for (SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.SELECTED) {
@@ -239,9 +239,9 @@ public class Configuration implements Cloneable {
 	}
 
 	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
-		return propagator.getSolutions(max, new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.getSolutions(max));
 	}
-	
+
 	public List<IFeature> getUnSelectedFeatures() {
 		final List<IFeature> result = new ArrayList<IFeature>();
 		for (SelectableFeature feature : features) {
@@ -252,7 +252,7 @@ public class Configuration implements Cloneable {
 
 		return result;
 	}
-	
+
 	public List<IFeature> getUndefinedSelectedFeatures() {
 		final List<IFeature> result = new ArrayList<IFeature>();
 		for (SelectableFeature feature : features) {
@@ -275,7 +275,7 @@ public class Configuration implements Cloneable {
 	 * @return {@code true} if the current selection is a valid configuration
 	 */
 	public boolean isValid() {
-		return propagator.isValid(new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.isValid());
 	}
 
 	/**
@@ -283,15 +283,15 @@ public class Configuration implements Cloneable {
 	 * Use this, when propgate is disabled (hidden features are not updated).
 	 */
 	public boolean isValidNoHidden() {
-		return propagator.isValidNoHidden(new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.isValidNoHidden());
 	}
 
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
-		propagator.leadToValidConfiguration(featureList, new WorkMonitor());
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, IMonitor workMonitor) {
+		LongRunningWrapper.runMethod(propagator.leadToValidConfiguration(featureList));
 	}
 
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
-		propagator.leadToValidConfiguration(featureList, mode, new WorkMonitor());
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, IMonitor workMonitor) {
+		LongRunningWrapper.runMethod(propagator.leadToValidConfiguration(featureList, mode));
 	}
 
 	/**
@@ -318,7 +318,7 @@ public class Configuration implements Cloneable {
 	 * @see #number(long)
 	 */
 	public long number() {
-		return propagator.number(250, new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.number(250));
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class Configuration implements Cloneable {
 	 *         or a negative value (if a timeout occured) that indicates that there are more solutions than the absolute value
 	 */
 	public long number(long timeout) {
-		return propagator.number(timeout, new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.number(timeout));
 	}
 
 	public void resetValues() {
@@ -341,7 +341,7 @@ public class Configuration implements Cloneable {
 
 	public void setManual(SelectableFeature feature, Selection selection) {
 		feature.setManual(selection);
-		update(false, null);
+		update(true, null);
 	}
 
 	public void setManual(String name, Selection selection) {
@@ -369,12 +369,12 @@ public class Configuration implements Cloneable {
 	}
 
 	public void update() {
-		update(false, null);
+		update(true, null);
 	}
 
 	public void update(boolean redundantManual, String startFeatureName) {
 		if (propagate) {
-			propagator.update(redundantManual, startFeatureName, new WorkMonitor());
+			LongRunningWrapper.runMethod(propagator.update(redundantManual, startFeatureName));
 		}
 	}
 
@@ -384,7 +384,8 @@ public class Configuration implements Cloneable {
 			try {
 				return (Configuration) super.clone();
 			} catch (CloneNotSupportedException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
+				throw new RuntimeException("Cloning is not supported for " + this.getClass());
 			}
 		}
 		return new Configuration(this);
@@ -396,9 +397,13 @@ public class Configuration implements Cloneable {
 	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
 	 */
-	public List<List<String>> coverFeatures(Collection<String> features, WorkMonitor monitor, boolean selection) throws TimeoutException {
+	public List<List<String>> coverFeatures(Collection<String> features, IMonitor monitor, boolean selection) throws TimeoutException {
 		return propagator.coverFeatures(features, selection, monitor);
 
+	}
+
+	public boolean isIgnoreAbstractFeatures() {
+		return ignoreAbstractFeatures;
 	}
 
 }

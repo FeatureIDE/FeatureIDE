@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,10 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -48,18 +52,25 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 	}
 
+	protected static final HiddenFilter hiddenFilter = new HiddenFilter();
+
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden;
-
-	public void layout(IGraphicalFeatureModel featureModel) {
+	
+	public final void layout(IGraphicalFeatureModel featureModel) {
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		layoutFeatureModel(featureModel);
+		layoutHidden(featureModel);
+		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {
+			entry.getKey().setLocation(new Point(0,0));
+			entry.getKey().setLocation(entry.getValue());
+		}
 		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
 			layoutLegend(featureModel, showHidden);
 		}
-		layoutHidden(featureModel);
+		newLocations.clear();
 	}
 
 	/**
@@ -69,7 +80,7 @@ abstract public class FeatureDiagramLayoutManager {
 		if (showHidden)
 			return false;
 		if (!feature.getObject().getStructure().isRoot())
-			return (feature.getObject().getStructure().isHidden() || isHidden(feature.getTree().getParentObject()));
+			return (feature.getObject().getStructure().isHidden() || isHidden(FeatureUIHelper.getGraphicalParent(feature)));
 		else
 			return feature.getObject().getStructure().isHidden();
 	}
@@ -81,12 +92,13 @@ abstract public class FeatureDiagramLayoutManager {
 	void layoutHidden(IGraphicalFeatureModel featureModel) {
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
 			if (isHidden(feature) && !feature.getObject().getStructure().isRoot()) {
-				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
+				// TODO does nothing
+//				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
 			}
 		}
 	}
 
-	abstract public void layoutFeatureModel(IGraphicalFeatureModel featureModel);
+	protected abstract void layoutFeatureModel(IGraphicalFeatureModel featureModel);
 
 	public void setControlSize(int width, int height) {
 		this.controlWidth = width;
@@ -96,12 +108,13 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * method to center the layout on the screen (horizontal only)
 	 */
+	@Deprecated
 	void centerLayoutX(IGraphicalFeatureModel featureModel) {
 		int mostRightFeatureX = Integer.MIN_VALUE;
 		int mostLeftFeatureX = Integer.MAX_VALUE;
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			int tempX = FeatureUIHelper.getLocation(feature).x;
-			int tempXOffset = FeatureUIHelper.getSize(feature).width;
+			int tempX = feature.getLocation().x;
+			int tempXOffset = feature.getSize().width;
 			if (mostRightFeatureX < tempX + tempXOffset)
 				mostRightFeatureX = tempX + tempXOffset;
 			if (mostLeftFeatureX > tempX)
@@ -110,8 +123,7 @@ abstract public class FeatureDiagramLayoutManager {
 		int width = mostRightFeatureX - mostLeftFeatureX;
 		int offset = mostRightFeatureX - ((controlWidth - width) / 2);
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			FeatureUIHelper.setLocation(feature,
-					new Point(FeatureUIHelper.getLocation(feature).getCopy().x + offset, FeatureUIHelper.getLocation(feature).getCopy().y));
+			setLocation(feature, new Point(feature.getLocation().getCopy().x + offset, feature.getLocation().getCopy().y));
 		}
 	}
 
@@ -119,9 +131,9 @@ abstract public class FeatureDiagramLayoutManager {
 		int y = yoffset + FMPropertyManager.getConstraintSpace();
 		boolean depthFirst = this instanceof DepthFirstLayout;
 		for (IGraphicalConstraint constraint : constraints) {
-			Dimension size = FeatureUIHelper.getSize(constraint);
+			Dimension size = constraint.getSize();
 			int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
-			FeatureUIHelper.setLocation(constraint, new Point(x, y));
+			constraint.setLocation(new Point(x, y));
 			y += size.height;
 		}
 	}
@@ -139,19 +151,15 @@ abstract public class FeatureDiagramLayoutManager {
 		 */
 		Iterable<IGraphicalFeature> nonHidden = showHidden ? featureModel.getFeatures() : Functional.filter(featureModel.getFeatures(), new HiddenFilter());
 		for (IGraphicalFeature feature : nonHidden) {
-			Point temp = FeatureUIHelper.getLocation(feature);
-			if (null == temp)
-				continue;
-			Dimension tempSize = FeatureUIHelper.getSize(feature);
-
-			if (temp.x < min.x)
-				min.x = temp.x;
-			if (temp.y < min.y)
-				min.y = temp.y;
-			if ((temp.x + tempSize.width) > max.x)
-				max.x = temp.x + tempSize.width;
-			if (temp.y + tempSize.height > max.y)
-				max.y = temp.y + tempSize.height;
+			Rectangle position = FeatureUIHelper.getBounds(feature);
+			if (position.x < min.x)
+				min.x = position.x;
+			if (position.y < min.y)
+				min.y = position.y;
+			if ((position.x + position.width) > max.x)
+				max.x = position.right();
+			if (position.y + position.height > max.y)
+				max.y = position.bottom();
 		}
 
 		/*
@@ -159,18 +167,15 @@ abstract public class FeatureDiagramLayoutManager {
 		 * for constraints
 		 */
 		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
-			Point temp = FeatureUIHelper.getLocation(constraint);
-			if (null == temp)
-				continue;
-			Dimension tempSize = FeatureUIHelper.getSize(constraint);
-			if (temp.x < min.x)
-				min.x = temp.x;
-			if (temp.y < min.y)
-				min.y = temp.y;
-			if ((temp.x + tempSize.width) > max.x)
-				max.x = temp.x + tempSize.width;
-			if (temp.y + tempSize.height > max.y)
-				max.y = temp.y + tempSize.height;
+			Rectangle position = FeatureUIHelper.getBounds(constraint);
+			if (position.x < min.x)
+				min.x = position.x;
+			if (position.y < min.y)
+				min.y = position.y;
+			if ((position.x + position.width) > max.x)
+				max.x = position.right();
+			if (position.y + position.height > max.y)
+				max.y = position.bottom();
 		}
 
 		final Dimension legendSize = FeatureUIHelper.getLegendSize(featureModel);
@@ -187,9 +192,9 @@ abstract public class FeatureDiagramLayoutManager {
 		 * check if features would intersect with the legend on the edges
 		 */
 		for (IGraphicalFeature feature : nonHidden) {
-			final Point tempLocation = FeatureUIHelper.getLocation(feature);
+			final Point tempLocation = feature.getLocation();
 			if (null != tempLocation) {
-				final Dimension tempSize = FeatureUIHelper.getSize(feature);
+				final Dimension tempSize = feature.getSize();
 				if (tempSize != null) {
 					if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
 							&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
@@ -211,10 +216,10 @@ abstract public class FeatureDiagramLayoutManager {
 		 */
 		if (topRight || topLeft || botLeft || botRight) {
 			for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
-				Point tempLocation = FeatureUIHelper.getLocation(constraint);
+				Point tempLocation = constraint.getLocation();
 				if (null == tempLocation)
 					continue;
-				Dimension tempSize = FeatureUIHelper.getSize(constraint);
+				Dimension tempSize = constraint.getSize();
 				if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
 						&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
 					topRight = false;
@@ -243,6 +248,39 @@ abstract public class FeatureDiagramLayoutManager {
 			featureModel.getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
 		} else {
 			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
+		}
+	}
+	
+	/**
+	 * Stores locations separately to {@link IGraphicalFeature}.
+	 */
+	protected Map<IGraphicalFeature, Point> newLocations = new HashMap<>();
+	
+	protected void setLocation(IGraphicalFeature feature , Point location) {
+		newLocations.put(feature, location);
+	}
+	
+	protected Point getLocation(IGraphicalFeature feature) {
+		Point location = newLocations.get(feature);
+		if (location == null) {
+			location = feature.getLocation();
+		}
+		return location;
+	}
+	
+	protected Rectangle getBounds(IGraphicalFeature feature) {
+		if (getLocation(feature) == null || feature.getSize() == null) {
+			// UIHelper not set up correctly, refresh the feature model
+			feature.getObject().getFeatureModel().handleModelDataChanged();
+		}
+		return new Rectangle(getLocation(feature), feature.getSize());
+	}
+
+	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
+		if (showHidden) {
+			return FeatureUIHelper.getGraphicalChildren(feature);
+		} else {
+			return Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), hiddenFilter));
 		}
 	}
 }

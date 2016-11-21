@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_OP
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to set a Feature mandatory/concrete. Enables
@@ -59,13 +60,14 @@ public class SetFeatureToMandatoryOperation extends AbstractFeatureModelOperatio
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
-		feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
-		return null;
+	protected FeatureIDEEvent operation() {
+		final boolean isMandatory = feature.getStructure().isMandatory();
+		feature.getStructure().setMandatory(!isMandatory);
+		return new FeatureIDEEvent(feature, EventType.MANDATORY_CHANGED, isMandatory, !isMandatory);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		return operation();
 	}
 

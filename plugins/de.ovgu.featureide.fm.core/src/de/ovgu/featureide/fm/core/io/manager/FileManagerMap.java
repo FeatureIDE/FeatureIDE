@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,7 +30,7 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
@@ -56,7 +56,7 @@ public abstract class FileManagerMap {
 					try {
 						Files.createDirectory(extraFolder);
 					} catch (IOException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 				}
 
@@ -83,6 +83,15 @@ public abstract class FileManagerMap {
 	public static IFileManager getFileManager(String path) {
 		return map.get(constructAbsolutePath(path));
 	}
+	
+	/**
+	 * Checks whether there is already instance 
+	 * @param path
+	 * @return
+	 */
+	public static boolean hasInstance(String path) {
+		return map.containsKey(constructAbsolutePath(path));
+	}
 
 	/**
 	 * Returns and casts an instance of a {@link IFileManager} for a certain file.
@@ -99,20 +108,20 @@ public abstract class FileManagerMap {
 		return (R) map.get(constructAbsolutePath(path));
 	}
 
-	public static <T, R extends AFileManager<T>> R getInstance(String path, IPersistentFormat<T> format, Class<R> c) {
+	public static <T, R extends AFileManager<T>> R getInstance(T object, String path, IPersistentFormat<T> format, Class<R> c, Class<T> t) {
 		final String absolutePath = constructAbsolutePath(path);
 		final IFileManager manager = map.get(absolutePath);
 		if (manager != null) {
 			return c.cast(manager);
 		} else {
 			try {
-				final Constructor<R> constructor = c.getDeclaredConstructor(String.class, IPersistentFormat.class);
+				final Constructor<R> constructor = c.getDeclaredConstructor(t, String.class, IPersistentFormat.class);
 				constructor.setAccessible(true);
-				final R newInstance = constructor.newInstance(absolutePath, format);
+				final R newInstance = constructor.newInstance(object, absolutePath, format);
 				map.put(absolutePath, newInstance);
 				return newInstance;
 			} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 				return null;
 			}
 		}

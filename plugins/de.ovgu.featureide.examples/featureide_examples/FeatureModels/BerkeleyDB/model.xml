@@ -301,7 +301,9 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="false" Constraints="true" Features="true" Redundant="true"/>
 		<comments>
 			<c>Semantic Dependencies</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>

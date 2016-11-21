@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,7 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
@@ -43,15 +44,15 @@ public class LayoutSelectionOperation extends AbstractGraphicalFeatureModelOpera
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		graphicalFeatureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
-		return null;
+		return new FeatureIDEEvent(null, EventType.MODEL_LAYOUT_CHANGED);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		graphicalFeatureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
-		return null;
+		return new FeatureIDEEvent(null, EventType.MODEL_LAYOUT_CHANGED);
 	}
 
 }

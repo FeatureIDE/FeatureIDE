@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,9 +26,9 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 /**
- * TODO description
+ * Abstract implementation of the {@link TreeIterator} interface.
  * 
- * @author skrieter
+ * @author Sebastian Krieter
  */
 public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 

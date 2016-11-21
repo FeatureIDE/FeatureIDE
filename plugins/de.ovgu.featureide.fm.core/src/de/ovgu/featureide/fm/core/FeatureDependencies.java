@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,7 +36,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Calculates dependencies of features
@@ -101,7 +101,7 @@ public class FeatureDependencies {
 						    maybe.get(feature).add(current_feature);
 						}
 				    } catch (TimeoutException e) {
-				    	FMCorePlugin.getDefault().logError(e);
+				    	Logger.logError(e);
 				    }
 				}
 		    }
@@ -131,7 +131,7 @@ public class FeatureDependencies {
     			}
     		}
     	} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
     	return impliedFeatures;
     }
@@ -149,7 +149,7 @@ public class FeatureDependencies {
 		try {
 			return nodeImpliesFeature(nodeSel, B.getName(), true);
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return false;
 	}
@@ -162,7 +162,7 @@ public class FeatureDependencies {
      * @return Node representing the featureModel
      */
     private  Node createRootNode(IFeatureModel fm) {
-		return NodeCreator.createNodes(fm, true).toCNF();
+		return AdvancedNodeCreator.createCNF(fm);
     }
 
     /**
@@ -191,7 +191,7 @@ public class FeatureDependencies {
     public Set<IFeature> always(IFeature feature) {
     	return always.get(feature);
     }
-
+    
     /**
      * @param feature
      * @return
@@ -199,7 +199,7 @@ public class FeatureDependencies {
     public Set<IFeature> never(IFeature feature) {
     	return never.get(feature);
     }
-
+    
     /**
      * @param feature
      * @return
@@ -207,7 +207,7 @@ public class FeatureDependencies {
     public Set<IFeature> maybe(IFeature feature) {
     	return maybe.get(feature);
     }
-
+    
     public String toString() {
     	StringBuilder builder = new StringBuilder();
 		for (IFeature feature : fm.getFeatures()) {

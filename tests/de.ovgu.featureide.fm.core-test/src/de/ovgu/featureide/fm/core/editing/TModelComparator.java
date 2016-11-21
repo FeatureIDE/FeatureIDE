@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,9 +36,8 @@ import de.ovgu.featureide.common.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 
 /**
  * Checks that the calculation of edit categories works properly. A couple of
@@ -338,11 +337,10 @@ public class TModelComparator {
 			throws UnsupportedModelException {
 		ModelComparator comperator = new ModelComparator(TIMEOUT);
 		IFeatureModel oldModel = FMFactoryManager.getFactory().createFeatureModel();
-		IFeatureModelReader reader = new GuidslReader(oldModel);
-		reader.readFromString(fm1);
+		GuidslFormat reader = new GuidslFormat();
+		reader.read(oldModel, fm1);
 		IFeatureModel newModel = FMFactoryManager.getFactory().createFeatureModel();
-		reader = new GuidslReader(newModel);
-		reader.readFromString(fm2);
+		reader.read(newModel, fm2);
 		return comperator.compare(oldModel, newModel);
 	}
 

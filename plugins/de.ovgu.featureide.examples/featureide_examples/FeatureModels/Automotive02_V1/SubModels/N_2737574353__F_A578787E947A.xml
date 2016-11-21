@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="N_2737574353__F_A578787E947A">
+				<description>
+					Lorem i
+				</description>
+				<feature name="F_F8F40487AE91">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_A57B96FCFAAB">
+					<description>
+						Lorem ipsum dolor sit am
+					</description>
+				</feature>
+				<feature name="F_EBF736381DD0">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_1A6B89453F08">
+					<description>
+						Lorem ipsum dolor sit a
+					</description>
+				</feature>
+				<feature name="F_BF6A33FFD08D">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_B8A78D57DC8A">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed d
+					</description>
+				</feature>
+				<feature name="F_BB03E2F4706A">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadi
+					</description>
+				</feature>
+				<feature name="F_6D2FD3CE33F3">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sad
+					</description>
+				</feature>
+				<feature name="F_9C01C31B57BA">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_4403CA66AB54">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_67156988EE26">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadip
+					</description>
+				</feature>
+				<feature name="F_945EDA7F188D">
+					<description>
+						
+					</description>
+				</feature>
+				<feature name="F_3666D0AE9215">
+					<description>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, s
+					</description>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c/>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

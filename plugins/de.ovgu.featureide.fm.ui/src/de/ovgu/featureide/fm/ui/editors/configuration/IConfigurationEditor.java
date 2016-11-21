@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,12 +34,20 @@ public interface IConfigurationEditor {
 
 	File getModelFile();
 
-	ConfigJobManager getConfigJobManager();
+	JobSynchronizer getConfigJobManager();
 
 	boolean isAutoSelectFeatures();
 
 	void setAutoSelectFeatures(boolean autoSelectFeatures);
-	
+
 	boolean hasValidFeatureModel();
+
+	enum EXPAND_ALGORITHM {
+		DEFUALT, OPEN_CLAUSE, PARENT, CHILDREN, PARENT_CLAUSE
+	}
+
+	EXPAND_ALGORITHM getExpandAlgorithm();
+
+	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
 
 }

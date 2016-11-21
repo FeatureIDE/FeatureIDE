@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -68,6 +68,10 @@ public class AsyncTree extends Thread {
 						}
 						childNode.setText(currentFeature.getFeature().getProperty().getDisplayName());
 						childNode.setData(currentFeature);
+
+						childNode.setFont(ConfigurationTreeEditorPage.treeItemStandardFont);
+						childNode.setForeground(null);
+
 						itemMap.put(currentFeature, childNode);
 						if (currentFeature.hasChildren()) {
 							runnableList.add(new Builder(childNode, currentFeature.getChildren()));
@@ -98,13 +102,10 @@ public class AsyncTree extends Thread {
 
 		@Override
 		public void run() {
+			perNodeFunction.invoke(item, (SelectableFeature) item.getData());
 			final TreeItem[] children = item.getItems();
 			for (int i = 0; i < children.length; i++) {
 				final TreeItem childNode = children[i];
-				final Object data = childNode.getData();
-				final SelectableFeature feature = (SelectableFeature) data;
-				perNodeFunction.invoke(childNode, feature);
-
 				if (childNode.getItemCount() > 0) {
 					runnableList.add(new Traverser(childNode, perNodeFunction));
 				}
@@ -120,17 +121,18 @@ public class AsyncTree extends Thread {
 	private final HashMap<SelectableFeature, TreeItem> itemMap;
 
 	private final Functional.IFunction<Void, Void> callbackIfDone;
+	private final Object countLock = new Object();
 	private Integer count = 0;
 
 	public void inc() {
-		synchronized (count) {
+		synchronized (countLock) {
 			++count;
 		}
 	}
 
 	public void dec() {
 		boolean done;
-		synchronized (count) {
+		synchronized (countLock) {
 			done = --count == 0;
 		}
 		if (done) {

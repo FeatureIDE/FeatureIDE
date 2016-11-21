@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,23 +25,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.PlatformUI;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
@@ -55,46 +41,19 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  */
 public class MoveElementsOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
-	private Object viewer;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
-	public MoveElementsOperation(Object viewer, IFeatureModel featureModel) {
+	public MoveElementsOperation(IFeatureModel featureModel) {
 		super(featureModel, DELETE);
-		this.viewer = viewer;
 	}
+
+//	@Override
+//	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
+//		return Status.OK_STATUS;
+//	}
 
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		return Status.OK_STATUS;
-	}
-
-	private IStructuredSelection getSelection() {
-		if (viewer instanceof GraphicalViewerImpl) {
-			return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
-		} else {
-			return (IStructuredSelection) ((TreeViewer) viewer).getSelection();
-		}
-	}
-
-	private boolean moveConstraint(Object element) {
-		return false;
-	}
-
-	private IFeature moveFeature(Object element, Map<IFeature, List<IFeature>> removalMap, List<IFeature> alreadyDeleted) {
-		return null;
-	}
-
-	public void executeOperation(AbstractFeatureModelOperation operation) {
-		operations.add(operation);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(operation, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-	}
-
-	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
 			AbstractFeatureModelOperation operation = it.next();
 			if (operation.canRedo()) {
@@ -105,7 +64,7 @@ public class MoveElementsOperation extends AbstractFeatureModelOperation impleme
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
 			AbstractFeatureModelOperation operation = it.next();
 			if (operation.canUndo()) {

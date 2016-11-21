@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
@@ -30,10 +29,12 @@ import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
@@ -43,9 +44,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, IFeatureModelListener {
+public class ConstraintEditPart extends AbstractGraphicalEditPart implements IEventListener {
 
-	ConstraintEditPart(Object constraint) {
+	public ConstraintEditPart(Object constraint) {
 		super();
 		setModel(constraint);
 	}
@@ -59,7 +60,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 	}
 
 	@Override
-	protected IFigure createFigure() {
+	public IFigure createFigure() {
 		return new ConstraintFigure(getConstraintModel());
 	}
 
@@ -69,14 +70,13 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 	}
 
 	public void performRequest(Request request) {
+		final IGraphicalConstraint constraintModel = getConstraintModel();
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintDialog(getConstraintModel().getObject().getFeatureModel(), getConstraintModel().getObject());
+			new ConstraintDialog(constraintModel.getObject().getFeatureModel(), constraintModel.getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
-				for (IFeature containedFeature : getConstraintModel().getObject().getContainedFeatures()) {
-					containedFeature.setConstraintSelected(true);
-					// TODO _Feature interfaces removed code
-//					containedFeature.getFeatureModel().setConstraintSelected(true);
+				for (IFeature containedFeature : constraintModel.getObject().getContainedFeatures()) {
+					FeatureUIHelper.getGraphicalFeature(containedFeature, constraintModel.getGraphicalModel()).setConstraintSelected(true);
 				}
 			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);
@@ -86,23 +86,34 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 
 	@Override
 	public void activate() {
-		getConstraintModel().getObject().addListener(this);
+		getConstraintModel().registerUIObject(this);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getConstraintModel().getObject().removeListener(this);
 	}
 
 	@Override
-	public void propertyChange(FeatureModelEvent event) {
-		String prop = event.getPropertyName();
-		if (LOCATION_CHANGED.equals(prop)) {
-			getConstraintFigure().setLocation((Point) event.getNewValue());
-		} else if (ATTRIBUTE_CHANGED.equals(prop) || CONSTRAINT_SELECTED.equals(prop)) {
+	public void propertyChange(FeatureIDEEvent event) {
+		final EventType prop = event.getEventType();
+		switch (prop) {
+		case CONSTRAINT_MOVE:
+		case LOCATION_CHANGED:
+			getConstraintFigure().setLocation(getConstraintModel().getLocation());
+			break;
+		case CONSTRAINT_MODIFY:
 			getConstraintFigure().setConstraintProperties();
+			getConstraintModel().setSize(getConstraintFigure().getSize());
+			break;
+		case ATTRIBUTE_CHANGED:
+		case CONSTRAINT_SELECTED:
+			getConstraintFigure().setConstraintProperties();
+			break;
+		default:
+			FMUIPlugin.getDefault().logWarning(event + " @ " + getConstraintModel() + " not handled.");
+			break;
 		}
 	}
 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Representation of all test runs.
@@ -59,7 +58,7 @@ public class TestResults {
 		}
 		tests++;
 		if (!testResults.containsKey(klass)) {
-			testResults.put(klass, new ConcurrentHashMap<String, Set<Test>>());
+			testResults.put(klass, new TreeMap<String, Set<Test>>());
 		}
 		
 		Map<String, Set<Test>> klassTest = testResults.get(klass);

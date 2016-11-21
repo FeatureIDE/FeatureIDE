@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import javax.annotation.CheckForNull;
+
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
@@ -33,54 +34,19 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeatureModel> {
 
-	public enum IOType {
-		XML_FIDE(0);
-
-		private final int index;
-
-		private IOType(int index) {
-			this.index = index;
-		}
-
-		public int getIndex() {
-			return index;
-		}
+	@CheckForNull
+	public static IPersistentFormat<IGraphicalFeatureModel> getFormat(String fileName) {
+		return new GraphicalFeatureModelFormat();
 	}
 
-	public static IPersistentFormat<IGraphicalFeatureModel> getFormat(IOType ioType) {
-		switch (ioType) {
-		case XML_FIDE:
-			return new GraphicalFeatureModelFormat();
-		default:
-			return null;
-		}
-	}
-
-	private IFeatureModel featureModel;
-
-	public static GraphicalFeatureModelManager getInstance(String absolutePath, IOType ioType, IFeatureModel featureModel) {
-		return getInstance(absolutePath, getFormat(ioType), featureModel);
-	}
-	
-	public static GraphicalFeatureModelManager getInstance(String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format, IFeatureModel featureModel) {
-		final GraphicalFeatureModelManager manager = FileManagerMap.getInstance(absolutePath, format, GraphicalFeatureModelManager.class);
-		if (manager.featureModel == null) {
-			manager.featureModel = featureModel;
-		}
-		manager.init();
+	public static GraphicalFeatureModelManager getInstance(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {
+		final GraphicalFeatureModelManager manager = FileManagerMap.getInstance(model, absolutePath, format, GraphicalFeatureModelManager.class, IGraphicalFeatureModel.class);
+		manager.read();
 		return manager;
 	}
 
-	protected GraphicalFeatureModelManager(String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {
-		super(absolutePath, format);
-	}
-
-	@Override
-	protected IGraphicalFeatureModel createNewObject() {
-		// TODO _interfaces: implement factory for graphical feature model
-		GraphicalFeatureModel graphicalItem = new GraphicalFeatureModel(featureModel);
-		graphicalItem.init();
-		return graphicalItem;
+	protected GraphicalFeatureModelManager(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {
+		super(model, absolutePath, format);
 	}
 
 	@Override

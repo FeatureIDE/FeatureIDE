@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,6 +30,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.signature.base.IConstrainedObject;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 public class ConstraintFilter implements IFilter<IConstrainedObject> {
 	
@@ -66,16 +67,16 @@ public class ConstraintFilter implements IFilter<IConstrainedObject> {
 				for (int i = 0; i < andChildren.length; i++) {
 					final Node andChild = andChildren[i];
 					if (andChild instanceof Or) {
-						if (!checkOr(andChild)) {
-							return false;
+						if (checkOr(andChild)) {
+							return true;
 						}
 					} else {
-						if (solver.isSatisfiable(andChild)) {
-							return false;
+						if (!solver.isSatisfiable(andChild)) {
+							return true;
 						}
 					}
 				}
-				return true;
+				return false;
 			}
 		} catch (TimeoutException e) {
 			CorePlugin.getDefault().logError(e);

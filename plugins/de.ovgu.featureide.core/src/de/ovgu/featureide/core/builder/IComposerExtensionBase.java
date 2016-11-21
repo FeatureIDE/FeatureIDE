@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,7 +24,7 @@ import javax.annotation.CheckForNull;
 
 import org.eclipse.core.runtime.IStatus;
 
-import de.ovgu.featureide.core.IExtension;
+import de.ovgu.featureide.fm.core.IExtension;
 
 /**
  * A FeatureIDE extension to compose source files.
@@ -32,15 +32,15 @@ import de.ovgu.featureide.core.IExtension;
  * @author Tom Brosch
  */
 public interface IComposerExtensionBase extends IExtension {
-	
+
 	public static String extensionPointID = "composers";
-	
+
 	public static String extensionID = "composer";
-	
+
 	String getName();
-	
+
 	String getDescription();
-	
+
 	/**
 	 * @return <code>true</code> if the composer has a folder for each feature.
 	 */
@@ -50,27 +50,27 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @return <code>false</code> if a source folder should not be created. Default: <code>true</code>
 	 */
 	boolean hasSourceFolder();
-	
+
 	/**
 	 * @return <code>true</code> if the composition tool supports contract composition.
 	 */
 	boolean hasContractComposition();
-	
+
 	/**
 	 * @return <code>true</code> if the composition tool supports meta product generation.
 	 */
 	boolean hasMetaProductGeneration();
-	
+
 	/**
 	 * @return <code>true</code> if the composition tool supports different composition tools
 	 */
-	boolean hasCompositionMechanisms();
-	
+	String[] getCompositionMechanisms();
+
 	/**
-	 * @return <code>true</code> if the composition tool should create a folder for each feature 
+	 * @return <code>true</code> if the composition tool should create a folder for each feature
 	 */
 	boolean createFolderForFeatures();
-	
+
 	/**
 	 * @return <code>true</code> if the composition tool supports Android projects
 	 */
@@ -82,13 +82,12 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @see de.ovgu.featureide.ui.variantimport.SPLMigrationWizard
 	 */
 	boolean supportsMigration();
-	
-	
+
 	/**
 	 * @return whether all dependencies are fulfilled to use this composer
 	 */
 	IStatus isComposable();
-	
+
 	@CheckForNull
 	<T extends IComposerObject> T getComposerObjectInstance(Class<T> c);
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,44 +22,41 @@ package de.ovgu.featureide.fm.core.job.util;
 
 import java.lang.reflect.Constructor;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.job.AProjectJob;
-import de.ovgu.featureide.fm.core.job.IProjectJob;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
  * This class is implemented by callers as an anonymous class to encapsulate
  * parameters for the job constructor, so multiple {@code Job}s can be called
  * with low effort.
  * 
- * TODO KT: Add list of supporting Jobs.
- * 
  * @author Sebastian Krieter
  */
 public abstract class JobArguments {
 
-	private final Constructor<? extends AProjectJob<?>> constructor;
+	private final Constructor<? extends LongRunningMethod<?>> constructor;
 
 	@SuppressWarnings("unchecked")
 	protected JobArguments(Class<? extends JobArguments> cl) {
-		Constructor<? extends AProjectJob<?>> tempConstructor;
+		Constructor<? extends LongRunningMethod<?>> tempConstructor;
 		try {
-			tempConstructor = (Constructor<? extends AProjectJob<?>>) cl.getEnclosingClass().getDeclaredConstructor(cl);
+			tempConstructor = (Constructor<? extends LongRunningMethod<?>>) cl.getEnclosingClass().getDeclaredConstructor(cl);
 			tempConstructor.setAccessible(true);
 		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			tempConstructor = null;
 		}
 		constructor = tempConstructor;
 	}
 
-	public IProjectJob createJob() {
+	public LongRunningMethod<?> createJob() {
 		if (constructor == null) {
 			return null;
 		}
 		try {
 			return constructor.newInstance(this);
 		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return null;
 		}
 	}

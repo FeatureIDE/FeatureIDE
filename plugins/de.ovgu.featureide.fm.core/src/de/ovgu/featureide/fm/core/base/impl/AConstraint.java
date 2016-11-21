@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.base.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -33,7 +34,8 @@ import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -53,23 +55,23 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 
-//	protected IGraphicalConstraint graphicalRepresentation;
-
 	protected Node propNode;
 	boolean featureSelected;
+	boolean isImplicit;
+
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
 		this.propNode = oldConstraint.propNode;
 		this.featureSelected = oldConstraint.featureSelected;
-//		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
+		this.isImplicit = oldConstraint.isImplicit;
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
 		this.propNode = propNode;
 		this.featureSelected = false;
-//		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
+		this.isImplicit = false;
 	}
 
 	@Override
@@ -83,38 +85,33 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	 */
 	@Override
 	public Collection<IFeature> getContainedFeatures() {
-		if (containedFeatureList.isEmpty()) {
-			setContainedFeatures();
+		synchronized (containedFeatureList) {
+			if (containedFeatureList.isEmpty()) {
+				setContainedFeatures();
+			}
+			return containedFeatureList;
 		}
-		return containedFeatureList;
 	}
 
 	@Override
 	public Collection<IFeature> getDeadFeatures() {
-		return deadFeatures;
+		return Collections.unmodifiableCollection(deadFeatures);
 	}
 
-	/**
-	 * Looks for all dead features if they ares caused dead by this constraint
-	 * 
-	 * @param solver
-	 * @param fm The actual model
-	 * @param fmDeadFeatures The dead features the complete model
-	 * @return The dead features caused by this constraint
-	 */
 	@Override
-	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
+	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers) {
+		
 		final Collection<IFeature> deadFeatures;
 		final Node propNode = getNode();
 		final Comparator<IFeature> featComp = new FeatureComparator(true);
 		if (propNode != null) {
-			deadFeatures = fm.getAnalyser().getDeadFeatures(solver, propNode);
+			deadFeatures = featureModel.getAnalyser().getDeadFeatures(solver, propNode);
 		} else {
 			deadFeatures = new TreeSet<IFeature>(featComp);
 		}
 		final Collection<IFeature> deadFeaturesAfter = new TreeSet<>(featComp);
 
-		deadFeaturesAfter.addAll(fmDeadFeatures);
+		deadFeaturesAfter.addAll(exlcudeFeatuers);
 		deadFeaturesAfter.retainAll(deadFeatures);
 		return deadFeaturesAfter;
 	}
@@ -145,10 +142,10 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	}
 
 	@Override
-	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
-		attribute = attri;
-		if (fire) {
-			fireEvent(new FeatureModelEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+	public void setConstraintAttribute(ConstraintAttribute attribute, boolean notifyListeners) {
+		this.attribute = attribute;
+		if (notifyListeners) {
+			fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 	}
 
@@ -157,9 +154,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	 */
 	@Override
 	public void setContainedFeatures() {
-		containedFeatureList.clear();
-		for (final String featureName : propNode.getContainedFeatures()) {
-			containedFeatureList.add(featureModel.getFeature(featureName));
+		synchronized (containedFeatureList) {
+			containedFeatureList.clear();
+			for (final String featureName : propNode.getContainedFeatures()) {
+				containedFeatureList.add(featureModel.getFeature(featureName));
+			}
 		}
 	}
 
@@ -170,31 +169,26 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	}
 
 	@Override
-	public boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
+	public boolean setFalseOptionalFeatures(IFeatureModel featureModel, Collection<IFeature> collection) {
 		falseOptionalFeatures.clear();
-		falseOptionalFeatures.addAll(clone.getAnalyser().getFalseOptionalFeatures(fmFalseOptionals));
-		fmFalseOptionals.removeAll(falseOptionalFeatures);
+		falseOptionalFeatures.addAll(featureModel.getAnalyser().getFalseOptionalFeatures(collection));
+		collection.removeAll(falseOptionalFeatures);
 		return !falseOptionalFeatures.isEmpty();
 	}
 
-//	@Override
-//	public IGraphicalConstraint getGraphicRepresenation() {
-//		return graphicalRepresentation;
-//	}
-
 	@Override
-	public boolean isFeatureSelected() {
-		return featureSelected;
+	public void setFalseOptionalFeatures(Iterable<IFeature> foFeatures) {
+		falseOptionalFeatures.clear();
+		this.falseOptionalFeatures.addAll(Functional.toList(foFeatures));
 	}
-
-	@Override
-	public void setFeatureSelected(boolean b) {
-		featureSelected = b;
-		fireEvent(new FeatureModelEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
-	}
-
+	
 	public void setNode(Node node) {
 		this.propNode = node;
+	}
+
+	@Override
+	public String toString() {
+		return "AConstraint [propNode=" + propNode + "]";
 	}
 
 }

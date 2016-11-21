@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+
 /**
  * Interface for methods that take a long time to finish.</br>
  * Can be executed as Eclipse job with the wrapper {@link LongRunningJob}.
@@ -28,6 +30,6 @@ package de.ovgu.featureide.fm.core.job;
  */
 public interface LongRunningMethod<T> {
 
-	T execute(WorkMonitor monitor) throws Exception;
+	T execute(IMonitor monitor) throws Exception;
 
 }

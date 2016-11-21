@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -59,6 +59,7 @@ public interface XMLFeatureModelTags {
 	static final String NAME = "name";
 	static final String FALSE = "false";
 	static final String SHOW_HIDDEN_FEATURES = "showHiddenFeatures";
+	static final String SHOW_SHORT_NAMES = "showShortNames";
 	static final String HORIZONTAL_LAYOUT = "horizontalLayout";
 	static final String RULE = "rule";
 	static final String UNKNOWN = "unknown";

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,7 +33,8 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -137,7 +138,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 */
 	public static void updateEditors() {
 		for (IFeatureModel model : featureModels) {
-			model.fireEvent(new FeatureModelEvent(model, FeatureModelEvent.MODEL_DATA_LOADED));
+			model.fireEvent(new FeatureIDEEvent(model, EventType.MODEL_DATA_LOADED));
 		}
 	}
 
@@ -303,6 +304,16 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		}
 		return CURRENT_CONSTRAINT_BACKGROUND;
 	}
+	
+	public static Color getImplicitConstraintBackgroundColor() {
+		if (CURRENT_CONSTRAINT_BACKGROUND == null) {
+			CURRENT_CONSTRAINT_BACKGROUND = getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
+		}
+		return IMPLICIT_CONSTRAINT;
+	}
+	
+	Color color = new Color (null,255,0,0);
+
 
 	public static void setConstraintBackgroundColor(Color color) {
 		CURRENT_CONSTRAINT_BACKGROUND = color;
@@ -423,6 +434,13 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_CONSTRAINT_SPACE_Y = value;
 		setInt(QN_CONSTRAINT_SPACE, value);
 	}
+	
+	public static Color getImplicitConstraintBorderColor(boolean implicit) {
+		if (implicit) {
+			return GUIBasics.createBorderColor(getImplicitConstraintBackgroundColor());
+		}
+		return getConstraintBackgroundColor();
+	}
 
 	public static Color getConstraintBorderColor(boolean selected) {
 		if (selected) {
@@ -436,6 +454,10 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 			return GUIBasics.createLineBorder(getConstraintBorderColor(true), 3);
 		}
 		return GUIBasics.createLineBorder(getConstraintBorderColor(false), 0);
+	}
+	
+	public static Border getImplicitConstraintBorder() {
+		return GUIBasics.createLineBorder(getImplicitConstraintBorderColor(true), 3);
 	}
 
 	public static Border getHiddenFeatureBorder(boolean selected) {

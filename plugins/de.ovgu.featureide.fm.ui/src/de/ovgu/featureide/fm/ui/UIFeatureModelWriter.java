@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,12 +20,17 @@
  */
 package de.ovgu.featureide.fm.ui;
 
+import java.util.List;
+
 import org.eclipse.draw2d.geometry.Point;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.io.xml.AbstractXMLFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -34,13 +39,34 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * 
  * @author Sebastian Krieter
  */
-public class UIFeatureModelWriter extends AbstractXMLFeatureModelWriter<IGraphicalFeatureModel> {
+public class UIFeatureModelWriter extends AXMLFormat<IGraphicalFeatureModel> {
 
-	public UIFeatureModelWriter(IGraphicalFeatureModel featureModel) {
-		super(featureModel);
+	@Override
+	public IPersistentFormat<IGraphicalFeatureModel> getInstance() {
+		return this;
 	}
 
-	protected void createXmlDoc(Document doc) {
+	@Override
+	public boolean supportsRead() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getId() {
+		return null;
+	}
+
+	@Override
+	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+	}
+
+	@Override
+	protected void writeDocument(Document doc) {
 		Element root = doc.createElement(FEATURE_MODEL);
 		root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, "" + object.getLayout().getLayoutAlgorithm());
 
@@ -82,8 +108,7 @@ public class UIFeatureModelWriter extends AbstractXMLFeatureModelWriter<IGraphic
 				rule.setAttribute(COORDINATES, location.x + ", " + location.y);
 				constraintsNode.appendChild(rule);
 			}
-		}
-
+		}		
 	}
 
 }

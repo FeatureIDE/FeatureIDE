@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,7 +28,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -60,23 +61,23 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		FeatureUIHelper.getLegendFigure(graphicalFeatureModel).setLocation(newLocation);
 		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(newLocation.x, newLocation.y);
 		layout.setLegendAutoLayout(false);
 		graphicalFeatureModel.handleLegendLayoutChanged();
-		return null;
+		return new FeatureIDEEvent(featureModel, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		FeatureUIHelper.getLegendFigure(graphicalFeatureModel).setLocation(oldLocation);
 		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(oldLocation.x, oldLocation.y);
 		layout.setLegendAutoLayout(wasAutoLayout);
 		graphicalFeatureModel.handleLegendLayoutChanged();
-		return null;
+		return new FeatureIDEEvent(featureModel, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 }

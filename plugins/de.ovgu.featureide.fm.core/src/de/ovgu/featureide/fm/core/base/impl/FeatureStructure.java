@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,8 +30,8 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * All structural information of an {@link IFeatureModel}.
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke  
  */
-public class FeatureStructure implements IFeatureStructure, PropertyConstants {
+public class FeatureStructure implements IFeatureStructure {
 
 	protected boolean and;
 
@@ -92,9 +92,12 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 
 	@Override
 	public void addChildAtPosition(int index, IFeatureStructure newChild) {
-		children.add(index, newChild);
+		if (index > children.size()) {
+			children.add(newChild);
+		} else {
+			children.add(index, newChild);
+		}
 		newChild.setParent(this);
-		fireChildrenChanged();
 	}
 
 	protected void addNewChild(IFeatureStructure newChild) {
@@ -128,18 +131,23 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		return new FeatureStructure(this, newFeatureModel);
 	}
 
+	protected void fireAttributeChanged() {
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED);
+		correspondingFeature.fireEvent(event);
+	}
+	
 	protected void fireChildrenChanged() {
-		final FeatureModelEvent event = new FeatureModelEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.GROUP_TYPE_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
 	protected void fireHiddenChanged() {
-		final FeatureModelEvent event = new FeatureModelEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
 	protected void fireMandatoryChanged() {
-		final FeatureModelEvent event = new FeatureModelEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
@@ -237,12 +245,13 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	}
 
 	@Override
-	public boolean isAncestorOf(IFeatureStructure next) {
-		while (next.getParent() != null) {
-			if (next.getParent() == getParent()) {
+	public boolean isAncestorOf(IFeatureStructure parent) {
+		IFeatureStructure currParent = getParent();
+		while (currParent != null) {
+			if (parent == currParent) {
 				return true;
 			}
-			next = next.getParent();
+			currParent = currParent.getParent();
 		}
 		return false;
 	}
@@ -333,7 +342,7 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	@Override
 	public void setAbstract(boolean value) {
 		concrete = !value;
-		fireChildrenChanged();
+		fireAttributeChanged();
 	}
 
 	@Override
