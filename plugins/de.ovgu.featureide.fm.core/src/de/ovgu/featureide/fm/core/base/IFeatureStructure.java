@@ -65,8 +65,6 @@ public interface IFeatureStructure {
 	boolean hasVisibleChildren(boolean showHiddenFeatures);
 
 	boolean hasHiddenParent();
-	
-	boolean hasCollapsedParent();
 
 	boolean hasInlineRule();
 
@@ -85,8 +83,6 @@ public interface IFeatureStructure {
 	boolean isFirstChild(IFeatureStructure child);
 
 	boolean isHidden();
-	
-	boolean isCollapsed();
 
 	boolean isMandatory();
 
@@ -115,8 +111,6 @@ public interface IFeatureStructure {
 	void setChildren(List<IFeatureStructure> children);	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 
 	void setHidden(boolean hid);
-
-	void setCollapsed(boolean collapsed);
 
 	void setMandatory(boolean mandatory);
 

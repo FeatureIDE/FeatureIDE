@@ -55,6 +55,7 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
@@ -127,7 +128,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			setSize(new Dimension(0, 0));
 		}
 
-		if (feature.getObject().getStructure().hasCollapsedParent()) {
+		if (feature.hasCollapsedParent()) {
 			setSize(new Dimension(0, 0));
 		}
 	}

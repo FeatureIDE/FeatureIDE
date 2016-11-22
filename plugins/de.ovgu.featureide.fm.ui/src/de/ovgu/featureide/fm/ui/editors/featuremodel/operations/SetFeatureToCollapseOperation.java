@@ -51,7 +51,7 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 	 * 
 	 */
 	public SetFeatureToCollapseOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
-		super(graphicalFeatureModel.getFeatureModel(), getLabel(feature));
+		super(graphicalFeatureModel.getFeatureModel(), getLabel(graphicalFeatureModel.getGraphicalFeature(feature)));
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		this.feature = feature;
 	}
@@ -60,8 +60,8 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 	 * @param feature
 	 * @return String to be used in undo/redo menu
 	 */
-	private static String getLabel(IFeature feature) {
-		if (feature.getStructure().isCollapsed())
+	private static String getLabel(IGraphicalFeature feature) {
+		if (feature.isCollapsed())
 			return SET_FEATURE_COLLAPSED;
 		else
 			return SET_FEATURE_EXPANDED;
@@ -74,7 +74,6 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 			IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.setCollapsed(!graphicalFeature.isCollapsed());
 			
-			feature.getStructure().setCollapsed(!feature.getStructure().isCollapsed());
 			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, null, null);
 		}
 		return new FeatureIDEEvent(feature, EventType.DEFAULT);

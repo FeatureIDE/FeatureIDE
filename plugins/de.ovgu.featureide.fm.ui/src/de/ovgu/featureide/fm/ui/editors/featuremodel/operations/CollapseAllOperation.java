@@ -62,11 +62,10 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 			IFeature feature = gFeature.getObject();
 			if (!feature.getStructure().isRoot() || !collapse) {
 				if (feature.getStructure().hasChildren()) {
-					if (feature.getStructure().isCollapsed() != collapse) {
+					if (gFeature.isCollapsed() != collapse) {
 						affectedFeatureList.add(gFeature);
 					}
 					gFeature.setCollapsed(collapse);
-					feature.getStructure().setCollapsed(collapse);
 				}
 			}
 		}
@@ -78,7 +77,6 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 		Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
 		for (IGraphicalFeature f : affectedFeatureList) {
 			f.setCollapsed(!collapse);
-			f.getObject().getStructure().setCollapsed(!collapse);
 		}
 		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
 

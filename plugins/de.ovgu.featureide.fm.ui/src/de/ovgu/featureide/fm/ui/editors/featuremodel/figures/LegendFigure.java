@@ -167,7 +167,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		_abstract = fmStructure.hasAbstract();
 		concrete = fmStructure.hasConcrete();
 		hidden = fmStructure.hasHidden();
-		collapsed = fmStructure.hasCollapsed();
+		//TODO MISSING GMODEL fmStructure.hasCollapsed() not longer existing because feature model editor has no access on the graphical model
+		//collapsed = fmStructure.hasCollapsed();
 		dead = fmStructure.hasDeadFeatures();
 		
 		

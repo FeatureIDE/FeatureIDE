@@ -286,7 +286,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	public void refreshCollapsedDecorator() {
 		final IGraphicalFeature f = getFeature();
 		final FeatureFigure featureFigure = (FeatureFigure) getFigure();
-		if(f.isCollapsed() && f.getObject().getStructure().hasChildren() && !f.getObject().getStructure().hasCollapsedParent())
+		if(f.isCollapsed() && f.getObject().getStructure().hasChildren() && !f.hasCollapsedParent())
 		{
 			//Create collapse decorator if not existing
 			if (featureFigure.getParent() != null) {

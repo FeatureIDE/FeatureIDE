@@ -323,7 +323,8 @@ public class FeatureModel implements IFeatureModel {
 	public Collection<IFeature> getVisibleFeatures(boolean showHiddenFeatures) {
 		Collection<IFeature> features = new ArrayList<IFeature>();
 		for (IFeature f : getFeatures()) {
-			if (!(f.getStructure().hasHiddenParent() && !showHiddenFeatures) && !f.getStructure().hasCollapsedParent()) {
+			//TODO MISSING GMODEL
+			if (!(f.getStructure().hasHiddenParent() && !showHiddenFeatures)){// && !f.getStructure().hasCollapsedParent()) {
 				features.add(f);
 			}
 		}

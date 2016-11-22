@@ -149,7 +149,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
 		for (IFeatureStructure child : feature.getStructure().getChildren()) {
-			if (!(child.hasHiddenParent() && !graphicalFeatureModel.getLayout().showHiddenFeatures()) && !child.hasCollapsedParent())
+			IGraphicalFeature graphicalChild = graphicalFeatureModel.getGraphicalFeature(child.getFeature());
+			if (!(child.hasHiddenParent() && !graphicalFeatureModel.getLayout().showHiddenFeatures()) && !graphicalChild.hasCollapsedParent())
 				targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
 		}
 		return targetConnections;
@@ -219,6 +220,22 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void setCollapsed(boolean collapse) {
 		collapsed = collapse;		
+	}
+
+	public boolean hasCollapsedParent() {
+		IFeatureStructure parent = getObject().getStructure().getParent();
+		if (parent == null)
+			return false;
+
+		while (parent != null) {
+			IGraphicalFeature graphicParent = getGraphicalModel().getGraphicalFeature(parent.getFeature());
+
+			if (graphicParent.isCollapsed())
+				return true;
+
+			parent = parent.getFeature().getStructure().getParent();
+		}
+		return false;
 	}
 
 }

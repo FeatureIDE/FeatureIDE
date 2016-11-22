@@ -202,7 +202,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IFeature source = getConnectionModel().getSource().getObject();
 		IFeature sourceParent = getConnectionModel().getSource().getObject();
 		final IGraphicalFeature graphicalTarget = getConnectionModel().getTarget();
-		if (graphicalTarget == null || source.getStructure().hasCollapsedParent()) {
+		final IGraphicalFeature graphicalSource = getConnectionModel().getSource();
+		if (graphicalTarget == null || graphicalSource.hasCollapsedParent()) {
 			return;
 		}
 		IFeature target = graphicalTarget.getObject();
@@ -241,10 +242,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		RotatableDecoration targetDecoration = createClearDecoration();
 		final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-		if (target == null || target.getObject().getStructure().hasCollapsedParent()) {
+		if (target == null || target.hasCollapsedParent()) {
 			return;
 		}
-		if (target.getObject().getStructure().isCollapsed()) {
+		if (target.isCollapsed()) {
 			connection.setTargetDecoration(new CollapsedDecoration(target));
 			return;
 		}

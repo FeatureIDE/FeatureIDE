@@ -146,9 +146,10 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		if (isCollapsed)
 			return true;
 		for (final IFeature f : getContainedFeatures()) {
-			if (!f.getStructure().hasCollapsedParent()) {
-				return false;
-			}
+			//TODO MISSING GMODEL
+//			if (!f.getStructure().hasCollapsedParent()) {
+//				return false;
+//			}
 		}
 		return true;
 	}

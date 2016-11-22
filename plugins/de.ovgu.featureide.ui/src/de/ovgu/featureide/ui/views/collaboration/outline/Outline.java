@@ -599,7 +599,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 														FmTreeContentProvider contentProvider = (FmTreeContentProvider) viewer.getContentProvider();
 														ArrayList<Object> expandedElements = new ArrayList<>();
 														for (IFeature f : contentProvider.getFeatureModel().getFeatures()) {
-															if (f.getStructure().hasChildren() && !f.getStructure().isCollapsed())
+															//TODO MISSING GMODEL   && !f.getStructure().isCollapsed()
+															if (f.getStructure().hasChildren())
 																expandedElements.add(f);
 														}
 														expandedElements.add("Constraints");
@@ -777,7 +778,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				if (syncCollapsedFeaturesToggle && viewer.getContentProvider() instanceof FmTreeContentProvider) {
 					for (IFeature f : ((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures()) {
 						if (!f.getStructure().isRoot()) {
-							f.getStructure().setCollapsed(true);
+							//TODO MISSING GMODEL
+							//f.getStructure().setCollapsed(true);
 						}
 					}
 					((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().fireEvent(new FeatureIDEEvent(
@@ -798,7 +800,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				}
 				if (syncCollapsedFeaturesToggle && viewer.getContentProvider() instanceof FmTreeContentProvider) {
 					for (IFeature f : ((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures()) {
-						f.getStructure().setCollapsed(false);
+						//TODO MISSING GMODEL
+						//f.getStructure().setCollapsed(false);
 					}
 					((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().fireEvent(new FeatureIDEEvent(
 							((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
@@ -1057,7 +1060,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		@Override
 		public void treeCollapsed(TreeExpansionEvent event) {
 			if (viewer.getContentProvider() instanceof FmTreeContentProvider && syncCollapsedFeaturesToggle && event.getElement() instanceof IFeature) {
-				((IFeature) event.getElement()).getStructure().setCollapsed(true);
+				//TODO MISSING GMODEL
+				//((IFeature) event.getElement()).getStructure().setCollapsed(true);
 				featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
 			}
 		}
@@ -1075,7 +1079,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 			}
 			if (viewer.getContentProvider() instanceof FmTreeContentProvider && syncCollapsedFeaturesToggle && event.getElement() instanceof IFeature) {
-				((IFeature) event.getElement()).getStructure().setCollapsed(false);
+				//TODO MISSING GMODEL
+				//((IFeature) event.getElement()).getStructure().setCollapsed(false);
 				featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
 			}
 		}

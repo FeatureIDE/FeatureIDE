@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
@@ -71,8 +72,10 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
+		if(graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) return new FeatureIDEEvent(null, EventType.DEFAULT);
 		for (IFeature f : affectedFeatureList) {
-			f.getStructure().setCollapsed(!collapse);
+			IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
+			graphicalF.setCollapsed(!collapse);
 		}
 		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
 
@@ -113,7 +116,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 
 			//expand next level
 			for (IFeature f : level) {
-				f.getStructure().setCollapsed(false);
+				IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
+				graphicalF.setCollapsed(false);
 			}
 			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 			((FeatureDiagramEditor) getEditor()).internRefresh(true);
@@ -153,7 +157,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			for(IFeature f : parentSet)
 			{
 				//Expand and relayout parent
-				f.getStructure().setCollapsed(false);
+				IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
+				graphicalF.setCollapsed(false);
 				((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 				((FeatureDiagramEditor) getEditor()).internRefresh(true);
 				
@@ -172,14 +177,16 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			for(IFeature f : parentSet)
 			{				
 				//collapse and relayout parent
-				f.getStructure().setCollapsed(true);
+				IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
+				graphicalF.setCollapsed(true);
 			}
 		}
 
 		if (bestSolution.size() > 0) {
 			for(IFeature f : bestSolution)
 			{
-				f.getStructure().getParent().setCollapsed(false);
+				IGraphicalFeature graphicalFParent = graphicalFeatureModel.getGraphicalFeature(f.getStructure().getParent().getFeature());
+				graphicalFParent.setCollapsed(false);
 			}
 		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
@@ -213,7 +220,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 */
 	private void collapseLayer(LinkedList<IFeature> level) {
 		for (IFeature feature : level) {
-			feature.getStructure().setCollapsed(true);
+			IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+			graphicalFeature.setCollapsed(true);
 		}
 	}
 

@@ -47,8 +47,6 @@ public interface IFeatureModelStructure {
 	boolean hasConcrete();
 
 	boolean hasHidden();
-	
-	boolean hasCollapsed();
 
 	boolean hasIndetHidden();
 	

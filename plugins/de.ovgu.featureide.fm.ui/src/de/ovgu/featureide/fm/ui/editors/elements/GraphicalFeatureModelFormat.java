@@ -99,7 +99,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				int x = 0;
 				int y = 0;
 				boolean collapsed = false;
-				
+
 				for (int i = 0; i < nodeMap.getLength(); i++) {
 					org.w3c.dom.Node node = nodeMap.item(i);
 					String attributeName = node.getNodeName();
@@ -150,6 +150,8 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				NamedNodeMap nodeMap = e.getAttributes();
 				int x = 0;
 				int y = 0;
+				boolean collapsed = false;
+
 				for (int i = 0; i < nodeMap.getLength(); i++) {
 					org.w3c.dom.Node node = nodeMap.item(i);
 					String attributeName = node.getNodeName();
@@ -166,11 +168,16 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 						} catch (NumberFormatException error) {
 							// throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 						}
+					} else if (attributeName.equals("collapsed")) {
+						collapsed = Boolean.parseBoolean(attributeValue);
 					} else {
 						// throwError("Unknown constraint attribute: " + attributeName, node);
 					}
 				}
-				constraint.setLocation(new Point(x, y));
+				if (constraint != null) {
+					constraint.setLocation(new Point(x, y));
+					constraint.setCollapsed(collapsed);
+				}
 			}
 		}
 	}
@@ -207,8 +214,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				final Point location = feat.getLocation();
 				fnod.setAttribute("X", Integer.toString(location.x));
 				fnod.setAttribute("Y", Integer.toString(location.y));
-				if(feat.isCollapsed())
-				{
+				if (feat.isCollapsed()) {
 					fnod.setAttribute("collapsed", TRUE);
 				}
 				struct.appendChild(fnod);
@@ -223,16 +229,27 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				}
 			}
 		}
-
-		if (!object.getLayout().hasFeaturesAutoLayout()) {
+		if (!object.getLayout().showHiddenFeatures() || !object.getLayout().hasFeaturesAutoLayout()) {
 			for (IGraphicalConstraint constr : object.getConstraints()) {
 				final Element rule = doc.createElement(RULE);
 				final Point location = constr.getLocation();
 				rule.setAttribute("X", Integer.toString(location.x));
 				rule.setAttribute("Y", Integer.toString(location.y));
+				if (constr.isCollapsed()) {
+					rule.setAttribute("collapsed", TRUE);
+				}
 				constraints.appendChild(rule);
 			}
+		} else if (object.getLayout().hasFeaturesAutoLayout()) {
+			for (IGraphicalConstraint constr : object.getConstraints()) {
+				if (constr.isCollapsed()) {
+					final Element rule = doc.createElement(RULE);
+					rule.setAttribute("collapsed", TRUE);
+					constraints.appendChild(rule);
+				}
+			}
 		}
+
 	}
 
 	@Override

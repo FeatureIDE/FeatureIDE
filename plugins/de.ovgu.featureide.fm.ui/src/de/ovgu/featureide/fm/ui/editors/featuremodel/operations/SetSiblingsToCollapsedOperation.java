@@ -29,6 +29,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to set all siblings to collapsed. Enables
@@ -39,7 +41,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperation {
 
 	private IFeature feature;
-
+	private IGraphicalFeatureModel graphicalFeatureModel;
 	private LinkedList<Boolean> collapseStates = new LinkedList<Boolean>();
 
 	/**
@@ -49,9 +51,10 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	 *            feature on which this operation will be executed
 	 * 
 	 */
-	public SetSiblingsToCollapsedOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, getLabel(feature));
+	public SetSiblingsToCollapsedOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
+		super(graphicalFeatureModel.getFeatureModel(), getLabel(feature));
 		this.feature = feature;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	/**
@@ -66,9 +69,10 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	protected FeatureIDEEvent operation() {
 		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
-				collapseStates.add(f.isCollapsed());
+				IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
+				collapseStates.add(graphicalFeature.isCollapsed());
 				if (!f.equals(feature.getStructure())) {
-					f.setCollapsed(true);
+					graphicalFeature.setCollapsed(true);
 				}
 			}
 		}
@@ -80,7 +84,8 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 		int i = 0;
 		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
-				f.setCollapsed(collapseStates.get(i++));
+				IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
+				graphicalFeature.setCollapsed(collapseStates.get(i++));
 			}
 		}
 		return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);

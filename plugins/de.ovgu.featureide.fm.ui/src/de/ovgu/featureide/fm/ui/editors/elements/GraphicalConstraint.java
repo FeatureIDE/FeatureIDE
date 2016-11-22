@@ -43,6 +43,7 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 	protected boolean featureSelected = false;
 	public boolean isImplicit = false;
+	protected boolean collapsed;
 
 	
 	protected Point location = new Point(0, 0);
@@ -148,5 +149,15 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	@Override
 	public void registerUIObject(IEventListener listener) {
 		this.uiObject = listener;
+	}
+	
+	@Override
+	public boolean isCollapsed() {
+		return collapsed;
+	}
+
+	@Override
+	public void setCollapsed(boolean collapse) {
+		collapsed = collapse;		
 	}
 }

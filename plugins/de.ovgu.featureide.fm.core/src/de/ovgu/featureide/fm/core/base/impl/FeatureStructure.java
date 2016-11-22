@@ -48,7 +48,6 @@ public class FeatureStructure implements IFeatureStructure {
 	protected final IFeature correspondingFeature;
 
 	protected boolean hidden;
-	protected boolean collapsed;
 
 	protected boolean mandatory;
 	protected boolean multiple;
@@ -147,11 +146,6 @@ public class FeatureStructure implements IFeatureStructure {
 		correspondingFeature.fireEvent(event);
 	}
 	
-	protected void fireCollapsedChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.COLLAPSED_CHANGED, Boolean.FALSE, Boolean.TRUE);
-		correspondingFeature.fireEvent(event);
-	}
-
 	protected void fireMandatoryChanged() {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
@@ -171,7 +165,7 @@ public class FeatureStructure implements IFeatureStructure {
 	public boolean hasVisibleChildren(boolean showHiddenFeature) {
 		boolean check = false;
 		for (IFeatureStructure child: children) {
-			if (!child.hasCollapsedParent() && (!child.hasHiddenParent() || showHiddenFeature)) {
+			if ((!child.hasHiddenParent() || showHiddenFeature)) {
 				check = true;
 			}
 		}
@@ -241,29 +235,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 		return false;
 	}
-	
 
-	/**
-	 * Checks for collapsed Parent. If the node to check is the root, the root collapse value is returned. 
-	 */
-	@Override
-	public boolean hasCollapsedParent() {
-
-		if (isRoot()) {
-
-			return false;
-		}
-		IFeatureStructure p = getParent();
-
-		while (!p.isRoot()) {
-			if (p.isCollapsed()) {
-				return true;
-			}
-			p = p.getParent();
-		}
-
-		return p.isCollapsed();
-	}
 
 	/**
 	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef ::
@@ -329,11 +301,6 @@ public class FeatureStructure implements IFeatureStructure {
 		return hidden;
 	}
 	
-	@Override
-	public boolean isCollapsed() {
-		return collapsed;
-	}
-
 	@Override
 	public boolean isMandatory() {
 		return (parent == null) || !parent.isAnd() || mandatory;
@@ -420,12 +387,6 @@ public class FeatureStructure implements IFeatureStructure {
 	public void setHidden(boolean hid) {
 		hidden = hid;
 		fireHiddenChanged();
-	}
-	
-	@Override
-	public void setCollapsed(boolean collapsed) {
-		this.collapsed = collapsed;
-		fireCollapsedChanged();
 	}
 
 	@Override

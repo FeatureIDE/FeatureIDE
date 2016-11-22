@@ -64,12 +64,13 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 
 			final IGraphicalFeature newParent = data.getNewParent();
 
-			if (newParent.getObject().getStructure().isCollapsed()) {
+			if (newParent.isCollapsed()) {
 				newParent.getObject().getStructure().addChildAtPosition(newParent.getObject().getStructure().getChildrenCount() + 1, featureStructure);
 				
 					for (IFeatureStructure fs : newParent.getObject().getStructure().getChildren()) {
 						if (fs != featureStructure) {
-							fs.setCollapsed(true);
+							IGraphicalFeature graphicalFS = feature.getGraphicalModel().getGraphicalFeature(fs.getFeature());
+							graphicalFS.setCollapsed(true);
 						}
 				}
 			} else {
@@ -82,8 +83,8 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 				newParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 			}
 
-			if (newParent.getObject().getStructure().isCollapsed()) {
-				newParent.getObject().getStructure().setCollapsed(false);
+			if (newParent.isCollapsed()) {
+				newParent.setCollapsed(false);
 				feature.getGraphicalModel().getFeatureModel().fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.COLLAPSED_CHANGED, null, null));
 			}
 		} else {

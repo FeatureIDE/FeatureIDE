@@ -412,7 +412,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		hiddenAction = new HiddenAction(this, featureModel);
 
 		collapseAction = new CollapseAction(this, graphicalFeatureModel);
-		collapseFeaturesAction = new CollapseSiblingsAction(this, featureModel);
+		collapseFeaturesAction = new CollapseSiblingsAction(this, graphicalFeatureModel);
 		collapseAllAction = new CollapseAllAction(this, graphicalFeatureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
 		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR);
@@ -908,11 +908,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IFeatureModel fm = (IFeatureModel) event.getSource();
 			if (parent != null && parent != newFeature) {
 				// Uncollapse if collapsed
-				if (parent.getStructure().isCollapsed()) {
-					parent.getStructure().setCollapsed(false);
+				IGraphicalFeature graphicalParent = graphicalFeatureModel.getGraphicalFeature(parent);
+				if (graphicalParent.isCollapsed()) {
+					graphicalParent.setCollapsed(false);
 					for (IFeatureStructure featureStructure : parent.getStructure().getChildren()) {
 						if (featureStructure != newFeature.getStructure()) {
-							featureStructure.setCollapsed(true);
+							IGraphicalFeature graphicalFeatureStructure = graphicalFeatureModel.getGraphicalFeature(featureStructure.getFeature());
+							graphicalFeatureStructure.setCollapsed(true);
 						}
 					}
 					fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED, null, null));
