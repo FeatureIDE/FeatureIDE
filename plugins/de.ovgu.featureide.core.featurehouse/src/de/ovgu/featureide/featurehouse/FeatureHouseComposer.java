@@ -860,7 +860,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
-		List<String> featureOrder = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
+		List<String> featureOrder = featureProject.getFeatureModel().getFeatureOrderList();
 		String[] features = new String[featureOrder.size()];
 		int i = 0;
 		for (String f : featureOrder) {
@@ -1011,7 +1011,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
 
-		List<String> featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
+		List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
 		String[] features = new String[featureOrderList.size()];
 		int i = 0;
 		for (String f : featureOrderList) {

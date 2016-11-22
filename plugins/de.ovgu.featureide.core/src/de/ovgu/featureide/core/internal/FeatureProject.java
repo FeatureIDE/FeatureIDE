@@ -281,6 +281,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							break;
 						}
 					}
+					if(addedFeatures < 10 && addedFeatures > 0)
+					{
+						message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ")+2);						
+					}
 
 					return message.toString();
 				}
@@ -855,6 +859,15 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		try {
 			List<IFile> configs = getAllConfigurations();
+			IResourceDelta configurationDelta = event.getDelta().findMember(configFolder.getFullPath());
+			if(configurationDelta != null)
+			{
+				for (IResourceDelta delta : configurationDelta.getAffectedChildren(IResourceDelta.REMOVED)) {
+					CorePlugin.getDefault().logInfo(delta.toString() + " was removed.");
+					//if configuration was removed update warnings
+					checkFeatureCoverage();
+				}
+			}
 			List<IFile> changedConfigs = new ArrayList<IFile>();
 			IFile currentConfig = getCurrentConfiguration();
 			for (IFile config : configs) {
