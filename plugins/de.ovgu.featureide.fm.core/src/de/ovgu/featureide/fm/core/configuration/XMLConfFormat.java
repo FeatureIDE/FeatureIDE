@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.AssertionFailedException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,6 +31,7 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
+import de.ovgu.featureide.fm.core.io.xml.PositionalXMLHandler;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -50,7 +50,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	public IPersistentFormat<Configuration> getInstance() {
-		return null;
+		return this;
 	}
 
 	@Override
@@ -65,28 +65,68 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
-		Element root = doc.getDocumentElement();
+		final Element root = doc.getDocumentElement();
+		if (root == null) {
+			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));
+			return;
+		}
 		if (root.getNodeName().equals("configuration")) {
 			for (Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
-				SelectableFeature selectablefeature = object.getSelectablefeature(feature.getAttribute(ATTRIBUTE_NAME));
-				selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC)));
-				selectablefeature.setManual(getSelection(feature.getAttribute(ATTRIBUTE_MANUAL)));
+				final SelectableFeature selectablefeature;
+				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
+					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
+					selectablefeature = object.getSelectablefeature(featureName);
+					if (selectablefeature == null) {
+						createWarning("Invalid feature name: " + featureName, feature, warnings);
+						continue;
+					}
+				} else {
+					createWarning("No feature name specified", feature, warnings);
+					continue;
+				}
+
+				if (feature.hasAttribute(ATTRIBUTE_AUTOMATIC)) {
+					selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC), feature, warnings));
+				} else {
+					createWarning("No automatic selection state specified", feature, warnings);
+					continue;
+				}
+
+				if (feature.hasAttribute(ATTRIBUTE_MANUAL)) {
+					selectablefeature.setManual(getSelection(feature.getAttribute(ATTRIBUTE_MANUAL), feature, warnings));
+				} else {
+					createWarning("No manual selection state specified", feature, warnings);
+					continue;
+				}
+			}
+		} else {
+			warnings.add(new Problem("Root element must be <configuration>", 1, Problem.Severity.ERROR));
+		}
+	}
+
+	protected void createWarning(final String message, Element feature, List<Problem> warnings) {
+		final Object lineNumber = feature.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
+		warnings.add(new Problem(message, (lineNumber instanceof Integer) ? (int) lineNumber : 1, Problem.Severity.WARNING));
+	}
+
+	private Selection getSelection(String selection, Element feature, List<Problem> warnings) {
+		if (selection == null) {
+			createWarning("Selection state not specified" + selection, feature, warnings);
+			return Selection.UNDEFINED;
+		} else {
+			switch (selection) {
+			case "selected":
+				return Selection.SELECTED;
+			case "undefined":
+				return Selection.UNDEFINED;
+			case "unselected":
+				return Selection.UNSELECTED;
+			default:
+				createWarning("Invalid selection state: " + selection, feature, warnings);
+				return Selection.UNDEFINED;
 			}
 		}
 	}
-	
-	private Selection getSelection(String selection) {
-		switch (selection) {
-		case "selected":
-			return Selection.SELECTED;
-		case "undefined":
-			return Selection.UNDEFINED;
-		case "unselected":
-			return Selection.UNSELECTED;
-		default:
-			throw new AssertionFailedException(selection);
-		} 
-	}	
 
 	private String getSelectionString(Selection selection) {
 		switch (selection) {
@@ -98,7 +138,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			return "unselected";
 		default:
 			throw new RuntimeException(selection.toString());
-		} 
+		}
 	}
 
 	@Override

@@ -424,8 +424,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		final String orgExtension;
 		final int extIndex = configName.lastIndexOf('.');
 		if (extIndex > 0) {
-			configName = configName.substring(0, extIndex);
 			orgExtension = configName.substring(extIndex + 1);
+			configName = configName.substring(0, extIndex);
 		} else {
 			orgExtension = "";
 		}
