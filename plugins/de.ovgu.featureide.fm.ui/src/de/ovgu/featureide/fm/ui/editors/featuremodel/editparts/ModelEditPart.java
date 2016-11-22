@@ -34,6 +34,8 @@ import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
@@ -76,11 +78,11 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		final IGraphicalFeatureModel fm = getFeatureModel();
 
 		final List<?> constraints = fm.getConstraints();
-		final Collection<?> features = Functional.toList(fm.getFeatures());
+		final Collection<IGraphicalFeature> features = Functional.toList(fm.getFeatures());
 
 		final ArrayList<Object> list = new ArrayList<>(constraints.size() + features.size() + 1);
-
-		list.addAll(features);
+		
+		addAllNonCollapsedFeatures(list, features);
 		list.addAll(constraints);
 
 		if (!FMPropertyManager.isLegendHidden()) {
@@ -93,5 +95,15 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 	@Override
 	public EditPart createChild(Object model) {
 		return super.createChild(model);
+	}
+	
+	public  void addAllNonCollapsedFeatures(ArrayList<Object> list, Collection<IGraphicalFeature> features)
+	{
+		for (IGraphicalFeature feature 	: features) {
+			if(!feature.hasCollapsedParent())
+			{
+				list.add(feature);
+			}
+		}
 	}
 }

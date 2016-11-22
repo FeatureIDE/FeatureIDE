@@ -183,7 +183,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		refreshCollapsedDecorator();
 		
 	}
-
+	
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();

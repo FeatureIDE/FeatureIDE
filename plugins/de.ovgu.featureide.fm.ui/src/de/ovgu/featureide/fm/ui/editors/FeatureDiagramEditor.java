@@ -733,7 +733,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	public void reload() {// TODO do not layout twice
-		internRefresh(true);
+//		internRefresh(true);
 		((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 		internRefresh(true);
 	}
@@ -1094,12 +1094,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case COLLAPSED_CHANGED:
 			//Reload editpart to notify the diagramm that the IGraphicalModel has changed
-			reload();
+			
 			if (event.getNewValue() == null) {
 				IFeature selectedFeature = (IFeature) event.getSource();
 				refreshChildAll(selectedFeature);
 			}
-			internRefresh(true);
+			reload();
+//			internRefresh(true);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
 			break;
