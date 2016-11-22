@@ -331,7 +331,7 @@ public class GuidslReader {
 		ESList eSList = consStmt.getESList();
 		AstListNode astListNode = (AstListNode) eSList.arg[0];
 		do {
-			line = 0;
+			line = 1;
 			Node node = exprToNode(((EStmt) astListNode.arg[0]).getExpr());
 			try {
 				if (!new SatSolver(new Not(node.clone()), 250).isSatisfiable())

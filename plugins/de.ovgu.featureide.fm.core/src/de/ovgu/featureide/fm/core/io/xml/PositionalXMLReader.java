@@ -47,6 +47,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * @author Jens Meinicke
  */
+@Deprecated
 public class PositionalXMLReader {
     final static String LINE_NUMBER_KEY_NAME = "lineNumber";
 
