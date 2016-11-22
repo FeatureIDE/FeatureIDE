@@ -55,7 +55,7 @@ public class Problem {
 	public final Throwable error;
 
 	public Problem(Throwable throwable) {
-		this(throwable.getMessage(), 0, Severity.ERROR, throwable);
+		this(throwable.getMessage(), 1, Severity.ERROR, throwable);
 	}
 
 	public Problem(Throwable throwable, int line) {

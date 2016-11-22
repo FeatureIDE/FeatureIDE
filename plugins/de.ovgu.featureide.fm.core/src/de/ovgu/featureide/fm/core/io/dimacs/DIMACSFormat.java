@@ -65,7 +65,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		final LinkedList<String> sb = new LinkedList<>();
 
 		String[] names = null;
-		int lineNumber = 0;
+		int lineNumber = 1;
 		try (BufferedReader r = new BufferedReader(new StringReader(source.toString()))) {
 			String str = null;
 			while ((str = r.readLine()) != null) {
