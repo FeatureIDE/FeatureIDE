@@ -599,15 +599,13 @@ public class ConstraintDialog implements GUIDefaults {
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
 			for (IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
-					//WIP GR
-					//op = new EditConstraintOperation(graph constraint, propNode);
+					op = new EditConstraintOperation(featureModel, c, propNode);
 					break;
 				}
 			}
 		}
 		if (op == null) {
-			//WIP GR
-			//op = new CreateConstraintOperation(propNode, featureModel);
+			op = new CreateConstraintOperation(propNode, featureModel);
 		}
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

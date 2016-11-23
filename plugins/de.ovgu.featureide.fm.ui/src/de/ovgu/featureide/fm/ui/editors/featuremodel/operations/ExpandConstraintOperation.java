@@ -62,14 +62,18 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		}
 
 		IFeatureStructure p = feature.getStructure().getParent();
-		IGraphicalFeature g = graphicalFeatureModel.getGraphicalFeature(feature);
+		IGraphicalFeature g = null;
 		while (!p.isRoot()) {
+			g = graphicalFeatureModel.getGraphicalFeature(p.getFeature());
 			if (g.isCollapsed()) {
 				expandFeature(g);
 			}
 			p = p.getParent();
 		}
-		g.setCollapsed(false);
+		if(g != null)
+		{
+			g.setCollapsed(false);
+		}
 	}
 
 	@Override
@@ -86,7 +90,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 			expandParents(feature);
 		}
 
-		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint);
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_ALL_CHANGED, null, iConstraint);
 	}
 
 	@Override
@@ -98,7 +102,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 		for (IGraphicalFeature f : affectedFeatureList) {
 			expandFeature(f);
 		}
-		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_CHANGED, null, iConstraint);
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_ALL_CHANGED, null, iConstraint);
 	}
 
 	/**

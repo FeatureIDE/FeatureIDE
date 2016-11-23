@@ -26,6 +26,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -43,26 +44,18 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint constraint;
 	private Node newNode;
 	private Node oldNode;
-	private IGraphicalFeatureModel graphcialFeatureModel;
 	
-	public EditConstraintOperation(IGraphicalFeatureModel graphcialFeatureModel, IConstraint constraint, Node propNode) {
-		super(graphcialFeatureModel.getFeatureModel(), EDIT_CONSTRAINT);
+	public EditConstraintOperation(IFeatureModel featureModel, IConstraint constraint, Node propNode) {
+		super(featureModel, EDIT_CONSTRAINT);
 		this.newNode = propNode;
 		this.oldNode = constraint.getNode();
 		this.constraint = constraint;
-		this.graphcialFeatureModel = graphcialFeatureModel;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
 		constraint.setNode(newNode);
 
-		ExpandConstraintOperation operation = new ExpandConstraintOperation(graphcialFeatureModel, constraint);
-		try {
-			operation.execute(null,  null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldNode, newNode);
 	}
 

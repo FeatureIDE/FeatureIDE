@@ -42,29 +42,29 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint constraint;
-	private IGraphicalFeatureModel	graphicalFeatureModel;
+	private IFeatureModel	featureModel;
 	/**
 	 * @param node
 	 *            the node representing the constraint to be added
 	 * @param featureModel
 	 *            model that will be used to add the constraint
 	 */
-	public CreateConstraintOperation(Node node, IGraphicalFeatureModel graphicalFeatureModel) {
-		super(graphicalFeatureModel.getFeatureModel(), CREATE_CONSTRAINT);
+	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
+		super(featureModel, CREATE_CONSTRAINT);
 		constraint = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, node);
-		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
 		featureModel.addConstraint(constraint);
 
-		ExpandConstraintOperation operation = new ExpandConstraintOperation(graphicalFeatureModel, constraint);
-		try {
-			operation.execute(null,  null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+//		ExpandConstraintOperation operation = new ExpandConstraintOperation(featureModel, constraint);
+//		try {
+//			operation.execute(null,  null);
+//		} catch (ExecutionException e) {
+//			FMUIPlugin.getDefault().logError(e);
+//		}
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_ADD, null, constraint);
 	}
 
