@@ -48,6 +48,8 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	void refreshContextMenu();
 	
+	void refreshConstraints();
+	
 	Collection<IGraphicalFeature> getFeatures();
 
 	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
@@ -59,5 +61,40 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	IGraphicalFeatureModel clone();
 	
 	void init();
+
+	/**
+	 * Returns the list of not collapsed constraints stored in this feature model.
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.3
+	 * 
+	 * @return All not collapsed constraints stored in this feature model.
+	 */
+	List<IGraphicalConstraint> getVisibleConstraints();
+
+	/**
+	 * Returns the list of not collapsed features stored in this feature model.
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * 
+	 * @since 3.3
+	 * 
+	 * @return All not collapsed constraints stored in this feature model.
+	 */
+	List<IGraphicalFeature> getVisibleFeatures();
+
 
 }

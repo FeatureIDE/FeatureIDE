@@ -733,7 +733,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	public void reload() {// TODO do not layout twice
-//		internRefresh(true);
+		//		internRefresh(true);
+		graphicalFeatureModel.refreshConstraints();
 		((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 		internRefresh(true);
 	}
@@ -823,10 +824,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 						graphicalFeatureModel.getGraphicalFeature(f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}
-					for (IConstraint c : featureModelEditor.getFeatureModel()
-							.getVisibleConstraints(graphicalFeatureModel.getLayout().showCollapsedConstraints())) {
-						c.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
-						graphicalFeatureModel.getGraphicalConstraint(c).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+					for (IGraphicalConstraint c : graphicalFeatureModel.getVisibleConstraints()) {
+						c.getObject().fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
+						c.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}
 				} else {
 					for (Object f : changedAttributes.keySet()) {
@@ -1021,7 +1021,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			if (extraPath != null) {
-			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
 			}
 			final Map<?, ?> registry = getEditPartRegistry();
 			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
@@ -1095,12 +1095,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case COLLAPSED_CHANGED:
 			//Reload editpart to notify the diagramm that the IGraphicalModel has changed
 			reload();
-			
+
 			if (event.getNewValue() == null) {
 				IFeature selectedFeature = (IFeature) event.getSource();
 				refreshChildAll(selectedFeature);
 			}
-//			internRefresh(true);
+			//			internRefresh(true);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
 			break;
@@ -1168,14 +1168,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 		refreshFeature(parent);
 	}
-	
-	void refreshFeature(IFeature feature)
-	{
-		if(!graphicalFeatureModel.getLayout().showHiddenFeatures() && feature.getStructure().isHidden()) return;
+
+	void refreshFeature(IFeature feature) {
+		if (!graphicalFeatureModel.getLayout().showHiddenFeatures() && feature.getStructure().isHidden())
+			return;
 		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
-		if(editPart == null) return;
-		
+		if (editPart == null)
+			return;
+
 		//Refresh Connection
 		for (FeatureConnection connection : graphicalFeature.getTargetConnections()) {
 			Map<?, ?> registry2 = getEditPartRegistry();

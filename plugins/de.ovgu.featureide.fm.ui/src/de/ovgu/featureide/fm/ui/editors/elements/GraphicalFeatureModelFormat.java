@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -71,6 +72,12 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 			object.getLayout().showHiddenFeatures(true);
 		} else if (showHidden.equals(FALSE)) {
 			object.getLayout().showHiddenFeatures(false);
+		}
+		String showCollapsedConstraints = eElement.getAttribute(SHOW_COLLAPSED_CONSTRAINTS);
+		if (showCollapsedConstraints.equals(TRUE)) {
+			object.getLayout().showCollapsedConstraints(true);
+		} else if (showCollapsedConstraints.equals(FALSE)) {
+			object.getLayout().showCollapsedConstraints(false);
 		}
 		String showShort = eElement.getAttribute(SHOW_SHORT_NAMES);
 		if (showShort.equals(TRUE)) {
@@ -199,6 +206,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		}
 		if (object.getLayout().showShortNames()) {
 			root.setAttribute(SHOW_SHORT_NAMES, TRUE);
+		}
+		if (!object.getLayout().showCollapsedConstraints()) {
+			root.setAttribute(SHOW_COLLAPSED_CONSTRAINTS, FALSE);
 		}
 
 		doc.appendChild(root);
