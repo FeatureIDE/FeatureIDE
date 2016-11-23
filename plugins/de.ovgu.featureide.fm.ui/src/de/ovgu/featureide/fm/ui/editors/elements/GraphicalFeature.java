@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -236,6 +238,19 @@ public class GraphicalFeature implements IGraphicalFeature {
 			parent = parent.getFeature().getStructure().getParent();
 		}
 		return false;
+	}
+
+
+	@Override
+	public List<IGraphicalFeature> getGraphicalChildren() {
+		List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (IFeatureStructure f : getObject().getStructure().getChildren()) {
+			IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
+			if (!gf.hasCollapsedParent()) {
+				features.add(gf);
+			}
+		}
+		return Collections.unmodifiableList(features);
 	}
 
 }

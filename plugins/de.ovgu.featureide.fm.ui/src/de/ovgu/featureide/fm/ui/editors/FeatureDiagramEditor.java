@@ -1100,16 +1100,24 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				IFeature selectedFeature = (IFeature) event.getSource();
 				refreshChildAll(selectedFeature);
 			}
-			//			internRefresh(true);
+			internRefresh(false);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
+
+			//Center collapsed feature after operation
+			if (event.getSource() instanceof IFeature) {
+				centerPointOnScreen((IFeature) event.getSource());
+			}
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			reload();
 			refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
-			internRefresh(true);
+			internRefresh(false);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
+
+			//Center root feature after operation
+			centerPointOnScreen(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
@@ -1141,10 +1149,22 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 * 
 	 * @param centerFeature
 	 */
-	public void centerPointOnScreen(int x, int y, int offsetX, int offsetY) {
-		int xCenter = (int) (zoomManager.getZoom() * x - (getFigureCanvas().getViewport().getSize().width / 2) + (zoomManager.getZoom() * offsetX));
-		int yCenter = (int) (zoomManager.getZoom() * y - (getFigureCanvas().getViewport().getSize().height / 2) + (zoomManager.getZoom() * offsetY));
-		getFigureCanvas().getViewport().setViewLocation(xCenter, yCenter);
+	public void centerPointOnScreen(IFeature feature) {
+		
+		IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+		final Map<?, ?> registryCollapsed = getEditPartRegistry();
+		final Object featureEditPart = registryCollapsed.get(graphFeature);
+		if (featureEditPart instanceof FeatureEditPart) {
+			FeatureEditPart editPart = (FeatureEditPart) featureEditPart;
+
+			int x = editPart.getFigure().getBounds().x; 
+			int y = editPart.getFigure().getBounds().y; 
+			int offsetX = editPart.getFigure().getBounds().width / 2;
+			int offsetY =  editPart.getFigure().getBounds().height / 2;
+			int xCenter = (int) (zoomManager.getZoom() * x - (getFigureCanvas().getViewport().getSize().width / 2) + (zoomManager.getZoom() * offsetX));
+			int yCenter = (int) (zoomManager.getZoom() * y - (getFigureCanvas().getViewport().getSize().height / 2) + (zoomManager.getZoom() * offsetY));
+			getFigureCanvas().getViewport().setViewLocation(xCenter, yCenter);
+		}
 	}
 
 	private void refreshAll() {

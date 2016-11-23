@@ -90,7 +90,7 @@ public class FeatureDiagramLayoutHelper {
 		int rightX = Integer.MIN_VALUE;
 		final int constraintCount = featureModel.getConstraints().size();
 		if (constraintCount == 1) {
-			for (IGraphicalFeature feature : featureModel.getFeatures()) {
+			for (IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 				if (feature.getLocation().y > newLocation.y) {
 					newLocation.y = feature.getLocation().y;
 				}

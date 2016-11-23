@@ -195,7 +195,7 @@ public class FeatureDragAndDropCommand extends Command {
 	public IGraphicalFeature calculateNext(final Point referencePoint) {
 		IGraphicalFeature next = null;
 		int distance = Integer.MAX_VALUE;
-		for (IGraphicalFeature child : featureModel.getFeatures()) {
+		for (IGraphicalFeature child : featureModel.getVisibleFeatures()) {
 			final Point targetLocation = FeatureUIHelper.getTargetLocation(child);
 			if (hasVerticalLayout && targetLocation.x < referencePoint.x || !hasVerticalLayout && targetLocation.y < referencePoint.y) {
 				int newDistance = (int) targetLocation.getDistance(referencePoint);

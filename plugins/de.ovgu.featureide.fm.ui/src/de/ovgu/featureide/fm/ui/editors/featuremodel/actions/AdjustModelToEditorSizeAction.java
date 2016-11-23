@@ -68,7 +68,7 @@ public class AdjustModelToEditorSizeAction extends Action {
 		if(editor != null && editor instanceof FeatureDiagramEditor)
 		{
 			IGraphicalFeature graphicalRoot = FeatureUIHelper.getGraphicalFeature(root, editor.getGraphicalFeatureModel());
-			editor.centerPointOnScreen(graphicalRoot.getLocation().x + graphicalRoot.getSize().width/2, graphicalRoot.getLocation().y + graphicalRoot.getSize().height/2, 0 ,0);
+			editor.centerPointOnScreen(graphicalRoot.getObject());
 		}
 	}
 

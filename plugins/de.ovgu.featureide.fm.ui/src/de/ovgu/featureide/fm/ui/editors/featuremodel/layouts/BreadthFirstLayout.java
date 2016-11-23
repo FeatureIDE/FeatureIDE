@@ -24,6 +24,7 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;

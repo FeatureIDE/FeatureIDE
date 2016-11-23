@@ -29,6 +29,8 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -88,7 +90,7 @@ abstract public class FeatureDiagramLayoutManager {
 	void centerLayoutX(IGraphicalFeatureModel featureModel) {
 		int mostRightFeatureX = Integer.MIN_VALUE;
 		int mostLeftFeatureX = Integer.MAX_VALUE;
-		for (IGraphicalFeature feature : featureModel.getFeatures()) {
+		for (IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 			int tempX = feature.getLocation().x;
 			int tempXOffset = feature.getSize().width;
 			if (mostRightFeatureX < tempX + tempXOffset)
@@ -98,7 +100,7 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 		int width = mostRightFeatureX - mostLeftFeatureX;
 		int offset = mostRightFeatureX - ((controlWidth - width) / 2);
-		for (IGraphicalFeature feature : featureModel.getFeatures()) {
+		for (IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 			setLocation(feature, new Point(feature.getLocation().getCopy().x + offset, feature.getLocation().getCopy().y));
 		}
 	}
@@ -126,7 +128,7 @@ abstract public class FeatureDiagramLayoutManager {
 		 * update lowest, highest, most left, most right coordinates
 		 * for features
 		 */
-		Iterable<IGraphicalFeature> nonHidden = featureModel.getFeatures();
+		Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();
 		for (IGraphicalFeature feature : nonHidden) {
 			Rectangle position = FeatureUIHelper.getBounds(feature);
 			if (position.x < min.x)
@@ -143,7 +145,7 @@ abstract public class FeatureDiagramLayoutManager {
 		 * update lowest, highest, most left, most right coordinates
 		 * for constraints
 		 */
-		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
+		for (IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
 			Rectangle position = FeatureUIHelper.getBounds(constraint);
 			if (position.x < min.x)
 				min.x = position.x;
@@ -254,6 +256,6 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
-		return FeatureUIHelper.getGraphicalChildren(feature);
+		return Functional.toList(feature.getGraphicalChildren());
 	}
 }

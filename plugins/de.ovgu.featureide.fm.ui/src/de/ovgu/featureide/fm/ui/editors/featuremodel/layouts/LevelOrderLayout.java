@@ -27,6 +27,7 @@ import java.util.List;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -80,7 +81,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void layoutLevelInX(LinkedList<IGraphicalFeature> level) {
 		for (IGraphicalFeature feature : level)
-			if (feature.getObject().getStructure().hasVisibleChildren(feature.getGraphicalModel().getLayout().showHiddenFeatures())) {
+			if (!feature.isCollapsed() && feature.getGraphicalChildren().size() > 0) {
 				centerAboveChildren(feature);
 			}
 
@@ -96,7 +97,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
 		
-		if (!feature.getObject().getStructure().hasVisibleChildren(feature.getGraphicalModel().getLayout().showHiddenFeatures()))
+		if (feature.getGraphicalChildren().size() == 0)
 			nextToLeftSibling(feature, lastFeature);
 		else {
 			if (lastFeature != null)
@@ -108,7 +109,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				firstCompound = false;
 				boolean compoundSibling = false;
 				for (int k = j - 1; k >= 0; k--)
-					if (level.get(k).getObject().getStructure().hasVisibleChildren(feature.getGraphicalModel().getLayout().showHiddenFeatures()))
+					if (level.get(k).getGraphicalChildren().size() > 0)
 						compoundSibling = true;
 				if (!compoundSibling)
 					for (int k = j - 1; k >= 0; k--)
