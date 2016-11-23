@@ -335,28 +335,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @return <b>true</b> if a feature (or a features parent) is marked as <i>hidden</i> and contained in the formula of this constraint
 	 */
 	boolean hasHiddenFeatures();
-	
-	/**
-	 * Returns whenever this constraints contains only features which are <i>collapsed</i>
-	 * <br/>
-	 * <br/>
-	 * Checks if all features contained in this constraint are <i>collapsed</i> by checking
-	 * if all features in the set of contained features have a <i>collapsed</i> parent. If all features are collapsed, the method returns <b>true</b>,
-	 * otherwise <b>false</b>.
-	 * 
-	 * <br/><br/>
-	 * <b>Notes on side effects and <code>null</code> references</b><br/>
-	 * Calling this method:
-	 * <ul>
-	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
-	 * </ul>
-	 * 
-	 * @since 3.0
-	 * 
-	 * @return <b>true</b> if a feature (or a features parent) is marked as <i>hidden</i> and contained in the formula of this constraint
-	 */
-	boolean isCollapsed();
-	
+		
 	/**
 	 * Sets the analysis attribute for this constraints which determine how this constraint affects features.
 	 * <br/><br/>
@@ -417,26 +396,6 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @param deadFeatures iterable of features which are claimed to be dead
 	 */
 	void setDeadFeatures(Iterable<IFeature> deadFeatures);
-
-	/**
-	 * Sets the collection of <i>dead</i> features caused by this constraint to the values stored
-	 * in <code>deadFeature</code>.
-	 * 
-	 * <br/><br/>
-	 * <b>Notes on side effects and <code>null</code> references</b><br/>
-	 * Calling this method:
-	 * <ul>
-	 * <li>does <b>affect</b> the <b>members</b> in this object.</li>
-	 * <li>does <b>not</b> affect the <b>parameter</b> <code>deadFeatures</code>.</li>
-	 * <li>the parameter <code>deadFeatures</code> is expected to be <b>non-null</b></li>
-	 * </ul>
-	 * 
-	 * @see #getDeadFeatures()
-	 * @see Functional#getEmptyIterable(Class) Setting an empty iterable
-	 * 
-	 * @param deadFeatures iterable of features which are claimed to be dead
-	 */
-	void setCollapsed(boolean collapse);
 
 	/**
 	 * Calculates and sets the collections of <i>false optional</i> features in <code>featureModel</code> caused by this constraint.

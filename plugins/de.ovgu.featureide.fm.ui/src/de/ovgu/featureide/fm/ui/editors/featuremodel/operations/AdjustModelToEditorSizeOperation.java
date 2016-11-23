@@ -91,7 +91,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	public void calculateVisibleLayer(IFeature root) {
 		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
 		for (IConstraint ic : featureModel.getConstraints()) {
-			ic.setCollapsed(true);
+			//TODO MISSING GMODEL
+			//ic.setCollapsed(true);
 		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 
@@ -129,7 +130,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		} while (lastStep != null && lastStep.size() != 0);
 		
 		for (IConstraint ic : featureModel.getConstraints()) {
-			ic.setCollapsed(false);
+			//TODO MISSING GMODEL
+			//ic.setCollapsed(false);
 		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 	}

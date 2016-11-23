@@ -58,7 +58,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	protected Node propNode;
 	boolean featureSelected;
 	boolean isImplicit;
-	boolean isCollapsed;
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
@@ -142,19 +141,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	}
 
 	@Override
-	public boolean isCollapsed() {
-		if (isCollapsed)
-			return true;
-		for (final IFeature f : getContainedFeatures()) {
-			//TODO MISSING GMODEL
-//			if (!f.getStructure().hasCollapsedParent()) {
-//				return false;
-//			}
-		}
-		return true;
-	}
-
-	@Override
 	public void setConstraintAttribute(ConstraintAttribute attribute, boolean notifyListeners) {
 		this.attribute = attribute;
 		if (notifyListeners) {
@@ -179,11 +165,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	public void setDeadFeatures(Iterable<IFeature> deadFeatures) {
 		this.deadFeatures.clear();
 		this.deadFeatures.addAll(Functional.toList(deadFeatures));
-	}
-
-	@Override
-	public void setCollapsed(boolean collapse) {
-		isCollapsed = collapse;
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		layout(root);
-		layout(featureDiagramBottom, featureModel.getConstraints());
+		layout(featureDiagramBottom, featureModel.getVisibleConstraints());
 	}
 
 	private void layout(IGraphicalFeature root) {
@@ -130,7 +130,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				l = k + 1;
 				break;
 			}
-			if (sibling.getObject().getStructure().hasVisibleChildren(feature.getGraphicalModel().getLayout().showHiddenFeatures())) {
+			if (sibling.getGraphicalChildren().size() > 0) {
 				l = k + 1;
 				right = false;
 				space = getBounds(feature).x - getBounds(sibling).right() - width;

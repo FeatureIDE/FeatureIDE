@@ -49,8 +49,6 @@ public interface IFeatureModelStructure {
 	boolean hasHidden();
 
 	boolean hasIndetHidden();
-	
-	boolean hasCollapsedConstraint();
 
 	boolean hasMandatoryFeatures();
 

@@ -137,7 +137,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasAlternativeGroup() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
-			//TODO MISSING GMODEL	:	!f.getStructure().isCollapsed() && 
 			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAlternative()) {
 				return true;
 			}
@@ -148,7 +147,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasAndGroup() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
-			//TODO MISSING GMODEL	:	!f.getStructure().isCollapsed() &&
 			if ( (f.getStructure().getChildrenCount() > 1) && f.getStructure().isAnd()) {
 				return true;
 			}
@@ -187,16 +185,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	}
 	
 	@Override
-	public boolean hasCollapsedConstraint() {
-		for (final IConstraint f : correspondingFeatureModel.getConstraints()) {
-			if (f.isCollapsed()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
 	public boolean hasMandatoryFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
 			final IFeatureStructure parent = f.getStructure().getParent();
@@ -220,7 +208,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOrGroup() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
-			//TODO MISSING GMODEL	:	!f.getStructure().isCollapsed() &&
 			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isOr()) {
 				return true;
 			}
@@ -232,7 +219,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public int numAlternativeGroup() {
 		int count = 0;
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
-			//TODO MISSING GMODEL	:	!f.getStructure().isCollapsed() &&
 			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAlternative()) {
 				count++;
 			}
@@ -244,7 +230,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public int numOrGroup() {
 		int count = 0;
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
-			//TODO MISSING GMODEL	:	!f.getStructure().isCollapsed() &&
 			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isOr()) {
 				count++;
 			}
@@ -268,8 +253,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	private boolean existsFeatureWithStatus(FeatureStatus status) {
 		for (final IFeature f : correspondingFeatureModel.getFeatureTable().values()) {
-			//TODO MISSING GMODEL
-			if ((!f.getStructure().hasHiddenParent() || showHiddenFeatures))// && !f.getStructure().hasCollapsedParent())
+			if ((!f.getStructure().hasHiddenParent() || showHiddenFeatures))
 				if (f.getProperty().getFeatureStatus() == status) {
 					return true;
 				}
