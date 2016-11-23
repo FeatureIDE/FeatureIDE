@@ -45,7 +45,6 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
@@ -54,12 +53,9 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.SourceAnchor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.TargetAnchor;
@@ -138,15 +134,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		IFeature feature = this.feature.getObject();
-		Explanation explanation = null;
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
-		
-		boolean hasExpl = false;
-		if (feature.getProperty().getFeatureStatus() == FeatureStatus.DEAD || 
-				feature.getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL || 
-				feature.getStructure().isRoot() && !analyser.valid()) {
-			hasExpl = true;
-		}
 		
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
 			// only color if the active profile is not the default profile
@@ -165,17 +153,13 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			if (feature.getStructure().isRoot() && !analyser.valid()) {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-				explanation = analyser.getDeadFeatureExplanation(feature);
+				toolTip.append(VOID);
 			} else {
 				if (feature.getStructure().isConcrete()) {
-					if (!hasExpl) {
-						toolTip.append(CONCRETE);
-					}
+					toolTip.append(CONCRETE);
 				} else {
 					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					if (!hasExpl) {
-						toolTip.append(ABSTRACT);
-					}
+					toolTip.append(ABSTRACT);
 				}
 
 				if (feature.getStructure().hasHiddenParent()) {
@@ -184,22 +168,18 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 					toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
 				}
 
-				if (!hasExpl) {
-					toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
-				}
+				toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
 
 				switch (feature.getProperty().getFeatureStatus()) {
 				case DEAD:
-					if (analyser.valid()) {
-						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-						explanation = analyser.getDeadFeatureExplanation(feature);
-					}
+					setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+					setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+					toolTip.append(DEAD);
 					break;
 				case FALSE_OPTIONAL:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
 					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-					explanation = analyser.getFalseOptionalFeatureExplanation(feature);
+					toolTip.append(FALSE_OPTIONAL);
 					break;
 				case INDETERMINATE_HIDDEN:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
@@ -240,7 +220,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
 		if (!contraints.isEmpty()) {
-			String c = hasExpl? "\nConstraints:\n" : "\n\nConstraints:\n";
+			String c = "\n\nConstraints:\n";
 			toolTip.append(c);
 			toolTip.append(contraints + "\n");
 		}
@@ -248,11 +228,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(gl);
 
-		if (!hasExpl) {
-			Label featureName = new Label(feature.getName());
-			featureName.setFont(DEFAULT_FONT_BOLD);
-			toolTipContent.add(featureName);
-		}
+		Label featureName = new Label(feature.getName());
+		featureName.setFont(DEFAULT_FONT_BOLD);
+		toolTipContent.add(featureName);
 		Label furtherInfos = new Label(toolTip.toString());
 		furtherInfos.setFont(DEFAULT_FONT);
 		toolTipContent.add(furtherInfos);
@@ -265,12 +243,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 
-		// only set explanation if not null or empty
-		if (explanation == null || explanation.getReasons() == null || explanation.getReasons().isEmpty()) {
-			setToolTip(toolTipContent);
-		} else {
-			setToolTip(toolTipContent, panel, explanation);
-		}
+		setToolTip(toolTipContent);
 	}
 
 	private void appendCustomProperties(Figure toolTipContent) {
@@ -301,29 +274,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			toolTipContent.add(propertiesInfo);
 			toolTipContent.add(properties);
 		}
-	}
-
-	/**
-	 * Color explanation parts according to their occurrences in all explanations for a defect feature.
-	 * If expl. part occured once, it is colored black. If it occurred in every explanation, it is colored red.
-	 * For all other cases, a color gradient is used.
-	 * 
-	 * @param the origin content of a feature tool tip, i.e. feature name and respective constraints
-	 * @param panel the panel to pass for a tool tip
-	 * @param expl the explanation within a tool tip
-	 */
-	private void setToolTip(Figure content, Panel panel, Explanation expl) {
-		final ExplanationWriter ew = new ExplanationWriter(expl);
-		panel.add(new Label(ew.getHeaderString()));
-		if (expl != null && expl.getReasons() != null) {
-			for (final Explanation.Reason reason : expl.getReasons()) {
-				final Label label = new Label(ew.getReasonString(reason));
-				label.setForegroundColor(GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0));
-				panel.add(label);
-			}
-		}
-		panel.add(content);
-		setToolTip(panel);
 	}
 
 	public ConnectionAnchor getSourceAnchor() {

@@ -32,8 +32,6 @@ import java.util.Collections;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.Panel;
-import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -41,8 +39,6 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -66,6 +62,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	private static final IFigure VOID_LABEL = new Label(VOID_MODEL);
 	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);
 	private static final IFigure TAUTOLOGY_LABEL = new Label(TAUTOLOGY);
+	private static final IFigure REDUNDANCE_LABEL = new Label(REDUNDANCE);
 
 	private static final String[] symbols;
 	static {
@@ -134,26 +131,9 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			setToolTip(TAUTOLOGY_LABEL);
 			break;
 		case REDUNDANT:
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			Explanation explanationRedundant = constraint.getFeatureModel().getAnalyser().getRedundantConstraintExplanation(constraint);
-			Panel panelRedundant = new Panel();
-			panelRedundant.setLayoutManager(new ToolbarLayout(false));
-			panelRedundant.add(new Label(REDUNDANCE));
-			setToolTip(panelRedundant, explanationRedundant);
-			break;
 		case IMPLICIT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getImplicitConstraintBorder());
-			// set tooltip with explanation for redundant constraint
-			Explanation explanationImplicit = constraint.getFeatureModel().getAnalyser().getRedundantConstraintExplanation(constraint);
-			if (explanationImplicit != null) {
-				explanationImplicit.setImplicit(true);
-			}
-
-			Panel panelImplicit = new Panel();
-			panelImplicit.setLayoutManager(new ToolbarLayout(false));
-			panelImplicit.add(new Label(REDUNDANCE));
-			setToolTip(panelImplicit, explanationImplicit);
+			setToolTip(REDUNDANCE_LABEL);
 			break;
 		case DEAD:
 		case FALSE_OPTIONAL:
@@ -202,27 +182,6 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
-	}
-
-	/**
-	 * Color explanation parts according to their occurrences in all explanations for a defect constraint.
-	 * If expl. part occured once, it is colored black. If it occurred in every explanation, it is colored red.
-	 * For all other cases, a color gradient is used.
-	 * 
-	 * @param panel the panel to pass for a tool tip
-	 * @param expl the explanation within a tool tip
-	 */
-	private void setToolTip(Panel panel, Explanation expl) {
-		final ExplanationWriter ew = new ExplanationWriter(expl);
-		panel.add(new Label(ew.getHeaderString()));
-		if (expl != null) {
-			for (final Explanation.Reason reason : expl.getReasons()) {
-				final Label label = new Label(ew.getReasonString(reason));
-				label.setForegroundColor(GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0));
-				panel.add(label);
-			}
-		}
-		setToolTip(panel);
 	}
 
 	private String getConstraintText(IConstraint constraint) {
