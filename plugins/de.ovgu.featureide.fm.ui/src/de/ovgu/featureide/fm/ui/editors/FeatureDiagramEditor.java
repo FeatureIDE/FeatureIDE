@@ -1094,12 +1094,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case COLLAPSED_CHANGED:
 			//Reload editpart to notify the diagramm that the IGraphicalModel has changed
+			reload();
 			
 			if (event.getNewValue() == null) {
 				IFeature selectedFeature = (IFeature) event.getSource();
 				refreshChildAll(selectedFeature);
 			}
-			reload();
 //			internRefresh(true);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);

@@ -76,7 +76,14 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 				}
 			}
 		}
-		return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);
+		if(feature.getStructure().getParent() != null)
+		{
+			return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.COLLAPSED_CHANGED);
+		}
+		else
+		{
+			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);
+		}
 	}
 
 	@Override
