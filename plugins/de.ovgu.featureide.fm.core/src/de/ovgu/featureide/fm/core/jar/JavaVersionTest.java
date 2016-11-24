@@ -23,7 +23,6 @@ public class JavaVersionTest {
 	 */
 	public static void testJavaVersion(final Class<?> c) throws Exception {
 		final CodeSource source = c.getProtectionDomain().getCodeSource();
-		final ClassLoader loader = JavaVersionTest.class.getClassLoader();
 		final File file = new File(source.getLocation().toURI());
 		try (JarFile jarFile = new JarFile(file)) {
 			final Enumeration<JarEntry> iterator = jarFile.entries();
@@ -33,7 +32,7 @@ public class JavaVersionTest {
 				if (!name.endsWith(".class")) {
 					continue;
 				}
-				try (InputStream in = loader.getResourceAsStream(name); DataInputStream data = new DataInputStream(in)) {
+				try (InputStream in = jarFile.getInputStream(entry); DataInputStream data = new DataInputStream(in)) {
 					if (0xCAFEBABE != data.readInt()) {
 						throw new IOException("invalid header");
 					}
