@@ -216,8 +216,8 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		root.appendChild(struct);
 		root.appendChild(constraints);
 
-		if (!object.getLayout().showHiddenFeatures() || !object.getLayout().hasFeaturesAutoLayout()) {
-			for (IGraphicalFeature feat : object.getFeatures()) {
+		if (!object.getLayout().hasFeaturesAutoLayout()) {
+			for (IGraphicalFeature feat : object.getAllFeatures()) {
 				final Element fnod = doc.createElement(FEATURE);
 				fnod.setAttribute(NAME, feat.getObject().getName());
 
@@ -230,7 +230,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				struct.appendChild(fnod);
 			}
 		} else if (object.getLayout().hasFeaturesAutoLayout()) {
-			for (IGraphicalFeature feat : object.getFeatures()) {
+			for (IGraphicalFeature feat : object.getAllFeatures()) {
 				if (feat.isCollapsed()) {
 					final Element fnod = doc.createElement(FEATURE);
 					fnod.setAttribute(NAME, feat.getObject().getName());
@@ -239,7 +239,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				}
 			}
 		}
-		if (!object.getLayout().showHiddenFeatures() || !object.getLayout().hasFeaturesAutoLayout()) {
+		if (!object.getLayout().hasFeaturesAutoLayout()) {
 			for (IGraphicalConstraint constr : object.getConstraints()) {
 				final Element rule = doc.createElement(RULE);
 				final Point location = constr.getLocation();

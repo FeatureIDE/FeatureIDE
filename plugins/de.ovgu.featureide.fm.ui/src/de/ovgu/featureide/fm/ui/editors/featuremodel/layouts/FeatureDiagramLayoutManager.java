@@ -194,7 +194,7 @@ abstract public class FeatureDiagramLayoutManager {
 		 * check if constraints would intersect with the legend on the edges
 		 */
 		if (topRight || topLeft || botLeft || botRight) {
-			for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
+			for (IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
 				Point tempLocation = constraint.getLocation();
 				if (null == tempLocation)
 					continue;

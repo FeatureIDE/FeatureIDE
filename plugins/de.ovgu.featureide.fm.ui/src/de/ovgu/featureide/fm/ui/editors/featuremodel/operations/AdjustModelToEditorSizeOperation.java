@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
@@ -90,9 +91,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 */
 	public void calculateVisibleLayer(IFeature root) {
 		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
-		for (IConstraint ic : featureModel.getConstraints()) {
-			//TODO MISSING GMODEL
-			//ic.setCollapsed(true);
+		for (IGraphicalConstraint ic : graphicalFeatureModel.getVisibleConstraints()) {
+			ic.setCollapsed(true);
 		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 
@@ -129,9 +129,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			lastStep = calculateNextLevel(lastStep);
 		} while (lastStep != null && lastStep.size() != 0);
 		
-		for (IConstraint ic : featureModel.getConstraints()) {
-			//TODO MISSING GMODEL
-			//ic.setCollapsed(false);
+		for (IGraphicalConstraint ic : graphicalFeatureModel.getVisibleConstraints()) {
+			ic.setCollapsed(false);
 		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 	}
@@ -143,7 +142,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		LinkedList<IFeature> parents = new LinkedList<IFeature>();
 		for(IFeature f : lastLevel)
 		{
-			if(f.getStructure().hasChildren())
+			if(f.getStructure().getChildrenCount() > 0)
 			{
 				parents.add(f);
 			}
@@ -164,9 +163,9 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 				((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 				((FeatureDiagramEditor) getEditor()).internRefresh(true);
 				
-				for(IFeatureStructure child : f.getStructure().getChildren())
+				for(IGraphicalFeature child : graphicalF.getGraphicalChildren())
 				{
-					childList.add(child.getFeature());
+					childList.add(child.getObject());
 				}
 			}
 
@@ -194,6 +193,11 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 		((FeatureDiagramEditor) getEditor()).internRefresh(true);
 		return bestSolution;
+	}
+	
+	public void NextPowerSet()
+	{
+		
 	}
 	
 	public static <IFeatue> LinkedList<LinkedList<IFeatue>> powerSet(LinkedList<IFeatue> originalSet) {
@@ -231,7 +235,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 * Calculates the levels from the given IGraphicalFeature by iterating through the levels
 	 * of features.
 	 * 
-	 * @param root root of the model.
+	 * @param root of the model.
 	 * @return list of levels, which are again lists of IFeatures
 	 */
 	private LinkedList<LinkedList<IFeature>> calculateLevels(IFeature root) {
@@ -242,7 +246,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			levels.add(level);
 			LinkedList<IFeature> newLevel = new LinkedList<IFeature>();
 			for (IFeature feature : level) {
-				for (IFeatureStructure child : feature.getStructure().getChildren()) {
+				IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+				for (IFeatureStructure child : graphicalFeature.getObject().getStructure().getChildren()) {
 					newLevel.add(child.getFeature());
 				}
 			}

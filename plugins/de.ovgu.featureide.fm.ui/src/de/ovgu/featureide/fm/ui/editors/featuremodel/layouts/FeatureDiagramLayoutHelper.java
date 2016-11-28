@@ -85,10 +85,10 @@ public class FeatureDiagramLayoutHelper {
 	 */
 	public static void initializeConstraintPosition(IGraphicalFeatureModel featureModel, int index) {
 		Point newLocation = new Point(0, 0);
-		IGraphicalConstraint constraint = featureModel.getConstraints().get(index);
+		IGraphicalConstraint constraint = featureModel.getVisibleConstraints().get(index);
 		int leftX = Integer.MAX_VALUE;
 		int rightX = Integer.MIN_VALUE;
-		final int constraintCount = featureModel.getConstraints().size();
+		final int constraintCount = featureModel.getVisibleConstraints().size();
 		if (constraintCount == 1) {
 			for (IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 				if (feature.getLocation().y > newLocation.y) {
@@ -104,7 +104,7 @@ public class FeatureDiagramLayoutHelper {
 			newLocation.x = (leftX + rightX) / 2;
 			newLocation.y += FMPropertyManager.getFeatureSpaceY();
 		} else {
-			IGraphicalConstraint lastConstraint = featureModel.getConstraints().get(constraintCount - 2);
+			IGraphicalConstraint lastConstraint = featureModel.getVisibleConstraints().get(constraintCount - 2);
 			newLocation = lastConstraint.getLocation().getCopy();
 			newLocation.y += FMPropertyManager.getConstraintSpace();
 		}

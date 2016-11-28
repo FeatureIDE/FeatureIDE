@@ -52,7 +52,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		yoffset = 0;
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
-		layout(yoffset, featureModel.getConstraints());
+		layout(yoffset, featureModel.getVisibleConstraints());
 	}
 
 	private void layout(IGraphicalFeature root) {

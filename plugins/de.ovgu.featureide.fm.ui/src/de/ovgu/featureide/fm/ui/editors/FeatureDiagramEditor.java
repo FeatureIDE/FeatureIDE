@@ -309,16 +309,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		double borderLeft = rootMidX - editorWidth / 2;
 		double borderRight = rootMidX + editorWidth / 2;
 
-		for (IFeature f : featureModelEditor.getFeatureModel().getVisibleFeatures(false)) {
-			if (f.getStructure().isRoot()) {
+		for (IGraphicalFeature f : graphicalFeatureModel.getVisibleFeatures()) {
+			if (f.getObject().getStructure().isRoot()) {
 				continue;
 			}
-			IGraphicalFeature g = graphicalFeatureModel.getGraphicalFeature(f);
-			if ((g.getLocation().x + g.getSize().width) > borderRight || g.getLocation().x < borderLeft) {
+			if ((f.getLocation().x + f.getSize().width) > borderRight || f.getLocation().x < borderLeft) {
 				getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int) borderLeft, (int) rootMidY));
 				return true;
 			}
-			if ((g.getLocation().y + g.getSize().height) > editorHeight || g.getLocation().y < 0) {
+			if ((f.getLocation().y + f.getSize().height) > editorHeight || f.getLocation().y < 0) {
 				getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int) borderLeft, (int) rootMidY));
 				return true;
 			}

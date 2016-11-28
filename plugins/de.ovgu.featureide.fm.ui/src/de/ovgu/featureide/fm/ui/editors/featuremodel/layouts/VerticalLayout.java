@@ -56,7 +56,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 
 		calculateLevelWidth(FeatureUIHelper.getGraphicalRootFeature(featureModel));
 		centerOther(FeatureUIHelper.getGraphicalRootFeature(featureModel), 0);
-		layout(height, featureModel.getConstraints());
+		layout(height, featureModel.getVisibleConstraints());
 	}
 
 	/**
