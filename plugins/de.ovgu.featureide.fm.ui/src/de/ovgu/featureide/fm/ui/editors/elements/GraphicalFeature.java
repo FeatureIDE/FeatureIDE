@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,6 +54,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
+	protected boolean collapsed;
+	
 	protected Point location = new Point(0, 0);
 
 	protected Dimension dimension = new Dimension(10, 10);
@@ -142,12 +146,14 @@ public class GraphicalFeature implements IGraphicalFeature {
 		list.add(getSourceConnection());
 		return (list);
 	}
-	
+
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
 		for (IFeatureStructure child : feature.getStructure().getChildren()) {
-			targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
+			IGraphicalFeature graphicalChild = graphicalFeatureModel.getGraphicalFeature(child.getFeature());
+			if (!(child.hasHiddenParent() && !graphicalFeatureModel.getLayout().showHiddenFeatures()) && !graphicalChild.hasCollapsedParent())
+				targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
 		}
 		return targetConnections;
 	}
@@ -195,7 +201,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void update(FeatureIDEEvent event) {
 		if (uiObject != null) {
@@ -206,6 +212,45 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void registerUIObject(IEventListener listener) {
 		this.uiObject = listener;
+	}
+
+	@Override
+	public boolean isCollapsed() {
+		return collapsed;
+	}
+
+	@Override
+	public void setCollapsed(boolean collapse) {
+		collapsed = collapse;		
+	}
+
+	public boolean hasCollapsedParent() {
+		IFeatureStructure parent = getObject().getStructure().getParent();
+		if (parent == null)
+			return false;
+
+		while (parent != null) {
+			IGraphicalFeature graphicParent = getGraphicalModel().getGraphicalFeature(parent.getFeature());
+
+			if (graphicParent.isCollapsed())
+				return true;
+
+			parent = parent.getFeature().getStructure().getParent();
+		}
+		return false;
+	}
+
+
+	@Override
+	public List<IGraphicalFeature> getGraphicalChildren() {
+		List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (IFeatureStructure f : getObject().getStructure().getChildren()) {
+			IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
+			if (!gf.hasCollapsedParent()) {
+				features.add(gf);
+			}
+		}
+		return Collections.unmodifiableList(features);
 	}
 
 }

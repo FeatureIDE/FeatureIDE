@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -118,7 +119,16 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public Collection<IGraphicalFeature> getFeatures() {
 		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (IFeature f : correspondingFeatureModel.getFeatures()) {
+		for (IFeature f : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+			featureList.add(getGraphicalFeature(f));
+		}
+		return Collections.unmodifiableCollection(featureList);
+	}
+	
+	@Override
+	public Collection<IGraphicalFeature> getAllFeatures() {
+		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
+		for (IFeature f : correspondingFeatureModel.getVisibleFeatures(true)) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -142,7 +152,18 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		}
 		return constraintList;
 	}
-
+	
+	@Override
+	public List<IGraphicalConstraint> getVisibleConstraints() {
+		if (getLayout().showCollapsedConstraints()) return getConstraints();
+		List<IGraphicalConstraint> constraints = new ArrayList<IGraphicalConstraint>();
+		for (IGraphicalConstraint c : getConstraints()) {
+			if (!c.isCollapsed()) {
+				constraints.add(c);
+			}
+		}
+		return Collections.unmodifiableList(constraints);
+	}
 	@Override
 	public IGraphicalConstraint getGraphicalConstraint(IConstraint constraint) {
 		IGraphicalConstraint graphicalConstraint = constraints.get(constraint);
@@ -177,12 +198,48 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			}
 			
 			features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
-			for (IFeature feature : correspondingFeatureModel.getFeatures()) {
-				features.put(feature, new GraphicalFeature(feature, this));
+			for (IFeature feature : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+					features.put(feature, new GraphicalFeature(feature, this));
 			}
 		} else {
 			constraints = new HashMap<>();
 			features = new HashMap<>();
+		}
+	}
+
+
+	@Override
+	public List<IGraphicalFeature> getVisibleFeatures() {
+		List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (IGraphicalFeature f : getFeatures()) {
+			if (!f.hasCollapsedParent()) {
+				features.add(f);
+			}
+		}
+		return Collections.unmodifiableList(features);
+	}
+
+
+	@Override
+	public void refreshConstraints() {
+		for (IGraphicalConstraint c : getConstraints()) {
+			boolean allFeaturesCollapsed = true;
+			for (IFeature f : c.getObject().getContainedFeatures())
+			{
+				IGraphicalFeature gf = getGraphicalFeature(f);
+				if(!gf.hasCollapsedParent())
+				{
+					allFeaturesCollapsed = false;
+				}
+			}
+			if(allFeaturesCollapsed)
+			{
+				c.setCollapsed(true);
+			}
+			else
+			{
+				c.setCollapsed(false);
+			}
 		}
 	}
 

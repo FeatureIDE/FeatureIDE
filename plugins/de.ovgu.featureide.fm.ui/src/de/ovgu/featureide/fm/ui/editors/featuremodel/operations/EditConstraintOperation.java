@@ -22,11 +22,15 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAINT;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to edit a constraint. Enables undo/redo
@@ -40,9 +44,9 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint constraint;
 	private Node newNode;
 	private Node oldNode;
-
-	public EditConstraintOperation(IConstraint constraint, Node propNode) {
-		super(constraint.getFeatureModel(), EDIT_CONSTRAINT);
+	
+	public EditConstraintOperation(IFeatureModel featureModel, IConstraint constraint, Node propNode) {
+		super(featureModel, EDIT_CONSTRAINT);
 		this.newNode = propNode;
 		this.oldNode = constraint.getNode();
 		this.constraint = constraint;
@@ -51,6 +55,7 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		constraint.setNode(newNode);
+
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldNode, newNode);
 	}
 

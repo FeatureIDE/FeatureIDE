@@ -27,10 +27,12 @@ import java.util.Map;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
+import org.eclipse.gef.editparts.AbstractEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -49,8 +51,9 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
 /**
@@ -84,6 +87,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		final FeatureFigure featureFigure = new FeatureFigure(f, f.getGraphicalModel());
 		sourceAnchor = featureFigure.getSourceAnchor();
 		targetAnchor = featureFigure.getTargetAnchor();
+
 		return featureFigure;
 	}
 
@@ -118,11 +122,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			if (feature.getStructure().isRoot() || !feature.getStructure().getParent().isAnd()) {
-				return;
-			}
-
-			SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel.getFeatureModel());
+			SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {
@@ -165,22 +165,32 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	@Override
 	public void activate() {
 		getFeature().registerUIObject(this);
-		getFeatureFigure().setVisible(true);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
+		refreshCollapsedDecorator();
 		super.deactivate();
-		getFeatureFigure().setVisible(false);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#refresh()
+	 */
+	@Override
+	public void refresh() {
+		super.refresh();
+		refreshCollapsedDecorator();
+		
+	}
+	
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		FeatureConnection sourceConnection;
 		switch (prop) {
 		case CHILDREN_CHANGED:
+			getFeatureFigure().setLocation(getFeature().getLocation());
 			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
@@ -188,6 +198,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 					connectionEditPart.refresh();
 				}
 			}
+			refreshCollapsedDecorator();
 			break;
 		case LOCATION_CHANGED:
 			getFeatureFigure().setLocation(getFeature().getLocation());
@@ -226,17 +237,20 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 			break;
 		case FEATURE_NAME_CHANGED:
-			String displayName = getFeature().getObject().getProperty().getDisplayName();
-			
-			if(getFeature().getGraphicalModel().getLayout().showShortNames()){
+			String displayName = getFeature().getObject().getName();
+
+			if (getFeature().getGraphicalModel().getLayout().showShortNames()) {
 				int lastIndexOf = displayName.lastIndexOf(".");
 				displayName = displayName.substring(++lastIndexOf);
-			}	
+			}
 			getFeatureFigure().setName(displayName);
 			getFeature().setSize(getFeatureFigure().getSize());
+			refreshCollapsedDecorator();
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
+		case COLLAPSED_ALL_CHANGED:
+		case COLLAPSED_CHANGED:
 			getFeatureFigure().setProperties();
 			break;
 		case MANDATORY_CHANGED:
@@ -252,18 +266,41 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
-			connectionEditPart.refreshParent();			
+			refreshCollapsedDecorator();
+			connectionEditPart.refreshVisuals();
 			break;
 		case HIDDEN_CHANGED:
 			getFeatureFigure().setProperties();
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			refreshCollapsedDecorator();
 			connectionEditPart.refreshSourceDecoration();
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getFeature() + " not handled.");
 			break;
+		}
+	}
+
+	public void refreshCollapsedDecorator() {
+		final IGraphicalFeature f = getFeature();
+		final FeatureFigure featureFigure = (FeatureFigure) getFigure();
+		if(f.isCollapsed() && f.getObject().getStructure().hasChildren() && !f.hasCollapsedParent())
+		{
+			//Create collapse decorator if not existing
+			if (featureFigure.getParent() != null) {
+				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
+				if (featureFigure.getCollapsedDecorator() == null) {
+					featureFigure.setCollapsedDecorator(collapsedDecoration);
+					featureFigure.getParent().add(collapsedDecoration);
+				}
+			}
+			getFeatureFigure().setLocation(getFeature().getLocation());
+		}
+		else if (featureFigure.getCollapsedDecorator() != null)
+		{
+			featureFigure.RemoveCollapsedDecorator();
 		}
 	}
 

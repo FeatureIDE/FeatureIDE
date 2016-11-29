@@ -35,10 +35,16 @@ public interface IGraphicalConstraint extends IGraphicalElement {
 	boolean isFeatureSelected();
 	
 	boolean isImplicit();
+	
+	boolean isCollapsed();
+	
+	void setCollapsed(boolean collapse);
 
 	void setFeatureSelected(boolean selected);
 	
 	void setConstraintImplicit(boolean selected);
 
 	IGraphicalConstraint clone();
+	
+	
 }

@@ -38,10 +38,10 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 	}
 
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		for (IGraphicalFeature feature : featureModel.getFeatures()) {
+		for (IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 			setLocation(feature, feature.getLocation());
 		}
-		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
+		for (IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
 			constraint.setLocation(constraint.getLocation());
 		}
 	}

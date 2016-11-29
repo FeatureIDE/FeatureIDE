@@ -40,7 +40,7 @@ public class MandatoryAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public MandatoryAction(Object viewer, IFeatureModel featureModel) {
-		super("Mandatory (Double Click)", viewer);
+		super("Mandatory", viewer);
 		this.featureModel = featureModel;
 	}
 

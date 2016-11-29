@@ -335,7 +335,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @return <b>true</b> if a feature (or a features parent) is marked as <i>hidden</i> and contained in the formula of this constraint
 	 */
 	boolean hasHiddenFeatures();
-
+		
 	/**
 	 * Sets the analysis attribute for this constraints which determine how this constraint affects features.
 	 * <br/><br/>

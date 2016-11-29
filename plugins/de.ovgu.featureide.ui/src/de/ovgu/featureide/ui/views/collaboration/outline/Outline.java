@@ -28,6 +28,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_FIELDS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_METHODS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OUTLINE_SELECTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_BY_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SYNC_COLLAPSED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_OUTLINE_VIEW;
 
 import java.util.ArrayList;
@@ -97,6 +98,12 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
@@ -141,6 +148,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	private static final ImageDescriptor IMG_SHOW_FIELDS = UIPlugin.getDefault().getImageDescriptor("icons/fields_co.gif");
 	private static final ImageDescriptor IMG_SHOW_METHODS = UIPlugin.getDefault().getImageDescriptor("icons/methods_co.gif");
 	private static final ImageDescriptor IMG_SORT_FEATURES = UIPlugin.getDefault().getImageDescriptor("icons/alphab_sort_co.gif");
+	private static final ImageDescriptor IMG_SYNC_FEATURES = UIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif");
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.outline.CollaborationOutline";
 
@@ -163,6 +171,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	private boolean hideAllFieldsToggle = false;
 	private boolean hideAllMethodsToggle = false;
 	private boolean sortFeatureToggle = false;
+	private boolean syncCollapsedFeaturesToggle = true;
 
 	private IPartListener editorListener = new IPartListener() {
 
@@ -187,25 +196,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		public void partActivated(IWorkbenchPart part) {
 			if (part instanceof IEditorPart || part instanceof ViewPart)
 				setEditorActions(part);
-		}
-
-	};
-
-	/**
-	 * colors the tree in case a treeItem has been expanded (because the
-	 * children are lazily loaded)
-	 */
-	private ITreeViewerListener treeListener = new ITreeViewerListener() {
-
-		@Override
-		public void treeCollapsed(TreeExpansionEvent event) {
-		}
-
-		@Override
-		public void treeExpanded(TreeExpansionEvent event) {
-			if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
-				((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
-			}
 		}
 
 	};
@@ -492,6 +482,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 	};
 
+	private TreeViewerListenerImpl treeListener;
+
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -501,7 +493,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
 		addContentProv(new FmTreeContentProvider(), new FMOutlineLabelProviderWrapper());
 		addContentProv(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
-		
+
 		addContentProv(new MungeExtendedContentProvider(), new MungeOutlineLabelProvider());
 
 		checkForExtensions();
@@ -520,6 +512,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				update(inputFile);
 		}
 
+		treeListener = new TreeViewerListenerImpl();
 		viewer.addTreeListener(treeListener);
 		viewer.addSelectionChangedListener(selectionChangedListener);
 
@@ -596,8 +589,25 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
+												//Remove and add again else it will create a sync loop
+												viewer.removeTreeListener(treeListener);
 												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
-
+												viewer.addTreeListener(treeListener);
+												if (viewer.getContentProvider() instanceof FmTreeContentProvider) {
+													treeListener.setFeatureModel(((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel());
+													if (syncCollapsedFeaturesToggle) {
+														FmTreeContentProvider contentProvider = (FmTreeContentProvider) viewer.getContentProvider();
+														ArrayList<Object> expandedElements = new ArrayList<>();
+														for (IFeature f : contentProvider.getFeatureModel().getFeatures()) {
+															//TODO MISSING GMODEL   && !f.getStructure().isCollapsed()
+															if (f.getStructure().hasChildren())
+																expandedElements.add(f);
+														}
+														expandedElements.add("Constraints");
+														viewer.setExpandedElements(expandedElements.toArray());
+													}
+												}
+												syncCollapsedFeatures.setEnabled(true);
 												// recreate the context menu in case
 												// we switched to another model
 												if (contextMenu == null
@@ -612,9 +622,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 														viewer.removeDoubleClickListener(contextMenu.dblClickListener);
 													}
 													contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
-															((FeatureModelEditor) active_editor).getFeatureModel());
+															((FeatureModelEditor) active_editor).getFeatureModel(), syncCollapsedFeaturesToggle);
 												}
-
 											} else {
 												viewer.setInput(iFile);
 											}
@@ -627,6 +636,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 											viewer.getContentProvider().inputChanged(viewer, null, iFile);
 										}
+
 										viewer.getControl().setRedraw(true);
 										viewer.getControl().setEnabled(true);
 										viewer.refresh();
@@ -643,11 +653,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		}
 	}
-	
+
 	private boolean refreshContent(IFile oldFile, IFile currentFile) {
 		sortMethods.setEnabled(false);
 		hideAllFields.setEnabled(false);
 		hideAllMethods.setEnabled(false);
+		syncCollapsedFeatures.setEnabled(false);
+		syncCollapsedFeatures.setChecked(syncCollapsedFeaturesToggle);
 		if (currentFile != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(currentFile);
 			if (featureProject != null) {
@@ -658,13 +670,16 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 						hideAllFields.setEnabled(true);
 						hideAllMethods.setEnabled(true);
 					}
+					if (viewer.getContentProvider() instanceof FmTreeContentProvider) {
+						syncCollapsedFeatures.setEnabled(true);
+					}
 					if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 						OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
 						return lp.refreshContent(oldFile, currentFile);
 					}
 				}
 			}
-		} 
+		}
 		return false;
 	}
 
@@ -738,6 +753,15 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 	};
 
+	private Action syncCollapsedFeatures = new Action("", Action.AS_CHECK_BOX) {
+
+		public void run() {
+			syncCollapsedFeaturesToggle = !syncCollapsedFeaturesToggle;
+			contextMenu.setSyncCollapsedFeatures(syncCollapsedFeaturesToggle);
+			update(iFile);
+		}
+	};
+
 	/**
 	 * provides functionality to expand and collapse all items in viewer
 	 * 
@@ -750,6 +774,16 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				viewer.expandToLevel(2);
 				if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 					((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
+				}
+				if (syncCollapsedFeaturesToggle && viewer.getContentProvider() instanceof FmTreeContentProvider) {
+					for (IFeature f : ((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures()) {
+						if (!f.getStructure().isRoot()) {
+							//TODO MISSING GMODEL
+							//f.getStructure().setCollapsed(true);
+						}
+					}
+					((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().fireEvent(new FeatureIDEEvent(
+							((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
 				}
 			}
 		};
@@ -764,6 +798,14 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 					((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 				}
+				if (syncCollapsedFeaturesToggle && viewer.getContentProvider() instanceof FmTreeContentProvider) {
+					for (IFeature f : ((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures()) {
+						//TODO MISSING GMODEL
+						//f.getStructure().setCollapsed(false);
+					}
+					((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().fireEvent(new FeatureIDEEvent(
+							((FmTreeContentProvider) viewer.getContentProvider()).getFeatureModel().getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
+				}
 			}
 		};
 
@@ -776,8 +818,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		sortMethods.setToolTipText(SORT_BY_FEATURE);
 		sortMethods.setImageDescriptor(IMG_SORT_FEATURES);
 
+		syncCollapsedFeatures.setToolTipText(SYNC_COLLAPSED_FEATURES);
+		syncCollapsedFeatures.setImageDescriptor(IMG_SYNC_FEATURES);
+
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
+		iToolBarManager.add(syncCollapsedFeatures);
 		iToolBarManager.add(hideAllFields);
 		iToolBarManager.add(hideAllMethods);
 		iToolBarManager.add(sortMethods);
@@ -995,4 +1041,50 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			return null;
 		}
 	}
+
+	private class TreeViewerListenerImpl implements ITreeViewerListener {
+
+		IFeatureModel featureModel;
+
+		public TreeViewerListenerImpl() {
+			super();
+		}
+
+		public void setFeatureModel(IFeatureModel fm) {
+			this.featureModel = fm;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
+		 */
+		@Override
+		public void treeCollapsed(TreeExpansionEvent event) {
+			if (viewer.getContentProvider() instanceof FmTreeContentProvider && syncCollapsedFeaturesToggle && event.getElement() instanceof IFeature) {
+				//TODO MISSING GMODEL
+				//((IFeature) event.getElement()).getStructure().setCollapsed(true);
+				featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
+		 */
+		@Override
+		public void treeExpanded(TreeExpansionEvent event) {
+			if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
+				/**
+				 * colors the tree in case a treeItem has been expanded (because the
+				 * children are lazily loaded)
+				 */
+				((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
+			}
+			if (viewer.getContentProvider() instanceof FmTreeContentProvider && syncCollapsedFeaturesToggle && event.getElement() instanceof IFeature) {
+				//TODO MISSING GMODEL
+				//((IFeature) event.getElement()).getStructure().setCollapsed(false);
+				featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
+			}
+		}
+
+	}
+
 }

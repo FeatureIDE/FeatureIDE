@@ -53,7 +53,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 
 	public RelationDecoration(final boolean fill, final IGraphicalFeature lastChild) {
 		super();
-		
+
 		this.fill = fill;
 		this.lastChild = lastChild;
 		if (lastChild == null) {
@@ -74,7 +74,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	public void setLocation(final Point p) {
 		if (this instanceof LegendRelationDecoration) {
 			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
-		}else {
+		} else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
 			if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
 				super.setLocation(p.translate(0, (-getBounds().width >> 1)));
@@ -90,7 +90,8 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	}
 
 	@Override
-	protected void fillShape(final Graphics graphics) {	}
+	protected void fillShape(final Graphics graphics) {
+	}
 
 	@Override
 	protected void outlineShape(final Graphics graphics) {
@@ -98,7 +99,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	}
 
 	private void drawShape(final Graphics graphics) {
-		boolean verticalLayout = false; 
+		boolean verticalLayout = false;
 		if (featureModel != null) {
 			verticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
 		}
@@ -106,12 +107,12 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		double maxAngle = Double.MIN_VALUE;
 		final Rectangle r;
 		if (verticalLayout) {
-			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1,  1);
+			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1, 1);
 		} else {
-			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1,  1);
+			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1, 1);
 		}
 		final Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
-		
+
 		if (this instanceof LegendRelationDecoration) {
 			maxAngle = calculateAngle(center, getFeatureLocation());
 			minAngle = calculateAngle(center, referencePoint);
@@ -119,15 +120,13 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 			if (children != null && children.size() > 1) {
 				for (final IGraphicalFeature curChild : children) {
 					lastChild = curChild;
-					if (!(lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
-						final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
-						final double currentAngle = calculateAngle(center, featureLocation);
-						if (currentAngle < minAngle) {
-							minAngle = currentAngle;
-						}
-						if (currentAngle > maxAngle) {
-							maxAngle = currentAngle;
-						}
+					final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
+					final double currentAngle = calculateAngle(center, featureLocation);
+					if (currentAngle < minAngle) {
+						minAngle = currentAngle;
+					}
+					if (currentAngle > maxAngle) {
+						maxAngle = currentAngle;
 					}
 				}
 			} else {
@@ -135,7 +134,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 			}
 		}
 		if (fill) {
-			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int)(maxAngle - minAngle));
+			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int) (maxAngle - minAngle));
 		} else {
 			graphics.drawArc(r, (int) minAngle, (int) (maxAngle - minAngle));
 		}
@@ -148,7 +147,6 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	protected int getTargetAnchorDiameter() {
 		return TARGET_ANCHOR_DIAMETER;
 	}
-
 
 	private double calculateAngle(final Point point, final Point referencePoint) {
 		int dx = referencePoint.x - point.x;

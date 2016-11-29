@@ -61,6 +61,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependencyAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
@@ -89,6 +90,7 @@ public class FmOutlinePageContextMenu {
 
 	private HiddenAction hAction;
 	private MandatoryAction mAction;
+	private CollapseAction collapseAction;
 	private AbstractAction aAction;
 	private DeleteAction dAction;
 	private DeleteAllAction dAAction;
@@ -101,21 +103,31 @@ public class FmOutlinePageContextMenu {
 	private OrAction oAction;
 	private AndAction andAction;
 	private AlternativeAction altAction;
-//	private ReverseOrderAction roAction;
+	//	private ReverseOrderAction roAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
 	public IDoubleClickListener dblClickListener;
+	private boolean syncCollapsedFeatures = false;
 
 	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.view.outline.contextmenu";
 
-	private static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
-	private static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
+	public static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
+	public static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
 	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput) {
 		this.site = site;
 		this.fTextEditor = fTextEditor;
 		this.viewer = viewer;
 		this.fInput = fInput;
+		initContextMenu();
+	}
+
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures) {
+		this.site = site;
+		this.fTextEditor = fTextEditor;
+		this.viewer = viewer;
+		this.fInput = fInput;
+		this.syncCollapsedFeatures = syncCollapsedFeatures;
 		initContextMenu();
 	}
 
@@ -145,6 +157,7 @@ public class FmOutlinePageContextMenu {
 	private void initActions() {
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
+		//collapseAction = new CollapseAction(viewer, fInput);
 		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
 		dAction = new DeleteAction(viewer, fInput);
 		dAAction = new DeleteAllAction(viewer, fInput);
@@ -156,7 +169,7 @@ public class FmOutlinePageContextMenu {
 		reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
 		oAction = new OrAction(viewer, fInput);
 		//TODO _interfaces Removed Code
-//		roAction = new ReverseOrderAction(viewer, fInput);
+		//		roAction = new ReverseOrderAction(viewer, fInput);
 		andAction = new AndAction(viewer, fInput);
 		altAction = new AlternativeAction(viewer, fInput);
 
@@ -179,10 +192,11 @@ public class FmOutlinePageContextMenu {
 		dblClickListener = new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature))
-					mAction.run();
-				else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint))
-					ecAction.run();
-
+					if (syncCollapsedFeatures) {
+						//collapseAction.run();
+					} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
+						ecAction.run();
+					}
 			}
 		};
 
@@ -247,7 +261,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(altAction);
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			//TODO _interfaces Removed Code
-//			manager.add(roAction);
+			//			manager.add(roAction);
 		}
 		if (sel instanceof IFeature) {
 
@@ -279,7 +293,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(hAction);
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			//TODO _interfaces Removed Code
-//			manager.add(roAction);
+			//			manager.add(roAction);
 		}
 		if (sel instanceof IConstraint) {
 			manager.add(ccAction);
@@ -303,5 +317,12 @@ public class FmOutlinePageContextMenu {
 
 	public IFeatureModel getFeatureModel() {
 		return fInput;
+	}
+
+	/**
+	 * @param syncCollapsedFeaturesToggle
+	 */
+	public void setSyncCollapsedFeatures(boolean syncCollapsedFeaturesToggle) {
+		this.syncCollapsedFeatures = syncCollapsedFeaturesToggle;
 	}
 }

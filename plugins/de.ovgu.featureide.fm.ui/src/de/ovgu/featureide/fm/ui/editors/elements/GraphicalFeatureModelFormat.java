@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -43,7 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Sebastian Krieter
  */
 public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
-	
+
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
 
 	@Override
@@ -72,6 +73,12 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		} else if (showHidden.equals(FALSE)) {
 			object.getLayout().showHiddenFeatures(false);
 		}
+		String showCollapsedConstraints = eElement.getAttribute(SHOW_COLLAPSED_CONSTRAINTS);
+		if (showCollapsedConstraints.equals(TRUE)) {
+			object.getLayout().showCollapsedConstraints(true);
+		} else if (showCollapsedConstraints.equals(FALSE)) {
+			object.getLayout().showCollapsedConstraints(false);
+		}
 		String showShort = eElement.getAttribute(SHOW_SHORT_NAMES);
 		if (showShort.equals(TRUE)) {
 			object.getLayout().setShowShortNames(true);
@@ -98,7 +105,8 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				IGraphicalFeature feature = null;
 				int x = 0;
 				int y = 0;
-				
+				boolean collapsed = false;
+
 				for (int i = 0; i < nodeMap.getLength(); i++) {
 					org.w3c.dom.Node node = nodeMap.item(i);
 					String attributeName = node.getNodeName();
@@ -117,12 +125,15 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 						}
 					} else if (attributeName.equals("name")) {
 						feature = map.get(attributeValue);
+					} else if (attributeName.equals("collapsed")) {
+						collapsed = Boolean.parseBoolean(attributeValue);
 					} else {
 						// throwError("Unknown constraint attribute: " + attributeName, node);
 					}
 				}
 				if (feature != null) {
 					feature.setLocation(new Point(x, y));
+					feature.setCollapsed(collapsed);
 				}
 			}
 		}
@@ -137,7 +148,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	private void parseConstraint(NodeList nodeList) {
 		Iterator<IGraphicalConstraint> iterator = object.getConstraints().iterator();
 		for (Element e : getElements(nodeList)) {
-//			String nodeName = e.getNodeName();
+			//			String nodeName = e.getNodeName();
 			if (!iterator.hasNext()) {
 				break;
 			}
@@ -146,6 +157,8 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				NamedNodeMap nodeMap = e.getAttributes();
 				int x = 0;
 				int y = 0;
+				boolean collapsed = false;
+
 				for (int i = 0; i < nodeMap.getLength(); i++) {
 					org.w3c.dom.Node node = nodeMap.item(i);
 					String attributeName = node.getNodeName();
@@ -162,11 +175,16 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 						} catch (NumberFormatException error) {
 							// throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 						}
+					} else if (attributeName.equals("collapsed")) {
+						collapsed = Boolean.parseBoolean(attributeValue);
 					} else {
 						// throwError("Unknown constraint attribute: " + attributeName, node);
 					}
 				}
-				constraint.setLocation(new Point(x, y));
+				if (constraint != null) {
+					constraint.setLocation(new Point(x, y));
+					constraint.setCollapsed(collapsed);
+				}
 			}
 		}
 	}
@@ -189,33 +207,59 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		if (object.getLayout().showShortNames()) {
 			root.setAttribute(SHOW_SHORT_NAMES, TRUE);
 		}
+		if (!object.getLayout().showCollapsedConstraints()) {
+			root.setAttribute(SHOW_COLLAPSED_CONSTRAINTS, FALSE);
+		}
 
 		doc.appendChild(root);
 
 		root.appendChild(struct);
 		root.appendChild(constraints);
 
-		if (!object.getLayout().showHiddenFeatures() || !object.getLayout().hasFeaturesAutoLayout()) {
-			for (IGraphicalFeature feat : object.getFeatures()) {
+		if (!object.getLayout().hasFeaturesAutoLayout()) {
+			for (IGraphicalFeature feat : object.getAllFeatures()) {
 				final Element fnod = doc.createElement(FEATURE);
 				fnod.setAttribute(NAME, feat.getObject().getName());
 
 				final Point location = feat.getLocation();
 				fnod.setAttribute("X", Integer.toString(location.x));
 				fnod.setAttribute("Y", Integer.toString(location.y));
+				if (feat.isCollapsed()) {
+					fnod.setAttribute("collapsed", TRUE);
+				}
 				struct.appendChild(fnod);
 			}
+		} else if (object.getLayout().hasFeaturesAutoLayout()) {
+			for (IGraphicalFeature feat : object.getAllFeatures()) {
+				if (feat.isCollapsed()) {
+					final Element fnod = doc.createElement(FEATURE);
+					fnod.setAttribute(NAME, feat.getObject().getName());
+					fnod.setAttribute("collapsed", TRUE);
+					struct.appendChild(fnod);
+				}
+			}
 		}
-
 		if (!object.getLayout().hasFeaturesAutoLayout()) {
 			for (IGraphicalConstraint constr : object.getConstraints()) {
 				final Element rule = doc.createElement(RULE);
 				final Point location = constr.getLocation();
 				rule.setAttribute("X", Integer.toString(location.x));
 				rule.setAttribute("Y", Integer.toString(location.y));
+				if (constr.isCollapsed()) {
+					rule.setAttribute("collapsed", TRUE);
+				}
 				constraints.appendChild(rule);
 			}
+		} else if (object.getLayout().hasFeaturesAutoLayout()) {
+			for (IGraphicalConstraint constr : object.getConstraints()) {
+				if (constr.isCollapsed()) {
+					final Element rule = doc.createElement(RULE);
+					rule.setAttribute("collapsed", TRUE);
+					constraints.appendChild(rule);
+				}
+			}
 		}
+
 	}
 
 	@Override
@@ -232,6 +276,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	public boolean supportsWrite() {
 		return true;
 	}
+
 	@Override
 	public String getId() {
 		return ID;

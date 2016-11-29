@@ -27,6 +27,7 @@ import java.util.List;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -54,7 +55,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		layout(root);
-		layout(featureDiagramBottom, featureModel.getConstraints());
+		layout(featureDiagramBottom, featureModel.getVisibleConstraints());
 	}
 
 	private void layout(IGraphicalFeature root) {
@@ -80,7 +81,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void layoutLevelInX(LinkedList<IGraphicalFeature> level) {
 		for (IGraphicalFeature feature : level)
-			if (feature.getObject().getStructure().hasChildren()) {
+			if (!feature.isCollapsed() && feature.getGraphicalChildren().size() > 0) {
 				centerAboveChildren(feature);
 			}
 
@@ -95,12 +96,12 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private int layoutFeatureInX(LinkedList<IGraphicalFeature> level, int j, int moveWidth, IGraphicalFeature lastFeature) {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
-		if (!feature.getObject().getStructure().hasChildren())
+		
+		if (feature.getGraphicalChildren().size() == 0)
 			nextToLeftSibling(feature, lastFeature);
 		else {
 			if (lastFeature != null)
-				moveWidth = Math.max(moveWidth,
-						getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX() - getLocation(feature).x);
+				moveWidth = Math.max(moveWidth, getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX() - getLocation(feature).x);
 			if (moveWidth > 0)
 				moveTree(feature, moveWidth);
 			layoutSiblingsEquidistant(level, j, feature);
@@ -108,7 +109,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				firstCompound = false;
 				boolean compoundSibling = false;
 				for (int k = j - 1; k >= 0; k--)
-					if (level.get(k).getObject().getStructure().hasChildren())
+					if (level.get(k).getGraphicalChildren().size() > 0)
 						compoundSibling = true;
 				if (!compoundSibling)
 					for (int k = j - 1; k >= 0; k--)
@@ -129,7 +130,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				l = k + 1;
 				break;
 			}
-			if (sibling.getObject().getStructure().hasChildren()) {
+			if (sibling.getGraphicalChildren().size() > 0) {
 				l = k + 1;
 				right = false;
 				space = getBounds(feature).x - getBounds(sibling).right() - width;
@@ -170,6 +171,9 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void centerAboveChildren(IGraphicalFeature feature) {
 		final List<IGraphicalFeature> graphicalChildren = getChildren(feature);
+		if(graphicalChildren.size() == 0) {
+			return;
+		}
 		int minX = getBounds(graphicalChildren.get(0)).x;
 		int maxX = getBounds(graphicalChildren.get(graphicalChildren.size() - 1)).right();
 		Point location = getLocation(feature);
@@ -195,7 +199,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		for (IGraphicalFeature child : getChildren(root))
 			moveTree(child, deltaX);
 	}
-	
+
 	private void centerTheRoot(IGraphicalFeature root) {
 		int newX = (controlWidth - getBounds(root).width) / 2;
 		moveTree(root, newX - getLocation(root).x);
