@@ -91,9 +91,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 */
 	public void calculateVisibleLayer(IFeature root) {
 		FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
-		for (IGraphicalConstraint ic : graphicalFeatureModel.getVisibleConstraints()) {
-			ic.setCollapsed(true);
-		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 
 		LinkedList<LinkedList<IFeature>> levels = calculateLevels(root);
@@ -128,10 +125,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		do{
 			lastStep = calculateNextLevel(lastStep);
 		} while (lastStep != null && lastStep.size() != 0);
-		
-		for (IGraphicalConstraint ic : graphicalFeatureModel.getVisibleConstraints()) {
-			ic.setCollapsed(false);
-		}
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 	}
 

@@ -47,8 +47,6 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	void redrawDiagram();
 
 	void refreshContextMenu();
-	
-	void refreshConstraints();
 
 	Collection<IGraphicalFeature> getFeatures();
 	

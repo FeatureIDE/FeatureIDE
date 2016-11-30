@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
@@ -167,8 +168,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		_abstract = fmStructure.hasAbstract();
 		concrete = fmStructure.hasConcrete();
 		hidden = fmStructure.hasHidden();
-		//TODO MISSING GMODEL fmStructure.hasCollapsed() not longer existing because feature model editor has no access on the graphical model
-		//collapsed = fmStructure.hasCollapsed();
+		
+		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getAllFeatures().size();
 		dead = fmStructure.hasDeadFeatures();
 		
 		

@@ -625,10 +625,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
 		}
-		//TODO MISSING GMODEL Methode zum testen ob ein constraint is collapsed
-//		if (featureModelEditor.getFeatureModel().getStructure().hasCollapsedConstraint()) {
-//			menu.add(showCollapsedConstraintsAction);
-//		}
+		if (graphicalFeatureModel.getVisibleConstraints().size() != graphicalFeatureModel.getConstraints().size() || graphicalFeatureModel.getLayout().showCollapsedConstraints()) {	
+			menu.add(showCollapsedConstraintsAction);
+		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		// call of the FeatureDiagramExtensions (for features only)
@@ -734,7 +733,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	public void reload() {// TODO do not layout twice
 		//		internRefresh(true);
-		graphicalFeatureModel.refreshConstraints();
 		((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 		internRefresh(true);
 	}
