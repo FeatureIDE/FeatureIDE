@@ -608,12 +608,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
 											
-											if (contextMenu != null) contextMenu.setFeatureModel(CorePlugin.getFeatureProject(iFile).getFeatureModel());
-											else {
-												contextMenu =  new FmOutlinePageContextMenu(getSite(), viewer,	CorePlugin.getFeatureProject(iFile).getFeatureModel());
-												contextMenu.getSetFeatureAction().addColorChangedListener(colorChangedListener);
-											}
-											
+//											if (contextMenu != null) contextMenu.setFeatureModel(CorePlugin.getFeatureProject(iFile).getFeatureModel());
+//											else {
+//												contextMenu =  new FmOutlinePageContextMenu(getSite(), viewer,	CorePlugin.getFeatureProject(iFile).getFeatureModel());
+//												contextMenu.getSetFeatureAction().addColorChangedListener(colorChangedListener);
+//											}
+//											
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) || active_editor instanceof FeatureModelEditor) {
 												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 												
@@ -632,7 +632,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 														viewer.removeDoubleClickListener(contextMenu.dblClickListener);
 													}
 													contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
-															CorePlugin.getFeatureProject(iFile).getFeatureModel());
+															((FeatureModelEditor) active_editor).getFeatureModel());
 													contextMenu.getSetFeatureAction().addColorChangedListener(colorChangedListener);
 												}
 
