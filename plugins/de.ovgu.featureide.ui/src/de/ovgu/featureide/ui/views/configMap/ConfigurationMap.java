@@ -273,11 +273,11 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			public void partActivated(IWorkbenchPart part) {
 				update(part);
 			}
-			
+
 			private void update(IWorkbenchPart part) {
 				if (part instanceof IEditorPart)
 					setEditor((IEditorPart) part);
-				
+
 				if (configUpdateNecessary) {
 					refresh();
 					configUpdateNecessary = false;
@@ -295,13 +295,13 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 				if (event.getEventType() == FeatureIDEEvent.EventType.COLOR_CHANGED)
 					updateTree();
 			}
-		});		
-		
-		CorePlugin.getDefault().addConfigurationChangedListener(new IConfigurationChangedListener(){
+		});
+
+		CorePlugin.getDefault().addConfigurationChangedListener(new IConfigurationChangedListener() {
 			@Override
 			public void configurationChanged(IFeatureProject featureProject) {
-				refresh();				
-			}			
+				refresh();
+			}
 		});
 
 		createToolbar();
@@ -327,7 +327,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 						break;
 					}
 				}
-				
+
 				header.setSelectedColumn(clickedColumn);
 			}
 
@@ -387,25 +387,24 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		menuMgr.add(openFileAction);
 	}
 
-	private void fillContextMenu(IMenuManager menuMgr) {		
+	private void fillContextMenu(IMenuManager menuMgr) {
 		if (featureProject == null)
 			return;
-		
-		if(selectedColumnIndex >= 0)
+
+		if (selectedColumnIndex >= 0)
 			fillHeaderMenu(menuMgr);
-		
+
 		boolean isNotEmpty = !tree.getSelection().isEmpty();
 		setFeatureColor.setFeatureModel(featureProject.getFeatureModel());
 
 		setFeatureColor.setEnabled(isNotEmpty);
 		menuMgr.add(setFeatureColor);
-		
+
 	}
 
 	public void loadConfigurations() {
 		// Callback will handle creating columns
 		this.configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
-
 		// update header
 		TreeColumn[] columns = tableTree.getColumns();
 		List<CustomColumnStyle> styles = new ArrayList<>(columns.length);
@@ -439,16 +438,16 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		// refresh gui
 		updateGUI();
 	}
-	
+
 	public void refresh() {
 		loadConfigurations();
 		updateGUI(true);
 	}
-	
+
 	public void updateGUI() {
 		updateGUI(false);
 	}
-	
+
 	public void updateGUI(boolean forceUpdate) {
 		if (forceUpdate || isActive()) {
 			updateHeaderHeight();
@@ -456,9 +455,13 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		}
 	}
 
-	void updateTree() {
+	public void updateTree() {
 		tree.refresh();
 		tree.expandAll();
+	}
+
+	public void updateElements() {
+		treeViewerContentProvider.updateElements();
 	}
 
 	private void updateHeaderHeight() {
@@ -476,7 +479,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	public int getConfigColumnsOffset() {
 		return this.configColumnsOffset;
 	}
-	
+
 	private boolean isActive() {
 		IWorkbenchPartSite site = getSite();
 		return site.getPage().isPartVisible(site.getPart());
@@ -530,7 +533,8 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	public List<Configuration> getConfigurations() {
-		if (this.configurations == null) return this.configurations;
+		if (this.configurations == null)
+			return this.configurations;
 		return Collections.unmodifiableList(this.configurations);
 	}
 

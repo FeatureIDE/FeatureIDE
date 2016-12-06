@@ -50,7 +50,8 @@ public class ConfigMapRefreshAction extends Action {
 	 */
 	@Override
 	public void run() {
-		super.run();		
-		configMap.loadConfigurations();
+		super.run();	
+		configMap.updateElements();
+		configMap.refresh();
 	}
 }

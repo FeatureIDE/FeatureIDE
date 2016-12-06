@@ -607,13 +607,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setContentProvider(curContentProvider);
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
-											
-//											if (contextMenu != null) contextMenu.setFeatureModel(CorePlugin.getFeatureProject(iFile).getFeatureModel());
-//											else {
-//												contextMenu =  new FmOutlinePageContextMenu(getSite(), viewer,	CorePlugin.getFeatureProject(iFile).getFeatureModel());
-//												contextMenu.getSetFeatureAction().addColorChangedListener(colorChangedListener);
-//											}
-//											
 											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) || active_editor instanceof FeatureModelEditor) {
 												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 												
