@@ -87,7 +87,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 		}
 	}
 
-	private void updateElements() {
+	public void updateElements() {
 		if (featureProject == null)
 			return;
 
