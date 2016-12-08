@@ -91,7 +91,6 @@ public class DeadFeatureExplanationCreator extends ExplanationCreator {
 			return null;
 		}
 		explanation.setDefectDeadFeature(getDeadFeature());
-		explanation.setFeatureModel(getFeatureModel());
 		return explanation;
 	}
 }

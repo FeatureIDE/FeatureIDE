@@ -32,7 +32,6 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 
 /**
@@ -149,8 +148,6 @@ public class Explanation implements Cloneable {
 	
 	/** the explanation mode */
 	private Mode mode;
-	/** the feature model context of this explanation */
-	private IFeatureModel fm;
 	/** the defect feature model element */
 	private IFeatureModelElement defectElement;
 	/** true if this explanation is for an implicit constraint */
@@ -164,22 +161,6 @@ public class Explanation implements Cloneable {
 	 */
 	public Mode getMode() {
 		return mode;
-	}
-	
-	/**
-	 * Returns the feature model context of this explanation.
-	 * @return the feature model context of this explanation
-	 */
-	public IFeatureModel getFeatureModel() {
-		return fm;
-	}
-	
-	/**
-	 * Sets the feature model.
-	 * @param fm feature model
-	 */
-	public void setFeatureModel(IFeatureModel fm) {
-		this.fm = fm;
 	}
 	
 	/**
@@ -369,7 +350,6 @@ public class Explanation implements Cloneable {
 	public Explanation clone() {
 		final Explanation clone = new Explanation();
 		clone.mode = mode;
-		clone.fm = fm;
 		clone.defectElement = defectElement;
 		clone.explanationCount = explanationCount;
 		clone.reasonCounts.putAll(reasonCounts);
@@ -382,7 +362,6 @@ public class Explanation implements Cloneable {
 		int result = 1;
 		result = prime * result + ((defectElement == null) ? 0 : defectElement.hashCode());
 		result = prime * result + explanationCount;
-		result = prime * result + ((fm == null) ? 0 : fm.hashCode());
 		result = prime * result + (implicit ? 1231 : 1237);
 		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
 		result = prime * result + ((reasonCounts == null) ? 0 : reasonCounts.hashCode());
@@ -405,11 +384,6 @@ public class Explanation implements Cloneable {
 			return false;
 		if (explanationCount != other.explanationCount)
 			return false;
-		if (fm == null) {
-			if (other.fm != null)
-				return false;
-		} else if (!fm.equals(other.fm))
-			return false;
 		if (implicit != other.implicit)
 			return false;
 		if (mode != other.mode)
@@ -427,7 +401,6 @@ public class Explanation implements Cloneable {
 		return "Explanation["
 				+ "reasonCounts=" + reasonCounts + ", "
 				+ "mode=" + mode + ", "
-				+ "fm=" + fm + ", "
 				+ "defectElement=" + defectElement + ", "
 				+ "implicit=" + implicit + ", "
 				+ "explanationCount=" + explanationCount

@@ -136,7 +136,7 @@ public class ExplanationWriter {
 		String s = null;
 		switch (reason.getLiteral().getSourceAttribute()) {
 			case CHILD:
-				final IFeature feature = FeatureUtils.getFeatureTable(explanation.getFeatureModel()).get(reason.getLiteral().var);
+				final IFeature feature = FeatureUtils.getFeatureTable(explanation.getDefectElement().getFeatureModel()).get(reason.getLiteral().var);
 				final IFeature parent = FeatureUtils.getParent(feature);
 				if (parent == null) {
 					throw new IllegalStateException("Missing parent despite child source attribute");
@@ -144,7 +144,7 @@ public class ExplanationWriter {
 				s = String.format("%s is %s of %s.", feature.getName(), getChildString(feature, parent), parent.getName());
 				break;
 			case CONSTRAINT:
-				final Node constraint = FeatureUtils.getConstraint(explanation.getFeatureModel(), reason.getLiteral().getSourceIndex());
+				final Node constraint = FeatureUtils.getConstraint(explanation.getDefectElement().getFeatureModel(), reason.getLiteral().getSourceIndex());
 				s = String.format("%s is a constraint.", NodeWriter.nodeToString(constraint, NodeWriter.logicalSymbols));
 				break;
 			case ROOT:

@@ -177,7 +177,6 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 			cumulatedExplanation.addExplanation(explanation);
 		}
 		cumulatedExplanation.setDefectRedundantConstraint(getRedundantConstraint());
-		cumulatedExplanation.setFeatureModel(getFeatureModel());
 		return cumulatedExplanation;
 	}
 	

@@ -92,7 +92,6 @@ public class FalseOptionalFeatureExplanationCreator extends ExplanationCreator {
 			return null;
 		}
 		explanation.setDefectFalseOptionalFeature(getFalseOptionalFeature());
-		explanation.setFeatureModel(getFeatureModel());
 		return explanation;
 	}
 }
