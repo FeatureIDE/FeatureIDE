@@ -49,7 +49,11 @@ public class ComposerExtensionManager extends ExtensionManager<IComposerExtensio
 			protected IComposerExtension parseExtension(IConfigurationElement configurationElement) {
 				if (!IComposerExtension.extensionID.equals(configurationElement.getName()))
 					return null;
-				return new ComposerExtensionProxy(configurationElement);
+				try {
+					return new ComposerExtensionProxy(configurationElement);
+				} catch (Exception e) {
+					return null;
+				}
 			}
 		});
 	}
