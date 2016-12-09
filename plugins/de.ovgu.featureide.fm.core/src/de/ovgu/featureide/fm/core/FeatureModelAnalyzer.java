@@ -884,8 +884,11 @@ public class FeatureModelAnalyzer {
 	 * @param feature potentially dead feature
 	 */
 	public void addDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
-		deadFeatureExplanationCreator.setDeadFeature(feature);
-		deadFeatureExplanations.put(feature, deadFeatureExplanationCreator.getExplanation());
+		final DeadFeatureExplanationCreator creator = fm == this.fm
+				? deadFeatureExplanationCreator
+				: new DeadFeatureExplanationCreator(fm);
+		creator.setDeadFeature(feature);
+		deadFeatureExplanations.put(feature, creator.getExplanation());
 	}
 	
 	/**
@@ -913,8 +916,11 @@ public class FeatureModelAnalyzer {
 	 * @param feature potentially false-optional feature
 	 */
 	public void addFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
-		falseOptionalFeatureExplanationCreator.setFalseOptionalFeature(feature);
-		falseOptionalFeatureExplanations.put(feature, falseOptionalFeatureExplanationCreator.getExplanation());
+		final FalseOptionalFeatureExplanationCreator creator = fm == this.fm
+				? falseOptionalFeatureExplanationCreator
+				: new FalseOptionalFeatureExplanationCreator(fm);
+		creator.setFalseOptionalFeature(feature);
+		falseOptionalFeatureExplanations.put(feature, creator.getExplanation());
 	}
 	
 	/**
@@ -943,8 +949,11 @@ public class FeatureModelAnalyzer {
 	 * @param constraint potentially redundant constraint
 	 */
 	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
-		redundantConstraintExplanationCreator.setRedundantConstraint(constraint);
-		redundantConstraintExplanations.put(constraint, redundantConstraintExplanationCreator.getExplanation());
+		final RedundantConstraintExplanationCreator creator = fm == this.fm
+				? redundantConstraintExplanationCreator
+				: new RedundantConstraintExplanationCreator(fm);
+		creator.setRedundantConstraint(constraint);
+		redundantConstraintExplanations.put(constraint, creator.getExplanation());
 	}
 	
 	/**
