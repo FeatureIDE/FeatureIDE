@@ -58,6 +58,7 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
+
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -65,6 +66,7 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
+
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -82,7 +84,6 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -95,7 +96,6 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import fuji.CompilerWarningException;
-import fuji.Composition;
 import fuji.CompositionErrorException;
 import fuji.FeatureDirNotFoundException;
 import fuji.Main;
@@ -731,13 +731,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				"-typechecker", "-basedir", sourcePath };
 		Program ast = null;
 		try {
-			IFeatureModel fm = featureProject.getFeatureModel();
+			final IFeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
-			Main fuji = new Main(fujiOptions, fm, FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
-			
-			Composition composition = fuji.getComposition(fuji);
-			ast = composition.composeAST();
+			final Main fuji = new Main(fujiOptions, fm, null);
+
+			ast = fuji.getComposition(fuji).composeAST();
+			ast.setCmd(fuji.getCmd());
 
 			// run type check
 			fuji.typecheckAST(ast);
