@@ -33,9 +33,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATU
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -63,6 +66,8 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -71,7 +76,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
-import org.prop4j.Literal.FeatureAttribute;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -80,6 +84,7 @@ import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -135,6 +140,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
@@ -214,6 +220,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private FeatureModelAnalyzer analyzer;
 
 	final FeatureDiagramEditorKeyHandler editorKeyHandler;
+
+	/** The currently active explanation. */
+	private Explanation activeExplanation;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -332,6 +341,68 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		rootEditPart = new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart.getLayer(LayerConstants.CONNECTION_LAYER)).setAntialias(SWT.ON);
 		setRootEditPart(rootEditPart);
+		
+		addActiveExplanationChangeListener();
+	}
+
+	/**
+	 * Adds a listener that updates the active explanation.
+	 */
+	private void addActiveExplanationChangeListener() {
+		this.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				setActiveExplanation();
+			}
+		});
+	}
+
+	/**
+	 * Sets the active explanation depending on the current selection.
+	 */
+	protected void setActiveExplanation() {
+		ModelElementEditPart primary = null;
+		for (final Object selected : getSelectedEditParts()) {
+			if (!(selected instanceof ModelElementEditPart)) {
+				continue;
+			}
+			if (primary != null) { //multiple selected
+				setActiveExplanation(null);
+				return;
+			}
+			primary = (ModelElementEditPart) selected;
+		}
+		if (primary == null) { //none selected
+			setActiveExplanation(null);
+			return;
+		}
+		final IFeatureModelElement primaryModel = primary.getModel().getObject();
+		getFeatureModel().getAnalyser().addExplanation(primaryModel);
+		final Explanation activeExplanation = getFeatureModel().getAnalyser().getExplanation(primaryModel);
+		setActiveExplanation(activeExplanation);
+	}
+
+	/**
+	 * Sets the currently active explanation.
+	 * If it changes, notifies the listeners of the change.
+	 * @param activeExplanation the new active explanation
+	 */
+	public void setActiveExplanation(Explanation activeExplanation) {
+		final Explanation oldActiveExplanation = this.activeExplanation;
+		this.activeExplanation = activeExplanation;
+		getFeatureModel().fireEvent(new FeatureIDEEvent(
+				this,
+				EventType.ACTIVE_EXPLANATION_CHANGED,
+				oldActiveExplanation,
+				activeExplanation));
+	}
+
+	/**
+	 * Returns the currently active explanation.
+	 * @return the currently active explanation.
+	 */
+	public Explanation getActiveExplanation() {
+		return this.activeExplanation;
 	}
 
 	public IFeatureModel getFeatureModel() {
@@ -734,9 +805,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						}
 					}
 				}
-
-				// call refresh to redraw legend
-				getContents().refresh();
+				setActiveExplanation();
+				getContents().refresh(); // call refresh to redraw legend
 				return Status.OK_STATUS;
 			}
 
@@ -783,7 +853,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		final EventType prop = event.getEventType();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
-			getFeatureModel().getAnalyser().clearExplanations();
 			IFeature oldParent = (IFeature) event.getOldValue();
 			if (oldParent != null) {
 				final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
@@ -796,7 +865,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 			}
 		case FEATURE_ADD:
-			getFeatureModel().getAnalyser().clearExplanations();
 			((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			featureModelEditor.setPageModified(true);
 			IFeature newFeature = (IFeature) event.getNewValue();
@@ -847,13 +915,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 			break;
 		case MANDATORY_CHANGED:
-			getFeatureModel().getAnalyser().clearExplanations();
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
 		case GROUP_TYPE_CHANGED:
-			getFeatureModel().getAnalyser().clearExplanations();
 			for (IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) event.getSource(), graphicalFeatureModel)) {
 				f.update(event);
 			}
@@ -875,7 +941,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 			break;
 		case CONSTRAINT_MODIFY:
-			getFeatureModel().getAnalyser().clearExplanations();
 			final IConstraint c = (IConstraint) event.getSource();
 			final IGraphicalConstraint graphicalConstraint = graphicalFeatureModel.getGraphicalConstraint(c);
 			graphicalConstraint.update(event);
@@ -886,14 +951,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
-			getFeatureModel().getAnalyser().clearExplanations();
 			reload();
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_LOADED:
 		case MODEL_DATA_CHANGED:
-			getFeatureModel().getAnalyser().clearExplanations();
 			// clear registry
 			final Map<?, ?> registry = getEditPartRegistry();
 			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
@@ -913,7 +976,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case FEATURE_DELETE:
-			getFeatureModel().getAnalyser().clearExplanations();
 			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 			deletedFeature.update(event);
 			oldParent = (IFeature) event.getOldValue();
@@ -949,7 +1011,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			internRefresh(false);
 			break;
 		case HIDDEN_CHANGED:
-			getFeatureModel().getAnalyser().clearExplanations();
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
@@ -971,27 +1032,32 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(false);
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
-			final boolean explanationActivated = event.getNewValue() != null;
-			final Explanation activeExplanation = (Explanation) (explanationActivated ? event.getNewValue() : event.getOldValue());
-			final IGraphicalElement defectElement;
-			if (activeExplanation.getDefectElement() instanceof IConstraint) {
-				defectElement = graphicalFeatureModel.getGraphicalConstraint((IConstraint) activeExplanation.getDefectElement());
-			} else {
-				defectElement = graphicalFeatureModel.getGraphicalFeature((IFeature) activeExplanation.getDefectElement());
+			//Deactivate the old active explanation.
+			final Explanation oldActiveExplanation = (Explanation) event.getOldValue();
+			if (oldActiveExplanation != null) {
+				final IGraphicalElement defectElement = FeatureUIHelper.getGraphicalElement(oldActiveExplanation.getDefectElement(), getGraphicalFeatureModel());
+				defectElement.update(event);
 			}
-			defectElement.update(event);
-			for (final Explanation.Reason reason : activeExplanation.getReasons()) {
-				final IGraphicalElement reasonElement;
-				if (reason.getLiteral().getSourceAttribute() == FeatureAttribute.CONSTRAINT) {
-					reasonElement = graphicalFeatureModel.getConstraints().get(reason.getLiteral().getSourceIndex());
-				} else {
-					reasonElement = graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getFeature((String) reason.getLiteral().var));
-				}
-				reasonElement.update(new FeatureIDEEvent(
+			
+			//Activate the new active explanation.
+			final Explanation newActiveExplanation = (Explanation) event.getNewValue();
+			if (newActiveExplanation != null) {
+				final IGraphicalElement defectElement = FeatureUIHelper.getGraphicalElement(newActiveExplanation.getDefectElement(), getGraphicalFeatureModel());
+				defectElement.update(event);
+			}
+			
+			//Notify each affected element of its new active reason.
+			final Map<IGraphicalElement, Explanation.Reason> elementOldActiveReasons = getGraphicalElementReasons(oldActiveExplanation);
+			final Map<IGraphicalElement, Explanation.Reason> elementNewActiveReasons = getGraphicalElementReasons(newActiveExplanation);
+			final Set<IGraphicalElement> elements = new HashSet<>();
+			elements.addAll(elementOldActiveReasons.keySet());
+			elements.addAll(elementNewActiveReasons.keySet());
+			for (final IGraphicalElement element : elements) {
+				element.update(new FeatureIDEEvent(
 						event.getSource(),
 						EventType.ACTIVE_REASON_CHANGED,
-						explanationActivated ? null : reason,
-						explanationActivated ? reason : null));
+						elementOldActiveReasons.get(element),
+						elementNewActiveReasons.get(element)));
 			}
 			break;
 		default:
@@ -1002,6 +1068,22 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		for (IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
 			page.propertyChange(event);
 		}
+	}
+
+	/**
+	 * Returns each reason mapped to the graphical feature model element it affects.
+	 * @param explanation explanation containing reasons
+	 * @return each reason mapped to the graphical feature model element it affects; never null
+	 */
+	private Map<IGraphicalElement, Explanation.Reason> getGraphicalElementReasons(Explanation explanation) {
+		if (explanation == null) {
+			return Collections.emptyMap();
+		}
+		final Map<IGraphicalElement, Explanation.Reason> elementReasons = new HashMap<>();
+		for (final Explanation.Reason reason : explanation.getReasons()) {
+			elementReasons.put(FeatureUIHelper.getGraphicalElement(reason.getSourceElement(), getGraphicalFeatureModel()), reason);
+		}
+		return elementReasons;
 	}
 
 	private void refreshAll() {

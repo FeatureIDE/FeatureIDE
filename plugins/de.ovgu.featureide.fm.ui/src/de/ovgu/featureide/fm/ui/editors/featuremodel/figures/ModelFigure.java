@@ -24,39 +24,17 @@ import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.MarginBorder;
 
-import de.ovgu.featureide.fm.core.explanations.Explanation;
-
 /**
  * A figure representing the feature model.
  * 
  * @author Timo Guenther
  */
 public class ModelFigure extends FreeformLayer {
-	/** the currently active explanation */
-	private Explanation activeExplanation;
-	
 	/**
 	 * Constructs a new instance of this class.
 	 */
 	public ModelFigure() {
 		setLayoutManager(new FreeformLayout());
 		setBorder(new MarginBorder(5));
-	}
-	
-	/**
-	 * Returns the currently active explanation.
-	 * This is the one explaining the defect of the feature that is currently being hovered over.
-	 * @return
-	 */
-	public Explanation getActiveExplanation() {
-		return activeExplanation;
-	}
-	
-	/**
-	 * Sets the currently active explanation.
-	 * @param activeExplanation the currently active explanation
-	 */
-	public void setActiveExplanation(Explanation activeExplanation) {
-		this.activeExplanation = activeExplanation;
 	}
 }

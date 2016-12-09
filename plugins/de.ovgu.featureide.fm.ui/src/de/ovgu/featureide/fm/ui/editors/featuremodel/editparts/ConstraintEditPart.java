@@ -117,8 +117,9 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			break;
 		case ATTRIBUTE_CHANGED:
 		case CONSTRAINT_SELECTED:
-		case ACTIVE_EXPLANATION_CHANGED:
 			getFigure().setConstraintProperties();
+			break;
+		case ACTIVE_EXPLANATION_CHANGED:
 			break;
 		case ACTIVE_REASON_CHANGED:
 			getFigure().setActiveReason((Explanation.Reason) event.getNewValue());
