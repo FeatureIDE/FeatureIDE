@@ -37,7 +37,9 @@ import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.gef.editparts.ZoomManager;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -60,6 +62,18 @@ public class FeatureUIHelper {
 		
 	public static IGraphicalFeature getGraphicalRootFeature(IGraphicalFeatureModel model) {
 		return getGraphicalFeature(model.getFeatureModel().getStructure().getRoot(), model);
+	}
+	
+	public static IGraphicalElement getGraphicalElement(IFeatureModelElement element, IGraphicalFeatureModel model) {
+		if (element instanceof IConstraint) {
+			return getGraphicalConstraint((IConstraint) element, model);
+		} else {
+			return getGraphicalFeature((IFeature) element, model);
+		}
+	}
+	
+	public static IGraphicalElement getGraphicalConstraint(IConstraint constraint, IGraphicalFeatureModel model) {
+		return model.getGraphicalConstraint(constraint);
 	}
 	
 	public static IGraphicalFeature getGraphicalFeature(IFeatureStructure feature, IGraphicalFeatureModel model) {
