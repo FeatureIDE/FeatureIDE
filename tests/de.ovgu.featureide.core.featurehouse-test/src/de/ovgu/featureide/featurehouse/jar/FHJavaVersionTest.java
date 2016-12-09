@@ -1,11 +1,10 @@
 package de.ovgu.featureide.featurehouse.jar;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import composer.FSTGenComposer;
-import fuji.Main;
 import de.ovgu.featureide.fm.core.jar.JavaVersionTest;
+import fuji.Main;
 
 /**
  * Checks the Java Version of FeatureHouse jars
@@ -19,7 +18,7 @@ public class FHJavaVersionTest {
 		JavaVersionTest.testJavaVersion(FSTGenComposer.class);
 	}
 	
-	@Test@Ignore
+	@Test
 	public void testFUJIJavaVersion() throws Exception {
 		JavaVersionTest.testJavaVersion(Main.class);
 	}
