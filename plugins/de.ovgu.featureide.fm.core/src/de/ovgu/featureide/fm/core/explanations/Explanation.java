@@ -257,6 +257,7 @@ public class Explanation implements Cloneable {
 	 * @param count how often to add the given reason
 	 */
 	protected void addReason(Reason reason, int count) {
+		reason = new Reason(reason.getClause(), reason.getLiteral());
 		reasonCounts.put(reason, reasonCounts.getOrDefault(reason, 0) + count);
 	}
 	
@@ -284,6 +285,7 @@ public class Explanation implements Cloneable {
 	 * @param reason reason to add
 	 */
 	public void addUniqueReason(Reason reason) {
+		reason = new Reason(reason.getClause(), reason.getLiteral());
 		reasonCounts.putIfAbsent(reason, 1);
 	}
 	
