@@ -49,6 +49,7 @@ public class English implements ILanguage {
 	private static final String INTERFACED = FROM_INTERFACE;
 	private static final String CONCRETE = "Concrete";
 	private static final String HIDDEN = "Hidden";
+	private static final String COLLAPSED = "Collapsed";
 	private static final String DEAD = "Dead feature";
 	private static final String FALSE_OPTIONAL = FALSE_OPTIONAL_FEATURE;
 	private static final String OPTIONAL = "Optional";
@@ -132,6 +133,11 @@ public class English implements ILanguage {
 	@Override
 	public String getHidden() {
 		return HIDDEN;
+	}
+	
+	@Override
+	public String getCollapsed() {
+		return COLLAPSED;
 	}
 
 	@Override

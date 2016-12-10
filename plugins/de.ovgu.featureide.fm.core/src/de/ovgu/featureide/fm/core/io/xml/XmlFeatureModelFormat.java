@@ -263,15 +263,29 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		final Element fnod;
 		if (children.isEmpty()) {
 			fnod = doc.createElement(FEATURE);
-		} else if (feat.getStructure().isAnd()) {
-			fnod = doc.createElement(AND);
-		} else if (feat.getStructure().isOr()) {
-			fnod = doc.createElement(OR);
-		} else if (feat.getStructure().isAlternative()) {
-			fnod = doc.createElement(ALT);
+			final String description = feat.getProperty().getDescription();
+			if (description != null && !description.trim().isEmpty()) {
+				final Element descr = doc.createElement(DESCRIPTION);
+				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
+				fnod.appendChild(descr);
+			}
+			writeAttributes(node, fnod, feat);
 		} else {
-			fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
-		}
+			if (feat.getStructure().isAnd()) {
+				fnod = doc.createElement(AND);
+			} else if (feat.getStructure().isOr()) {
+				fnod = doc.createElement(OR);
+			} else if (feat.getStructure().isAlternative()) {
+				fnod = doc.createElement(ALT);
+			} else {
+				fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
+			}
+			final String description = feat.getProperty().getDescription();
+			if (description != null && !description.trim().isEmpty()) {
+				final Element descr = doc.createElement(DESCRIPTION);
+				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
+				fnod.appendChild(descr);
+			}}
 
 		addDescription(doc, feat, fnod);
 		writeAttributes(node, fnod, feat);
@@ -478,7 +492,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (nodeName.equals(DESCRIPTION)) {
 				/* case: description */
 				String nodeValue = e.getFirstChild().getNodeValue();
-				if (nodeValue != null) {
+				if (nodeValue != null && !nodeValue.isEmpty()) {
 					nodeValue = nodeValue.replace("\t", "");
 					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
 					nodeValue = nodeValue.trim();

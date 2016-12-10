@@ -69,7 +69,7 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 	public void setLocation(final Point p) {
 		if (this instanceof LegendRelationDecoration) {
 			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
-		}else {
+		} else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
 			if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
 				super.setLocation(p.translate(0, (-getBounds().width >> 1)));
@@ -100,7 +100,7 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
 		}
 		
-		boolean verticalLayout = false; 
+		boolean verticalLayout = false;
 		if (featureModel != null) {
 			verticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
 		}
@@ -108,9 +108,9 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 		double maxAngle = Double.MIN_VALUE;
 		final Rectangle r;
 		if (verticalLayout) {
-			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1,  1);
+			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1, 1);
 		} else {
-			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1,  1);
+			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1, 1);
 		}
 		final Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
 		
@@ -121,15 +121,13 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 			if (children != null && children.size() > 1) {
 				for (final IGraphicalFeature curChild : children) {
 					lastChild = curChild;
-					if (!(lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
-						final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
-						final double currentAngle = calculateAngle(center, featureLocation);
-						if (currentAngle < minAngle) {
-							minAngle = currentAngle;
-						}
-						if (currentAngle > maxAngle) {
-							maxAngle = currentAngle;
-						}
+					final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
+					final double currentAngle = calculateAngle(center, featureLocation);
+					if (currentAngle < minAngle) {
+						minAngle = currentAngle;
+					}
+					if (currentAngle > maxAngle) {
+						maxAngle = currentAngle;
 					}
 				}
 			} else {
@@ -137,7 +135,7 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 			}
 		}
 		if (fill) {
-			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int)(maxAngle - minAngle));
+			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int) (maxAngle - minAngle));
 		} else {
 			graphics.drawArc(r, (int) minAngle, (int) (maxAngle - minAngle));
 		}

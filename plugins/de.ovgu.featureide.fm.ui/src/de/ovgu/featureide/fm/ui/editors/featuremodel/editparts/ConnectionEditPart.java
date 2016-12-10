@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
@@ -192,8 +193,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	@Override
 	protected void refreshVisuals() {
-		refreshParent();
 		refreshSourceDecoration();
+		refreshParent();
 		refreshTargetDecoration();
 		refreshToolTip();
 	}
@@ -217,7 +218,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IFeature source = getModel().getSource().getObject();
 		IFeature sourceParent = getModel().getSource().getObject();
 		final IGraphicalFeature graphicalTarget = getModel().getTarget();
-		if (graphicalTarget == null) {
+		final IGraphicalFeature graphicalSource = getModel().getSource();
+		if (graphicalTarget == null || graphicalSource.hasCollapsedParent()) {
 			return;
 		}
 		IFeature target = graphicalTarget.getObject();
@@ -246,6 +248,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	public void refreshTargetDecoration() {
 		IGraphicalFeature target = getModel().getTarget();
 		if (target == null) {
+			return;
+		}
+		
+		if (target.isCollapsed()) {
+			getFigure().setTargetDecoration(new CollapsedDecoration(target));
 			return;
 		}
 		

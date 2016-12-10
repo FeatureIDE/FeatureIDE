@@ -33,6 +33,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ODER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANTES_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNBESTIMMBAR_VERSTECKTES_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VERSTECKT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EINGEKLAPPT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VON_INTERFACE;
 /**
  * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
@@ -53,16 +54,17 @@ public class German implements ILanguage {
 	private static final String INTERFACED = VON_INTERFACE;
 	private static final String CONCRETE = KONKRET;
 	private static final String HIDDEN = VERSTECKT;
-	private static final String DEAD = "Unw�hlbar";
+	private static final String COLLAPSED = EINGEKLAPPT;
+	private static final String DEAD = "Unwählbar";
 	private static final String FALSE_OPTIONAL = FALSCH_OPTIONALES_FEATURE;
 	private static final String OR = ODER;
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = UNBESTIMMBAR_VERSTECKTES_FEATURE;
 	private static final String REDUNDANT = REDUNDANTES_CONSTRAINT;
 	private static final String IMPLICIT = "Implizites Constraint";
-	private static final String UNSATISFIABLE_CONST = "Unerf�llbares Constraint";
+	private static final String UNSATISFIABLE_CONST = "Unerfüllbares Constraint";
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IST_TAUTOLOGIE;
-	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerf�llbar";
+	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";
 
 	@Override
 	public String getRedundantConst() {
@@ -137,6 +139,11 @@ public class German implements ILanguage {
 	@Override
 	public String getHidden() {
 		return HIDDEN;
+	}
+	
+	@Override
+	public String getCollapsed() {
+		return COLLAPSED;
 	}
 
 	@Override

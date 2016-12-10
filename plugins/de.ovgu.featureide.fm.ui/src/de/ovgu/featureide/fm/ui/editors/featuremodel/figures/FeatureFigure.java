@@ -77,7 +77,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private final ConnectionAnchor targetAnchor;
 
 	private IGraphicalFeature feature;
-
+	private CollapsedDecoration collapseDecoration;
 	private static GridLayout gl = new GridLayout();
 
 	private static String ABSTRACT = " Abstract";
@@ -104,7 +104,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
 		
 		String displayName = feature.getObject().getName();
-		if(featureModel.getLayout().showShortNames()){
+		if (featureModel.getLayout().showShortNames()) {
 			int lastIndexOf = displayName.lastIndexOf(".");
 			displayName = displayName.substring(++lastIndexOf);
 		}
@@ -122,6 +122,10 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		}
 
 		if (!featureModel.getLayout().showHiddenFeatures() && feature.getObject().getStructure().hasHiddenParent()) {
+			setSize(new Dimension(0, 0));
+		}
+
+		if (feature.hasCollapsedParent()) {
 			setSize(new Dimension(0, 0));
 		}
 	}
@@ -322,5 +326,36 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	 */
 	public IGraphicalFeature getFeature() {
 		return feature;
+	}
+
+	@Override
+	public void setLocation(Point p) {
+		super.setLocation(p);
+		if (collapseDecoration != null) {
+			if (getFeature().getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
+				//left To Right Layout
+				collapseDecoration.setLocation(new Point(p.x + getBounds().width, p.y + getBounds().height / 2));
+			} else {
+				collapseDecoration.setLocation(new Point(p.x + getBounds().width / 2, p.y + getBounds().height));
+			}
+		}
+	}
+
+	public void setCollapsedDecorator(CollapsedDecoration decoration) {
+		collapseDecoration = decoration;
+	}
+
+	public CollapsedDecoration getCollapsedDecorator() {
+		return collapseDecoration;
+	}
+
+	public void RemoveCollapsedDecorator() {
+		if (collapseDecoration == null)
+			return;
+		if (collapseDecoration.getParent() != null) {
+			collapseDecoration.getParent().remove(collapseDecoration);
+			
+		}
+		collapseDecoration = null;
 	}
 }

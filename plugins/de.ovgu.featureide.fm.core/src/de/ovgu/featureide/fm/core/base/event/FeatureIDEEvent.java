@@ -102,7 +102,15 @@ public class FeatureIDEEvent {
 		 */
 		HIDDEN_CHANGED,
 		/**
-		 * The location of an object was.
+		 * A collapsed feature was changed.
+		 */
+		COLLAPSED_CHANGED,
+		/**
+		 * A collapsed feature was changed.
+		 */
+		COLLAPSED_ALL_CHANGED,
+		/**
+		 * The location of an object was changed.
 		 */
 		LOCATION_CHANGED,
 		/**
@@ -173,6 +181,10 @@ public class FeatureIDEEvent {
 		 * As such, each event of this type carries the respective reason so the feature model element does not have to look for it itself.
 		 */
 		ACTIVE_REASON_CHANGED,
+		/**
+		 * Default. Do nothing.
+		 */
+		DEFAULT,
 	}
 	
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];

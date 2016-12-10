@@ -47,8 +47,9 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
 /**
@@ -122,11 +123,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			if (feature.getStructure().isRoot() || !feature.getStructure().getParent().isAnd()) {
-				return;
-			}
-
-			SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel.getFeatureModel());
+			SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {
@@ -169,22 +166,28 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	@Override
 	public void activate() {
 		getModel().registerUIObject(this);
-		getFigure().setVisible(true);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
+		refreshCollapsedDecorator();
 		super.deactivate();
-		getFigure().setVisible(false);
 	}
 
+	@Override
+	public void refresh() {
+		super.refresh();
+		refreshCollapsedDecorator();
+	}
+	
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		FeatureConnection sourceConnection;
 		switch (prop) {
 		case CHILDREN_CHANGED:
+			getFigure().setLocation(getModel().getLocation());
 			for (FeatureConnection connection : getModel().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
@@ -192,6 +195,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 					connectionEditPart.refresh();
 				}
 			}
+			refreshCollapsedDecorator();
 			break;
 		case LOCATION_CHANGED:
 			getFigure().setLocation(getModel().getLocation());
@@ -230,17 +234,20 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 			break;
 		case FEATURE_NAME_CHANGED:
-			String displayName = getModel().getObject().getProperty().getDisplayName();
+			String displayName = getModel().getObject().getName();
 			
-			if(getModel().getGraphicalModel().getLayout().showShortNames()){
+			if (getModel().getGraphicalModel().getLayout().showShortNames() ){
 				int lastIndexOf = displayName.lastIndexOf(".");
 				displayName = displayName.substring(++lastIndexOf);
-			}	
+			}
 			getFigure().setName(displayName);
 			getModel().setSize(getFigure().getSize());
+			refreshCollapsedDecorator();
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
+		case COLLAPSED_ALL_CHANGED:
+		case COLLAPSED_CHANGED:
 			getFigure().setProperties();
 			break;
 		case MANDATORY_CHANGED:
@@ -256,7 +263,8 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			sourceConnection = getModel().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
-			connectionEditPart.refreshParent();			
+			refreshCollapsedDecorator();
+			connectionEditPart.refreshVisuals();
 			break;
 		case HIDDEN_CHANGED:
 			getFigure().setProperties();
@@ -283,6 +291,27 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
 			break;
+		}
+	}
+
+	public void refreshCollapsedDecorator() {
+		final IGraphicalFeature f = getModel();
+		final FeatureFigure featureFigure = getFigure();
+		if(f.isCollapsed() && f.getObject().getStructure().hasChildren() && !f.hasCollapsedParent())
+		{
+			//Create collapse decorator if not existing
+			if (featureFigure.getParent() != null) {
+				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
+				if (featureFigure.getCollapsedDecorator() == null) {
+					featureFigure.setCollapsedDecorator(collapsedDecoration);
+					featureFigure.getParent().add(collapsedDecoration);
+				}
+			}
+			getFigure().setLocation(getModel().getLocation());
+		}
+		else if (featureFigure.getCollapsedDecorator() != null)
+		{
+			featureFigure.RemoveCollapsedDecorator();
 		}
 	}
 

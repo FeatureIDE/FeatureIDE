@@ -24,6 +24,7 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -51,12 +52,11 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		yoffset = 0;
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
-		layout(yoffset, featureModel.getConstraints());
+		layout(yoffset, featureModel.getVisibleConstraints());
 	}
 
 	private void layout(IGraphicalFeature root) {
-		final HiddenFilter hiddenFilter = new HiddenFilter();
-		if (root == null || !hiddenFilter.isValid(root)) {
+		if (root == null || root.getObject().getStructure().isHidden()) {
 			return;
 		}
 		LinkedList<IGraphicalFeature> list = new LinkedList<>();

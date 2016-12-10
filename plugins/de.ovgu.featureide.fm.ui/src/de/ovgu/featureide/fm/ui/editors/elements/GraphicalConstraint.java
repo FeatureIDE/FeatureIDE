@@ -24,6 +24,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -148,5 +149,15 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	@Override
 	public void registerUIObject(IEventListener listener) {
 		this.uiObject = listener;
+	}
+	
+	@Override
+	public boolean isCollapsed() {
+		for (IFeature f : correspondingConstraint.getContainedFeatures()) {
+			if (!graphicalFeatureModel.getGraphicalFeature(f).hasCollapsedParent()) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

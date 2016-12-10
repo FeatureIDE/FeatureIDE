@@ -55,11 +55,11 @@ public class FeatureUIHelper {
 
 	private static final Map<IGraphicalFeatureModel, Dimension> legendSize = new WeakHashMap<>();
 	private static final Map<IGraphicalFeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
-		
+	
 	public static boolean isAncestorOf(IGraphicalFeature feature, IGraphicalFeature parent) {
 		return FeatureUtils.isAncestorOf(feature.getObject(), parent.getObject());
 	}
-		
+	
 	public static IGraphicalFeature getGraphicalRootFeature(IGraphicalFeatureModel model) {
 		return getGraphicalFeature(model.getFeatureModel().getStructure().getRoot(), model);
 	}
@@ -109,9 +109,11 @@ public class FeatureUIHelper {
 		final List<IFeatureStructure> children = feature.getStructure().getChildren();
 		final List<IGraphicalFeature> graphicalChildren = new ArrayList<>(children.size());
 		for (final IFeatureStructure child : children) {
-			graphicalChildren.add(getGraphicalFeature(child, model));			
+			IGraphicalFeature graphicChild = getGraphicalFeature(child, model);
+			if (!graphicChild.hasCollapsedParent() && (!child.hasHiddenParent() || model.getLayout().showHiddenFeatures()))
+				graphicalChildren.add(graphicChild);
 		}
-		return graphicalChildren;		
+		return graphicalChildren;
 	}
 
 	/**
@@ -178,6 +180,10 @@ public class FeatureUIHelper {
 		featureModel.getLayout().showHiddenFeatures(show);
 	}
 
+	public static void showCollapsedConstraints(boolean show, IGraphicalFeatureModel featureModel) {
+		featureModel.getLayout().showCollapsedConstraints(show);
+	}
+
 	public static void setLegendSize(IGraphicalFeatureModel featureModel, Dimension dim) {
 		legendSize.put(featureModel, dim);
 	}
@@ -224,16 +230,11 @@ public class FeatureUIHelper {
 	}
 
 	public static Point getSourceLocation(IGraphicalFeature feature) {
-		IFeatureStructure parentFeature = feature.getObject().getStructure();
-		boolean parentFeatureHidden = false;
-		while (!parentFeature.isRoot()) {
-			parentFeature = parentFeature.getParent();
-			if (parentFeature.isHidden()) {
-				parentFeatureHidden = true;
-			}
-		}
-		if ((feature.getObject().getStructure().isHidden() || parentFeatureHidden)
-				&& !feature.getGraphicalModel().getLayout().showHiddenFeatures()) {
+		/* Checks if the feature is hidden or has a hidden parent and hidden features should not be shown or if the feature 
+		 * has a collapsed parent and should therefore not be shown.
+		 */
+		if ((feature.getObject().getStructure().hasHiddenParent() && !feature.getGraphicalModel().getLayout().showHiddenFeatures())
+				|| feature.hasCollapsedParent()) {
 			return getTargetLocation(getGraphicalParent(feature));
 		}
 
