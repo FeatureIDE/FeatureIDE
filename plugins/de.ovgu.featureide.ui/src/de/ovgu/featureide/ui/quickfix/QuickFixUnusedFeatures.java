@@ -63,7 +63,7 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 					monitor2.setRemainingWork(2);
 					IMonitor subTask = monitor2.subTask(1);
 					subTask.setTaskName("Collect unused features");
-					final Collection<String> unusedFeatures = project.getFalseOptionalConfigurationFeatures();
+					final Collection<String> unusedFeatures = project.getUnusedConfigurationFeatures();
 					subTask.step();
 					subTask.done();
 					createConfigurations(unusedFeatures, monitor2.subTask(1), false);

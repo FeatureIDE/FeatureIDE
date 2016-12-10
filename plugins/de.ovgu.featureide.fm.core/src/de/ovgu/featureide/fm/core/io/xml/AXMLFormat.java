@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -45,18 +44,14 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.SAXParseException;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
-import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -69,63 +64,13 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 
 	private static final String SUFFIX = "xml";
 
-	private static final String LINE_NUMBER_KEY_NAME = "lineNumber";
-
 	protected T object;
 
 	public static Document readXML(CharSequence source) throws IOException, SAXException, ParserConfigurationException {
 		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-		final LinkedList<Element> elementStack = new LinkedList<>();
-		final StringBuilder textBuffer = new StringBuilder();
-
-		final DefaultHandler handler = new DefaultHandler() {
-			private Locator locator;
-
-			@Override
-			public void characters(final char ch[], final int start, final int length) throws SAXException {
-				textBuffer.append(ch, start, length);
-			}
-
-			@Override
-			public void endElement(final String uri, final String localName, final String qName) {
-				addTextIfNeeded();
-				final Element closedEl = elementStack.pop();
-				if (elementStack.isEmpty()) { // Is this the root element?
-					doc.appendChild(closedEl);
-				} else {
-					final Element parentEl = elementStack.peek();
-					parentEl.appendChild(closedEl);
-				}
-			}
-
-			@Override
-			public void setDocumentLocator(final Locator locator) {
-				this.locator = locator;
-			}
-
-			@Override
-			public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
-				addTextIfNeeded();
-				final Element el = doc.createElement(qName);
-				for (int i = 0; i < attributes.getLength(); i++) {
-					el.setAttribute(attributes.getQName(i), attributes.getValue(i));
-				}
-				el.setUserData(LINE_NUMBER_KEY_NAME, String.valueOf(this.locator.getLineNumber()), null);
-				elementStack.push(el);
-			}
-
-			private void addTextIfNeeded() {
-				if (textBuffer.length() > 0) {
-					final Element el = elementStack.peek();
-					final Node textNode = doc.createTextNode(textBuffer.toString());
-					el.appendChild(textNode);
-					textBuffer.delete(0, textBuffer.length());
-				}
-			}
-		};
 
 		final InputSource inputSource = new InputSource(new StringReader(source.toString()));
-		SAXParserFactory.newInstance().newSAXParser().parse(inputSource, handler);
+		SAXParserFactory.newInstance().newSAXParser().parse(inputSource, new PositionalXMLHandler(doc));
 		return doc;
 	}
 
@@ -203,18 +148,12 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 			final Document doc = readXML(source);
 			doc.getDocumentElement().normalize();
 			readDocument(doc, lastWarnings);
-		} catch (SAXException e) {
-			//TODO add line information, if any
-			lastWarnings.add(new Problem(e));
+		} catch (SAXParseException e) {
+			lastWarnings.add(new Problem(e, e.getLineNumber()));
 		} catch (UnsupportedModelException e) {
-			Logger.logError(e);
-			lastWarnings.add(new Problem(e.getMessage(), e.lineNumber, Severity.ERROR));
-		} catch (IOException | ParserConfigurationException e) {
-			Logger.logError(e);
-			lastWarnings.add(new Problem(e.getMessage(), 0, Severity.ERROR));
+			lastWarnings.add(new Problem(e, e.lineNumber));
 		} catch (Exception e) {
-			Logger.logError(e);
-			lastWarnings.add(new Problem(e.getMessage(), 0, Severity.ERROR));
+			lastWarnings.add(new Problem(e));
 		}
 
 		return lastWarnings;

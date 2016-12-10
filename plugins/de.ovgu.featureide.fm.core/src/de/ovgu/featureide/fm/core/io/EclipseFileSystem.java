@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -18,11 +19,13 @@ import de.ovgu.featureide.fm.core.io.FileSystem.IFileSystem;
 
 public class EclipseFileSystem implements IFileSystem {
 
+	private JavaFileSystem JAVA = new JavaFileSystem();
+
 	@Override
 	public void write(Path path, byte[] content) throws IOException {
 		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
 		if (file == null) {
-			throw new IOException(new NullPointerException());
+			JAVA.write(path, content);
 		}
 		try {
 			if (file.exists()) {
@@ -39,7 +42,7 @@ public class EclipseFileSystem implements IFileSystem {
 	public void append(Path path, byte[] content) throws IOException {
 		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
 		if (file == null) {
-			throw new IOException(new NullPointerException());
+			JAVA.append(path, content);
 		}
 		try {
 			file.appendContents(new ByteArrayInputStream(content), true, true, null);
@@ -57,7 +60,7 @@ public class EclipseFileSystem implements IFileSystem {
 	public void mkDir(Path path) throws IOException {
 		IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(getIPath(path));
 		if (container == null) {
-			throw new IOException(new NullPointerException());
+			JAVA.mkDir(path);
 		}
 		try {
 			if (container instanceof IFolder) {
@@ -78,13 +81,12 @@ public class EclipseFileSystem implements IFileSystem {
 	@Override
 	public void delete(Path path) throws IOException {
 		final IPath iPath = getIPath(path);
-		IResource res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(iPath);
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
 		try {
-			if (res != null && res.exists()) {
-				res.delete(true, null);
-			}
-			res = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(iPath);
-			if (res != null && res.exists()) {
+			if (res == null) {
+				JAVA.exists(path);
+			} else if (res.exists()) {
 				res.delete(true, null);
 			}
 		} catch (CoreException e) {
@@ -95,12 +97,12 @@ public class EclipseFileSystem implements IFileSystem {
 	@Override
 	public boolean exists(Path path) {
 		final IPath iPath = getIPath(path);
-		IResource res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(iPath);
-		if (res != null && res.isAccessible()) {
-			return true;
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+		if (res == null) {
+			return JAVA.exists(path);
 		}
-		res = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(iPath);
-		return res != null && res.isAccessible();
+		return res.isAccessible();
 	}
 
 	private IPath getIPath(Path path) {

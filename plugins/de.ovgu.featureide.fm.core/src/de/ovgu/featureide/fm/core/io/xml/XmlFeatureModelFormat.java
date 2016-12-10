@@ -30,7 +30,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -255,47 +254,39 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param feat current feature
 	 */
 	private void createXmlDocRec(Document doc, Element node, IFeature feat) {
-
 		if (feat == null) {
 			return;
 		}
 
-		Element fnod;
-		List<IFeature> children;
+		final List<IFeature> children = FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
 
-		children = FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
+		final Element fnod;
 		if (children.isEmpty()) {
 			fnod = doc.createElement(FEATURE);
-			final String description = feat.getProperty().getDescription();
-			if (description != null) {
-				final Element descr = doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-				fnod.appendChild(descr);
-			}
-			writeAttributes(node, fnod, feat);
+		} else if (feat.getStructure().isAnd()) {
+			fnod = doc.createElement(AND);
+		} else if (feat.getStructure().isOr()) {
+			fnod = doc.createElement(OR);
+		} else if (feat.getStructure().isAlternative()) {
+			fnod = doc.createElement(ALT);
 		} else {
-			if (feat.getStructure().isAnd()) {
-				fnod = doc.createElement(AND);
-			} else if (feat.getStructure().isOr()) {
-				fnod = doc.createElement(OR);
-			} else if (feat.getStructure().isAlternative()) {
-				fnod = doc.createElement(ALT);
-			} else {
-				fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
-			}
-			final String description = feat.getProperty().getDescription();
-			if (description != null) {
-				final Element descr = doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-				fnod.appendChild(descr);
-			}
+			fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
+		}
 
-			writeAttributes(node, fnod, feat);
+		addDescription(doc, feat, fnod);
+		writeAttributes(node, fnod, feat);
 
-			final Iterator<IFeature> i = children.iterator();
-			while (i.hasNext()) {
-				createXmlDocRec(doc, fnod, i.next());
-			}
+		for (IFeature feature : children) {
+			createXmlDocRec(doc, fnod, feature);
+		}
+	}
+
+	protected void addDescription(Document doc, IFeature feat, Element fnod) {
+		final String description = feat.getProperty().getDescription();
+		if (description != null && !description.isEmpty()) {
+			final Element descr = doc.createElement(DESCRIPTION);
+			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
+			fnod.appendChild(descr);
 		}
 	}
 
@@ -575,13 +566,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param tempNode The node that causes the error. this node is used for positioning.
 	 */
 	private void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
-		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
+		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
 	}
 
-	// TODO implement
+	// TODO implement warnings
 	@SuppressWarnings("unused")
 	private void throwWarning(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
-		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
+		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
 	}
 
 	private void writeAttributes(Element node, Element fnod, IFeature feat) {
