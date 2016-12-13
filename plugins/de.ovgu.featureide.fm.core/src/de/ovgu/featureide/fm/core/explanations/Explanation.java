@@ -94,7 +94,7 @@ public class Explanation implements Cloneable {
 		/**
 		 * Sets the stored source feature model element to denote the source of the literal.
 		 */
-		protected void setSource() {
+		protected void setSourceElement() {
 			final IFeatureModel fm = getDefectElement().getFeatureModel();
 			if (getLiteral().getSourceAttribute() == FeatureAttribute.CONSTRAINT) {
 				sourceElement = fm.getConstraints().get(getLiteral().getSourceIndex());
@@ -203,7 +203,7 @@ public class Explanation implements Cloneable {
 	public void setDefectDeadFeature(IFeature defectElement) {
 		this.mode = Explanation.Mode.DEAD_FEATURE;
 		this.defectElement = defectElement;
-		setReasonSources();
+		setReasonSourceElements();
 	}
 	
 	/**
@@ -214,7 +214,7 @@ public class Explanation implements Cloneable {
 	public void setDefectFalseOptionalFeature(IFeature defectElement) {
 		this.mode = Explanation.Mode.FALSE_OPTIONAL_FEATURE;
 		this.defectElement = defectElement;
-		setReasonSources();
+		setReasonSourceElements();
 	}
 	
 	/**
@@ -225,15 +225,15 @@ public class Explanation implements Cloneable {
 	public void setDefectRedundantConstraint(IConstraint defectElement) {
 		this.mode = Explanation.Mode.REDUNDANT_CONSTRAINT;
 		this.defectElement = defectElement;
-		setReasonSources();
+		setReasonSourceElements();
 	}
 	
 	/**
 	 * Sets each reason's source.
 	 */
-	protected void setReasonSources() {
+	protected void setReasonSourceElements() {
 		for (final Reason reason : getReasons()) {
-			reason.setSource();
+			reason.setSourceElement();
 		}
 	}
 	
