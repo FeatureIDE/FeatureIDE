@@ -246,9 +246,15 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
+			getFigure().setProperties();
 		case COLLAPSED_ALL_CHANGED:
 		case COLLAPSED_CHANGED:
 			getFigure().setProperties();
+			/*
+			 * Reset the active reason in case we missed that it was set to null while this was collapsed.
+			 * In case it should not be null, the active reason will be set to the correct value in the upcoming feature model analysis anyway.
+			 */
+			setActiveReason(null);
 			break;
 		case MANDATORY_CHANGED:
 			sourceConnection = getModel().getSourceConnection();
@@ -276,22 +282,29 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case ACTIVE_EXPLANATION_CHANGED:
 			break;
 		case ACTIVE_REASON_CHANGED:
-			final Explanation.Reason activeReason = (Explanation.Reason) event.getNewValue();
-			getFigure().setActiveReason(activeReason);
-			getFigure().setProperties();
-			sourceConnection = getModel().getSourceConnection();
-			if (sourceConnection == null) {
-				break;
-			}
-			registry = getViewer().getEditPartRegistry();
-			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
-			connectionEditPart.setActiveReason(activeReason);
-			connectionEditPart.refresh();
+			setActiveReason((Explanation.Reason) event.getNewValue());
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
 			break;
 		}
+	}
+
+	/**
+	 * Sets the currently active reason.
+	 * Refreshes accordingly.
+	 * @param activeReason the new active reason
+	 */
+	protected void setActiveReason(Explanation.Reason activeReason) {
+		getFigure().setActiveReason(activeReason);
+		getFigure().setProperties();
+		final FeatureConnection sourceConnection = getModel().getSourceConnection();
+		if (sourceConnection == null || getViewer() == null) {
+			return;
+		}
+		final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
+		connectionEditPart.setActiveReason(activeReason);
+		connectionEditPart.refresh();
 	}
 
 	public void refreshCollapsedDecorator() {

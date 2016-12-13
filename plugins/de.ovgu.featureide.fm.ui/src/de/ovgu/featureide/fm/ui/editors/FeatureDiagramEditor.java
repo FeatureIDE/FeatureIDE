@@ -114,6 +114,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllButExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
@@ -191,6 +192,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private CollapseSiblingsAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private CollapseAllAction expandAllAction;
+	private CollapseAllButExplanationAction collapseAllButExplanationAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private HiddenAction hiddenAction;
@@ -437,7 +439,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	/**
 	 * Sets the currently active explanation.
-	 * If it changes, notifies the listeners of the change.
+	 * Notifies the listeners of the change.
 	 * @param activeExplanation the new active explanation
 	 */
 	public void setActiveExplanation(Explanation activeExplanation) {
@@ -484,6 +486,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		collapseFeaturesAction = new CollapseSiblingsAction(this, graphicalFeatureModel);
 		collapseAllAction = new CollapseAllAction(this, graphicalFeatureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); //icon for collapse added
+		collapseAllButExplanationAction = new CollapseAllButExplanationAction(getGraphicalFeatureModel());
 		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR);
 
 		expandAllAction = new CollapseAllAction(this, graphicalFeatureModel, false, EXPAND_ALL);
@@ -584,15 +587,25 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
 		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());
 
-		if (!getSelectedEditParts().isEmpty()) {
-			if (getSelectedEditParts().get(0) instanceof FeatureEditPart) {
-				FeatureEditPart f = (FeatureEditPart) getSelectedEditParts().get(0);
-				if (f.getModel().getObject().getStructure().hasChildren()) {
-					collapseAction.setEnabled(true);
-				} else {
-					collapseAction.setEnabled(false);
-				}
+		//Get the primary selected element.
+		ModelElementEditPart primaryElement = null;
+		for (final Object selected : getSelectedEditParts()) {
+			if (!(selected instanceof ModelElementEditPart)) {
+				break;
 			}
+			if (primaryElement != null) { //multiple selected
+				primaryElement = null;
+				break;
+			}
+			primaryElement = (ModelElementEditPart) selected;
+		}
+
+		FeatureEditPart primaryFeature = null;
+		if (primaryElement instanceof FeatureEditPart) {
+			primaryFeature = (FeatureEditPart) primaryElement;
+		}
+		if (primaryElement != null) {
+			collapseAction.setEnabled(primaryFeature.getModel().getObject().getStructure().hasChildren());
 		}
 
 		final IMenuManager subMenuLayout = new MenuManager(SET_LAYOUT);
@@ -655,6 +668,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(hiddenAction);
 			menu.add(collapseAction);
 			menu.add(collapseFeaturesAction);
+			if (getActiveExplanation() != null) {
+				menu.add(collapseAllButExplanationAction);
+			}
 			menu.add(changeFeatureDescriptionAction);
 			menu.add(new Separator());
 			menu.add(subMenuLayout);
@@ -757,6 +773,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return collapseAction;
 		if (CollapseSiblingsAction.ID.equals(workbenchActionID))
 			return collapseFeaturesAction;
+		if (CollapseAllButExplanationAction.ID.equals(workbenchActionID))
+			return collapseAllButExplanationAction;
 		if (AbstractAction.ID.equals(workbenchActionID))
 			return abstractAction;
 		if (HiddenAction.ID.equals(workbenchActionID))
