@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -382,6 +383,57 @@ public class Explanation implements Cloneable {
 			reasonCount.setValue(explanation.reasonCounts.get(reasonCount.getKey()));
 		}
 		explanationCount = explanation.explanationCount;
+	}
+	
+	/**
+	 * Returns all feature model elements affected by this explanation.
+	 * An element is considered affected if it is the defect element, the source element of any reason or part of any such constraint.
+	 * @return all feature model elements affected by this explanation
+	 */
+	public Set<IFeatureModelElement> getAffectedElements() {
+		final Set<IFeatureModelElement> affectedElements = new LinkedHashSet<>();
+		for (final Reason reason : getReasons()) {
+			affectedElements.add(reason.getSourceElement());
+		}
+		affectedElements.add(getDefectElement());
+		final Set<IFeatureModelElement> constraintElements = new LinkedHashSet<>();
+		for (final IFeatureModelElement affectedElement : affectedElements) {
+			if (!(affectedElement instanceof IConstraint)) {
+				continue;
+			}
+			final IConstraint constraint = (IConstraint) affectedElement;
+			constraintElements.addAll(constraint.getContainedFeatures());
+		}
+		affectedElements.addAll(constraintElements);
+		return affectedElements;
+	}
+	
+	/**
+	 * Returns all features affected by this explanation.
+	 * @return all features affected by this explanation
+	 */
+	public Set<IFeature> getAffectedFeatures() {
+		final Set<IFeature> affectedFeatures = new LinkedHashSet<>();
+		for (final IFeatureModelElement affectedElement : getAffectedElements()) {
+			if (affectedElement instanceof IFeature) {
+				affectedFeatures.add((IFeature) affectedElement);
+			}
+		}
+		return affectedFeatures;
+	}
+	
+	/**
+	 * Returns all constraints affected by this explanation.
+	 * @return all constraints affected by this explanation
+	 */
+	public Set<IConstraint> getAffectedConstraints() {
+		final Set<IConstraint> affectedConstraints = new LinkedHashSet<>();
+		for (final IFeatureModelElement affectedElement : getAffectedElements()) {
+			if (affectedElement instanceof IConstraint) {
+				affectedConstraints.add((IConstraint) affectedElement);
+			}
+		}
+		return affectedConstraints;
 	}
 	
 	@Override
