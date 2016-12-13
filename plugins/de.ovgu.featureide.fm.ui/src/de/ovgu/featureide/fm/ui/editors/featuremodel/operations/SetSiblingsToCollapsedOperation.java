@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -66,7 +67,7 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation() {		
 		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
 				IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
@@ -95,7 +96,7 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 				graphicalFeature.setCollapsed(collapseStates.get(i++));
 			}
 		}
-		return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);
+		return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.COLLAPSED_CHANGED);
 	}
 
 }
