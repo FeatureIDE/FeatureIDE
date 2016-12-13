@@ -164,6 +164,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		}
 		return Collections.unmodifiableList(constraints);
 	}
+	
 	@Override
 	public IGraphicalConstraint getGraphicalConstraint(IConstraint constraint) {
 		IGraphicalConstraint graphicalConstraint = constraints.get(constraint);
@@ -217,30 +218,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			}
 		}
 		return Collections.unmodifiableList(features);
-	}
-
-
-	@Override
-	public void refreshConstraints() {
-		for (IGraphicalConstraint c : getConstraints()) {
-			boolean allFeaturesCollapsed = true;
-			for (IFeature f : c.getObject().getContainedFeatures())
-			{
-				IGraphicalFeature gf = getGraphicalFeature(f);
-				if(!gf.hasCollapsedParent())
-				{
-					allFeaturesCollapsed = false;
-				}
-			}
-			if(allFeaturesCollapsed)
-			{
-				c.setCollapsed(true);
-			}
-			else
-			{
-				c.setCollapsed(false);
-			}
-		}
 	}
 
 }

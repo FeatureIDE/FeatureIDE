@@ -157,7 +157,6 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				NamedNodeMap nodeMap = e.getAttributes();
 				int x = 0;
 				int y = 0;
-				boolean collapsed = false;
 
 				for (int i = 0; i < nodeMap.getLength(); i++) {
 					org.w3c.dom.Node node = nodeMap.item(i);
@@ -175,15 +174,12 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 						} catch (NumberFormatException error) {
 							// throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 						}
-					} else if (attributeName.equals("collapsed")) {
-						collapsed = Boolean.parseBoolean(attributeValue);
 					} else {
 						// throwError("Unknown constraint attribute: " + attributeName, node);
 					}
 				}
 				if (constraint != null) {
 					constraint.setLocation(new Point(x, y));
-					constraint.setCollapsed(collapsed);
 				}
 			}
 		}
@@ -245,18 +241,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				final Point location = constr.getLocation();
 				rule.setAttribute("X", Integer.toString(location.x));
 				rule.setAttribute("Y", Integer.toString(location.y));
-				if (constr.isCollapsed()) {
-					rule.setAttribute("collapsed", TRUE);
-				}
 				constraints.appendChild(rule);
-			}
-		} else if (object.getLayout().hasFeaturesAutoLayout()) {
-			for (IGraphicalConstraint constr : object.getConstraints()) {
-				if (constr.isCollapsed()) {
-					final Element rule = doc.createElement(RULE);
-					rule.setAttribute("collapsed", TRUE);
-					constraints.appendChild(rule);
-				}
 			}
 		}
 

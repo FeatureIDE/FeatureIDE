@@ -65,7 +65,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		final LinkedList<String> sb = new LinkedList<>();
 
 		String[] names = null;
-		int lineNumber = 0;
+		int lineNumber = 1;
 		try (BufferedReader r = new BufferedReader(new StringReader(source.toString()))) {
 			String str = null;
 			while ((str = r.readLine()) != null) {
@@ -133,7 +133,8 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		}
 		Node cnf = new And(clauses.toArray(new Or[0]));
 		final IMonitor workMonitor = new ConsoleMonitor();
-		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
+		final FeatureRemover remover = new FeatureRemover(cnf, abstractNames, false);
+		cnf = remover.createNewClauseList(LongRunningWrapper.runMethod(remover, workMonitor));
 		for (Node clause : cnf.getChildren()) {
 			featureModel.addConstraint(factory.createConstraint(featureModel, clause));
 		}
@@ -144,36 +145,33 @@ public class DIMACSFormat implements IFeatureModelFormat {
 	public String write(IFeatureModel featureModel) {
 		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
 
-		StringBuilder string = new StringBuilder();
-		Map<String, Integer> featureMap = new HashMap<String, Integer>();
+		final StringBuilder stringBuilder = new StringBuilder();
+		Map<String, Integer> featureMap = new HashMap<>();
 		int i = 1;
 		for (CharSequence name : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
 			featureMap.put(name.toString(), i);
-			string.append("c ");
-			string.append(i);
-			string.append(' ');
-			string.append(name.toString());
-			string.append(System.lineSeparator());
+			stringBuilder.append("c ");
+			stringBuilder.append(i);
+			stringBuilder.append(' ');
+			stringBuilder.append(name.toString());
+			stringBuilder.append(System.lineSeparator());
 			i++;
 		}
-		string.append("p cnf ");
-		string.append(featureModel.getNumberOfFeatures());
-		string.append(' ');
-		string.append(nodes.getChildren().length - 2);
-		string.append("\r\n");
 
+		int clauseCount = 0;
+		final StringBuilder clauseStringBuilder = new StringBuilder();
 		CHILDREN : for (Node and : nodes.getChildren()) {
 			if (and instanceof Literal) {
 				if (and.toString().equals("True") || and.toString().equals("-False")) {
 					continue;
 				}
 				if (((Literal) and).positive) {
-					string.append(featureMap.get(and.toString()));
+					clauseStringBuilder.append(featureMap.get(and.toString()));
 				} else {
-					string.append('-');
-					string.append(featureMap.get(((Literal) and).var.toString()));
+					clauseStringBuilder.append('-');
+					clauseStringBuilder.append(featureMap.get(((Literal) and).var.toString()));
 				}
-				string.append(' ');
+				clauseStringBuilder.append(' ');
 			} else {
 				for (Node literal : and.getChildren()) {
 					if (literal.toString().equals("True") || literal.toString().equals("-False")) {
@@ -183,19 +181,27 @@ public class DIMACSFormat implements IFeatureModelFormat {
 
 				for (Node literal : and.getChildren()) {
 					if (((Literal) literal).positive) {
-						string.append(featureMap.get(literal.toString()));
+						clauseStringBuilder.append(featureMap.get(literal.toString()));
 					} else {
-						string.append('-');
-						string.append(featureMap.get(((Literal) literal).var.toString()));
+						clauseStringBuilder.append('-');
+						clauseStringBuilder.append(featureMap.get(((Literal) literal).var.toString()));
 					}
-					string.append(' ');
+					clauseStringBuilder.append(' ');
 				}
 			}
-			string.append('0');
-			string.append(System.lineSeparator());
+			clauseStringBuilder.append('0');
+			clauseStringBuilder.append(System.lineSeparator());
+			clauseCount++;
 		}
+		
+		stringBuilder.append("p cnf ");
+		stringBuilder.append(featureModel.getNumberOfFeatures());
+		stringBuilder.append(' ');
+		stringBuilder.append(clauseCount);
+		stringBuilder.append(System.lineSeparator());
+		stringBuilder.append(clauseStringBuilder);
 
-		return string.toString();
+		return stringBuilder.toString();
 	}
 
 	@Override

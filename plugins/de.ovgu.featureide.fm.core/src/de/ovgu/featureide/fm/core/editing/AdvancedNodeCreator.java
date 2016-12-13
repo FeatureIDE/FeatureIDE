@@ -266,8 +266,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	private Node removeFeatures(final Node[] nodeArray, IMonitor monitor) {
 		if (excludedFeatureNames != null && !excludedFeatureNames.isEmpty()) {
-			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular),
-					monitor);
+			final FeatureRemover remover = new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular);
+			return remover.createNewClauseList(LongRunningWrapper.runMethod(remover, monitor));
 		} else {
 			return new And(nodeArray);
 		}

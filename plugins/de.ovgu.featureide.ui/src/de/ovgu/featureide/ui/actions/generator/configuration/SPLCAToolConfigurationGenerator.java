@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
 
 import java.io.IOException;
 import java.net.URL;
@@ -31,6 +32,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.util.BundleUtility;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -38,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 import no.sintef.ict.splcatool.CoveringArray;
@@ -62,7 +66,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 		this.algorithm = algorithm;
 		this.t = t;
 	}
-	
+
 	@Override
 	public Void execute(IMonitor monitor) throws Exception {
 		runSPLCATool();
@@ -72,8 +76,9 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	@SuppressWarnings("deprecation")
 	private void runSPLCATool() {
 		CoveringArray ca = null;
+		final boolean casa = algorithm.equals(CASA.substring(0, CASA.indexOf(" ")));
 		try {
-			if (algorithm.equals(CASA.substring(0, CASA.indexOf(" ")))) {
+			if (casa) {
 				URL url = BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
 				try {
 					url = FileLocator.toFileURL(url);
@@ -89,18 +94,27 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 				return;
 			}
 			ca.generate();
-		} catch (FeatureModelException e) {
+		} catch (FeatureModelException | TimeoutException | CoveringArrayGenerationException e) {
 			UIPlugin.getDefault().logError(e);
-		} catch (TimeoutException e) {
-			UIPlugin.getDefault().logError(e);
-		} catch (CoveringArrayGenerationException e) {
-			UIPlugin.getDefault().logError(e);
+			return;
+		} catch (final Exception e) {
+			final Display display = Display.getDefault();
+			display.syncExec(new Runnable() {
+				@Override
+				public void run() {
+					final String errorMessage = algorithm + " experienced an error during its execution.\n" + (casa
+							? "Maybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)" : "Message:\n\t" + e.getMessage());
+					new MessageDialog(display.getActiveShell(), "External Execution Error", GUIDefaults.FEATURE_SYMBOL, errorMessage, MessageDialog.ERROR,
+							new String[] { OK }, 0).open();
+				}
+			});
+			return;
 		}
 
 		List<List<String>> solutions = Collections.emptyList();
-		try{
+		try {
 			solutions = removeDuplicates(ca);
-		}catch(Exception e){
+		} catch (Exception e) {
 			UIPlugin.getDefault().logWarning("Problems occurred during the execution of " + algorithm);
 		}
 		builder.configurationNumber = solutions.size();

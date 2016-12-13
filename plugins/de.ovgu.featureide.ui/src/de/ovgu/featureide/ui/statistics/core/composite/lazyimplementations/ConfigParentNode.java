@@ -32,6 +32,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
+import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 /**
  * Parent for the actual {@link ConfigNode}s.
@@ -63,7 +64,7 @@ public class ConfigParentNode extends LazyParent {
 		 *            for the job.
 		 */
 		public void calculate(final long timeout, final int priority) {
-			LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
+			LongRunningMethod<Boolean> job = new TreeJob(this) {
 				private String calculateConfigs() {
 					boolean ignoreAbstract = description.equals(DESC_CONFIGS);
 					if (!ignoreAbstract && innerModel.getAnalyser().countConcreteFeatures() == 0) {
@@ -81,6 +82,11 @@ public class ConfigParentNode extends LazyParent {
 				public Boolean execute(IMonitor workMonitor) throws Exception {
 					setValue(calculateConfigs());
 					return true;
+				}
+
+				@Override
+				public boolean cancel() {
+					return false;
 				}
 			};
 			LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATING + this.description, job);

@@ -24,6 +24,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -43,7 +44,6 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 	protected boolean featureSelected = false;
 	public boolean isImplicit = false;
-	protected boolean collapsed;
 
 	
 	protected Point location = new Point(0, 0);
@@ -153,11 +153,11 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	
 	@Override
 	public boolean isCollapsed() {
-		return collapsed;
-	}
-
-	@Override
-	public void setCollapsed(boolean collapse) {
-		collapsed = collapse;		
+		for (IFeature f : correspondingConstraint.getContainedFeatures()) {
+			if (!graphicalFeatureModel.getGraphicalFeature(f).hasCollapsedParent()) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
