@@ -285,13 +285,14 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				final Element descr = doc.createElement(DESCRIPTION);
 				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 				fnod.appendChild(descr);
-			}}
+			}
 
-		addDescription(doc, feat, fnod);
-		writeAttributes(node, fnod, feat);
+			addDescription(doc, feat, fnod);
+			writeAttributes(node, fnod, feat);
 
-		for (IFeature feature : children) {
-			createXmlDocRec(doc, fnod, feature);
+			for (IFeature feature : children) {
+				createXmlDocRec(doc, fnod, feature);
+			}
 		}
 	}
 
