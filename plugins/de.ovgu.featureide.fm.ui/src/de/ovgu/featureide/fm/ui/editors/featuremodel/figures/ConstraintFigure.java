@@ -119,11 +119,9 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		case NORMAL:
 			break;
 		case VOID_MODEL:
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(VOID_LABEL);
 			break;
 		case UNSATISFIABLE:
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(UNSATISFIABLE_LABEL);
 			break;
 		case TAUTOLOGY:
@@ -139,7 +137,6 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		case FALSE_OPTIONAL:
 			final StringBuilder toolTip = new StringBuilder();
 			if (!constraint.getDeadFeatures().isEmpty()) {
-				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				toolTip.append(DEAD_FEATURE);
 				ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
 				for (IFeature dead : constraint.getDeadFeatures()) {
@@ -155,9 +152,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			}
 
 			if (!constraint.getFalseOptional().isEmpty()) {
-				if (constraint.getDeadFeatures().isEmpty()) {
-					setBackgroundColor(FMPropertyManager.getWarningColor());
-				} else {
+				if (!constraint.getDeadFeatures().isEmpty()) {
 					toolTip.append("\n\n");
 				}
 
