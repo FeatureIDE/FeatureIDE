@@ -69,6 +69,14 @@ public class Explanation implements Cloneable {
 		}
 		
 		/**
+		 * Returns the containing explanation.
+		 * @return the containing explanation
+		 */
+		public Explanation getExplanation() {
+			return Explanation.this;
+		}
+		
+		/**
 		 * Returns the clause containing the literal.
 		 * @return the clause containing the literal
 		 */
@@ -111,6 +119,14 @@ public class Explanation implements Cloneable {
 		 * @return the confidence of this reason
 		 */
 		public float getConfidence() {
+			/*
+			 * TODO Provide a useful explanation count for redundant constraints.
+			 * The explanation count for redundant constraints is currently useless.
+			 * To avoid confusing the user, do not take it into account when giving confidence hints and default to 1.
+			 */
+			if (getExplanation().getMode() == Mode.REDUNDANT_CONSTRAINT) {
+				return 1;
+			}
 			return (float) reasonCounts.get(this)/getExplanationCount();
 		}
 		
