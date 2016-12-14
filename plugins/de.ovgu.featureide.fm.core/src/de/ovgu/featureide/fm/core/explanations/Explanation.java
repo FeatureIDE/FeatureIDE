@@ -124,7 +124,7 @@ public class Explanation implements Cloneable {
 			 * The explanation count for redundant constraints is currently useless.
 			 * To avoid confusing the user, do not take it into account when giving confidence hints and default to 1.
 			 */
-			if (getExplanation().getMode() == Mode.REDUNDANT_CONSTRAINT) {
+			if (getMode() == Mode.REDUNDANT_CONSTRAINT) {
 				return 1;
 			}
 			return (float) reasonCounts.get(this)/getExplanationCount();
