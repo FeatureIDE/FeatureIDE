@@ -1013,5 +1013,8 @@ public class StringTable {
 	public static final String SET_FEATURE_EXPANDED = "Set Feature Expanded";
 	public static final String COLLAPSE_SIBLINGS = "Collapse siblings";
 	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust model to editor size";
+	public static final String CALCULATE_VOID_FEATURES = "Calculate Void Features";
+	public static final String CALCULATE_FALSE_OPTIONAL_FEATURES = "Calculate False Optional Features";
+	public static final String CALCULATE_DEAF_FEATURES = "Calculate Dead Features";
 	
 }
