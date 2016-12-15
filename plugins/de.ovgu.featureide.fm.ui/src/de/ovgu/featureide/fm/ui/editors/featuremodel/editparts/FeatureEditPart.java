@@ -304,7 +304,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		}
 		final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 		connectionEditPart.setActiveReason(activeReason);
-		connectionEditPart.refresh();
+		connectionEditPart.refreshVisuals();
 	}
 
 	public void refreshCollapsedDecorator() {

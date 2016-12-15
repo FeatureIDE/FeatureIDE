@@ -246,35 +246,52 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 
 	public void refreshTargetDecoration() {
+		//Check if there is a target to refresh.
 		IGraphicalFeature target = getModel().getTarget();
 		if (target == null) {
 			return;
 		}
 		
+		//Check if the target is collapsed.
 		if (target.isCollapsed()) {
 			getFigure().setTargetDecoration(new CollapsedDecoration(target));
 			return;
 		}
 		
+		/*
+		 * Add a target decoration only if this is the main connection.
+		 * The main connection is the first sibling and the only one with a target decoration.
+		 */
+		final IFeatureStructure targetStructure = target.getObject().getStructure();
+		final IGraphicalFeature source = getModel().getSource();
+		final IFeatureStructure sourceStructure = source.getObject().getStructure();
+		final IFeatureStructure mainSourceStructure = targetStructure.getFirstChild();
 		RelationDecoration targetDecoration = null;
-		final IFeatureStructure structure = target.getObject().getStructure();
-		if (structure.getChildrenCount() > 1
-				&& !structure.isAnd()
-				&& structure.isFirstChild(getModel().getSource().getObject().getStructure())) {
+		if (sourceStructure == mainSourceStructure
+				&& !targetStructure.isAnd()
+				&& targetStructure.getChildrenCount() > 1) {
 			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
 			final IGraphicalFeature lastChild = FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel())
 					? graphicalChildren.get(0)
 					: graphicalChildren.get(graphicalChildren.size() - 1);
-			targetDecoration = new RelationDecoration(structure.isMultiple(), lastChild);
+			targetDecoration = new RelationDecoration(targetStructure.isMultiple(), lastChild);
 		}
 		getFigure().setTargetDecoration(targetDecoration);
 		
-		if (getActiveReason() != null
-				&& getFigure().getTargetDecoration() != null
-				&& (getFigure().getTargetDecoration().getActiveReason() == null
-				|| getFigure().getTargetDecoration().getActiveReason().getConfidence() < getActiveReason().getConfidence())) { //maximum confidence of all siblings
-			getFigure().getTargetDecoration().setActiveReason(getActiveReason());
+		/*
+		 * Refresh the active reason of the target decoration of the main connection (which might not be this one).
+		 * We have to do this whenever any connection is refreshed as the main connection might not be refreshed even though its target decoration has to be.
+		 */
+		final IGraphicalFeature mainSource = FeatureUIHelper.getGraphicalFeature(mainSourceStructure, target.getGraphicalModel());
+		final ConnectionEditPart mainConnectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(mainSource.getSourceConnection());
+		if (mainConnectionEditPart == null) {
+			return;
 		}
+		final RelationDecoration mainTargetDecoration = mainConnectionEditPart.getFigure().getTargetDecoration();
+		if (mainTargetDecoration == null) {
+			return;
+		}
+		mainTargetDecoration.setActiveReason(getMainActiveReason());
 	}
 
 	public void refreshToolTip() {
@@ -330,6 +347,50 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	 */
 	public void setActiveReason(Reason activeReason) {
 		this.activeReason = activeReason;
+	}
+	
+	/**
+	 * Returns the active reason for use with the main connection's target decoration.
+	 * The main active reason has the maximum confidence of all reasons of all siblings.
+	 * @return the active reason for use with the main connection's target decoration
+	 */
+	private Reason getMainActiveReason() {
+		final IGraphicalFeature target = getModel().getTarget();
+		if (target == null) {
+			return null;
+		}
+		final IFeatureStructure targetStructure = target.getObject().getStructure();
+		final IGraphicalFeature source = getModel().getSource();
+		final IFeatureStructure sourceStructure = source.getObject().getStructure();
+		Reason mainActiveReason = null;
+		for (final IFeatureStructure siblingStructure : targetStructure.getChildren()) {
+			final IGraphicalFeature sibling;
+			final ConnectionEditPart siblingConnectionEditPart;
+			if (siblingStructure == sourceStructure) {
+				//Don't bother looking up this edit part.
+				sibling = source;
+				siblingConnectionEditPart = this;
+			} else {
+				/*
+				 * TODO Increase performance by accessing edit parts directly instead of looking them up.
+				 * The sibling edit parts should be accessible through getTarget().getTargetConnections().
+				 * However, as of writing, that method always returns an empty list.
+				 * As a result, the sibling edit parts have to be looked up with a detour to each sibling's model.
+				 */
+				sibling = FeatureUIHelper.getGraphicalFeature(siblingStructure, target.getGraphicalModel());
+				siblingConnectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sibling.getSourceConnection());
+			}
+			if (siblingConnectionEditPart == null) {
+				continue;
+			}
+			final Reason activeReason = siblingConnectionEditPart.getActiveReason();
+			if (activeReason != null
+					&& (mainActiveReason == null
+					|| mainActiveReason.getConfidence() < activeReason.getConfidence())) { //maximum confidence of all siblings
+				mainActiveReason = activeReason;
+			}
+		}
+		return mainActiveReason;
 	}
 	
 	/**
