@@ -254,7 +254,8 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	private final IFeatureModel writeAndReadModel() throws UnsupportedModelException {
 		IFeatureModel newFm = FMFactoryManager.getFactory().createFeatureModel();
 		final IFeatureModelFormat format = getFormat();
-		format.read(newFm, format.write(origFm));
+		final String write = format.getInstance().write(origFm);
+		format.getInstance().read(newFm, write);
 		return newFm;
 	}
 
