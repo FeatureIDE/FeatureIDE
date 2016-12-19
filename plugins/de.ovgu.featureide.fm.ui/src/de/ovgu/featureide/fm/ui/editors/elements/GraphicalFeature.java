@@ -144,6 +144,12 @@ public class GraphicalFeature implements IGraphicalFeature {
 		final List<FeatureConnection> list;
 		list = new LinkedList<>();
 		list.add(getSourceConnection());
+		if(isCollapsed())
+		{
+			FeatureConnection collapsedConnection = new FeatureConnection(this);
+			collapsedConnection.setTarget(this);
+			list.add(collapsedConnection);
+		}
 		return (list);
 	}
 
@@ -216,6 +222,10 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public boolean isCollapsed() {
+		if(!getObject().getStructure().hasChildren())
+		{
+			return false;
+		}
 		return collapsed;
 	}
 

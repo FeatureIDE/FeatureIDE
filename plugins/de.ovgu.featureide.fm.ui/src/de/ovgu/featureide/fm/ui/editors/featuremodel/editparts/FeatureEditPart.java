@@ -47,7 +47,6 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
@@ -148,6 +147,9 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
+		if (getModel().isCollapsed() && connection.getTarget() == connection.getSource()) {
+			return targetAnchor;
+		}
 		return sourceAnchor;
 	}
 
@@ -171,14 +173,12 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	public void deactivate() {
-		refreshCollapsedDecorator();
 		super.deactivate();
 	}
 
 	@Override
 	public void refresh() {
 		super.refresh();
-		refreshCollapsedDecorator();
 	}
 	
 	@Override
@@ -195,7 +195,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 					connectionEditPart.refresh();
 				}
 			}
-			refreshCollapsedDecorator();
 			break;
 		case LOCATION_CHANGED:
 			getFigure().setLocation(getModel().getLocation());
@@ -242,7 +241,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 			getFigure().setName(displayName);
 			getModel().setSize(getFigure().getSize());
-			refreshCollapsedDecorator();
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
@@ -269,7 +267,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			sourceConnection = getModel().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
-			refreshCollapsedDecorator();
 			connectionEditPart.refreshVisuals();
 			break;
 		case HIDDEN_CHANGED:
@@ -305,27 +302,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 		connectionEditPart.setActiveReason(activeReason);
 		connectionEditPart.refreshVisuals();
-	}
-
-	public void refreshCollapsedDecorator() {
-		final IGraphicalFeature f = getModel();
-		final FeatureFigure featureFigure = getFigure();
-		if(f.isCollapsed() && f.getObject().getStructure().hasChildren() && !f.hasCollapsedParent())
-		{
-			//Create collapse decorator if not existing
-			if (featureFigure.getParent() != null) {
-				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
-				if (featureFigure.getCollapsedDecorator() == null) {
-					featureFigure.setCollapsedDecorator(collapsedDecoration);
-					featureFigure.getParent().add(collapsedDecoration);
-				}
-			}
-			getFigure().setLocation(getModel().getLocation());
-		}
-		else if (featureFigure.getCollapsedDecorator() != null)
-		{
-			featureFigure.RemoveCollapsedDecorator();
-		}
 	}
 
 	private static boolean equals(final IGraphicalFeature newTarget, final IGraphicalFeature target) {

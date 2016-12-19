@@ -233,7 +233,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+		if (graphicalSource == graphicalTarget && graphicalSource.isCollapsed()) {
+			getFigure().setSourceDecoration(new CollapsedDecoration(graphicalTarget));
+			return;
+		} else if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
 			}
@@ -249,12 +252,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		//Check if there is a target to refresh.
 		IGraphicalFeature target = getModel().getTarget();
 		if (target == null) {
-			return;
-		}
-		
-		//Check if the target is collapsed.
-		if (target.isCollapsed()) {
-			getFigure().setTargetDecoration(new CollapsedDecoration(target));
 			return;
 		}
 		
