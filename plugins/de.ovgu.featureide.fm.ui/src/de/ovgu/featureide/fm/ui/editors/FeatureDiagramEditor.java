@@ -604,7 +604,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		if (primaryElement instanceof FeatureEditPart) {
 			primaryFeature = (FeatureEditPart) primaryElement;
 		}
-		if (primaryElement != null) {
+		if (primaryFeature != null) {
 			collapseAction.setEnabled(primaryFeature.getModel().getObject().getStructure().hasChildren());
 		}
 
@@ -687,6 +687,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(expandConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
+			if (getActiveExplanation() != null) {
+				menu.add(new Separator());
+				menu.add(collapseAllButExplanationAction);
+			}
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
 			menu.add(legendAction);
