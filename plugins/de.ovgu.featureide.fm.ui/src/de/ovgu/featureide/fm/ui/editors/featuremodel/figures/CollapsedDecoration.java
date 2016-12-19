@@ -53,9 +53,11 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		super();
 		graphicalFeature = parent;
 		setLayoutManager(layout);
-		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
+		setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
+		setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 
 		childrenCount.setFont(DEFAULT_FONT);
+		setOpaque(true);
 		setDecoratorText("" + GetAllChildren(parent.getObject().getStructure()));
 		add(childrenCount);
 	}
@@ -63,8 +65,10 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 	public CollapsedDecoration() {
 		super();
 		setLayoutManager(layout);
-		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
+		setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
+		setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 
+		setOpaque(true);
 		childrenCount.setFont(DEFAULT_FONT);
 		setDecoratorText("n");
 		add(childrenCount);
@@ -75,7 +79,7 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		if (graphicalFeature != null)
 			if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
 				//left to right layout 
-				super.setLocation(p.translate(GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE + getBounds().width / 2, -getBounds().height / 2));
+				super.setLocation(p.translate(+getBounds().width/2 + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,-getBounds().height/2));
 			}
 		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
 	}
@@ -134,7 +138,9 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		}
 		int height = getBounds().height - 2;
 		graphics.setLineWidth(1);
-		graphics.setForegroundColor(FMPropertyManager.getFeatureBorderColor());
+		graphics.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
+
+		graphics.fillRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
 		graphics.drawRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
 	}
 

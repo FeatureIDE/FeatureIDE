@@ -42,6 +42,7 @@ import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
 import org.eclipse.gef.requests.SelectionRequest;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.internal.win32.GESTURECONFIG;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -217,12 +218,18 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd())
-				&& !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
-			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
-				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
+		if (graphicalSource == graphicalTarget && graphicalSource.isCollapsed()) {
+			sourceDecoration = getCollapsedDecoration(graphicalTarget);
+		} else {
+
+			if ((target.getStructure().isAnd())
+					&& !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+				if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+					sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
+				}
 			}
 		}
+
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
 	}
@@ -235,6 +242,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		return new CircleDecoration(mandatory);
 	}
 
+	private CollapsedDecoration getCollapsedDecoration(IGraphicalFeature f) {
+		return new CollapsedDecoration(f);
+	}
+
 	public void refreshTargetDecoration() {
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
@@ -245,12 +256,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		if (target == null || target.hasCollapsedParent()) {
 			return;
 		}
-		if (target.isCollapsed()) {
-			connection.setTargetDecoration(new CollapsedDecoration(target));
-			return;
-		}
-		if (target.getObject().getStructure().getChildrenCount() > 1) {
-			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
+
+		final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
+		if (!graphicalChildren.isEmpty()) {
 			final IGraphicalFeature object = graphicalChildren.get(0);
 			final IFeatureStructure structure = target.getObject().getStructure();
 			if (structure.isAnd()) {
@@ -272,7 +280,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		} else {
 			connection.setTargetDecoration(createClearDecoration());
 		}
-
 	}
 
 	public void refreshToolTip() {

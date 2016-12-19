@@ -147,6 +147,9 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
+		if (getFeature().isCollapsed() && connection.getTarget() == connection.getSource()) {
+			return targetAnchor;
+		}
 		return sourceAnchor;
 	}
 
@@ -170,7 +173,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	public void deactivate() {
-		refreshCollapsedDecorator();
 		super.deactivate();
 	}
 
@@ -180,10 +182,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	@Override
 	public void refresh() {
 		super.refresh();
-		refreshCollapsedDecorator();
-		
 	}
-	
+
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
@@ -198,7 +198,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 					connectionEditPart.refresh();
 				}
 			}
-			refreshCollapsedDecorator();
 			break;
 		case LOCATION_CHANGED:
 			getFeatureFigure().setLocation(getFeature().getLocation());
@@ -245,7 +244,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 			getFeatureFigure().setName(displayName);
 			getFeature().setSize(getFeatureFigure().getSize());
-			refreshCollapsedDecorator();
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
@@ -266,7 +264,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
-			refreshCollapsedDecorator();
 			connectionEditPart.refreshVisuals();
 			break;
 		case HIDDEN_CHANGED:
@@ -274,33 +271,11 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			sourceConnection = getFeature().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
-			refreshCollapsedDecorator();
 			connectionEditPart.refreshSourceDecoration();
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getFeature() + " not handled.");
 			break;
-		}
-	}
-
-	public void refreshCollapsedDecorator() {
-		final IGraphicalFeature f = getFeature();
-		final FeatureFigure featureFigure = (FeatureFigure) getFigure();
-		if(f.isCollapsed() && f.getObject().getStructure().hasChildren() && !f.hasCollapsedParent())
-		{
-			//Create collapse decorator if not existing
-			if (featureFigure.getParent() != null) {
-				CollapsedDecoration collapsedDecoration = new CollapsedDecoration(f);
-				if (featureFigure.getCollapsedDecorator() == null) {
-					featureFigure.setCollapsedDecorator(collapsedDecoration);
-					featureFigure.getParent().add(collapsedDecoration);
-				}
-			}
-			getFeatureFigure().setLocation(getFeature().getLocation());
-		}
-		else if (featureFigure.getCollapsedDecorator() != null)
-		{
-			featureFigure.RemoveCollapsedDecorator();
 		}
 	}
 

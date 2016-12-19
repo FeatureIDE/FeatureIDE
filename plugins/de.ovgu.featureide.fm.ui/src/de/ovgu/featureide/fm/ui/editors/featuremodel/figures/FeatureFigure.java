@@ -80,7 +80,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private final ConnectionAnchor targetAnchor;
 
 	private IGraphicalFeature feature;
-	private CollapsedDecoration collapseDecoration;
 	private static GridLayout gl = new GridLayout();
 
 	private static String ABSTRACT = " Abstract";
@@ -416,31 +415,5 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	@Override
 	public void setLocation(Point p) {
 		super.setLocation(p);
-		if (collapseDecoration != null) {
-			if (getFeature().getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
-				//left To Right Layout
-				collapseDecoration.setLocation(new Point(p.x + getBounds().width, p.y + getBounds().height / 2));
-			} else {
-				collapseDecoration.setLocation(new Point(p.x + getBounds().width / 2, p.y + getBounds().height));
-			}
-		}
-	}
-
-	public void setCollapsedDecorator(CollapsedDecoration decoration) {
-		collapseDecoration = decoration;
-	}
-
-	public CollapsedDecoration getCollapsedDecorator() {
-		return collapseDecoration;
-	}
-
-	public void RemoveCollapsedDecorator() {
-		if (collapseDecoration == null)
-			return;
-		if (collapseDecoration.getParent() != null) {
-			collapseDecoration.getParent().remove(collapseDecoration);
-			
-		}
-		collapseDecoration = null;
 	}
 }
