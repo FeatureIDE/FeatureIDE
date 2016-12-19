@@ -28,9 +28,9 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
+ * An action to toggle the analyser of the feature model that it should calculate false optional features.
  * 
- * @author Joshua
+ * @author Joshua Sprey
  */
 public class FalseOptionalFeaturesCalculationAction extends Action {
 

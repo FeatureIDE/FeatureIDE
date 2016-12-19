@@ -482,95 +482,108 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	}
 
 	private void checkFeatureDead(final SatInstance si) {
-		deadFeatures.clear();
-		coreFeatures.clear();
-		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si), monitor.subTask(0));
-		monitor.checkCancel();
-		for (int i = 0; i < solution2.length; i++) {
+		if (calculateDeadConstraints) {
+			deadFeatures.clear();
+			coreFeatures.clear();
+			final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si), monitor.subTask(0));
 			monitor.checkCancel();
-			final int var = solution2[i];
-			final IFeature feature = fm.getFeature((String) si.getVariableObject(var));
-			if (var < 0) {
-				setFeatureAttribute(feature, FeatureStatus.DEAD);
-				deadFeatures.add(feature);
+			for (int i = 0; i < solution2.length; i++) {
+				monitor.checkCancel();
+				final int var = solution2[i];
+				final IFeature feature = fm.getFeature((String) si.getVariableObject(var));
+				if (var < 0) {
+					setFeatureAttribute(feature, FeatureStatus.DEAD);
+					deadFeatures.add(feature);
 
-				if (calculateExplanations) {
-					// explain dead features and remember explanation in map
-					DeadFeature deadF = new DeadFeature();
-					List<String> expl = deadF.explain(fm, feature, false);
-					deadFeatureExpl.put(feature, expl);
+					if (calculateExplanations) {
+						// explain dead features and remember explanation in map
+						DeadFeature deadF = new DeadFeature();
+						List<String> expl = deadF.explain(fm, feature, false);
+						deadFeatureExpl.put(feature, expl);
 
-				} else {
-					coreFeatures.add(feature);
+					} else {
+						coreFeatures.add(feature);
+					}
 				}
 			}
 		}
 	}
 
 	private List<IFeature> checkFeatureDead2(final BasicSolver solver, List<IFeature> deadList) {
-		if (deadList.size() == 0) {
-			return Collections.emptyList();
-		}
-		final List<IFeature> result = new ArrayList<>();
-		int[] deadVar = new int[deadList.size()];
-		int j = 0;
-		for (IFeature deadFeature : deadList) {
-			deadVar[j++] = solver.getSatInstance().getVariable(deadFeature.getName());
-		}
-		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(solver, deadVar));
-		for (int i = 0; i < solution2.length; i++) {
-			final int var = solution2[i];
-			if (var < 0) {
-				result.add(fm.getFeature((String) solver.getSatInstance().getVariableObject(var)));
+		if (calculateDeadConstraints) {
+			if (deadList.size() == 0) {
+				return Collections.emptyList();
 			}
+			final List<IFeature> result = new ArrayList<>();
+			int[] deadVar = new int[deadList.size()];
+			int j = 0;
+			for (IFeature deadFeature : deadList) {
+				deadVar[j++] = solver.getSatInstance().getVariable(deadFeature.getName());
+			}
+			final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(solver, deadVar));
+			for (int i = 0; i < solution2.length; i++) {
+				final int var = solution2[i];
+				if (var < 0) {
+					result.add(fm.getFeature((String) solver.getSatInstance().getVariableObject(var)));
+				}
+			}
+			return result;
+		} else {
+			return new ArrayList<IFeature>();
 		}
-		return result;
 	}
 
 	private void checkFeatureFalseOptional(final Iterable<IFeature> features, final SatInstance si) {
-		final List<int[]> possibleFOFeatures = new ArrayList<>();
-		for (IFeature feature : features) {
-			final IFeature parent = FeatureUtils.getParent(feature);
-			if (parent != null && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
-				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
+		if (calculateFOConstraints) {
+			final List<int[]> possibleFOFeatures = new ArrayList<>();
+			for (IFeature feature : features) {
+				final IFeature parent = FeatureUtils.getParent(feature);
+				if (parent != null && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
+					possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
+				}
 			}
-		}
-		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(si, possibleFOFeatures), monitor.subTask(0));
-		monitor.checkCancel();
-		falseOptionalFeatures.clear();
-		for (int[] pair : solution3) {
+			final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(si, possibleFOFeatures), monitor.subTask(0));
 			monitor.checkCancel();
-			final IFeature feature = fm.getFeature((CharSequence) si.getVariableObject(pair[1]));
-			setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
-			falseOptionalFeatures.add(feature);
+			falseOptionalFeatures.clear();
+			for (int[] pair : solution3) {
+				monitor.checkCancel();
+				final IFeature feature = fm.getFeature((CharSequence) si.getVariableObject(pair[1]));
+				setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
+				falseOptionalFeatures.add(feature);
 
-			if (calculateExplanations) {
-				// explain false optional features and remember explanation in map
-				FalseOptionalFeature falseOpts = new FalseOptionalFeature();
-				List<String> expl = falseOpts.explain(fm, feature);
-				falseOptFeatureExpl.put(feature, expl);
+				if (calculateExplanations) {
+					// explain false optional features and remember explanation in map
+					FalseOptionalFeature falseOpts = new FalseOptionalFeature();
+					List<String> expl = falseOpts.explain(fm, feature);
+					falseOptFeatureExpl.put(feature, expl);
+				}
 			}
 		}
 	}
 
 	private List<IFeature> checkFeatureFalseOptional2(final BasicSolver solver, List<IFeature> foList) {
-		if (foList.size() == 0) {
-			return Collections.emptyList();
-		}
-		final List<IFeature> result = new ArrayList<>();
-		final List<int[]> possibleFOFeatures = new ArrayList<>();
-		final SatInstance si = solver.getSatInstance();
-		for (IFeature feature : foList) {
-			final IFeature parent = FeatureUtils.getParent(feature);
-			if (parent != null && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
-				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
+		if (calculateFOConstraints) {
+			if (foList.size() == 0) {
+				return Collections.emptyList();
 			}
+			final List<IFeature> result = new ArrayList<>();
+			final List<int[]> possibleFOFeatures = new ArrayList<>();
+			final SatInstance si = solver.getSatInstance();
+			for (IFeature feature : foList) {
+				final IFeature parent = FeatureUtils.getParent(feature);
+				if (parent != null && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
+					possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
+				}
+			}
+			final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(solver, possibleFOFeatures));
+			for (int[] pair : solution3) {
+				result.add(fm.getFeature((CharSequence) si.getVariableObject(pair[1])));
+			}
+			return result;
+		} else
+		{
+			return new ArrayList<IFeature>();
 		}
-		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(solver, possibleFOFeatures));
-		for (int[] pair : solution3) {
-			result.add(fm.getFeature((CharSequence) si.getVariableObject(pair[1])));
-		}
-		return result;
 	}
 
 	/**
