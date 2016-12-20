@@ -17,4 +17,7 @@ Bundle-ClassPath: lib/jak2java.jar,
  .
 Export-Package: de.ovgu.featureide.ahead,
  de.ovgu.featureide.ahead.model,
- de.ovgu.featureide.ahead.wrapper
+ de.ovgu.featureide.ahead.wrapper,
+ jak2java,
+ jampack,
+ mixin

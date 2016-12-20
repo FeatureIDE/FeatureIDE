@@ -9,14 +9,14 @@ Require-Bundle: de.ovgu.featureide.core,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core,
- org.eclipse.jdt.launching,
  org.eclipse.ltk.core.refactoring
 Bundle-Activator: de.ovgu.featureide.core.mpl.MPLPlugin
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.jdt.core.refactoring,
  org.eclipse.jdt.core.refactoring.descriptors,
  org.eclipse.jdt.internal.core
-Export-Package: de.ovgu.featureide.core.mpl,
+Export-Package: .,
+ de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.builder,
  de.ovgu.featureide.core.mpl.job,
  de.ovgu.featureide.core.mpl.signature,

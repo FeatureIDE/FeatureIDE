@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Images Composer
+Bundle-Name: FeatureIDE Plug-In for Image Composition
 Bundle-SymbolicName: de.ovgu.featureide.core.images;singleton:=true
 Bundle-Version: 3.1.2.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
@@ -11,3 +11,5 @@ Require-Bundle: de.ovgu.featureide.core,
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Jabier Martinez
 Bundle-Activator: de.ovgu.featureide.core.images.activator.ImagesCorePlugin
+Export-Package: de.ovgu.featureide.core.images,
+ de.ovgu.featureide.core.images.activator

@@ -13,6 +13,9 @@ Bundle-ClassPath: .,
  lib/antenna.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
-Export-Package: de.ovgu.featureide.antenna,
+Export-Package: antenna.preprocessor,
+ antenna.preprocessor.v3,
+ antenna.preprocessor.v3.parser,
+ de.ovgu.featureide.antenna,
  de.ovgu.featureide.antenna.documentation,
  de.ovgu.featureide.antenna.model
