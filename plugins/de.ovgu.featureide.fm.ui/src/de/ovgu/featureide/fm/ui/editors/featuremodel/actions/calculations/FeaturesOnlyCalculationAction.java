@@ -41,6 +41,7 @@ public class FeaturesOnlyCalculationAction extends Action {
 	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_FEATURES);
 		this.featureModel = featureModel;
+		setToolTipText("Test");
 		setChecked(featureModel.getAnalyser().calculateFeatures);
 	}
 
@@ -55,6 +56,8 @@ public class FeaturesOnlyCalculationAction extends Action {
 			featureModel.getAnalyser().calculateFOConstraints = false;
 		} else {
 			featureModel.getAnalyser().calculateFeatures = true;
+			featureModel.getAnalyser().calculateDeadConstraints = true;
+			featureModel.getAnalyser().calculateFOConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}
