@@ -120,13 +120,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundActio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeadFeaturesCalculationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FalseOptionalFeaturesCalculationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -140,14 +138,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.VoidFeaturesCalculationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.DeadFOCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RedundantConstrainsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunManualCalculationsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.TautologyContraintsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
@@ -581,14 +575,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		subMenuCalculations.add(new AutomatedCalculationsAction(this, getFeatureModel()));
 		subMenuCalculations.add(new RunManualCalculationsAction(this, getFeatureModel()));
 		subMenuCalculations.add(new Separator());	
-		subMenuCalculations.add(new VoidFeaturesCalculationAction(this, getFeatureModel()));
-		subMenuCalculations.add(new FalseOptionalFeaturesCalculationAction(this, getFeatureModel()));
-		subMenuCalculations.add(new DeadFeaturesCalculationAction(this, getFeatureModel()));	
-		//subMenuCalculations.add(new FeaturesOnlyCalculationAction(this, getFeatureModel()));
+		subMenuCalculations.add(new FeaturesOnlyCalculationAction(this, getFeatureModel()));
 		subMenuCalculations.add(new ConstrainsCalculationsAction(this, getFeatureModel()));
-		subMenuCalculations.add(new RedundantConstrainsCalculationsAction(this, getFeatureModel()));
-		subMenuCalculations.add(new TautologyContraintsCalculationsAction(this, getFeatureModel()));
-		//subMenuCalculations.add(new DeadFOCalculationsAction(this, getFeatureModel()));
 
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
 		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());
@@ -1365,11 +1353,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createContextMenu();
 		createActions();
 		createKeyBindings();
+		createMouseHandlers();
 	}
 
 	public void initEditorView() {
 		createContextMenu();
 		createKeyBindings();
+		createMouseHandlers();
 	}
 
 	private void createContextMenu() {
