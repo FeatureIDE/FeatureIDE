@@ -38,6 +38,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATU
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -54,12 +55,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureColorOperation;
 
 /**
  * Sets the color of the features in the feature diagram.
@@ -311,9 +314,13 @@ public class SetFeatureColorDialog extends Dialog {
 	}
 
 	protected void okPressed() {
-		for (int i = 0; i < featureListBuffer.size(); i++) {
-			final IFeature feature = featureListBuffer.get(i);
-			FeatureColorManager.setColor(feature, newColor);
+		SetFeatureColorOperation op = new SetFeatureColorOperation(featureListBuffer.get(0).getFeatureModel(), featureListBuffer, newColor);
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
 		}
 		super.okPressed();
 	}
