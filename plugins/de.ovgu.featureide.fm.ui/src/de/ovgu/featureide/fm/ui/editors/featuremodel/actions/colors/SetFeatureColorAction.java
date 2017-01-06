@@ -81,9 +81,21 @@ public class SetFeatureColorAction extends Action {
 	private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isSelectionValid(selection));
+			if(isEnabled())
 			updateFeatureList(selection);
 		}
 	};
+
+	public boolean isSelectionValid(IStructuredSelection selection) {
+		for (Object object : selection.toList()) {
+			if(!(object instanceof FeatureEditPart))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * @param viewer
@@ -143,14 +155,9 @@ public class SetFeatureColorAction extends Action {
 	}
 
 	/**
-<<<<<<< HEAD
 	 * Creates a featureList with the selected features of the feature diagram.
 	 * 
 	 * @param selection
-=======
-	 * @param selection
-	 *            Creates a featureList with the selected features of the feature diagram.
->>>>>>> bs_team3_configMap
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {
@@ -222,11 +229,11 @@ public class SetFeatureColorAction extends Action {
 
 				try {
 					IPath modelPath = new Path(featureModel.getSourceFile().getCanonicalPath());
-					IPath rootPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();					
+					IPath rootPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 					IPath relPath = modelPath.makeRelativeTo(rootPath);
-					
-					IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(relPath);			
-					IFolder folder =  CorePlugin.getFeatureProject(file).getSourceFolder();					
+
+					IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(relPath);
+					IFolder folder = CorePlugin.getFeatureProject(file).getSourceFolder();
 					CorePlugin.getDefault().fireFeatureFolderChanged(folder);
 				} catch (IOException e) {
 					e.printStackTrace();

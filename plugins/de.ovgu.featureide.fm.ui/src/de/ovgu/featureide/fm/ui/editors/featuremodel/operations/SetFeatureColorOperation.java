@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * The operation to change the color of a feature. Enables redo and undo compability.
+ * The operation to change the color of a feature. Enables redo and undo compatibility.
  * 
  * @author Joshua Sprey
  */
