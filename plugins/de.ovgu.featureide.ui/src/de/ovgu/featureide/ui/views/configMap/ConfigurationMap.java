@@ -152,7 +152,11 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 				TreeColumn column = new TreeColumn(tableTree, SWT.CENTER);
 				column.setAlignment(SWT.CENTER);
 				column.setWidth(defaultColumnWidth);
-				column.setText(configName);
+				if (configName.length() < 15) {
+					column.setText(configName);
+				} else {
+					column.setText(configName.substring(0, 15) + "...");
+				}
 
 				configurationColumns.add(column);
 				configPaths.put(configuration, path);

@@ -56,6 +56,7 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 			return false;
 		
 		List<Configuration> configs = configurationMap.getConfigurations();
+		if(configs == null) return false;
 		for (Configuration config : configs) {
 			if (!config.getSelectedFeatures().contains(feature))
 				return false;

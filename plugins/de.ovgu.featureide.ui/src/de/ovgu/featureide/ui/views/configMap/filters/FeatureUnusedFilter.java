@@ -45,6 +45,7 @@ public class FeatureUnusedFilter extends ConfigurationMapFilter {
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
 		List<Configuration> configs = configurationMap.getConfigurations();
+		if(configs == null) return false;
 		for (Configuration config : configs) {
 			if (config.getSelectedFeatures().contains(feature))
 				return false;
