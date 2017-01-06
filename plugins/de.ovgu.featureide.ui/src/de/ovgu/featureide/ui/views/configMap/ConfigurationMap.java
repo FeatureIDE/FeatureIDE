@@ -220,7 +220,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		tableTree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		headerBackground = header.getDisplay().getSystemColor(SWT.COLOR_WHITE);
 
-		GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		headerGridData.horizontalSpan = gridColumns;
 		header.setLayoutData(headerGridData);
 		header.setBackground(headerBackground);
@@ -230,7 +230,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		header.addColumnSelectionListener(this);
 
 		// TREE
-		GridData tableTreeGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		GridData tableTreeGridData = new GridData(SWT.FILL, SWT.FILL, false, true);
 		tableTreeGridData.horizontalSpan = gridColumns;
 		tableTree.setLayoutData(tableTreeGridData);
 		tableTree.setHeaderVisible(false);
