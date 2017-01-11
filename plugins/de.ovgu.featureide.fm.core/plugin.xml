@@ -70,6 +70,11 @@
             name="DefaultFormat">
       </configFormat>
       <configFormat
+            class="de.ovgu.featureide.fm.core.configuration.XMLConfFormat"
+            id="de.ovgu.featureide.fm.core.format.config.XMLFormat"
+            name="XMLFormat">
+      </configFormat>
+      <configFormat
             class="de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat"
             id="de.ovgu.featureide.fm.core.format.config.FeatureIDEFormat"
             name="FeatureIDEFormat">

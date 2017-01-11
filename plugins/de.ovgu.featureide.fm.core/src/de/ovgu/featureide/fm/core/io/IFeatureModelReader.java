@@ -25,13 +25,17 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Parses a feature model from a given file or string.
  * 
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead.
+ * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public interface IFeatureModelReader {
 	
 	/**
