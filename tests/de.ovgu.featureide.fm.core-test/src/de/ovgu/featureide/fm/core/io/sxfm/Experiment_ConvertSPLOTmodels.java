@@ -90,7 +90,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 		
 		//
 		// read the same SPLOT file using the FeatureiDE reader
-		IFeatureModel fm_original = FMFactoryManager.getFactory().createFeatureModel();		
+		IFeatureModel fm_original = FMFactoryManager.getDefaultFactory().createFeatureModel();		
 		SXFMFormat format = new SXFMFormat();
 		final ProblemList problems = FileHandler.load(modelFileOrigin.toPath(), fm_original, format);
 		if (problems.containsError()) {

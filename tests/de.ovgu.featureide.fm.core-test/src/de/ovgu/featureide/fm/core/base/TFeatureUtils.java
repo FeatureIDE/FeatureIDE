@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class TFeatureUtils {
 
-	final static IFeatureModelFactory FACTORY = FMFactoryManager.getFactory();
+	final static IFeatureModelFactory FACTORY = FMFactoryManager.getDefaultFactory();
 	
 	/**
 	 * Test method for {@link de.ovgu.featureide.fm.core.base.FeatureUtils#getParent(de.ovgu.featureide.fm.core.base.IFeature)}.

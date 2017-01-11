@@ -85,15 +85,14 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 			}
 			if (!foundParent) {
 				final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
-				IFeatureModelFactory factory;
+				IFeatureModel featureModel;
 				final String filePathString = fullFilePath.toOSString();
 				try {
-					factory = FMFactoryManager.getFactory(filePathString, format);
+					featureModel = FMFactoryManager.getFactory(filePathString, format).createFeatureModel();
 				} catch (NoSuchExtensionException e) {
 					Logger.logError(e);
-					factory = FMFactoryManager.getFactory();
+					featureModel = FMFactoryManager.getEmptyFeatureModel();
 				}
-				final IFeatureModel featureModel = factory.createFeatureModel();
 				featureModel.createDefaultValues("");
 				FileHandler.save(Paths.get(filePathString), featureModel, format);
 			}
@@ -139,7 +138,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				factory = FMFactoryManager.getFactory(path.toString(), format);
 			} catch (NoSuchExtensionException e) {
 				Logger.logError(e);
-				factory = FMFactoryManager.getFactory();
+				factory = FMFactoryManager.getDefaultFactory();
 			}
 			final IFeatureModel featureModel = factory.createFeatureModel();
 			featureModel.createDefaultValues("");

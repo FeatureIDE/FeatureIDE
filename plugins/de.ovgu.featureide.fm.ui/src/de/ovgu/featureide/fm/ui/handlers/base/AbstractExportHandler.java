@@ -56,7 +56,7 @@ public abstract class AbstractExportHandler extends AFileHandler {
 			factory = FMFactoryManager.getFactory(path.toString(), format);
 		} catch (NoSuchExtensionException e) {
 			Logger.logError(e);
-			factory = FMFactoryManager.getFactory();
+			factory = FMFactoryManager.getDefaultFactory();
 		}
 		final IFeatureModel fm = factory.createFeatureModel();
 

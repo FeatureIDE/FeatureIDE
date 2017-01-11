@@ -52,17 +52,17 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 			if (format == null) {
 				Logger.logError(new ExtensionManager.NoSuchExtensionException("No format found for " + path));
 				try {
-					factory = FMFactoryManager.getFactory(path);
+					factory = FMFactoryManager.getDefaultFactoryForPath(path);
 				} catch (Exception e) {
 					Logger.logError(e);
-					factory = FMFactoryManager.getFactory();
+					factory = FMFactoryManager.getDefaultFactory();
 				}
 			} else {
 				try {
 					factory = FMFactoryManager.getFactory(path, format);
 				} catch (Exception e) {
 					Logger.logError(e);
-					factory = FMFactoryManager.getFactory();
+					factory = FMFactoryManager.getDefaultFactory();
 				}
 			}
 			featureModelManager = FeatureModelManager.getInstance(factory.createFeatureModel(), path, format);

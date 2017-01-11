@@ -576,7 +576,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			factory = FMFactoryManager.getFactory(modelPath.toString(), format);
 		} catch (NoSuchExtensionException e) {
 			Logger.logError(e);
-			factory = FMFactoryManager.getFactory();
+			factory = FMFactoryManager.getDefaultFactory();
 		}
 		IFeatureModel featureModel = factory.createFeatureModel();
 		FMComposerManager.getFMComposerExtension(project);

@@ -133,7 +133,7 @@ public class Commons {
 				return FeatureModelManager.readFromFile(f.toPath());
 			}
 		}
-		return FMFactoryManager.getFactory().createFeatureModel();
+		return FMFactoryManager.getEmptyFeatureModel();
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {
