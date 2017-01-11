@@ -261,7 +261,8 @@ public abstract class TAbstractFeatureModelReaderWriter {
 			fail();
 		}
 		final IFeatureModelFormat format = getFormat();
-		format.read(newFm, format.write(origFm));
+		final String write = format.getInstance().write(origFm);
+		format.getInstance().read(newFm, write);
 		return newFm;
 	}
 
