@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.base.impl;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.ExtensionManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -32,13 +33,37 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public abstract class FormatManager<T extends IPersistentFormat<?>> extends ExtensionManager<T> {
 
+	/**
+	 * Extracts the file extension from a file name.<br/>
+	 * <b>Note:</b> A dot at the first position of the file name is ignored.
+	 * E.g., ".file" has no extension, but ".file.txt" would return "txt".
+	 * 
+	 * @param fileName the name of a file
+	 * @return the extension or an empty string if there is none.
+	 */
+	@Nonnull
+	public static String getFileExtension(String fileName) {
+		final int extIndex = fileName.lastIndexOf('.');
+		return extIndex > 0 ? fileName.substring(extIndex + 1) : "";
+	}
+
 	public T getFormatById(String id) throws NoSuchExtensionException {
 		return getExtension(id);
 	}
 
+	/**
+	 * Returns the format that fits the given parameter.
+	 * 
+	 * @param fileName the file name (it is also possible to just specify the file extension (e.g., "xml"))
+	 * @return A {@link IPersistentFormat format} that uses the given extension or {@code null} if there is none.<br/>
+	 *         In case there are multiple formats that fit the given extension, only the first one of the list is returned.
+	 *         In order to avoid this, please use the methods {@link #getFormatByContent(CharSequence, String)} or {@link #getFormatByPath(CharSequence)}, which
+	 *         also take into account the content that should be parsed.
+	 */
 	@CheckForNull
-	public T getFormatByExtension(String extension) {
-		if (extension != null) {
+	public T getFormatByFileName(String fileName) {
+		if (fileName != null) {
+			final String extension = getFileExtension(fileName);
 			for (T format : getExtensions()) {
 				if (extension.equals(format.getSuffix())) {
 					return format;
@@ -49,8 +74,25 @@ public abstract class FormatManager<T extends IPersistentFormat<?>> extends Exte
 	}
 
 	@CheckForNull
-	public T getFormatByFileName(String fileName) {
-		return getFormatByExtension(fileName.substring(fileName.lastIndexOf('.') + 1));
+	public T getFormatByContent(CharSequence content) {
+		for (T format : getExtensions()) {
+			if (format.supportsContent(content)) {
+				return format;
+			}
+		}
+		return null;
+	}
+
+	public T getFormatByContent(CharSequence content, String fileName) {
+		if (fileName != null) {
+			final String extension = getFileExtension(fileName);
+			for (T format : getExtensions()) {
+				if (extension.equals(format.getSuffix()) && format.supportsContent(content)) {
+					return format;
+				}
+			}
+		}
+		return null;
 	}
 
 }

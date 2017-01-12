@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.mpl;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
@@ -30,18 +29,13 @@ import org.eclipse.core.resources.IProject;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
@@ -112,17 +106,7 @@ public class InterfaceProject {
 		this.featureProject = featureProject;
 
 		if (projectReference != null) {
-			final Path featureModelPath = Paths.get(projectReference.getFile("model.xml").getLocationURI());
-			final IFeatureModelFormat format = FeatureModelManager.getFormat(featureModelPath.getFileName().toString());
-			IFeatureModelFactory factory;
-			try {
-				factory = FMFactoryManager.getFactory(featureModelPath.toString(), format);
-			} catch (NoSuchExtensionException e) {
-				Logger.logError(e);
-				factory = FMFactoryManager.getFactory();
-			}
-			featureModel = factory.createFeatureModel();
-			FileHandler.load(featureModelPath, featureModel, format);
+			featureModel = FeatureModelManager.readFromFile(Paths.get(projectReference.getFile("model.xml").getLocationURI()));
 		} else {
 			featureModel = null;
 		}
@@ -212,8 +196,7 @@ public class InterfaceProject {
 		if (configuration == null) {
 			final IFile configFile = featureProject.getCurrentConfiguration();
 			configuration = new Configuration(featureModel);
-			FileHandler.load(Paths.get(configFile.getLocationURI()), configuration,
-					ConfigurationManager.getFormat(configFile.getName()));
+			FileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		}
 		return configuration;
 	}

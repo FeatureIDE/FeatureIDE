@@ -46,6 +46,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -90,11 +91,13 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SXFMFormat.class.getSimpleName();
 
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*<[?]xml\\s.*[?]>\\s*<feature_model>");
+
 	private final static String[] symbols = new String[] { "~", " and ", " or ", "", "", ", ", "", "", "" };
 
 	@Override
 	public String getSuffix() {
-		return "model";
+		return "xml";
 	}
 
 	@Override
@@ -866,6 +869,11 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 			this.end = end;
 		}
 
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }

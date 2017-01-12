@@ -14,8 +14,8 @@ import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -104,7 +104,7 @@ public class ImagesComposer extends ComposerExtensionClass {
 	protected List<String> getSelectedNonAbstractFeatures(IFile config) {
 		List<String> selectedFeatures = new ArrayList<String>();
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
-		FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigurationManager.getFormat(config.getName()));
+		FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		for (IFeature f : configuration.getSelectedFeatures()) {
 			if (!f.getStructure().isAbstract()) {
 				selectedFeatures.add(f.getName());

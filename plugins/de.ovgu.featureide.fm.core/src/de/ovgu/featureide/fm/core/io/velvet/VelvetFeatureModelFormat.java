@@ -63,14 +63,12 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -89,8 +87,8 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
  * Reads / Writes feature models in the Velvet format.
@@ -377,18 +375,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(file.getName());
-		final IFeatureModelFactory fmFactory;
-		try {
-			fmFactory = FMFactoryManager.getFactory(file.getAbsolutePath(), format);
-		} catch (NoSuchExtensionException e) {
-			Logger.logError(e);
-			return null;
-		}
-		final IFeatureModel fm = fmFactory.createFeatureModel();
-		fm.setSourceFile(file);
-		FileHandler.<IFeatureModel> load(file.toPath(), fm, format);
-		return fm;
+		return FeatureModelManager.readFromFile(file.toPath());
 	}
 
 	private boolean checkExternalModelFile(Tree curNode) {
@@ -608,18 +595,9 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private IFeatureModel readExternalModelFileAPI(File file) {
-		IFeatureModelFormat format = null;
-		IFeatureModelFactory fmFactory = null;
-		if (file.getName().endsWith(".xml")) {
-			format = new XmlFeatureModelFormat();
-			fmFactory = new ExtendedFeatureModelFactory();
-		} else {
-			format = new VelvetFeatureModelFormat(true);
-			fmFactory = new ExtendedFeatureModelFactory();
-		}
-		final IFeatureModel fm = fmFactory.createFeatureModel();
+		final IFeatureModel fm = new ExtendedFeatureModelFactory().createFeatureModel();
 		fm.setSourceFile(file);
-		FileHandler.load(file.toPath(), fm, format);
+		FileHandler.load(file.toPath(), fm, FMFormatManager.getInstance());
 		return fm;
 	}
 
@@ -1405,6 +1383,11 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
 	}
 
 }

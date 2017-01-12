@@ -88,4 +88,9 @@ public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 		return ID;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }

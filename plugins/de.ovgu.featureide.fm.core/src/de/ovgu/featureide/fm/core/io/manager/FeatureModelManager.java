@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
@@ -97,15 +98,28 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	}
 
 	public static IFeatureModel readFromFile(Path path) {
-		try {
-			final String pathString = path.toAbsolutePath().toString();
-			final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
-			final IFeatureModel featureModel = FMFactoryManager.getFactory(pathString, format).createFeatureModel();
-			FileHandler.load(path, featureModel, format);
-			return featureModel;
-		} catch (NoSuchExtensionException e) {
-			Logger.logError(e);
+		final SimpleFileHandler<IFeatureModel> fileHandler = new SimpleFileHandler<>(path, null, null);
+		final String content = fileHandler.getContent();
+
+		if (content != null) {
+			final String fileName = path.getFileName().toString();
+			final IPersistentFormat<IFeatureModel> format = FMFormatManager.getInstance().getFormatByContent(content, fileName);
+			if (format == null) {
+				Logger.logError(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!"));
+			} else {
+				try {
+					final IFeatureModel featureModel = FMFactoryManager.getFactory(path.toAbsolutePath().toString(), format).createFeatureModel();
+					fileHandler.setObject(featureModel);
+					fileHandler.setFormat(format);
+					fileHandler.parse(content);
+					featureModel.setSourceFile(path.toFile());
+					return featureModel;
+				} catch (NoSuchExtensionException e) {
+					Logger.logError(e);
+				}
+			}
 		}
+
 		return null;
 	}
 
@@ -114,7 +128,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
 		return !FileHandler.save(path, featureModel, format).containsError();
 	}
-	
+
 	public static boolean convert(Path inPath, Path outPath) {
 		IFeatureModel featureModel = readFromFile(inPath);
 		if (featureModel == null) {
