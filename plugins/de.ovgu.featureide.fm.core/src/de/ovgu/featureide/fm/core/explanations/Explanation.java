@@ -31,6 +31,7 @@ import org.prop4j.Literal;
 import org.prop4j.Literal.FeatureAttribute;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;

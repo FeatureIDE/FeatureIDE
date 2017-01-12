@@ -584,6 +584,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 	
 	public static Color getReasonColor(Explanation.Reason reason) {
+//		FMCorePlugin.getDefault().logInfo(reason.getSourceElement().getName() + " got color " + GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0));
 		return GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0);
 	}
 	

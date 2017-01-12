@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAK
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
@@ -39,6 +40,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -105,7 +107,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
 	private static final String MODEL_CONST_TOOLTIP = CONSTRAINT_MAKES_THE_MODEL_VOID_;
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
-
+	private static final String EXPLANATION_TOOLTIP = "Placeholder";
 
 	private static final int ABSTRACT = 0;
 	private static final int CONCRETE = 1;
@@ -119,8 +121,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int INHERITED = 9;
 	private static final int INTERFACED = 10;
 	private static final int IMPLICIT = 11;
-	private static final int COLLAPSED = 12;
-
+	private static final int EXPLANATION = 12;
 
 	private static final XYLayout layout = new XYLayout();
 
@@ -143,10 +144,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean tautologyConst;
 	private boolean voidModelConst;
 	private boolean redundantConst;
+	private boolean explanations;
 	private boolean imported = false;
 	private boolean inherited = false;
 	private boolean interfaced = false;
-	private boolean implicitConst = false; 
+	private boolean implicitConst = false;
+
+	private Figure explanation;
+	private int row;
 
 	@Override
 	public boolean useLocalCoordinates() {
@@ -160,7 +165,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		final IFeatureModelStructure fmStructure = featureModel.getStructure();
 		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
 		fmStructure.setShowHiddenFeatures(showHidden);
-		
+
 		mandatory = fmStructure.hasMandatoryFeatures();
 		optional = fmStructure.hasOptionalFeatures();
 		alternative = fmStructure.hasAlternativeGroup();
@@ -168,14 +173,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		_abstract = fmStructure.hasAbstract();
 		concrete = fmStructure.hasConcrete();
 		hidden = fmStructure.hasHidden();
-		
+
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getAllFeatures().size();
-		if(analyser.calculateDeadConstraints)
-		{
+		if (analyser.calculateDeadConstraints) {
 			dead = fmStructure.hasDeadFeatures();
 		}
-		if(analyser.calculateFOConstraints)
-		{
+		if (analyser.calculateFOConstraints) {
 			falseoptional = fmStructure.hasFalseOptionalFeatures();
 		}
 		indetHidden = fmStructure.hasIndetHidden();
@@ -184,8 +187,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
 		voidModelConst = analyser.calculateConstraints && FeatureUtils.hasVoidModelConst(featureModel);
 		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
-		implicitConst = isImplicit(graphicalFeatureModel); 
+		implicitConst = isImplicit(graphicalFeatureModel);
 
+		if (FeatureUIHelper.getCurrentExpalantion() != null) {
+			explanations = true;
+		}
 
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
@@ -295,7 +301,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			width = widthInPixels;
 		}
 	}
-	
+
 	private boolean isImplicit(IGraphicalFeatureModel fm) {
 		List<IGraphicalConstraint> consts = fm.getConstraints();
 		for (IGraphicalConstraint c : consts) {
@@ -308,7 +314,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRows() {
 		createRowTitle();
-		int row = 2;
+		row = 2;
 		if (mandatory) {
 			createRowMandatory(row++);
 		}
@@ -367,14 +373,19 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (implicitConst) {
 			createRowImplicitConst(row++);
 		}
+		refreshExplanation();
 	}
+
+	/**
+	 * @param i
+	 */
 
 	private void createRowRedundantConst(int row) {
 		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
 		Label labelIndetHidden = createLabel(row, language.getRedundantConst(), FMPropertyManager.getFeatureForgroundColor(), REDUNDANT_TOOLTIP);
 		add(labelIndetHidden);
 	}
-	
+
 	private void createRowImplicitConst(int row) {
 		createSymbol(row, IMPLICIT, false, IMPLICIT_TOOLTIP);
 		Label labelIndetHidden = createLabel(row, language.getImplicitConst(), FMPropertyManager.getFeatureForgroundColor(), IMPLICIT_TOOLTIP);
@@ -484,7 +495,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Label labelHidden = createLabel(row, language.getHidden(), HIDDEN_FOREGROUND, HIDDEN_TOOLTIP);
 		add(labelHidden);
 	}
-	
+
 	private void createRowCollapsed(int row) {
 		createCollapsedSymbol(row, COLLAPSED_TOOLTIP);
 		Label labelCollapsed = createLabel(row, language.getCollapsed(), FMPropertyManager.getFeatureForgroundColor(), COLLAPSED_TOOLTIP);
@@ -589,11 +600,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		p.setToolTip(createToolTipContent(toolTipText));
 		return p;
 	}
-	
+
 	private void createCollapsedSymbol(int row, String toolTip) {
 		final CollapsedDecoration collapsedDecoration = new CollapsedDecoration();
-		collapsedDecoration.setSize(collapsedDecoration.getBounds().width, collapsedDecoration.getBounds().height-1);
-		Point target = new Point(5 + SYMBOL_SIZE / 2, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE/5);
+		collapsedDecoration.setSize(collapsedDecoration.getBounds().width, collapsedDecoration.getBounds().height - 1);
+		Point target = new Point(5 + SYMBOL_SIZE / 2, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE / 5);
 		collapsedDecoration.setToolTip(createToolTipContent(toolTip));
 		collapsedDecoration.setLocation(target);
 		this.add(collapsedDecoration);
@@ -632,8 +643,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		case (FALSE_OPT):
 			if (feature) {
 				rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
-			} 
-			else {
+			} else {
 				rect.setBorder(FMPropertyManager.getConstraintBorder(false));
 			}
 			rect.setBackgroundColor(FMPropertyManager.getWarningColor());
@@ -651,10 +661,72 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		case (INTERFACED):
 			rect.setBorder(FMPropertyManager.getInterfacedFeatureBorder());
 			break;
+		case (EXPLANATION):
+			rect.setBorder(FMPropertyManager.getInterfacedFeatureBorder());
+			break;
 		}
 		rect.setSize(x2 - x1, y2 - y1);
 		rect.setLocation(p1);
 		rect.setToolTip(createToolTipContent(toolTip));
 		this.add(rect);
+	}
+
+	public void refreshExplanation() {
+		//Remove explanation
+		if(explanation != null)
+		{
+			if (explanation.getParent() != null) {
+				explanation.getParent().remove(explanation);
+				explanation.removeAll();
+				setSize(getSize().width, getSize().height - 2*ROW_HEIGHT - 5);
+			}
+		}
+		explanations = FeatureUIHelper.getCurrentExpalantion() != null ? true : false;
+		if (explanations) {
+			setWidth(language.getRedundantConst());
+			setSize(getSize().width, getSize().height + 2*ROW_HEIGHT + 5);
+
+			XYLayout  layout = new XYLayout ();
+			explanation = new Figure();
+			explanation.setLayoutManager(layout);
+			explanation.setToolTip(createToolTipContent(EXPLANATION_TOOLTIP));
+
+
+			Point target = new Point(0, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE / 5);
+			explanation.setLocation(target);
+			explanation.setSize(getSize().width, 2*ROW_HEIGHT+5);
+			
+			
+			//Add Red to dark red Gradient
+			TwoColorGradientLine redToBlack = new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0,0,0));
+			redToBlack.setSize(getSize().width - (SYMBOL_SIZE), 18);
+			redToBlack.setLocation(new Point(SYMBOL_SIZE / 2, explanation.getLocation().y));
+
+			//Label left
+			Label labelLeft = new Label("likely");
+			labelLeft.setLabelAlignment(Label.LEFT);
+			labelLeft.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
+			labelLeft.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
+			labelLeft.setFont(DEFAULT_FONT);
+			labelLeft.setSize(labelLeft.getPreferredSize().width, ROW_HEIGHT);
+			labelLeft.setLocation(new Point(SYMBOL_SIZE / 2-2,explanation.getLocation().y + redToBlack.getSize().height));
+			
+			//label right
+			Label labelRight = new Label("not likely");
+			labelRight.setLabelAlignment(Label.RIGHT);
+			labelRight.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
+			labelRight.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
+			labelRight.setFont(DEFAULT_FONT);
+			labelRight.setSize(labelRight.getPreferredSize().width, ROW_HEIGHT);
+			labelRight.setLocation(new Point(SYMBOL_SIZE / 2 + redToBlack.getSize().width -2 -labelRight.getPreferredSize().width,explanation.getLocation().y + redToBlack.getSize().height));
+			
+			
+			explanation.add(redToBlack);
+			explanation.add(labelLeft);		
+			explanation.add(labelRight);			
+			
+			explanation.setOpaque(true);
+			this.add(explanation);
+		}
 	}
 }

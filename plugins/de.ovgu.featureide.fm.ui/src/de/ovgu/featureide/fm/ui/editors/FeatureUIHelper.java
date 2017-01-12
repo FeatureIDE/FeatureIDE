@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -53,6 +54,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  */
 public class FeatureUIHelper {
 
+	private static Explanation currentExplanation;
+	
 	private static final Map<IGraphicalFeatureModel, Dimension> legendSize = new WeakHashMap<>();
 	private static final Map<IGraphicalFeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
 	
@@ -62,6 +65,16 @@ public class FeatureUIHelper {
 	
 	public static IGraphicalFeature getGraphicalRootFeature(IGraphicalFeatureModel model) {
 		return getGraphicalFeature(model.getFeatureModel().getStructure().getRoot(), model);
+	}
+
+	public static Explanation getCurrentExpalantion()
+	{
+		if(currentExplanation == null) return null;
+		return currentExplanation;
+	}
+	public static void setCurrentExpalantion(Explanation explanation)
+	{
+		currentExplanation = explanation;
 	}
 	
 	public static IGraphicalElement getGraphicalElement(IFeatureModelElement element, IGraphicalFeatureModel model) {

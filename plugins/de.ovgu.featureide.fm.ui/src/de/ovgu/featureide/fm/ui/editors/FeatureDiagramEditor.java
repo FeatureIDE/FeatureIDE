@@ -1227,6 +1227,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				final IGraphicalElement defectElement = FeatureUIHelper.getGraphicalElement(newActiveExplanation.getDefectElement(), getGraphicalFeatureModel());
 				defectElement.update(event);
 			}
+			FeatureUIHelper.setCurrentExpalantion(newActiveExplanation);
 			
 			//Notify each affected element of its new active reason.
 			final Map<IGraphicalElement, Explanation.Reason> elementOldActiveReasons = getGraphicalElementReasons(oldActiveExplanation);
@@ -1241,7 +1242,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						elementOldActiveReasons.get(element),
 						elementNewActiveReasons.get(element)));
 			}
+			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
+			legendFigure.refreshExplanation();
 			break;
+
 		case DEFAULT:
 			break;
 		default:
@@ -1252,6 +1256,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		for (IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
 			page.propertyChange(event);
 		}
+
+		
 	}
 
 	/**
