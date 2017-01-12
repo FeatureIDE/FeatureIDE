@@ -224,6 +224,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	public boolean isCollapsed() {
 		if(!getObject().getStructure().hasChildren())
 		{
+			System.out.println("hasCHild: " + getObject().getStructure().hasChildren());
 			return false;
 		}
 		return collapsed;
