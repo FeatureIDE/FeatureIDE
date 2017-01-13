@@ -79,6 +79,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
+import org.w3c.dom.events.EventTarget;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -1189,6 +1190,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			if (event.getSource() instanceof IFeature) {
 				centerPointOnScreen((IFeature) event.getSource());
 			}
+			
+			//redraw the explanation after collaspse
+			propertyChange(new FeatureIDEEvent(
+					this,
+					EventType.ACTIVE_EXPLANATION_CHANGED,
+					activeExplanation,
+					activeExplanation));
+			
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			reload();
@@ -1199,6 +1208,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 			//Center root feature after operation
 			centerPointOnScreen(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			
+
+			//redraw the explanation after collaspse
+			propertyChange(new FeatureIDEEvent(
+					this,
+					EventType.ACTIVE_EXPLANATION_CHANGED,
+					activeExplanation,
+					activeExplanation));
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
