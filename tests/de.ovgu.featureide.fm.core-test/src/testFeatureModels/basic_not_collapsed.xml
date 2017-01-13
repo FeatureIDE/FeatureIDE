@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
 		<struct>
-			<and mandatory="true" name="Root" collapsed="false">
-				<feature name="A" collapsed="false"/>
-				<feature name="B" collapsed="false"/>
+			<and mandatory="true" name="Root">
+				<feature name="A"/>
+				<feature name="B"/>
 			</and>
 		</struct>
 		<constraints/>
