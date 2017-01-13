@@ -39,7 +39,9 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -86,6 +88,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 * more space for the symbols)
 	 */
 	private static final int LIFT_2 = 12;
+	/**
+	 * Width that the two color gradient needs to display itself
+	 */
+	private static final int GRADIENT_WIDTH = 250;
 
 	private static final int SYMBOL_SIZE = ROW_HEIGHT;
 	private static final String ALTERNATIVE_TOOLTIP = "Alternative group:\n\nExactly one of the features in this group must be selected,\n if the parent feature is selected.";
@@ -149,8 +155,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean inherited = false;
 	private boolean interfaced = false;
 	private boolean implicitConst = false;
+	private int lastWidth = 0;
 
-	private Figure explanation;
+	private Figure explanationFigure;
 	private int row;
 
 	@Override
@@ -603,7 +610,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createCollapsedSymbol(int row, String toolTip) {
 		final CollapsedDecoration collapsedDecoration = new CollapsedDecoration();
-		collapsedDecoration.setSize(collapsedDecoration.getBounds().width, collapsedDecoration.getBounds().height - 1);
+		collapsedDecoration.setSize(SYMBOL_SIZE, SYMBOL_SIZE);
 		Point target = new Point(5 + SYMBOL_SIZE / 2, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE / 5);
 		collapsedDecoration.setToolTip(createToolTipContent(toolTip));
 		collapsedDecoration.setLocation(target);
@@ -673,60 +680,95 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	public void refreshExplanation() {
 		//Remove explanation
-		if(explanation != null)
-		{
-			if (explanation.getParent() != null) {
-				explanation.getParent().remove(explanation);
-				explanation.removeAll();
-				setSize(getSize().width, getSize().height - 2*ROW_HEIGHT - 5);
+		if (explanationFigure != null) {
+			if (explanationFigure.getParent() != null) {
+				explanationFigure.getParent().remove(explanationFigure);
+				explanationFigure.removeAll();
+				if (lastWidth != 0) {
+					setSize(lastWidth, getSize().height - 18 - 2 * ROW_HEIGHT - 5);
+				} else {
+					setSize(getSize().width, getSize().height - 18 - 2 * ROW_HEIGHT - 5);
+				}
 			}
 		}
 		explanations = FeatureUIHelper.getCurrentExpalantion() != null ? true : false;
 		if (explanations) {
-			setWidth(language.getRedundantConst());
-			setSize(getSize().width, getSize().height + 2*ROW_HEIGHT + 5);
+			Explanation explanation = FeatureUIHelper.getCurrentExpalantion();
 
-			XYLayout  layout = new XYLayout ();
-			explanation = new Figure();
-			explanation.setLayoutManager(layout);
-			explanation.setToolTip(createToolTipContent(EXPLANATION_TOOLTIP));
-
+			lastWidth = getSize().width;
+			XYLayout layout = new XYLayout();
+			explanationFigure = new Figure();
+			explanationFigure.setLayoutManager(layout);
+			explanationFigure.setToolTip(createToolTipContent(EXPLANATION_TOOLTIP));
 
 			Point target = new Point(0, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE / 5);
-			explanation.setLocation(target);
-			explanation.setSize(getSize().width, 2*ROW_HEIGHT+5);
-			
-			
-			//Add Red to dark red Gradient
-			TwoColorGradientLine redToBlack = new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0,0,0));
-			redToBlack.setSize(getSize().width - (SYMBOL_SIZE), 18);
-			redToBlack.setLocation(new Point(SYMBOL_SIZE / 2, explanation.getLocation().y));
+			explanationFigure.setLocation(target);
+
+			int x_SymbolStart = SYMBOL_SIZE / 2;
+			int y_Entry = explanationFigure.getLocation().y;
 
 			//Label left
-			Label labelLeft = new Label("likely");
+			Label labelExplanation = new Label();
+
+			switch (explanation.getMode()) {
+			case DEAD_FEATURE:
+				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " dead feature because of the highlighted dependencies:");
+				break;
+			case FALSE_OPTIONAL_FEATURE:
+				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " false-optional because of the highlighted dependencies:");
+				break;
+			case REDUNDANT_CONSTRAINT:
+				labelExplanation.setText("Redundant constraint because of the highlighted dependencies:");
+				explanationFigure.setToolTip(createToolTipContent("The constraint\n" + ((Constraint)explanation.getDefectElement()).getDisplayName() + "\n is redundant because of the highligthed dependencies."));
+				break;
+
+			default:
+				break;
+			}
+			
+			//SetWidth depending of string
+			explanationFigure.setSize(labelExplanation.getPreferredSize().width + SYMBOL_SIZE, 18 + 2 * ROW_HEIGHT + 5);
+			setSize(getSize().width < labelExplanation.getPreferredSize().width + SYMBOL_SIZE ? labelExplanation.getPreferredSize().width + SYMBOL_SIZE : getSize().width, getSize().height + explanationFigure.getSize().height);
+			
+			labelExplanation.setLabelAlignment(Label.LEFT);
+			labelExplanation.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
+			labelExplanation.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
+			labelExplanation.setFont(DEFAULT_FONT);
+			labelExplanation.setSize(getSize().width, ROW_HEIGHT + 2);
+			labelExplanation.setLocation(new Point(x_SymbolStart, y_Entry));
+			y_Entry += ROW_HEIGHT + 5;
+
+			//Add Red to dark red Gradient
+			TwoColorGradientLine redToBlack = new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0, 0, 0));
+			redToBlack.setSize(getSize().width - (SYMBOL_SIZE), 18);
+			redToBlack.setLocation(new Point(x_SymbolStart, y_Entry));
+			y_Entry += 18;
+
+			//Label left
+			Label labelLeft = new Label("likely cause");
 			labelLeft.setLabelAlignment(Label.LEFT);
 			labelLeft.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 			labelLeft.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 			labelLeft.setFont(DEFAULT_FONT);
-			labelLeft.setSize(labelLeft.getPreferredSize().width, ROW_HEIGHT);
-			labelLeft.setLocation(new Point(SYMBOL_SIZE / 2-2,explanation.getLocation().y + redToBlack.getSize().height));
-			
+			labelLeft.setSize(labelLeft.getPreferredSize().width + 2, ROW_HEIGHT);
+			labelLeft.setLocation(new Point(SYMBOL_SIZE / 2 - 2, y_Entry));
+
 			//label right
-			Label labelRight = new Label("not likely");
+			Label labelRight = new Label("unlikely cause");
 			labelRight.setLabelAlignment(Label.RIGHT);
 			labelRight.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 			labelRight.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 			labelRight.setFont(DEFAULT_FONT);
-			labelRight.setSize(labelRight.getPreferredSize().width, ROW_HEIGHT);
-			labelRight.setLocation(new Point(SYMBOL_SIZE / 2 + redToBlack.getSize().width -2 -labelRight.getPreferredSize().width,explanation.getLocation().y + redToBlack.getSize().height));
-			
-			
-			explanation.add(redToBlack);
-			explanation.add(labelLeft);		
-			explanation.add(labelRight);			
-			
-			explanation.setOpaque(true);
-			this.add(explanation);
+			labelRight.setSize(labelRight.getPreferredSize().width + 2, ROW_HEIGHT);
+			labelRight.setLocation(new Point(SYMBOL_SIZE / 2 + redToBlack.getSize().width - 2 - labelRight.getPreferredSize().width - 2, y_Entry));
+
+			explanationFigure.add(labelExplanation);
+			explanationFigure.add(redToBlack);
+			explanationFigure.add(labelLeft);
+			explanationFigure.add(labelRight);
+
+			explanationFigure.setOpaque(true);
+			this.add(explanationFigure);
 		}
 	}
 }

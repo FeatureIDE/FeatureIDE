@@ -1257,6 +1257,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			page.propertyChange(event);
 		}
 
+		setLayout();
 		
 	}
 

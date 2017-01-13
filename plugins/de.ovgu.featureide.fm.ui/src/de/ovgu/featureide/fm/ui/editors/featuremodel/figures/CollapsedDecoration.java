@@ -48,6 +48,8 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 	private static final FreeformLayout layout = new FreeformLayout();
 
 	private IGraphicalFeature graphicalFeature;
+	
+	public boolean isLegendEntry = false;
 
 	public CollapsedDecoration(IGraphicalFeature parent) {
 		super();
@@ -70,7 +72,8 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 
 		setOpaque(true);
 		childrenCount.setFont(DEFAULT_FONT);
-		setDecoratorText("n");
+		setDecoratorText("");
+		childrenCount.setText("");
 		add(childrenCount);
 	}
 
