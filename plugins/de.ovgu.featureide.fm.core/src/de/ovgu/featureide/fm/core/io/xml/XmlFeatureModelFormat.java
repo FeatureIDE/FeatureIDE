@@ -74,7 +74,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + XmlFeatureModelFormat.class.getSimpleName();
 
-	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*<[?]xml\\s.*[?]>\\s*<featureModel>");
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
 
 	private IFeatureModelFactory factory;
 

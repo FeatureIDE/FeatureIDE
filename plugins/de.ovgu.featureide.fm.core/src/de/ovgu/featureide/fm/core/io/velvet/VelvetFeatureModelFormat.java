@@ -375,7 +375,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		return FeatureModelManager.readFromFile(file.toPath());
+		return FeatureModelManager.load(file.toPath()).getObject();
 	}
 
 	private boolean checkExternalModelFile(Tree curNode) {

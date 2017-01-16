@@ -130,7 +130,7 @@ public class Commons {
 		
 		for (File f : files) {
 			if (f.getName().equals(featureModelXmlFilename)) {
-				return FeatureModelManager.readFromFile(f.toPath());
+				return FeatureModelManager.load(f.toPath()).getObject();
 			}
 		}
 		return FMFactoryManager.getFactory().createFeatureModel();

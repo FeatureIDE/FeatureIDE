@@ -87,13 +87,13 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -228,7 +228,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		graphicalFeatureModel.init();
 
 		if (featureModelEditor.fmManager != null) { // read-only feature model is currently only a view on the editable feature model and not persistent
-			extraPath = FileManagerMap.constructExtraPath(featureModelEditor.fmManager.getAbsolutePath(), format);
+			extraPath = GraphicalFeatureModelManager.constructExtraPath(featureModelEditor.fmManager.getAbsolutePath(), format);
 			FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
 			featureModelEditor.fmManager.addListener(this);
 		} else {

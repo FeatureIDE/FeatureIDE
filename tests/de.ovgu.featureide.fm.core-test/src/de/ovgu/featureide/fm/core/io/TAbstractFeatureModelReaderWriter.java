@@ -94,7 +94,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		
 		for (File f : MODEL_FILE_FOLDER.listFiles(fileFilter)) {
 			Object[] models = new Object[2];
-			IFeatureModel fm = FeatureModelManager.readFromFile(f.toPath());
+			IFeatureModel fm = FeatureModelManager.load(f.toPath()).getObject();
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);

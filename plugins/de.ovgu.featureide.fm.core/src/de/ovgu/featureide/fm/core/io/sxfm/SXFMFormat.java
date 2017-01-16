@@ -40,17 +40,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.prop4j.And;
 import org.prop4j.Equals;
@@ -63,8 +59,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
@@ -78,7 +72,6 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
-import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 
@@ -91,7 +84,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SXFMFormat.class.getSimpleName();
 
-	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*<[?]xml\\s.*[?]>\\s*<feature_model>");
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<feature_model[\\s>]");
 
 	private final static String[] symbols = new String[] { "~", " and ", " or ", "", "", ", ", "", "", "" };
 
@@ -138,7 +131,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		Node featTree = doc.createElement("feature_tree");
 		elem.appendChild(featTree);
 		featTree.appendChild(doc.createTextNode("\n"));
-		createXmlDocRec(doc, featTree, featureModel.getStructure().getRoot().getFeature(), false, "");
+		createXmlDocRec(doc, featTree, object.getStructure().getRoot().getFeature(), false, "");
 		createPropositionalConstraints(doc, elem);
 	}
 
@@ -212,11 +205,11 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		FeatMod.appendChild(propConstr);
 		Node newNode = doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
-		if (featureModel.getConstraints().isEmpty())
+		if (object.getConstraints().isEmpty())
 			return;
 		// as before
 		int i = 1;
-		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(featureModel.getConstraints())) {
+		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(object.getConstraints())) {
 			// avoid use of parenthesis from the beginning
 			//			org.prop4j.Node cnf = node.clone().toCNF();
 
@@ -278,59 +271,15 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+		idTable.clear();
+		warnings.clear();
+		line = 0;
 		buildFModelRec(doc);
 	}
 
 	private int line;
 
-	private Hashtable<String, IFeature> idTable;
-
-	private IFeatureModel featureModel;
-
-	private ProblemList warnings = new ProblemList();
-
-	private DocumentBuilder init() {
-		warnings.clear();
-		//Parse the XML-File to a DOM-Document
-		boolean ignoreWhitespace = false;
-		boolean ignoreComments = true;
-		boolean putCDATAIntoText = true;
-		boolean createEntityRefs = false;
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		dbf.setIgnoringComments(ignoreComments);
-		dbf.setIgnoringElementContentWhitespace(ignoreWhitespace);
-		dbf.setCoalescing(putCDATAIntoText);
-		dbf.setExpandEntityReferences(!createEntityRefs);
-		DocumentBuilder db = null;
-		try {
-			db = dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException pce) {
-			System.err.println(pce);
-			Logger.logError(pce);
-		}
-		featureModel.reset();
-		line = 0;
-		idTable = new Hashtable<String, IFeature>();
-		return db;
-	}
-
-	protected void parseInputStream(IFeatureModel featureModel, String source) throws UnsupportedModelException {
-		this.featureModel = featureModel;
-		DocumentBuilder db = init();
-
-		Document doc = null;
-		try {
-			doc = db.parse(new InputSource(new StringReader(source)));
-		} catch (SAXException se) {
-			Logger.logError(se);
-		} catch (IOException ioe) {
-			Logger.logError(ioe);
-		}
-		// Create the Feature Model from the DOM-Document
-		buildFModelRec(doc);
-		featureModel.handleModelDataLoaded();
-	}
+	private HashMap<String, IFeature> idTable = new HashMap<>();
 
 	/**
 	 * Recursively traverses the Document structure
@@ -391,7 +340,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		}
 		BufferedReader reader = new BufferedReader(new StringReader(buffer.toString()));
 		buildFeatureTree(reader);
-		removeUnnecessaryAbstractFeatures(featureModel.getStructure().getRoot().getFeature());
+		removeUnnecessaryAbstractFeatures(object.getStructure().getRoot().getFeature());
 	}
 
 	private String removeWhitespaces(String str) {
@@ -416,7 +365,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 */
 	private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
 		try {
-			FeatureIndent lastFeat = new FeatureIndent(featureModel, -1);
+			FeatureIndent lastFeat = new FeatureIndent(object, -1);
 			// List of Features with arbitrary cardinalities
 			LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();
 			String lineText = reader.readLine();
@@ -462,23 +411,23 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 				lineText = new String(lineTextChars);
 
 				if (lineText.startsWith(":r")) {
-					feat = new FeatureIndent(featureModel, 0);
+					feat = new FeatureIndent(object, 0);
 					feat.getStructure().setMandatory(true);
 					featId = setNameGetID(feat, lineText);
 					//		    		if (feat.getName().trim().toLowerCase().equals("root"))
 					//		    			feat.setName("root_");
-					featureModel.getStructure().setRoot(feat.getStructure());
+					object.getStructure().setRoot(feat.getStructure());
 					feat.getStructure().changeToAnd();
 					countIndent = 0;
 				} else if (lineText.startsWith(":m")) {
-					feat = new FeatureIndent(featureModel, countIndent);
+					feat = new FeatureIndent(object, countIndent);
 					feat.getStructure().setMandatory(true);
 					featId = setNameGetID(feat, lineText);
 					feat.getStructure().setParent(lastFeat.getStructure());
 					lastFeat.getStructure().addChild(feat.getStructure());
 					feat.getStructure().changeToAnd();
 				} else if (lineText.startsWith(":o")) {
-					feat = new FeatureIndent(featureModel, countIndent);
+					feat = new FeatureIndent(object, countIndent);
 					feat.getStructure().setMandatory(false);
 					featId = setNameGetID(feat, lineText);
 					feat.getStructure().setParent(lastFeat.getStructure());
@@ -486,7 +435,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					feat.getStructure().changeToAnd();
 				} else if (lineText.startsWith(":g")) {
 					//create an abstract feature for each group (could be optimized, but avoid mixing up several groups)
-					feat = new FeatureIndent(featureModel, countIndent);
+					feat = new FeatureIndent(object, countIndent);
 					feat.getStructure().setMandatory(true);
 					feat.getStructure().setAbstract(true);
 					//try to generate a name that hopefully does not exist in the model
@@ -513,7 +462,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					addFeatureToModel(feat);
 					continue;
 				} else if (lineText.startsWith(":")) {
-					feat = new FeatureIndent(featureModel, countIndent);
+					feat = new FeatureIndent(object, countIndent);
 					feat.getStructure().setMandatory(true);
 					String name;
 					if (lineText.contains("(")) {
@@ -563,7 +512,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					feature.getStructure().changeToAlternative();
 				child.setParent(null);
 				feature.getStructure().removeChild(child);
-				featureModel.deleteFeatureFromTable(child.getFeature());
+				object.deleteFeatureFromTable(child.getFeature());
 			}
 		}
 		for (IFeatureStructure child : feature.getStructure().getChildren())
@@ -580,7 +529,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	private void addFeatureToModel(IFeature feat) {
 		String orig_name = feat.getName();
 		int i = 1;
-		while (!featureModel.addFeature(feat)) {
+		while (!object.addFeature(feat)) {
 			feat.setName(orig_name + EMPTY___ + i++);
 		}
 
@@ -621,10 +570,10 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 				throw new UnsupportedModelException(GROUP_CARDINALITY + INVALID, line);
 			int f = children.size();
 			node = buildMinConstr(FeatureUtils.convertToFeatureList(children), f - start + 1, feat.getName());
-			featureModel.addConstraint(new Constraint(featureModel, node));
+			object.addConstraint(new Constraint(object, node));
 			if ((start > 0) && (end < f)) {
 				node = buildMaxConstr(FeatureUtils.convertToFeatureList(children), end + 1);
-				featureModel.addConstraint(new Constraint(featureModel, node));
+				object.addConstraint(new Constraint(object, node));
 			}
 		}
 	}
@@ -764,7 +713,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		}
 		scan.close();
 		org.prop4j.Node propNode = buildPropNode(elements);
-		featureModel.addConstraint(new Constraint(featureModel, propNode));
+		object.addConstraint(new Constraint(object, propNode));
 	}
 
 	/**

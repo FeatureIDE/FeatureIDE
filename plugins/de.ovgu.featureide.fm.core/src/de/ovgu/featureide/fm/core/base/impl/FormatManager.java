@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import de.ovgu.featureide.fm.core.CoreExtensionLoader;
 import de.ovgu.featureide.fm.core.ExtensionManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
@@ -31,7 +32,15 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  * 
  * @author Sebastian Krieter
  */
-public abstract class FormatManager<T extends IPersistentFormat<?>> extends ExtensionManager<T> {
+public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionManager<T> {
+
+	@SuppressWarnings("unchecked")
+	public FormatManager(T... formats) {
+		setExtensionLoaderInternal(new CoreExtensionLoader<T>(formats));
+	}
+
+	protected FormatManager() {
+	}
 
 	/**
 	 * Extracts the file extension from a file name.<br/>
