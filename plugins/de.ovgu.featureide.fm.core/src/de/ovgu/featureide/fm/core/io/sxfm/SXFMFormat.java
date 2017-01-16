@@ -274,6 +274,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		idTable.clear();
 		warnings.clear();
 		line = 0;
+		object.reset();
 		buildFModelRec(doc);
 	}
 
