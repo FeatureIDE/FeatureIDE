@@ -133,16 +133,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstr
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.DeadFOCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RedundantConstrainsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunManualCalculationsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.TautologyContraintsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -504,12 +500,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		IMenuManager subMenuCalculations = new MenuManager(SET_CALCULATIONS);
 		subMenuCalculations.add(new AutomatedCalculationsAction(this, getFeatureModel()));
 		subMenuCalculations.add(new RunManualCalculationsAction(this, getFeatureModel()));
-		subMenuCalculations.add(new Separator());
+		subMenuCalculations.add(new Separator());	
 		subMenuCalculations.add(new FeaturesOnlyCalculationAction(this, getFeatureModel()));
 		subMenuCalculations.add(new ConstrainsCalculationsAction(this, getFeatureModel()));
-		subMenuCalculations.add(new RedundantConstrainsCalculationsAction(this, getFeatureModel()));
-		subMenuCalculations.add(new TautologyContraintsCalculationsAction(this, getFeatureModel()));
-		subMenuCalculations.add(new DeadFOCalculationsAction(this, getFeatureModel()));
 
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
 		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());

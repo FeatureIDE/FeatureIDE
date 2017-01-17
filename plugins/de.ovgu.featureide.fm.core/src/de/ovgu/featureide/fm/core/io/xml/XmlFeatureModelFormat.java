@@ -289,6 +289,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
+
 		}
 		for (IFeature feature : children) {
 			createXmlDocRec(doc, fnod, feature);

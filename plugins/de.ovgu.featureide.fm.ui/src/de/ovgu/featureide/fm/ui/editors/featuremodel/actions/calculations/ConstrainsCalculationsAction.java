@@ -47,11 +47,13 @@ public class ConstrainsCalculationsAction extends Action {
 			featureModel.getAnalyser().calculateConstraints = false;
 			featureModel.getAnalyser().calculateRedundantConstraints = false;
 			featureModel.getAnalyser().calculateTautologyConstraints = false;
-			featureModel.getAnalyser().calculateDeadConstraints = false;
-			featureModel.getAnalyser().calculateFOConstraints = false;
 		} else {
 			featureModel.getAnalyser().calculateConstraints = true;
 			featureModel.getAnalyser().calculateFeatures = true;
+			featureModel.getAnalyser().calculateRedundantConstraints = true;
+			featureModel.getAnalyser().calculateTautologyConstraints = true;
+			featureModel.getAnalyser().calculateDeadConstraints = true;
+			featureModel.getAnalyser().calculateFOConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}
