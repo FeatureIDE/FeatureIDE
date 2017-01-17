@@ -114,4 +114,10 @@
           type="org.eclipse.jface.viewers.IStructuredSelection">
     </propertyTester>
  </extension>
+ <extension
+       point="de.ovgu.featureide.fm.ui.Outline">
+    <Outline
+          OutlineProvider="de.ovgu.featureide.munge.ui.outline.MungeOutline">
+    </Outline>
+ </extension>
 </plugin>

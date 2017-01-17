@@ -151,8 +151,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature

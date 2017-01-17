@@ -20,34 +20,45 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Set;
 
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.viewers.Viewer;
+
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 
 /**
- * Filter to hide methods in the collaboration outline.
  * 
-  * @author Dominic Labsch
-  * @author Daniel P�sche
+ * Implements all functions needed for the FeatureIDE outline
+ * 
+ * @author Christopher Sontag
  */
-public class HideAllMethods implements ICollaborationOutlineFilter {
+public class ContextOutline extends OutlineProvider {
+
+	private static final Set<String> supportedTypes = new HashSet<>();
+	static {
+		supportedTypes.add("java");
+		supportedTypes.add("jak");
+		supportedTypes.add("hs");
+		supportedTypes.add("h");
+		supportedTypes.add("c");
+		supportedTypes.add("cs");
+		supportedTypes.add("asm");
+	}
+	
+	public ContextOutline() {
+		super(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
+	}
 
 	@Override
-	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
+	public boolean checkSupported(String extension) {
+		return supportedTypes.contains(extension);
+	}
 
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
-			for (int i = 0; i < obj.length; i++) {
-				if (!(obj[i] instanceof FSTMethod)) {
-					resultList.add(obj[i]);
-				}
-			}
-		}else{
-			return obj;
-		}
-		return resultList.toArray();
-
+	@Override
+	public void handleUpdate(Viewer viewer, IFile iFile) {
+		viewer.setInput(iFile);
 	}
 
 }

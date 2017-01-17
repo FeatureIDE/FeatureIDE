@@ -18,12 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.munge.ui.outline;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutlineLabelProvider;
 
 /**
  * Provides labels and images for Collaboration outline

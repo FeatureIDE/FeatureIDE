@@ -95,7 +95,7 @@ import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
 /**
  * A multi page editor to edit feature models. If the model file contains

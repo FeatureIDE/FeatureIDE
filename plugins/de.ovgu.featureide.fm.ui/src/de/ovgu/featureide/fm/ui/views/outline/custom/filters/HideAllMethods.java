@@ -18,16 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
+
+import java.util.LinkedList;
+
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
- * Interface to filter the content of the CollaborationOutline.
+ * Filter to hide methods in the collaboration outline.
  * 
- * @author Dominic Labsch	
- * @author Daniel P�sche
+  * @author Dominic Labsch
+  * @author Daniel P�sche
  */
-public interface ICollaborationOutlineFilter {
+public class HideAllMethods implements ICollaborationOutlineFilter {
 
-	public Object[] filter(Object[] obj);
-		
+	@Override
+	public Object[] filter(Object[] obj) {
+		LinkedList<Object> resultList = new LinkedList<Object>();
+
+		if (obj.length > 0 && obj[0] instanceof RoleElement) {
+			for (int i = 0; i < obj.length; i++) {
+				if (!(obj[i] instanceof FSTMethod)) {
+					resultList.add(obj[i]);
+				}
+			}
+		}else{
+			return obj;
+		}
+		return resultList.toArray();
+
+	}
+
 }

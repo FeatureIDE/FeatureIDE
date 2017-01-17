@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.outline;
+package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -287,12 +287,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				fnod.appendChild(descr);
 			}
 
-		addDescription(doc, feat, fnod);
-		writeAttributes(node, fnod, feat);
-
+			addDescription(doc, feat, fnod);
+			writeAttributes(node, fnod, feat);
+		}
 		for (IFeature feature : children) {
 			createXmlDocRec(doc, fnod, feature);
 		}
+
 	}
 
 	protected void addDescription(Document doc, IFeature feat, Element fnod) {
