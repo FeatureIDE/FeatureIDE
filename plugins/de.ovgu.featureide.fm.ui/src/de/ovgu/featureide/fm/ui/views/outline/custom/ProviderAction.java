@@ -18,38 +18,30 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom;
 
-import java.util.LinkedList;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 
-import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+public class ProviderAction extends Action {
+	
+	private ITreeContentProvider treeProv = null;
+	private OutlineLabelProvider lableProv = null;
+	
+	public ProviderAction(String name, int type, ITreeContentProvider treeProv, OutlineLabelProvider prov){
+		super("", AS_RADIO_BUTTON);
 
-/**
- * 
- * Filter to hide fields in the collaboration outline.
- * 
- * @author Dominic Labsch	
- * @author Daniel P�sche
- */
-public class HideAllFields implements ICollaborationOutlineFilter {
-
-
-	@Override
-	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
-
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
-			for (int i = 0; i < obj.length; i++) {
-				if (!(obj[i] instanceof FSTField)) {
-					resultList.add(obj[i]);
-				}
-			}
-		}else{
-			return obj;
-		}
-		return resultList.toArray();
-
+		this.setText(name);
+		this.treeProv = treeProv;
+		this.lableProv = prov;
+		
 	}
-
+	
+	public ITreeContentProvider getTreeContentProvider(){
+		return treeProv;
+	}
+	
+	public OutlineLabelProvider getLabelProvider() {
+		return lableProv;
+	}
 }

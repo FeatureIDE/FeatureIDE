@@ -65,8 +65,7 @@ Export-Package:
    de.ovgu.featureide.fm.core",
  de.ovgu.featureide.ui.views.collaboration.editparts,
  de.ovgu.featureide.ui.views.collaboration.figures,
- de.ovgu.featureide.ui.views.collaboration.model,
- de.ovgu.featureide.ui.views.collaboration.outline;
+ de.ovgu.featureide.ui.views.collaboration.model;
   uses:="org.eclipse.ui,
    de.ovgu.featureide.core.fstmodel,
    org.eclipse.ui.part,
@@ -79,6 +78,7 @@ Export-Package:
    de.ovgu.featureide.core.listeners,
    org.eclipse.jface.util,
    org.eclipse.swt.widgets",
+ de.ovgu.featureide.ui.views.collaboration.outline,
  de.ovgu.featureide.ui.views.collaboration.policy,
  de.ovgu.featureide.ui.views.configMap,
  de.ovgu.featureide.ui.views.configMap.actions,

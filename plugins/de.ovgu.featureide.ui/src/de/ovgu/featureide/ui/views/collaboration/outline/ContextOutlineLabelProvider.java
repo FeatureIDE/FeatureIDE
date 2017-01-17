@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.outline;
+package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_CONTEXT_OUTLINE;
 
@@ -55,9 +55,9 @@ import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
-import de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider;
 
 /**
  * Provides labels and images for Collaboration outline

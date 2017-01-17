@@ -18,16 +18,20 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline;
+package de.ovgu.featureide.fm.ui.views.outline.standard;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 
 /**
  * This class is part of the outline. It sets up an new outline page that uses a
@@ -50,7 +54,9 @@ public class FmOutlinePage extends ContentOutlinePage {
 
 	private TreeViewer viewer;
 
-	private Object[] expandedElements;
+	private FmOutlinePageContextMenu contextMenu;
+	
+	private IFile iFile;
 
 	public FmOutlinePage(IDocumentProvider documentProvider, FeatureModelEditor editor) {
 		super();
@@ -67,23 +73,63 @@ public class FmOutlinePage extends ContentOutlinePage {
 	 */
 	public void setInput(IFeatureModel input) {
 		fInput = input;
-		update();
+		update(((FileEditorInput) fTextEditor.getEditorInput()).getFile());
 	}
 
 	/**
-	 * Updates the outline page.
+	 * Sets the new input or disables the viewer in case no editor is open
+	 * 
 	 */
-	public void update() {
-		if (fInput == null || fInput.getStructure().getRoot() == null)
-			return;
+	private void update(IFile iFile2) {
 		if (viewer != null) {
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
-				expandedElements = viewer.getExpandedElements();
-				control.setRedraw(false);
-				viewer.setInput(fInput);
-				viewer.setExpandedElements(expandedElements);
-				control.setRedraw(true);
+
+				iFile = iFile2;
+				
+				if (viewer != null) {
+					if (viewer.getControl() != null && !viewer.getControl().isDisposed()) {
+						viewer.getControl().setRedraw(false);
+
+						viewer.setContentProvider(new FmTreeContentProvider());
+						viewer.setLabelProvider(new FMOutlineLabelProviderWrapper());
+						if (iFile != null) {
+							if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && fTextEditor.getEditorInput() instanceof FeatureModelEditor) {
+
+								// recreate the context menu in case
+								// we switched to another model
+								if (contextMenu == null || contextMenu.getFeatureModel() != ((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel()) {
+									if (contextMenu != null) {
+										// the listener isn't
+										// recreated, if it still
+										// exists
+										// but we need a new
+										// listener for the new
+										// model
+										viewer.removeDoubleClickListener(contextMenu.dblClickListener);
+									}
+									contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) fTextEditor.getEditorInput(), viewer,
+											((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel(), false);
+								}
+							} else {
+								viewer.setInput(iFile);
+							}
+						} else {
+							viewer.setInput("");
+						}
+
+						if (viewer.getLabelProvider() instanceof OutlineLabelProvider && iFile != null) {
+							((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
+
+							viewer.getContentProvider().inputChanged(viewer, null, iFile);
+						}
+
+						viewer.getControl().setRedraw(true);
+						viewer.getControl().setEnabled(true);
+						viewer.refresh();
+
+					}
+				}
 			}
 		}
 	}
@@ -106,4 +152,5 @@ public class FmOutlinePage extends ContentOutlinePage {
 		FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fInput);
 		cm.addToolbar(getSite().getActionBars().getToolBarManager());
 	}
+	
 }

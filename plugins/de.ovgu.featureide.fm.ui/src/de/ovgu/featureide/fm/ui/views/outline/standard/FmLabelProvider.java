@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline;
+package de.ovgu.featureide.fm.ui.views.outline.standard;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.IColorProvider;

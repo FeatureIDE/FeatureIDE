@@ -18,16 +18,37 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.munge.ui.outline;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.swt.widgets.TreeItem;
+
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutlineLabelProvider;
 
 /**
- * Interface to filter the content of the CollaborationOutline.
+ * Provides labels and images for Collaboration outline
  * 
- * @author Dominic Labsch	
- * @author Daniel P�sche
+ * @author Reimar Schr�ter
  */
-public interface ICollaborationOutlineFilter {
+public class MungeOutlineLabelProvider extends CollaborationOutlineLabelProvider {
 
-	public Object[] filter(Object[] obj);
-		
+
+	@Override
+	public String getText(Object element) {
+		if (element instanceof FSTClass) {
+			FSTClass fstclass = (FSTClass) element;
+			return fstclass.getName();
+		}else{
+			return super.getText(element);
+		}
+	}
+
+	public String getLabelProvName() {
+		return "Extended Outline";
+	}
+	
+	public void setForeground(TreeItem item, IFile iFile) {
+		return;
+	}
 }

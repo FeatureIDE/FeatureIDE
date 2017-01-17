@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
 
 import java.util.LinkedList;
 

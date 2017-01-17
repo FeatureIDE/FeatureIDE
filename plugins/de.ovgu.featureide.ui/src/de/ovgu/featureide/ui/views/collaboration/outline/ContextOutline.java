@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,34 +20,45 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.swt.widgets.TreeItem;
+import java.util.HashSet;
+import java.util.Set;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.viewers.Viewer;
+
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 
 /**
- * Provides labels and images for Collaboration outline
  * 
- * @author Reimar Schr�ter
+ * Implements all functions needed for the FeatureIDE outline
+ * 
+ * @author Christopher Sontag
  */
-public class MungeOutlineLabelProvider extends CollaborationOutlineLabelProvider {
+public class ContextOutline extends OutlineProvider {
 
-
-	@Override
-	public String getText(Object element) {
-		if (element instanceof FSTClass) {
-			FSTClass fstclass = (FSTClass) element;
-			return fstclass.getName();
-		}else{
-			return super.getText(element);
-		}
-	}
-
-	public String getLabelProvName() {
-		return "Extended Outline";
+	private static final Set<String> supportedTypes = new HashSet<>();
+	static {
+		supportedTypes.add("java");
+		supportedTypes.add("jak");
+		supportedTypes.add("hs");
+		supportedTypes.add("h");
+		supportedTypes.add("c");
+		supportedTypes.add("cs");
+		supportedTypes.add("asm");
 	}
 	
-	public void setForeground(TreeItem item, IFile iFile) {
-		return;
+	public ContextOutline() {
+		super(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
 	}
+
+	@Override
+	public boolean checkSupported(String extension) {
+		return supportedTypes.contains(extension);
+	}
+
+	@Override
+	public void handleUpdate(Viewer viewer, IFile iFile) {
+		viewer.setInput(iFile);
+	}
+
 }

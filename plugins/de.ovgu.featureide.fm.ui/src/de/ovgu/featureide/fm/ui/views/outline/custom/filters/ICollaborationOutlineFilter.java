@@ -18,30 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.ITreeContentProvider;
+/**
+ * Interface to filter the content of the CollaborationOutline.
+ * 
+ * @author Dominic Labsch	
+ * @author Daniel P�sche
+ */
+public interface ICollaborationOutlineFilter {
 
-public class ProviderAction extends Action {
-	
-	private ITreeContentProvider treeProv = null;
-	private OutlineLabelProvider lableProv = null;
-	
-	public ProviderAction(String name, int type, ITreeContentProvider treeProv, OutlineLabelProvider prov){
-		super("", AS_RADIO_BUTTON);
-
-		this.setText(name);
-		this.treeProv = treeProv;
-		this.lableProv = prov;
+	public Object[] filter(Object[] obj);
 		
-	}
-	
-	public ITreeContentProvider getTreeContentProvider(){
-		return treeProv;
-	}
-	
-	public OutlineLabelProvider getLabelProvider() {
-		return lableProv;
-	}
 }

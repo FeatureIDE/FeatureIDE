@@ -96,14 +96,6 @@
 		</view>
 		<view
 				category="FeatureIDE"
-				class="de.ovgu.featureide.ui.views.collaboration.outline.Outline"
-				icon="icons/FeatureIconSmall.ico"
-				id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
-				name="FeatureIDE Outline"
-				restorable="true">
-		</view>
-		<view
-				category="FeatureIDE"
 				class="de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView"
 				icon="icons/FeatureIconSmall.ico"
 				id="de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView"
@@ -1524,6 +1516,15 @@
              </equals>
           </with></enablement>
     </commonWizard>
+ </extension>
+ <extension
+       point="de.ovgu.featureide.fm.ui.Outline">
+    <Outline
+          OutlineProvider="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline">
+    </Outline>
+    <Outline
+          OutlineProvider="de.ovgu.featureide.ui.views.collaboration.outline.ContextOutline">
+    </Outline>
  </extension>
 	
 	

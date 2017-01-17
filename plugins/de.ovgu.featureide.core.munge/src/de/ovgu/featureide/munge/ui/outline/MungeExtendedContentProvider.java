@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.munge.ui.outline;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
 
@@ -51,6 +51,7 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTModelForPP;
+import de.ovgu.featureide.fm.ui.views.outline.custom.filters.ICollaborationOutlineFilter;
 
 /**
  * Provides the content for the collaboration outline.
