@@ -58,7 +58,6 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -736,11 +735,6 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 				reportSyntaxError(curNode);
 			}
 		}
-		IFeatureModel mappingModel = FMFactoryManager.getFactory().createFeatureModel();
-		IFeatureStructure rootFeature = FMFactoryManager.getFactory().createFeature(mappingModel, "MPL").getStructure();
-		rootFeature.setAnd();
-		rootFeature.setAbstract(true);
-		rootFeature.setMandatory(true);
 	}
 
 	private void parseUse(Tree root, IFeature parent) throws RecognitionException {

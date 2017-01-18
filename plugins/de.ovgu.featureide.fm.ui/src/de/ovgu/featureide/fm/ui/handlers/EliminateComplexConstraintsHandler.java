@@ -22,11 +22,11 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -41,18 +41,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
-import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard;
@@ -63,11 +63,7 @@ import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard;
  * @author Alexander
  */
 public class EliminateComplexConstraintsHandler extends AFileHandler {
-	
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.handlers.base.AFileHandler#singleAction(org.eclipse.core.resources.IFile)
-	 */
+
 	@Override
 	protected void singleAction(IFile file) {
 		final IFeatureModel featureModel = readModel(file);
@@ -75,51 +71,43 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 		IConverterStrategy strategy = new NNFConverter();
 		ComplexConstraintConverter converter = new ComplexConstraintConverter();
 		String path = "";
-		
+
 		boolean trivial = ComplexConstraintConverter.trivialRefactoring(featureModel);
-		
+
 		int pseudo = 0, strict = 0;
-		for(IConstraint c : featureModel.getConstraints()) {
-			if(ComplexConstraintConverter.isSimple(c.getNode())) {
-			}
-			else if(ComplexConstraintConverter.isPseudoComplex(c.getNode()))
+		for (IConstraint c : featureModel.getConstraints()) {
+			if (ComplexConstraintConverter.isSimple(c.getNode())) {
+			} else if (ComplexConstraintConverter.isPseudoComplex(c.getNode()))
 				pseudo++;
 			else {
 				strict++;
 			}
 		}
-		
+
 		//count number of constraints
 		//set file extension
 		final EliminateConstraintsWizard wizard = new EliminateConstraintsWizard(file, "Complex-constraints elimination", trivial, pseudo, strict, "xml");
-		
+
 		List<Option> options = new ArrayList<Option>();
-		
+
 		if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
 			strategy = wizard.getStrategy();
-			if(wizard.preserveConfigurations())
+			if (wizard.preserveConfigurations())
 				options.add(Option.COHERENT);
-			if(wizard.removeRedundancy()) 
+			if (wizard.removeRedundancy())
 				options.add(Option.REMOVE_RDUNDANCY);
 			path = wizard.getPath();
-			if((new File(path)).exists() && !MessageDialog.openQuestion(new Shell(), "Warning!",
-					"Selected file already exists. File will be overwritten.")) {
+			if ((new File(path)).exists() && !MessageDialog.openQuestion(new Shell(), "Warning!", "Selected file already exists. File will be overwritten.")) {
 				return;
 			}
 		}
-		
+
 		IFeatureModel result = converter.convert(featureModel, strategy, options.toArray(new Option[options.size()]));
 
-		final FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(result));
-		try {
-			fmWriter.writeToFile(new File(path));
-			file.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		FileHandler.save(Paths.get(path), result, FMFormatManager.getInstance().getFormatByFileName(path));
 	}
-	
+
+	@SuppressWarnings("unused")
 	private void openFileInEditor(IFile outputFile) throws PartInitException {
 		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		final IEditorInput editorInput = new FileEditorInput(outputFile);
@@ -133,6 +121,7 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 		}
 		IDE.openEditor(page, outputFile);
 	}
+
 	/**
 	 * reads the featureModel from file
 	 * 
@@ -142,14 +131,16 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 	 * @throws FileNotFoundException
 	 */
 	private IFeatureModel readModel(IFile inputFile) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
-
+		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(inputFile.getName());
+		IFeatureModel fm;
 		try {
-			fmReader.readFromFile(inputFile);
-		} catch (FileNotFoundException e) {
-			FMUIPlugin.getDefault().logError(e);
-		} catch (UnsupportedModelException e) {
+			fm = FMFactoryManager.getFactory(inputFile.getLocation().toString(), format).createFeatureModel();
+		} catch (NoSuchExtensionException e) {
+			fm = FMFactoryManager.getDefaultFactory().createFeatureModel();
+		}
+		try {
+			FileHandler.load(inputFile.getContents(), fm, format);
+		} catch (CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 		return fm;

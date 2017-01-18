@@ -113,7 +113,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * 
 	 * @return Returns the default feature model factory.
 	 */
-	public static IFeatureModelFactory getFactory() {
+	public static IFeatureModelFactory getDefaultFactory() {
 		try {
 			return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace().getDefaultFactoryID());
 		} catch (NoSuchExtensionException e) {
@@ -135,7 +135,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * 
 	 * @throws NoSuchExtensionException
 	 */
-	public static IFeatureModelFactory getFactory(String path) throws NoSuchExtensionException {
+	public static IFeatureModelFactory getDefaultFactoryForPath(String path) throws NoSuchExtensionException {
 		return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace(path).getDefaultFactoryID());
 	}
 
@@ -167,8 +167,15 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * 
 	 * @throws NoSuchExtensionException
 	 */
-	public static IFeatureModelFactory getFactory(IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
+	public static IFeatureModelFactory getDefaultFactoryForFormat(IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
 		return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace().getID(format));
+	}
+
+	/**
+	 * @return An empty feature model from the default factory.
+	 */
+	public static IFeatureModel getEmptyFeatureModel() {
+		return getDefaultFactory().createFeatureModel();
 	}
 
 }

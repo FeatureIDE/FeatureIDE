@@ -67,7 +67,7 @@ public abstract class Generator {
 	}
 	
 	public static IFeatureModel generateFeatureDiagram(Random random, int numberOfFeatures) {
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+		final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
 		IFeatureModel fm = factory.createFeatureModel();
 		List<IFeature> leaves = new LinkedList<IFeature>();
 		leaves.add(fm.getFeature("C1"));

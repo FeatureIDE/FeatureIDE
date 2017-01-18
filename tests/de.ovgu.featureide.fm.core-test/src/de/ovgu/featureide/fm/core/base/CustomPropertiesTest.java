@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 public class CustomPropertiesTest {
 
 	static final File modelFile = new File("feature_model_tmp_" + System.currentTimeMillis() + ".xml");
-	static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
 
 	@Before
 	public void setup() {

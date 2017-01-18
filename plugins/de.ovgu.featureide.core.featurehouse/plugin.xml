@@ -72,10 +72,6 @@
 								<reference
 										definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
 								</reference>
-								<test
-										args="de.ovgu.featureide.core.featurehouse.ui.commands.fuji"
-										property="de.ovgu.featureide.core.featurehouse.properties.toggle.fuji">
-								</test>
 							</and>
 						</with>
 					</visibleWhen>

@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class TComplexConstraintConverter {
 	
-	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	private static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
 	private static IFeatureModel fm;
 	
 	static {

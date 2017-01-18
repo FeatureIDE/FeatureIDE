@@ -3,6 +3,7 @@
 
 	<!-- Set JAR name -->
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm" />
+	<property name="build.jar.version" value="3.2.0" />
 
 	<!-- Constants -->
 	<property name="src.dir" value="../src" />
@@ -45,6 +46,7 @@
 		       debug="on"
 		       includeantruntime="false"
 		       source="1.7"
+		       target="1.7"
 		/>
 
 		<!-- Calculate checksum for .class files -->
@@ -62,7 +64,7 @@
 		</tstamp>
 
 		<!-- Create version file -->
-		<echo file="${build.version.path}" append="false">Build Time:         ${timeStamp}${line.separator}Checksum (SHA-256): ${build.checksum}</echo>
+		<echo file="${build.version.path}" append="false">FeatureIDE Version:	${build.jar.version}${line.separator}Build Time:         ${timeStamp}${line.separator}Checksum (SHA-256): ${build.checksum}${line.separator}</echo>
 
 	</target>
 
@@ -75,7 +77,7 @@
 		</jar>
 
 	</target>
-	
+
 	<target name="deleteFiles" description="Delete all files with eclipse dependencies (For test purposes only!)">
 		<!-- Alternative: Remove files from classpath -->
 		<delete>

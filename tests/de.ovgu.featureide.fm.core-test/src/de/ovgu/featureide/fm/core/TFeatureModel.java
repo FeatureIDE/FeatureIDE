@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class TFeatureModel {
 
-	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	private static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
 	@Test
     public void recordGetFeatureName(){
         IFeatureModel fm = factory.createFeatureModel();

@@ -14,3 +14,6 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: de.ovgu.featureide.migration.impl,
+ de.ovgu.featureide.ui.migration.plugin,
+ de.ovgu.featureide.ui.migration.wizard

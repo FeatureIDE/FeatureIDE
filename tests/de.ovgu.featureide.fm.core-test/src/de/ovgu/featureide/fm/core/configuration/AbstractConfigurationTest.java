@@ -84,7 +84,7 @@ public abstract class AbstractConfigurationTest {
 
 	private static IFeatureModel load(IFeatureModelFormat format, String xml) {
 		try {
-			final IFeatureModel fm = FMFactoryManager.getFactory(format).createFeatureModel();
+			final IFeatureModel fm = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
 			if (format.read(fm, xml).containsError()) {
 				fail();
 			}

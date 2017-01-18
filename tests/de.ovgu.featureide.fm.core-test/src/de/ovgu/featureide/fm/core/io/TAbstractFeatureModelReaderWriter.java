@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -35,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -252,9 +254,15 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	}
 
 	private final IFeatureModel writeAndReadModel() throws UnsupportedModelException {
-		IFeatureModel newFm = FMFactoryManager.getFactory().createFeatureModel();
+		IFeatureModel newFm = null;
+		try {
+			newFm = FMFactoryManager.getDefaultFactoryForPath(origFm.getFactoryID()).createFeatureModel();
+		} catch (NoSuchExtensionException e) {
+			fail();
+		}
 		final IFeatureModelFormat format = getFormat();
-		format.read(newFm, format.write(origFm));
+		final String write = format.getInstance().write(origFm);
+		format.getInstance().read(newFm, write);
 		return newFm;
 	}
 
