@@ -64,12 +64,17 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 		add(childrenCount);
 	}
 
+	/***
+	 * COnstructor for the collapsed decoration figure of the legend
+	 */
 	public CollapsedDecoration() {
 		super();
 		setLayoutManager(layout);
 		setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 
+		isLegendEntry = true;
+		
 		setOpaque(true);
 		childrenCount.setFont(DEFAULT_FONT);
 		setDecoratorText("");
@@ -79,6 +84,11 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 
 	@Override
 	public void setLocation(Point p) {
+		if (isLegendEntry) {
+			super.setLocation(p);
+			return;
+		}
+		
 		if (graphicalFeature != null)
 			if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
 				//left to right layout 
@@ -132,6 +142,14 @@ public class CollapsedDecoration extends Shape implements RotatableDecoration, G
 
 	@Override
 	protected void outlineShape(Graphics graphics) {
+		if(isLegendEntry)
+		{
+			graphics.setLineWidth(1);
+			graphics.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
+			graphics.fillRoundRectangle(getBounds(), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
+			graphics.drawRoundRectangle(getBounds(), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
+			return;
+		}
 		int x = getBounds().x + 1;
 		int y = getBounds().y + 1;
 		int width = getBounds().width - 2;

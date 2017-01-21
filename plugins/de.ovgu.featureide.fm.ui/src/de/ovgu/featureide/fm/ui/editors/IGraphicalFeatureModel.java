@@ -27,6 +27,7 @@ import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
@@ -95,6 +96,13 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	 * @return All not collapsed constraints stored in this feature model.
 	 */
 	List<IGraphicalFeature> getVisibleFeatures();
+
+	/**
+	 * return the current index of the constraint. It will olny count constaints that are currently visible.
+	 * @param constraint
+	 * @return
+	 */
+	int getConstraintIndex(Constraint constraint);
 
 
 }

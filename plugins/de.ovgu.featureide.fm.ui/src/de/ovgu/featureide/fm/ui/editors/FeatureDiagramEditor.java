@@ -1197,7 +1197,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					EventType.ACTIVE_EXPLANATION_CHANGED,
 					activeExplanation,
 					activeExplanation));
-			
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			reload();

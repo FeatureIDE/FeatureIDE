@@ -159,6 +159,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private Figure explanationFigure;
 	private int row;
+	final IGraphicalFeatureModel graphicalFeatureModel;
 
 	@Override
 	public boolean useLocalCoordinates() {
@@ -166,6 +167,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	public LegendFigure(IGraphicalFeatureModel graphicalFeatureModel, Point pos) {
+		this.graphicalFeatureModel = graphicalFeatureModel;
 		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModel();
 		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
 
@@ -610,10 +612,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createCollapsedSymbol(int row, String toolTip) {
 		final CollapsedDecoration collapsedDecoration = new CollapsedDecoration();
-		collapsedDecoration.setSize(SYMBOL_SIZE, SYMBOL_SIZE);
-		Point target = new Point(5 + SYMBOL_SIZE / 2, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE / 5);
+
+		int x1 = (SYMBOL_SIZE / 2 - 2);
+		int y1 = (ROW_HEIGHT * row - LIFT_2 / 2);
+		int x2 = SYMBOL_SIZE + SYMBOL_SIZE / 2;
+		int y2 = (ROW_HEIGHT * row + SYMBOL_SIZE - LIFT_2);
+		Point p1 = new Point(x1, y1);
+		collapsedDecoration.isLegendEntry = true;
+		collapsedDecoration.setSize(x2 - x1, y2 - y1);
 		collapsedDecoration.setToolTip(createToolTipContent(toolTip));
-		collapsedDecoration.setLocation(target);
+		collapsedDecoration.setLocation(p1);
 		this.add(collapsedDecoration);
 	}
 
@@ -712,29 +720,35 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 			switch (explanation.getMode()) {
 			case DEAD_FEATURE:
-				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " dead feature because of the highlighted dependencies:");
+				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " dead feature because of highlighted dependencies:");
+				explanationFigure.setToolTip(createToolTipContent("The feature\n" + explanation.getDefectElement().getName() + "\nis dead because of the highligthed dependencies."));
 				break;
 			case FALSE_OPTIONAL_FEATURE:
-				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " false-optional because of the highlighted dependencies:");
+				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " false-optional because of highlighted dependencies:");
+				explanationFigure.setToolTip(createToolTipContent("The feature\n" + explanation.getDefectElement().getName() + "\nis false optional because of the highligthed dependencies."));
 				break;
 			case REDUNDANT_CONSTRAINT:
-				labelExplanation.setText("Redundant constraint because of the highlighted dependencies:");
-				explanationFigure.setToolTip(createToolTipContent("The constraint\n" + ((Constraint)explanation.getDefectElement()).getDisplayName() + "\n is redundant because of the highligthed dependencies."));
+				Constraint constraint = (Constraint)explanation.getDefectElement();
+				int index = graphicalFeatureModel.getConstraintIndex(constraint);
+				labelExplanation.setText((index+1) + ". constraint redundant because of highlighted dependencies:");
+				explanationFigure.setToolTip(createToolTipContent("The constraint\n" + constraint.getDisplayName() + "\nis redundant because of the highligthed dependencies."));
 				break;
 
 			default:
 				break;
 			}
+			int widthInPixels = createLabel(1, labelExplanation.getText(), FMPropertyManager.getFeatureForgroundColor(), "").getPreferredSize().width + 25;
 			
 			//SetWidth depending of string
-			explanationFigure.setSize(labelExplanation.getPreferredSize().width + SYMBOL_SIZE, 18 + 2 * ROW_HEIGHT + 5);
-			setSize(getSize().width < labelExplanation.getPreferredSize().width + SYMBOL_SIZE ? labelExplanation.getPreferredSize().width + SYMBOL_SIZE : getSize().width, getSize().height + explanationFigure.getSize().height);
+			explanationFigure.setSize(widthInPixels, 18 + 2 * ROW_HEIGHT + 5);
+			setSize(getSize().width < widthInPixels  ? widthInPixels : getSize().width, getSize().height + explanationFigure.getSize().height);
 			
 			labelExplanation.setLabelAlignment(Label.LEFT);
 			labelExplanation.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 			labelExplanation.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 			labelExplanation.setFont(DEFAULT_FONT);
 			labelExplanation.setSize(getSize().width, ROW_HEIGHT + 2);
+			
 			labelExplanation.setLocation(new Point(x_SymbolStart, y_Entry));
 			y_Entry += ROW_HEIGHT + 5;
 
