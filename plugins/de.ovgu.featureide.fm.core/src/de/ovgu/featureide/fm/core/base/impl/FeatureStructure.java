@@ -145,7 +145,7 @@ public class FeatureStructure implements IFeatureStructure {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
-
+	
 	protected void fireMandatoryChanged() {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
@@ -159,6 +159,17 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public List<IFeatureStructure> getChildren() {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 		return children;
+	}
+	
+	@Override
+	public boolean hasVisibleChildren(boolean showHiddenFeature) {
+		boolean check = false;
+		for (IFeatureStructure child: children) {
+			if ((!child.hasHiddenParent() || showHiddenFeature)) {
+				check = true;
+			}
+		}
+		return check;
 	}
 
 	@Override
@@ -225,6 +236,7 @@ public class FeatureStructure implements IFeatureStructure {
 		return false;
 	}
 
+
 	/**
 	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef ::
 	 * Gh'.
@@ -288,7 +300,7 @@ public class FeatureStructure implements IFeatureStructure {
 	public boolean isHidden() {
 		return hidden;
 	}
-
+	
 	@Override
 	public boolean isMandatory() {
 		return (parent == null) || !parent.isAnd() || mandatory;
@@ -429,5 +441,6 @@ public class FeatureStructure implements IFeatureStructure {
 		sb.append(")");
 		return sb.toString();
 	}
+
 
 }

@@ -160,7 +160,7 @@ public class MoveAction extends Action {
 	 */
 	private void moveFigure(Object element, boolean doStop) {
 		if ((element instanceof FeatureEditPart) || (element instanceof IFeature)) {
-			IGraphicalFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (IGraphicalFeature) element;
+			IGraphicalFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getModel() : (IGraphicalFeature) element;
 			final Point newPos = feature.getLocation().translate(deltaPos);
 
 			if (doStop) {
@@ -169,7 +169,7 @@ public class MoveAction extends Action {
 
 			feature.setLocation(newPos);
 		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
-			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (IGraphicalConstraint) element;
+			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getModel() : (IGraphicalConstraint) element;
 			final Point newPos = constraint.getLocation().translate(deltaPos);
 			constraint.setLocation(newPos);
 		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {

@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 
 /**
- * Graphical representation of a constraint.
+ * Graphical representation of a element.
  * 
  * @author Sebastian Krieter
  */

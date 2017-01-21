@@ -92,12 +92,12 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			Object editPart = r.getEditParts().get(0);
 			if (editPart instanceof FeatureEditPart) {
 				FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
-				IGraphicalFeature feature = featureEditPart.getFeature();
+				IGraphicalFeature feature = featureEditPart.getModel();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
 			} else if (editPart instanceof ConstraintEditPart) {
-				IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
+				IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getModel();
 
 				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
 					Point point = r.getLocation().getCopy();

@@ -72,7 +72,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		Point s = editPart.getConstraintModel().getLocation().getCopy();
+		Point s = editPart.getModel().getLocation().getCopy();
 		getHostFigure().translateToAbsolute(s);
 
 		c = new PolylineConnection();

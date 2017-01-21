@@ -97,7 +97,7 @@ public class SetFeatureColorAction extends Action {
 				Object editPart = editPartArray[i];
 				if (editPart instanceof FeatureEditPart) {
 					FeatureEditPart editP = (FeatureEditPart) editPart;
-					IGraphicalFeature feature = editP.getFeature();
+					IGraphicalFeature feature = editP.getModel();
 					if (!featureList.contains(feature))
 						featureList.add(feature);
 				}

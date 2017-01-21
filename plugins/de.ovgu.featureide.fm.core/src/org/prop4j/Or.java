@@ -42,6 +42,21 @@ public class Or extends Node implements Cloneable {
 	}
 
 	@Override
+	public boolean isConjunctiveNormalForm() {
+		for (final Node child : children) {
+			if (!(child instanceof Literal)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isClausalNormalForm() {
+		return false;
+	}
+
+	@Override
 	protected Node clausify() {
 		for (int i = 0; i < children.length; i++) {
 			children[i] = children[i].clausify();

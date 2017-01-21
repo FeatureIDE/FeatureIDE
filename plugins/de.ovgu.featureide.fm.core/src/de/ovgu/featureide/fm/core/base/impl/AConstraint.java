@@ -59,7 +59,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	boolean featureSelected;
 	boolean isImplicit;
 
-
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
 		this.propNode = oldConstraint.propNode;
@@ -100,7 +99,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	@Override
 	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers) {
-		
+
 		final Collection<IFeature> deadFeatures;
 		final Node propNode = getNode();
 		final Comparator<IFeature> featComp = new FeatureComparator(true);
@@ -181,7 +180,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		falseOptionalFeatures.clear();
 		this.falseOptionalFeatures.addAll(Functional.toList(foFeatures));
 	}
-	
+
 	public void setNode(Node node) {
 		this.propNode = node;
 	}

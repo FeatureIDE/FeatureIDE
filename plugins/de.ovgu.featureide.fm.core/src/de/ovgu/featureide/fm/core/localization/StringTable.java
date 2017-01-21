@@ -428,7 +428,9 @@ public class StringTable {
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
 	public static final String CALCULATE_DEPENDENCY = "Show Hidden Dependencies of Submodel";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
-	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures";
+	public static final String EXPAND_CONSTRAINT = "Show contained features";
+	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures (CTRL + D)";
+	public static final String COLLAPSE_FEATURE = "Collapse (CTRL + C)";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
 	public static final String EXPORT_AS = "Export As";
 	public static final String HIDE_LEGEND = "Hide Legend";
@@ -438,6 +440,7 @@ public class StringTable {
 	public static final String REVERSE_FEATURE_ORDER = "Reverse Feature Order";
 	public static final String SELECTION = "Selection";
 	public static final String SHOW_HIDDEN_FEATURES = "Show Hidden Features";
+	public static final String SHOW_COLLAPSED_CONSTRAINTS = "Show Collapsed Constraints";
 	public static final String RENAMING_FEATURE = "Renaming feature ";
 	public static final String IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME = "It is not recommended to change upper and lower case. You currently try to rename ";
 	public static final String THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_ = "This name is already used for another feature.";
@@ -533,6 +536,7 @@ public class StringTable {
 	public static final String VON_INTERFACE = "von Interface";
 	public static final String KONKRET = "Konkret";
 	public static final String VERSTECKT = "Versteckt";
+	public static final String EINGEKLAPPT = "Eingeklappt";
 	public static final String FALSCH_OPTIONALES_FEATURE = "Falsch-optionales Feature";
 	public static final String ODER = "Oder";
 	public static final String UNBESTIMMBAR_VERSTECKTES_FEATURE = "Unbestimmbar verstecktes Feature";
@@ -587,6 +591,7 @@ public class StringTable {
 	public static final String CONSTRAINT_ELEMENT = "constraint element";
 	public static final String COLLAPSE_ALL = "Collapse All";
 	public static final String EXPAND_ALL = "Expand All";
+	public static final String COLLAPSE_ALL_BUT_EXPLANATION = "Collapse All But Explanation";
 	public static final String CREATE_FEATURE_BELOW = "Create Feature Below";
 	public static final String RENAME = "Rename";
 	public static final String NO_DATA_TO_DISPLAY_AVAILABLE_ = "No data to display available.";
@@ -826,6 +831,7 @@ public class StringTable {
 	public static final String HIDE_FIELDS = "Hide Fields";
 	public static final String HIDE_METHODS = "Hide Methods";
 	public static final String SORT_BY_FEATURE = "Sort By Feature";
+	public static final String SYNC_COLLAPSED_FEATURES = "Sync collapsed states with FM";
 	public static final String EMPTY_OUTLINE = "Empty Outline";
 	public static final String AN_OUTLINE_IS_NOT_AVAILABLE_ = "An outline is not available.";
 	public static final String THIS_IS_NO_FEATURE_PROJECT = "Not a FeatureIDE project";
@@ -1004,4 +1010,12 @@ public class StringTable {
 	public static final String FEATURES_ = "Features:";
 	public static final String FIDECONF = "fideconf";
 	public static final String PARAMETER_IS_EXPECTED_TO_BE_NON_NULL = "The method parameter is expected to be non-null";
+	public static final String SET_FEATURE_COLLAPSED = "Set Feature Collapsed";
+	public static final String SET_FEATURE_EXPANDED = "Set Feature Expanded";
+	public static final String COLLAPSE_SIBLINGS = "Collapse siblings";
+	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust model to editor size";
+	public static final String CALCULATE_VOID_FEATURES = "Calculate Void Features";
+	public static final String CALCULATE_FALSE_OPTIONAL_FEATURES = "Calculate False Optional Features";
+	public static final String CALCULATE_DEAF_FEATURES = "Calculate Dead Features";
+	
 }

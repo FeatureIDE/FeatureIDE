@@ -62,7 +62,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			newCompound.getStructure().setAND(true);
 			newCompound.getStructure().setMultiple(parent.isMultiple());
 		}
-		
+		//TODO redundant if check 
 		if (parent != null) {
 			final int index = parent.getChildIndex(child.getStructure());
 			parent.removeChild(child.getStructure());
