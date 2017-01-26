@@ -30,8 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
@@ -40,7 +39,7 @@ import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
- * Generates all current configurations in the config folder. 
+ * Generates all current configurations in the config folder.
  * 
  * @author Jens Meinicke
  */
@@ -56,7 +55,7 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 		buildCurrentConfigurations(builder.featureProject, monitor);
 		return null;
 	}
-	
+
 	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor monitor) {
 		try {
 			for (IResource configuration : featureProject.getConfigFolder().members()) {
@@ -79,8 +78,6 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 		}
 	}
 
-	private FileHandler<Configuration> reader;
-	
 	/**
 	 * Builds the given configuration file into the folder for current
 	 * configurations.
@@ -90,11 +87,10 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @param monitor
 	 */
 	private void build(IResource configuration, IMonitor monitor) {
-		reader = new FileHandler<>(this.configuration);
-		reader.read(Paths.get(configuration.getLocationURI()), ConfigurationManager.getFormat(configuration.getName()));
+		FileHandler.load(Paths.get(configuration.getLocationURI()), this.configuration, ConfigFormatManager.getInstance());
 		builder.addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
 	}
-	
+
 	/**
 	 * @param res
 	 *            A file.
@@ -103,7 +99,7 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	private boolean isConfiguration(IResource res) {
 		return res instanceof IFile && CorePlugin.getDefault().getConfigurationExtensions().contains(res.getFileExtension());
 	}
-	
+
 	/**
 	 * Counts the configurations at the given folder.
 	 * 

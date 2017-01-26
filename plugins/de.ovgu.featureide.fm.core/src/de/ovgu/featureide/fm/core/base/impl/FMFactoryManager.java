@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
 
 /**
@@ -108,7 +108,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	/**
 	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br/>
 	 * <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IFeatureModelFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
 	 * underlying feature model file.
 	 * 
 	 * @return Returns the default feature model factory.
@@ -126,7 +126,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * Returns the currently set default factory for the given path
 	 * (if none is specified an instance of the default factory is returned).<br/>
 	 * <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IFeatureModelFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
 	 * underlying feature model file.
 	 * 
 	 * @param path
@@ -150,7 +150,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * 
 	 * @throws NoSuchExtensionException
 	 */
-	public static IFeatureModelFactory getFactory(String path, IFeatureModelFormat format) throws NoSuchExtensionException {
+	public static IFeatureModelFactory getFactory(String path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
 		return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace(path).getID(format));
 	}
 
@@ -158,7 +158,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * Returns the currently set default factory for the given format
 	 * (if none is specified an instance of the default factory is returned).<br/>
 	 * <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IFeatureModelFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat<IFeatureModel>)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
 	 * underlying feature model file.
 	 * 
 	 * @param format
@@ -167,7 +167,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * 
 	 * @throws NoSuchExtensionException
 	 */
-	public static IFeatureModelFactory getDefaultFactoryForFormat(IFeatureModelFormat format) throws NoSuchExtensionException {
+	public static IFeatureModelFactory getDefaultFactoryForFormat(IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
 		return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace().getID(format));
 	}
 

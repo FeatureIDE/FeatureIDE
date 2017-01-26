@@ -267,4 +267,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		return ID;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }

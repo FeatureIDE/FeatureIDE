@@ -159,4 +159,9 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 		return ID;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }

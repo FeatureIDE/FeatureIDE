@@ -223,4 +223,9 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		return true;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }
