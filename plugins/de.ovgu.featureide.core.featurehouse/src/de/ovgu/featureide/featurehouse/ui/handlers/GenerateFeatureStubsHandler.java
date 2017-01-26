@@ -21,6 +21,7 @@
 package de.ovgu.featureide.featurehouse.ui.handlers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STUBS_GENERATION_STARTED_;
+
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.featurehouse.meta.FeatureStubsGenerator;

@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRAINT;
+
+import java.util.Iterator;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
@@ -30,15 +34,11 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraintOperation;
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRAINT;
-
-import java.util.Iterator;
 
 /**
  * Expands up to the level of the features of this constraint and collapses all other features.
