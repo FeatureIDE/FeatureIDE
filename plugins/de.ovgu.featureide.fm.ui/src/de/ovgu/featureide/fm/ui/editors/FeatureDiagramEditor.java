@@ -79,7 +79,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
-import org.w3c.dom.events.EventTarget;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;

@@ -116,7 +116,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		final ArrayList<Or> clauses = new ArrayList<>();
 		while (!lines.isEmpty()) {
 			final String[] clauseLine = lines.poll().split("\\s+");
-			final Literal[] array = new Literal[clauseLine.length];
+			final Literal[] array = new Literal[clauseLine.length - 1];
 			for (int i = 0; i < clauseLine.length - 1; i++) {
 				final int varIndex = Integer.parseInt(clauseLine[i]);
 				array[i] = new Literal(names[Math.abs(varIndex)], varIndex > 0);

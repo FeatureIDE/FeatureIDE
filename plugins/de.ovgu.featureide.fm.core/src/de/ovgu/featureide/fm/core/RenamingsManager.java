@@ -113,7 +113,7 @@ public class RenamingsManager implements IEventManager {
 		performRenamings(file.toPath());
 	}
 
-	private void performRenamings(Path path) {
+	public void performRenamings(Path path) {
 		final FeatureModelManager instance = FeatureModelManager.getInstance(path);
 		if (instance == null) {
 			return;

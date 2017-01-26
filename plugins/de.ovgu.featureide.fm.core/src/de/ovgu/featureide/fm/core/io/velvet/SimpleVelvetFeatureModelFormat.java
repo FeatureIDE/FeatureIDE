@@ -25,10 +25,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SUCH_ATTRIB
 import static java.lang.String.format;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -80,7 +80,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SimpleVelvetFeatureModelFormat.class.getSimpleName();
 
-	protected File featureModelFile;
+	protected Path featureModelFile;
 
 	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
 	private static final String NEWLINE = System.getProperty("line.separator", "\n");
@@ -742,7 +742,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void reportWarning(Tree curNode, String message) {
-		Logger.logWarning(message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \""
+		Logger.logWarning(message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getFileName() : "") + ": \""
 				+ curNode.getText() + "\")");
 	}
 

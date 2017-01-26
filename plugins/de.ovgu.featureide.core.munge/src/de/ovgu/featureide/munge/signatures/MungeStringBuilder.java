@@ -22,6 +22,7 @@ package de.ovgu.featureide.munge.signatures;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXTENDS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLEMENTS;
+
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;

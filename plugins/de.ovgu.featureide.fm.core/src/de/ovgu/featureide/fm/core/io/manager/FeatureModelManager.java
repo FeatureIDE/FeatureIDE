@@ -43,7 +43,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		@Override
 		protected IFeatureModel createObject(Path path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
 			final IFeatureModel featureModel = FMFactoryManager.getFactory(path.toAbsolutePath().toString(), format).createFeatureModel();
-			featureModel.setSourceFile(path.toFile());
+			featureModel.setSourceFile(path);
 			return featureModel;
 		}
 	};

@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
