@@ -379,7 +379,10 @@ public class LTMS {
 		final Map<Literal, Node> allAntecedents = new LinkedHashMap<>();
 		allAntecedents.put(derivedLiteral, derivedClause);
 		for (final Entry<Literal, Node> e : getAllAntecedents(derivedLiteral).entrySet()) {
-			allAntecedents.putIfAbsent(e.getKey(), e.getValue());
+			final Node value = allAntecedents.get(e.getKey());
+			if (value == null) {
+				allAntecedents.put(e.getKey(), e.getValue());
+			}
 		}
 		
 		//Explain every antecedent and its reason.
@@ -434,7 +437,10 @@ public class LTMS {
 			}
 			allAntecedents.put(antecedent, reason);
 			for (final Entry<Literal, Node> e : getAllAntecedents(antecedent).entrySet()) {
-				allAntecedents.putIfAbsent(e.getKey(), e.getValue());
+				final Node value = allAntecedents.get(e.getKey());
+				if (value == null) {
+					allAntecedents.put(e.getKey(), e.getValue());
+				}
 			}
 		}
 		return allAntecedents;
