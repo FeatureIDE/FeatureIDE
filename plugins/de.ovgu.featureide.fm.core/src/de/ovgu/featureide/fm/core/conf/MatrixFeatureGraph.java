@@ -70,7 +70,7 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 			break;
 		case EDGE_00:
 			assert !isEdge(oldValue, EDGE_01);
-			newValue = (oldValue & MASK_0_CLEAR) | EDGE_00;
+			newValue = (oldValue & EDGE_POSITIVE) | EDGE_00;
 			break;
 		case EDGE_01Q:
 			if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
@@ -81,7 +81,7 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 			break;
 		case EDGE_01:
 			assert !isEdge(oldValue, EDGE_00);
-			newValue = (oldValue & MASK_0_CLEAR) | EDGE_01;
+			newValue = (oldValue & EDGE_POSITIVE) | EDGE_01;
 			break;
 
 		case EDGE_10Q:
@@ -93,7 +93,7 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 			break;
 		case EDGE_10:
 			assert !isEdge(oldValue, EDGE_11);
-			newValue = (oldValue & MASK_1_CLEAR) | EDGE_10;
+			newValue = (oldValue & EDGE_NEGATIVE) | EDGE_10;
 			break;
 		case EDGE_11Q:
 			if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
@@ -104,7 +104,7 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 			break;
 		case EDGE_11:
 			assert !isEdge(oldValue, EDGE_10);
-			newValue = (oldValue & MASK_1_CLEAR) | EDGE_11;
+			newValue = (oldValue & EDGE_NEGATIVE) | EDGE_11;
 			break;
 		default:
 			newValue = oldValue;
@@ -135,8 +135,7 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 		if (internalFrom < 0 || internalTo < 0) {
 			return -1;
 		}
-		final int index = (internalFrom * size) + internalTo;
-		return (byte) (((fromSelected ? (adjMatrix[index] >>> 4) : adjMatrix[index])) & 0x0000000f);
+		return getValue(internalFrom, internalTo, fromSelected);
 	}
 
 }

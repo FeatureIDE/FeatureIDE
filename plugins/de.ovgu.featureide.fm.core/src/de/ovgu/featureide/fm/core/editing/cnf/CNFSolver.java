@@ -35,8 +35,6 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.editing.remove.DeprecatedClause;
-
 /**
  * Light version of {@link SatSolver}.
  * 
@@ -169,7 +167,7 @@ public class CNFSolver implements ICNFSolver {
 		solver.reset();
 	}
 
-	public void addClause(DeprecatedClause mainClause) {
+	public void addClause(Clause mainClause) {
 		final int[] literals = mainClause.literals;
 
 		try {

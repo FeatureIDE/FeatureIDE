@@ -20,11 +20,24 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
-import org.prop4j.solver.SatInstance;
+import java.io.Serializable;
 
-public abstract class AFeatureGraph implements IFeatureGraph {
+import org.sat4j.core.VecInt;
+import org.sat4j.specs.IVecInt;
 
-	private static final long serialVersionUID = 1L;
+public interface IFeatureGraph2 extends Serializable {
+
+	public interface ITraverser {
+
+		void traverse2(int curVar, int[] model, IVecInt vecInt);
+
+		void traverse(int curVar, int[] model);
+
+		void clear();
+
+		VecInt getRelevantVariables();
+
+	}
 
 	public static final byte EDGE_NONE = 0b00000000, //0x00;
 			EDGE_00Q = 			0b00000001, //0x01,
@@ -54,66 +67,10 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 	public static final byte EDGE_WEAK_NEGATIVE 	= EDGE_NEGATIVE & EDGE_WEAK;
 	public static final byte EDGE_WEAK_POSITIVE 	= EDGE_POSITIVE & EDGE_WEAK;
 
-	protected transient SatInstance satInstance;
+	byte getEdge(int fromIndex, int toIndex);
 
-	protected int[] index;
-	protected int size;
+	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
 
-	public static boolean isEdge(byte edge, byte q) {
-		return (edge & q) != 0;
-	}
-
-	public static boolean isWeakEdge(byte edge) {
-		return (edge & EDGE_WEAK) != 0;
-	}
-
-	public static boolean isStrongEdge(byte edge) {
-		return (edge & EDGE_STRONG) != 0;
-	}
-
-	public AFeatureGraph(SatInstance satInstance, int[] index) {
-		int count = 0;
-		for (int i = 0; i < index.length; i++) {
-			if (index[i] >= 0) {
-				count++;
-			}
-		}
-		this.size = count;
-
-		this.satInstance = satInstance;
-		this.index = index;
-	}
-
-	public AFeatureGraph() {
-		this.satInstance = null;
-		this.index = null;
-	}
-
-	public void copyValues(IFeatureGraph otherGraph) {
-		final AFeatureGraph anotherAGraph = (AFeatureGraph) otherGraph;
-		this.size = anotherAGraph.size;
-		this.index = anotherAGraph.index;
-	}
-
-	public void setSatInstance(SatInstance satInstance) {
-		this.satInstance = satInstance;
-	}
-
-	public int getSize() {
-		return size;
-	}
-
-	public SatInstance getSatInstance() {
-		return satInstance;
-	}
-
-	public int[] getIndex() {
-		return index;
-	}
-
-	@Override
-	public int getFeatureIndex(String name) {
-		return index[satInstance.getVariable(name) - 1];
-	}
+	ITraverser traverse();
 
 }

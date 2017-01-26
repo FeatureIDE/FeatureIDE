@@ -16,18 +16,36 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://featureide.cs.ovgu.de/ for further information.
+ * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.editing.cnf;
+package de.ovgu.featureide.fm.core.job.monitor;
 
-import org.sat4j.specs.TimeoutException;
+import de.ovgu.featureide.fm.core.job.IJob;
 
-public interface ICNFSolver {
+/**
+ * Control object for {@link IJob}s.
+ * Can be used to check for cancel request, display job progress, and calling intermediate functions.
+ * 
+ * @author Sebastian Krieter
+ */
+public class ConsoleTimeMonitor extends ConsoleMonitor {
 
-	boolean isSatisfiable(int[] literals) throws TimeoutException;
+	protected long time = System.nanoTime();
 
-	void reset();
+	public ConsoleTimeMonitor() {
+		super();
+	}
 
-	void addClause(Clause mainClause);
+	public ConsoleTimeMonitor(boolean output) {
+		super(output);
+	}
+
+	protected void print(String name) {
+		if (output) {
+			long oldTime = time;
+			time = System.nanoTime();
+			System.out.println(name + " -> " + (((time - oldTime) / 1_000_000) / 1_000.0) + "s");
+		}
+	}
 
 }

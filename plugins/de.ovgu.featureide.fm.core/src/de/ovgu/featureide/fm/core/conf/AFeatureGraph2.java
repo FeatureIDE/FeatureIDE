@@ -18,16 +18,22 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.editing.cnf;
+package de.ovgu.featureide.fm.core.conf;
 
-import org.sat4j.specs.TimeoutException;
+public abstract class AFeatureGraph2 implements IFeatureGraph2 {
 
-public interface ICNFSolver {
+	private static final long serialVersionUID = 1L;
 
-	boolean isSatisfiable(int[] literals) throws TimeoutException;
+	public static boolean isEdge(byte edge, byte q) {
+		return (edge & q) != 0;
+	}
 
-	void reset();
+	public static boolean isWeakEdge(byte edge) {
+		return (edge & EDGE_WEAK) != 0;
+	}
 
-	void addClause(Clause mainClause);
+	public static boolean isStrongEdge(byte edge) {
+		return (edge & EDGE_STRONG) != 0;
+	}
 
 }

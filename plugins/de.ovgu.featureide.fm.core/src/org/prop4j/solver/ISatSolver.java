@@ -23,10 +23,10 @@ package org.prop4j.solver;
 import java.util.List;
 
 import org.prop4j.Node;
+import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVecInt;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.util.RingList;
@@ -62,7 +62,7 @@ public interface ISatSolver extends Cloneable {
 
 	void fixOrder();
 
-	IVecInt getAssignment();
+	VecInt getAssignment();
 
 	int[] getAssignmentArray(int from, int to);
 

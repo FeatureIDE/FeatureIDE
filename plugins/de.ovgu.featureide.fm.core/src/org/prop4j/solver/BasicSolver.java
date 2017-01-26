@@ -38,7 +38,6 @@ import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Logger;
@@ -244,7 +243,7 @@ public class BasicSolver implements ISatSolver {
 	}
 
 	@Override
-	public IVecInt getAssignment() {
+	public VecInt getAssignment() {
 		return assignment;
 	}
 

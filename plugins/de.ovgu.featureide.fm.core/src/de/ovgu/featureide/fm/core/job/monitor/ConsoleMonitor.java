@@ -31,10 +31,10 @@ import de.ovgu.featureide.fm.core.job.IJob;
  */
 public class ConsoleMonitor extends ATaskMonitor {
 
-	private boolean output = true;
+	protected boolean output = true;
 
-	private boolean canceled = false;
-	private int work = 0;
+	protected boolean canceled = false;
+	protected int work = 0;
 
 	public ConsoleMonitor() {
 		super();
@@ -93,7 +93,7 @@ public class ConsoleMonitor extends ATaskMonitor {
 		print(getTaskName());
 	}
 
-	private void print(String name) {
+	protected void print(String name) {
 		if (output) {
 			System.out.println(name);
 		}
