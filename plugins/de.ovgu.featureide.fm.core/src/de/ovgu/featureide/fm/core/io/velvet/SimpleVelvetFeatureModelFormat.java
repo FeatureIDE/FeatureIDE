@@ -780,4 +780,9 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 		return ID;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }

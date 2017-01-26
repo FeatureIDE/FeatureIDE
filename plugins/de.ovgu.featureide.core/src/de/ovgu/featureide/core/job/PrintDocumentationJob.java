@@ -53,6 +53,7 @@ import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
 import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder;
 import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -60,7 +61,6 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.FileSystem;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -122,7 +122,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 					Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
-				FileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigurationManager.getFormat(file.getName()));
+				FileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
 			} catch (Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;

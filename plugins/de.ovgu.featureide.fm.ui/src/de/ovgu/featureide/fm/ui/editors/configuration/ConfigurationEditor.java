@@ -75,7 +75,6 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -238,20 +237,21 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		//			featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
 		//		}
 
-		final Configuration c;
+		final Configuration config;
 
 		final IFeatureGraph fg = loadFeatureGraph(res.getLocation().removeLastSegments(1).append("model.fg"));
 		if (fg == null) {
-			c = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
-			configurationManager = FileManagerMap.<Configuration, ConfigurationManager> getInstance(file.getLocation().toOSString());
+			config = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
+			final Path path = file.getLocation().toFile().toPath();
+			configurationManager = ConfigurationManager.getInstance(path);
 			if (configurationManager != null) {
-				configurationManager.setConfiguration(c);
+				configurationManager.setConfiguration(config);
 				configurationManager.read();
 			} else {
-				configurationManager = ConfigurationManager.getInstance(c, file.getLocation().toOSString());
+				configurationManager = ConfigurationManager.getInstance(path, config);
 			}
 		} else {
-			c = new ConfigurationFG(featureModelManager.getObject(), fg, ConfigurationFG.PARAM_IGNOREABSTRACT | ConfigurationFG.PARAM_LAZY);
+			config = new ConfigurationFG(featureModelManager.getObject(), fg, ConfigurationFG.PARAM_IGNOREABSTRACT | ConfigurationFG.PARAM_LAZY);
 		}
 
 		final ProblemList lastProblems = configurationManager.getLastProblems();

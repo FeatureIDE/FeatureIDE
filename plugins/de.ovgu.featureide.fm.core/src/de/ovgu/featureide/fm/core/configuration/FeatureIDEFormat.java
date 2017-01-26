@@ -183,4 +183,9 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 		return ID;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }

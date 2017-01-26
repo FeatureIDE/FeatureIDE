@@ -90,4 +90,9 @@ public class FGAdjListFormat implements IPersistentFormat<AdjList> {
 		return ID;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }
