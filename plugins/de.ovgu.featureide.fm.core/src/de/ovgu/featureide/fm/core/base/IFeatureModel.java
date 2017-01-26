@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.base;
  
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -886,7 +887,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @param file the source file of this model (might be <b>null</b>.
 	 */
-	void setSourceFile(File file);
+	void setSourceFile(Path file);
 
 	/**
 	 * @see #setSourceFile(File)
@@ -895,7 +896,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @return Returns the feature models current source file, or <b>null</b> if no source file is specified.
 	 */
-	File getSourceFile();
+	Path getSourceFile();
 
 	/**
 	 * Feature models are identified with their system-wide unique numeric

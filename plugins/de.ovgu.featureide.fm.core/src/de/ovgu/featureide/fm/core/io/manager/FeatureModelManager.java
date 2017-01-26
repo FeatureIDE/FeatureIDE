@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.CheckForNull;
 
@@ -82,7 +82,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	public static FeatureModelManager getInstance(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> format) {
 		final FeatureModelManager instance = FileManagerMap.getInstance(model, absolutePath, format, FeatureModelManager.class, IFeatureModel.class);
-		model.setSourceFile(new File(absolutePath));
+		model.setSourceFile(Paths.get(absolutePath));
 		instance.read();
 		return instance;
 	}
