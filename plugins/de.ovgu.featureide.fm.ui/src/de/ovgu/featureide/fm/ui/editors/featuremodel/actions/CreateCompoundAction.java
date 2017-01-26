@@ -72,7 +72,6 @@ public class CreateCompoundAction extends Action {
 	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
 		super(CREATE_FEATURE_ABOVE, createImage);
 		this.featureModel = featureModel;
-
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -110,7 +109,7 @@ public class CreateCompoundAction extends Action {
 			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart)
-				feature = ((FeatureEditPart) editPart).getFeature().getObject();
+				feature = ((FeatureEditPart) editPart).getModel().getObject();
 			else
 				feature = (IFeature) editPart;
 
@@ -123,7 +122,7 @@ public class CreateCompoundAction extends Action {
 					return false;
 				}
 			}
-			
+
 			selectedFeatures.add(feature);
 		}
 		return !selectedFeatures.isEmpty();

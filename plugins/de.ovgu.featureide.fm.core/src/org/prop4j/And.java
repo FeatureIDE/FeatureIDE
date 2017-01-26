@@ -40,6 +40,35 @@ public class And extends Node {
 	}
 
 	@Override
+	public boolean isConjunctiveNormalForm() {
+		for (final Node child : children) {
+			if (child instanceof Literal) {
+				continue;
+			}
+			if (!(child instanceof Or)) {
+				return false;
+			}
+			if (!child.isConjunctiveNormalForm()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isClausalNormalForm() {
+		for (final Node child : children) {
+			if (!(child instanceof Or)) {
+				return false;
+			}
+			if (!child.isConjunctiveNormalForm()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
 	protected Node clausify() {
 		for (int i = 0; i < children.length; i++) {
 			children[i] = children[i].clausify();

@@ -68,7 +68,7 @@ public class LegendDragAndDropCommand extends Command {
 		Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
 
 		// check if legend intersects with a feature
-		for (IGraphicalFeature f : model.getFeatures()) {
+		for (IGraphicalFeature f : model.getVisibleFeatures()) {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(f))) {
 				return false;
 			}

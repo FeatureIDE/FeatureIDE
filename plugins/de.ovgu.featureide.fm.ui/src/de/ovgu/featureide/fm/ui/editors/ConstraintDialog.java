@@ -599,7 +599,7 @@ public class ConstraintDialog implements GUIDefaults {
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
 			for (IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
-					op = new EditConstraintOperation(constraint, propNode);
+					op = new EditConstraintOperation(featureModel, c, propNode);
 					break;
 				}
 			}

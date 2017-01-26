@@ -61,7 +61,7 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 			if (selection.size() == 1) {
 				Object editPart = selection.getFirstElement();
 
-				IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature().getObject() : null;
+				IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : null;
 
 				if (feature != null) {
 					updateConstraintActionText(feature.getName());

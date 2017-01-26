@@ -59,8 +59,10 @@ public interface IFeatureStructure {
 	IFeatureStructure getParent();
 
 	Collection<IConstraint> getRelevantConstraints();
-
+	
 	boolean hasChildren();
+	
+	boolean hasVisibleChildren(boolean showHiddenFeatures);
 
 	boolean hasHiddenParent();
 

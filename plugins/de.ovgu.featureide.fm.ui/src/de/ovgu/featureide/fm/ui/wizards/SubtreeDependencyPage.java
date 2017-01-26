@@ -31,10 +31,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.RedundantConstraint;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -133,9 +131,8 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
 		// iterate implicit constraints and generate explanations 
 		for (IConstraint redundantC : getImplicitConstraints()) {
-			List<String> expl = new RedundantConstraint().explain(completeFm, redundantC);
-			subtreeModel.getAnalyser().redundantConstrExpl.put(FeatureUtils.getConstraintIndex(subtreeModel, redundantC), expl);
 			redundantC.setConstraintAttribute(ConstraintAttribute.IMPLICIT, false);
+			subtreeModel.getAnalyser().addRedundantConstraintExplanation(completeFm, redundantC);
 			
 			// remember if an implicit constraint exists to adapt legend 
 			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {

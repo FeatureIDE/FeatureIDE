@@ -119,18 +119,8 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		TrayDialog.setDialogHelpAvailable(false);
 		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		dialog.open();
-		resetExplanations();
+		completeFm.getAnalyser().clearExplanations();
 		return new FeatureIDEEvent(completeFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);
-	}
-
-	/**
-	 * Performs finishing actions when closing the wizard, i.e. set model to analyze back to origin feature model
-	 * and clear maps which hold explanations for defects.
-	 */
-	private void resetExplanations() {
-	completeFm.getAnalyser().deadFeatureExpl.clear();
-	completeFm.getAnalyser().falseOptFeatureExpl.clear();
-	completeFm.getAnalyser().redundantConstrExpl.clear();
 	}
 
 	/**

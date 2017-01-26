@@ -64,7 +64,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 			int y = 0;
 
 			LinkedList<IGraphicalFeature> featureList = new LinkedList<>();
-			featureList.addAll(Functional.toList(graphicalFeatureModel.getFeatures()));
+			featureList.addAll(Functional.toList(graphicalFeatureModel.getVisibleFeatures()));
 
 			for (int i = 0; i < featureList.size(); i++) {
 				if (y < featureList.get(i).getLocation().y) {
