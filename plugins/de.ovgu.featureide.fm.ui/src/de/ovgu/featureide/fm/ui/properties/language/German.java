@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.properties.language;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRAKT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IST_TAUTOLOGIE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EINGEKLAPPT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FALSCH_OPTIONALES_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GEERBT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GERMAN;
@@ -33,7 +34,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ODER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANTES_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNBESTIMMBAR_VERSTECKTES_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VERSTECKT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.EINGEKLAPPT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VON_INTERFACE;
 /**
  * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>

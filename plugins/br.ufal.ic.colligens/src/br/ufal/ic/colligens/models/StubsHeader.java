@@ -38,14 +38,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import tree.Node;
-import util.Type;
-import util.TypeGeneratorVisitor;
 import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.ProjectExplorerController;
 import core.GeneralFrontend;
 import core.presence.condition.PresenceConditionVisitor;
 import de.fosd.typechef.options.OptionException;
+import tree.Node;
+import util.Type;
+import util.TypeGeneratorVisitor;
 
 @SuppressWarnings(RESTRICTION)
 public class StubsHeader extends AbstractHeader {

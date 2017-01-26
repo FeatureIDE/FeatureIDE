@@ -14,9 +14,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import scala.Function3;
-import tree.Node;
-import tree.visitor.VisitorPrinter;
 import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.core.PluginException;
 import br.ufal.ic.colligens.models.FileProxy;
@@ -31,6 +28,9 @@ import de.fosd.typechef.featureexpr.FeatureExpr;
 import de.fosd.typechef.options.FrontendOptions;
 import de.fosd.typechef.options.FrontendOptionsWithConfigFiles;
 import de.fosd.typechef.options.OptionException;
+import scala.Function3;
+import tree.Node;
+import tree.visitor.VisitorPrinter;
 
 public class PresenceConditionController {
 	private IFile file = null;

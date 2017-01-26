@@ -1,11 +1,11 @@
 package br.ufal.ic.colligens.models;
 
-import scala.Function1;
-import scala.Function3;
-import scala.Tuple3;
 import br.ufal.ic.colligens.util.Log;
 import de.fosd.typechef.error.Position;
 import de.fosd.typechef.featureexpr.FeatureExpr;
+import scala.Function1;
+import scala.Function3;
+import scala.Tuple3;
 
 public class RenderParserError implements
 		Function3<FeatureExpr, String, Position, Object> {
