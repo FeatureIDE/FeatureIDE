@@ -20,18 +20,6 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import jampack.AST_Modifiers;
-import jampack.AST_ParList;
-import jampack.AST_Program;
-import jampack.AST_TypeName;
-import jampack.AstCursor;
-import jampack.AstNode;
-import jampack.AstToken;
-import jampack.DecNameDim;
-import jampack.FldVarDec;
-import jampack.MethodDcl;
-import jampack.MthDector;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,6 +31,17 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import jampack.AST_Modifiers;
+import jampack.AST_ParList;
+import jampack.AST_Program;
+import jampack.AST_TypeName;
+import jampack.AstCursor;
+import jampack.AstNode;
+import jampack.AstToken;
+import jampack.DecNameDim;
+import jampack.FldVarDec;
+import jampack.MethodDcl;
+import jampack.MthDector;
 
 /**
  * This builder builds the JakProjectModel, by extracting features, 

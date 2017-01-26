@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -99,7 +99,7 @@ public class FeatureModel implements IFeatureModel {
 	protected final IFeatureModelStructure structure;
 
 	protected Object undoContext = null;
-	private File sourceFile;
+	private Path sourceFile;
 
 	public FeatureModel(String factoryID) {
 		this.factoryID = factoryID;
@@ -492,7 +492,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public void setSourceFile(File file) {
+	public void setSourceFile(Path file) {
 		this.sourceFile = file;
 		if (file != null) {
 			id = ModelFileIdMap.getModelId(this, file);
@@ -500,7 +500,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public File getSourceFile() {
+	public Path getSourceFile() {
 		return this.sourceFile;
 	}
 

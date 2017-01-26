@@ -21,6 +21,7 @@
 package de.ovgu.featureide.core.images.activator;
 
 import org.osgi.framework.BundleContext;
+
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 /**

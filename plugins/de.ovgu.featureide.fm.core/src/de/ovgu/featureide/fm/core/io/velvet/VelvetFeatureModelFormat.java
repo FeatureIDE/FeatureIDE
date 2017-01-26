@@ -327,7 +327,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		final ProblemList problemList = new ProblemList();
 		extFeatureModel = (ExtendedFeatureModel) object;
 		if (extFeatureModel != null) {
-			featureModelFile = extFeatureModel.getSourceFile();
+			featureModelFile = extFeatureModel.getSourceFile().toFile();
 		}
 
 		ByteArrayInputStream inputstr = new ByteArrayInputStream(source.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
@@ -597,7 +597,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private IFeatureModel readExternalModelFileAPI(File file) {
 		final IFeatureModel fm = new ExtendedFeatureModelFactory().createFeatureModel();
-		fm.setSourceFile(file);
+		fm.setSourceFile(file.toPath());
 		FileHandler.load(file.toPath(), fm, FMFormatManager.getInstance());
 		return fm;
 	}
