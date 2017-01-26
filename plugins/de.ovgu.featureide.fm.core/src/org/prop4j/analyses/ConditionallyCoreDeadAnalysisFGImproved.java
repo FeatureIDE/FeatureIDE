@@ -166,7 +166,7 @@ public class ConditionallyCoreDeadAnalysisFGImproved extends AConditionallyCoreD
 
 	@Override
 	public String toString() {
-		return "FG_Improved";
+		return "OFG_Improved";
 	}
 
 }

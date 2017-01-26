@@ -113,7 +113,7 @@ public class ConditionallyCoreDeadAnalysisFGNaive3 extends AConditionallyCoreDea
 
 	@Override
 	public String toString() {
-		return "FG_Naive    ";
+		return "FG_LNaive   ";
 	}
 
 }
