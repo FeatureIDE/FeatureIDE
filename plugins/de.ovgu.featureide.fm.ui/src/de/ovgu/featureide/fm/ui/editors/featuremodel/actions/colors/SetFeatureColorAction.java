@@ -89,6 +89,10 @@ public class SetFeatureColorAction extends Action {
 
 	public boolean isSelectionValid(IStructuredSelection selection) {
 		for (Object object : selection.toList()) {
+			if(object instanceof IFeature)
+			{
+				return true;
+			}
 			if(!(object instanceof FeatureEditPart))
 			{
 				return false;

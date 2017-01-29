@@ -468,7 +468,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
 		boolean mplModel = false;
-		
+
 		if (getFeatureModel() instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel ext = (ExtendedFeatureModel) getFeatureModel();
 			mplModel = ext.isMultiProductLineModel();
@@ -509,26 +509,28 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(legendAction);
 		} else if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
 			connectionEntrys(menu);
-		}else{		
+		} else {
 			menu.add(createConstraintAction);
 			menu.add(new Separator());
 			menu.add(subMenuLayout);
 			menu.add(subMenuCalculations);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
-			menu.add(legendAction);				
+			menu.add(legendAction);
 		}
-	
+
 		boolean isEmpty = true;
-		for(Object obj : ((StructuredSelection) getSelection()).toArray())
-			if(obj instanceof FeatureEditPart) isEmpty = false;
-		if(!isEmpty){
+		for (Object obj : ((StructuredSelection) getSelection()).toArray()) {
+			if (obj instanceof FeatureEditPart || obj instanceof IFeature)
+			{
+				isEmpty = false;
+			}
+		}
+		if (!isEmpty) {
 			menu.add(new Separator());
 			menu.add(colorSelectedFeatureAction);
 		}
-	
-		
-		
+
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
