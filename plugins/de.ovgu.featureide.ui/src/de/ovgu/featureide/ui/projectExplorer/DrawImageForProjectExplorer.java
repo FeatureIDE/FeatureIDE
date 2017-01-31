@@ -216,6 +216,7 @@ public class DrawImageForProjectExplorer {
 		Image finalImage = new Image(DEVICE, FOLDER_IMAGE.getImageData().width + COLOR_IMAGE_WIDTH + 3, FOLDER_IMAGE.getImageData().height);
 		GC gc = new GC(finalImage);
 		gc.drawImage(FOLDER_IMAGE, 0, 0);
+		if(WHITESPACE_IMAGE == null) init();
 		if (colors.get(0).equals(-1)) {
 			gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH + 2, 0);
 		} else {

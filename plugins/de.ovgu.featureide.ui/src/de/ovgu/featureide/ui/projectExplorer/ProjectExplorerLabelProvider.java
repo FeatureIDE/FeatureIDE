@@ -352,7 +352,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 						
 						//folder inSourceFolder but not SourceFolder itself
 						if (isInSourceFolder(folder) && folder.getParent().equals(featureProject.getSourceFolder())) {							
-							return folder.getName();
+							return " " + folder.getName();
 						}
 					}
 				} else if (isInBuildFolder(res) || isInSourceFolder(res)) {					
