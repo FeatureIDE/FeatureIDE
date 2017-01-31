@@ -86,6 +86,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
@@ -238,6 +239,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createControl(container);
 		initializeGraphicalViewer();
 
+		FeatureColorManager.addListener(this);
+		
 		if (isEditable) {
 			setEditDomain(new DefaultEditDomain(featureModelEditor));
 		}
@@ -350,6 +353,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		deleteAction = new DeleteAction(this, featureModel);
 
 		colorSelectedFeatureAction = new SetFeatureColorAction(this, getFeatureModel());
+		colorSelectedFeatureAction.setEnableUndoRedo(true);
 
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
@@ -1081,6 +1085,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		if (analyzeJob != null) {
 			analyzeJob.cancel();
 		}
+		FeatureColorManager.removeListener(this);
 		featureModelEditor.fmManager.removeListener(this);
 		graphicalFeatureModel.getFeatureModel().removeListener(editorKeyHandler);
 	}

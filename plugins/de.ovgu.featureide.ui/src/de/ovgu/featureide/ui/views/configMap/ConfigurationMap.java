@@ -61,9 +61,12 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.listeners.IConfigurationChangedListener;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
 import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
@@ -87,7 +90,7 @@ import de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionL
  * @author Antje Moench
  */
 
-public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSelectionListener {
+public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSelectionListener, IEventListener {
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.configMap";
 
 	private int featureColumnWidth, defaultColumnWidth;
@@ -185,6 +188,8 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		this.loader = new ConfigurationLoader(configLoaderCallback);
 		this.configurationColumns = new ArrayList<>();
 		this.configPaths = new HashMap<>();
+
+		FeatureColorManager.addListener(this);
 
 		this.filters = new ArrayList<>();
 		createFilters();
@@ -291,15 +296,10 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		page.addPartListener(this.partListener);
 
 		setEditor(page.getActiveEditor());
-
+		
 		setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
-		setFeatureColor.addColorChangedListener(new IEventListener() {
-			@Override
-			public void propertyChange(FeatureIDEEvent event) {
-				if (event.getEventType() == FeatureIDEEvent.EventType.COLOR_CHANGED)
-					updateTree();
-			}
-		});
+		
+		
 
 		CorePlugin.getDefault().addConfigurationChangedListener(new IConfigurationChangedListener() {
 			@Override
@@ -399,9 +399,6 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			fillHeaderMenu(menuMgr);
 
 		boolean isNotEmpty = !tree.getSelection().isEmpty();
-		setFeatureColor.setFeatureModel(featureProject.getFeatureModel());
-
-		setFeatureColor.setEnabled(isNotEmpty);
 		menuMgr.add(setFeatureColor);
 
 	}
@@ -590,11 +587,28 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	 */
 	@Override
 	public void dispose() {
+		FeatureColorManager.removeListener(this);
 		IWorkbenchPage page = getSite().getPage();
 		page.removePartListener(this.partListener);
 		header.removeColumnSelectionListener(this);
 		header.dispose();
 		columnHighlightColor.dispose();
 		super.dispose();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
+	 */
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		final EventType prop = event.getEventType();
+		switch (prop) {
+		case COLOR_CHANGED:
+			updateTree();
+			break;
+		default:
+			break;
+		}
+
 	}
 }

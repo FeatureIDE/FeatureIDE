@@ -16,7 +16,8 @@ Require-Bundle:
  org.eclipse.gef,
  org.eclipse.core.expressions,
  de.ovgu.featureide.fm.core,
- org.eclipse.jface
+ org.eclipse.jface,
+ org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
 Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors;

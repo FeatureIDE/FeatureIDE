@@ -70,7 +70,10 @@ import de.ovgu.featureide.fm.core.annotation.LogService;
 import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * Assigns color annotations to the editor.
@@ -102,6 +105,12 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private int openConnections = 0;
 	private int docLines, docLength;
 
+	private IEventListener colorChangeListener = new IEventListener() {
+		@Override
+		public void propertyChange(FeatureIDEEvent event) {
+			updateAnnotations(true);
+		}
+	};
 	private IDocumentListener documentListener = new IDocumentListener() {
 		@Override
 		public void documentChanged(DocumentEvent event) {
@@ -129,6 +138,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		docLines = document.getNumberOfLines();
 		docLength = document.getLength();
 
+		FeatureColorManager.addListener(colorChangeListener);
+		
 		updateAnnotations(true);
 
 		editor.addPropertyListener(new IPropertyListener() {
@@ -729,6 +740,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		if (--openConnections == 0) {
 			document.removeDocumentListener(documentListener);
 		}
+		FeatureColorManager.removeListener(colorChangeListener);
 	}
 
 	/**

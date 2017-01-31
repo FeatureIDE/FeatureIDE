@@ -28,8 +28,12 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.jface.action.Action;
@@ -47,10 +51,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -78,23 +80,23 @@ public class SetFeatureColorAction extends Action {
 	protected List<IFeature> featureList = new ArrayList<>();
 	private IFeatureModel featureModel;
 
+	private boolean undoRedoEnabled = false;
+
 	private ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isSelectionValid(selection));
-			if(isEnabled())
-			updateFeatureList(selection);
+			if (isEnabled())
+				updateFeatureList(selection);
 		}
 	};
 
 	public boolean isSelectionValid(IStructuredSelection selection) {
 		for (Object object : selection.toList()) {
-			if(object instanceof IFeature)
-			{
+			if (object instanceof IFeature) {
 				return true;
 			}
-			if(!(object instanceof FeatureEditPart))
-			{
+			if (!(object instanceof FeatureEditPart)) {
 				return false;
 			}
 		}
@@ -146,16 +148,8 @@ public class SetFeatureColorAction extends Action {
 		this.featureModel = featureModel;
 	}
 
-	public boolean addColorChangedListener(IEventListener eventListener) {
-		if (colorChangedListeners == null)
-			colorChangedListeners = new ArrayList<>();
-		return colorChangedListeners.add(eventListener);
-	}
-
-	public boolean removeColorChangedListener(IEventListener eventListener) {
-		if (colorChangedListeners != null)
-			return colorChangedListeners.remove(eventListener);
-		return false;
+	public void setEnableUndoRedo(boolean set) {
+		this.undoRedoEnabled = set;
 	}
 
 	/**
@@ -219,18 +213,10 @@ public class SetFeatureColorAction extends Action {
 				selectedColor = FeatureColorManager.getColor(selectedFeature);
 			}
 
-			SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, features, selectedColor);
+			SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, features, selectedColor, undoRedoEnabled);
 
 			// inform ui to update
 			if (dialog.open() == Window.OK) {
-				FeatureIDEEvent colorChangedEvent = new FeatureIDEEvent(dialog.getRecoloredFeatures(), FeatureIDEEvent.EventType.COLOR_CHANGED);
-				featureModel.fireEvent(colorChangedEvent);
-				if (colorChangedListeners != null) {
-					for (IEventListener eventListener : colorChangedListeners) {
-						eventListener.propertyChange(colorChangedEvent);
-					}
-				}
-
 				try {
 					IPath modelPath = new Path(featureModel.getSourceFile().getCanonicalPath());
 					IPath rootPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
@@ -241,6 +227,15 @@ public class SetFeatureColorAction extends Action {
 					CorePlugin.getDefault().fireFeatureFolderChanged(folder);
 				} catch (IOException e) {
 					e.printStackTrace();
+				}
+
+				for (IProject ip : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+					try {
+						ip.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}

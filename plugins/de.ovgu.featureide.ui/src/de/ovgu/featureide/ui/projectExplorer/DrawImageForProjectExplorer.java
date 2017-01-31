@@ -100,8 +100,8 @@ public class DrawImageForProjectExplorer {
 		gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
 		gc.setBackground(new Color(DEVICE, 255, 255, 254));// use 255 for trancparency
 		gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
-		gc.dispose();
 		WHITESPACE_IMAGE = finalImage;
+		gc.dispose();
 		
 		for (int i = 0; i < NUMBER_OF_COLORS; i++) {
 			finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);

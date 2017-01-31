@@ -89,6 +89,8 @@ public class SetFeatureColorDialog extends Dialog {
 	private Table featureTable;
 	private Combo colorDropDownMenu;
 
+	private boolean enableUndoRedo = false;
+
 	/**
 	 * @param parentShell
 	 * @param featurelist
@@ -102,6 +104,11 @@ public class SetFeatureColorDialog extends Dialog {
 		this.featureList = featurelist;
 		this.initialSelectedColor = selectedColor;
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
+	}
+
+	protected SetFeatureColorDialog(Shell parentShell, List<IFeature> featurelist, FeatureColor selectedColor, boolean enableUndoRedo) {
+		this(parentShell, featurelist, selectedColor);
+		this.enableUndoRedo = enableUndoRedo;
 	}
 
 	/**
@@ -122,7 +129,7 @@ public class SetFeatureColorDialog extends Dialog {
 
 	/**
 	 * Creates the general layout of the dialog.
-
+	 * 
 	 * @param parent
 	 */
 	protected Control createDialogArea(Composite parent) {
@@ -207,13 +214,13 @@ public class SetFeatureColorDialog extends Dialog {
 
 			private void findSiblings() {
 				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
-					for (IFeature feature : featureListBuffer) {
-						if (!feature.getStructure().isRoot()) {
-							for (IFeatureStructure featureStructure : feature.getStructure().getParent().getChildren()) {
-								affectedFeatures.add(featureStructure.getFeature());
-							}
+				for (IFeature feature : featureListBuffer) {
+					if (!feature.getStructure().isRoot()) {
+						for (IFeatureStructure featureStructure : feature.getStructure().getParent().getChildren()) {
+							affectedFeatures.add(featureStructure.getFeature());
 						}
 					}
+				}
 				featureListBuffer = affectedFeatures;
 			}
 
@@ -299,7 +306,7 @@ public class SetFeatureColorDialog extends Dialog {
 		for (int i = 0; i < featureListBuffer.size(); i++) {
 			TableItem item = new TableItem(featureTable, SWT.NONE);
 			item.setText(featureListBuffer.get(i).getName());
-			
+
 			FeatureColor color = FeatureColor.getColor(colorDropDownMenu.getText());
 			item.setBackground(getItemColorFor(color));
 		}
@@ -316,19 +323,23 @@ public class SetFeatureColorDialog extends Dialog {
 	protected void okPressed() {
 		SetFeatureColorOperation op = new SetFeatureColorOperation(featureListBuffer.get(0).getFeatureModel(), featureListBuffer, newColor);
 
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
+		if (enableUndoRedo) {
+			try {
+				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+			} catch (ExecutionException e) {
+				op.redo();
+			}
+		} else {
+			op.redo();
 		}
+
 		super.okPressed();
 	}
-	
+
 	public List<IFeature> getRecoloredFeatures() {
 		return featureListBuffer;
 	}
-	
+
 	private Color getItemColorFor(FeatureColor featureColor) {
 		return featureColor == FeatureColor.NO_COLOR ? WHITE : featureColor.toSwtColor();
 	}

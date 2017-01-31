@@ -101,6 +101,7 @@ import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
@@ -438,6 +439,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	public Outline() {
 		super();
 		CorePlugin.getDefault().addCurrentBuildListener(this);
+		FeatureColorManager.addListener(colorChangedListener);
 	}
 
 	/**
@@ -567,6 +569,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 			@Override
 			public void dispose() {
+				FeatureColorManager.removeListener(colorChangedListener);
 				if (fMenu != null) {
 					fMenu.dispose();
 				}
@@ -626,7 +629,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 													}
 													contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
 															((FeatureModelEditor) active_editor).getFeatureModel());
-													contextMenu.getSetFeatureAction().addColorChangedListener(colorChangedListener);
 												}
 
 											} else {

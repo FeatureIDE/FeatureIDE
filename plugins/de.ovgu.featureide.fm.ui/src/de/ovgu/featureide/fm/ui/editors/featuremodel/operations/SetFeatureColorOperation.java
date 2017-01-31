@@ -64,6 +64,7 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation{
 			final IFeature feature = features.get(i);
 			FeatureColorManager.setColor(feature, newColor);
 		}
+		FeatureColorManager.notifyColorChange(features);
 		return new FeatureIDEEvent(features, EventType.COLOR_CHANGED);
 	}
 
@@ -76,6 +77,7 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation{
 			final IFeature feature = features.get(i);
 			FeatureColorManager.setColor(feature, oldColor.get(i));
 		}
+		FeatureColorManager.notifyColorChange(features);
 		return new FeatureIDEEvent(features, EventType.COLOR_CHANGED);
 	}
 

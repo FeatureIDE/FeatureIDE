@@ -154,14 +154,6 @@ public class FmOutlinePageContextMenu {
 
 	private void initActions() {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, getFeatureModel());
-		setFeatureColorAction.addColorChangedListener(new IEventListener() {
-
-			@Override
-			public void propertyChange(FeatureIDEEvent event) {
-				viewer.refresh();
-			}
-
-		});
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
 		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());

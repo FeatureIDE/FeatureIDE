@@ -122,6 +122,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -283,14 +284,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	private void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
-			if (this.featureProject != null)
-				this.featureModel.removeListener(colorChangeListener);
-
 			this.featureProject = featureProject;
 
 			if (this.featureProject != null) {
 				this.featureModel = this.featureProject.getFeatureModel();
-				this.featureModel.addListener(colorChangeListener);
 				this.setFeatureColourAction.setFeatureModel(this.featureModel);
 			}
 		}
@@ -428,6 +425,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		makeActions();
 		contributeToActionBars();
 
+		//Add to color CHange Listener
+		FeatureColorManager.addListener(colorChangeListener);
+		
 		CollaborationViewSearch.Builder builder = new CollaborationViewSearch.Builder();
 		search = builder.setAttachedViewerParent(viewer).setSearchBoxText(SEARCH_IN_COLLABORATION_DIAGRAM).setFindResultsColor(ROLE_BACKGROUND_SELECTED)
 				.setNoSearchResultsColor(ROLE_BACKGROUND_UNSELECTED).create();
@@ -890,5 +890,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	public void refreshAll() {
 		refreshButton.run();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+		FeatureColorManager.removeListener(colorChangeListener);
+		super.dispose();
 	}
 }
