@@ -48,6 +48,8 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
@@ -101,7 +103,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		label.setFont(DEFAULT_FONT);
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
-		
+
 		String displayName = feature.getObject().getName();
 		if (featureModel.getLayout().showShortNames()) {
 			int lastIndexOf = displayName.lastIndexOf(".");
@@ -138,7 +140,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		IFeature feature = this.feature.getObject();
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
-		
+
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
 			// only color if the active profile is not the default profile
 			FeatureColor color = FeatureColorManager.getColor(feature);
@@ -153,7 +155,16 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 				}
 			}
 		} else {
-			if (feature.getStructure().isRoot() && !analyser.valid()) {
+			if (!analyser.valid()) {
+				if (getFeature().getObject().getStructure().isRoot()) {
+					for (IGraphicalFeature gFeature : getFeature().getGraphicalModel().getFeatures()) {
+						if (gFeature.getObject().getStructure().isRoot()) {
+							continue;
+						}
+						gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+						gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+					}
+				}
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 				toolTip.append(VOID);
@@ -210,7 +221,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 				setBorder(FMPropertyManager.getInterfacedFeatureBorder());
 			}
 		}
-		
+
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
@@ -314,7 +325,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
 	}
-	
+
 	@Override
 	public ModelFigure getParent() {
 		return (ModelFigure) super.getParent();
