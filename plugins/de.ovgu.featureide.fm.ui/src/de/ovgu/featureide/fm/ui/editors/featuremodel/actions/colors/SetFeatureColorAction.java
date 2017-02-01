@@ -90,19 +90,6 @@ public class SetFeatureColorAction extends Action {
 				updateFeatureList(selection);
 		}
 	};
-
-	public boolean isSelectionValid(IStructuredSelection selection) {
-		for (Object object : selection.toList()) {
-			if (object instanceof IFeature) {
-				return true;
-			}
-			if (!(object instanceof FeatureEditPart)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	/**
 	 * @param viewer
 	 */
@@ -150,6 +137,24 @@ public class SetFeatureColorAction extends Action {
 
 	public void setEnableUndoRedo(boolean set) {
 		this.undoRedoEnabled = set;
+	}
+
+	protected boolean isSelectionValid(IStructuredSelection selection) {
+		for (Object object : selection.toList()) {
+			if (object instanceof IFeature) {
+				continue;
+			} else if (object instanceof AbstractGraphicalEditPart) {
+				AbstractGraphicalEditPart agep = (AbstractGraphicalEditPart) object;
+				IFeature feature = featureModel.getFeature(agep.getModel().toString());
+				if (feature != null)
+					continue;
+			} else if (object instanceof FeatureEditPart) {
+				continue;
+			} else {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
