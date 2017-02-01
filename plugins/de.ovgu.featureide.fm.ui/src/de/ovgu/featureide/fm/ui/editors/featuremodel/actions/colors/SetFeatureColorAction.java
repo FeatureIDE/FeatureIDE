@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -228,19 +229,13 @@ public class SetFeatureColorAction extends Action {
 					IPath relPath = modelPath.makeRelativeTo(rootPath);
 
 					IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(relPath);
-					IFolder folder = CorePlugin.getFeatureProject(file).getSourceFolder();
-					CorePlugin.getDefault().fireFeatureFolderChanged(folder);
+					IFeatureProject project = CorePlugin.getFeatureProject(file);
+					project.getProject().touch(null);
+					project.getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 				} catch (IOException e) {
 					e.printStackTrace();
-				}
-
-				for (IProject ip : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-					try {
-						ip.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-					} catch (CoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				} catch (CoreException e) {
+					e.printStackTrace();
 				}
 			}
 		}
