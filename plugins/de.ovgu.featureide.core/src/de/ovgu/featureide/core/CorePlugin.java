@@ -363,7 +363,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * after adding the FeatureIDE nature to a project.
 	 */
 	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath) {
-		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false);
+		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false);
 
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
 		try {
@@ -378,7 +378,8 @@ public class CorePlugin extends AbstractCorePlugin {
 							}
 
 							public void run() throws Exception {
-								runProjectConversion(project, sourcePath, configPath, buildPath, (IComposerExtensionClass) o);
+								runProjectConversion(project, sourcePath, configPath, buildPath, (IComposerExtensionClass) o);	
+								addFeatureNatureToProject(project);							
 							}
 						};
 						SafeRunner.run(runnable);
@@ -389,7 +390,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		} catch (CoreException e) {
 			getDefault().logError(e);
 		}
-
 	}
 
 	/**
@@ -443,6 +443,7 @@ public class CorePlugin extends AbstractCorePlugin {
 				fw.close();
 			}
 		}
+
 	}
 
 	/**
@@ -455,7 +456,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param addCompiler <code>false</code> if the project already has a compiler
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addCompiler) {
+			final String buildPath, boolean addCompiler, boolean addNature) {
 		createProjectStructure(project, sourcePath, configPath, buildPath);
 
 		if (addCompiler) {
@@ -497,7 +498,10 @@ public class CorePlugin extends AbstractCorePlugin {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
 		}
-		addFeatureNatureToProject(project);
+		if(addNature)
+		{
+			addFeatureNatureToProject(project);
+		}
 	}
 
 	private static void addFeatureNatureToProject(IProject project) {
