@@ -19,7 +19,7 @@ public class SimulationUnit {
 		sim.start(5);
 	}
 	
-	private MainWindow createMainWindow(SimulationUnit sim) {
+	private static MainWindow createMainWindow(SimulationUnit sim) {
 		return new MainWindow();
 	}
 	
