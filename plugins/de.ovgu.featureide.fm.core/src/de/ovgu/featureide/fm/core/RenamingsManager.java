@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,9 +108,8 @@ public class RenamingsManager implements IEventManager {
 		renamings.clear();
 	};
 
-	public void performRenamings(File file) {
-		final String location = file.getPath();
-		performRenamings(location);
+	public void performRenamings(java.nio.file.Path file) {
+		performRenamings(file.toString());
 	}
 
 	private void performRenamings(final String location) {

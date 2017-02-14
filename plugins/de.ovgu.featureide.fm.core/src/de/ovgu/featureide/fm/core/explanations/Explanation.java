@@ -31,7 +31,6 @@ import org.prop4j.Literal;
 import org.prop4j.Literal.FeatureAttribute;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -312,7 +311,8 @@ public class Explanation implements Cloneable {
 	 */
 	protected void addReason(Reason reason, int count) {
 		reason = new Reason(reason.getClause(), reason.getLiteral());
-		reasonCounts.put(reason, reasonCounts.getOrDefault(reason, 0) + count);
+		final Integer reasonCount = reasonCounts.get(reason);
+		reasonCounts.put(reason, (reasonCount == null ? 0 : reasonCount) + count);
 	}
 	
 	/**
@@ -340,7 +340,10 @@ public class Explanation implements Cloneable {
 	 */
 	public void addUniqueReason(Reason reason) {
 		reason = new Reason(reason.getClause(), reason.getLiteral());
-		reasonCounts.putIfAbsent(reason, 1);
+		final Integer value = reasonCounts.get(reason);
+		if (value == null) {
+			reasonCounts.put(reason, 1);
+		}
 	}
 	
 	/**
