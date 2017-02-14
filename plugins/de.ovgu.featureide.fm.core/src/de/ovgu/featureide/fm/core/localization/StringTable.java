@@ -745,9 +745,9 @@ public class StringTable {
 	public static final String PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT = "Please open a file from a FeatureIDE project";
 	public static final String STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String STATISTICS_OF_PRODUCT_LINE_SPECIFICATION = "Statistics of product-line specification";
-	public static final String VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL = "Valid configurations of the feature model";
+	public static final String SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL = "Semantical statistics";
 	public static final String ATOMIC_SETS_OF_THE_FEATURE_MODEL = "Number of atomic sets";
-	public static final String FEATURE_STATISTICS = "Feature statistics";
+	public static final String SYNTACTICAL_STATISTICS_OF_THE_FEATURE_MODEL = "Syntactical statistics";
 	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
 	public static final String NUMBER_OF_FEATURES = "Number of features";
 	public static final String NUMBER_OF_CONCRETE_FEATURES = "Number of concrete features";
