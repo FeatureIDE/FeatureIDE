@@ -223,23 +223,18 @@ public class SetFeatureColorAction extends Action {
 
 			// inform ui to update
 			if (dialog.open() == Window.OK) {
-				//TODO SPREY 
-				/*
 				try {
-					java.nio.file.Path modelPath = featureModel.getSourceFile().getFileName();
-					IPath rootPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
-					IPath relPath = modelPath.makeRelativeTo(rootPath);
-
-					IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(relPath);
-					IFeatureProject project = CorePlugin.getFeatureProject(file);
-					project.getProject().touch(null);
-					project.getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-				} catch (IOException e) {
-					e.printStackTrace();
+					for(IFeatureProject p : CorePlugin.getFeatureProjects())
+					{
+						if(p.getFeatureModel().getId() == featureModel.getId())
+						{
+							p.getProject().touch(null);
+							p.getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+						}
+					}
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
-				*/
 			}
 		}
 	}
