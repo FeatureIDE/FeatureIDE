@@ -44,7 +44,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	private final Map<IFeatureProject, IComposerExtensionClass> projectComposerMap;
 	private IComposerExtensionClass defaultComposerExtensionClass;
 
-	public ComposerExtensionProxy(IConfigurationElement configurationElement) {
+	public ComposerExtensionProxy(IConfigurationElement configurationElement) throws Exception {
 		this.configElement = configurationElement;
 		name = configElement.getAttribute("name");
 		id = configElement.getAttribute("id");
@@ -54,6 +54,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 			defaultComposerExtensionClass = (IComposerExtensionClass) configElement.createExecutableExtension("class");
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
+			throw e;
 		}
 	}
 

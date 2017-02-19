@@ -195,8 +195,12 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labels.add(labelAlgorithm);
 		comboAlgorithm = new Combo(groupDeriveConf, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		comboAlgorithm.setLayoutData(gd_Fill_H);
+		
 		for (TWise tWise : TWise.values()) {
-			comboAlgorithm.add(getTWiseText(tWise));
+			final String tWiseText = getTWiseText(tWise);
+			if (tWiseText != null) {
+				comboAlgorithm.add(tWiseText);
+			}
 		}
 		comboAlgorithm.setText(algorithm);
 		comboAlgorithm.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS));
@@ -330,7 +334,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private String getTWiseText(TWise tWise) {
 		switch (tWise) {
 		case CASA:
-			return CASA;
+			final boolean windowsOS = System.getProperty("os.name").startsWith("Windows");
+			return windowsOS ? CASA : null;
 		case CHVATAL:
 			return CHVATAL;
 		case ICPL:

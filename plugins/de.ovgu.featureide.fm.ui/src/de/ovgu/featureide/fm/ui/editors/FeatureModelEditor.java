@@ -112,7 +112,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	public FeatureOrderEditor featureOrderEditor;
 	public FeatureModelTextEditorPage textEditor;
 
-	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<IFeatureModelEditorPage>();
+	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<>();
 	public IFeatureModel featureModel;
 
 	ModelMarkerHandler<IFile> markerHandler;
@@ -137,7 +137,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			manager = FMFactoryManager.getFactory(markerHandler.getModelFile().getLocation().toString(), fmManager.getFormat());
 		} catch (NoSuchExtensionException e) {
 			FMUIPlugin.getDefault().logError(e);
-			manager = FMFactoryManager.getFactory();
+			manager = FMFactoryManager.getDefaultFactory();
 		}
 		final ProblemList warnings = fmManager.getFormat().getInstance().read(manager.createFeatureModel(), source);
 		createModelFileMarkers(warnings);
@@ -169,6 +169,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return;
 		}
 
+		diagramEditor.doSave(monitor);
 		featureOrderEditor.doSave(monitor);
 		featureModel.getRenamingsManager().performRenamings(featureModel.getSourceFile());
 		for (IFeatureModelEditorPage page : extensionPages) {

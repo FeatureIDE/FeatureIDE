@@ -82,7 +82,6 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -95,7 +94,6 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import fuji.CompilerWarningException;
-import fuji.Composition;
 import fuji.CompositionErrorException;
 import fuji.FeatureDirNotFoundException;
 import fuji.Main;
@@ -371,7 +369,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
-		final String configPath = config.getRawLocation().toOSString();
+		final String configPath = createTemporaryConfigrationsFile(config).getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
 
@@ -731,14 +729,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				"-typechecker", "-basedir", sourcePath };
 		Program ast = null;
 		try {
-			IFeatureModel fm = featureProject.getFeatureModel();
+			final IFeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
-			@SuppressWarnings("deprecation")
-			Main fuji = new Main(fujiOptions, new de.ovgu.featureide.fm.core.FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
-			
-			Composition composition = fuji.getComposition(fuji);
-			ast = composition.composeAST();
+			final Main fuji = new Main(fujiOptions, fm, null);
+
+			ast = fuji.getComposition(fuji).composeAST();
+			ast.setCmd(fuji.getCmd());
 
 			// run type check
 			fuji.typecheckAST(ast);
@@ -861,7 +858,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
-		List<String> featureOrder = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
+		List<String> featureOrder = featureProject.getFeatureModel().getFeatureOrderList();
 		String[] features = new String[featureOrder.size()];
 		int i = 0;
 		for (String f : featureOrder) {
@@ -999,7 +996,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final String configPath;
 		IFile currentConfiguration = featureProject.getCurrentConfiguration();
 		if (currentConfiguration != null) {
-			configPath = currentConfiguration.getRawLocation().toOSString();
+			configPath = createTemporaryConfigrationsFile(currentConfiguration).getRawLocation().toOSString();
 		} else {
 			configPath = featureProject.getProject().getFile(".project").getRawLocation().toOSString();
 		}
@@ -1012,7 +1009,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
 
-		List<String> featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
+		List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
 		String[] features = new String[featureOrderList.size()];
 		int i = 0;
 		for (String f : featureOrderList) {
@@ -1041,7 +1038,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
-		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
+		composer.run(getArguments(createTemporaryConfigrationsFile(configurationFile).getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
 		if (errorPropagation != null && errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, because the

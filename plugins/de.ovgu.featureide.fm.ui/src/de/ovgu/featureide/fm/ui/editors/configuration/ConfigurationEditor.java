@@ -70,6 +70,7 @@ import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -118,6 +119,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private boolean autoSelectFeatures = false;
 
 	public boolean invalidFeatureModel = true;
+
+	private boolean containsError = true;
 
 	/**
 	 * The file of the corresponding feature model.
@@ -260,7 +263,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		featureModelManager.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		getExtensions();
-
+		
 		if (lastProblems.containsError()) {
 			setActivePage(2);
 		} else {
@@ -390,6 +393,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		LongRunningWrapper.runMethod(configuration.getPropagator().resolve());
 
 		configurationManager.setConfiguration(configuration);
+		setContainsError(configurationManager.getLastProblems().containsError());
 
 		// Reinitialize the pages
 		final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
@@ -408,6 +412,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 		for (IConfigurationEditorPage page : extensionPages) {
 			initPage(page).propertyChange(null);
+		}
+
+		if (containsError()) {
+			setActivePage(2);
 		}
 	}
 
@@ -606,6 +614,25 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		ConfigurationMatrix matrix = new ConfigurationMatrix(featureModelManager.getObject(), Paths.get(file.getParent().getLocationURI()));
 		matrix.readConfigurations(file.getName());
 		return matrix;
+	}
+	
+	public ProblemList checkSource(CharSequence source) {
+		final Configuration configuration = getConfiguration();
+		final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
+
+		final ProblemList problems = confFormat.getInstance().read(configuration, source);
+		createModelFileMarkers(problems);
+		setContainsError(problems.containsError());
+
+		return problems;
+	}
+
+	public boolean containsError() {
+		return containsError;
+	}
+
+	private void setContainsError(boolean containsError) {
+		this.containsError = containsError;
 	}
 
 }

@@ -35,11 +35,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
  */
 public class SelectionWrapper<T> {
 
-	public static Object checkClass(Object element, Class<?> classType) {
+	public static <R> R checkClass(Object element, Class<R> classType) {
 		if (element.getClass() == classType) {
-			return element;
+			return classType.cast(element);
 		} else if (element instanceof IAdaptable) {
-			return ((IAdaptable) element).getAdapter(classType);
+			return (R)((IAdaptable) element).getAdapter(classType);
 		}
 		return null;
 	}
@@ -59,8 +59,7 @@ public class SelectionWrapper<T> {
 	@CheckForNull
 	public T getNext() {
 		while (it.hasNext()) {
-			@SuppressWarnings("unchecked")
-			final T element = (T) checkClass(it.next(), type);
+			final T element = checkClass(it.next(), type);
 			if (element != null) {
 				return element;
 			}

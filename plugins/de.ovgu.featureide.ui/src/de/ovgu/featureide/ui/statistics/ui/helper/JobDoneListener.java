@@ -39,7 +39,6 @@ import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent.StatisticTreeJob;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
-import de.ovgu.featureide.ui.statistics.ui.helper.jobs.ITreeJob;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 /**
@@ -96,8 +95,8 @@ public class JobDoneListener implements IJobChangeListener {
 			UIJob refreshJob = new UIJob(REFRESH_STATISTICS_VIEW) {
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					Job job = event.getJob();
-					if (job instanceof ITreeJob) {
+					final Job job = event.getJob();
+					if (job instanceof LongRunningJob) {
 						final LongRunningJob<?> treeJob = (LongRunningJob<?>) job;
 						LongRunningMethod<?> method = treeJob.getMethod();
 						final boolean expand = (method instanceof StatisticTreeJob) && ((StatisticTreeJob)method).isExpand();
@@ -134,8 +133,8 @@ public class JobDoneListener implements IJobChangeListener {
 		UIJob refreshJob = new UIJob(REFRESH_STATISTICS_VIEW) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				Job job = event.getJob();
-				if (job instanceof ITreeJob) {
+				final Job job = event.getJob();
+				if (job instanceof LongRunningJob) {
 					final LongRunningJob<?> treeJob = (LongRunningJob<?>) job;
 					runningJobs.add(treeJob);
 					Parent calc = ((TreeJob)treeJob.getMethod()).getCalculated();

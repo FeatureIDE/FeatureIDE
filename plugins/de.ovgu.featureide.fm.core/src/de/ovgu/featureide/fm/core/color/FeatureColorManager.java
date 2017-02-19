@@ -301,9 +301,9 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	private static IProject getProject(IFeatureModel featureModel) {
-		File file = featureModel.getSourceFile();
+		java.nio.file.Path file = featureModel.getSourceFile();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath location = Path.fromOSString(file.getAbsolutePath());
+		IPath location = Path.fromOSString(file.toAbsolutePath().toString());
 		IFile iFile = workspace.getRoot().getFileForLocation(location);
 		try {
 			return iFile.getProject();

@@ -176,7 +176,7 @@ public class SetFeatureColorAction extends Action {
 					featureList.add((IFeature) editPart);
 				} else if (editPart instanceof FeatureEditPart) {
 					FeatureEditPart editP = (FeatureEditPart) editPart;
-					IGraphicalFeature feature = editP.getFeature();
+					IGraphicalFeature feature = editP.getModel();
 					featureList.add(feature.getObject());
 				} else if (editPart instanceof AbstractGraphicalEditPart) {
 					AbstractGraphicalEditPart agep = (AbstractGraphicalEditPart) editPart;
@@ -223,8 +223,10 @@ public class SetFeatureColorAction extends Action {
 
 			// inform ui to update
 			if (dialog.open() == Window.OK) {
+				//TODO SPREY 
+				/*
 				try {
-					IPath modelPath = new Path(featureModel.getSourceFile().getCanonicalPath());
+					java.nio.file.Path modelPath = featureModel.getSourceFile().getFileName();
 					IPath rootPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 					IPath relPath = modelPath.makeRelativeTo(rootPath);
 
@@ -237,6 +239,7 @@ public class SetFeatureColorAction extends Action {
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
+				*/
 			}
 		}
 	}

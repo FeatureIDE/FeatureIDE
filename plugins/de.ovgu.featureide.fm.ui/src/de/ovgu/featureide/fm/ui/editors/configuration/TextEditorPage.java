@@ -77,7 +77,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	protected final void refresh() {
-		if (configurationEditor.getConfiguration() == null) {
+		if (configurationEditor.getConfiguration() == null || configurationEditor.containsError()) {
 			return;
 		}
 		String source = configurationEditor.configurationManager.getFormat().getInstance().write(configurationEditor.getConfiguration());
@@ -111,12 +111,19 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	@Override
+	protected void editorSaved() {
+		super.editorSaved();
+		checkSource();
+	}
+
+	@Override
 	public boolean allowPageChange(int newPageIndex) {
-		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
-		final IPersistentFormat<Configuration> confFormat = configurationEditor.configurationManager.getFormat();
-		final ProblemList problems = confFormat.getInstance().read(configurationEditor.getConfiguration(), text);
-		configurationEditor.createModelFileMarkers(problems);
-		return !problems.containsWarning();
+		final ProblemList problems = checkSource();
+		return !(problems.containsError() || (isDirty() && problems.containsWarning()));
+	}
+
+	protected ProblemList checkSource() {
+		return configurationEditor.checkSource(getDocumentProvider().getDocument(getEditorInput()).get());
 	}
 
 }

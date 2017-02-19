@@ -92,7 +92,9 @@ public class FmOutlinePage extends ContentOutlinePage {
 		super.createControl(parent);
 		if (viewer == null) {
 			viewer = getTreeViewer();
-			viewer.setContentProvider(new FmTreeContentProvider());
+			FmTreeContentProvider fmTreeContentProvider = new FmTreeContentProvider();
+			fmTreeContentProvider.setGraphicalFeatureModel(fTextEditor.diagramEditor.getGraphicalFeatureModel());
+			viewer.setContentProvider(fmTreeContentProvider);
 			viewer.setLabelProvider(new FmLabelProvider());
 		}
 

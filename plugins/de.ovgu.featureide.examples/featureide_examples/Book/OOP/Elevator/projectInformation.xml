@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<exampleWizard>
+	<contentProvider name="Book Example">
+		<path>Part I/Chapter 4 (Running Example of an Elevator)</path>
+	</contentProvider>
+</exampleWizard>

@@ -336,10 +336,10 @@ public class TModelComparator {
 	private Comparison compare(String fm1, String fm2)
 			throws UnsupportedModelException {
 		ModelComparator comperator = new ModelComparator(TIMEOUT);
-		IFeatureModel oldModel = FMFactoryManager.getFactory().createFeatureModel();
+		IFeatureModel oldModel = FMFactoryManager.getDefaultFactory().createFeatureModel();
 		GuidslFormat reader = new GuidslFormat();
 		reader.read(oldModel, fm1);
-		IFeatureModel newModel = FMFactoryManager.getFactory().createFeatureModel();
+		IFeatureModel newModel = FMFactoryManager.getDefaultFactory().createFeatureModel();
 		reader.read(newModel, fm2);
 		return comperator.compare(oldModel, newModel);
 	}

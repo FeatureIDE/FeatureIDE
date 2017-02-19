@@ -51,12 +51,11 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		yoffset = 0;
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
-		layout(yoffset, featureModel.getConstraints());
+		layout(yoffset, featureModel.getVisibleConstraints());
 	}
 
 	private void layout(IGraphicalFeature root) {
-		final HiddenFilter hiddenFilter = new HiddenFilter();
-		if (root == null || !hiddenFilter.isValid(root)) {
+		if (root == null || root.getObject().getStructure().isHidden()) {
 			return;
 		}
 		LinkedList<IGraphicalFeature> list = new LinkedList<>();

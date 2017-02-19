@@ -84,7 +84,7 @@ public class TGuidslReader {
 	private IFeatureModel load(String input) {
 		try {
 			final IFeatureModelFormat format = new GuidslFormat();
-			IFeatureModel model = FMFactoryManager.getFactory(format).createFeatureModel();
+			IFeatureModel model = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
 			if (format.read(model, input).containsError()) {
 				fail();
 			}

@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
+import de.ovgu.featureide.fm.core.job.IProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
