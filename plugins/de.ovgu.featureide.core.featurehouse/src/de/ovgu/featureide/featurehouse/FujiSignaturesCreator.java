@@ -139,7 +139,7 @@ public class FujiSignaturesCreator {
 					// get modifiers
 					StringBuilder classModifierSB = new StringBuilder();
 					for (Modifier modifier : typeDecl.getModifiers().getModifierList()) {
-						classModifierSB.append(modifier.getID());
+						classModifierSB.append(modifier.getID() + " ");
 					}
 					String modifierString = classModifierSB.toString();
 
@@ -169,7 +169,7 @@ public class FujiSignaturesCreator {
 							// get modifiers
 							StringBuilder bodyModifierSB = new StringBuilder();
 							for (Modifier modifier : method.getModifiers().getModifierList()) {
-								bodyModifierSB.append(modifier.getID());
+								bodyModifierSB.append(modifier.getID() + " ");
 							}
 							modifierString = bodyModifierSB.toString();
 							name = method.name();
@@ -188,7 +188,7 @@ public class FujiSignaturesCreator {
 							// get modifiers
 							StringBuilder bodyModifierSB = new StringBuilder();
 							for (Modifier modifier : field.getModifiers().getModifierList()) {
-								bodyModifierSB.append(modifier.getID());
+								bodyModifierSB.append(modifier.getID() + " ");
 							}
 							modifierString = bodyModifierSB.toString();
 							name = field.name();
@@ -204,7 +204,7 @@ public class FujiSignaturesCreator {
 								// get modifiers
 								StringBuilder bodyModifierSB = new StringBuilder();
 								for (Modifier modifier : constructor.getModifiers().getModifierList()) {
-									bodyModifierSB.append(modifier.getID());
+									bodyModifierSB.append(modifier.getID() + " ");
 								}
 								modifierString = bodyModifierSB.toString();
 								name = constructor.name();
