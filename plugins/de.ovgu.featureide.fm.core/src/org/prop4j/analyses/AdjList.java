@@ -76,6 +76,22 @@ public class AdjList extends AFeatureGraph2 {
 			return id;
 		}
 
+		public int[] getNegComplexClauses() {
+			return negComplexClauses;
+		}
+
+		public int[] getNegStrongEdges() {
+			return negStrongEdges;
+		}
+
+		public int[] getPosComplexClauses() {
+			return posComplexClauses;
+		}
+
+		public int[] getPosStrongEdges() {
+			return posStrongEdges;
+		}
+
 	}
 
 	private static class Builder implements LongRunningMethod<AdjList> {
