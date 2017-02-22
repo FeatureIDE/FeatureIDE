@@ -23,11 +23,14 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
+import org.sat4j.specs.TimeoutException;
+
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
@@ -40,8 +43,8 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
  * @author Dominik Hamann
  * @author Patrick Haese
  */
-public class ConfigParentNode extends LazyParent {
-	
+public class StatisticsSemanticalFeatureModel extends LazyParent {
+
 	private final IFeatureModel model;
 
 	public static class ConfigNode extends Parent {
@@ -74,7 +77,7 @@ public class ConfigParentNode extends LazyParent {
 					}
 
 					final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout);
-					
+
 					return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
 				}
 
@@ -99,14 +102,33 @@ public class ConfigParentNode extends LazyParent {
 		}
 	}
 
-	public ConfigParentNode(String description, IFeatureModel model) {
+	public StatisticsSemanticalFeatureModel(String description, IFeatureModel model) {
 		super(description);
 		this.model = model;
 	}
 
 	@Override
 	protected void initChildren() {
+		
+		Boolean isValid = null;
+		try {
+			isValid = model.getAnalyser().isValid();
+		} catch (TimeoutException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+
+		addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
+
+		addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
+
+		addChild(new DeadFeaturesParentNode(DEAD_FEATURES, model));
+
+		addChild(new FalseOptionalFeaturesParentNode(FO_FEATURES, model));
+
+		addChild(new AtomicParentNode(ATOMIC_SETS, model));
+
 		addChild(new ConfigNode(DESC_CONFIGS, model));
+		
 		addChild(new ConfigNode(DESC_VARIANTS, model));
 	}
 }

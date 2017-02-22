@@ -125,6 +125,7 @@ public class SetColorAction extends AbstractColorAction {
 		IFeature feature = fm.getFeature(collName);
 		if (feature != null) {
 			FeatureColorManager.setColor(feature, FeatureColor.getColor(index));
+			FeatureColorManager.notifyColorChange(feature);
 			return true;
 		}
 		return false;

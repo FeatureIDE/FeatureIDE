@@ -21,112 +21,68 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.DirectoryStream.Filter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
+import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
 
 /**
  * Reads all configuration file from a certain folder and saves their content in form of a selection matrix.
  * 
+ * @author Paul Maximilan Bittner
  * @author Sebastian Krieter
+ * @author Antje Moench
  */
 public class ConfigurationMatrix {
+	private final List<Config> configurationMatrix;
+	private ConfigurationLoader loader;
+	private IFeatureModel featureModel;
+	private Path path;
 
-	private static final class ConfigFileFilter implements Filter<Path> {
-
-		private final String excludeFile;
-
-		public ConfigFileFilter() {
-			this(null);
-		}
-
-		public ConfigFileFilter(String excludeFile) {
-			this.excludeFile = excludeFile;
-		}
-
-		@Override
-		public boolean accept(Path configPath) throws IOException {
-			final Path fileName = configPath.getFileName();
-			if (fileName == null) {
-				return false;
-			}
-			final String fileNameString = fileName.toString();
-			return fileNameString.endsWith(".config") && !fileNameString.equals(excludeFile) && Files.isReadable(configPath) && Files.isRegularFile(configPath);
-		}
-	}
-
-	private final List<Config> configurationMatrix = new ArrayList<>();
-
-	private final IFeatureModel featureModel;
-	private final Path path;
-
-	private String[] featureNames = null;
-	private boolean read = false;
+	private double[] rec = null;
 
 	public ConfigurationMatrix(IFeatureModel featureModel, String path) {
-		this.featureModel = featureModel;
-		this.path = Paths.get(path).toAbsolutePath();
+		this(featureModel, Paths.get(path));
 	}
 
 	public ConfigurationMatrix(IFeatureModel featureModel, Path path) {
 		this.featureModel = featureModel;
-		this.path = path.toAbsolutePath();
+		this.path = path;
+		this.configurationMatrix = new ArrayList<>();
+		loader = new ConfigurationLoader(new IConfigurationLoaderCallback() {
+
+			@Override
+			public void onLoadingStarted() {
+				configurationMatrix.clear();
+			}
+
+			@Override
+			public void onLoadingError(IOException exception) {}
+
+			@Override
+			public void onConfigurationLoaded(Configuration configuration, Path path) {
+				configurationMatrix.add(createConfig(configuration));
+			}
+
+			@Override
+			public void onLoadingFinished() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 
 	public void readConfigurations() {
-		readConfigurations(new ConfigFileFilter());
+		loader.loadConfigurations(this.featureModel, this.path);
 	}
 
 	public void readConfigurations(String excludeFile) {
-		readConfigurations(new ConfigFileFilter(excludeFile));
-	}
-
-	private void readConfigurations(Filter<? super Path> filter) {
-		final Configuration c = new Configuration(featureModel);
-		final FileHandler<Configuration> r = new FileHandler<>(c);
-
-		read = false;
-		configurationMatrix.clear();
-
-		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
-			for (Path configPath : directoryStream) {
-				r.read(configPath, ConfigurationManager.getFormat(configPath.toString()));
-				addConfig(c);
-			}
-		} catch (IOException e) {
-			Logger.logError(e);
-		}
-	}
-
-	public String[] getFeatureNames() {
-		return featureNames;
-	}
-
-	public void setFeatureNames(String[] featureNames) {
-		this.featureNames = featureNames;
-	}
-
-	private void addConfig(Configuration configuration) {
-		final List<SelectableFeature> features = configuration.getFeatures();
-		if (!read) {
-			featureNames = new String[features.size()];
-			int i = 0;
-			for (SelectableFeature feature : features) {
-				featureNames[i++] = feature.getName();
-			}
-			read = true;
-		}
-		configurationMatrix.add(createConfig(configuration));
+		loader.loadConfigurations(this.featureModel, this.path, excludeFile);
 	}
 
 	private Config createConfig(Configuration configuration) {
@@ -148,29 +104,8 @@ public class ConfigurationMatrix {
 		return new Config(configArray);
 	}
 
-	private double[] rec = null;
-
 	public double[] getRec() {
 		return rec;
-	}
-
-	private static class Config {
-		private final byte[] configArray;
-
-		public Config(byte[] configArray) {
-			this.configArray = configArray;
-		}
-
-		public int getDelta(Config otherConfig) {
-			int count = 0;
-			for (int i = 0; i < configArray.length; i++) {
-				if (configArray[i] == otherConfig.configArray[i]) {
-					count++;
-				}
-			}
-			return count;
-		}
-
 	}
 
 	public void calcRec(Configuration configuration) {
@@ -207,4 +142,22 @@ public class ConfigurationMatrix {
 		}
 	}
 
+	private static class Config {
+		private final byte[] configArray;
+
+		public Config(byte[] configArray) {
+			this.configArray = configArray;
+		}
+
+		public int getDelta(Config otherConfig) {
+			int count = 0;
+			for (int i = 0; i < configArray.length; i++) {
+				if (configArray[i] == otherConfig.configArray[i]) {
+					count++;
+				}
+			}
+			return count;
+		}
+
+	}
 }

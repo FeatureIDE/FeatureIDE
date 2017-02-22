@@ -63,6 +63,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.conf.ConfigurationFG;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
@@ -149,6 +150,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			if (featureModelManager != null) {
 				featureModelManager.removeListener(ConfigurationEditor.this);
 			}
+			FeatureColorManager.removeListener(ConfigurationEditor.this);
 		}
 
 		@Override
@@ -181,6 +183,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		markerHandler = new ModelMarkerHandler<>(file);
 
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+		FeatureColorManager.addListener(this);
 		super.setInput(input);
 		getSite().getPage().addPartListener(iPartListener);
 		IProject project = file.getProject();
@@ -256,13 +259,16 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 		final ProblemList lastProblems = configurationManager.getLastProblems();
 		createModelFileMarkers(lastProblems);
-		setContainsError(lastProblems.containsError());
 
 		featureModelManager.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		getExtensions();
-
-		loadPropagator();
+		
+		if (lastProblems.containsError()) {
+			setActivePage(2);
+		} else {
+			loadPropagator();
+		}
 	}
 
 	public void loadPropagator() {
@@ -378,10 +384,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public void propertyChange(final FeatureIDEEvent evt) {
-		if (!EventType.MODEL_DATA_SAVED.equals(evt.getEventType())) {
+		if (!EventType.MODEL_DATA_SAVED.equals(evt.getEventType()) && !EventType.COLOR_CHANGED.equals(evt.getEventType())) {
 			return;
 		}
-
 		configurationManager.read();
 		final Configuration configuration = new Configuration(configurationManager.getObject(), featureModelManager.getObject());
 		configuration.loadPropagator();

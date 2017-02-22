@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.actions;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.color.DefaultColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
@@ -42,7 +43,7 @@ public class SetProfileColorSchemeAction extends Action {
 	 * Constructor
 	 */
 	public SetProfileColorSchemeAction(String text, int style, IFeatureModel model) {
-		super(text, Action.AS_CHECK_BOX);
+		super(text, style);
 		this.model = model;
 		this.newProfileColorSchemeName = text;
 	}
@@ -51,11 +52,11 @@ public class SetProfileColorSchemeAction extends Action {
 	 * Changes selected color scheme and saves the configuration 
 	 */
 	public void run() {
-		if (FeatureColorManager.isCurrentColorScheme(model, newProfileColorSchemeName)) {
-			FeatureColorManager.setActive(model, DefaultColorScheme.defaultName);
-		} else {
-			FeatureColorManager.setActive(model, newProfileColorSchemeName);
-		}
+		String clrSchemeName = newProfileColorSchemeName;
+		
+		if (FeatureColorManager.isCurrentColorScheme(model, clrSchemeName))
+			clrSchemeName = DefaultColorScheme.defaultName;
 
+		FeatureColorManager.setActive(model, clrSchemeName);
 	}
 }
