@@ -33,6 +33,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_FORMAT_IS_NOT_SUPPORTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_PROJECT_IS_NOT_A_FEATUREIDE_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_CLASS_NAME_MUST_BE_SPECIFIED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PUBLIC_CLASS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PUBLIC_INTERFACE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,11 +105,13 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private static final String MESSAGE_LANGUAGE_SUPPORT = SELECTED_FILE_FORMAT_IS_NOT_SUPPORTED;
 
 	private static final String MESSAGE_MODULE_VALID = MODULE_NAME_IS_INVALID;
-	
+		
 	private static int lastSelection = -1;
 	private static String lastComposerID = null;
 
 	private Combo comboProject, comboFeature, comboLanguage, comboPackage, comboClass;
+	private Button isInterface;
+	private Label isInterfaceLabel;
 
 	private Text textModulename;
 	private Button buttonRefines;
@@ -196,6 +201,13 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		comboClass = new Combo(composite, SWT.BORDER | SWT.SINGLE);
 		comboClass.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
+		
+		isInterfaceLabel = new Label(composite, SWT.NULL);
+		isInterfaceLabel.setText("&Interface:");
+		isInterfaceLabel.setVisible(false);
+		isInterface = new Button(composite, SWT.CHECK);
+		isInterface.setVisible(false);
+		new Label(composite, SWT.NULL);
 
 		labelModulename = new Label(composite, SWT.NULL);
 		labelModulename.setText("&Module name:");
@@ -261,6 +273,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 					initTextModulename();
 					initRefinesButton();
 					initComboClassName();
+					initInterfaceCheckbox();
 					
 					NewFeatureIDEFilePage.lastComposerID = composer.getId();
 					NewFeatureIDEFilePage.lastSelection = comboLanguage.getSelectionIndex();
@@ -329,11 +342,27 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			initComboPackages(sourceFolder, "");
 			initTextModulename();
 			initComboClassName();
+			initInterfaceCheckbox();
 			initRefinesButton();
 		}
 
 	}
-
+	/**
+	 * Fills the class combo with class names of the same package at other
+	 * features.
+	 */
+	private void initInterfaceCheckbox() {
+		if(comboLanguage.getText().equals(JAVA))
+		{
+			isInterfaceLabel.setVisible(true);
+			isInterface.setVisible(true);
+		}
+		else {
+			isInterfaceLabel.setVisible(false);
+			isInterface.setVisible(false);
+			isInterface.setSelection(false);
+		}
+	}
 	/**
 	 * Fills the class combo with class names of the same package at other
 	 * features.
@@ -727,7 +756,15 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if (formats.isEmpty()) {
 			return null;
 		}
-		return formats.get(comboLanguage.getSelectionIndex())[2];
+		if(comboLanguage.getText().equals(JAVA) && isInterface.getSelection())
+		{
+			String javaTemplate = formats.get(comboLanguage.getSelectionIndex())[2];
+			javaTemplate = javaTemplate.replaceAll(PUBLIC_CLASS, PUBLIC_INTERFACE);
+			return javaTemplate;
+		}
+		else {
+			return formats.get(comboLanguage.getSelectionIndex())[2];
+		}
 	}
 
 	/**

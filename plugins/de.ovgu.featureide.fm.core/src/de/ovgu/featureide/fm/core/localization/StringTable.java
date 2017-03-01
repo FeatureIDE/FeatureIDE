@@ -1019,4 +1019,7 @@ public class StringTable {
 	public static final String CALCULATE_FALSE_OPTIONAL_FEATURES = "Calculate False Optional Features";
 	public static final String CALCULATE_DEAD_FEATURES = "Calculate Dead Features";
 	
+	public static final String PUBLIC_CLASS = "public class";
+	public static final String PUBLIC_INTERFACE = "public interface";
+	
 }
