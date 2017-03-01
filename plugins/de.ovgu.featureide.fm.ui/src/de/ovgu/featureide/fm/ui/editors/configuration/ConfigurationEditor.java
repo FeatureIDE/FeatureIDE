@@ -54,8 +54,13 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.views.properties.ResourcePropertySource;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
@@ -149,12 +154,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			configJobManager.cancelAllJobs();
 			if (featureModelManager != null) {
 				featureModelManager.removeListener(ConfigurationEditor.this);
-			}
+			}		
 			FeatureColorManager.removeListener(ConfigurationEditor.this);
 		}
 
 		@Override
 		public void partDeactivated(IWorkbenchPart part) {
+			
 		}
 
 		@Override
@@ -213,6 +219,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				if (path == null) {
 					return;
 				}
+
+				modelFile = new File(path);
+
 				if (!setModelFile(path)) {
 					return;
 				}
@@ -224,12 +233,20 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 					if (path == null) {
 						return;
 					}
+
+					modelFile = new File(path);
+
 					setModelFile(path);
 				}
 			}
 		}
+		
 
-		featureModelManager = FeatureModelManager.getInstance(Paths.get(res.getLocationURI()));
+		if (res == null) {
+			featureModelManager = FeatureModelManager.getInstance(modelFile.toPath());
+		} else {
+			featureModelManager = FeatureModelManager.getInstance(Paths.get(res.getLocationURI()));
+		}
 		invalidFeatureModel = featureModelManager.getLastProblems().containsError();
 		if (invalidFeatureModel) {
 			return;
@@ -242,8 +259,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		//		}
 
 		final Configuration c;
-
-		final IFeatureGraph fg = loadFeatureGraph(res.getLocation().removeLastSegments(1).append("model.fg"));
+		final IFeatureGraph fg;
+		if (res == null) {
+			fg = loadFeatureGraph(
+					org.eclipse.core.runtime.Path.fromOSString(modelFile.getAbsolutePath()).removeLastSegments(1).append("model.fg").toFile().toPath());
+		} else {
+			fg = loadFeatureGraph(res.getLocation().removeLastSegments(1).append("model.fg").toFile().toPath());
+		}
 		if (fg == null) {
 			c = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
 			configurationManager = FileManagerMap.<Configuration, ConfigurationManager> getInstance(file.getLocation().toOSString());
@@ -263,7 +285,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		featureModelManager.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		getExtensions();
-		
+
 		if (lastProblems.containsError()) {
 			setActivePage(2);
 		} else {
@@ -291,11 +313,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 	}
 
-	private IFeatureGraph loadFeatureGraph(IPath file) {
+	private IFeatureGraph loadFeatureGraph(Path filePath) {
 		final IFeatureGraph featureGraph = new MatrixFeatureGraph();
 		final FeatureGraphFormat format = new FeatureGraphFormat();
-		Path path = Paths.get(file.toFile().toURI());
-		if (FileHandler.load(path, featureGraph, format).containsError()) {
+		if (FileHandler.load(filePath, featureGraph, format).containsError()) {
 			return null;
 		} else {
 			return featureGraph;
@@ -415,7 +436,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 
 		if (containsError()) {
-			setActivePage(2);
+			setActivePage(getPageCount()-1);
 		}
 	}
 
@@ -571,8 +592,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	@Override
-
 	public Configuration getConfiguration() {
+		if(configurationManager == null) return null;
 		return configurationManager.editObject();
 	}
 
@@ -615,7 +636,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		matrix.readConfigurations(file.getName());
 		return matrix;
 	}
-	
+
 	public ProblemList checkSource(CharSequence source) {
 		final Configuration configuration = getConfiguration();
 		final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
