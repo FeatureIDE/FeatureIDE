@@ -1290,7 +1290,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						elementNewActiveReasons.get(element)));
 			}
 			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
-			legendFigure.refreshExplanation();
+			if(legendFigure != null && legendFigure.isVisible())
+			{
+				legendFigure.refreshExplanation();
+			}
 			break;
 
 		case DEFAULT:
