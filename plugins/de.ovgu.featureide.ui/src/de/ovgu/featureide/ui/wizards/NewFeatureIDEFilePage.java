@@ -128,6 +128,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	private String feature;
 	private String clss;
+	private String pack;
 	private String comboProjectText;
 
 	private IFeatureProject featureProject = null;
@@ -150,8 +151,10 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	 *            Feature selected at the collaboration diagram.
 	 * @param clss
 	 *            Class selected at the collaboration diagram.
+	 * @param pack
+	 * 			  Package selected at the collaboration diagram
 	 */
-	public NewFeatureIDEFilePage(ISelection selection, String feature, String clss) {
+	public NewFeatureIDEFilePage(ISelection selection, String feature, String clss, String pack) {
 		super("wizardPage");
 		setTitle(PAGE_TITLE);
 		setDescription(PAGE_DESCRIPTION);
@@ -162,6 +165,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 		this.feature = feature;
 		this.clss = clss;
+		this.pack = pack;
 	}
 
 	public void createControl(Composite parent) {
@@ -247,7 +251,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 						// reload all formats for the changed Project
 						initComboLanguage();
 						initComboFeature();
-						initComboPackages(sourceFolder, "");
+						initComboPackages(sourceFolder, "", pack);
 						initComboClassName();
 					}
 
@@ -339,7 +343,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if (featureProject != null) {
 			initComboFeature();
 			initComboLanguage();
-			initComboPackages(sourceFolder, "");
+			initComboPackages(sourceFolder, "", pack);
 			initTextModulename();
 			initComboClassName();
 			initInterfaceCheckbox();
@@ -458,7 +462,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	 * @param folder
 	 * @param packageName
 	 */
-	private void initComboPackages(IFolder folder, String packageName) {
+	private void initComboPackages(IFolder folder, String packageName, String defaultPackage) {
+		if (defaultPackage == null) defaultPackage = "";
 		String p = comboPackage.getText();
 		String p2 = null;
 		Object obj = selection.getFirstElement();
@@ -475,7 +480,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 				comboPackage.removeAll();
 				for (IResource res : folder.members()) {
 					if (res instanceof IFolder) {
-						initComboPackages((IFolder) res, packageName);
+						initComboPackages((IFolder) res, packageName, defaultPackage);
 					}
 				}
 			} else {
@@ -485,7 +490,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 						if (!containsPackage(subPackage)) {
 							comboPackage.add(subPackage);
 						}
-						initComboPackages((IFolder) res, subPackage);
+						initComboPackages((IFolder) res, subPackage, defaultPackage);
 					}
 				}
 			}
@@ -495,7 +500,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if (p2 != null) {
 			comboPackage.setText(p2);
 		} else {
-			comboPackage.setText(p);
+			comboPackage.setText(defaultPackage);
 		}
 	}
 

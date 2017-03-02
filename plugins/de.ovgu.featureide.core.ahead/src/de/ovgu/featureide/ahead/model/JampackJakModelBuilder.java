@@ -97,7 +97,7 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 		for (int i = 0; i < sources.size(); i++) {
 			currentFile = sources.get(i);
 			// The role corresponding to the current source file
-			FSTRole role = model.addRole(getFeature((IFolder)currentFile.getParent()), currentClass, currentFile);
+			FSTRole role = model.addRole(getFeature((IFolder)currentFile.getParent()), model.getAbsoluteClassName(currentFile), currentFile);
 		
 			// Add methods and fields of the FST to the role
 			for (c.First(ownASTs[i]); c.More(); c.PlusPlus()) {
