@@ -78,7 +78,7 @@ public class AddRoleAction extends Action {
 			} else if (selectedItem instanceof ClassEditPart) {
 				clss = ((ClassEditPart) selectedItem).getClassModel().getName();
 				pack = ((ClassEditPart) selectedItem).getClassModel().getName().replace("/", ".");
-				if (pack.matches("\\..+\\.")) {
+				if (pack.indexOf(".") != pack.lastIndexOf(".")) {
 					pack = pack.substring(0, pack.lastIndexOf("."));
 					pack = pack.substring(0, pack.lastIndexOf('.'));
 				} else {
