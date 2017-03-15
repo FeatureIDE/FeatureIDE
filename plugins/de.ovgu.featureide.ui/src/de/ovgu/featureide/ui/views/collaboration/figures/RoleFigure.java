@@ -594,18 +594,14 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	}
 
 	private void setDirectivesContent(Figure tooltipContent, String className) {
-		LinkedList<String> duplicates = new LinkedList<String>();
 		tooltipContent.add(new Label(className + " ", IMAGE_CLASS));
 		tooltipContent.add(new Label(role.getFeature() + " ", IMAGE_FEATURE));
 		this.setToolTip(tooltipContent);
 
 		for (FSTDirective d : role.getDirectives()) {
-			String dependencyString = d.toDependencyString();
-			if (!duplicates.contains(dependencyString)) {
-//				duplicates.add(dependencyString);
-				Label partLabel = new RoleFigureLabel(dependencyString, IMAGE_HASH, dependencyString, d);
-				addLabel(partLabel);
-			}
+			String dependencyString = d.toCommandString();
+			Label partLabel = new RoleFigureLabel(dependencyString, IMAGE_HASH, dependencyString, d);
+			addLabel(partLabel);
 			// TODO draw separationline between fields and methods
 		}
 	}
