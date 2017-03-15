@@ -165,7 +165,7 @@ public class FSTModel {
 		FSTFeature feature = addFeature(featureName);
 		FSTArbitraryRole arbitraryRole = new FSTArbitraryRole(feature, c);
 		arbitraryRole.addFile(file);
-		c.addRole(featureName, arbitraryRole);
+		c.addRole(this.getAbsoluteClassName(file), arbitraryRole);
 		feature.addRole(className, arbitraryRole);
 		return role;
 	}

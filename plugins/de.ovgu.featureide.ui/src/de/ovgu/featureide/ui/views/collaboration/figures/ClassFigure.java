@@ -65,6 +65,7 @@ public class ClassFigure extends Figure implements GUIDefaults {
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(CLASS_INSETS.left, CLASS_INSETS.top));
 		this.height = height;
+
 		String name = c.getName();
 		if (name.contains("/")) {
 			name = name.substring(name.lastIndexOf("/")+1,name.length());
