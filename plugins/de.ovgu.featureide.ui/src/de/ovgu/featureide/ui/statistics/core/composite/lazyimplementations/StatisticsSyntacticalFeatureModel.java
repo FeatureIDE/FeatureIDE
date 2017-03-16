@@ -41,13 +41,13 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Dominik Hamann
  * @author Patrick Haese
  */
-public final class StatisticsFeatureComplexity extends LazyParent {
+public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 
 	private static final double precision = 1000.0;
 
 	private final IFeatureModel model;
 
-	public StatisticsFeatureComplexity(String description, IFeatureModel model) {
+	public StatisticsSyntacticalFeatureModel(String description, IFeatureModel model) {
 		super(description, null);
 		this.model = model;
 	}
@@ -57,13 +57,6 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 		if (model != null) {
 
 			final int constraints = model.getConstraintCount();
-
-			Boolean isValid = null;
-			try {
-				isValid = model.getAnalyser().isValid();
-			} catch (TimeoutException e) {
-				UIPlugin.getDefault().logError(e);
-			}
 
 			final Collection<IFeature> listOfFeatures = Functional.toList(model.getFeatures());
 
@@ -90,8 +83,6 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 				constraintFeatures.addAll(constraint.getContainedFeatures());
 			}
 
-			addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
-
 			addChild(new FeatureListNode(NUMBER_FEATURES, listOfFeatures));
 
 			addChild(new FeatureListNode(NUMBER_CONCRETE, listOfConcreteFeatures));
@@ -110,13 +101,6 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 
 			addChild(new Parent(CONSTRAINT_RATIO, Math.floor((precision * constraintFeatures.size()) / model.getNumberOfFeatures()) / precision));
 
-			addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
-
-			addChild(new DeadFeaturesParentNode(DEAD_FEATURES, model));
-
-			addChild(new FalseOptionalFeaturesParentNode(FO_FEATURES, model));
-
-			addChild(new AtomicParentNode(ATOMIC_SETS, model));
 		}
 	}
 }

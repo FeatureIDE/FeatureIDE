@@ -57,7 +57,7 @@ public class CircleDecoration extends ConnectionDecoration implements GUIDefault
 		}
 		final Rectangle bounds = new Rectangle(getBounds());
 		bounds.shrink(1, 1);
-		graphics.fillOval(bounds);
+		Draw2dHelper.fillCircle(graphics, bounds);
 	}
 
 	@Override
