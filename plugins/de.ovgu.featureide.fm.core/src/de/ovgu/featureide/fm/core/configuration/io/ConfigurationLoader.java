@@ -31,8 +31,9 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * This class loads all configurations of a given IFeatureModel.
@@ -95,7 +96,7 @@ public class ConfigurationLoader {
 			for (Path configPath : directoryStream) {
 				Configuration currentConfiguration = new Configuration(featureModel, propagateConfigs);
 				
-				ConfigurationManager.load(configPath, currentConfiguration);
+				FileHandler.load(configPath, currentConfiguration, ConfigFormatManager.getInstance());
 				configs.add(currentConfiguration);
 				if (callback != null)
 					callback.onConfigurationLoaded(currentConfiguration, configPath);
