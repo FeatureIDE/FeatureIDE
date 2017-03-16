@@ -45,4 +45,9 @@ public class EquationFormat extends DefaultFormat {
 		return ID;
 	}
 
+	@Override
+	public String getName() {
+		return "Equation";
+	}
+
 }

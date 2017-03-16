@@ -196,4 +196,9 @@ public class DefaultFormat implements IConfigurationFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "FeatureList";
+	}
+
 }

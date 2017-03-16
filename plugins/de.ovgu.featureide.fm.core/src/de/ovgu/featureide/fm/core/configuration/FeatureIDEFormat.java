@@ -188,4 +188,9 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "FeatureIDE-Internal";
+	}
+
 }
