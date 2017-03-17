@@ -186,7 +186,7 @@ public class NewConfigurationFilePage extends WizardPage {
 			featureComboProject.setText(configFolder.getProject().getName());
 		}
 		for (IConfigurationFormat format : formatExtensions) {
-			formatCombo.add(format.getName());
+			formatCombo.add(format.getName() + " (*." + format.getSuffix() + ")");
 		}
 		try {
 			formatCombo.select(formatExtensions.indexOf(ConfigFormatManager.getInstance().getExtension(XMLConfFormat.ID)));
