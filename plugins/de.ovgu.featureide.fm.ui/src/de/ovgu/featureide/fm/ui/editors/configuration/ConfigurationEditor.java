@@ -119,7 +119,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	public boolean invalidFeatureModel = true;
 
-	private boolean containsError = true;
+	private boolean containsError = false;
 
 	/**
 	 * The file of the corresponding feature model.
@@ -277,9 +277,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		getExtensions();
 
-		if (lastProblems.containsError()) {
-			setActivePage(2);
-		} else {
+		setContainsError(lastProblems.containsError());
+		if (!containsError()) {
 			loadPropagator();
 		}
 	}
@@ -427,7 +426,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 
 		if (containsError()) {
-			setActivePage(getPageCount()-1);
+			setActivePage(2);
 		}
 	}
 
