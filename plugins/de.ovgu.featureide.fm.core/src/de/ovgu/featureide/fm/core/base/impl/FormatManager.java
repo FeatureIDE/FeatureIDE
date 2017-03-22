@@ -60,6 +60,10 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 		return getExtension(id);
 	}
 
+	public boolean hasFormat(String fileName) {
+		return getFormatByFileName(fileName) != null;
+	}
+
 	/**
 	 * Returns the format that fits the given parameter.
 	 * 

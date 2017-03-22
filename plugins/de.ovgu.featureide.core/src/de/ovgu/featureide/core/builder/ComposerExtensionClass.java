@@ -324,7 +324,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public String getConfigurationExtension() {
-		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
+		return ConfigFormatManager.getInstance().getExtensions().get(0).getSuffix();
 	}
 
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
@@ -346,6 +346,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public boolean hasSourceFolder() {
+		return true;
+	}
+
+	public boolean hasSource() {
 		return true;
 	}
 

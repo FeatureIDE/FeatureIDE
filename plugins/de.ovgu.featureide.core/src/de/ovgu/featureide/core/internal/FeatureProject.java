@@ -83,7 +83,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
-import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.job.ModelScheduleRule;
@@ -327,22 +326,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		String projectBuildPath = getProjectBuildPath();
 
-		try {
-
-			// just create the bin folder if project hat only the FeatureIDE
-			// Nature
-			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if (!(projectBuildPath.isEmpty() && getProjectSourcePath().isEmpty())) {
-					binFolder = CorePlugin.createFolder(project, "bin");
-				}
-			}
-		} catch (CoreException e) {
-			LOGGER.logError(e);
-		}
 		libFolder = project.getFolder("lib");
-		buildFolder = CorePlugin.createFolder(project, projectBuildPath);
-		configFolder = CorePlugin.createFolder(project, getProjectConfigurationPath());
-		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
+		binFolder = CorePlugin.getFolder(project, "bin");
+		buildFolder = CorePlugin.getFolder(project, projectBuildPath);
+		configFolder = CorePlugin.getFolder(project, getProjectConfigurationPath());
+		sourceFolder = CorePlugin.getFolder(project, getProjectSourcePath());
 		fstModel = null;
 		// loading model data and listen to changes in the model file
 		addModelListener();
@@ -989,10 +977,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return configs;
 		try {
 			for (IResource res : configFolder.members()) {
-				if (!(res instanceof IFile))
-					continue;
-				if (LOGGER.getConfigurationExtensions().contains(res.getFileExtension()))
+				if (res instanceof IFile && ConfigFormatManager.getInstance().hasFormat(res.getName())) {
 					configs.add((IFile) res);
+				}
 			}
 		} catch (CoreException e) {
 			LOGGER.logError(e);
