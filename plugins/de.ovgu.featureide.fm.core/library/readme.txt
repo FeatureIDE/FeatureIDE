@@ -12,8 +12,8 @@ Build:
 
 What could go wrong:
 	No JDK is installed:	
-		In order for this to work you need the JAVA_HOME variable on your system to point to a JDK with the java compiler.
-		It must be Java 1.7 or higher.
+		In order for this to work, the variable "bin.javac.path" in the subant_build_jar.xml script must point to an executable java compiler (javac).
+		It must be Java 1.7.
 	
 	
 	Due to changes there are unwanted dependencies (e.g., to Eclipse API) in the source files:
