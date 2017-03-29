@@ -59,8 +59,8 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
-import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureColorOperation;
 
@@ -341,6 +341,6 @@ public class SetFeatureColorDialog extends Dialog {
 	}
 
 	private Color getItemColorFor(FeatureColor featureColor) {
-		return featureColor == FeatureColor.NO_COLOR ? WHITE : featureColor.toSwtColor();
+		return featureColor == FeatureColor.NO_COLOR ? WHITE : ColorPalette.toSwtColor(featureColor);
 	}
 }
