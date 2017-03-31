@@ -57,6 +57,3 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.wizards
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
-Import-Package: de.ovgu.featureide.core,
- de.ovgu.featureide.core.fstmodel,
- de.ovgu.featureide.core.fstmodel.preprocessor
