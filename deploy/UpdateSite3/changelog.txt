@@ -7,15 +7,17 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
-Release 3.3.0 (April 2016)
+Release 3.3.0 (March 2017)
 * Feature subtrees in feature diagram can be folded manually and automatically
 * Visual explanations for feature-model defects (e.g., dead features)
 * New view Configuration Map added for an overview on all user-defined configurations
 * New visualizations on feature usage in configurations added (e.g., feature relations graph)
+* Added new XML format to store configurations (including selection states of abstract features)
 * New short cuts added for feature diagrams
 * Improved usability of collaboration diagram, statistics view and colors in all views
 * Improved performance for explanations on feature-diagram defects
-* Improved FeatureIDE library
+* Improved feature-model slicing
+* Improved FeatureIDE library and its build scripts
 
 Release 3.2.0 (December 2016)
 * Refactored main FeatureIDE functionality into Jar without dependencies to Eclipse
