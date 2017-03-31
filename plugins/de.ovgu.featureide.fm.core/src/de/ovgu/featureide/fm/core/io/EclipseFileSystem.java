@@ -39,6 +39,17 @@ import de.ovgu.featureide.fm.core.io.FileSystem.IFileSystem;
 
 public class EclipseFileSystem implements IFileSystem {
 
+	public static IPath getIPath(Path path) {
+		return org.eclipse.core.runtime.Path.fromOSString(path.toAbsolutePath().toString());
+	}
+
+	public static IResource getResource(Path path) {
+		final IPath iPath = getIPath(path);
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+		return res;
+	}
+
 	private JavaFileSystem JAVA = new JavaFileSystem();
 
 	@Override
@@ -100,9 +111,7 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public void delete(Path path) throws IOException {
-		final IPath iPath = getIPath(path);
-		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+		final IResource res = getResource(path);
 		try {
 			if (res == null) {
 				JAVA.exists(path);
@@ -116,17 +125,11 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public boolean exists(Path path) {
-		final IPath iPath = getIPath(path);
-		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+		final IResource res = getResource(path);
 		if (res == null) {
 			return JAVA.exists(path);
 		}
 		return res.isAccessible();
-	}
-
-	private IPath getIPath(Path path) {
-		return org.eclipse.core.runtime.Path.fromOSString(path.toAbsolutePath().toString());
 	}
 
 }

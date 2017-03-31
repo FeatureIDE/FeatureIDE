@@ -22,19 +22,13 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
@@ -50,13 +44,11 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -77,7 +69,6 @@ import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
 public class SetFeatureColorAction extends Action {
 
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
-	private List<IEventListener> colorChangedListeners;
 	protected List<IFeature> featureList = new ArrayList<>();
 	private IFeatureModel featureModel;
 
@@ -223,17 +214,12 @@ public class SetFeatureColorAction extends Action {
 
 			// inform ui to update
 			if (dialog.open() == Window.OK) {
+				final IProject project = EclipseFileSystem.getResource(featureModel.getSourceFile()).getProject();
 				try {
-					for(IFeatureProject p : CorePlugin.getFeatureProjects())
-					{
-						if(p.getFeatureModel().getId() == featureModel.getId())
-						{
-							p.getProject().touch(null);
-							p.getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-						}
-					}
+					project.touch(null);
+					project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 				} catch (CoreException e) {
-					e.printStackTrace();
+					FMUIPlugin.getDefault().logError(e);
 				}
 			}
 		}
