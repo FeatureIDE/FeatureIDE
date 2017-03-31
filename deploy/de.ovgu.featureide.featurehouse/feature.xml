@@ -205,28 +205,28 @@ Library.
          id="de.ovgu.featureide.core.featurehouse"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.3.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.mpl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.3.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui.mpl"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.3.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.conversion.ahead_featurehouse"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.3.0.qualifier"
          unpack="false"/>
 
 </feature>

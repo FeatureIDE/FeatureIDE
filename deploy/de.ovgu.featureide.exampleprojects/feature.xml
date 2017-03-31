@@ -214,7 +214,7 @@ Library.
          id="de.ovgu.featureide.examples"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.3.0.qualifier"
          unpack="false"/>
 
 </feature>
