@@ -151,7 +151,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			int offsetOfLine = context.getDocument().getLineOffset(line);
 			int lineLength = context.getDocument().getLineLength(line);
 			String lineContent = context.getDocument().get(offsetOfLine,lineLength);
-			if (!lineContent.contains("#if") && !lineContent.contains("#elif")){
+			if (!lineContent.contains("#if") && !lineContent.contains("#elif") && !lineContent.contains("#condition")){
 				return false;
 			}
 		} catch (BadLocationException e1) {

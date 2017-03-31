@@ -26,8 +26,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -56,10 +59,12 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureColorManager implements IEventListener {
-	
+
 	private static final FeatureColorManager INSTANCE = new FeatureColorManager();
 
 	private static final Map<IProject, Map<String, ColorScheme>> colorSchemes = new HashMap<>();
+
+	protected static final List<IEventListener> colorListener = new LinkedList<>();
 
 	/**
 	 * Returns the current color of the given feature.
@@ -68,14 +73,13 @@ public class FeatureColorManager implements IEventListener {
 		return getCurrentColorScheme(feature).getColor(feature);
 	}
 
-	
 	/**
 	 * Sets the feature color to the given index.
 	 */
 	public static void setColor(IFeature feature, int index) {
-		setColor(feature, FeatureColor.getColor(index));	
+		setColor(feature, FeatureColor.getColor(index));
 	}
-	
+
 	/**
 	 * Sets the feature color to the given color.
 	 */
@@ -107,7 +111,7 @@ public class FeatureColorManager implements IEventListener {
 		colorSchemes.get(project).remove(currentName);
 		final IFile file = profileFolder.getFile(currentName + ".profile");
 		if (!file.exists()) {
-			Logger.logWarning(file  + " does not exist");
+			Logger.logWarning(file + " does not exist");
 			return;
 		}
 		try {
@@ -120,6 +124,7 @@ public class FeatureColorManager implements IEventListener {
 
 	/**
 	 * Checks whether the given scheme is active.
+	 * 
 	 * @param newProfileColorSchemeName
 	 * @return
 	 */
@@ -128,7 +133,7 @@ public class FeatureColorManager implements IEventListener {
 		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
 		return currentSchemes.get(schmeName).isCurrent();
 	}
-	
+
 	/**
 	 * Returns the current color scheme.
 	 */
@@ -147,10 +152,10 @@ public class FeatureColorManager implements IEventListener {
 		// Fix for #398
 		try {
 			project = getProject(featureModel);
-		} catch(NullPointerException e) {
+		} catch (NullPointerException e) {
 			return new DefaultColorScheme();
 		}
-		
+
 		if (!colorSchemes.containsKey(project)) {
 			initColorSchemes(project);
 		}
@@ -159,7 +164,7 @@ public class FeatureColorManager implements IEventListener {
 			initColorSchemes(project);
 			currentSchemes = colorSchemes.get(project);
 		}
-		
+
 		for (ColorScheme cs : currentSchemes.values()) {
 			if (cs.isCurrent()) {
 				return cs;
@@ -167,7 +172,7 @@ public class FeatureColorManager implements IEventListener {
 		}
 		return new DefaultColorScheme();
 	}
-	
+
 	/**
 	 * Returns the default color scheme.
 	 */
@@ -187,7 +192,7 @@ public class FeatureColorManager implements IEventListener {
 		Map<String, ColorScheme> newEntry = new HashMap<>();
 		newEntry.put(DefaultColorScheme.defaultName, new DefaultColorScheme());
 		colorSchemes.put(project, newEntry);
-		
+
 		IFolder profileFolder = project.getFolder(".profiles");
 		if (!profileFolder.exists()) {
 			return;
@@ -197,7 +202,7 @@ public class FeatureColorManager implements IEventListener {
 				final String ext = res.getFileExtension();
 				if (ext == null)
 					throw new RuntimeException("Unexpected null reference");
-				
+
 				if (res instanceof IFile && ext.equals("profile")) {
 					readColors(newEntry, res);
 				}
@@ -221,14 +226,14 @@ public class FeatureColorManager implements IEventListener {
 			if (line.equals("true")) {
 				setActive(res.getProject(), name, false);
 			}
-			
+
 			while ((line = in.readLine()) != null) {
 				String[] split = line.split("=");
 				try {
 					if (split.length != 2) {
 						continue;
 					}
-					newCs.setColor(split[0], FeatureColor.valueOf(split[1]));					
+					newCs.setColor(split[0], FeatureColor.valueOf(split[1]));
 				} catch (IllegalArgumentException e) {
 					Logger.logError("Color not found", e);
 				}
@@ -237,7 +242,7 @@ public class FeatureColorManager implements IEventListener {
 			Logger.logError(e);
 		}
 	}
-	
+
 	/**
 	 * Writes the given color scheme to a file.
 	 */
@@ -261,7 +266,7 @@ public class FeatureColorManager implements IEventListener {
 				Logger.logError(e);
 			}
 		}
-		
+
 		try (PrintWriter out = new PrintWriter(new FileWriter(new File(file.getLocationURI()), false), true)) {
 			out.println(colorScheme.isCurrent());
 			for (Entry<String, FeatureColor> entry : colorScheme.getColors().entrySet()) {
@@ -269,7 +274,7 @@ public class FeatureColorManager implements IEventListener {
 				out.print('=');
 				out.println(entry.getValue());
 			}
-			
+
 			file.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
 		} catch (IOException | CoreException e) {
 			Logger.logError(e);
@@ -293,11 +298,11 @@ public class FeatureColorManager implements IEventListener {
 	private static IProject getProject(IFeature feature) {
 		return getProject(feature.getFeatureModel());
 	}
-	
+
 	private static IProject getProject(IFeatureModel featureModel) {
-		File file = featureModel.getSourceFile();
+		java.nio.file.Path file = featureModel.getSourceFile();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath location = Path.fromOSString(file.getAbsolutePath());
+		IPath location = Path.fromOSString(file.toAbsolutePath().toString());
 		IFile iFile = workspace.getRoot().getFileForLocation(location);
 		try {
 			return iFile.getProject();
@@ -351,7 +356,7 @@ public class FeatureColorManager implements IEventListener {
 		setActive(project, collName, true);
 		fm.handleModelDataChanged();
 	}
-	
+
 	/**
 	 * Activates the color scheme with the given name.
 	 */
@@ -377,7 +382,7 @@ public class FeatureColorManager implements IEventListener {
 					}
 				}
 			}
-			
+
 		}
 	}
 
@@ -397,6 +402,55 @@ public class FeatureColorManager implements IEventListener {
 		if (event.getEventType() == EventType.FEATURE_NAME_CHANGED) {
 			renameFeature(((IFeature) event.getSource()).getFeatureModel(), (String) event.getOldValue(), (String) event.getNewValue());
 		}
+	}
+
+	/**
+	 * Add a listener to the ColorChange Notification List.
+	 * 
+	 * @param listener
+	 */
+	public static void addListener(IEventListener listener) {
+		if (!colorListener.contains(listener)) {
+			colorListener.add(listener);
+		}
+	}
+
+	/**
+	 * Notify all listener that the color of features has changed
+	 * 
+	 * @param features All features that colors were changed
+	 */
+	public static void notifyColorChange(ArrayList<IFeature> features) {
+		for (final IEventListener listener : colorListener) {
+			try {
+				listener.propertyChange(new FeatureIDEEvent(features, EventType.COLOR_CHANGED));
+			} catch (Throwable e) {
+				Logger.logError(e);
+			}
+		}
+	}
+
+	/**
+	 * Notify all listener that the color of a feature has changed
+	 * 
+	 * @param features All features that colors were changed
+	 */
+	public static void notifyColorChange(IFeature feature) {
+		for (final IEventListener listener : colorListener) {
+			try {
+				listener.propertyChange(new FeatureIDEEvent(feature, EventType.COLOR_CHANGED));
+			} catch (Throwable e) {
+				Logger.logError(e);
+			}
+		}
+	}
+
+	/**
+	 * Removes the listener from the notification list.
+	 * @param listener
+	 */
+	public static void removeListener(IEventListener listener) {
+		colorListener.remove(listener);
 	}
 
 }

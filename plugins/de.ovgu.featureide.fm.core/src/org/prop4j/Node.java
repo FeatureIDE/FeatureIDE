@@ -26,9 +26,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 
@@ -65,6 +67,25 @@ public abstract class Node {
 	public Node[] getChildren() {
 		return children;
 	}
+
+	/**
+	 * Returns true iff this is in conjunctive normal form.
+	 * This is the case iff this is a conjunction of disjunctions of literals.
+	 * Note that redundant nodes may be omitted.
+	 * This means that instead of one-literal conjunctions and disjunctions, the literal alone may be stored.
+	 * @return true iff this is in conjunctive normal form.
+	 */
+	public abstract boolean isConjunctiveNormalForm();
+	
+	/**
+	 * Returns true iff this is in clausal normal form.
+	 * This is a more narrow case of conjunctive normal form.
+	 * Specifically, redundant nodes may not be omitted.
+	 * In other words, this must be a conjunction of clauses.
+	 * Each clause must in turn contain nothing but a positive amount of literals.
+	 * @return true iff this is in clausal normal form
+	 */
+	public abstract boolean isClausalNormalForm();
 
 	public Node toCNF() {
 		Node cnf = this;
@@ -525,4 +546,21 @@ public abstract class Node {
 		}
 	}
 
+	/**
+	 * Returns all literals contained in this node and its children.
+	 * @return all literals contained in this node and its children
+	 */
+	public Set<Literal> getLiterals() {
+		final Set<Literal> literals = new LinkedHashSet<>();
+		if (this instanceof Literal) {
+			literals.add((Literal) this);
+		}
+		if (children == null) {
+			return literals;
+		}
+		for (int i = 0; i < children.length; i++) {
+			literals.addAll(children[i].getLiterals());
+		}
+		return literals;
+	}
 }

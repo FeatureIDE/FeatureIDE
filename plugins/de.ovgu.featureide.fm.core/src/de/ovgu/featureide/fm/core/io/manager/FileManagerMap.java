@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -31,6 +30,7 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 public abstract class FileManagerMap {
 
 	private static final Map<String, IFileManager> map = new HashMap<>();
-	
+
 	public static String constructExtraPath(String path, IPersistentFormat<?> format) throws IllegalArgumentException {
 		final Path mainPath = Paths.get(path).toAbsolutePath();
 		final Path mainFileNamePath = mainPath.getFileName();
@@ -50,11 +50,11 @@ public abstract class FileManagerMap {
 			final Path subpath = mainPath.subpath(0, mainPath.getNameCount() - 1);
 			final Path root = mainPath.getRoot();
 			if (subpath != null && root != null) {
-				final Path extraFolder = root.resolve(subpath.resolve("." + mainFileNameString));
+				final Path extraFolder = root.resolve(subpath.resolve(".featureide").resolve(mainFileNameString));
 
-				if (!Files.exists(extraFolder)) {
+				if (!FileSystem.exists(extraFolder)) {
 					try {
-						Files.createDirectory(extraFolder);
+						FileSystem.mkDir(extraFolder);
 					} catch (IOException e) {
 						Logger.logError(e);
 					}
@@ -83,9 +83,10 @@ public abstract class FileManagerMap {
 	public static IFileManager getFileManager(String path) {
 		return map.get(constructAbsolutePath(path));
 	}
-	
+
 	/**
-	 * Checks whether there is already instance 
+	 * Checks whether there is already an instance.
+	 * 
 	 * @param path
 	 * @return
 	 */
@@ -126,7 +127,7 @@ public abstract class FileManagerMap {
 			}
 		}
 	}
-	
+
 	public static IFileManager remove(String path) {
 		return map.remove(constructAbsolutePath(path));
 	}

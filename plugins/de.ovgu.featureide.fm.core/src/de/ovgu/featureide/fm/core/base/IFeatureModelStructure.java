@@ -78,4 +78,6 @@ public interface IFeatureModelStructure {
 
 	boolean hasDeadFeatures();
 
+	void setShowHiddenFeatures(boolean showHiddenFeatures);
+
 }

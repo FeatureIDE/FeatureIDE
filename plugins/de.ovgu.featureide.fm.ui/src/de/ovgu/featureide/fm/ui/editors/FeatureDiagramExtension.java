@@ -25,11 +25,11 @@ import java.util.LinkedList;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.gef.editparts.AbstractConnectionEditPart;
 import org.eclipse.jface.action.IMenuManager;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 
 /**
@@ -71,7 +71,7 @@ public class FeatureDiagramExtension {
 	 * @return the revised tool tip
 	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart
 	 */
-	public Figure extendConnectionToolTip(Figure toolTipContent, ConnectionEditPart connectionEditPart) {
+	public Figure extendConnectionToolTip(Figure toolTipContent, AbstractConnectionEditPart connectionEditPart) {
 		return toolTipContent;
 	}
 

@@ -11,6 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.core,
  de.ovgu.featureide.fm.core
 Export-Package: 
+ com.sun.tools.classfile,
+ com.sun.tools.javac.jvm,
  de.ovgu.featureide.core,
  de.ovgu.featureide.core.builder,
  de.ovgu.featureide.core.builder.preprocessor,

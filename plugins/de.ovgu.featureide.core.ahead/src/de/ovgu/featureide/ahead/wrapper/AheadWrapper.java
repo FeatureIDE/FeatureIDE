@@ -21,7 +21,6 @@
 package de.ovgu.featureide.ahead.wrapper;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_PROBLEM_MARKERS_FOR;
-import jak2java.Jak2JavaWrapper;
 
 import java.io.IOException;
 import java.util.Vector;
@@ -39,6 +38,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import jak2java.Jak2JavaWrapper;
 
 /**
  * The AheadWrapper class encapsulates all functionality that has to do

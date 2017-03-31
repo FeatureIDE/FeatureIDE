@@ -183,7 +183,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 			final String featureName;
 
 			if (element instanceof FeatureEditPart) {
-				featureName = ((FeatureEditPart) element).getFeature().getObject().getName();
+				featureName = ((FeatureEditPart) element).getModel().getObject().getName();
 			} else if (element instanceof IFeature) {
 				featureName = ((IFeature) element).getName();
 			} else {

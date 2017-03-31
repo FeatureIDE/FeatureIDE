@@ -119,7 +119,7 @@ public class InterfaceProject {
 				factory = FMFactoryManager.getFactory(featureModelPath.toString(), format);
 			} catch (NoSuchExtensionException e) {
 				Logger.logError(e);
-				factory = FMFactoryManager.getFactory();
+				factory = FMFactoryManager.getDefaultFactory();
 			}
 			featureModel = factory.createFeatureModel();
 			FileHandler.load(featureModelPath, featureModel, format);

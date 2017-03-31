@@ -60,13 +60,13 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());
 
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, newFeature);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, feature, newFeature);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
-		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, feature, null);
+		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, null, newFeature);
 	}
 }

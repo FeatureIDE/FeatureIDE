@@ -58,7 +58,6 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
-
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -66,7 +65,6 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -371,7 +369,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
-		final String configPath = config.getRawLocation().toOSString();
+		final String configPath = createTemporaryConfigrationsFile(config).getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
 
@@ -998,7 +996,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final String configPath;
 		IFile currentConfiguration = featureProject.getCurrentConfiguration();
 		if (currentConfiguration != null) {
-			configPath = currentConfiguration.getRawLocation().toOSString();
+			configPath = createTemporaryConfigrationsFile(currentConfiguration).getRawLocation().toOSString();
 		} else {
 			configPath = featureProject.getProject().getFile(".project").getRawLocation().toOSString();
 		}
@@ -1040,7 +1038,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
-		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
+		composer.run(getArguments(createTemporaryConfigrationsFile(configurationFile).getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
 		if (errorPropagation != null && errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, because the

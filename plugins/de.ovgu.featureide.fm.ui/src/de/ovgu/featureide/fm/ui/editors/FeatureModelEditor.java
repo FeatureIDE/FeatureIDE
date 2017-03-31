@@ -137,7 +137,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			manager = FMFactoryManager.getFactory(markerHandler.getModelFile().getLocation().toString(), fmManager.getFormat());
 		} catch (NoSuchExtensionException e) {
 			FMUIPlugin.getDefault().logError(e);
-			manager = FMFactoryManager.getFactory();
+			manager = FMFactoryManager.getDefaultFactory();
 		}
 		final ProblemList warnings = fmManager.getFormat().getInstance().read(manager.createFeatureModel(), source);
 		createModelFileMarkers(warnings);

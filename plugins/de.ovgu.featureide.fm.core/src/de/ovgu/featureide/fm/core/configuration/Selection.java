@@ -41,4 +41,9 @@ public enum Selection {
 		return value;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString();
+	}
+
 }

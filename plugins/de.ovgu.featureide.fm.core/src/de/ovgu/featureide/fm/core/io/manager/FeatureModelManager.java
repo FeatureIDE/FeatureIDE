@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.CheckForNull;
 
@@ -52,17 +52,17 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 			if (format == null) {
 				Logger.logError(new ExtensionManager.NoSuchExtensionException("No format found for " + path));
 				try {
-					factory = FMFactoryManager.getFactory(path);
+					factory = FMFactoryManager.getDefaultFactoryForPath(path);
 				} catch (Exception e) {
 					Logger.logError(e);
-					factory = FMFactoryManager.getFactory();
+					factory = FMFactoryManager.getDefaultFactory();
 				}
 			} else {
 				try {
 					factory = FMFactoryManager.getFactory(path, format);
 				} catch (Exception e) {
 					Logger.logError(e);
-					factory = FMFactoryManager.getFactory();
+					factory = FMFactoryManager.getDefaultFactory();
 				}
 			}
 			featureModelManager = FeatureModelManager.getInstance(factory.createFeatureModel(), path, format);
@@ -82,7 +82,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	public static FeatureModelManager getInstance(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> format) {
 		final FeatureModelManager instance = FileManagerMap.getInstance(model, absolutePath, format, FeatureModelManager.class, IFeatureModel.class);
-		model.setSourceFile(new File(absolutePath));
+		model.setSourceFile(Paths.get(absolutePath));
 		instance.read();
 		return instance;
 	}

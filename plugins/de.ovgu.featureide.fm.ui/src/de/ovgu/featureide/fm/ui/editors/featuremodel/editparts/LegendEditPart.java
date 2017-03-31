@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
@@ -35,14 +34,28 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  */
 public class LegendEditPart extends AbstractGraphicalEditPart {
 
-	LegendEditPart(Object legend) {
-		super();
+	LegendEditPart(Legend legend) {
 		setModel(legend);
+	}
+	
+	@Override
+	public ModelEditPart getParent() {
+		return (ModelEditPart) super.getParent();
+	}
+	
+	@Override
+	public Legend getModel() {
+		return (Legend) super.getModel();
+	}
+	
+	@Override
+	public LegendFigure getFigure() {
+		return (LegendFigure) super.getFigure();
 	}
 
 	@Override
-	protected IFigure createFigure() {
-		return new LegendFigure(((Legend) this.getModel()).getModel(), ((Legend) getModel()).getPos());
+	protected LegendFigure createFigure() {
+		return new LegendFigure(getModel().getModel(), getModel().getPos());
 	}
 
 	@Override

@@ -23,13 +23,17 @@ package de.ovgu.featureide.fm.core.io;
 import java.io.File;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Writes a feature model to a file or string.
  * 
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead.
+ * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public interface IFeatureModelWriter {
 
 	/**

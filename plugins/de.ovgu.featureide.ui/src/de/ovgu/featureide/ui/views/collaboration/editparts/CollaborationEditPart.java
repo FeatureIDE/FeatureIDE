@@ -62,7 +62,7 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	/* (non-Javadoc)
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#createEditPolicies()
 	 */
-	//@Override
+	@Override
 	protected void createEditPolicies() {
 	}
 	

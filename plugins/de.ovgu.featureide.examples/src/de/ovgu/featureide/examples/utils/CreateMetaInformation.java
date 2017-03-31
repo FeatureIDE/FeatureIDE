@@ -187,8 +187,15 @@ public class CreateMetaInformation {
 	}
 
 	private static Path pluginRoot;
+	
+	private static boolean force = false;
 
 	public static void main(String[] args) throws IOException {
+		if (args.length > 0) {
+			if ("-force".equals(args[0])) {
+				force = true;
+			}
+		}
 		pluginRoot = Paths.get(".");
 		Path exampleDir = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
 		Path indexFile = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
@@ -243,10 +250,15 @@ public class CreateMetaInformation {
 		try {
 			final List<String> listOfFiles = new ArrayList<>();
 			Files.walkFileTree(projectDir, new FileWalker(listOfFiles, projectDir));
-			final Path fileToRead = projectDir.resolve(ProjectRecord.INDEX_FILENAME);
-			final List<String> listOfFilesOld = readFile(fileToRead);
+			final Path indexFile = projectDir.resolve(ProjectRecord.INDEX_FILENAME);
+			final List<String> listOfFilesOld = force ? null : readFile(indexFile);
 			if (listOfFilesOld == null || listOfFilesOld.hashCode() != listOfFiles.hashCode() || !listOfFiles.equals(listOfFilesOld)) {
-				Files.write(fileToRead, listOfFiles, Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+				StringBuilder sb = new StringBuilder();
+				for (String filePath : listOfFiles) {
+					sb.append(filePath);
+					sb.append("\n"); // always use Unix file separator to keep file lists line endings uniform across different platforms
+				}
+				Files.write(indexFile, sb.toString().getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
 						StandardOpenOption.WRITE);
 				return true;
 			}

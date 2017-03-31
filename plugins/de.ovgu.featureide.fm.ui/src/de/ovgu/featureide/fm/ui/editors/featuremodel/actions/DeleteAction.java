@@ -106,7 +106,7 @@ public class DeleteAction extends Action {
 			Object editPart = iter.next();
 			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature))
 				continue;
-			IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature().getObject() : (IFeature) editPart;
+			IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : (IFeature) editPart;
 			if (feature == root) {
 				if (root.getStructure().getChildrenCount() != 1)
 					return false;

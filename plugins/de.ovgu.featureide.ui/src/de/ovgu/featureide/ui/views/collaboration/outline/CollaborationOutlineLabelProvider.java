@@ -305,19 +305,25 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			if (colorID != FeatureColor.NO_COLOR.getValue()) {
 				item.setBackground(new Color(null, ColorPalette.getRGB(colorID, 0.5f)));
 			}
+			else {
+				item.setBackground(null);
+			}
 		} else if (data instanceof FSTRole) {
 			int colorID = ((FSTRole) data).getFeature().getColor();
 			if (colorID != FeatureColor.NO_COLOR.getValue()) {
 				item.setBackground(new Color(null, ColorPalette.getRGB(colorID, 0.5f)));
 			}
+			else {
+				item.setBackground(null);
+			}
 		} else {
 			final IRoleElement element = (IRoleElement) data;
 			for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
 				if (role.getFile().equals(iFile)
-						&& ((element instanceof FSTMethod && role.getAllMethods().contains(element))
+						&& ((element instanceof FSTMethod && role.getAllMethods().contains(element) && role.getClassFragment().getMethods().contains(element))
 								|| (element instanceof FSTInvariant && role.getClassFragment().getInvariants().contains(element))
-								|| (element instanceof FSTField && role.getAllFields().contains(element)) || (element instanceof FSTClassFragment && role
-								.getAllInnerClasses().contains(element)))) {
+								|| (element instanceof FSTField && role.getAllFields().contains(element) && role.getClassFragment().getFields().contains(element)) 
+								|| (element instanceof FSTClassFragment && role.getAllInnerClasses().contains(element)))) {
 					item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 					return;
 				}
@@ -326,6 +332,8 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 		}
 	}
+	
+	
 
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 		if (currentFile != null && oldFile != null) {

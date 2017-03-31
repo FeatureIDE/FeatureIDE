@@ -21,7 +21,7 @@
 package de.ovgu.featureide.ui.statistics.core;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ATOMIC_SETS_OF_THE_FEATURE_MODEL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STATISTICS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SYNTACTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE___DETAILS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATION_TOOL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LINES_OF_CODE;
@@ -54,7 +54,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RELATIVE_NUMBE
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_PRODUCT_LINE_SPECIFICATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TIMEOUT_STRING;
-import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 
 import java.util.HashMap;
 
@@ -77,12 +77,12 @@ public interface StatisticsIds {
 	public static final String OPEN_FILE = PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
 	public static final String PRODUCT_LINE_IMPLEMENTATION = STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION;
 	public static final String CONTRACT_COMPLEXITY = STATISTICS_OF_PRODUCT_LINE_SPECIFICATION;
-	public static final String VALID_CONFIGURATIONS = VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL;
+	public static final String SEMANTICAL_STATISTICS = SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 	public static final String ATOMIC_SETS = ATOMIC_SETS_OF_THE_FEATURE_MODEL;
 	public static final String CORE_FEATURES = "Number of core features";
 	public static final String DEAD_FEATURES = "Number of dead features";
 	public static final String FO_FEATURES = "Number of false-optional features";
-	public static final String NUMBER_OF_FEATURE = FEATURE_STATISTICS;
+	public static final String SYNTACTICAL_STATISTICS = SYNTACTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 	public static final String SEPARATOR = ": ";
 	public static final String CLASS_SEPARATOR = "$";
 	public static final String NUMBER_FEATURES = NUMBER_OF_FEATURES;
