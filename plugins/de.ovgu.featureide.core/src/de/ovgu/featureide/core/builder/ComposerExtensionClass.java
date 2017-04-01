@@ -448,7 +448,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 		final IFile tempConfigurationFile = folder.getFile(new Path(configName));
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), false);
 
 		final IConfigurationFormat inFormat = ConfigFormatManager.getInstance().getFormatByExtension(orgExtension);
 		if (inFormat == null) {
