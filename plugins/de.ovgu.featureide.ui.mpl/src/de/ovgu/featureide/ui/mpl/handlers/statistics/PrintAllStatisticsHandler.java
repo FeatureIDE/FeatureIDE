@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.mpl.handlers.statistics;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FOLDER_OF_STATISTICS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS;
+
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;

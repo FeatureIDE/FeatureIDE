@@ -35,6 +35,7 @@ public interface XMLFeatureModelTags {
 	static final String FEATURE_ORDER = "featureOrder";
 	static final String CONSTRAINTS = "constraints";
 	static final String CONSTRAINT = "constraint";
+	static final String COLLAPSED = "collapsed";
 	static final String FEATURES = "features";
 	static final String CHOSEN_LAYOUT_ALGORITHM = "chosenLayoutAlgorithm";
 	static final String C = "c";
@@ -59,6 +60,7 @@ public interface XMLFeatureModelTags {
 	static final String NAME = "name";
 	static final String FALSE = "false";
 	static final String SHOW_HIDDEN_FEATURES = "showHiddenFeatures";
+	static final String SHOW_COLLAPSED_CONSTRAINTS = "showCollapsedConstraints";
 	static final String SHOW_SHORT_NAMES = "showShortNames";
 	static final String HORIZONTAL_LAYOUT = "horizontalLayout";
 	static final String RULE = "rule";

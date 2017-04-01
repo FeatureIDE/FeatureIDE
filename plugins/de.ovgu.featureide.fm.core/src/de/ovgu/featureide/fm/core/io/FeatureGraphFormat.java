@@ -90,4 +90,9 @@ public class FeatureGraphFormat implements IFeatureGraphFormat {
 		return ID;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }

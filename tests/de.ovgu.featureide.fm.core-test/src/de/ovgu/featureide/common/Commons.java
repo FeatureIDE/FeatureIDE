@@ -62,6 +62,9 @@ public class Commons {
 
 	public static final String FEATURE_MODEL_BENCHMARK_PATH_REMOTE = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/";
 	public static final String FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH = "benchmarkFeatureModels";
+	
+	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/";
+	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH = "testFeatureModels";
 
 	/**
 	 * Returns a file reference to <code>remotePath</code> via a absolute path on TeamCity build server or
@@ -130,10 +133,10 @@ public class Commons {
 		
 		for (File f : files) {
 			if (f.getName().equals(featureModelXmlFilename)) {
-				return FeatureModelManager.readFromFile(f.toPath());
+				return FeatureModelManager.load(f.toPath()).getObject();
 			}
 		}
-		return FMFactoryManager.getFactory().createFeatureModel();
+		return FMFactoryManager.getEmptyFeatureModel();
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

@@ -45,4 +45,9 @@ public class ExpressionFormat extends DefaultFormat {
 		return ID;
 	}
 
+	@Override
+	public String getName() {
+		return "Expression";
+	}
+
 }

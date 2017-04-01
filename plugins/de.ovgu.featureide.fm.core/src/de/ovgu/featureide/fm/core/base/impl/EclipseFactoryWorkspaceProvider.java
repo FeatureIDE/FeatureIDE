@@ -48,7 +48,7 @@ public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProv
 
 	public FactoryWorkspace getFactoryWorkspace(String path) {
 		final IFile[] findFilesForLocationURI = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(Paths.get(path).toUri());
-		if (findFilesForLocationURI.length > 0) {
+		if (findFilesForLocationURI.length > 0 && findFilesForLocationURI[0].getProject() != null) {
 			return super.getFactoryWorkspace(findFilesForLocationURI[0].getProject().toString());
 		}
 		return defaultWorkspace;
@@ -76,7 +76,7 @@ public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProv
 			}
 			for (Entry<String, FactoryWorkspace> entry : projectMap.entrySet()) {
 				final IFile file = root.getProject(entry.getKey()).getFile(FACTORY_WORKSPACE_FILENAME + format.getSuffix());
-				FileHandler.save(Paths.get(file.getLocationURI()), entry.getValue(), format.getInstance());
+				FileHandler.save(Paths.get(file.getLocationURI()), entry.getValue(), format);
 			}
 		}
 	}

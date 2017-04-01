@@ -101,6 +101,11 @@ public interface ILanguage {
 	 * @return The word for: "Hidden"
 	 */
 	public String getHidden();
+	
+	/**
+	 * @return The word for: "Collapsed"
+	 */
+	public String getCollapsed();
 
 	/**
 	 * @return The translation for: "Dead"

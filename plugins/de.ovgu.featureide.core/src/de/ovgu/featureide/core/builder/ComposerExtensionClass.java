@@ -59,7 +59,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -325,7 +324,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public String getConfigurationExtension() {
-		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
+		return ConfigFormatManager.getInstance().getExtensions().get(0).getSuffix();
 	}
 
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
@@ -347,6 +346,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public boolean hasSourceFolder() {
+		return true;
+	}
+
+	public boolean hasSource() {
 		return true;
 	}
 
@@ -421,13 +424,9 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 */
 	public IFile createTemporaryConfigrationsFile(IFile config) {
 		String configName = config.getName();
-		final String orgExtension;
 		final int extIndex = configName.lastIndexOf('.');
 		if (extIndex > 0) {
-			orgExtension = configName.substring(extIndex + 1);
 			configName = configName.substring(0, extIndex);
-		} else {
-			orgExtension = "";
 		}
 		configName = configName + '.' + getConfigurationExtension();
 		CorePlugin.getDefault().logInfo("create config " + configName);
@@ -450,13 +449,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), false);
 
-		final IConfigurationFormat inFormat = ConfigFormatManager.getInstance().getFormatByExtension(orgExtension);
-		if (inFormat == null) {
-			CorePlugin.getDefault().logWarning("failed to read " + config);
-			return null;
-		}
-
-		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, inFormat);
+		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		if (problems.containsError()) {
 			CorePlugin.getDefault().logWarning("failed to read " + config);
 			return null;

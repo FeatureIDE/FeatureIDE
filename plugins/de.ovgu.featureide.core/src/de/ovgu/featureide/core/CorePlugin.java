@@ -23,19 +23,13 @@ package de.ovgu.featureide.core;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AND_COMPOSER_TO_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_OLD_NATURE_TO_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONF;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COULD_NOT_SET_PERSISTANT_PROPERTY;
-import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IN_PROJECT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSER_FOUND_IN_DESCRIPTION_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_DESCRIPTION_FOUND_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_RESOURCE_GIVEN_WHILE_GETTING_THE_PROJECT_DATA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -106,6 +100,8 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -166,7 +162,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		featureProjectMap = new HashMap<IProject, IFeatureProject>();
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-			try { 
+			try {
 				if (project.isOpen()) {
 					// conversion for old projects
 					IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
@@ -197,8 +193,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @throws CoreException
 	 */
 	private static void changeOldNature(IProject project, String composerID) throws CoreException {
-		CorePlugin.getDefault().logInfo(
-				CHANGE_OLD_NATURE_TO_ + FeatureProjectNature.NATURE_ID + AND_COMPOSER_TO_ + composerID + IN_PROJECT_ + project.getName() + "'");
+		CorePlugin.getDefault()
+				.logInfo(CHANGE_OLD_NATURE_TO_ + FeatureProjectNature.NATURE_ID + AND_COMPOSER_TO_ + composerID + IN_PROJECT_ + project.getName() + "'");
 		IProjectDescription description = project.getDescription();
 		String[] natures = description.getNatureIds();
 		for (int i = 0; i < natures.length; i++)
@@ -289,7 +285,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		IFeatureProject featureProject = featureProjectMap.remove(project);
 		// Quick fix #402 
 		featureProject.dispose();
-		
+
 		logInfo(project.getName() + REMOVED);
 
 		for (IProjectListener listener : projectListeners)
@@ -362,34 +358,28 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * Starts composer specific changes of the project structure,
 	 * after adding the FeatureIDE nature to a project.
 	 */
-	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath) {
-		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false);
+	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
+			final String buildPath) {
+		final IComposerExtensionClass composer = getComposer(compositionToolID);
 
-		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
-		try {
-			for (IConfigurationElement e : config) {
-				if (e.getAttribute("id").equals(compositionToolID)) {
-					final Object o = e.createExecutableExtension("class");
-					if (o instanceof IComposerExtensionClass) {
+		createProjectStructure(project, sourcePath, configPath, buildPath, composer);
+		IFeatureModel featureModel = createFeatureModelFile(project);
+		createConfigFile(project, configPath, featureModel, project.getName().split("[-]")[0] + ".");
 
-						ISafeRunnable runnable = new ISafeRunnable() {
-							public void handleException(Throwable e) {
-								getDefault().logError(e);
-							}
-
-							public void run() throws Exception {
-								runProjectConversion(project, sourcePath, configPath, buildPath, (IComposerExtensionClass) o);
-							}
-						};
-						SafeRunner.run(runnable);
-					}
-					break;
+		if (composer != null) {
+			ISafeRunnable runnable = new ISafeRunnable() {
+				public void handleException(Throwable e) {
+					getDefault().logError(e);
 				}
-			}
-		} catch (CoreException e) {
-			getDefault().logError(e);
-		}
 
+				public void run() throws Exception {
+					runProjectConversion(project, sourcePath, configPath, buildPath, composer);
+					addFeatureNatureToProject(project);
+				}
+			};
+			SafeRunner.run(runnable);
+		}
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, false);
 	}
 
 	/**
@@ -423,26 +413,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		/**
-		 * create a configuration to automatically build
-		 * the project after adding the FeatureIDE nature
-		 **/
-		IFile configFile = project.getFolder(configPath).getFile(project.getName().split("[-]")[0] + "." + composer.getConfigurationExtension());
-		FileWriter fw = null;
-		try {
-			fw = new FileWriter(configFile.getRawLocation().toFile());
-			fw.write(BASE_FEATURE);
-
-			configFile.create(null, true, null);
-			configFile.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (CoreException e) {
-			// Avoid file exist error
-			// Has no negative effect
-		} finally {
-			if (fw != null) {
-				fw.close();
-			}
-		}
 	}
 
 	/**
@@ -455,40 +425,30 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param addCompiler <code>false</code> if the project already has a compiler
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addCompiler) {
-		createProjectStructure(project, sourcePath, configPath, buildPath);
+			final String buildPath, boolean addCompiler, boolean addNature) {
+		final IComposerExtensionClass composer = getComposer(compositionToolID);
 
-		if (addCompiler) {
-			try {
-				IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
-				for (IConfigurationElement e : config) {
-					if (e.getAttribute("id").equals(compositionToolID)) {
-						final Object o = e.createExecutableExtension("class");
-						if (o instanceof IComposerExtensionClass) {
+		createProjectStructure(project, sourcePath, configPath, buildPath, composer);
+		IFeatureModel featureModel = createFeatureModelFile(project);
+		createConfigFile(project, configPath, featureModel, "default.");
 
-							ISafeRunnable runnable = new ISafeRunnable() {
-								public void handleException(Throwable e) {
-									getDefault().logError(e);
-								}
-
-								public void run() throws Exception {
-									((IComposerExtensionClass) o).addCompiler(project, sourcePath, configPath, buildPath);
-
-									final String path = project.getFolder(configPath).getRawLocation() + "/default."
-											+ ((IComposerExtensionClass) o).getConfigurationExtension();
-									new File(path).createNewFile();
-									project.getFolder(configPath).refreshLocal(IResource.DEPTH_INFINITE, null);
-								}
-							};
-							SafeRunner.run(runnable);
-						}
-						break;
-					}
+		if (composer != null && addCompiler) {
+			ISafeRunnable runnable = new ISafeRunnable() {
+				public void handleException(Throwable e) {
+					getDefault().logError(e);
 				}
-			} catch (CoreException e) {
-				getDefault().logError(e);
-			}
+
+				public void run() throws Exception {
+					composer.addCompiler(project, sourcePath, configPath, buildPath);
+				}
+			};
+			SafeRunner.run(runnable);
 		}
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, addNature);
+	}
+
+	private static void setProjectProperties(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
+			final String buildPath, boolean addNature) {
 		try {
 			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
 			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
@@ -497,7 +457,27 @@ public class CorePlugin extends AbstractCorePlugin {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
 		}
-		addFeatureNatureToProject(project);
+		if (addNature) {
+			addFeatureNatureToProject(project);
+		}
+	}
+
+	private static IComposerExtensionClass getComposer(String compositionToolID) {
+		IComposerExtensionClass composer = null;
+		for (IConfigurationElement element : Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID)) {
+			if (element.getAttribute("id").equals(compositionToolID)) {
+				try {
+					final Object o = element.createExecutableExtension("class");
+					if (o instanceof IComposerExtensionClass) {
+						composer = (IComposerExtensionClass) o;
+					}
+				} catch (CoreException e) {
+					getDefault().logError(e);
+				}
+				break;
+			}
+		}
+		return composer;
 	}
 
 	private static void addFeatureNatureToProject(IProject project) {
@@ -544,30 +524,46 @@ public class CorePlugin extends AbstractCorePlugin {
 		return folder;
 	}
 
+	public static IFolder getFolder(IProject project, String name) {
+		if ("".equals(name)) {
+			return null;
+		}
+		String[] names = name.split("[/]");
+		IFolder folder = null;
+		for (String folderName : names) {
+			if (folder == null) {
+				folder = project.getFolder(folderName);
+			} else {
+				folder = folder.getFolder(folderName);
+			}
+		}
+		return folder;
+	}
+
 	/**
 	 * Creates the source-, features- and build-folder at the given paths.<br>
 	 * Also creates the bin folder if necessary.<br>
 	 * Creates the default feature model.
-	 * 
-	 * @param project
-	 * @param sourcePath
-	 * @param configPath
-	 * @param buildPath
 	 */
-	private static void createProjectStructure(IProject project, String sourcePath, String configPath, String buildPath) {
+	private static void createProjectStructure(IProject project, String sourcePath, String configPath, String buildPath, IComposerExtensionClass composer) {
 		try {
 			/** just create the bin folder if project has only the FeatureIDE Nature **/
 			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if ("".equals(buildPath) && "".equals(sourcePath)) {
+				if (!("".equals(buildPath) && "".equals(sourcePath)) && composer.hasSource()) {
 					createFolder(project, "bin");
 				}
 			}
 		} catch (CoreException e) {
 			getDefault().logError(e);
 		}
-		createFolder(project, sourcePath);
+		if (composer.hasSource()) {
+			createFolder(project, sourcePath);
+			createFolder(project, buildPath);
+		}
 		createFolder(project, configPath);
-		createFolder(project, buildPath);
+	}
+
+	private static IFeatureModel createFeatureModelFile(IProject project) {
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
 		final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
@@ -576,13 +572,22 @@ public class CorePlugin extends AbstractCorePlugin {
 			factory = FMFactoryManager.getFactory(modelPath.toString(), format);
 		} catch (NoSuchExtensionException e) {
 			Logger.logError(e);
-			factory = FMFactoryManager.getFactory();
+			factory = FMFactoryManager.getDefaultFactory();
 		}
 		IFeatureModel featureModel = factory.createFeatureModel();
 		FMComposerManager.getFMComposerExtension(project);
 		featureModel.createDefaultValues(project.getName());
 
 		FileHandler.save(modelPath, featureModel, format);
+		return featureModel;
+	}
+
+	private static Configuration createConfigFile(IProject project, String configPath, IFeatureModel featureModel, final String configName) {
+		final XMLConfFormat configFormat = new XMLConfFormat();
+		final IFile file = project.getFolder(configPath).getFile(configName + configFormat.getSuffix());
+		final Configuration config = new Configuration(featureModel);
+		FileHandler.save(Paths.get(file.getLocationURI()), config, configFormat);
+		return config;
 	}
 
 	/**
@@ -627,18 +632,6 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public static boolean hasProjectData(IResource res) {
 		return getFeatureProject(res) != null;
-	}
-
-	/**
-	 * @return A list of all valid configuration extensions
-	 */
-	public LinkedList<String> getConfigurationExtensions() {
-		LinkedList<String> extensions = new LinkedList<String>();
-		extensions.add(CONFIG);
-		extensions.add(EQUATION);
-		extensions.add(EXPRESSION);
-		extensions.add(CONF);
-		return extensions;
 	}
 
 	/**
@@ -701,7 +694,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		if (signatures != null) {
 			SignatureIterator it = signatures.iterator();
 			int featureID = signatures.getFeatureID(featureName);
-			if(featureID == -1){
+			if (featureID == -1) {
 				return Collections.emptyList();
 			}
 			it.addFilter(new ContextFilter(featureName, signatures));
@@ -793,8 +786,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void buildContextDocumentation(List<IProject> pl, String options, String featureName) {
 		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
-			arguments.add(new PrintDocumentationJob.Arguments("Docu_Context_" + featureName, options.split("\\s+"),
-					new ContextMerger(), featureName, iProject));
+			arguments
+					.add(new PrintDocumentationJob.Arguments("Docu_Context_" + featureName, options.split("\\s+"), new ContextMerger(), featureName, iProject));
 		}
 		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
@@ -810,8 +803,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void buildFeatureDocumentation(List<IProject> pl, String options, String featureName) {
 		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
-			arguments.add(new PrintDocumentationJob.Arguments("Docu_Feature_" + featureName, options.split("\\s+"),
-					new FeatureModuleMerger(), featureName, iProject));
+			arguments.add(new PrintDocumentationJob.Arguments("Docu_Feature_" + featureName, options.split("\\s+"), new FeatureModuleMerger(), featureName,
+					iProject));
 		}
 		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
@@ -823,7 +816,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
-	
+
 	public static Node removeFeatures(IFeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
 		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, removeFeatures);
 		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);

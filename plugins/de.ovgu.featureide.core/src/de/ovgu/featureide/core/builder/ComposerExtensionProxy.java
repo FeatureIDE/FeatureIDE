@@ -44,7 +44,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	private final Map<IFeatureProject, IComposerExtensionClass> projectComposerMap;
 	private IComposerExtensionClass defaultComposerExtensionClass;
 
-	public ComposerExtensionProxy(IConfigurationElement configurationElement) {
+	public ComposerExtensionProxy(IConfigurationElement configurationElement) throws Exception {
 		this.configElement = configurationElement;
 		name = configElement.getAttribute("name");
 		id = configElement.getAttribute("id");
@@ -54,6 +54,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 			defaultComposerExtensionClass = (IComposerExtensionClass) configElement.createExecutableExtension("class");
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
+			throw e;
 		}
 	}
 
@@ -71,7 +72,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public String toString() {
 		return "Name: " + name + "; ID: " + id;
 	}
-	
+
 	@Override
 	public String getDescription() {
 		return description;
@@ -104,6 +105,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	}
 
 	@Override
+	public boolean hasSource() {
+		return defaultComposerExtensionClass.hasSource();
+	}
+
+	@Override
 	public boolean hasContractComposition() {
 		return defaultComposerExtensionClass.hasContractComposition();
 	}
@@ -127,17 +133,17 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public boolean supportsAndroid() {
 		return defaultComposerExtensionClass.supportsAndroid();
 	}
-	
+
 	@Override
 	public boolean supportsMigration() {
 		return defaultComposerExtensionClass.supportsMigration();
 	}
-	
+
 	@Override
 	public IStatus isComposable() {
 		return defaultComposerExtensionClass.isComposable();
 	}
-	
+
 	@Override
 	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c) {
 		return defaultComposerExtensionClass.getComposerObjectInstance(c);

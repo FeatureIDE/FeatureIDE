@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.prop4j.And;
 import org.prop4j.AtMost;
@@ -72,6 +73,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + XmlFeatureModelFormat.class.getSimpleName();
+
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
 
 	private IFeatureModelFactory factory;
 
@@ -263,21 +266,36 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		final Element fnod;
 		if (children.isEmpty()) {
 			fnod = doc.createElement(FEATURE);
-		} else if (feat.getStructure().isAnd()) {
-			fnod = doc.createElement(AND);
-		} else if (feat.getStructure().isOr()) {
-			fnod = doc.createElement(OR);
-		} else if (feat.getStructure().isAlternative()) {
-			fnod = doc.createElement(ALT);
+			final String description = feat.getProperty().getDescription();
+			if (description != null && !description.trim().isEmpty()) {
+				final Element descr = doc.createElement(DESCRIPTION);
+				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
+				fnod.appendChild(descr);
+			}
+			writeAttributes(node, fnod, feat);
 		} else {
-			fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
-		}
+			if (feat.getStructure().isAnd()) {
+				fnod = doc.createElement(AND);
+			} else if (feat.getStructure().isOr()) {
+				fnod = doc.createElement(OR);
+			} else if (feat.getStructure().isAlternative()) {
+				fnod = doc.createElement(ALT);
+			} else {
+				fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
+			}
+			final String description = feat.getProperty().getDescription();
+			if (description != null && !description.trim().isEmpty()) {
+				final Element descr = doc.createElement(DESCRIPTION);
+				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
+				fnod.appendChild(descr);
+			}
 
-		addDescription(doc, feat, fnod);
-		writeAttributes(node, fnod, feat);
+			addDescription(doc, feat, fnod);
+			writeAttributes(node, fnod, feat);
 
-		for (IFeature feature : children) {
-			createXmlDocRec(doc, fnod, feature);
+			for (IFeature feature : children) {
+				createXmlDocRec(doc, fnod, feature);
+			}
 		}
 	}
 
@@ -478,7 +496,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (nodeName.equals(DESCRIPTION)) {
 				/* case: description */
 				String nodeValue = e.getFirstChild().getNodeValue();
-				if (nodeValue != null) {
+				if (nodeValue != null && !nodeValue.isEmpty()) {
 					nodeValue = nodeValue.replace("\t", "");
 					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
 					nodeValue = nodeValue.trim();
@@ -598,6 +616,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }

@@ -20,11 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.nio.file.Path;
+
 import javax.annotation.CheckForNull;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -34,15 +38,33 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeatureModel> {
 
-	@CheckForNull
-	public static IPersistentFormat<IGraphicalFeatureModel> getFormat(String fileName) {
-		return new GraphicalFeatureModelFormat();
+	private static class ObjectCreator extends AFileManager.ObjectCreator<IGraphicalFeatureModel> {
+		private final IGraphicalFeatureModel model;
+
+		public ObjectCreator(IGraphicalFeatureModel model) {
+			super(IGraphicalFeatureModel.class, GraphicalFeatureModelManager.class,
+					new FormatManager<GraphicalFeatureModelFormat>(new GraphicalFeatureModelFormat()));
+			this.model = model;
+		}
+
+		@Override
+		protected IGraphicalFeatureModel createObject(Path path, IPersistentFormat<IGraphicalFeatureModel> format) throws NoSuchExtensionException {
+			return model;
+		}
 	}
 
-	public static GraphicalFeatureModelManager getInstance(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {
-		final GraphicalFeatureModelManager manager = FileManagerMap.getInstance(model, absolutePath, format, GraphicalFeatureModelManager.class, IGraphicalFeatureModel.class);
-		manager.read();
-		return manager;
+	@CheckForNull
+	public static GraphicalFeatureModelManager getInstance(Path path) {
+		return (GraphicalFeatureModelManager) getAInstance(path);
+	}
+
+	@CheckForNull
+	public static GraphicalFeatureModelManager getInstance(Path path, IGraphicalFeatureModel model) {
+		return (GraphicalFeatureModelManager) getAInstance(path, new ObjectCreator(model));
+	}
+
+	public static FileHandler<IGraphicalFeatureModel> load(Path path, IGraphicalFeatureModel model) {
+		return getFileHandler(path, new ObjectCreator(model));
 	}
 
 	protected GraphicalFeatureModelManager(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {

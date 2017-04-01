@@ -13,8 +13,8 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -48,7 +48,7 @@ public class ConfigAnalysisUtils {
 		int iconf = 0;
 		for (IFile config : configs) {
 			final Configuration configuration = new Configuration(featureProject.getFeatureModel());
-			FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigurationManager.getFormat(config.getName()));
+			FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 			Set<String> configFeatures = configuration.getSelectedFeatureNames();
 			int ifeat = 0;
 			for (String f : featureList) {

@@ -60,7 +60,6 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -74,7 +73,6 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -82,8 +80,8 @@ import de.ovgu.featureide.fm.core.constraint.ReferenceType;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -139,17 +137,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(file.getName());
-		final IFeatureModelFactory fmFactory;
-		try {
-			fmFactory = FMFactoryManager.getFactory(file.getAbsolutePath(), format);
-		} catch (NoSuchExtensionException e) {
-			Logger.logError(e);
-			return null;
-		}
-		final IFeatureModel fm = fmFactory.createFeatureModel();
-		FileHandler.<IFeatureModel>load(file.toPath(), fm, format);
-		return fm;
+		return FeatureModelManager.load(file.toPath()).getObject();
 	}
 	
 	private boolean checkExternalModelFile(Tree curNode) {
@@ -977,8 +965,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				reportSyntaxError(curNode);
 			}
 		}
-		IFeatureModel mappingModel = FMFactoryManager.getFactory().createFeatureModel();
-		IFeatureStructure rootFeature = FMFactoryManager.getFactory().createFeature(mappingModel, "MPL").getStructure();
+		final IFeatureModelFactory mappingModelFactory = FMFactoryManager.getDefaultFactory();
+		IFeatureModel mappingModel = mappingModelFactory.createFeatureModel();
+		IFeatureStructure rootFeature = mappingModelFactory.createFeature(mappingModel, "MPL").getStructure();
 		rootFeature.setAnd();
 		rootFeature.setAbstract(true);
 		rootFeature.setMandatory(true);
@@ -994,14 +983,14 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		
 		for (Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
 			if (parameter.getValue().getType() == ExtendedFeature.TYPE_INTERFACE) {
-				IFeatureStructure parameterFeature = FMFactoryManager.getFactory().createFeature(mappingModel, parameter.getKey()).getStructure();
+				IFeatureStructure parameterFeature = mappingModelFactory.createFeature(mappingModel, parameter.getKey()).getStructure();
 				parameterFeature.setOr();
 				parameterFeature.setAbstract(true);
 				parameterFeature.setMandatory(true);
 				rootFeature.addChild(parameterFeature);
 				
 				for (String projectName : possibleProjects) {
-					IFeatureStructure projectFeature = FMFactoryManager.getFactory().createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
+					IFeatureStructure projectFeature = mappingModelFactory.createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
 					projectFeature.setAbstract(false);
 					projectFeature.setMandatory(false);
 					parameterFeature.addChild(projectFeature);

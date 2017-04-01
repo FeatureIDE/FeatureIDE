@@ -153,6 +153,17 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 		}
 		return ret.toString();
 	}
+	
+	/**
+	 * Returns a command and in an else case also a negation
+	 * @return
+	 */
+	public String toCommandString() {
+		if (command.equals(FSTDirectiveCommand.ELSE) || command.equals(FSTDirectiveCommand.ELSE_NOT)) {
+			return "if !(" + parent.getExpression() + ")";
+		}
+		return interpretCommand(command) + ' ' + expression;
+	}
 
 	@Override
 	public String toString() {

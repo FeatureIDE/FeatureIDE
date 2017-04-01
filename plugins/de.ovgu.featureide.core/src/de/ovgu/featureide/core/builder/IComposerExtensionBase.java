@@ -52,6 +52,11 @@ public interface IComposerExtensionBase extends IExtension {
 	boolean hasSourceFolder();
 
 	/**
+	 * @return <code>false</code> if the project has no source code. Default: <code>true</code>
+	 */
+	boolean hasSource();
+
+	/**
 	 * @return <code>true</code> if the composition tool supports contract composition.
 	 */
 	boolean hasContractComposition();

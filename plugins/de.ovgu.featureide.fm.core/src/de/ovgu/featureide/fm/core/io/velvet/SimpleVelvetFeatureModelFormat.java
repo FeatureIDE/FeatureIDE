@@ -25,10 +25,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SUCH_ATTRIB
 import static java.lang.String.format;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -58,7 +58,6 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -81,7 +80,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SimpleVelvetFeatureModelFormat.class.getSimpleName();
 
-	protected File featureModelFile;
+	protected Path featureModelFile;
 
 	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
 	private static final String NEWLINE = System.getProperty("line.separator", "\n");
@@ -736,11 +735,6 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 				reportSyntaxError(curNode);
 			}
 		}
-		IFeatureModel mappingModel = FMFactoryManager.getFactory().createFeatureModel();
-		IFeatureStructure rootFeature = FMFactoryManager.getFactory().createFeature(mappingModel, "MPL").getStructure();
-		rootFeature.setAnd();
-		rootFeature.setAbstract(true);
-		rootFeature.setMandatory(true);
 	}
 
 	private void parseUse(Tree root, IFeature parent) throws RecognitionException {
@@ -748,7 +742,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void reportWarning(Tree curNode, String message) {
-		Logger.logWarning(message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \""
+		Logger.logWarning(message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getFileName() : "") + ": \""
 				+ curNode.getText() + "\")");
 	}
 
@@ -784,6 +778,11 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
 	}
 
 }

@@ -63,7 +63,6 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.PluginID;
@@ -89,8 +88,8 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
  * Reads / Writes feature models in the Velvet format.
@@ -328,7 +327,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		final ProblemList problemList = new ProblemList();
 		extFeatureModel = (ExtendedFeatureModel) object;
 		if (extFeatureModel != null) {
-			featureModelFile = extFeatureModel.getSourceFile();
+			featureModelFile = extFeatureModel.getSourceFile().toFile();
 		}
 
 		ByteArrayInputStream inputstr = new ByteArrayInputStream(source.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
@@ -377,18 +376,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(file.getName());
-		final IFeatureModelFactory fmFactory;
-		try {
-			fmFactory = FMFactoryManager.getFactory(file.getAbsolutePath(), format);
-		} catch (NoSuchExtensionException e) {
-			Logger.logError(e);
-			return null;
-		}
-		final IFeatureModel fm = fmFactory.createFeatureModel();
-		fm.setSourceFile(file);
-		FileHandler.<IFeatureModel> load(file.toPath(), fm, format);
-		return fm;
+		return FeatureModelManager.load(file.toPath()).getObject();
 	}
 
 	private boolean checkExternalModelFile(Tree curNode) {
@@ -608,18 +596,9 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private IFeatureModel readExternalModelFileAPI(File file) {
-		IFeatureModelFormat format = null;
-		IFeatureModelFactory fmFactory = null;
-		if (file.getName().endsWith(".xml")) {
-			format = new XmlFeatureModelFormat();
-			fmFactory = new ExtendedFeatureModelFactory();
-		} else {
-			format = new VelvetFeatureModelFormat(true);
-			fmFactory = new ExtendedFeatureModelFactory();
-		}
-		final IFeatureModel fm = fmFactory.createFeatureModel();
-		fm.setSourceFile(file);
-		FileHandler.load(file.toPath(), fm, format);
+		final IFeatureModel fm = new ExtendedFeatureModelFactory().createFeatureModel();
+		fm.setSourceFile(file.toPath());
+		FileHandler.load(file.toPath(), fm, FMFormatManager.getInstance());
 		return fm;
 	}
 
@@ -1273,8 +1252,9 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 		}
 		if (!IS_USED_AS_API) {
-			IFeatureModel mappingModel = FMFactoryManager.getFactory().createFeatureModel();
-			IFeatureStructure rootFeature = FMFactoryManager.getFactory().createFeature(mappingModel, "MPL").getStructure();
+			final IFeatureModelFactory mappingModelFactory = FMFactoryManager.getDefaultFactory();
+			IFeatureModel mappingModel = mappingModelFactory.createFeatureModel();
+			IFeatureStructure rootFeature = mappingModelFactory.createFeature(mappingModel, "MPL").getStructure();
 			rootFeature.setAnd();
 			rootFeature.setAbstract(true);
 			rootFeature.setMandatory(true);
@@ -1290,14 +1270,14 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 			for (Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
 				if (parameter.getValue().getType() == ExtendedFeature.TYPE_INTERFACE) {
-					IFeatureStructure parameterFeature = FMFactoryManager.getFactory().createFeature(mappingModel, parameter.getKey()).getStructure();
+					IFeatureStructure parameterFeature = mappingModelFactory.createFeature(mappingModel, parameter.getKey()).getStructure();
 					parameterFeature.setOr();
 					parameterFeature.setAbstract(true);
 					parameterFeature.setMandatory(true);
 					rootFeature.addChild(parameterFeature);
 
 					for (String projectName : possibleProjects) {
-						IFeatureStructure projectFeature = FMFactoryManager.getFactory()
+						IFeatureStructure projectFeature = mappingModelFactory
 								.createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
 						projectFeature.setAbstract(false);
 						projectFeature.setMandatory(false);
@@ -1405,6 +1385,11 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
 	}
 
 }

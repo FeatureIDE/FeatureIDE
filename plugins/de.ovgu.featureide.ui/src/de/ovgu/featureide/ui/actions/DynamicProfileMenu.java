@@ -44,7 +44,7 @@ public class DynamicProfileMenu extends ContributionItem {
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
 	private final IFeatureModel featureModel; {
 		IFeatureProject curFeatureProject = getCurrentFeatureProject();
-		featureModel = curFeatureProject == null ? FMFactoryManager.getFactory().createFeatureModel() : curFeatureProject.getFeatureModel();
+		featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
 	}
 	private boolean multipleSelected = isMultipleSelection();
 

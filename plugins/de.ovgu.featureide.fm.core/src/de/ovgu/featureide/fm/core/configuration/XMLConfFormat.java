@@ -55,12 +55,12 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	public boolean supportsRead() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean supportsWrite() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -157,6 +157,16 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
+	@Override
+	public String getName() {
+		return "XML";
 	}
 
 }

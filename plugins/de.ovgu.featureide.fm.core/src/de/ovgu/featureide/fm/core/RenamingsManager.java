@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +39,9 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 
 /**
  * Handles feature renamings.
@@ -82,6 +83,7 @@ public class RenamingsManager implements IEventManager {
 			renameVariables(c.getNode(), oldName, newName);
 		}
 
+		FeatureColorManager.renameFeature(model, oldName, newName);
 		// update the feature order list
 
 		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
@@ -110,12 +112,11 @@ public class RenamingsManager implements IEventManager {
 	};
 
 	public void performRenamings(File file) {
-		final String location = file.getPath();
-		performRenamings(location);
+		performRenamings(file.toPath());
 	}
 
-	private void performRenamings(final String location) {
-		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(location);
+	public void performRenamings(Path path) {
+		final FeatureModelManager instance = FeatureModelManager.getInstance(path);
 		if (instance == null) {
 			return;
 		}

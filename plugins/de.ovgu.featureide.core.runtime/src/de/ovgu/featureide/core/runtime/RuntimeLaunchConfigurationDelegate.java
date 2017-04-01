@@ -33,10 +33,10 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationDelegate {
@@ -60,7 +60,7 @@ public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationD
 			final String userDefinedArgs = launchConfigCopy.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, "");
 
 			final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
-			FileHandler.load(configPath, featureProjectConfig, ConfigurationManager.getFormat(configPath.getFileName().toString()));
+			FileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 
 			String args = userDefinedArgs;
 			for (final SelectableFeature f : featureProjectConfig.getFeatures()) {
