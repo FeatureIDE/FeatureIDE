@@ -68,7 +68,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	}
 
 	@Override
-	public boolean hasFeaureOrder() {
+	public boolean hasFeatureOrder() {
 		return false;
 	}
 	

@@ -178,7 +178,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	@Override
 	public void createPartControl(Composite parent) {
 		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
-		hasFeatureOrder = FMComposerManager.getFMComposerExtension(project).hasFeaureOrder();
+		hasFeatureOrder = FMComposerManager.getFMComposerExtension(project).hasFeatureOrder();
 		comp = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		comp.setLayout(layout);

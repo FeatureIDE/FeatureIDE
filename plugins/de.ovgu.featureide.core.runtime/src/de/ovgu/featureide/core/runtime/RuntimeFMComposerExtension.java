@@ -62,7 +62,7 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 	}
 
 	@Override
-	public boolean hasFeaureOrder() {
+	public boolean hasFeatureOrder() {
 		return true;
 	}
 

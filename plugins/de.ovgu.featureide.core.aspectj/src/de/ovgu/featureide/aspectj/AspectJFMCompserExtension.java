@@ -216,7 +216,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
 	 */
 	@Override
-	public boolean hasFeaureOrder() {
+	public boolean hasFeatureOrder() {
 		return false;
 	}
 

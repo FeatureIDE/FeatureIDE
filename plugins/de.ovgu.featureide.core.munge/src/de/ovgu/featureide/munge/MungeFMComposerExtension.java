@@ -150,7 +150,7 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 	}
 	
 	@Override
-	public boolean hasFeaureOrder() {
+	public boolean hasFeatureOrder() {
 		return false;
 	}
 }

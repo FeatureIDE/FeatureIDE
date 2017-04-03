@@ -39,7 +39,7 @@ public class FMComposerExtension implements IFMComposerExtension {
 	}
 
 	@Override
-	public boolean hasFeaureOrder() {
+	public boolean hasFeatureOrder() {
 		return true;
 	}
 

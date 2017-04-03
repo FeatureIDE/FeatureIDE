@@ -171,8 +171,8 @@ public class FMComposerManager implements IFMComposerExtension {
 	}
 
 	@Override
-	public boolean hasFeaureOrder() {
-		return fmComposerExtension.hasFeaureOrder();
+	public boolean hasFeatureOrder() {
+		return fmComposerExtension.hasFeatureOrder();
 	}
 
 	@Override
