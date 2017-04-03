@@ -1,13 +1,11 @@
+public class World implements interfaces.IMessage {
 
-public class World implements interfaces.Print, interfaces.Announce{
-
-	@Override
-	public void announce() {
-		System.err.print("World");
+	public String getMessage() {
+		return " world";
+	}
+	
+	public boolean isStartMessage() {
+		return false;
 	}
 
-	@Override
-	public void print() {
-		System.out.print("World");
-	}
 }

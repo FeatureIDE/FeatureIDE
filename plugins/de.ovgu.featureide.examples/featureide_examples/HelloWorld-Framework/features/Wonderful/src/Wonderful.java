@@ -1,9 +1,11 @@
+public class Wonderful implements interfaces.IMessage {
 
-public class Wonderful implements interfaces.Print{
-
-	@Override
-	public void print() {
-		System.out.print(" Wonderful ");
+	public String getMessage() {
+		return " wonderful";
+	}
+	
+	public boolean isStartMessage() {
+		return false;
 	}
 
 }

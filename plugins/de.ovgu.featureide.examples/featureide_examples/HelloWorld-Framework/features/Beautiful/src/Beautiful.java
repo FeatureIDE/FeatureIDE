@@ -1,7 +1,11 @@
+public class Beautiful implements interfaces.IMessage {
 
-public class Beautiful implements interfaces.Print{
-	@Override
-	public void print() {
-		System.out.print(" Beautiful ");	
+	public String getMessage() {
+		return " beautiful";
 	}
+	
+	public boolean isStartMessage() {
+		return false;
+	}
+
 }

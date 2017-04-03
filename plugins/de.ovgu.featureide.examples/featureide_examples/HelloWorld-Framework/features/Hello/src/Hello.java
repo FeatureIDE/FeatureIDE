@@ -1,7 +1,11 @@
+public class Hello implements interfaces.IMessage {
 
-public class Hello implements interfaces.Print {
-	@Override
-	public void print() {
-		System.out.print(" Hello ");
+	public String getMessage() {
+		return "Hello";
 	}
+	
+	public boolean isStartMessage() {
+		return true;
+	}
+
 }
