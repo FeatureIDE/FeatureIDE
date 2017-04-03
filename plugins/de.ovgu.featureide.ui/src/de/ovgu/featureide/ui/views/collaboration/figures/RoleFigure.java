@@ -492,6 +492,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (name.startsWith(RoleElement.DEFAULT_PACKAGE)) {
 			name = name.substring(RoleElement.DEFAULT_PACKAGE.length());
 		}
+		if (name.contains(".")) {
+			name = name.substring(name.lastIndexOf(".")+1, name.length());
+		}
 		
 		RoleFigureLabel classLabel = new RoleFigureLabel(name, IMAGE_CLASS, classFragment.getFullName());
 		classLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
