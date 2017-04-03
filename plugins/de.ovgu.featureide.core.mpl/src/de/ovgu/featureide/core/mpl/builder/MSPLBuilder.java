@@ -88,7 +88,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 
 	private final HashMap<String, Boolean> buildMap = new HashMap<String, Boolean>();
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
 		final IProject project = getProject();

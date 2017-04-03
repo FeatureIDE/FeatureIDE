@@ -71,7 +71,6 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
 public class BuildProductsPage extends WizardPage implements IConfigurationBuilderBasics {
 
 	private static final String JUNIT_PLUGIN_WARNING = "Testing generated producted requires plugin \"org.junit\" which cannot be found.";

@@ -20,11 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.configMap.actions;
 
-import java.io.File;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.ImageData;
 
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;

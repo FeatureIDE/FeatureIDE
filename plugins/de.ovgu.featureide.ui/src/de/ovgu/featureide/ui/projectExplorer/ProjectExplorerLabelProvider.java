@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.projectExplorer;
 
-import java.awt.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +46,6 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**

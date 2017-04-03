@@ -45,12 +45,14 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	private class JobFL extends JobChangeAdapter {
+		@SuppressWarnings("rawtypes")
 		private JobFinishListener listener;
 
-		public JobFL(JobFinishListener listener) {
+		public JobFL(@SuppressWarnings("rawtypes") JobFinishListener listener) {
 			this.listener = listener;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void done(IJobChangeEvent event) {
 			listener.jobFinished(AbstractJob.this);
@@ -83,6 +85,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		setPriority(priority);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final void addJobFinishedListener(final JobFinishListener listener) {
 		addJobChangeListener(new JobFL(listener));
@@ -98,6 +101,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		return status;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final void removeJobFinishedListener(JobFinishListener listener) {
 		removeJobChangeListener(new JobFL(listener));

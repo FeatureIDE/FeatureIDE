@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.actions;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.color.DefaultColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 

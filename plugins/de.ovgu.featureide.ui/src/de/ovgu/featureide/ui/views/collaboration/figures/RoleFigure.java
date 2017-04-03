@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.views.collaboration.figures;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;

@@ -26,7 +26,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
-import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 
 /**
  * @author Paul Maximilian Bittner
