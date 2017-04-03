@@ -264,7 +264,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			InputStream source = new ByteArrayInputStream(stringBuilder.toString()
 					.getBytes(Charset.availableCharsets().get("UTF-8")));
 			
-			IFile file = parentFolder.getFile("." + getConfigurationExtension());
+			IFile file = parentFolder.getFile("temp." + getConfigurationExtension());
 			try {
 				if (file.exists()) {
 					file.setContents(source, false, true, null);	

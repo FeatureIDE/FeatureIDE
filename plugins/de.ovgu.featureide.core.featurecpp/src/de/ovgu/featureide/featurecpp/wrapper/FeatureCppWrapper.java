@@ -138,7 +138,7 @@ public class FeatureCppWrapper {
 	}
 
 	public void compose(IFile config) {
-		assert (config != null && config.exists()) : CONFIGURATION_FILE_DOES_NOT_EXIST;
+		assert (config == null || !config.exists()) : CONFIGURATION_FILE_DOES_NOT_EXIST;
 		try {
 			if (!buildDirectory.exists())
 				buildDirectory.create(false, true, null);
@@ -157,8 +157,10 @@ public class FeatureCppWrapper {
 		} else {
 			command.add(GPP);
 		}
-		command.add(config.getRawLocation().toOSString());
-		process(command);
+		if(config != null) {
+			command.add(config.getRawLocation().toOSString());
+			process(command);
+		}
 	}
 
 	private void process(AbstractList<String> command) {
