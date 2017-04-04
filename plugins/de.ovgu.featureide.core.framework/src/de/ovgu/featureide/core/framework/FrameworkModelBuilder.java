@@ -164,7 +164,9 @@ public class FrameworkModelBuilder {
 			interfaceVisitor = new MyASTVisitor(true);
 			interfaceUnit.accept(interfaceVisitor);
 		} catch (final IOException e) {
-			FrameworkCorePlugin.getDefault().logError(e);
+			//Interface not found
+			FrameworkCorePlugin.getDefault().logWarning(e.getMessage());
+			return;
 		}
 
 		final IFile classFile = findFile(location, implementingClass);
