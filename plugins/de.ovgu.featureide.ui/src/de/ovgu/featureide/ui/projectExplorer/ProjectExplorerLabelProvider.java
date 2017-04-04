@@ -20,8 +20,13 @@
  */
 package de.ovgu.featureide.ui.projectExplorer;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -46,6 +51,9 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -57,6 +65,8 @@ import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.Explore
 @SuppressWarnings("restriction")
 public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
+	private List<String> selectedFeatures = new ArrayList<String>();
+	
 	public ProjectExplorerLabelProvider() {
 		super(new PackageExplorerContentProvider(true));
 	}
@@ -86,6 +96,21 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject == null) {
 				return superImage;
 			}
+			
+			//Save all selected Features as String List
+			selectedFeatures = new ArrayList<String>();
+			IFile currentConfig = featureProject.getCurrentConfiguration();
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(currentConfig.getRawLocation().toOSString()));
+				String line;
+				while((line = br.readLine()) != null)
+				{
+					selectedFeatures.add(line);
+				}
+			} catch (IOException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+			
 			IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return superImage;
@@ -245,7 +270,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			return;
 		}
 		for (FSTRole r : clazz.getRoles()) {
-			if (colorUnselectedFeature || r.getFeature().isSelected()) {
+			if (colorUnselectedFeature || selectedFeatures.contains(r.getFeature().getName())) {
 				if (r.getFeature().getColor() != FeatureColor.NO_COLOR.getValue()) {
 					myColors.add(r.getFeature().getColor());
 				}
@@ -350,6 +375,21 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject == null) {
 				return null;
 			}
+
+			//Save all selected Features as String List
+			selectedFeatures = new ArrayList<String>();
+			IFile currentConfig = featureProject.getCurrentConfiguration();
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(currentConfig.getRawLocation().toOSString()));
+				String line;
+				while((line = br.readLine()) != null)
+				{
+					selectedFeatures.add(line);
+				}
+			} catch (IOException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+			
 			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return null;
