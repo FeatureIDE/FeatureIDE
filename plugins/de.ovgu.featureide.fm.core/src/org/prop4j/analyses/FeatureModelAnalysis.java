@@ -241,6 +241,10 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 			checkFeatureHidden(features);
 			monitor.step();
+		} else { //unsatisfiable and therefore void feature model
+			for (final IFeature feature : features) {
+				setFeatureAttribute(feature, FeatureStatus.DEAD);
+			}
 		}
 	}
 
