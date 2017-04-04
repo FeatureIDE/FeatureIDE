@@ -432,7 +432,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 		CorePlugin.getDefault().logInfo("create config " + configName);
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), false);
 
 		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		if (problems.containsError()) {
