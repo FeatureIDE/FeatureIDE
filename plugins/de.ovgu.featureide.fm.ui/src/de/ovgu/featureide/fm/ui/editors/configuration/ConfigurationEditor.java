@@ -119,7 +119,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	public boolean invalidFeatureModel = true;
 
-	private boolean containsError = true;
+	private boolean containsError = false;
 
 	/**
 	 * The file of the corresponding feature model.
