@@ -1277,7 +1277,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						getGraphicalFeatureModel());
 				defectElement.update(event);
 			}
-			FeatureUIHelper.setCurrentExpalantion(newActiveExplanation);
 
 			//Notify each affected element of its new active reason.
 			final Map<IGraphicalElement, Explanation.Reason> elementOldActiveReasons = getGraphicalElementReasons(oldActiveExplanation);
@@ -1290,10 +1289,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						elementNewActiveReasons.get(element)));
 			}
 			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
+			
 			if(legendFigure != null && legendFigure.isVisible())
 			{
-				legendFigure.refreshExplanation();
+				legendFigure.refreshExplanation(newActiveExplanation);
 			}
+			legendAction.refresh();
+			legendLayoutAction.refresh();
 			break;
 
 		case DEFAULT:

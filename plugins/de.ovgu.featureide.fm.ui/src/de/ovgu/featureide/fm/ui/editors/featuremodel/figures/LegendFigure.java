@@ -107,7 +107,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String FALSE_OPT_TOOLTIP = "False optional feature:\n\nThis feature is declared optional, but is always selected\n if the parent feature is selected.";
 	private static final String INDET_HIDDEN_TOOLTIP = "Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
 	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";
-	private static final String UNSATISFIABLE_CONST_TOOLTIP = "Unsatisfiable Constraint\n\nThis constraint cannot become true";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
 	private static final String MODEL_CONST_TOOLTIP = CONSTRAINT_MAKES_THE_MODEL_VOID_;
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
@@ -144,7 +143,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean showHidden;
 	private boolean falseoptional;
 	private boolean indetHidden;
-	private boolean unsatisfiableConst;
 	private boolean tautologyConst;
 	private boolean voidModelConst;
 	private boolean redundantConst;
@@ -190,15 +188,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		}
 		indetHidden = fmStructure.hasIndetHidden();
 
-		unsatisfiableConst = analyser.calculateConstraints && FeatureUtils.hasUnsatisfiableConst(featureModel);
 		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
 		voidModelConst = analyser.calculateConstraints && FeatureUtils.hasVoidModelConst(featureModel);
 		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
 		implicitConst = isImplicit(graphicalFeatureModel);
 
-		if (FeatureUIHelper.getCurrentExpalantion() != null) {
-			explanations = true;
-		}
+		explanations = false;
 
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
@@ -283,10 +278,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getTautologyConst());
 		}
-		if (unsatisfiableConst) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getUnsatisfiableConst());
-		}
 		if (voidModelConst) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getVoidModelConst());
@@ -361,10 +352,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createRowVoidModelConst(row++);
 		}
 
-		if (unsatisfiableConst) {
-			createRowUnsatisfiableConst(row++);
-		}
-
 		if (falseoptional) {
 			createRowFalseOpt(row++);
 		}
@@ -380,7 +367,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (implicitConst) {
 			createRowImplicitConst(row++);
 		}
-		refreshExplanation();
 	}
 
 	/**
@@ -398,13 +384,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Label labelIndetHidden = createLabel(row, language.getImplicitConst(), FMPropertyManager.getFeatureForgroundColor(), IMPLICIT_TOOLTIP);
 		add(labelIndetHidden);
 	}
-
-	private void createRowUnsatisfiableConst(int row) {
-		createSymbol(row, DEAD, false, UNSATISFIABLE_CONST_TOOLTIP);
-		Label labelIndetHidden = createLabel(row, language.getUnsatisfiableConst(), FMPropertyManager.getFeatureForgroundColor(), UNSATISFIABLE_CONST_TOOLTIP);
-		add(labelIndetHidden);
-	}
-
+	
 	private void createRowTautologyConst(int row) {
 		createSymbol(row, FALSE_OPT, false, TAUTOLOGY_CONST_TOOLTIP);
 		Label labelIndetHidden = createLabel(row, language.getTautologyConst(), FMPropertyManager.getFeatureForgroundColor(), TAUTOLOGY_CONST_TOOLTIP);
@@ -684,7 +664,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		this.add(rect);
 	}
 
-	public void refreshExplanation() {
+	public void refreshExplanation(Explanation explanation) {
 		//Remove explanation
 		if (explanationFigure != null) {
 			if (explanationFigure.getParent() != null) {
@@ -697,10 +677,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				}
 			}
 		}
-		explanations = FeatureUIHelper.getCurrentExpalantion() != null ? true : false;
+		explanations = explanation != null ? true : false;
+		
 		if (explanations) {
-			Explanation explanation = FeatureUIHelper.getCurrentExpalantion();
-
 			lastWidth = getSize().width;
 			XYLayout layout = new XYLayout();
 			explanationFigure = new Figure();
@@ -718,17 +697,17 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 			switch (explanation.getMode()) {
 			case DEAD_FEATURE:
-				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " dead feature because of highlighted dependencies:");
+				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " is dead because of highlighted dependencies:");
 				explanationFigure.setToolTip(createToolTipContent("The feature\n" + explanation.getDefectElement().getName() + "\nis dead because of the highligthed dependencies."));
 				break;
 			case FALSE_OPTIONAL_FEATURE:
-				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " false-optional because of highlighted dependencies:");
+				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " is false-optional because of highlighted dependencies:");
 				explanationFigure.setToolTip(createToolTipContent("The feature\n" + explanation.getDefectElement().getName() + "\nis false optional because of the highligthed dependencies."));
 				break;
 			case REDUNDANT_CONSTRAINT:
 				Constraint constraint = (Constraint)explanation.getDefectElement();
 				int index = graphicalFeatureModel.getConstraintIndex(constraint);
-				labelExplanation.setText((index+1) + ". constraint redundant because of highlighted dependencies:");
+				labelExplanation.setText((index+1) + ". constraint is redundant because of highlighted dependencies:");
 				explanationFigure.setToolTip(createToolTipContent("The constraint\n" + constraint.getDisplayName() + "\nis redundant because of the highligthed dependencies."));
 				break;
 
