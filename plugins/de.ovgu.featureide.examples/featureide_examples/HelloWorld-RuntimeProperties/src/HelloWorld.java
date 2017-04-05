@@ -41,7 +41,7 @@ public class HelloWorld {
 			System.out.print(" wonderful");
 		}
 		if (PropertyManager.getProperty("World")) {
-			System.out.println(" World!");
+			System.out.println(" world");
 		}
 	}
 

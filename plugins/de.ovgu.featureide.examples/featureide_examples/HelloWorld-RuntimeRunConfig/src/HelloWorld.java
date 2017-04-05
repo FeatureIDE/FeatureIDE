@@ -44,7 +44,7 @@ public class HelloWorld {
 			System.out.print(" wonderful");
 		}
 		if (list.contains("World")) {
-			System.out.println(" World!");
+			System.out.println(" world");
 		}
 	}
 
