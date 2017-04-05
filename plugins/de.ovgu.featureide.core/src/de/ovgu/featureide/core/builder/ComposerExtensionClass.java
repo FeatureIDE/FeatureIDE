@@ -433,7 +433,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 		CorePlugin.getDefault().logInfo("create config " + configName);
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_LAZY);
 
 		final IConfigurationFormat inFormat = ConfigFormatManager.getInstance().getFormatByExtension(orgExtension);
 		if (inFormat == null) {
