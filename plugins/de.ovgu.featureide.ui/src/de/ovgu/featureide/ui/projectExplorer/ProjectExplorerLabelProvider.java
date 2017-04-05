@@ -158,8 +158,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			}
 			FSTModel model = featureProject.getFSTModel();
 			if (model == null || model.getClasses().isEmpty()) {
-				featureProject.getComposer().buildFSTModel();
-				model = featureProject.getFSTModel();
+				return superImage;
 			}
 			if (!composer.getName().equals("AHEAD")) {
 				if (composer.hasFeatureFolder()) {
