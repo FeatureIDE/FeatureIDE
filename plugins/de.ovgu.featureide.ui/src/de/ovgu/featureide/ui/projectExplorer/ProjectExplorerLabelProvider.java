@@ -20,10 +20,7 @@
  */
 package de.ovgu.featureide.ui.projectExplorer;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +50,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -97,19 +94,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				return superImage;
 			}
 			
-			//Save all selected Features as String List
-			selectedFeatures = new ArrayList<String>();
-			IFile currentConfig = featureProject.getCurrentConfiguration();
-			try {
-				BufferedReader br = new BufferedReader(new FileReader(currentConfig.getRawLocation().toOSString()));
-				String line;
-				while((line = br.readLine()) != null)
-				{
-					selectedFeatures.add(line);
-				}
-			} catch (IOException e) {
-				UIPlugin.getDefault().logError(e);
-			}
+			readCurrentConfiguration(featureProject);
 			
 			IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
@@ -236,6 +221,18 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		}
 
 		return superImage;
+	}
+
+	/**
+	 * Stores all selected Features in a string list.
+	 * 
+	 * @param featureProject
+	 */
+	private void readCurrentConfiguration(IFeatureProject featureProject) {
+		final Configuration config = new Configuration(featureProject.getFeatureModel());
+		final IFile currentConfig = featureProject.getCurrentConfiguration();
+		FileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigurationManager.getFormat(currentConfig.getName()));
+		selectedFeatures = new ArrayList<>(config.getSelectedFeatureNames());
 	}
 
 	private boolean isJavaFile(final IFile file) {
@@ -375,19 +372,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				return null;
 			}
 
-			//Save all selected Features as String List
-			selectedFeatures = new ArrayList<String>();
-			IFile currentConfig = featureProject.getCurrentConfiguration();
-			try {
-				BufferedReader br = new BufferedReader(new FileReader(currentConfig.getRawLocation().toOSString()));
-				String line;
-				while((line = br.readLine()) != null)
-				{
-					selectedFeatures.add(line);
-				}
-			} catch (IOException e) {
-				UIPlugin.getDefault().logError(e);
-			}
+			readCurrentConfiguration(featureProject);
 			
 			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
