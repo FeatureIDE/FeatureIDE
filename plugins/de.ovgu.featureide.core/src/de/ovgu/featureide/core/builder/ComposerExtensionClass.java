@@ -23,6 +23,8 @@ package de.ovgu.featureide.core.builder;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -61,6 +63,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.JavaFileSystem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
@@ -419,7 +422,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 * @param config The configuration file to read from.
 	 * @return The temporary configuration file.
 	 */
-	public IFile createTemporaryConfigrationsFile(IFile config) {
+	public java.nio.file.Path createTemporaryConfigrationsFile(IFile config) {
 		String configName = config.getName();
 		final String orgExtension;
 		final int extIndex = configName.lastIndexOf('.');
@@ -429,26 +432,9 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		} else {
 			orgExtension = "";
 		}
-		configName = configName + '.' + getConfigurationExtension();
 		CorePlugin.getDefault().logInfo("create config " + configName);
-		final IFolder folder = config.getProject().getFolder(".tempconf");
-		try {
-			if (!folder.exists()) {
-				folder.create(true, true, null);
-			} else {
-				for (IResource member : folder.members()) {
-					if (!member.getName().equals(configName)) {
-						member.delete(true, null);
-					}
-				}
-			}
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
 
-		final IFile tempConfigurationFile = folder.getFile(new Path(configName));
-
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_LAZY);
 
 		final IConfigurationFormat inFormat = ConfigFormatManager.getInstance().getFormatByExtension(orgExtension);
 		if (inFormat == null) {
@@ -462,9 +448,16 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			return null;
 		}
 
-		FileHandler.save(Paths.get(tempConfigurationFile.getLocationURI()), configuration, new DefaultFormat());
+		try {
+			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + getConfigurationExtension());
+			new JavaFileSystem().write(tempFile, new DefaultFormat().write(configuration).getBytes(Charset.defaultCharset()));
+			tempFile.toFile().deleteOnExit();
+			return tempFile;
+		} catch (Exception e) {
+			CorePlugin.getDefault().logError(e);
+		}
 
-		return tempConfigurationFile;
+		return null;
 	}
 
 	@Override

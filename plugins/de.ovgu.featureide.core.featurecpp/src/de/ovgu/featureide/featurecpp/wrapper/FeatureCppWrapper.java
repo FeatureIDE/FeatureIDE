@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.AbstractList;
 import java.util.LinkedList;
 
@@ -137,8 +138,8 @@ public class FeatureCppWrapper {
 		return true;
 	}
 
-	public void compose(IFile config) {
-		assert (config == null || !config.exists()) : CONFIGURATION_FILE_DOES_NOT_EXIST;
+	public void compose(java.nio.file.Path config) {
+		assert (config != null && Files.exists(config)) : CONFIGURATION_FILE_DOES_NOT_EXIST;
 		try {
 			if (!buildDirectory.exists())
 				buildDirectory.create(false, true, null);
@@ -157,8 +158,8 @@ public class FeatureCppWrapper {
 		} else {
 			command.add(GPP);
 		}
-		if(config != null) {
-			command.add(config.getRawLocation().toOSString());
+		if (config != null) {
+			command.add(config.toString());
 			process(command);
 		}
 	}

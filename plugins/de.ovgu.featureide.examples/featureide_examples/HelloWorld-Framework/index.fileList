@@ -1,6 +1,7 @@
 .classpath
 .project
 configs/BeautifulWorld.config
+configs/Hello.config
 configs/HelloWorld.config
 configs/WonderfulWorld.config
 features/Beautiful/.classpath
