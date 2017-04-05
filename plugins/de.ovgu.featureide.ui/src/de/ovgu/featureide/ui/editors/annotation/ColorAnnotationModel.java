@@ -305,13 +305,13 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				} catch (BadLocationException e) {
 					CorePlugin.getDefault().logError(e);
 				}
+			} else {
+				if (!directiveMap.isEmpty()) {
+					annotatedPositions.clear();
+					updateDirectives();
+					createAnnotations();
+				}
 			}
-			if (!directiveMap.isEmpty()) {
-				annotatedPositions.clear();
-				updateDirectives();
-				createAnnotations();
-			}
-
 		}
 	}
 
