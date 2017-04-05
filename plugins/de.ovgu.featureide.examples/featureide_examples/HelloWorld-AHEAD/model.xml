@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="HelloWorld">
 				<feature mandatory="true" name="Hello"/>
@@ -7,9 +8,18 @@
 					<feature mandatory="true" name="Wonderful"/>
 					<feature mandatory="true" name="Beautiful"/>
 				</alt>
-				<feature mandatory="true" name="World"/>
+				<feature name="World"/>
 			</and>
 		</struct>
-		<constraints/>
+		<constraints>
+			<rule>
+				<imp>
+					<var>Feature</var>
+					<var>World</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>
