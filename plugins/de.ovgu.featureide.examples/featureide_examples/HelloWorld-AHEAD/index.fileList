@@ -2,10 +2,11 @@
 .project
 .settings/org.eclipse.jdt.core.prefs
 configs/BeautifulWorld.config
+configs/Hello.config
 configs/HelloWorld.config
 configs/WonderfulWorld.config
-features/Beautiful/Main.jak
-features/Hello/Main.jak
-features/Wonderful/Main.jak
-features/World/Main.jak
+features/Beautiful/HelloWorld.jak
+features/Hello/HelloWorld.jak
+features/Wonderful/HelloWorld.jak
+features/World/HelloWorld.jak
 model.xml

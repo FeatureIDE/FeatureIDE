@@ -6,7 +6,7 @@ public:
 		if (res!=0)
 			return res;
 
-		printf(" World!");
+		printf(" world");
 		return 0;
 	}
 };
