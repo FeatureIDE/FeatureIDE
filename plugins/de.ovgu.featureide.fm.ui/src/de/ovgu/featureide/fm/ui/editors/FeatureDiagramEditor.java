@@ -69,9 +69,9 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -432,8 +432,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return;
 		}
 		final IFeatureModelElement primaryModel = primary.getModel().getObject();
-		getFeatureModel().getAnalyser().addExplanation(primaryModel);
-		final Explanation activeExplanation = getFeatureModel().getAnalyser().getExplanation(primaryModel);
+		final Explanation activeExplanation;
+		if (getFeatureModel().getAnalyser().valid()) {
+			getFeatureModel().getAnalyser().addExplanation(primaryModel);
+			activeExplanation = getFeatureModel().getAnalyser().getExplanation(primaryModel);
+		} else {
+			getFeatureModel().getAnalyser().addVoidFeatureModelExplanation();
+			activeExplanation = getFeatureModel().getAnalyser().getVoidFeatureModelExplanation();
+		}
 		setActiveExplanation(activeExplanation);
 	}
 
