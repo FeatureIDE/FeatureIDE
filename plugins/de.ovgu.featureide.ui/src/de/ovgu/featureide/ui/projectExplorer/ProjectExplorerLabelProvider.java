@@ -261,6 +261,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 * @return colors for files
 	 */
 	private void getColors(Set<Integer> myColors, IFile myfile, FSTModel model, boolean colorUnselectedFeature) {
+		if (model == null)
+			return;
 		FSTClass clazz = model.getClass(model.getAbsoluteClassName(myfile));
 		if (clazz == null) {
 			return;
