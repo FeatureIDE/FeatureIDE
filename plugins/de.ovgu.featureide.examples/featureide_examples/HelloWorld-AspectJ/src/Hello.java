@@ -25,13 +25,14 @@
  * 
  * @author Thomas Thuem
  */
-public class HelloWorld {
+public class Hello {
 
 	protected void print() {
+		System.out.print("Hello");
 	}
 
 	public static void main(String[] args) {
-		new HelloWorld().print();
+		new Hello().print();
 	}
 
 }

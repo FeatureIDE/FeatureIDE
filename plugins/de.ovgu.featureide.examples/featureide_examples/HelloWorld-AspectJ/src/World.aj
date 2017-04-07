@@ -27,9 +27,7 @@
  */
 public aspect World {
 
-	declare precedence: World, Wonderful, Beautiful, Hello; 
-
-	after(): call(void HelloWorld.print()) {
+	after(): execution(void Hello.print()) {
 		System.out.print(" world");
 	}
 
