@@ -28,6 +28,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
 import java.beans.PropertyChangeEvent;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -139,7 +140,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			FMUIPlugin.getDefault().logError(e);
 			manager = FMFactoryManager.getDefaultFactory();
 		}
-		final ProblemList warnings = fmManager.getFormat().getInstance().read(manager.createFeatureModel(), source);
+		IFeatureModel model = manager.createFeatureModel();
+		
+		if(getEditorInput() instanceof IFileEditorInput)
+		{
+			IFileEditorInput input = (IFileEditorInput)getEditorInput();
+			IFile sourceFile = input.getFile();
+			model.setSourceFile(sourceFile.getRawLocation().toFile().toPath());
+		}
+		final ProblemList warnings = fmManager.getFormat().getInstance().read(model, source);
 		createModelFileMarkers(warnings);
 
 		return !warnings.containsError();
