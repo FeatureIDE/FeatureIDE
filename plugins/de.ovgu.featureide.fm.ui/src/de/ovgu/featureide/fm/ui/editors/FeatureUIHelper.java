@@ -53,8 +53,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * @author Christian Kaestner
  */
 public class FeatureUIHelper {
-
-	private static Explanation currentExplanation;
 	
 	private static final Map<IGraphicalFeatureModel, Dimension> legendSize = new WeakHashMap<>();
 	private static final Map<IGraphicalFeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
@@ -65,16 +63,6 @@ public class FeatureUIHelper {
 	
 	public static IGraphicalFeature getGraphicalRootFeature(IGraphicalFeatureModel model) {
 		return getGraphicalFeature(model.getFeatureModel().getStructure().getRoot(), model);
-	}
-
-	public static Explanation getCurrentExpalantion()
-	{
-		if(currentExplanation == null) return null;
-		return currentExplanation;
-	}
-	public static void setCurrentExpalantion(Explanation explanation)
-	{
-		currentExplanation = explanation;
 	}
 	
 	public static IGraphicalElement getGraphicalElement(IFeatureModelElement element, IGraphicalFeatureModel model) {
