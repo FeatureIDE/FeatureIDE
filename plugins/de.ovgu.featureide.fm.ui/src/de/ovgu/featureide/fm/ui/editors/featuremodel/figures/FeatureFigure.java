@@ -181,15 +181,15 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		default:
 			break;
 		}
-		
+
 		if (!analyser.valid()) {
-			if (getFeature().getObject().getStructure().isRoot()) {
-				toolTip.setLength(0);
-				toolTip.trimToSize();
-				toolTip.append(VOID);
-			}
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+			toolTip.setLength(0);
+			toolTip.trimToSize();
+			toolTip.append(VOID);
 		}
-		
+
 		if (feature instanceof ExtendedFeature) {
 			final ExtendedFeature extendedFeature = (ExtendedFeature) feature;
 

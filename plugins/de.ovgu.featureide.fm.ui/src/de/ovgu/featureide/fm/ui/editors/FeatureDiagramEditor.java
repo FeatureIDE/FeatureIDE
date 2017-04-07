@@ -268,7 +268,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		initializeGraphicalViewer();
 
 		FeatureColorManager.addListener(this);
-		
+
 		if (isEditable) {
 			setEditDomain(new DefaultEditDomain(featureModelEditor));
 		}
@@ -452,6 +452,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void setActiveExplanation(Explanation activeExplanation) {
 		final Explanation oldActiveExplanation = this.activeExplanation;
 		this.activeExplanation = activeExplanation;
+		graphicalFeatureModel.setActiveExplanation(activeExplanation);
 		getFeatureModel().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
 	}
 
@@ -709,8 +710,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		boolean isEmpty = true;
 		for (Object obj : ((StructuredSelection) getSelection()).toArray()) {
-			if (obj instanceof FeatureEditPart || obj instanceof IFeature)
-			{
+			if (obj instanceof FeatureEditPart || obj instanceof IFeature) {
 				isEmpty = false;
 			}
 		}
@@ -940,7 +940,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					}
 				}
 				setActiveExplanation();
-				getContents().refresh(); // call refresh to redraw legend
+				getContents().refresh();
 				return Status.OK_STATUS;
 			}
 
@@ -1213,7 +1213,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				centerPointOnScreen((IFeature) event.getSource());
 			}
 
-			//redraw the explanation after collaspse
+			//redraw the explanation after collapse
 			propertyChange(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, activeExplanation, activeExplanation));
 			break;
 		case COLLAPSED_ALL_CHANGED:
@@ -1226,7 +1226,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			//Center root feature after operation
 			centerPointOnScreen(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 
-			//redraw the explanation after collaspse
+			//redraw the explanation after collapse
 			propertyChange(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, activeExplanation, activeExplanation));
 			break;
 		case COLOR_CHANGED:
@@ -1294,16 +1294,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, elementOldActiveReasons.get(element),
 						elementNewActiveReasons.get(element)));
 			}
-			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
-			
-			if(legendFigure != null && legendFigure.isVisible())
+			LegendFigure legend = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
+			if (legend != null && legend.isVisible())
 			{
-				legendFigure.refreshExplanation(newActiveExplanation);
+				legend.recreateLegend();
 			}
-			legendAction.refresh();
-			legendLayoutAction.refresh();
 			break;
-
 		case DEFAULT:
 			break;
 		default:
