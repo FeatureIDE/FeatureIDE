@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>HelloWorld-Run Configuration</name>
+	<name>HelloWorld-RuntimeParameters</name>
 	<comment>
 	[description]
 	Plain HelloWorld-example for Runtime variability using the program arguments of Eclipse.

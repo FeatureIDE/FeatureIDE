@@ -5,5 +5,5 @@ configs/Hello.config
 configs/HelloWorld.config
 configs/WonderfulWorld.config
 model.xml
-README.txt
+readme.txt
 src/HelloWorld.java
