@@ -60,8 +60,8 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.conf.ConfigurationFG;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
@@ -146,9 +146,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		@Override
 		public void partClosed(IWorkbenchPart part) {
 			configJobManager.cancelAllJobs();
-			if (featureModelManager != null) {
-				featureModelManager.removeListener(ConfigurationEditor.this);
-			}		
+			featureModelManager.removeListener(ConfigurationEditor.this);
+			configurationManager.removeListener(ConfigurationEditor.this);
 			FeatureColorManager.removeListener(ConfigurationEditor.this);
 		}
 
@@ -264,8 +263,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			c = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
 			configurationManager = FileManagerMap.<Configuration, ConfigurationManager> getInstance(file.getLocation().toOSString());
 			if (configurationManager != null) {
+				FileHandler.load(Paths.get(file.getLocationURI()), c, ConfigFormatManager.getInstance().getFormatByFileName(file.getLocation().toOSString()));
 				configurationManager.setConfiguration(c);
-				configurationManager.read();
 			} else {
 				configurationManager = ConfigurationManager.getInstance(c, file.getLocation().toOSString());
 			}
@@ -277,6 +276,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		createModelFileMarkers(lastProblems);
 
 		featureModelManager.addListener(this);
+		configurationManager.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		getExtensions();
 
@@ -399,21 +399,33 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public void propertyChange(final FeatureIDEEvent evt) {
-		if (!EventType.MODEL_DATA_SAVED.equals(evt.getEventType()) && !EventType.COLOR_CHANGED.equals(evt.getEventType())) {
-			return;
-		}
-		configurationManager.read();
-		final Configuration configuration = new Configuration(configurationManager.getObject(), featureModelManager.getObject());
-		configuration.loadPropagator();
-		LongRunningWrapper.runMethod(configuration.getPropagator().resolve());
+		switch (evt.getEventType()) {
+		case MODEL_DATA_SAVED:
+		case MODEL_DATA_OVERRIDDEN:
+		case COLOR_CHANGED:
+			if (evt.getSource() instanceof IFeatureModel) {
+				final Configuration configuration = new Configuration(configurationManager.getObject(), featureModelManager.getObject());
+				configuration.loadPropagator();
+				LongRunningWrapper.runMethod(configuration.getPropagator().resolve());
 
-		configurationManager.setConfiguration(configuration);
-		setContainsError(configurationManager.getLastProblems().containsError());
+				configurationManager.setConfiguration(configuration);
+				setContainsError(false);
 
-		// Reinitialize the pages
-		final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
-		if (currentPage != null) {
-			currentPage.propertyChange(evt);
+				// Reinitialize the pages
+				final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
+				if (currentPage != null) {
+					currentPage.propertyChange(evt);
+				}
+			} else if (evt.getSource() instanceof Configuration) {
+				// Reinitialize the pages
+				final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
+				if (currentPage != null) {
+					currentPage.propertyChange(evt);
+				}
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -513,23 +525,20 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public void resourceChanged(IResourceChangeEvent event) {
 		if (event.getResource() == null)
 			return;
-
 		if (event.getResource().getType() == IResource.PROJECT)
 			closeEditor = true;
 		final IEditorInput input = getEditorInput();
 		if (!(input instanceof IFileEditorInput))
 			return;
-		final IFile jmolfile = ((IFileEditorInput) input).getFile();
+		final IFile inputFile = ((IFileEditorInput) input).getFile();
 
 		/*
 		 * Closes editor if resource is deleted
 		 */
 		if ((event.getType() == IResourceChangeEvent.POST_CHANGE) && closeEditor) {
-			IResourceDelta rootDelta = event.getDelta();
-			// get the delta, if any, for the documentation directory
-			final List<IResource> deletedlist = new ArrayList<IResource>();
-			IResourceDelta docDelta = rootDelta.findMember(jmolfile.getFullPath());
-			if (docDelta != null) {
+			final List<IResource> deletedlist = new ArrayList<>();
+			final IResourceDelta inputFileDelta = event.getDelta().findMember(inputFile.getFullPath());
+			if (inputFileDelta != null) {
 				IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
 					public boolean visit(IResourceDelta delta) {
 						// only interested in removal changes
@@ -540,12 +549,12 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 					}
 				};
 				try {
-					docDelta.accept(visitor);
+					inputFileDelta.accept(visitor);
 				} catch (CoreException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			}
-			if (deletedlist.size() > 0 && deletedlist.contains(jmolfile)) {
+			if (deletedlist.size() > 0 && deletedlist.contains(inputFile)) {
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
 						if (getSite() == null)
@@ -575,7 +584,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 						return;
 					IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
 					for (int i = 0; i < pages.length; i++) {
-						if (jmolfile.getProject().equals(res)) {
+						if (inputFile.getProject().equals(res)) {
 							IEditorPart editorPart = pages[i].findEditor(input);
 							pages[i].closeEditor(editorPart, true);
 						}
@@ -587,7 +596,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public Configuration getConfiguration() {
-		if(configurationManager == null) return null;
 		return configurationManager.editObject();
 	}
 

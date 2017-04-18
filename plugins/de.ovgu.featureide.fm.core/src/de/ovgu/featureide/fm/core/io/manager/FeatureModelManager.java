@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.InternalFeatureModelFormat;
 
 /**
  * Responsible to load and save all information for a feature model instance.
@@ -42,6 +43,12 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
+	/**
+	 * Returns a singleton instance of a feature model manager associated with the specified model file.
+	 * 
+	 * @param modelFile Path to the physical model file.
+	 * @return
+	 */
 	public static FeatureModelManager getInstance(Path modelFile) {
 		final String path = modelFile.toAbsolutePath().toString();
 		FeatureModelManager featureModelManager = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(path);
@@ -80,20 +87,47 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return (IFeatureModelFormat) super.getFormat();
 	}
 
+	/**
+	 * Returns a singleton instance of a feature model manager associated with the specified model file.
+	 * 
+	 * @param model
+	 * @param absolutePath
+	 * @param format
+	 * @return
+	 */
 	public static FeatureModelManager getInstance(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> format) {
 		final FeatureModelManager instance = FileManagerMap.getInstance(model, absolutePath, format, FeatureModelManager.class, IFeatureModel.class);
-		model.setSourceFile(Paths.get(absolutePath));
-		instance.read();
 		return instance;
 	}
 
 	protected FeatureModelManager(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> modelHandler) {
-		super(model, absolutePath, modelHandler);
+		super(setSourcePath(model, absolutePath), absolutePath, modelHandler);
+	}
+
+	private static IFeatureModel setSourcePath(IFeatureModel model, String absolutePath) {
+		model.setSourceFile(Paths.get(absolutePath));
+		return model;
+	}
+
+	@Override
+	protected boolean compareObjects(IFeatureModel o1, IFeatureModel o2) {
+		final InternalFeatureModelFormat format = new InternalFeatureModelFormat();
+		final String s1 = format.getInstance().write(o1);
+		final String s2 = format.getInstance().write(o2);
+		return s1.equals(s2);
+	}
+
+	@Override
+	public void override() {
+		localObject.setUndoContext(variableObject.getUndoContext());
+		super.override();
 	}
 
 	@Override
 	protected IFeatureModel copyObject(IFeatureModel oldObject) {
-		return oldObject.clone();
+		final IFeatureModel clone = oldObject.clone();
+		clone.setUndoContext(oldObject.getUndoContext());
+		return clone;
 	}
 
 	public static IFeatureModel readFromFile(Path path) {

@@ -108,8 +108,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		importCustomProperties(customProperties, object);
-
-		object.handleModelDataLoaded();
 	}
 
 	@Override

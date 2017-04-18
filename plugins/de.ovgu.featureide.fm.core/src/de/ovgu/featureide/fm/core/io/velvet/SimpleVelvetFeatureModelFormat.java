@@ -301,9 +301,6 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 			unsupportedModelException.addSuppressed(e);
 			throw unsupportedModelException;
 		}
-
-		// Update the FeatureModel in Editor
-		extFeatureModel.handleModelDataLoaded();
 	}
 
 	private ExtendedFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,

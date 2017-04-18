@@ -86,7 +86,6 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -202,11 +201,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	@Override
 	public void propertyChange(FeatureIDEEvent evt) {
-		if (evt == null || !EventType.MODEL_DATA_SAVED.equals(evt.getEventType())) {
-			return;
+		if (evt != null) {
+			switch (evt.getEventType()) {
+			case MODEL_DATA_SAVED:
+			case MODEL_DATA_OVERRIDDEN:
+				refreshPage();
+				setDirty();
+				break;
+			default:
+				break;
+			}
 		}
-		refreshPage();
-		setDirty();
 	}
 
 	protected final void refreshPage() {

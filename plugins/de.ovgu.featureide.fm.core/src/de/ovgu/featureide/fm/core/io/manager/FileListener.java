@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.Logger;
  * 
  * @author Sebastian Krieter
  */
+@Deprecated
 public abstract class FileListener<T> implements IResourceChangeListener {
 
 	private final AFileManager<T> fileManager;

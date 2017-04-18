@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
 
 /**
@@ -150,7 +151,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * 
 	 * @throws NoSuchExtensionException
 	 */
-	public static IFeatureModelFactory getFactory(String path, IFeatureModelFormat format) throws NoSuchExtensionException {
+	public static IFeatureModelFactory getFactory(String path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
 		return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace(path).getID(format));
 	}
 

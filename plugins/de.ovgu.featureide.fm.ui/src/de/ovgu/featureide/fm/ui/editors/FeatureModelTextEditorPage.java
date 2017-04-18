@@ -75,7 +75,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(featureModelEditor.featureModel);
+		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(featureModelEditor.getFeatureModel());
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);
@@ -149,7 +149,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	private void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
-			final IFeatureModel fm = featureModelEditor.featureModel;
+			final IFeatureModel fm = featureModelEditor.getFeatureModel();
 			
 			//TODO _interfaces replace text with DocumentEvent (delta)
 			SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);

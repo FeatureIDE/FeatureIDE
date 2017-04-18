@@ -78,6 +78,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
@@ -467,10 +468,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	public IFeatureModel getFeatureModel() {
 		return featureModelEditor.getFeatureModel();
-	}
-
-	public void setFeatureModel(IFeatureModel fm) {
-		featureModelEditor.setFeatureModel(fm);
 	}
 
 	private void createActions() {
@@ -1122,20 +1119,33 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
 			break;
-		case MODEL_DATA_LOADED:
+		case MODEL_DATA_OVERRIDDEN:
+			if (extraPath != null) {
+				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			}
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					deregisterEditParts();
+					graphicalFeatureModel.init();
+					if (extraPath != null) {
+						FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
+					}
+					
+					setContents(graphicalFeatureModel);
+					refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+					reload();
+				}
+			});
+			featureModelEditor.setPageModified(false);
+			analyzeFeatureModel();
+			break;
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			if (extraPath != null) {
 				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
 			}
-			final Map<?, ?> registry = getEditPartRegistry();
-			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
-				registry.remove(f);
-				registry.remove(f.getSourceConnection());
-			}
-			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
-				registry.remove(f);
-			}
+			deregisterEditParts();
 			graphicalFeatureModel.init();
 			if (extraPath != null) {
 				FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
@@ -1246,7 +1256,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						features = new ArrayList<>();
 						// ... get the IGraphicalFeatures, if Features are passed
 						if (firstElement instanceof IFeature) {
-
 							for (Object featureObj : srcList) {
 								features.add(graphicalFeatureModel.getGraphicalFeature((IFeature) featureObj));
 							}
@@ -1313,6 +1322,17 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		setLayout();
 
+	}
+
+	private void deregisterEditParts() {
+		final Map<?, ?> registry = getEditPartRegistry();
+		for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+			registry.remove(f);
+			registry.remove(f.getSourceConnection());
+		}
+		for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
+			registry.remove(f);
+		}
 	}
 
 	/**
