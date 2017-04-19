@@ -1,5 +1,8 @@
 .classpath
 .project
-configs/default.config
+configs/BeautifulWorld.config
+configs/Hello.config
+configs/HelloWorld.config
+configs/WonderfulWorld.config
 model.xml
-src/Main.java
+src/HelloWorld.java

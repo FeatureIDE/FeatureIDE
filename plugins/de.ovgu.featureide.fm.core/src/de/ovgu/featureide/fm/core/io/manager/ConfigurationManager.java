@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -59,16 +59,16 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 	@CheckForNull
 	public static ConfigurationManager getInstance(Path path) {
-		return (ConfigurationManager) getAInstance(path);
+		return AFileManager.getInstance(path);
 	}
 
 	@CheckForNull
 	public static ConfigurationManager getInstance(Path path, Configuration configuration) {
-		return (ConfigurationManager) getAInstance(path, new ObjectCreator(configuration));
+		return AFileManager.getInstance(path, new ObjectCreator(configuration));
 	}
 
 	public static FileHandler<Configuration> load(Path path, Configuration configuration) {
-		return getFileHandler(path, new ObjectCreator(configuration));
+		return AFileManager.getFileHandler(path, new ObjectCreator(configuration));
 	}
 
 	protected ConfigurationManager(Configuration configuration, String absolutePath, IPersistentFormat<Configuration> modelHandler) {
@@ -82,7 +82,10 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 	public void setConfiguration(Configuration configuration) {
 		variableObject = configuration;
-		persist();
+		synchronized (syncObject) {
+			persistentObject = copyObject(variableObject);
+			localObject = copyObject(variableObject);
+		}
 	}
 
 }

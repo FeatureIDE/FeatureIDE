@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
-Bundle-Version: 3.2.0.qualifier
+Bundle-Version: 3.3.0.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.ui,
@@ -79,7 +79,12 @@ Export-Package:
    org.eclipse.jface.util,
    org.eclipse.swt.widgets",
  de.ovgu.featureide.ui.views.collaboration.policy,
+ de.ovgu.featureide.ui.views.configMap,
+ de.ovgu.featureide.ui.views.configMap.actions,
+ de.ovgu.featureide.ui.views.configMap.filters,
+ de.ovgu.featureide.ui.views.configMap.header,
  de.ovgu.featureide.ui.views.outline,
+ de.ovgu.featureide.ui.visualization,
  de.ovgu.featureide.ui.wizards;
   uses:="org.eclipse.jface.wizard,
    de.ovgu.featureide.core,

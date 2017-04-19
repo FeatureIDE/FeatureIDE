@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -52,17 +53,11 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITableColorProvider#getForeground(java.lang.Object, int)
-	 */
 	@Override
 	public Color getForeground(Object element, int columnIndex) {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITableColorProvider#getBackground(java.lang.Object, int)
-	 */
 	@Override
 	public Color getBackground(Object element, int columnIndex) {
 		if (columnIndex == configurationMap.getSelectedColumnIndex()) {
@@ -70,21 +65,18 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 		} else if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
 			FeatureColor featureColor = FeatureColorManager.getColor(feature);
-			return featureColor.toSwtColor();
+			return ColorPalette.toSwtColor(featureColor);
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
-	 */
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
 			if (configurationMap.isConfigColumn(columnIndex)) {// && columnIndex < configurationMap.end) {
 				Configuration config = configurationMap.getConfigurationOfColumn(columnIndex);
-				
+
 				if (!feature.getStructure().isAbstract()) {
 					String imgPath = imgUnselectedPath;
 					if (config.getSelectedFeatures().contains(feature))
@@ -98,9 +90,6 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
-	 */
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		if (configurationMap.getConfigColumnsOffset() > columnIndex) {
@@ -122,4 +111,5 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	@Override
 	public void dispose() {
 	}
+
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,10 +20,12 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.gef.EditPart;
@@ -40,7 +42,6 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -49,10 +50,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.IPageSite;
 
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -62,7 +59,6 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
@@ -95,7 +91,6 @@ public class FmOutlinePageContextMenu {
 	private SetFeatureColorAction setFeatureColorAction;
 	private HiddenAction hAction;
 	private MandatoryAction mAction;
-	private CollapseAction collapseAction;
 	private AbstractAction aAction;
 	private DeleteAction dAction;
 	private DeleteAllAction dAAction;
@@ -107,7 +102,6 @@ public class FmOutlinePageContextMenu {
 	private OrAction oAction;
 	private AndAction andAction;
 	private AlternativeAction altAction;
-	//	private ReverseOrderAction roAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
 	public IDoubleClickListener dblClickListener;
@@ -321,56 +315,8 @@ public class FmOutlinePageContextMenu {
 		if (sel instanceof String)
 			if (sel.equals(CONSTRAINTS))
 				manager.add(ccAction);
-
-		checkForColorableFeatures(manager, sel);
 	}
 	
-	private void checkForColorableFeatures(IMenuManager manager, Object sel){
-		if (sel instanceof RoleElement && !(sel instanceof FSTDirective)) {
-			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			List<IFeature> featureList = new ArrayList<>();	
-			
-			for(Object obj : ((IStructuredSelection) viewer.getSelection()).toArray()){
-				RoleElement method = (RoleElement) obj;
-				ITreeContentProvider contentProvider = (ITreeContentProvider) viewer.getContentProvider();
-				for(Object role : contentProvider.getChildren(method)){
-					FSTFeature fst = ((FSTRole) role).getFeature();
-					featureList.add(fInput.getFeature(fst.getName()));
-				}
-			}
-			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));
-			manager.add(setFeatureColorAction);
-		}
-		
-		else if (sel instanceof FSTRole) {
-			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			List<IFeature> featureList = new ArrayList<>();	
-			
-			for(Object obj : ((IStructuredSelection) viewer.getSelection()).toArray()){
-				FSTRole role = (FSTRole) obj;
-				FSTFeature feature = role.getFeature();
-				featureList.add(fInput.getFeature(feature.getName()));
-			}
-
-			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));
-			manager.add(setFeatureColorAction);
-		}
-		
-		else if (sel instanceof FSTDirective){
-			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			List<IFeature> featureList = new ArrayList<>();			
-			
-			for(Object obj : ((IStructuredSelection) viewer.getSelection()).toArray()){
-				FSTDirective fst = (FSTDirective) obj;
-				String featureName = fst.getFeatureNames().get(0);
-				IFeature feature = fInput.getFeature(featureName);
-				featureList.add(feature);
-			}
-			setFeatureColorAction.updateFeatureList(new StructuredSelection(featureList));			
-			manager.add(setFeatureColorAction);
-		}
-	}
-
 	/**
 	 * @param iToolBarManager
 	 */

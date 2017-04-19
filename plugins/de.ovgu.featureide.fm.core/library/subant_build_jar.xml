@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="JAR Build Script" default="build" basedir=".">
 
+	<!-- Path to Java Compiler (must be Java 1.7) -->
+	<property name="bin.javac.path" value="C:/Program Files/Java/jdk1.7.0_79/bin/javac.exe" />
+
 	<!-- Set JAR name -->
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm" />
-	<property name="build.jar.version" value="3.2.0" />
+	<property name="build.jar.version" value="3.3.0" />
 
 	<!-- Constants -->
 	<property name="src.dir" value="../src" />
@@ -17,7 +20,6 @@
 	<property name="build.jar.path" value="${build.jar.dir}/${build.jar.name}" />
 	<property name="build.version.name" value="version.txt" />
 	<property name="build.version.path" value="${build.bin.dir}/${build.version.name}" />
-
 
 	<target name="clean" description="Delete the Build Folder">
 
@@ -47,6 +49,8 @@
 		       includeantruntime="false"
 		       source="1.7"
 		       target="1.7"
+	           fork="yes"
+	           executable="${bin.javac.path}"
 		/>
 
 		<!-- Calculate checksum for .class files -->
@@ -81,7 +85,7 @@
 	<target name="deleteFiles" description="Delete all files with eclipse dependencies (For test purposes only!)">
 		<!-- Alternative: Remove files from classpath -->
 		<delete>
-			<fileset dir="${src.dir}" includesfile="${excludes.path}" />
+			<fileset dir="${src.dir}" includesfile="${build.excludes.path}" />
 		</delete>
 	</target>
 

@@ -158,8 +158,10 @@ public class FeatureCppWrapper {
 		} else {
 			command.add(GPP);
 		}
-		command.add(config.toString());
-		process(command);
+		if (config != null) {
+			command.add(config.toString());
+			process(command);
+		}
 	}
 
 	private void process(AbstractList<String> command) {

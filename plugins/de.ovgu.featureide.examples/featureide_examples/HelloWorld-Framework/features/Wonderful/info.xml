@@ -1,5 +1,5 @@
 <plugin>
-	<interface id="interfaces.Print">
+	<interface id="interfaces.IMessage">
 		<class>Wonderful</class>
 	</interface>
 </plugin>

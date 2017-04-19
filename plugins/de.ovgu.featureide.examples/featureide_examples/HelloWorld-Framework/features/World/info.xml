@@ -1,8 +1,5 @@
 <plugin>
-	<interface id="interfaces.Print">
-		<class>World</class>
-	</interface>
-	<interface id="interfaces.Announce">
+	<interface id="interfaces.IMessage">
 		<class>World</class>
 	</interface>
 </plugin>

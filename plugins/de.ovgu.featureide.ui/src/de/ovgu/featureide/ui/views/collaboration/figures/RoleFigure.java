@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.views.collaboration.figures;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -491,6 +490,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		String name = classFragment.getFullIdentifier();
 		if (name.startsWith(RoleElement.DEFAULT_PACKAGE)) {
 			name = name.substring(RoleElement.DEFAULT_PACKAGE.length());
+		}
+		if (name.contains(".")) {
+			name = name.substring(name.lastIndexOf(".")+1, name.length());
 		}
 		
 		RoleFigureLabel classLabel = new RoleFigureLabel(name, IMAGE_CLASS, classFragment.getFullName());
