@@ -1,4 +1,5 @@
 .classpath
+.featureide/model.xml/model.xml.xml
 .project
 configs/default.config
 features/CallButtons/de/ovgu/featureide/examples/elevator/core/controller/ControlUnit.java

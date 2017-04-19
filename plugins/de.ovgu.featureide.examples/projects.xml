@@ -6,17 +6,19 @@
 		<project name="BankAccount-FH-JML" path="featureide_examples/BankAccount-FH-JML/.project"/>
 		<project name="BerkeleyDB-FH-Java" path="featureide_examples/BerkeleyDB-FH-Java/.project"/>
 		<project name="Elevator SPL_FOP" path="featureide_examples/Book/FOP/Elevator SPL_FOP/.project"/>
+		<project name="Elevator SPL_FOP QA" path="featureide_examples/Book/FOP/Elevator SPL_FOP QA/.project"/>
 		<project name="Elevator SPL_FOP Sabbath" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath/.project"/>
 		<project name="Elevator SPL_FOP Sabbath and Service" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath and Service/.project"/>
 		<project name="Elevator SPL_FOP Sabbath and Service and FIFO" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath and Service and FIFO/.project"/>
-		<project name="Elevator SPL_FOP V5" path="featureide_examples/Book/FOP/Elevator SPL_FOP V5/.project"/>
-		<project name="Elevator SPL_FOP QA" path="featureide_examples/Book/FOP/Elevator SPL_FOP QA/.project"/>
 		<project name="Elevator SPL_FOP V4" path="featureide_examples/Book/FOP/Elevator SPL_FOP V4/.project"/>
+		<project name="Elevator SPL_FOP V5" path="featureide_examples/Book/FOP/Elevator SPL_FOP V5/.project"/>
 		<project name="Elevator" path="featureide_examples/Book/OOP/Elevator/.project"/>
 		<project name="Elevator SPL_PP" path="featureide_examples/Book/PP/Elevator SPL_PP/.project"/>
 		<project name="Elevator SPL_PP Sabbath" path="featureide_examples/Book/PP/Elevator SPL_PP Sabbath/.project"/>
 		<project name="Elevator SPL_PP Sabbath and Service" path="featureide_examples/Book/PP/Elevator SPL_PP Sabbath and Service/.project"/>
 		<project name="Elevator SPL_PP Sabbath and Service and FIFO" path="featureide_examples/Book/PP/Elevator SPL_PP Sabbath and Service and FIFO/.project"/>
+		<project name="Elevator01" path="featureide_examples/Book/PP/Elevator01/.project"/>
+		<project name="Elevator03" path="featureide_examples/Book/PP/Elevator03/.project"/>
 		<project name="Clock-FH-AsmetaL" path="featureide_examples/Clock-FH-AsmetaL/.project"/>
 		<project name="DesktopSearcher-AHEAD" path="featureide_examples/DesktopSearcher-AHEAD/.project"/>
 		<project name="DiGraph-FH-JML" path="featureide_examples/DiGraph-FH-JML/.project"/>
@@ -66,6 +68,7 @@
 		<project name="HelloWorld-FC++" path="featureide_examples/HelloWorld-FC++/.project"/>
 		<project name="HelloWorld-FH-AspectJ" path="featureide_examples/HelloWorld-FH-AspectJ/.project"/>
 		<project name="HelloWorld-FH-Java" path="featureide_examples/HelloWorld-FH-Java/.project"/>
+		<project name="HelloWorld-FH-JML" path="featureide_examples/HelloWorld-FH-JML/.project"/>
 		<project name="HelloWorld-FH-JUnit" path="featureide_examples/HelloWorld-FH-JUnit/.project"/>
 		<project name="HelloWorld-Framework" path="featureide_examples/HelloWorld-Framework/.project">
 			<project name="World" path="featureide_examples/HelloWorld-Framework/features/World/.project"/>
@@ -74,8 +77,8 @@
 			<project name="Beautiful" path="featureide_examples/HelloWorld-Framework/features/Beautiful/.project"/>
 		</project>
 		<project name="HelloWorld-Munge" path="featureide_examples/HelloWorld-Munge/.project"/>
+		<project name="HelloWorld-RuntimeParameters" path="featureide_examples/HelloWorld-RuntimeParameters/.project"/>
 		<project name="HelloWorld-RuntimeProperties" path="featureide_examples/HelloWorld-RuntimeProperties/.project"/>
-		<project name="HelloWorld-RuntimeRunConfig" path="featureide_examples/HelloWorld-RuntimeRunConfig/.project"/>
 		<project name="HelloWorldMPL-FH-Java" path="featureide_examples/HelloWorldMPL-FH-Java/.project">
 			<project name="HelloWorld-FH-Java-MPLDependency" path="featureide_examples/HelloWorldMPL-FH-Java/projects/HelloWorld-FH-Java-MPLDependency/.project"/>
 		</project>

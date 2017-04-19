@@ -1,5 +1,6 @@
 .classpath
 .project
+.settings/de.ovgu.featureide.core.prefs
 .settings/org.eclipse.jdt.core.prefs
 configs/BeautifulWorld.config
 configs/Hello.config
