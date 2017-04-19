@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="Elevator">
+				<description>
+					
+				</description>
+				<and abstract="true" mandatory="true" name="Behavior">
+					<description>
+						
+					</description>
+					<alt abstract="true" mandatory="true" name="Modes">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="Sabbath">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="FIFO">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="ShortestPath">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<feature name="Service">
+						<description>
+							
+						</description>
+					</feature>
+					<or abstract="true" name="Priorities">
+						<description>
+							
+						</description>
+						<feature abstract="true" mandatory="true" name="RushHour">
+							<description>
+								
+							</description>
+						</feature>
+						<feature abstract="true" mandatory="true" name="FloorPriority">
+							<description>
+								
+							</description>
+						</feature>
+						<feature abstract="true" mandatory="true" name="PersonPriority">
+							<description>
+								
+							</description>
+						</feature>
+					</or>
+				</and>
+				<feature abstract="true" name="VoiceOutput">
+					<description>
+						
+					</description>
+				</feature>
+				<alt name="CallButtons">
+					<description>
+						
+					</description>
+					<feature mandatory="true" name="DirectedCall">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="UndirectedCall">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
+				<and abstract="true" name="Security">
+					<description>
+						
+					</description>
+					<or abstract="true" mandatory="true" name="Permission">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="FloorPermission">
+							<description>
+								
+							</description>
+						</feature>
+						<feature abstract="true" mandatory="true" name="PermissionControl">
+							<description>
+								
+							</description>
+						</feature>
+					</or>
+				</and>
+				<and abstract="true" name="Safety">
+					<description>
+						
+					</description>
+					<feature abstract="true" name="Overloaded">
+						<description>
+							
+						</description>
+					</feature>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<var>CallButtons</var>
+					<var>Sabbath</var>
+				</disj>
+			</rule>
+			<rule>
+				<imp>
+					<var>DirectedCall</var>
+					<var>ShortestPath</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>UndirectedCall</var>
+					<disj>
+						<var>FIFO</var>
+						<var>ShortestPath</var>
+					</disj>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="true">
+			<feature name="Elevator"/>
+			<feature name="CallButtons"/>
+			<feature name="UndirectedCall"/>
+			<feature name="Service"/>
+			<feature name="Sabbath"/>
+			<feature name="FIFO"/>
+			<feature name="ShortestPath"/>
+			<feature name="DirectedCall"/>
+			<feature name="FloorPermission"/>
+		</featureOrder>
+	</featureModel>
