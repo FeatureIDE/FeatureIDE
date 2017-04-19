@@ -721,8 +721,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				break;
 			case REDUNDANT_CONSTRAINT:
 				Constraint constraint = (Constraint) explanation.getDefectElement();
-				int index = graphicalFeatureModel.getConstraintIndex(constraint);
-				labelExplanation.setText((index + 1) + ". constraint is redundant because of highlighted dependencies:");
+				labelExplanation.setText("The selected constraint is redundant because of highlighted dependencies:");
 				explanationFigure.setToolTip(
 						createToolTipContent("The constraint\n" + constraint.getDisplayName() + "\nis redundant because of the highligthed dependencies."));
 				break;
