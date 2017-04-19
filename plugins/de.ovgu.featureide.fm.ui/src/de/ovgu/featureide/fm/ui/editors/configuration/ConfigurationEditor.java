@@ -496,11 +496,16 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	@Override
-	public void doSave(IProgressMonitor monitor) {
+	public void doSave(final IProgressMonitor monitor) {
 		if (modelFile != null) {
 			final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
 			if (currentPage != null && currentPage.getID() == TextEditorPage.ID) {
-				currentPage.doSave(monitor);
+				configurationManager.externalSave(new Runnable() {
+					@Override
+					public void run() {
+						currentPage.doSave(monitor);
+					}
+				});
 			} else {
 				configurationManager.save();
 				for (IConfigurationEditorPage internalPage : internalPages) {

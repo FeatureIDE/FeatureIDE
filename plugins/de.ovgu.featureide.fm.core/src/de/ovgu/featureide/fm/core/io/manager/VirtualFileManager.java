@@ -75,6 +75,11 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 	}
 
 	@Override
+	public boolean externalSave(Runnable externalSaveMethod) {
+		return true;
+	}
+
+	@Override
 	public void addListener(IEventListener listener) {
 		eventManager.addListener(listener);
 	}
