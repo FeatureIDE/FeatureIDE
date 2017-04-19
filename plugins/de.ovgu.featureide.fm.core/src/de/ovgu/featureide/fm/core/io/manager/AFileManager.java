@@ -62,9 +62,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	protected T localObject;
 	protected T emptyObject;
 
-	public IPersistentFormat<T> getFormat() {
-		return format;
-	}
+	private boolean modifying = false;
 
 	protected AFileManager(T object, String absolutePath, IPersistentFormat<T> format) {
 		this.format = format;
@@ -89,6 +87,13 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		localObject = copyObject(variableObject);
 	}
 
+	@Override
+	public void addListener(IEventListener listener) {
+		eventManager.addListener(listener);
+	}
+
+	protected abstract T copyObject(T oldObject);
+
 	public T getObject() {
 		return persistentObject;
 	}
@@ -97,8 +102,27 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return variableObject;
 	}
 
+	public void setModifying(boolean modifying) {
+		synchronized (syncObject) {
+			this.modifying = modifying;
+		}
+	}
+
+	@Override
+	public void fireEvent(FeatureIDEEvent event) {
+		eventManager.fireEvent(event);
+	}
+
+	public IPersistentFormat<T> getFormat() {
+		return format;
+	}
+
 	public ProblemList getLastProblems() {
 		return lastProblems;
+	}
+
+	private void handleException(Exception e) {
+		lastProblems.add(new Problem(e));
 	}
 
 	public boolean read() {
@@ -107,6 +131,9 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		}
 		final boolean success, changed;
 		synchronized (syncObject) {
+			if (modifying) {
+				return true;
+			}
 			lastProblems.clear();
 			final T tempObject = copyObject(emptyObject);
 			try {
@@ -134,13 +161,21 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	// TODO Quickfix for #501. Should be implemented by overriding the current instance pointer.
 	public void override() {
 		synchronized (syncObject) {
+			if (modifying) {
+				return;
+			}
 			final String write = format.getInstance().write(localObject);
 			format.getInstance().read(variableObject, write);
 			format.getInstance().read(persistentObject, write);
-//			variableObject = copyObject(localObject);
-//			persistentObject = copyObject(localObject);
+			//			variableObject = copyObject(localObject);
+			//			persistentObject = copyObject(localObject);
 		}
 		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_OVERRIDDEN));
+	}
+
+	@Override
+	public void removeListener(IEventListener listener) {
+		eventManager.removeListener(listener);
 	}
 
 	/**
@@ -157,21 +192,25 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return s1.equals(s2);
 	}
 
-	protected abstract T copyObject(T oldObject);
-
 	public boolean save() {
 		final boolean success;
 		synchronized (syncObject) {
 			lastProblems.clear();
 			try {
+				if (modifying) {
+					return true;
+				}
+				modifying = true;
 				final T tempObject = copyObject(variableObject);
-				persistentObject = copyObject(tempObject);
-				localObject = copyObject(tempObject);
 				final byte[] content = format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET);
 				FileSystem.write(path, content);
+				persistentObject = copyObject(tempObject);
+				localObject = copyObject(tempObject);
 			} catch (Exception e) {
 				handleException(e);
 				return false;
+			} finally {
+				modifying = false;
 			}
 			success = lastProblems.isEmpty();
 		}
@@ -179,23 +218,29 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return success;
 	}
 
-	private void handleException(Exception e) {
-		lastProblems.add(new Problem(e));
-	}
-
-	@Override
-	public void addListener(IEventListener listener) {
-		eventManager.addListener(listener);
-	}
-
-	@Override
-	public void fireEvent(FeatureIDEEvent event) {
-		eventManager.fireEvent(event);
-	}
-
-	@Override
-	public void removeListener(IEventListener listener) {
-		eventManager.removeListener(listener);
+	public boolean externalSave(Runnable externalSaveMethod) {
+		final boolean success;
+		synchronized (syncObject) {
+			lastProblems.clear();
+			try {
+				if (modifying) {
+					return true;
+				}
+				modifying = true;
+				final T tempObject = copyObject(variableObject);
+				externalSaveMethod.run();
+				persistentObject = copyObject(tempObject);
+				localObject = copyObject(tempObject);
+			} catch (Exception e) {
+				handleException(e);
+				return false;
+			} finally {
+				modifying = false;
+			}
+			success = lastProblems.isEmpty();
+		}
+		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
+		return success;
 	}
 
 	@Override

@@ -60,6 +60,8 @@ public interface IFileManager<T> extends IEventManager {
 	 */
 	boolean save();
 
+	boolean externalSave(Runnable runnable);
+
 	/**
 	 * Overrides the variable and persistent object with the local object.
 	 */

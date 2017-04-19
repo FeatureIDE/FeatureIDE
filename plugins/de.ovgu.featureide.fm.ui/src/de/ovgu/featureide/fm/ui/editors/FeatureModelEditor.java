@@ -180,7 +180,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	}
 
 	@Override
-	public void doSave(IProgressMonitor monitor) {
+	public void doSave(final IProgressMonitor monitor) {
 		if (!saveEditors()) {
 			return;
 		}
@@ -196,7 +196,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		// write the model to the file
 		if (getActivePage() == textEditor.getIndex()) {
 			// textEditor.updateDiagram();
-			textEditor.doSave(monitor);
+			fmManager.externalSave(new Runnable() {
+				@Override
+				public void run() {
+					textEditor.doSave(monitor);
+				}
+			});
 		} else {
 			fmManager.save();
 		}
