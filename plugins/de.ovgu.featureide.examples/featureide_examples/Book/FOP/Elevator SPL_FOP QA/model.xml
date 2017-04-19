@@ -3,118 +3,36 @@
 		<properties/>
 		<struct>
 			<and mandatory="true" name="Elevator">
-				<description>
-					
-				</description>
 				<and abstract="true" mandatory="true" name="Behavior">
-					<description>
-						
-					</description>
 					<alt abstract="true" mandatory="true" name="Modes">
-						<description>
-							
-						</description>
-						<feature mandatory="true" name="Sabbath">
-							<description>
-								
-							</description>
-						</feature>
-						<feature mandatory="true" name="FIFO">
-							<description>
-								
-							</description>
-						</feature>
-						<feature mandatory="true" name="ShortestPath">
-							<description>
-								
-							</description>
-						</feature>
+						<feature mandatory="true" name="Sabbath"/>
+						<feature mandatory="true" name="FIFO"/>
+						<feature mandatory="true" name="ShortestPath"/>
 					</alt>
-					<feature name="Service">
-						<description>
-							
-						</description>
-					</feature>
+					<feature abstract="true" name="Service"/>
 					<or abstract="true" name="Priorities">
-						<description>
-							
-						</description>
-						<feature abstract="true" mandatory="true" name="RushHour">
-							<description>
-								
-							</description>
-						</feature>
-						<feature abstract="true" mandatory="true" name="FloorPriority">
-							<description>
-								
-							</description>
-						</feature>
-						<feature abstract="true" mandatory="true" name="PersonPriority">
-							<description>
-								
-							</description>
-						</feature>
+						<feature mandatory="true" name="RushHour"/>
+						<feature abstract="true" mandatory="true" name="FloorPriority"/>
+						<feature abstract="true" mandatory="true" name="PersonPriority"/>
 					</or>
 				</and>
-				<feature abstract="true" name="VoiceOutput">
-					<description>
-						
-					</description>
-				</feature>
+				<feature abstract="true" name="VoiceOutput"/>
 				<alt name="CallButtons">
-					<description>
-						
-					</description>
-					<feature mandatory="true" name="DirectedCall">
-						<description>
-							
-						</description>
-					</feature>
-					<feature mandatory="true" name="UndirectedCall">
-						<description>
-							
-						</description>
-					</feature>
+					<feature mandatory="true" name="DirectedCall"/>
+					<feature mandatory="true" name="UndirectedCall"/>
 				</alt>
 				<and abstract="true" name="Security">
-					<description>
-						
-					</description>
 					<or abstract="true" mandatory="true" name="Permission">
-						<description>
-							
-						</description>
-						<feature mandatory="true" name="FloorPermission">
-							<description>
-								
-							</description>
-						</feature>
-						<feature abstract="true" mandatory="true" name="PermissionControl">
-							<description>
-								
-							</description>
-						</feature>
+						<feature mandatory="true" name="FloorPermission"/>
+						<feature abstract="true" mandatory="true" name="PermissionControl"/>
 					</or>
 				</and>
 				<and abstract="true" name="Safety">
-					<description>
-						
-					</description>
-					<feature abstract="true" name="Overloaded">
-						<description>
-							
-						</description>
-					</feature>
+					<feature abstract="true" name="Overloaded"/>
 				</and>
 			</and>
 		</struct>
 		<constraints>
-			<rule>
-				<disj>
-					<var>CallButtons</var>
-					<var>Sabbath</var>
-				</disj>
-			</rule>
 			<rule>
 				<imp>
 					<var>DirectedCall</var>

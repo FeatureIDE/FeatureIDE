@@ -29,20 +29,15 @@ package de.ovgu.featureide.examples.elevator.core.model;
 public class Elevator {
 
 	private final int maxFloor;
-	private final int minFloor =
-		0;
+	private final int minFloor = 0;
 
-	private ElevatorState direction =
-		ElevatorState.MOVING_UP;
+	private ElevatorState direction = ElevatorState.MOVING_UP;
 
-	private int currentFloor =
-		0;
-	private ElevatorState currentState =
-		ElevatorState.FLOORING;
+	private int currentFloor = 0;
+	private ElevatorState currentState = ElevatorState.FLOORING;
 
 	public Elevator(int maxFloor) {
-		this.maxFloor =
-			maxFloor;
+		this.maxFloor = maxFloor;
 	}
 
 	public int getMaxFloor() {
@@ -58,13 +53,11 @@ public class Elevator {
 	}
 
 	public void setDirection(ElevatorState direction) {
-		this.direction =
-			direction;
+		this.direction = direction;
 	}
 
 	public void setCurrentFloor(int currentFloor) {
-		this.currentFloor =
-			currentFloor;
+		this.currentFloor = currentFloor;
 	}
 
 	public int getCurrentFloor() {
@@ -76,7 +69,6 @@ public class Elevator {
 	}
 
 	public void setCurrentState(ElevatorState state) {
-		currentState =
-			state;
+		currentState = state;
 	}
 }

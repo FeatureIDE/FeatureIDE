@@ -34,27 +34,24 @@ import de.ovgu.featureide.examples.elevator.core.model.ElevatorState;
  */
 public class ControlUnit implements Runnable {
 
-	public static int TIME_DELAY =
-		700;
-	public boolean run =
-		true;
+	public static int TIME_DELAY = 700;
+	public boolean run = true;
 
 	private Elevator elevator;
 
 	public ControlUnit(Elevator elevator) {
-		this.elevator =
-			elevator;
+		this.elevator = elevator
 	}
 
 	public void run() {
 		while (run) {
 			final ElevatorState state;
-			state =
-				setNextState();
+			state = setNextState();
 			// Moving or Waiting
 			try {
 				Thread.sleep(TIME_DELAY);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+			}
 
 			switch (state) {
 			case MOVING_UP:
@@ -71,21 +68,18 @@ public class ControlUnit implements Runnable {
 
 	private ElevatorState setNextState() {
 		// Get next state of the elevator
-		ElevatorState state =
-			calculateNextState();
-		if (state == null) state =
-			ElevatorState.FLOORING;
+		ElevatorState state = calculateNextState();
+		if (state == null)
+			state = ElevatorState.FLOORING;
 		elevator.setCurrentState(state);
 		switch (state) {
 		case MOVING_UP:
 			elevator.setDirection(ElevatorState.MOVING_UP);
-			elevator.setCurrentFloor(elevator.getCurrentFloor()
-				+ 1);
+			elevator.setCurrentFloor(elevator.getCurrentFloor() + 1);
 			break;
 		case MOVING_DOWN:
 			elevator.setDirection(ElevatorState.MOVING_DOWN);
-			elevator.setCurrentFloor(elevator.getCurrentFloor()
-				- 1);
+			elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
 			break;
 		case FLOORING:
 			this.triggerOnTick();
@@ -94,8 +88,7 @@ public class ControlUnit implements Runnable {
 		return state;
 	}
 
-	private List<ITickListener> tickListener =
-		new ArrayList<ITickListener>();
+	private List<ITickListener> tickListener = new ArrayList<ITickListener>();
 
 	public void addTickListener(ITickListener ticker) {
 		this.tickListener.add(ticker);
