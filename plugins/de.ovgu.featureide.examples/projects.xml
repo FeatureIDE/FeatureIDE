@@ -9,6 +9,8 @@
 		<project name="Elevator SPL_FOP Sabbath" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath/.project"/>
 		<project name="Elevator SPL_FOP Sabbath and Service" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath and Service/.project"/>
 		<project name="Elevator SPL_FOP Sabbath and Service and FIFO" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath and Service and FIFO/.project"/>
+		<project name="Elevator SPL_FOP V5" path="featureide_examples/Book/FOP/Elevator SPL_FOP V5/.project"/>
+		<project name="Elevator SPL_FOP V4" path="featureide_examples/Book/FOP/Elevator SPL_FOP V4/.project"/>
 		<project name="Elevator" path="featureide_examples/Book/OOP/Elevator/.project"/>
 		<project name="Elevator SPL_PP" path="featureide_examples/Book/PP/Elevator SPL_PP/.project"/>
 		<project name="Elevator SPL_PP Sabbath" path="featureide_examples/Book/PP/Elevator SPL_PP Sabbath/.project"/>
