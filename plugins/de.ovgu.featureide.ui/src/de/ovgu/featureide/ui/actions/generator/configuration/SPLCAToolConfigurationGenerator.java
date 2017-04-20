@@ -25,8 +25,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -137,9 +138,10 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	 */
 	private List<List<String>> removeDuplicates(final CoveringArray ca) {
 		final List<List<Integer>> solutions = ca.getSolutionsAsList();
-		final List<List<String>> duplicateFreeSolutions = new LinkedList<List<String>>();
+		final HashSet<List<String>> duplicateFreeSolutions = new HashSet<>();
+		final List<List<String>> duplicateFreeSolutionList = new ArrayList<>();
 		for (final List<Integer> solution : solutions) {
-			final List<String> convertedSolution = new LinkedList<String>();
+			final List<String> convertedSolution = new ArrayList<>();
 			for (final Integer i : solution) {
 				if (i > 0) {
 					String id = ca.getId(i);
@@ -149,14 +151,16 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 					}
 				}
 			}
-			if (!duplicateFreeSolutions.contains(convertedSolution)) {
-				duplicateFreeSolutions.add(convertedSolution);
+			Collections.sort(convertedSolution);
+			if (duplicateFreeSolutions.add(convertedSolution)) {
+				duplicateFreeSolutionList.add(convertedSolution);
 			}
 		}
-		if (solutions.size() - duplicateFreeSolutions.size() > 0) {
-			UIPlugin.getDefault().logInfo((solutions.size() - duplicateFreeSolutions.size()) + " duplicate solutions skipped!");
+		final int difference = solutions.size() - duplicateFreeSolutions.size();
+		if (difference > 0) {
+			UIPlugin.getDefault().logInfo(difference + " duplicate solutions skipped!");
 		}
-		return duplicateFreeSolutions;
+		return duplicateFreeSolutionList;
 	}
 
 }

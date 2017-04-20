@@ -54,7 +54,7 @@ public abstract class AConfigurationGenerator implements LongRunningMethod<Void>
 		this.builder = builder;
 		this.featureModel = featureModel;
 		this.featureProject = featureProject;
-		configuration = new Configuration(featureModel, false, false);
+		configuration = new Configuration(featureModel, Configuration.PARAM_NONE);
 	}
 	
 	protected void cancelGenerationJobs() {
