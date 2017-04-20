@@ -5,20 +5,21 @@
 		<project name="ATM-DeltaJ" path="featureide_examples/ATM-DeltaJ/.project"/>
 		<project name="BankAccount-FH-JML" path="featureide_examples/BankAccount-FH-JML/.project"/>
 		<project name="BerkeleyDB-FH-Java" path="featureide_examples/BerkeleyDB-FH-Java/.project"/>
-		<project name="Elevator SPL_FOP" path="featureide_examples/Book/FOP/Elevator SPL_FOP/.project"/>
-		<project name="Elevator SPL_FOP QA" path="featureide_examples/Book/FOP/Elevator SPL_FOP QA/.project"/>
-		<project name="Elevator SPL_FOP Sabbath" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath/.project"/>
-		<project name="Elevator SPL_FOP Sabbath and Service" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath and Service/.project"/>
-		<project name="Elevator SPL_FOP Sabbath and Service and FIFO" path="featureide_examples/Book/FOP/Elevator SPL_FOP Sabbath and Service and FIFO/.project"/>
-		<project name="Elevator SPL_FOP V4" path="featureide_examples/Book/FOP/Elevator SPL_FOP V4/.project"/>
-		<project name="Elevator SPL_FOP V5" path="featureide_examples/Book/FOP/Elevator SPL_FOP V5/.project"/>
+		<project name="Elevator-FeatureModeling" path="featureide_examples/Book/FM/Elevator-FeatureModeling/.project"/>
+		<project name="Elevator-FeatureHouse-v0.0" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.0/.project"/>
+		<project name="Elevator-FeatureHouse-v0.1" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.1/.project"/>
+		<project name="Elevator-FeatureHouse-v0.2" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.2/.project"/>
+		<project name="Elevator-FeatureHouse-v1.0" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v1.0/.project"/>
+		<project name="Elevator-FeatureHouse-v1.1" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v1.1/.project"/>
 		<project name="Elevator" path="featureide_examples/Book/OOP/Elevator/.project"/>
-		<project name="Elevator SPL_PP" path="featureide_examples/Book/PP/Elevator SPL_PP/.project"/>
-		<project name="Elevator SPL_PP Sabbath" path="featureide_examples/Book/PP/Elevator SPL_PP Sabbath/.project"/>
-		<project name="Elevator SPL_PP Sabbath and Service" path="featureide_examples/Book/PP/Elevator SPL_PP Sabbath and Service/.project"/>
-		<project name="Elevator SPL_PP Sabbath and Service and FIFO" path="featureide_examples/Book/PP/Elevator SPL_PP Sabbath and Service and FIFO/.project"/>
-		<project name="Elevator01" path="featureide_examples/Book/PP/Elevator01/.project"/>
-		<project name="Elevator03" path="featureide_examples/Book/PP/Elevator03/.project"/>
+		<project name="Elevator-Antenna-v0.0" path="featureide_examples/Book/PP/Elevator-Antenna-v0.0/.project"/>
+		<project name="Elevator-Antenna-v0.1" path="featureide_examples/Book/PP/Elevator-Antenna-v0.1/.project"/>
+		<project name="Elevator-Antenna-v0.2" path="featureide_examples/Book/PP/Elevator-Antenna-v0.2/.project"/>
+		<project name="Elevator-Antenna-v1.0" path="featureide_examples/Book/PP/Elevator-Antenna-v1.0/.project"/>
+		<project name="Elevator-Antenna-v1.1" path="featureide_examples/Book/PP/Elevator-Antenna-v1.1/.project"/>
+		<project name="Elevator-Antenna-v1.2" path="featureide_examples/Book/PP/Elevator-Antenna-v1.2/.project"/>
+		<project name="Elevator-Antenna-v1.3" path="featureide_examples/Book/PP/Elevator-Antenna-v1.3/.project"/>
+		<project name="Elevator-Antenna-v1.4" path="featureide_examples/Book/PP/Elevator-Antenna-v1.4/.project"/>
 		<project name="Clock-FH-AsmetaL" path="featureide_examples/Clock-FH-AsmetaL/.project"/>
 		<project name="DesktopSearcher-AHEAD" path="featureide_examples/DesktopSearcher-AHEAD/.project"/>
 		<project name="DiGraph-FH-JML" path="featureide_examples/DiGraph-FH-JML/.project"/>

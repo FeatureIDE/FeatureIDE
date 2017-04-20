@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <exampleWizard>
 	<contentProvider name="Book Example">
-		<path>Part IV/Chapter 13 (Feature-Oriented Programming with FeatureIDE)</path>
+		<path>Part IV/Chapter 14 (Developing an Elevator with Feature-Oriented Programming)</path>
 	</contentProvider>
 	<contentProvider name="Composer">
-		<path>FeatureC++</path>
+		<path>FeatureHouse</path>
 	</contentProvider>
 	<contentProvider name="Concepts">
-		<path>Feature-Oriented Programming/FeatureC++</path>
+		<path>Feature-Oriented Programming/FeatureHouse</path>
 	</contentProvider>
 	<contentProvider name="Languages">
-		<path>C++</path>
+		<path>Java</path>
 	</contentProvider>
 </exampleWizard>

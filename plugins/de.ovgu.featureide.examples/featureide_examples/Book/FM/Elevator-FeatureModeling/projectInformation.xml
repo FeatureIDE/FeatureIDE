@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<exampleWizard>
+	<contentProvider name="Book Example">
+		<path>Part II/Chapter 5 (Feature Modeling)</path>
+	</contentProvider>
+	<contentProvider name="Book Example">
+		<path>Part II/Chapter 6 (Product Configuration)</path>
+	</contentProvider>
+	<contentProvider name="Book Example">
+		<path>Part II/Chapter 7 (Feature Traceability in Feature Models and Configurations)</path>
+	</contentProvider>
+	<contentProvider name="Feature Modeling">
+		<path>FeatureIDE Format</path>
+	</contentProvider>
+</exampleWizard>
