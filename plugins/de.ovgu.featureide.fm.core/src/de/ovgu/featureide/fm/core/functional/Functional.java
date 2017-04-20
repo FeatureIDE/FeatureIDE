@@ -404,7 +404,7 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Converts the iterator <i>i</i> of type <b>T</b> into an list of type <b>T</b> by adding each element of <i>i</i> to the result list. <br/>
+	 * Converts the iterator <i>i</i> of type <b>T</b> into a list of type <b>T</b> by adding each element of <i>i</i> to the result list. <br/>
 	 * <br/>
 	 * It is guaranteed not to remove any element from the iterator. <br/>
 	 * <br/>
@@ -425,7 +425,7 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Converts the iterator <i>i</i> of type <b>T</b> into an set of type <b>T</b> by adding each element of <i>i</i> to the result set. <br/>
+	 * Converts the iterator <i>i</i> of type <b>T</b> into a set of type <b>T</b> by adding each element of <i>i</i> to the result set. <br/>
 	 * <br/>
 	 * It is guaranteed not to remove any element from the iterator. <br/>
 	 * <br/>
@@ -442,11 +442,11 @@ public abstract class Functional {
 		for (T t : source) {
 			retval.add(t);
 		}
-		return Collections.unmodifiableSet(retval);
+		return retval;
 	}
 
 	/**
-	 * Converts the iterator <i>source</i> of type <b>T</b> into an list of <b>Strings</b> using {@link #mapToString(Iterable)} on <b>source</b> and finally
+	 * Converts the iterator <i>source</i> of type <b>T</b> into a list of <b>Strings</b> using {@link #mapToString(Iterable)} on <b>source</b> and finally
 	 * {@link #toList(Iterable)} on the result. <br/>
 	 * <br/>
 	 * It is guaranteed not to remove any element from the iterator. <br/>
@@ -459,8 +459,26 @@ public abstract class Functional {
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static <T> Collection<String> mapToStringList(final Iterable<T> source) {
+	public static <T> List<String> mapToStringList(final Iterable<T> source) {
 		return toList(map(source, new ToStringFunction<T>()));
+	}
+
+	/**
+	 * Converts the iterator <i>source</i> of type <b>T</b> into a set of <b>Strings</b> using {@link #mapToString(Iterable)} on <b>source</b> and finally
+	 * {@link #toSet(Iterable)} on the result. <br/>
+	 * <br/>
+	 * It is guaranteed not to remove any element from the iterator. <br/>
+	 * <br/>
+	 * This is a <b>blocking</b> operation.
+	 * 
+	 * @param source Source of elements
+	 * @return A collection of strings that were yielded by <b>source</b>
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 3.0
+	 */
+	public static <T> Set<String> mapToStringSet (final Iterable<T> source) {
+		return toSet(map(source, new ToStringFunction<T>()));
 	}
 
 	/**
