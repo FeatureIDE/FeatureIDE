@@ -6,6 +6,8 @@
 		<project name="BankAccount-FH-JML" path="featureide_examples/BankAccount-FH-JML/.project"/>
 		<project name="BerkeleyDB-FH-Java" path="featureide_examples/BerkeleyDB-FH-Java/.project"/>
 		<project name="Elevator-FeatureModeling" path="featureide_examples/Book/FM/Elevator-FeatureModeling/.project"/>
+		<project name="Elevator-FeatureModeling-Colored" path="featureide_examples/Book/FM/Elevator-FeatureModeling-Colored/.project"/>
+		<project name="Elevator-FeatureModeling-Configuration" path="featureide_examples/Book/FM/Elevator-FeatureModeling-Configuration/.project"/>
 		<project name="Elevator-FeatureHouse-v0.0" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.0/.project"/>
 		<project name="Elevator-FeatureHouse-v0.1" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.1/.project"/>
 		<project name="Elevator-FeatureHouse-v0.2" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.2/.project"/>
