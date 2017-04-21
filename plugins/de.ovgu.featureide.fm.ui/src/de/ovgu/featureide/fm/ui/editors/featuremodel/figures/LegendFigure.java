@@ -148,7 +148,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean falseoptional;
 	private boolean indetHidden;
 	private boolean tautologyConst;
-	private boolean voidModelConst;
 	private boolean redundantConst;
 	private boolean explanations;
 	private boolean imported = false;
@@ -209,7 +208,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		indetHidden = fmStructure.hasIndetHidden();
 
 		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
-		voidModelConst = analyser.calculateConstraints && FeatureUtils.hasVoidModelConst(featureModel);
 		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
 		implicitConst = isImplicit(graphicalFeatureModel);
 
@@ -289,10 +287,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getTautologyConst());
 		}
-		if (voidModelConst) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getVoidModelConst());
-		}
 		if (redundantConst) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
@@ -360,10 +354,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createRowDead(row++);
 		}
 
-		if (voidModelConst) {
-			createRowVoidModelConst(row++);
-		}
-
 		if (falseoptional) {
 			createRowFalseOpt(row++);
 		}
@@ -404,12 +394,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowTautologyConst(int row) {
 		createSymbol(row, FALSE_OPT, false, TAUTOLOGY_CONST_TOOLTIP);
 		Label labelIndetHidden = createLabel(row, language.getTautologyConst(), FMPropertyManager.getFeatureForgroundColor(), TAUTOLOGY_CONST_TOOLTIP);
-		add(labelIndetHidden);
-	}
-
-	private void createRowVoidModelConst(int row) {
-		createSymbol(row, DEAD, false, MODEL_CONST_TOOLTIP);
-		Label labelIndetHidden = createLabel(row, language.getVoidModelConst(), FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
