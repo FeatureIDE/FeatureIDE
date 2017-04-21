@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="Character">
+				<alt abstract="true" mandatory="true" name="Clothes">
+					<and abstract="true" mandatory="true" name="NormalOutfit">
+						<alt abstract="true" mandatory="true" name="TopClothing">
+							<feature mandatory="true" name="RedSweater"/>
+							<feature mandatory="true" name="YellowSweater"/>
+						</alt>
+						<alt abstract="true" mandatory="true" name="BottomClothing">
+							<feature mandatory="true" name="Jeans"/>
+							<feature mandatory="true" name="BrownPant"/>
+						</alt>
+					</and>
+					<alt abstract="true" mandatory="true" name="Costume">
+						<feature mandatory="true" name="Koala"/>
+						<feature mandatory="true" name="Frog"/>
+					</alt>
+				</alt>
+				<or abstract="true" name="Objects">
+					<feature mandatory="true" name="Ball"/>
+					<feature mandatory="true" name="Balloon"/>
+				</or>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="true">
+			<feature name="Balloon"/>
+			<feature name="Ball"/>
+			<feature name="Character"/>
+			<feature name="Jeans"/>
+			<feature name="BrownPant"/>
+			<feature name="RedSweater"/>
+			<feature name="YellowSweater"/>
+			<feature name="Koala"/>
+			<feature name="Frog"/>
+		</featureOrder>
+	</featureModel>

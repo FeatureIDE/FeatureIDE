@@ -83,7 +83,6 @@
 		<project name="HelloWorldMPL-FH-Java" path="featureide_examples/HelloWorldMPL-FH-Java/.project">
 			<project name="HelloWorld-FH-Java-MPLDependency" path="featureide_examples/HelloWorldMPL-FH-Java/projects/HelloWorld-FH-Java-MPLDependency/.project"/>
 		</project>
-		<project name="Images_Example" path="featureide_examples/Images_Example/.project"/>
 		<project name="IntegerSet-FH-JML" path="featureide_examples/IntegerSet-FH-JML/.project"/>
 		<project name="IntList-FH-JML" path="featureide_examples/IntList-FH-JML/.project"/>
 		<project name="LandingGear-FH-AsmetaL" path="featureide_examples/LandingGear-FH-AsmetaL/.project"/>
@@ -105,4 +104,5 @@
 		<project name="Telecom Example-AspectJ" path="featureide_examples/Telecom Example-AspectJ/.project"/>
 		<project name="Tracing Example-AspectJ" path="featureide_examples/Tracing Example-AspectJ/.project"/>
 		<project name="UnionFind-FH-JML" path="featureide_examples/UnionFind-FH-JML/.project"/>
+		<project name="VariableCharacters-ImageComposer" path="featureide_examples/VariableCharacters-ImageComposer/.project"/>
 	</projectRecords>
