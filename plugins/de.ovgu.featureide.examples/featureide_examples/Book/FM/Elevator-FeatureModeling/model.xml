@@ -16,7 +16,7 @@
 					<description>
 						The behavior of the elevator in terms handling, ignoring, and prioritizing requests.
 					</description>
-					<or abstract="true" mandatory="true" name="Modes">
+					<alt abstract="true" mandatory="true" name="Modes">
 						<description>
 							Modes indicate in which order incoming requests are handled.
 						</description>
@@ -38,7 +38,7 @@
 								The elevator always moves to the requested floor that is closest to the current floor.
 							</description>
 						</feature>
-					</or>
+					</alt>
 					<feature name="Service">
 						<description>
 							The service mode enables maintenance by heading towards the lowest floor and ignoring all requests unless the service mode is stopped from within the elevator.
@@ -69,7 +69,7 @@
 					</or>
 				</and>
 				<feature name="VoiceOutput"/>
-				<alt name="CallButtons">
+				<alt abstract="true" name="CallButtons">
 					<description>
 						Call buttons enable to choose the desired floor in the inside as well as to call the elevator to a certain floor.
 					</description>
@@ -94,7 +94,7 @@
 					<description>
 						Variability of the elevator that directly influences security.
 					</description>
-					<or abstract="true" name="Permission">
+					<or abstract="true" mandatory="true" name="Permission">
 						<description>
 							Permissions enable to specify which floors can be reached by everyone or only with privileges.
 						</description>
@@ -137,20 +137,6 @@
 			</rule>
 			<rule>
 				<imp>
-					<var>Overloaded</var>
-					<not>
-						<var>Safety</var>
-					</not>
-				</imp>
-			</rule>
-			<rule>
-				<imp>
-					<var>Security</var>
-					<var>Permission</var>
-				</imp>
-			</rule>
-			<rule>
-				<imp>
 					<var>DirectedCall</var>
 					<var>ShortestPaht</var>
 				</imp>
@@ -165,7 +151,7 @@
 				</imp>
 			</rule>
 		</constraints>
-		<calculations Auto="false" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>
