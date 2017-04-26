@@ -730,10 +730,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		y_Entry += ROW_HEIGHT + 5;
 
 		//Add Red to dark red Gradient
-		TwoColorGradientLine redToBlack = new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0, 0, 0));
-		redToBlack.setSize(getSize().width - (SYMBOL_SIZE), 18);
+		TwoColorGradientLine redToBlack = new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0, 0, 0), labelExplanation.getPreferredSize().width, 6);
 		redToBlack.setLocation(new Point(x_SymbolStart, y_Entry));
-		y_Entry += 18;
+		y_Entry += redToBlack.getSize().height;
 
 		//Label left
 		Label labelLeft = new Label("likely cause");
@@ -742,7 +741,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelLeft.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelLeft.setFont(DEFAULT_FONT);
 		labelLeft.setSize(labelLeft.getPreferredSize().width + 2, ROW_HEIGHT);
-		labelLeft.setLocation(new Point(SYMBOL_SIZE / 2 - 2, y_Entry));
+		labelLeft.setLocation(new Point(redToBlack.getLocation().x, y_Entry));
 
 		//label right
 		Label labelRight = new Label("unlikely cause");
@@ -751,7 +750,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelRight.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelRight.setFont(DEFAULT_FONT);
 		labelRight.setSize(labelRight.getPreferredSize().width + 2, ROW_HEIGHT);
-		labelRight.setLocation(new Point(SYMBOL_SIZE / 2 + redToBlack.getSize().width - 2 - labelRight.getPreferredSize().width - 2, y_Entry));
+		labelRight.setLocation(new Point((redToBlack.getLocation().x + redToBlack.getSize().width) - labelRight.getPreferredSize().width, y_Entry));
 
 		explanationFigure.add(labelExplanation);
 		explanationFigure.add(redToBlack);
