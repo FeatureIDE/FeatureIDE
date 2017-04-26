@@ -37,11 +37,11 @@ import org.junit.runners.Parameterized.Parameters;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -78,14 +78,8 @@ public class QuickFixUnusedFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			IFeatureModel fm = new FeatureModel("") {
-				// display file name at JUnit view
-				public String toString() {
-					return f.getName();
-				};
-			};
-			IFeatureModelFormat format = new XmlFeatureModelFormat();
-			FileHandler.load(f.toPath(), fm, format);
+			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().createFeatureModel();
+			FileHandler.load(f.toPath(), fm, new XmlFeatureModelFormat());
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);
