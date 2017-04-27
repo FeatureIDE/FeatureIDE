@@ -33,7 +33,7 @@
 								The elevator proceeds requests based on the first-in-first-out principle. That is, the floor being requested first is the next target floor.
 							</description>
 						</feature>
-						<feature mandatory="true" name="ShortestPaht">
+						<feature mandatory="true" name="ShortestPath">
 							<description>
 								The elevator always moves to the requested floor that is closest to the current floor.
 							</description>
@@ -138,7 +138,7 @@
 			<rule>
 				<imp>
 					<var>DirectedCall</var>
-					<var>ShortestPaht</var>
+					<var>ShortestPath</var>
 				</imp>
 			</rule>
 			<rule>
@@ -146,7 +146,7 @@
 					<var>UndirectedCall</var>
 					<disj>
 						<var>FIFO</var>
-						<var>ShortestPaht</var>
+						<var>ShortestPath</var>
 					</disj>
 				</imp>
 			</rule>
