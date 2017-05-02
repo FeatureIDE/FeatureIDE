@@ -118,7 +118,7 @@ public class SatInstance {
 				if (includePositive) {
 					resultList.add(intToVar[Math.abs(var)].toString());
 				}
-			} else {
+			} else if (var < 0) {
 				if (includeNegative) {
 					resultList.add("-" + intToVar[Math.abs(var)].toString());
 				}

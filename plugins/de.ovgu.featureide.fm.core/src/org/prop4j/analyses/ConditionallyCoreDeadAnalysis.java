@@ -23,9 +23,9 @@ package org.prop4j.analyses;
 import org.prop4j.solver.FixedLiteralSelectionStrategy;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
+import org.sat4j.minisat.core.Solver;
 import org.prop4j.solver.SatInstance;
 import org.prop4j.solver.VarOrderHeap2;
-import org.sat4j.minisat.core.Solver;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -34,26 +34,14 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
+public class ConditionallyCoreDeadAnalysis extends AbstractAnalysis<int[]> {
 
-	public CoreDeadAnalysis(ISatSolver solver) {
-		this(solver, null);
-	}
-
-	private int[] features;
-
-	public CoreDeadAnalysis(SatInstance satInstance) {
-		this(satInstance, null);
-	}
-
-	public CoreDeadAnalysis(SatInstance satInstance, int[] features) {
-		super(satInstance);
-		this.setFeatures(features);
-	}
-
-	public CoreDeadAnalysis(ISatSolver solver, int[] features) {
+	public ConditionallyCoreDeadAnalysis(ISatSolver solver) {
 		super(solver);
-		this.setFeatures(features);
+	}
+
+	public ConditionallyCoreDeadAnalysis(SatInstance satInstance) {
+		super(satInstance);
 	}
 
 	public int[] analyze(IMonitor monitor) throws Exception {
@@ -63,19 +51,12 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 			int[] model2 = solver.findModel();
-
-			if (features != null) {
-				final int[] model3 = new int[model1.length];
-				for (int i = 0; i < features.length; i++) {
-					final int index = features[i] - 1;
-					if (index >= 0) {
-						model3[index] = model1[index];
-					}
-				}
-				model1 = model3;
-			}
-
+			
 			SatInstance.updateModel(model1, model2);
+			for (int i = 0; i < assumptions.length; i++) {
+				model1[Math.abs(assumptions[i]) - 1] = 0;
+			}
+			
 			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
 
 			for (int i = 0; i < model1.length; i++) {
@@ -85,7 +66,6 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 					switch (solver.isSatisfiable()) {
 					case FALSE:
 						solver.assignmentReplaceLast(varX);
-						monitor.invoke(varX);
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
@@ -99,16 +79,7 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 				}
 			}
 		}
-
-		return solver.getAssignmentArray(0, solver.getAssignment().size());
-	}
-
-	public int[] getFeatures() {
-		return features;
-	}
-
-	public void setFeatures(int[] features) {
-		this.features = features;
+		return solver.getAssignmentArray(assumptions.length, solver.getAssignment().size());
 	}
 
 }

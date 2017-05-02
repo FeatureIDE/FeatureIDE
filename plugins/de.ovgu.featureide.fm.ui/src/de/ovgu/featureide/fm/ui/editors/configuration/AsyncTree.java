@@ -106,9 +106,7 @@ public class AsyncTree extends Thread {
 			final TreeItem[] children = item.getItems();
 			for (int i = 0; i < children.length; i++) {
 				final TreeItem childNode = children[i];
-				if (childNode.getItemCount() > 0) {
-					runnableList.add(new Traverser(childNode, perNodeFunction));
-				}
+				runnableList.add(new Traverser(childNode, perNodeFunction));
 			}
 			dec();
 		}
@@ -145,7 +143,7 @@ public class AsyncTree extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				currentDisplay.asyncExec(runnableList.take());
+				currentDisplay.syncExec(runnableList.take());
 			}
 		} catch (InterruptedException e) {
 		}
