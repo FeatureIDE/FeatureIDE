@@ -1,0 +1,9 @@
+true
+CallButtons=NO_COLOR
+DirectedCall=Cyan
+UndirectedCall=Cyan
+Sabbath=Orange
+ShortestPath=Red
+Service=Dark_Green
+FIFO=Yellow
+FloorPermission=Pink

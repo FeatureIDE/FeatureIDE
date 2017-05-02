@@ -315,6 +315,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		featureModelManager = FeatureModelManager.getInstance(Paths.get(modelFile.getModelFile().getLocationURI()));
 		featureModelManager.addListener(new FeatureModelChangeListner());
+		featureModelManager.read();
 
 		// initialize project structure
 		try {

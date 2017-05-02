@@ -22,14 +22,15 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.editors.text.TextEditor;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -73,27 +74,38 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 
 	@Override
 	public void propertyChange(FeatureIDEEvent evt) {
-		refresh();
+		if (evt != null) {
+			switch (evt.getEventType()) {
+			case MODEL_DATA_SAVED:
+				try {
+					getDocumentProvider().resetDocument(getEditorInput());
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+				break;
+			default:
+				break;
+			}
+		} else {
+			refresh();
+		}
 	}
 
 	protected final void refresh() {
-		if (configurationEditor.getConfiguration() == null || configurationEditor.containsError()) {
-			return;
-		}
-		String source = configurationEditor.configurationManager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-		IDocumentProvider provider = getDocumentProvider();
-		IDocument document = provider.getDocument(getEditorInput());
-		if (!source.equals(document.get())) {
-			document.set(source);
+		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+		if (configurationManager != null && configurationEditor.getConfiguration() != null && !configurationEditor.containsError()) {
+			final String source = configurationManager.getFormat().getInstance().write(configurationEditor.getConfiguration());
+			final IDocument document = getDocumentProvider().getDocument(getEditorInput());
+			if (!source.equals(document.get())) {
+				document.set(source);
+			}
 		}
 	}
 
 	@Override
 	public void pageChangeFrom(int newPageIndex) {
-		IDocumentProvider provider = getDocumentProvider();
-		IDocument document = provider.getDocument(getEditorInput());
-		String text = document.get();
-		final IPersistentFormat<Configuration> confFormat = configurationEditor.configurationManager.getFormat();
+		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
+		final IPersistentFormat<Configuration> confFormat = configurationEditor.getConfigurationManager().getFormat();
 		if (!confFormat.getInstance().write(configurationEditor.getConfiguration()).equals(text)) {
 			confFormat.getInstance().read(configurationEditor.getConfiguration(), text);
 		}
@@ -123,7 +135,18 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	protected ProblemList checkSource() {
-		return configurationEditor.checkSource(getDocumentProvider().getDocument(getEditorInput()).get());
+		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+		if (configurationManager != null) {
+			final Configuration configuration = configurationEditor.getConfiguration();
+			final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
+
+			final ProblemList problems = confFormat.getInstance().read(configuration, getDocumentProvider().getDocument(getEditorInput()).get());
+			configurationEditor.createModelFileMarkers(problems);
+			configurationEditor.setContainsError(problems.containsError());
+
+			return problems;
+		}
+		return null;
 	}
 
 }

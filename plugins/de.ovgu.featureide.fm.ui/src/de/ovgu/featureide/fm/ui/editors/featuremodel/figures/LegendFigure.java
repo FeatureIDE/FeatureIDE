@@ -148,7 +148,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean falseoptional;
 	private boolean indetHidden;
 	private boolean tautologyConst;
-	private boolean voidModelConst;
 	private boolean redundantConst;
 	private boolean explanations;
 	private boolean imported = false;
@@ -209,7 +208,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		indetHidden = fmStructure.hasIndetHidden();
 
 		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
-		voidModelConst = analyser.calculateConstraints && FeatureUtils.hasVoidModelConst(featureModel);
 		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
 		implicitConst = isImplicit(graphicalFeatureModel);
 
@@ -289,10 +287,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getTautologyConst());
 		}
-		if (voidModelConst) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getVoidModelConst());
-		}
 		if (redundantConst) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
@@ -360,10 +354,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createRowDead(row++);
 		}
 
-		if (voidModelConst) {
-			createRowVoidModelConst(row++);
-		}
-
 		if (falseoptional) {
 			createRowFalseOpt(row++);
 		}
@@ -404,12 +394,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowTautologyConst(int row) {
 		createSymbol(row, FALSE_OPT, false, TAUTOLOGY_CONST_TOOLTIP);
 		Label labelIndetHidden = createLabel(row, language.getTautologyConst(), FMPropertyManager.getFeatureForgroundColor(), TAUTOLOGY_CONST_TOOLTIP);
-		add(labelIndetHidden);
-	}
-
-	private void createRowVoidModelConst(int row) {
-		createSymbol(row, DEAD, false, MODEL_CONST_TOOLTIP);
-		Label labelIndetHidden = createLabel(row, language.getVoidModelConst(), FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
@@ -721,8 +705,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				break;
 			case REDUNDANT_CONSTRAINT:
 				Constraint constraint = (Constraint) explanation.getDefectElement();
-				int index = graphicalFeatureModel.getConstraintIndex(constraint);
-				labelExplanation.setText((index + 1) + ". constraint is redundant because of highlighted dependencies:");
+				labelExplanation.setText("The selected constraint is redundant because of highlighted dependencies:");
 				explanationFigure.setToolTip(
 						createToolTipContent("The constraint\n" + constraint.getDisplayName() + "\nis redundant because of the highligthed dependencies."));
 				break;
@@ -747,10 +730,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		y_Entry += ROW_HEIGHT + 5;
 
 		//Add Red to dark red Gradient
-		TwoColorGradientLine redToBlack = new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0, 0, 0));
-		redToBlack.setSize(getSize().width - (SYMBOL_SIZE), 18);
+		TwoColorGradientLine redToBlack = new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0, 0, 0), labelExplanation.getPreferredSize().width, 6);
 		redToBlack.setLocation(new Point(x_SymbolStart, y_Entry));
-		y_Entry += 18;
+		y_Entry += redToBlack.getSize().height;
 
 		//Label left
 		Label labelLeft = new Label("likely cause");
@@ -759,7 +741,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelLeft.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelLeft.setFont(DEFAULT_FONT);
 		labelLeft.setSize(labelLeft.getPreferredSize().width + 2, ROW_HEIGHT);
-		labelLeft.setLocation(new Point(SYMBOL_SIZE / 2 - 2, y_Entry));
+		labelLeft.setLocation(new Point(redToBlack.getLocation().x, y_Entry));
 
 		//label right
 		Label labelRight = new Label("unlikely cause");
@@ -768,7 +750,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelRight.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelRight.setFont(DEFAULT_FONT);
 		labelRight.setSize(labelRight.getPreferredSize().width + 2, ROW_HEIGHT);
-		labelRight.setLocation(new Point(SYMBOL_SIZE / 2 + redToBlack.getSize().width - 2 - labelRight.getPreferredSize().width - 2, y_Entry));
+		labelRight.setLocation(new Point((redToBlack.getLocation().x + redToBlack.getSize().width) - labelRight.getPreferredSize().width, y_Entry));
 
 		explanationFigure.add(labelExplanation);
 		explanationFigure.add(redToBlack);

@@ -126,7 +126,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 	}
 
-	public class GetSolutionsMethod implements LongRunningMethod<LinkedList<List<String>>> {
+	public class GetSolutionsMethod implements LongRunningMethod<List<List<String>>> {
 		private final int max;
 
 		public GetSolutionsMethod(int max) {
@@ -207,9 +207,9 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 	}
 
-	public class UpdateMethod implements LongRunningMethod<List<String>> {
+	public class UpdateMethod implements LongRunningMethod<Void> {
 		@Override
-		public List<String> execute(IMonitor monitor) {
+		public Void execute(IMonitor monitor) {
 			final byte[] featureToCompute = new byte[variableConfiguration.size()];
 			boolean undefined = false;
 			final List<Literal> knownLiterals = new ArrayList<>();
@@ -372,9 +372,8 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			}
 
 			Collections.sort(changedFeatures);
-			final ArrayList<String> ret = new ArrayList<>(changedFeatures);
 			changedFeatures.clear();
-			return ret;
+			return null;
 		}
 
 	}
@@ -624,8 +623,17 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		return new SimpleAutoCompletionMethod(positive);
 	}
 
+	public UpdateMethod update(boolean redundantManual, List<SelectableFeature> featureOrder) {
+		return new UpdateMethod();
+	}
+
 	@Override
-	public UpdateMethod update(boolean redundantManual, String startFeatureName) {
+	public LongRunningMethod<Void> update(boolean redundantManual) {
+		return new UpdateMethod();
+	}
+
+	@Override
+	public LongRunningMethod<Void> update() {
 		return new UpdateMethod();
 	}
 
