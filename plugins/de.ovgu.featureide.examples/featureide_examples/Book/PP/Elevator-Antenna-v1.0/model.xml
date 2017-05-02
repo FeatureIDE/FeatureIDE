@@ -164,8 +164,14 @@
 					</disj>
 				</imp>
 			</rule>
+			<rule>
+				<imp>
+					<var>Modes</var>
+					<var>Overloaded</var>
+				</imp>
+			</rule>
 		</constraints>
-		<calculations Auto="false" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>
