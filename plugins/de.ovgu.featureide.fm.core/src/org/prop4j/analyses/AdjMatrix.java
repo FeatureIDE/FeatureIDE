@@ -551,11 +551,16 @@ public class AdjMatrix extends AFeatureGraph2 {
 		}
 
 		@Override
-		public void traverse(int curVar, int[] model) {
+		public void traverseDefined(int... vars) {
 		}
 
 		@Override
-		public void clear() {
+		public void traverseUndefined(int... vars) {
+		}
+
+		@Override
+		public void init(int[] model) {
+			
 		}
 
 		@Override

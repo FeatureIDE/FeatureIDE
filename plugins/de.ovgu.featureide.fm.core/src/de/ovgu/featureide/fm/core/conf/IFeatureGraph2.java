@@ -31,9 +31,11 @@ public interface IFeatureGraph2 extends Serializable {
 
 		void traverse2(int curVar, int[] model, IVecInt vecInt);
 
-		void traverse(int curVar, int[] model);
+		void traverseDefined(int... vars);
 
-		void clear();
+		void traverseUndefined(int... vars);
+
+		void init(int[] model);
 
 		VecInt getRelevantVariables();
 

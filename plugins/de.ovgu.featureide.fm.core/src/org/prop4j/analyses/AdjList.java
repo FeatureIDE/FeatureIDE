@@ -209,16 +209,22 @@ public class AdjList extends AFeatureGraph2 {
 	}
 
 	public static class Traverser implements ITraverser {
+		private static final byte MARK_AUTO_SELECT = 8;
+		private static final byte MARK_AUTO_DESELECT = 4;
+		
+		private static final byte MARK_POS_TRAVERSED = 8;
+		private static final byte MARK_NEG_TRAVERSED = 4;
+		
 		private final ArrayDeque<Integer> changed = new ArrayDeque<>();
 		private final byte[] dfsMark;
-		private final byte[] dfsMark2;
+		private final byte[] computationMark;
 		private final AdjList adjList;
-		private int[] model = null;
+		private int[] modelForDefinedVariables = null;
 
 		public Traverser(AdjList adjList) {
 			this.adjList = adjList;
 			this.dfsMark = new byte[adjList.adjList.size()];
-			this.dfsMark2 = new byte[adjList.adjList.size()];
+			this.computationMark = new byte[adjList.adjList.size()];
 		}
 
 		public void traverse2(int curVar, int[] model, IVecInt vecInt) {
@@ -234,34 +240,48 @@ public class AdjList extends AFeatureGraph2 {
 			}
 		}
 
-		public void clear() {
-			Arrays.fill(dfsMark, (byte) 0);
-			Arrays.fill(dfsMark2, (byte) 0);
+		public void init(int[] model) {
+			Arrays.fill(computationMark, (byte) 0);
+			this.modelForDefinedVariables = model;
+			changed.clear();
 		}
 
+		@Override
 		public VecInt getRelevantVariables() {
 			final VecInt vecInt = new VecInt();
-			for (int i = 0; i < dfsMark2.length; i++) {
-				if (model[i] == 0) {
-					if ((dfsMark2[i] & 8) != 0) {
-						vecInt.push((i + 1));
-					}
-					if ((dfsMark2[i] & 4) != 0) {
-						vecInt.push(-(i + 1));
-					}
+			for (int i = 0; i < computationMark.length; i++) {
+				if ((computationMark[i] & MARK_AUTO_SELECT) != 0) {
+					vecInt.push((i + 1));
+				}
+				if ((computationMark[i] & MARK_AUTO_DESELECT) != 0) {
+					vecInt.push(-(i + 1));
 				}
 			}
 			return vecInt;
 		}
 
-		public void traverse(int curVar, int[] model) {
-			this.model = model;
+		@Override
+		public void traverseDefined(int... newVars) {
 			Arrays.fill(dfsMark, (byte) 0);
-			changed.clear();
-			changed.push(curVar);
-			traverseStrong(curVar);
+
+			for (int var : newVars) {
+				changed.push(var);
+			}
+			for (int var : newVars) {
+				traverseStrong(var);
+			}
+
 			while (!changed.isEmpty()) {
 				traverseWeak(changed.pop());
+			}
+		}
+
+		@Override
+		public void traverseUndefined(int... undefinedVars) {
+			Arrays.fill(dfsMark, (byte) 0);
+
+			for (int var : undefinedVars) {
+				markAutomaticForCalculation(var);
 			}
 		}
 
@@ -284,7 +304,7 @@ public class AdjList extends AFeatureGraph2 {
 					if (index == curIndex) {
 						continue;
 					}
-					final int value = model[index];
+					final int value = modelForDefinedVariables[index];
 
 					if (value == 0) {
 						// add literal to list
@@ -306,7 +326,7 @@ public class AdjList extends AFeatureGraph2 {
 					traverseStrong(literal);
 				} else {
 					for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
-						markForCalculation(iterator.next());
+						markUndefinedForCalculation(iterator.next());
 					}
 				}
 			}
@@ -326,40 +346,39 @@ public class AdjList extends AFeatureGraph2 {
 
 		private void markStrong(final int literal) {
 			final int index = Math.abs(literal) - 1;
-			if (model[index] == 0) {
-				model[index] = literal;
+			if (modelForDefinedVariables[index] == 0) {
+				modelForDefinedVariables[index] = literal;
 				changed.push(literal);
 			} else {
-				if (model[index] == -literal) {
+				if (modelForDefinedVariables[index] == -literal) {
 					throw new RuntimeException();
 				}
 			}
 		}
 
-		// Transitive closure for strong edges
-		private void markForCalculation(int curVar) {
+		private void markUndefinedForCalculation(int curVar) {
 			final int curIndex = Math.abs(curVar) - 1;
-			if (model[curIndex] != 0) {
+			if (modelForDefinedVariables[curIndex] != 0) {
 				return;
 			}
 
 			final int[] strongEdges;
 			final int[] complexClauses;
 			if (curVar > 0) {
-				if ((dfsMark[curIndex] & 8) != 0) {
+				if ((dfsMark[curIndex] & MARK_POS_TRAVERSED) != 0) {
 					return;
 				}
-				dfsMark[curIndex] |= 8;
-				dfsMark2[curIndex] |= 8;
+				dfsMark[curIndex] |= MARK_POS_TRAVERSED;
+				computationMark[curIndex] |= MARK_AUTO_SELECT;
 				final Vertex vertex = adjList.adjList.get(curIndex);
 				strongEdges = vertex.posStrongEdges;
 				complexClauses = vertex.posComplexClauses;
 			} else {
-				if ((dfsMark[curIndex] & 4) != 0) {
+				if ((dfsMark[curIndex] & MARK_NEG_TRAVERSED) != 0) {
 					return;
 				}
-				dfsMark[curIndex] |= 4;
-				dfsMark2[curIndex] |= 4;
+				dfsMark[curIndex] |= MARK_NEG_TRAVERSED;
+				computationMark[curIndex] |= MARK_AUTO_DESELECT;
 				final Vertex vertex = adjList.adjList.get(curIndex);
 				strongEdges = vertex.negStrongEdges;
 				complexClauses = vertex.negComplexClauses;
@@ -367,7 +386,7 @@ public class AdjList extends AFeatureGraph2 {
 
 			// Strong Edges
 			for (int i = 0; i < strongEdges.length; i++) {
-				markForCalculation(strongEdges[i]);
+				markUndefinedForCalculation(strongEdges[i]);
 			}
 
 			// Weak Edges
@@ -383,7 +402,7 @@ public class AdjList extends AFeatureGraph2 {
 					if (index == curIndex) {
 						continue;
 					}
-					final int value = model[index];
+					final int value = modelForDefinedVariables[index];
 
 					if (value == 0) {
 						// add literal to list
@@ -399,12 +418,89 @@ public class AdjList extends AFeatureGraph2 {
 				}
 
 				for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
-					markForCalculation(iterator.next());
+					markUndefinedForCalculation(iterator.next());
 				}
-
 			}
 		}
 
+		private void markAutomaticForCalculation(int curVar) {
+			final int curIndex = Math.abs(curVar) - 1;
+			if (modelForDefinedVariables[curIndex] != 0) {
+				return;
+			}
+
+			final int[] strongEdges;
+			final int[] complexClauses;
+			if (curVar > 0) {
+				if ((dfsMark[curIndex] & MARK_POS_TRAVERSED) != 0) {
+					return;
+				}
+				dfsMark[curIndex] |= MARK_POS_TRAVERSED;
+
+				computationMark[curIndex] |= MARK_AUTO_SELECT;
+				final Vertex vertex = adjList.adjList.get(curIndex);
+				strongEdges = vertex.posStrongEdges;
+				complexClauses = vertex.posComplexClauses;
+			} else {
+				if ((dfsMark[curIndex] & MARK_NEG_TRAVERSED) != 0) {
+					return;
+				}
+				dfsMark[curIndex] |= MARK_NEG_TRAVERSED;
+
+				computationMark[curIndex] |= MARK_AUTO_DESELECT;
+				final Vertex vertex = adjList.adjList.get(curIndex);
+				strongEdges = vertex.negStrongEdges;
+				complexClauses = vertex.negComplexClauses;
+			}
+
+			// Strong Edges
+			for (int i = 0; i < strongEdges.length; i++) {
+				markAutomaticForCalculation(strongEdges[i]);
+			}
+
+			// Weak Edges
+			final VecInt v = new VecInt();
+			outerLoop: for (int i = 0; i < complexClauses.length; i++) {
+				final Clause clause = adjList.complexClauses.get(complexClauses[i]);
+
+				v.clear();
+				final int[] literals = clause.getLiterals();
+				for (int j = 0; j < literals.length; j++) {
+					final int literal = literals[j];
+					final int index = Math.abs(literal) - 1;
+					if (index == curIndex) {
+						continue;
+					}
+					final int value = modelForDefinedVariables[index];
+
+					if (value == 0) {
+						// add literal to list
+						v.push(literal);
+					} else {
+						if (value == literal) {
+							// Clause is satisfied
+							continue outerLoop;
+						} else {
+							// Do nothing
+						}
+					}
+				}
+
+				for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
+					markAutomaticForCalculation(iterator.next());
+				}
+			}
+			
+			
+//			// We can use the manual defined variables!
+//			for (int i = 0; i < complexClauses.length; i++) {
+//				for (int literal : adjList.complexClauses.get(complexClauses[i]).getLiterals()) {
+//					if (Math.abs(literal) != (curIndex + 1)) {
+//						markForCalculation2(literal);
+//					}
+//				}
+//			}
+		}
 	}
 
 	public static AdjList build(AdjMatrix adjMatrix) {
