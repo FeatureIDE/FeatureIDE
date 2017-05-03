@@ -18,22 +18,17 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf;
+package de.ovgu.featureide.fm.core.io;
 
-public abstract class AFeatureGraph2 implements IFeatureGraph2 {
+import org.prop4j.analyses.AdjList;
 
-	private static final long serialVersionUID = 1L;
+import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 
-	public static boolean isEdge(byte edge, byte q) {
-		return (edge & q) != 0;
-	}
-
-	public static boolean isWeakEdge(byte edge) {
-		return (edge & EDGE_WEAK) != 0;
-	}
-
-	public static boolean isStrongEdge(byte edge) {
-		return (edge & EDGE_STRONG) != 0;
-	}
+/**
+ * Format for {@link IFeatureGraph feature graphs}.
+ * 
+ * @author Sebastian Krieter
+ */
+public interface IModalImplicationGraphFormat extends IPersistentFormat<AdjList> {
 
 }
