@@ -103,7 +103,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			case TIMEOUT:
 				return false;
 			case TRUE:
-				return false;
+				return true;
 			default:
 				throw new AssertionError(satResult);
 			}
