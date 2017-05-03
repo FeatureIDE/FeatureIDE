@@ -93,8 +93,9 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		if (configurationMap.getConfigColumnsOffset() > columnIndex) {
-			if (element instanceof IFeature)
+			if (element instanceof IFeature || element instanceof String) {
 				return element.toString();
+			}
 		}
 
 		return null;

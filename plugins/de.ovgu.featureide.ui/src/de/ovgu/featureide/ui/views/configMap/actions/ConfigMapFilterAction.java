@@ -50,9 +50,6 @@ public class ConfigMapFilterAction extends Action {
 		return filter;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#setChecked(boolean)
-	 */
 	@Override
 	public void setChecked(boolean checked) {
 		super.setChecked(checked);
