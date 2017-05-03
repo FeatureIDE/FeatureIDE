@@ -137,7 +137,9 @@ public class SetFeatureColorAction extends Action {
 				continue;
 			} else if (object instanceof AbstractGraphicalEditPart) {
 				AbstractGraphicalEditPart agep = (AbstractGraphicalEditPart) object;
-				IFeature feature = featureModel.getFeature(agep.getModel().toString());
+				IFeature feature = null;
+				if (agep.getModel() != null)
+					feature = featureModel.getFeature(agep.getModel().toString());
 				if (feature != null)
 					continue;
 			} else if (object instanceof FeatureEditPart) {
