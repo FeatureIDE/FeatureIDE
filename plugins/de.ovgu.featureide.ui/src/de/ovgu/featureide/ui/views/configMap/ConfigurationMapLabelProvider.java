@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.configMap;
 
+import java.util.HashMap;
+
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -43,9 +45,15 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	private final static String imgUnselectedPath = "adeselected.ico";
 
 	private ConfigurationMap configurationMap;
+	
+	private HashMap<String, Image> cachedImages;
 
 	public ConfigurationMapLabelProvider(ConfigurationMap configurationMap) {
 		this.configurationMap = configurationMap;
+		
+		cachedImages = new HashMap<String, Image>();
+		cachedImages.put(imgSelectedPath, FMUIPlugin.getDefault().getImage(imgSelectedPath));
+		cachedImages.put(imgUnselectedPath, FMUIPlugin.getDefault().getImage(imgUnselectedPath));
 	}
 
 	@Override
@@ -82,7 +90,7 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 					if (config.getSelectedFeatures().contains(feature))
 						imgPath = imgSelectedPath;
 
-					return FMUIPlugin.getImage(imgPath);
+					return cachedImages.get(imgPath);
 				}
 			}
 		}
