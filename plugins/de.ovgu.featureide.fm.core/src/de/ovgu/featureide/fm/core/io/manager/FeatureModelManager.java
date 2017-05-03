@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.CheckForNull;
 
@@ -30,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.InternalFeatureModelFormat;
 
 /**
  * Responsible to load and save all information for a feature model instance.
@@ -59,28 +61,14 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	 */
 	@CheckForNull
 	public static FeatureModelManager getInstance(Path absolutePath) {
-		return (FeatureModelManager) getAInstance(absolutePath, objectCreator);
+		return (FeatureModelManager) AFileManager.getInstance(absolutePath, objectCreator);
 	}
 
-	protected FeatureModelManager(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> modelHandler) {
-		super(model, absolutePath, modelHandler);
+	public static IFeatureModelFormat getFormat(String fileName) {
+		return FMFormatManager.getInstance().getFormatByFileName(fileName);
 	}
 
-	@Override
-	public IFeatureModelFormat getFormat() {
-		return (IFeatureModelFormat) super.getFormat();
-	}
-
-	@Override
-	protected IFeatureModel copyObject(IFeatureModel oldObject) {
-		return oldObject.clone();
-	}
-
-	public static FileHandler<IFeatureModel> load(Path path) {
-		return getFileHandler(path, objectCreator);
-	}
-
-	public static boolean writeToFile(IFeatureModel featureModel, Path path) {
+	public static boolean save(IFeatureModel featureModel, Path path) {
 		final String pathString = path.toAbsolutePath().toString();
 		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
 		return !FileHandler.save(path, featureModel, format).containsError();
@@ -91,7 +79,46 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		if (featureModel == null) {
 			return false;
 		}
-		return writeToFile(featureModel, outPath);
+		return save(featureModel, outPath);
+	}
+
+	protected FeatureModelManager(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> modelHandler) {
+		super(setSourcePath(model, absolutePath), absolutePath, modelHandler);
+	}
+
+	private static IFeatureModel setSourcePath(IFeatureModel model, String absolutePath) {
+		model.setSourceFile(Paths.get(absolutePath));
+		return model;
+	}
+
+	@Override
+	protected boolean compareObjects(IFeatureModel o1, IFeatureModel o2) {
+		final InternalFeatureModelFormat format = new InternalFeatureModelFormat();
+		final String s1 = format.getInstance().write(o1);
+		final String s2 = format.getInstance().write(o2);
+		return s1.equals(s2);
+	}
+
+	@Override
+	public void override() {
+		localObject.setUndoContext(variableObject.getUndoContext());
+		super.override();
+	}
+
+	@Override
+	public IFeatureModelFormat getFormat() {
+		return (IFeatureModelFormat) super.getFormat();
+	}
+
+	@Override
+	protected IFeatureModel copyObject(IFeatureModel oldObject) {
+		final IFeatureModel clone = oldObject.clone();
+		clone.setUndoContext(oldObject.getUndoContext());
+		return clone;
+	}
+
+	public static FileHandler<IFeatureModel> load(Path path) {
+		return getFileHandler(path, objectCreator);
 	}
 
 }

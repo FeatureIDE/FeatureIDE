@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -94,7 +94,7 @@ public class MixinJakModelBuilder extends AbstractJakModelBuilder<AST_Program>{
 		for (int i = 0; i < sources.size(); i++) {
 			currentFile = sources.get(i);
 			// The role corresponding to the current source file
-			FSTRole role = model.addRole(getFeature((IFolder)currentFile.getParent()), currentClass, currentFile);
+			FSTRole role = model.addRole(getFeature((IFolder)currentFile.getParent()), model.getAbsoluteClassName(currentFile), currentFile);
 		
 			// Add methods and fields of the FST to the role
 			for (c.First(ownASTs[i]); c.More(); c.PlusPlus()) {

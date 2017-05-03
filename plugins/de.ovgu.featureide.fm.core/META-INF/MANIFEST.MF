@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model Core Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.core;singleton:=true
-Bundle-Version: 3.2.0.qualifier
+Bundle-Version: 3.3.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
@@ -38,6 +38,7 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.conf.worker,
  de.ovgu.featureide.fm.core.conf.worker.base,
  de.ovgu.featureide.fm.core.configuration,
+ de.ovgu.featureide.fm.core.configuration.io,
  de.ovgu.featureide.fm.core.constraint,
  de.ovgu.featureide.fm.core.constraint.analysis,
  de.ovgu.featureide.fm.core.conversion,

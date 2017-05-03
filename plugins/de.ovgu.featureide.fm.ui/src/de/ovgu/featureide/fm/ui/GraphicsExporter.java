@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -76,7 +76,7 @@ public class GraphicsExporter {
 			return false;
 
 		if (filePath.endsWith(".m") || filePath.endsWith(".xml") || filePath.endsWith(".velvet")) {
-			return FeatureModelManager.writeToFile(featureModel, Paths.get(filePath));
+			return FeatureModelManager.save(featureModel, Paths.get(filePath));
 		} else {
 			final File file = new File(filePath);
 			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);

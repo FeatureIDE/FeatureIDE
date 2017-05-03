@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -76,15 +76,7 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 			}
 
 			SatInstance.updateModel(model1, model2);
-			((Solver<?>) solver
-					.getInternalSolver())
-							.setOrder(
-									new VarOrderHeap2(
-											new FixedLiteralSelectionStrategy(model1,
-													model1.length > (AConditionallyCoreDeadAnalysis
-															.countNegative(model2)
-															+ AConditionallyCoreDeadAnalysis.countNegative(model1))),
-											solver.getOrder()));
+			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
 
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -61,7 +61,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 
 		final Image image1 = getConnectionImage(feature);
 		final Image image2 = getSelectionImage(selFeature, selection);
-		
+
 		final ImageData imageData1 = image1.getImageData();
 		final ImageData imageData2 = image2.getImageData();
 
@@ -144,7 +144,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 							item.setImage(getImage(feature, null));
 							if (updateFeatures.contains(feature)) {
 								item.setImage(getImage(feature, Selection.SELECTED));
-							} else if (feature.getAutomatic() == Selection.UNDEFINED) {
+							} else {
 								changeSelection(item, e.button == 1);
 							}
 						}
@@ -172,8 +172,8 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 							item.setImage(getImage(feature, null));
 							if (updateFeatures.contains(feature)) {
 								item.setImage(getImage(feature, Selection.SELECTED));
-							} else if (feature.getAutomatic() == Selection.UNDEFINED) {
-								cycleSelection(feature, true);
+							} else {
+								cycleSelection(item, true);
 							}
 						}
 					}
@@ -185,13 +185,18 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		});
 	}
 
-	protected void refreshItem(TreeItem item, SelectableFeature feature) {
-		item.setBackground(null);
-		item.setForeground(null);
-		item.setFont(treeItemStandardFont);
-		item.setImage(getImage(feature, null));
-		if (feature.getAutomatic() == Selection.UNSELECTED) {
-			item.setForeground(gray);
+	protected void refreshItem(TreeItem item) {
+		final Object data = item.getData();
+		if (data instanceof SelectableFeature) {
+			final SelectableFeature feature = (SelectableFeature) data;
+			item.setBackground(null);
+			item.setForeground(null);
+			item.setFont(treeItemStandardFont);
+			item.setImage(getImage(feature, null));
+			item.setText(feature.getName());
+			if (feature.getAutomatic() == Selection.UNSELECTED) {
+				item.setForeground(gray);
+			}
 		}
 	}
 
@@ -217,24 +222,21 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		return true;
 	}
 
-	private void cycleSelection(SelectableFeature feature, boolean up) {
-		if (feature.getAutomatic() == Selection.UNDEFINED) {
-			switch (feature.getManual()) {
-			case SELECTED:
-				set(feature, (up) ? Selection.UNSELECTED : Selection.UNDEFINED);
-				break;
-			case UNSELECTED:
-				set(feature, (up) ? Selection.UNDEFINED : Selection.SELECTED);
-				break;
-			case UNDEFINED:
-				set(feature, (up) ? Selection.SELECTED : Selection.UNSELECTED);
-				break;
-			default:
-				set(feature, Selection.UNDEFINED);
-			}
-			if (!dirty) {
-				setDirty();
-			}
+	protected void cycleSelection(TreeItem item, boolean up) {
+		final Selection manualSelection = ((SelectableFeature) item.getData()).getManual();
+		switch (manualSelection) {
+		case SELECTED:
+			setManual(item, (up) ? Selection.UNSELECTED : Selection.UNDEFINED);
+			break;
+		case UNSELECTED:
+			setManual(item, (up) ? Selection.UNDEFINED : Selection.SELECTED);
+			break;
+		case UNDEFINED:
+			setManual(item, (up) ? Selection.SELECTED : Selection.UNSELECTED);
+			break;
+		default:
+			throw new AssertionError(manualSelection);
 		}
 	}
+
 }

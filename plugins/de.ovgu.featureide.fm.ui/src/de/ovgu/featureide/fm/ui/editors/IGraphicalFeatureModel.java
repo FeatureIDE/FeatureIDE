@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
@@ -52,6 +53,9 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	Collection<IGraphicalFeature> getFeatures();
 	
 	Collection<IGraphicalFeature> getAllFeatures();
+
+	void setActiveExplanation(Explanation exp);
+	Explanation getActiveExplanation();
 
 	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
 

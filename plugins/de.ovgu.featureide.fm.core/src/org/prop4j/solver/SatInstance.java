@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -51,7 +51,7 @@ public class SatInstance {
 			}
 		}
 	}
-	
+
 	public static void updateModel(final int[] model1, Iterable<int[]> models) {
 		for (int i = 0; i < model1.length; i++) {
 			final int x = model1[i];
@@ -61,7 +61,7 @@ public class SatInstance {
 					model1[i] = 0;
 					break;
 				}
-			}			
+			}
 		}
 	}
 
@@ -118,7 +118,7 @@ public class SatInstance {
 				if (includePositive) {
 					resultList.add(intToVar[Math.abs(var)].toString());
 				}
-			} else {
+			} else if (var < 0) {
 				if (includeNegative) {
 					resultList.add("-" + intToVar[Math.abs(var)].toString());
 				}

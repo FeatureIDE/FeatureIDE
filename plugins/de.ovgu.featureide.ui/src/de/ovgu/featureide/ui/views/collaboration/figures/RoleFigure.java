@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.views.collaboration.figures;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -492,6 +491,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (name.startsWith(RoleElement.DEFAULT_PACKAGE)) {
 			name = name.substring(RoleElement.DEFAULT_PACKAGE.length());
 		}
+		if (name.contains(".")) {
+			name = name.substring(name.lastIndexOf(".")+1, name.length());
+		}
 		
 		RoleFigureLabel classLabel = new RoleFigureLabel(name, IMAGE_CLASS, classFragment.getFullName());
 		classLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
@@ -594,18 +596,14 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	}
 
 	private void setDirectivesContent(Figure tooltipContent, String className) {
-		LinkedList<String> duplicates = new LinkedList<String>();
 		tooltipContent.add(new Label(className + " ", IMAGE_CLASS));
 		tooltipContent.add(new Label(role.getFeature() + " ", IMAGE_FEATURE));
 		this.setToolTip(tooltipContent);
 
 		for (FSTDirective d : role.getDirectives()) {
-			String dependencyString = d.toDependencyString();
-			if (!duplicates.contains(dependencyString)) {
-//				duplicates.add(dependencyString);
-				Label partLabel = new RoleFigureLabel(dependencyString, IMAGE_HASH, dependencyString, d);
-				addLabel(partLabel);
-			}
+			String dependencyString = d.toCommandString();
+			Label partLabel = new RoleFigureLabel(dependencyString, IMAGE_HASH, dependencyString, d);
+			addLabel(partLabel);
 			// TODO draw separationline between fields and methods
 		}
 	}

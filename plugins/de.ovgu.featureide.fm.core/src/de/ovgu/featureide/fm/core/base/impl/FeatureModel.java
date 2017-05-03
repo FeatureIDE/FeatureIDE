@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,6 +28,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.prop4j.NodeWriter;
@@ -293,7 +294,7 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public List<String> getFeatureOrderList() {
 		if (featureOrderList.isEmpty()) {
-			return Functional.toList(Functional.mapToStringList(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter())));
+			return Functional.mapToStringList(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter()));
 		}
 		return Collections.unmodifiableList(featureOrderList);
 	}
@@ -424,9 +425,11 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderList(List<String> featureOrderList) {
-		this.featureOrderList.clear();
-		for (String cs : featureOrderList)
-			this.featureOrderList.add(cs);
+		final Set<String> basicSet = Functional.mapToStringSet(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter()));
+		basicSet.removeAll(featureOrderList);
+		featureOrderList.clear();
+		featureOrderList.addAll(featureOrderList);
+		featureOrderList.addAll(basicSet);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -44,10 +44,11 @@ public class CNFSolver implements ICNFSolver {
 
 	private HashMap<Object, Integer> varToInt = null;
 	private final ISolver solver;
+	
+	private boolean notSolveable = false;
 
 	public CNFSolver(Node cnf) {
 		varToInt = new HashMap<Object, Integer>();
-
 		if (cnf instanceof And) {
 			for (Node clause : cnf.getChildren()) {
 				if (clause instanceof Or) {
@@ -112,7 +113,8 @@ public class CNFSolver implements ICNFSolver {
 			}
 
 		} catch (ContradictionException e) {
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
+			notSolveable = true;
 		}
 	}
 
@@ -126,13 +128,17 @@ public class CNFSolver implements ICNFSolver {
 	}
 
 	public void addClauses(Collection<? extends Clause> clauses) {
+		//Before adding new clauses reset not solveable tag
+		notSolveable = false;
+		
 		try {
 			for (Clause node : clauses) {
 				final int[] literals = node.getLiterals();
 				solver.addClause(new VecInt(Arrays.copyOf(literals, literals.length)));
 			}
 		} catch (ContradictionException e) {
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
+			notSolveable = true; // Tag the CNF as not solvable
 		}
 	}
 
@@ -144,6 +150,7 @@ public class CNFSolver implements ICNFSolver {
 	}
 
 	public boolean isSatisfiable(int[] literals) throws TimeoutException {
+		if(notSolveable) return false;
 		final int[] unitClauses = new int[literals.length];
 		System.arraycopy(literals, 0, unitClauses, 0, unitClauses.length);
 
@@ -151,6 +158,7 @@ public class CNFSolver implements ICNFSolver {
 	}
 
 	public boolean isSatisfiable(Literal[] literals) throws TimeoutException, UnkownLiteralException {
+		if(notSolveable) return false;
 		final int[] unitClauses = new int[literals.length];
 		int i = 0;
 		for (Literal literal : literals) {
@@ -173,7 +181,8 @@ public class CNFSolver implements ICNFSolver {
 		try {
 			solver.addClause(new VecInt(Arrays.copyOf(literals, literals.length)));
 		} catch (ContradictionException e) {
-			throw new RuntimeException(e);
+//			throw new RuntimeException(e);
+			notSolveable = true; // Tag the CNF as not solvable
 		}
 
 	}

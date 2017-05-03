@@ -1,6 +1,9 @@
 .classpath
 .project
-configs/default.config
+configs/BeautifulWorld.config
+configs/Hello.config
+configs/HelloWorld.config
+configs/WonderfulWorld.config
 features/Beautiful/.classpath
 features/Beautiful/.project
 features/Beautiful/info.xml
@@ -8,7 +11,6 @@ features/Beautiful/src/Beautiful.java
 features/Hello/.classpath
 features/Hello/.project
 features/Hello/info.xml
-features/Hello/src/announcement/Hello.java
 features/Hello/src/Hello.java
 features/Wonderful/.classpath
 features/Wonderful/.project
@@ -19,7 +21,6 @@ features/World/.project
 features/World/info.xml
 features/World/src/World.java
 model.xml
-src/interfaces/Announce.java
-src/interfaces/Print.java
+src/HelloWorld.java
+src/interfaces/IMessage.java
 src/loader/PluginLoader.java
-src/Main.java

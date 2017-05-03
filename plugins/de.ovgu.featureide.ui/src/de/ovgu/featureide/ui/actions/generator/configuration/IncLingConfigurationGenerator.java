@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,11 +27,13 @@ import org.prop4j.analyses.PairWiseConfigurationGenerator;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -60,9 +62,9 @@ public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 		advancedNodeCreator.setCnfType(CNFType.Regular);
 		advancedNodeCreator.setIncludeBooleanValues(false);
 
-		Node createNodes = advancedNodeCreator.createNodes();
-		SatInstance satInstance = new SatInstance(createNodes);
-		PairWiseConfigurationGenerator gen = getGenerator(satInstance, solutionCount);
+		final Node createNodes = advancedNodeCreator.createNodes();
+		final SatInstance satInstance = new SatInstance(createNodes, Functional.toList(FeatureUtils.getConcreteFeatureNames(fm)));
+		final PairWiseConfigurationGenerator gen = getGenerator(satInstance, solutionCount);
 		exec(satInstance, gen, monitor);
 	}
 

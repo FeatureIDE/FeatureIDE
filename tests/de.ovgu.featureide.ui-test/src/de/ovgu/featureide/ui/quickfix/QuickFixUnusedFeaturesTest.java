@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -37,6 +37,7 @@ import org.junit.runners.Parameterized.Parameters;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -77,12 +78,7 @@ public class QuickFixUnusedFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			IFeatureModel fm = new FeatureModel("") {
-				// display file name at JUnit view
-				public String toString() {
-					return f.getName();
-				};
-			};
+			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().createFeatureModel();
 			FileHandler.load(f.toPath(), fm, FMFormatManager.getInstance());
 			models[0] = fm;
 			models[1] = f.getName();

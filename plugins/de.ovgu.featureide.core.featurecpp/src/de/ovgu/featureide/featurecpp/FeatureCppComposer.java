@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -264,7 +264,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			InputStream source = new ByteArrayInputStream(stringBuilder.toString()
 					.getBytes(Charset.availableCharsets().get("UTF-8")));
 			
-			IFile file = parentFolder.getFile("." + getConfigurationExtension());
+			IFile file = parentFolder.getFile("temp." + getConfigurationExtension());
 			try {
 				if (file.exists()) {
 					file.setContents(source, false, true, null);	

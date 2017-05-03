@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_PROJE
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -52,6 +53,10 @@ import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -64,7 +69,10 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewConfigurationFilePage extends WizardPage {
 
+	private final List<IConfigurationFormat> formatExtensions = ConfigFormatManager.getInstance().getExtensions();
+
 	private Combo featureComboProject;
+	private Combo formatCombo;
 
 	private Text fileText;
 
@@ -76,7 +84,7 @@ public class NewConfigurationFilePage extends WizardPage {
 
 	private String text;
 
-	private LinkedList<String> configNames = new LinkedList<String>();
+	private List<String> configNames = new LinkedList<>();
 	private boolean projectbool = false;
 	private boolean configbool = false;
 
@@ -113,6 +121,13 @@ public class NewConfigurationFilePage extends WizardPage {
 		label.setText("&File name:");
 		fileText = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		fileText.setLayoutData(gd);
+		new Label(composite, SWT.NULL);
+
+		label = new Label(composite, SWT.NULL);
+		label.setText("&Format:");
+		formatCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE);
+		formatCombo.setLayoutData(gd);
+		new Label(composite, SWT.NULL);
 
 		initialize();
 		addListeners();
@@ -156,6 +171,11 @@ public class NewConfigurationFilePage extends WizardPage {
 				dialogChanged();
 			}
 		});
+		formatCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
 	}
 
 	private void initialize() {
@@ -164,6 +184,14 @@ public class NewConfigurationFilePage extends WizardPage {
 		}
 		if (configFolder != null) {
 			featureComboProject.setText(configFolder.getProject().getName());
+		}
+		for (IConfigurationFormat format : formatExtensions) {
+			formatCombo.add(format.getName() + " (*." + format.getSuffix() + ")");
+		}
+		try {
+			formatCombo.select(formatExtensions.indexOf(ConfigFormatManager.getInstance().getExtension(XMLConfFormat.ID)));
+		} catch (NoSuchExtensionException e) {
+			formatCombo.select(0);
 		}
 	}
 
@@ -212,7 +240,6 @@ public class NewConfigurationFilePage extends WizardPage {
 			return;
 		}
 		updateStatus(null);
-
 	}
 
 	private void updateStatus(String message) {
@@ -226,6 +253,10 @@ public class NewConfigurationFilePage extends WizardPage {
 
 	public String getFileName() {
 		return fileText.getText();
+	}
+
+	public IConfigurationFormat getFormat() {
+		return formatExtensions.get(formatCombo.getSelectionIndex());
 	}
 
 	public boolean isFeatureProject(String text) {
@@ -248,7 +279,7 @@ public class NewConfigurationFilePage extends WizardPage {
 		}
 		return isFP;
 	}
-	
+
 	public IFeatureProject getFeatureProject() {
 		return featureProject;
 	}

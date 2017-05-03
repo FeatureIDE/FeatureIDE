@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -131,7 +131,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 		if (featureModel.getConstraintCount() > 0) {
 			children.clear();
-			for (String feature : selected.split("\\s+")) {
+			for (String feature : selected.split("\"")) {
 				children.add(new Literal(feature, true));
 			}
 			try {
@@ -147,14 +147,14 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			configuration.resetValues();
 
 			if (!selected.isEmpty()) {
-				for (final String feature : selected.split("\\s+")) {
+				for (final String feature : selected.split("\"")) {
 					configuration.setManual((feature), Selection.SELECTED);
 				}
 
 			}
 			if (configuration.isValid()) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
-				for (String f : selected.split("\\s+")) {
+				for (String f : selected.split("\"")) {
 					if (!"".equals(f)) {
 						selectedFeatures3.add(f);
 					}
@@ -212,7 +212,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {
@@ -241,7 +241,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {
@@ -276,7 +276,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {

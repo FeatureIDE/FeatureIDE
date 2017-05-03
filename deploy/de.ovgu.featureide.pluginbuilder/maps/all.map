@@ -32,6 +32,7 @@ fragment@de.ovgu.featureide.core.aspectj_test=COPY,/home/itidbrun/TeamCity/build
 fragment@de.ovgu.featureide.core.featurehouse_test=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.core.featurehouse-test
 fragment@de.ovgu.featureide.core.munge_test=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.core.munge-test
 fragment@de.ovgu.featureide.ui_test=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.ui-test
+fragment@de.ovgu.featureide.core.antenna_test=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.core.antenna-test
 feature@br.ufal.ic.colligens.feature=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/deploy,br.ufal.ic.colligens.feature
 plugin@br.ufal.ic.colligens=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,br.ufal.ic.colligens
 feature@de.ovgu.featureide.munge.android=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.munge.android

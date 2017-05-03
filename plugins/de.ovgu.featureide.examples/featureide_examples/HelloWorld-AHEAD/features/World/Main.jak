@@ -1,8 +1,0 @@
-public refines class Main {
-
-	public void print() {
-		Super().print();
-		System.out.print(" world!");
-	}
-
-}

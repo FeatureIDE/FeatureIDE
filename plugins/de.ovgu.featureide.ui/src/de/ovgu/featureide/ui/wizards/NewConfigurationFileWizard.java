@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,11 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPENING_FILE_FOR_EDITING___;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
+import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -54,7 +51,10 @@ import org.eclipse.ui.ide.IDE;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -92,12 +92,18 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		configFolder = page.getContainerObject();
-		final IComposerExtensionClass composer = page.getFeatureProject().getComposer();
-		final String fileName = page.getFileName() + "." + composer.getConfigurationExtension();
+		final IFeatureProject featureProject = page.getFeatureProject();
+		final IFeatureModel featureModel = featureProject.getFeatureModel();
+		final IConfigurationFormat format = page.getFormat();
+
+		final String suffix = "." + format.getSuffix();
+		final String name = page.getFileName();
+		final String fileName = name + (name.endsWith(suffix) ? "" : suffix);
+
 		final IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(configFolder, fileName, monitor);
+					doFinish(configFolder, fileName, featureModel, format, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -122,8 +128,8 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 * or just replace its contents, and open the editor on the newly created
 	 * file.
 	 */
-
-	private void doFinish(IContainer container, String fileName, IProgressMonitor monitor) throws CoreException {
+	private void doFinish(IContainer container, String fileName, IFeatureModel featureModel, IConfigurationFormat format, IProgressMonitor monitor)
+			throws CoreException {
 		// create a sample file
 		monitor.beginTask(CREATING + fileName, 2);
 		if (!container.exists()) {
@@ -131,14 +137,8 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		}
 
 		final IFile file = container.getFile(new Path(fileName));
-		try {
-			InputStream stream = openContentStream();
-			if (!file.exists()) {
-				file.create(stream, true, monitor);
-			}
-			stream.close();
-		} catch (IOException e) {
-		}
+		FileHandler.save(Paths.get(file.getLocationURI()), new Configuration(featureModel), format);
+
 		monitor.worked(1);
 		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);
 		getShell().getDisplay().asyncExec(new Runnable() {
@@ -151,14 +151,6 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 			}
 		});
 		monitor.worked(1);
-	}
-
-	/**
-	 * We will initialize file contents with a sample text.
-	 */
-	private InputStream openContentStream() {
-		String contents = "";
-		return new ByteArrayInputStream(contents.getBytes(Charset.availableCharsets().get("UTF-8")));
 	}
 
 	private void throwCoreException(String message) throws CoreException {

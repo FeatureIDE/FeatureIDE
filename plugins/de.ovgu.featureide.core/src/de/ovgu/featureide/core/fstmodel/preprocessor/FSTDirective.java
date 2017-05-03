@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -152,6 +152,17 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 			}
 		}
 		return ret.toString();
+	}
+	
+	/**
+	 * Returns a command and in an else case also a negation
+	 * @return
+	 */
+	public String toCommandString() {
+		if (command.equals(FSTDirectiveCommand.ELSE) || command.equals(FSTDirectiveCommand.ELSE_NOT)) {
+			return "if !(" + parent.getExpression() + ")";
+		}
+		return interpretCommand(command) + ' ' + expression;
 	}
 
 	@Override

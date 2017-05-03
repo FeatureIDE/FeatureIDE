@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -55,6 +56,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	protected Map<IFeature, IGraphicalFeature> features;
 	protected Map<IConstraint, IGraphicalConstraint> constraints;
 
+	/**
+	 * The currently active explanation that is shown in the FeatureDiagrammEditor if any defect element is selected.
+	 */
+	public Explanation currentlyActiveExplanation = null;
+	
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 		layout = new FeatureModelLayout();
@@ -239,6 +245,24 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			}
 		}
 		return index;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setActiveExplanation(de.ovgu.featureide.fm.core.explanations.Explanation)
+	 */
+	@Override
+	public void setActiveExplanation(Explanation exp) {
+		currentlyActiveExplanation = exp;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getActiveExplanation(de.ovgu.featureide.fm.core.explanations.Explanation)
+	 */
+	@Override
+	public Explanation getActiveExplanation() {
+		// TODO Auto-generated method stub
+		return currentlyActiveExplanation;
 	}
 
 }

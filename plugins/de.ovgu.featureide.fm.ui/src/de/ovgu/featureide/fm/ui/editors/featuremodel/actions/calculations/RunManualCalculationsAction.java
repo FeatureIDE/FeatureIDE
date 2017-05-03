@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,6 +26,8 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Action to specify feature model analysis.<br>
@@ -47,7 +49,7 @@ public class RunManualCalculationsAction extends Action {
 	public void run() {
 		boolean oldValue = featureModel.getAnalyser().runCalculationAutomatically;
 		featureModel.getAnalyser().runCalculationAutomatically = true;
-		featureModel.handleModelDataLoaded();
+		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
 		featureModel.getAnalyser().runCalculationAutomatically = oldValue;
 	}
 

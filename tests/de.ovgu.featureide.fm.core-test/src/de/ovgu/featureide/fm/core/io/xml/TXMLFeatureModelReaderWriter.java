@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -16,20 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://www.fosd.de/featureide/ for further information.
+ * See http://featureide.cs.ovgu.de/ for further information.
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
 import de.ovgu.featureide.common.Commons;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;

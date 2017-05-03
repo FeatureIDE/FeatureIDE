@@ -1,0 +1,9 @@
+true
+ShortestPaht=Red
+PermissionControl=Light_Green
+DirectedCall=Cyan
+UndirectedCall=Cyan
+Sabbath=Orange
+FIFO=Yellow
+VoiceOutput=Dark_Green
+FloorPermission=Pink

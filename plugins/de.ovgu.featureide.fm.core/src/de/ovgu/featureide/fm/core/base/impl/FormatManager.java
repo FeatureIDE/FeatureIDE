@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -58,6 +58,10 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 
 	public T getFormatById(String id) throws NoSuchExtensionException {
 		return getExtension(id);
+	}
+
+	public boolean hasFormat(String fileName) {
+		return getFormatByFileName(fileName) != null;
 	}
 
 	/**

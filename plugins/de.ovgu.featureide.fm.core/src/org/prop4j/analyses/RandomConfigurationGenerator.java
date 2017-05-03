@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,11 +36,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator {
 
-	private final int maxValue;
-
-	public RandomConfigurationGenerator(SatInstance satInstance, int maxValue) {
-		super(satInstance, 0);
-		this.maxValue = maxValue;
+	public RandomConfigurationGenerator(SatInstance satInstance, int maxNumber) {
+		super(satInstance, maxNumber);
 	}
 
 	@Override
@@ -48,7 +45,7 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 		time = System.nanoTime();
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
-		for (int i = 0; i < maxValue; i++) {
+		for (int i = 0; i < maxNumber; i++) {
 			monitor.checkCancel();
 			if (handleNewConfig(solver.findModel())) {
 				break;

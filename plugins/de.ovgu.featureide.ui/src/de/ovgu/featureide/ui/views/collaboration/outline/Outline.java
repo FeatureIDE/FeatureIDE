@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -101,10 +101,11 @@ import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
@@ -132,6 +133,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	private static int selectedOutlineType;
 
+	private IEventListener colorChangedListener = new IEventListener(){
+		@Override
+		public void propertyChange(FeatureIDEEvent event) {
+			update(iFile);	
+		}		
+	};
+	
 	private TreeViewer viewer;
 	private IFile iFile;
 	private IEditorPart active_editor;
@@ -416,6 +424,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	public Outline() {
 		super();
 		CorePlugin.getDefault().addCurrentBuildListener(this);
+		FeatureColorManager.addListener(colorChangedListener);
 	}
 
 	/**
@@ -484,9 +493,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	private TreeViewerListenerImpl treeListener;
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent) {		
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
+		
 
 		addContentProv(new NotAvailableContentProv(), new NotAvailableLabelProv());
 		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
@@ -515,7 +525,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		viewer.addTreeListener(treeListener);
 		viewer.addSelectionChangedListener(selectionChangedListener);
 
-		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
+		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());		
 	}
 
 	/**
@@ -547,6 +557,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 			@Override
 			public void dispose() {
+				FeatureColorManager.removeListener(colorChangedListener);
 				if (fMenu != null) {
 					fMenu.dispose();
 				}
@@ -612,6 +623,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 												if (contextMenu == null
 														|| contextMenu.getFeatureModel() != ((FeatureModelEditor) active_editor).getFeatureModel()) {
 													if (contextMenu != null) {
+														
 														// the listener isn't
 														// recreated, if it still
 														// exists

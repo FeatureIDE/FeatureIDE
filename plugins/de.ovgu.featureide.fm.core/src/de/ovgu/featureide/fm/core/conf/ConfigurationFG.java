@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -222,7 +222,7 @@ public class ConfigurationFG extends Configuration {
 		return featureList;
 	}
 
-	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
+	public List<List<String>> getSolutions(int max) throws TimeoutException {
 		return LongRunningWrapper.runMethod(propagator.getSolutions(max));
 	}
 
@@ -349,13 +349,9 @@ public class ConfigurationFG extends Configuration {
 		return builder.toString();
 	}
 
-	public void update() {
-		update(false, null);
-	}
-
-	public void update(boolean redundantManual, String startFeatureName) {
+	public void update(boolean redundantManual, List<SelectableFeature> featureOrder) {
 		if (propagate) {
-			LongRunningWrapper.runMethod(propagator.update(redundantManual, startFeatureName));
+			LongRunningWrapper.runMethod(propagator.update(redundantManual, featureOrder));
 		}
 	}
 
