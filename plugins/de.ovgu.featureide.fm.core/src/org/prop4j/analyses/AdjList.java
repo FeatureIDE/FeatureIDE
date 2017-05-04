@@ -26,24 +26,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 
-import de.ovgu.featureide.fm.core.conf.AFeatureGraph2;
+import de.ovgu.featureide.fm.core.conf.IFeatureGraph2;
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Adjacency list implementation for a feature graph.
  * 
  * @author Sebastian Krieter
  */
-public class AdjList extends AFeatureGraph2 {
+public class AdjList implements IFeatureGraph2 {
 
 	private static final long serialVersionUID = 5258868675944962032L;
 
@@ -74,136 +70,6 @@ public class AdjList extends AFeatureGraph2 {
 
 		public int getId() {
 			return id;
-		}
-
-	}
-
-	private static class Builder implements LongRunningMethod<AdjList> {
-
-		private static class TempVertex {
-			private ArrayList<Integer> posStrongEdges = new ArrayList<>();
-			private ArrayList<Integer> negStrongEdges = new ArrayList<>();
-			private ArrayList<Integer> relevantClausesIndex = new ArrayList<>();
-		}
-
-		private final AdjMatrix adjMatrix;
-		private final AdjList adjList;
-		private final int numberOfVariables;
-
-		private Builder(AdjMatrix adjMatrix) {
-			this.adjMatrix = adjMatrix;
-			numberOfVariables = adjMatrix.getNumVariables();
-			adjList = new AdjList(numberOfVariables);
-		}
-
-		@Override
-		public AdjList execute(IMonitor monitor) throws Exception {
-			init();
-			return adjList;
-		}
-
-		private ArrayList<TempVertex> createTempVertices(final List<Clause> clauseList) {
-			ArrayList<TempVertex> tempAdjList = new ArrayList<>(numberOfVariables);
-			for (int i = 0; i < numberOfVariables; i++) {
-				tempAdjList.add(new TempVertex());
-			}
-
-			for (int i = 0; i < numberOfVariables; i++) {
-				final TempVertex vertex = tempAdjList.get(i);
-				for (int j = 0; j < numberOfVariables; j++) {
-					final byte relation = adjMatrix.getEdge(i, j);
-					if ((relation & EDGE_00) != 0) {
-						vertex.negStrongEdges.add(-(j + 1));
-					} else if ((relation & EDGE_01) != 0) {
-						vertex.negStrongEdges.add((j + 1));
-					}
-					if ((relation & EDGE_10) != 0) {
-						vertex.posStrongEdges.add(-(j + 1));
-					} else if ((relation & EDGE_11) != 0) {
-						vertex.posStrongEdges.add((j + 1));
-					}
-				}
-			}
-
-			// Add clauses with 3 or more literals
-			final ListIterator<Clause> listIterator = clauseList.listIterator();
-			while (listIterator.hasNext()) {
-				if (listIterator.next().getLiterals().length > 2) {
-					listIterator.previous();
-					break;
-				}
-			}
-			adjList.complexClauses.addAll(clauseList.subList(listIterator.nextIndex(), clauseList.size()));
-			int complexClauseCount = 0;
-			while (listIterator.hasNext()) {
-				final int[] literals = listIterator.next().getLiterals();
-				for (int j = 0; j < literals.length; j++) {
-					final int literal = literals[j];
-					final TempVertex vertex = tempAdjList.get(Math.abs(literal) - 1);
-					vertex.relevantClausesIndex.add(complexClauseCount);
-				}
-				complexClauseCount++;
-			}
-
-			return tempAdjList;
-		}
-
-		private boolean posEdge(int j, final int[] literals) {
-			for (int literal : literals) {
-				if (Math.abs(literal) == j) {
-					return (literal < 0);
-				}
-			}
-			throw new RuntimeException();
-		}
-
-		private void init() {
-			final List<Clause> clauseList = adjMatrix.getClauseList();
-			if (clauseList.isEmpty()) {
-				return;
-			}
-			assert clauseList.get(0).getLiterals().length > 0;
-
-			ArrayList<TempVertex> tempAdjList = createTempVertices(clauseList);
-
-			for (int var = 1; var <= tempAdjList.size(); var++) {
-				final TempVertex tempVertex = tempAdjList.get(var - 1);
-
-				// Calculate array size for vertex
-				int negComplexCount = 0;
-				int posComplexCount = 0;
-				for (Integer clauseIndex : tempVertex.relevantClausesIndex) {
-					if (posEdge(var, adjList.complexClauses.get(clauseIndex).getLiterals())) {
-						posComplexCount += 1;
-					} else {
-						negComplexCount += 1;
-					}
-				}
-
-				// Initialize arrays
-				final int[] negStrongEdges = new int[tempVertex.negStrongEdges.size()];
-				final int[] posStrongEdges = new int[tempVertex.posStrongEdges.size()];
-				final int[] negComplexClauses = new int[negComplexCount];
-				final int[] posComplexClauses = new int[posComplexCount];
-
-				for (int i = 0; i < negStrongEdges.length; i++) {
-					negStrongEdges[i] = tempVertex.negStrongEdges.get(i);
-				}
-				for (int i = 0; i < posStrongEdges.length; i++) {
-					posStrongEdges[i] = tempVertex.posStrongEdges.get(i);
-				}
-
-				for (Integer clauseIndex : tempVertex.relevantClausesIndex) {
-					if (posEdge(var, adjList.complexClauses.get(clauseIndex).getLiterals())) {
-						posComplexClauses[--posComplexCount] = clauseIndex;
-					} else {
-						negComplexClauses[--negComplexCount] = clauseIndex;
-					}
-				}
-
-				final Vertex vertex = new Vertex(adjMatrix.getCore(var - 1), var, posStrongEdges, negStrongEdges, posComplexClauses, negComplexClauses);
-				adjList.adjList.add(vertex);
-			}
 		}
 
 	}
@@ -503,12 +369,8 @@ public class AdjList extends AFeatureGraph2 {
 		}
 	}
 
-	public static AdjList build(AdjMatrix adjMatrix) {
-		return LongRunningWrapper.runMethod(new Builder(adjMatrix));
-	}
-
-	private final List<Vertex> adjList;
-	private final List<Clause> complexClauses = new ArrayList<>(0);
+	final List<Vertex> adjList;
+	final List<Clause> complexClauses = new ArrayList<>(0);
 
 	public AdjList() {
 		adjList = new ArrayList<>(0);
@@ -534,30 +396,6 @@ public class AdjList extends AFeatureGraph2 {
 
 	public List<Clause> getComplexClauses() {
 		return Collections.unmodifiableList(complexClauses);
-	}
-
-	public long size() {
-		long sum = 0;
-
-		sum += 20;
-		sum += (8 + ((6 * 12) + 4 + 1)) * (adjList.size());
-		for (Vertex vertex : adjList) {
-			sum += 4 * vertex.negComplexClauses.length;
-			sum += 4 * vertex.negStrongEdges.length;
-			sum += 4 * vertex.posComplexClauses.length;
-			sum += 4 * vertex.posStrongEdges.length;
-		}
-		return sum;
-	}
-
-	@Override
-	public byte getEdge(int fromIndex, int toIndex) {
-		return 0;
-	}
-
-	@Override
-	public byte getValue(int fromIndex, int toIndex, boolean fromSelected) {
-		return 0;
 	}
 
 }

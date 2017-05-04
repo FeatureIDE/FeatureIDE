@@ -28,7 +28,7 @@ import java.util.Arrays;
  * 
  * @author Sebastian Krieter
  */
-public class Clause implements  Serializable {
+public class Clause implements Serializable {
 
 	private static final long serialVersionUID = -5382581102781797621L;
 

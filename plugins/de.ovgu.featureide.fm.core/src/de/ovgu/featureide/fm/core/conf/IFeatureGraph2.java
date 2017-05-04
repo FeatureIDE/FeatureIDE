@@ -69,10 +69,6 @@ public interface IFeatureGraph2 extends Serializable {
 	public static final byte EDGE_WEAK_NEGATIVE 	= EDGE_NEGATIVE & EDGE_WEAK;
 	public static final byte EDGE_WEAK_POSITIVE 	= EDGE_POSITIVE & EDGE_WEAK;
 
-	byte getEdge(int fromIndex, int toIndex);
-
-	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
-
 	ITraverser traverse();
 
 }
