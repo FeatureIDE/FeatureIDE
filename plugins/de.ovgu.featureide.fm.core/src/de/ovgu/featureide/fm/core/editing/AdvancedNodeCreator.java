@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -77,17 +78,19 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public static SatInstance createSatInstance(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
-		return createSatInstance(new AdvancedNodeCreator(featureModel, featureFilter));
-	}
-
-	public static SatInstance createSatInstance(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
-		return createSatInstance(new AdvancedNodeCreator(featureModel, excludedFeatureNames));
+		return createSatInstance(new AdvancedNodeCreator(featureModel, featureFilter), new InverseFilter<>(featureFilter));
 	}
 
 	private static SatInstance createSatInstance(AdvancedNodeCreator nodeCreator) {
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
-		return new SatInstance(nodeCreator.createNodes());
+		return new SatInstance(nodeCreator.createNodes(), Functional.mapToList(nodeCreator.getFeatureModel().getFeatures(), FeatureUtils.GET_FEATURE_NAME));
+	}
+
+	private static SatInstance createSatInstance(AdvancedNodeCreator nodeCreator, IFilter<IFeature> filter) {
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(false);
+		return new SatInstance(nodeCreator.createNodes(), Functional.mapToList(nodeCreator.getFeatureModel().getFeatures(), filter, FeatureUtils.GET_FEATURE_NAME));
 	}
 
 	public static Node createNodes(IFeatureModel featureModel) {
