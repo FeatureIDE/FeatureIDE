@@ -7,6 +7,10 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.3.1 (May 2017)
+* Hotfix containing only stability improvements over v3.3.0
+* Improvements for configuration editor, feature-model editor, configuration map, random and t-wise configuration generation
+
 Release 3.3.0 (April 2017)
 * Feature subtrees in feature diagram can be folded manually and automatically
 * Visual explanations for feature-model defects (e.g., dead features)
