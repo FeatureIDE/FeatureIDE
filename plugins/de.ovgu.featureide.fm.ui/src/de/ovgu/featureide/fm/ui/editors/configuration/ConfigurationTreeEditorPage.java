@@ -87,6 +87,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
@@ -206,16 +207,27 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	@Override
 	public void propertyChange(FeatureIDEEvent evt) {
 		if (evt != null) {
-			switch (evt.getEventType()) {
-			case MODEL_DATA_SAVED:
-				dirty = false;
-				break;
-			case MODEL_DATA_OVERRIDDEN:
-				refreshPage();
-				setDirty();
-				break;
-			default:
-				break;
+			if (evt.getSource() instanceof IFeatureModel) {
+				switch (evt.getEventType()) {
+				case MODEL_DATA_SAVED:
+				case MODEL_DATA_OVERRIDDEN:
+					refreshPage();
+					break;
+				default:
+					break;
+				}
+			} else if (evt.getSource() instanceof Configuration) {
+				switch (evt.getEventType()) {
+				case MODEL_DATA_SAVED:
+					dirty = false;
+					break;
+				case MODEL_DATA_OVERRIDDEN:
+					refreshPage();
+					setDirty();
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}
