@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORT
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -428,16 +429,9 @@ public abstract class Node {
 		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());
 	}
 
-	public List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
-		if (this instanceof Literal) {
-			if (((Literal) this).var.equals(feature.getName())) {
-				((Literal) this).var = replaceWithFeature.getName();
-				list.add(this);
-			}
-		} else {
-			for (Node child : this.children) {
-				child.replaceFeature(feature, replaceWithFeature, list);
-			}
+	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
+		for (Node child : this.children) {
+			child.replaceFeature(feature, replaceWithFeature, list);
 		}
 		return list;
 	}
@@ -548,16 +542,13 @@ public abstract class Node {
 
 	/**
 	 * Returns all literals contained in this node and its children.
-	 * @return all literals contained in this node and its children
+	 * @return all literals contained in this node and its children; not null
 	 */
 	public Set<Literal> getLiterals() {
-		final Set<Literal> literals = new LinkedHashSet<>();
-		if (this instanceof Literal) {
-			literals.add((Literal) this);
-		}
 		if (children == null) {
-			return literals;
+			return Collections.emptySet();
 		}
+		final Set<Literal> literals = new LinkedHashSet<>();
 		for (int i = 0; i < children.length; i++) {
 			literals.addAll(children[i].getLiterals());
 		}

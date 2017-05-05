@@ -21,8 +21,12 @@
 package org.prop4j;
 
 import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A variable or negated variable.
@@ -158,6 +162,15 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
+	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
+		if (this.var.equals(feature.getName())) {
+			this.var = replaceWithFeature.getName();
+			list.add(this);
+		}
+		return list;
+	}
+
+	@Override
 	public Literal clone() {
 		Literal copy = new Literal(var, positive);
 		copy.origin = this.origin;
@@ -186,4 +199,8 @@ public class Literal extends Node implements Cloneable {
 		return this.positive == map.get(this.var);
 	}
 
+	@Override
+	public Set<Literal> getLiterals() {
+		return Collections.singleton(this);
+	}
 }
