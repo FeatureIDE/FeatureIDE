@@ -323,24 +323,6 @@ public abstract class Node {
 		return node;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Node toCNFprintln() {
-		Node node = this;
-		System.out.println(node);
-		node = node.eliminate(Choose.class, Equals.class, Implies.class);
-		System.out.println(node);
-		node = node.eliminate(Not.class);
-		System.out.println(node);
-		node = node.eliminate(AtMost.class, AtLeast.class);
-		System.out.println(node);
-		node = node.eliminate(Not.class);
-		System.out.println(node);
-		node = node.clausify();
-		System.out.println(node);
-		System.out.println();
-		return node;
-	}
-
 	public void simplify() {
 		for (int i = 0; i < children.length; i++) {
 			children[i].simplify();
