@@ -38,6 +38,8 @@ import org.prop4j.Or;
  * @author Timo Guenther
  */
 public class DimacsReader {
+	/** Token leading a (single-line) comment. */
+	private static final String COMMENT = "c";
 	/** Token leading the problem definition. */
 	private static final String PROBLEM = "p";
 	/** Token identifying the problem type as CNF. */
@@ -52,6 +54,12 @@ public class DimacsReader {
 	private int variableCount;
 	/** The amount of clauses in the problem. */
 	private int clauseCount;
+	/**
+	 * True iff the last clause has been reached.
+	 * In this case, the token denoting the end of a clause is optional.
+	 * However, if it exists, any non-comment data past it is illegal.
+	 */
+	private boolean lastClause = false;
 	
 	/**
 	 * Constructs a new instance of this class with the given string.
@@ -70,15 +78,45 @@ public class DimacsReader {
 	}
 	
 	/**
+	 * Reads the next non-comment token.
+	 * Also reads any comments before it.
+	 * @return the next token; null if already completely read and empty
+	 * @throws ParseException if there is no token left in the input but the reader is not yet done
+	 */
+	private String readToken() throws ParseException {
+		if (!scanner.hasNext()) {
+			if (lastClause) {
+				return null;
+			}
+			throw new ParseException("Unexpected end of input", -1);
+		}
+		final String token = scanner.next();
+		if (COMMENT.equals(token)) {
+			scanner.nextLine();
+			return readToken();
+		}
+		return token;
+	}
+	
+	/**
 	 * Reads the input.
 	 * @return a CNF; not null
+	 * @throws IllegalStateException if this method has already been called on this instance before
+	 * (reading multiple times is disallowed since {@link Readable} cannot be reversed)
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
-	public Node read() throws ParseException {
-		try (final Scanner sc = new Scanner(in)) {
-			this.scanner = sc;
+	public synchronized Node read() throws IllegalStateException, ParseException {
+		if (scanner != null) {
+			throw new IllegalStateException("Already read");
+		}
+		try (final Scanner scanner = new Scanner(in)) {
+			this.scanner = scanner;
 			readProblem();
-			return new And(readClauses().toArray(new Node[clauseCount]));
+			List<Node> clauses = readClauses();
+			if (readToken() != null) {
+				throw new ParseException("Trailing data", -1);
+			}
+			return new And(clauses.toArray(new Node[clauseCount]));
 		}
 	}
 	
@@ -87,26 +125,28 @@ public class DimacsReader {
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
 	private void readProblem() throws ParseException {
-		if (!scanner.hasNext() || !PROBLEM.equals(scanner.next())) {
+		if (!PROBLEM.equals(readToken())) {
 			throw new ParseException("Missing problem definition", -1);
 		}
 		
-		if (!scanner.hasNext() || !CNF.equals(scanner.next())) {
+		if (!CNF.equals(readToken())) {
 			throw new ParseException("Problem type is not CNF", -1);
 		}
 		
-		if (!scanner.hasNextInt()) {
-			throw new ParseException("Missing variable count", -1);
+		try {
+			variableCount = Integer.parseInt(readToken());
+		} catch (NumberFormatException e) {
+			throw new ParseException("Variable count is not an integer", -1);
 		}
-		variableCount = scanner.nextInt();
 		if (variableCount <= 0) {
 			throw new ParseException("Variable count is not positive", -1);
 		}
 		
-		if (!scanner.hasNextInt()) {
-			throw new ParseException("Missing clause count", -1);
+		try {
+			clauseCount = Integer.parseInt(readToken());
+		} catch (NumberFormatException e) {
+			throw new ParseException("Clause count is not an integer", -1);
 		}
-		clauseCount = scanner.nextInt();
 		if (clauseCount <= 0) {
 			throw new ParseException("Clause count is not positive", -1);
 		}
@@ -119,7 +159,10 @@ public class DimacsReader {
 	 */
 	private List<Node> readClauses() throws ParseException {
 		final List<Node> clauses = new ArrayList<>(clauseCount);
-		for (int i = 0; i < clauseCount; i++) {
+		for (int i = 0; !lastClause; i++) {
+			if (i + 1 == clauseCount) {
+				lastClause = true;
+			}
 			clauses.add(readClause());
 		}
 		return clauses;
@@ -149,13 +192,16 @@ public class DimacsReader {
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
 	private Literal readLiteral() throws ParseException {
-		if (!scanner.hasNextInt()) {
-			if (!scanner.hasNext()) {
-				return null;
-			}
+		final String token = readToken();
+		if (token == null) {
+			return null;
+		}
+		final int index;
+		try {
+			index = Integer.parseInt(token);
+		} catch (NumberFormatException e) {
 			throw new ParseException("Illegal literal", -1);
 		}
-		final int index = scanner.nextInt();
 		return createLiteral(index);
 	}
 	
@@ -165,10 +211,9 @@ public class DimacsReader {
 	 * @return a literal; null if the index is 0
 	 */
 	private Literal createLiteral(int index) {
-		boolean positive = index > 0;
 		if (index == 0) {
 			return null;
 		}
-		return new Literal(String.valueOf(Math.abs(index)), positive);
+		return new Literal(String.valueOf(Math.abs(index)), index > 0);
 	}
 }
