@@ -23,8 +23,10 @@ package org.prop4j.transform;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.prop4j.And;
@@ -50,7 +52,12 @@ public class DimacsReader {
 	/** The scanner for tokenizing the input. */
 	private Scanner scanner;
 	
-	/** The amount of variables in the problem. */
+	/** Maps indexes to variables. */
+	private final Map<Integer, Object> indexVariables = new LinkedHashMap<>();
+	/**
+	 * The amount of variables as declared in the problem definition.
+	 * May differ from the actual amount of variables found.
+	 */
 	private int variableCount;
 	/** The amount of clauses in the problem. */
 	private int clauseCount;
@@ -112,9 +119,13 @@ public class DimacsReader {
 		try (final Scanner scanner = new Scanner(in)) {
 			this.scanner = scanner;
 			readProblem();
-			List<Node> clauses = readClauses();
+			final List<Node> clauses = readClauses();
 			if (readToken() != null) {
 				throw new ParseException("Trailing data", -1);
+			}
+			final int actualVariableCount = indexVariables.size();
+			if (variableCount != actualVariableCount) {
+				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), -1);
 			}
 			return new And(clauses.toArray(new Node[clauseCount]));
 		}
@@ -214,6 +225,9 @@ public class DimacsReader {
 		if (index == 0) {
 			return null;
 		}
-		return new Literal(String.valueOf(Math.abs(index)), index > 0);
+		final Integer key = Math.abs(index);
+		final Object variable = String.valueOf(key);
+		indexVariables.put(key, variable);
+		return new Literal(variable, index > 0);
 	}
 }
