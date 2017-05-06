@@ -21,10 +21,12 @@
 package org.prop4j.transform;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
@@ -58,12 +60,10 @@ public class DimacsWriter {
 		if (!cnf.isConjunctiveNormalForm()) {
 			throw new IllegalArgumentException("Input is not in CNF");
 		}
-		this.clauses = Arrays.asList(cnf.getChildren());
+		this.clauses = cnf instanceof And ? Arrays.asList(cnf.getChildren()) : Collections.singletonList(cnf);
 		this.variableIndexes = new LinkedHashMap<>();
-		for (final Node clause : clauses) {
-			for (final Literal l : clause.getLiterals()) {
-				addVariable(l.var);
-			}
+		for (final Literal l : cnf.getLiterals()) {
+			addVariable(l.var);
 		}
 	}
 	
