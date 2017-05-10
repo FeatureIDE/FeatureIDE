@@ -359,7 +359,7 @@ public abstract class Node {
 
 	@Override
 	public String toString() {
-		return NodeWriter.nodeToString(this);
+		return new NodeWriter(this).nodeToString();
 	}
 
 	/**
@@ -375,7 +375,10 @@ public abstract class Node {
 	 * @return a string representing this node
 	 */
 	public String toString(String[] symbols) {
-		return NodeWriter.nodeToString(this, symbols, false, true);
+		final NodeWriter nw = new NodeWriter(this);
+		nw.setSymbols(symbols);
+		nw.setEnquoteWhitespace(true);
+		return nw.nodeToString();
 	}
 
 	public static Node[] clone(Node[] array) {

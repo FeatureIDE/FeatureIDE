@@ -484,7 +484,7 @@ public class FeatureModel implements IFeatureModel {
 	private void print(List<IConstraint> constraints, StringBuilder sb) {
 		for (int i = 0; i < constraints.size(); i++) {
 			sb.append("[");
-			sb.append(NodeWriter.nodeToString(constraints.get(i).getNode()));
+			sb.append(new NodeWriter(constraints.get(i).getNode()).nodeToString());
 			sb.append("]");
 			if (i + 1 < constraints.size())
 				sb.append(", ");

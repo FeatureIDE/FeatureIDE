@@ -21,102 +21,121 @@
 package org.prop4j;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SYMBOL;
+
 /**
  * Converts a propositional node to a String object.
  * 
  * @author Thomas Thuem
+ * @author Timo Guenther
  */
 public class NodeWriter {
-	
 	/**
-	 * representation using logical operators
+	 * Symbols for a logical representation.
+	 * These are best used for displaying to the user due to brevity and beauty.
+	 * Since they consist of unwieldy Unicode characters, do not use them for editing or serialization;
+	 * in these cases, instead use {@link #textual long} or {@link #shortSymbols short textual symbols} respectively.
 	 */
 	public final static String[] logicalSymbols = new String[] {"\u00AC", " \u2227 ", " \u2228 ", " \u21D2 ", " \u21D4 ", ", ", "choose", "atleast", "atmost"};
-
 	/**
-	 * long textual representation
+	 * Symbols for a long textual representation.
+	 * These are best used for editing by the user due to simplicity and ease of handling.
+	 * Use {@link #logicalSymbols logical symbols} for displaying to the user and {@link #shortSymbols short textual symbols} for serialization.
 	 */
 	public final static String[] textualSymbols = new String[] {"not ", "and", "or", "implies", "iff", ", ", "choose", "atleast", "atmost"};
-	
 	/**
-	 * short textual representation
+	 * Symbols for a short textual representation.
+	 * Best used for serialization since they fall in the ASCII range but are still relatively short.
+	 * Use {@link #logicalSymbols} for displaying to the user and {@link #textualSymbols long textual symbols} for editing by the user.
 	 */
 	public final static String[] shortSymbols = new String[] {"-", " & ", " | ", " => ", " <=> ", ", ", "choose", "atleast", "atmost"};
-	
+	/** Denotes an unsupported symbol. */
 	public final static String noSymbol = NO_SYMBOL;
 	/**
-	 * java textual representation
+	 * Symbols for a representation like in Java.
+	 * These are inherently incomplete and should only be used if absolutely necessary.
 	 */
 	public final static String[] javaSymbols = new String[] {"!", " && ", " || ", noSymbol, " == ", noSymbol, noSymbol, noSymbol, noSymbol};
 	
+	/** The propositional node to convert. */
+	private final Node root;
+	
+	/** The symbols for the operations: not, and, or, implies, iff, separator, choose, atleast, atmost. */
+	private String[] symbols = shortSymbols;
+	/** If true, this writer will always place brackets, even if they are semantically irrelevant. */
+	private boolean enforceBrackets = false;
+	/** If true, this writer will enquote variables if they contain whitespace. */
+	private boolean enquoteWhitespace = false;
+	
 	/**
-	 * Converts the given node into a short textual representation.
-	 * 
-	 * @param node a propositional node to convert
-	 * @return the textual representation
+	 * Constructs a new instance of this class with the given node to transform.
+	 * By default, the set of short symbols is used, brackets are only placed if necessary, and variables containing whitespace will not be enquoted.
+	 * @param propositional node to transform; not null
 	 */
-	public static String nodeToString(Node node) {
-		return nodeToString(node, shortSymbols, false, null);
+	public NodeWriter(Node root) {
+		this.root = root;
 	}
 	
 	/**
-	 * Converts the given node into a specified textual representation.
-	 * 
-	 * @param node a propositional node to convert
-	 * @param symbols array containing strings for: not, and, or, implies, iff, seperator, choose, atleast and atmost
-	 * @return the textual representation
+	 * Sets the symbols to use for the operations.
+	 * By index, these are:
+	 * <ol start="0">
+	 * <li>{@link Not}</li>
+	 * <li>{@link And}</li>
+	 * <li>{@link Or}</li>
+	 * <li>{@link Implies}</li>
+	 * <li>{@link Equals}</li>
+	 * <li>the separator joining the operands of the following operations</li>
+	 * <li>{@link Choose}</li>
+	 * <li>{@link AtLeast}</li>
+	 * <li>{@link AtMost}</li>
+	 * </ol>
+	 * By default, the set of {@link shortSymbols short symbols} is used.
+	 * @param symbols symbols for the operations; not null
+	 * @see #logicalSymbols
+	 * @see #textualSymbols
+	 * @see #shortSymbols
+	 * @see #javaSymbols
 	 */
-	public static String nodeToString(Node node, String[] symbols) {
-		return nodeToString(node, symbols, false, null);
-	}
-
-	/**
-	 * Converts the given node into a specified textual representation.
-	 * 
-	 * @param node a propositional node to convert
-	 * @param symbols array containing strings for: not, and, or, implies, iff, seperator, choose, atleast and atmost
-	 * @param optionalBrackets a flag identifying if not necessary brackets will be added
-	 * @return the textual representation
-	 */
-	public static String nodeToString(Node node, String[] symbols, boolean optionalBrackets) {
-		return nodeToString(node, symbols, optionalBrackets, null);
-	}
-
-
-	/**
-	 * Converts the given node into a specified textual representation.
-	 * 
-	 * @param node a propositional node to convert
-	 * @param symbols array containing strings for: not, and, or, implies, iff, seperator, choose, atleast and atmost
-	 * @param optionalBrackets a flag identifying if not necessary brackets will be added
-	 * @param parent the class of the node's parent or null if not available
-	 * @return the textual representation
-	 */
-	protected static String nodeToString(Node node, String[] symbols, boolean optionalBrackets, Class<? extends Node> parent)
-	{
-		return nodeToString(node, symbols, optionalBrackets, false, parent);
+	public void setSymbols(String[] symbols) {
+		this.symbols = symbols;
 	}
 	
-	protected static String nodeToString(Node node, String[] symbols, boolean optionalBrackets, boolean addQuotationMarks)
-	{
-		return nodeToString(node, symbols, optionalBrackets, addQuotationMarks, null);
+	/**
+	 * Sets the enforcing brackets flag.
+	 * If true, this writer will always place brackets, even if they are semantically irrelevant. 
+	 * @param enforceBrackets
+	 */
+	public void setEnforceBrackets(boolean enforceBrackets) {
+		this.enforceBrackets = enforceBrackets;
 	}
 	
+	/**
+	 * Sets the enquoting whitespace flag.
+	 * If true, this writer will enquote variables if they contain whitespace.
+	 * @param enquoteWhitespace
+	 */
+	public void setEnquoteWhitespace(boolean enquoteWhitespace) {
+		this.enquoteWhitespace = enquoteWhitespace;
+	}
 	
 	/**
-	 * Converts the given node into a specified textual representation.
-	 * 
-	 * @param node a propositional node to convert
-	 * @param symbols array containing strings for: not, and, or, implies, iff, seperator, choose, atleast and atmost
-	 * @param optionalBrackets a flag identifying if not necessary brackets will be added
-	 * @param parent the class of the node's parent or null if not available
-	 * @param Surrounds feature name sincluding whitespaces with quotation marks
-	 * @return the textual representation
+	 * Converts the given node into the specified textual representation.
+	 * @return the textual representation; not null
 	 */
-	protected static String nodeToString(Node node, String[] symbols, boolean optionalBrackets, boolean addQuotationMarks, Class<? extends Node> parent) {
+	public String nodeToString() {
+		return nodeToString(root, null);
+	}
+	
+	/**
+	 * Converts a node having at most one child into the specified textual representation.
+	 * @param node propositional node to convert; not null
+	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
+	 * @return the textual representation; not null
+	 */
+	protected String nodeToString(Node node, Class<? extends Node> parent) {
 		if (node instanceof Literal)
 		{
-			if (addQuotationMarks)
+			if (enquoteWhitespace)
 			{
 				String returnnode = (((Literal) node).positive ? "" : symbols[0] );
 				if (((Literal) node).var.toString().contains(" "))
@@ -130,31 +149,28 @@ public class NodeWriter {
 			}
 		}
 		if (node instanceof Not)
-			return symbols[0] + " " + nodeToString(node.getChildren()[0], symbols, optionalBrackets, addQuotationMarks, node.getClass());
-		return multipleNodeToString(node, symbols, optionalBrackets, parent, addQuotationMarks);
+			return symbols[0] + " " + nodeToString(node.getChildren()[0], node.getClass());
+		return multipleNodeToString(node, parent);
 	}
-
+	
 	/**
-	 * Converts a node having multiple children into a specified textual representation.
-	 * 
-	 * @param node a propositional node to convert
-	 * @param symbols array containing strings for: not, and, or, implies, iff, seperator, choose, atleast and atmost
-	 * @param optionalBrackets a flag identifying if not necessary brackets will be added
-	 * @param parent the class of the node's parent or null if not available
-	 * @return the textual representation
+	 * Converts a node having multiple children into the specified textual representation.
+	 * @param node a propositional node to convert; not null
+	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
+	 * @return the textual representation; not null
 	 */
-	protected static String multipleNodeToString(Node node, String[] symbols, boolean optionalBrackets, Class<? extends Node> parent, boolean addQuotationMarks) {
+	protected String multipleNodeToString(Node node, Class<? extends Node> parent) {
 		Node[] children = node.getChildren();
 		if (children.length < 1)
 			return "???";
 		if (children.length == 1)
-			return nodeToString(children[0], symbols, optionalBrackets,addQuotationMarks, parent);
+			return nodeToString(children[0], parent);
 
 		StringBuilder s = new StringBuilder();
-		String separator = getSeparator(node, symbols);
+		String separator = getSeparator(node);
 		for (Node child : children) {
 			s.append(separator);
-			s.append(nodeToString(child, symbols, optionalBrackets,addQuotationMarks, node.getClass()));
+			s.append(nodeToString(child, node.getClass()));
 		}
 		
 		String prefix = "";
@@ -167,21 +183,23 @@ public class NodeWriter {
 		
 		int orderParent = order(parent);
 		int orderChild = order(node.getClass());
-		optionalBrackets = optionalBrackets || prefix.length() > 0 || orderParent > orderChild;
-		optionalBrackets |= orderParent == orderChild && orderParent == order(Implies.class);
-		return prefix + (optionalBrackets ? 
-					"(" + s.toString().substring(separator.length()) + ")" : 
-					s.toString().substring(separator.length()));
+		boolean brackets = enforceBrackets
+				|| prefix.length() > 0
+				|| orderParent > orderChild
+				|| orderParent == orderChild && orderParent == order(Implies.class);
+		return prefix + (brackets
+				? "(" + s.toString().substring(separator.length()) + ")"
+				: s.toString().substring(separator.length()));
 	}
 	
 	/**
-	 * Assigns a number to every type of node. That And has a higher order than
-	 * Or means that (A and B or C) is equal to ((A and B) or C).
-	 * 
-	 * @param nodeClass type of node
+	 * Assigns a number to every type of node.
+	 * For instance, that {@link And} has a higher order than {@link Or} means that <em>(A and B or C)</em> is equal to <em>((A and B) or C)</em>.
+	 * @param nodeClass type of node; not null
 	 * @return the order assigned to the type of node
+	 * @throws IllegalStateException if the node type is not recognized
 	 */
-	protected static int order(Class<? extends Node> nodeClass) {
+	protected int order(Class<? extends Node> nodeClass) throws IllegalStateException {
 		if (nodeClass == null)
 			return 0;
 		if (nodeClass.equals(AtMost.class) || nodeClass.equals(AtLeast.class) || nodeClass.equals(Choose.class))
@@ -196,17 +214,16 @@ public class NodeWriter {
 			return 5;
 		if (nodeClass.equals(Not.class))
 			return 6;
-		throw new RuntimeException("Unknown subtype from org.prop4j.Node \"" + nodeClass + "\"!");
+		throw new IllegalStateException("Unrecognized node type: " + nodeClass);
 	}
-
+	
 	/**
-	 * Retrieves the separating char between different child nodes.
-	 * 
-	 * @param node a node with child nodes
-	 * @param symbols a textual representation
-	 * @return the separating string
+	 * Retrieves the string for separating the children of the given node.
+	 * @param node a node with child nodes; not null
+	 * @return the separating string; not null
+	 * @throws IllegalStateException if the node type is not recognized
 	 */
-	protected static String getSeparator(Node node, String[] symbols) {
+	protected String getSeparator(Node node) throws IllegalStateException {
 		if (node instanceof And)
 			return " " + symbols[1] + " ";
 		if (node instanceof Or)
@@ -221,7 +238,6 @@ public class NodeWriter {
 			return symbols[5];
 		if (node instanceof AtMost)
 			return symbols[5];
-		throw new RuntimeException("Unknown subtype from org.prop4j.Node \"" + node + "\"!");
+		throw new IllegalStateException("Unrecognized node type: " + node);
 	}
-
 }

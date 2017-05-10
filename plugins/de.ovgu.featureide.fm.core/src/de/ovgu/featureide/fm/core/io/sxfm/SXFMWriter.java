@@ -261,7 +261,10 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 
 	private int createConstraint(Document doc, Node propConstr, int i, org.prop4j.Node node) {
 		Node newNode;
-		String nodeString = NodeWriter.nodeToString(node, symbols, true);
+		final NodeWriter nw = new NodeWriter(node);
+		nw.setSymbols(symbols);
+		nw.setEnforceBrackets(true);
+		String nodeString = nw.nodeToString();
 		// remove the external parenthesis
 		if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
 			nodeString = nodeString.substring(1, nodeString.length() - 1);
