@@ -97,7 +97,7 @@ public class ExplanationWriter {
 		} else if (explanation.getDefectElement() instanceof IConstraint) {
 			final IConstraint constraint = (IConstraint) explanation.getDefectElement();
 			s += "constraint ";
-			s += NodeWriter.nodeToString(constraint.getNode(), NodeWriter.logicalSymbols);
+			s += constraint.getNode().toString(NodeWriter.logicalSymbols);
 		} else {
 			throw new IllegalStateException("Unknown feature model element type");
 		}
@@ -145,7 +145,7 @@ public class ExplanationWriter {
 				break;
 			case CONSTRAINT:
 				final Node constraint = FeatureUtils.getConstraint(explanation.getDefectElement().getFeatureModel(), reason.getLiteral().getSourceIndex());
-				s = String.format("%s is a constraint.", NodeWriter.nodeToString(constraint, NodeWriter.logicalSymbols));
+				s = String.format("%s is a constraint.", constraint.toString(NodeWriter.logicalSymbols));
 				break;
 			case ROOT:
 				s = String.format("%s is the root.", reason.getLiteral().var.toString());
