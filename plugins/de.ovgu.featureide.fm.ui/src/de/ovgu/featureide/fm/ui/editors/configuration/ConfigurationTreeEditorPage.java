@@ -1154,7 +1154,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 				sb.append("Open Clauses:\n");
 				for (Node clause : openClauses) {
-					sb.append(NodeWriter.nodeToString(clause, NodeWriter.logicalSymbols)).append('\n');
+					sb.append(clause.toString(NodeWriter.logicalSymbols)).append('\n');
 				}
 			}
 
