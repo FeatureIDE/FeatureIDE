@@ -160,36 +160,35 @@ public class NodeWriter {
 	 * @return the textual representation; not null
 	 */
 	protected String multipleNodeToString(Node node, Class<? extends Node> parent) {
-		Node[] children = node.getChildren();
+		final Node[] children = node.getChildren();
 		if (children.length < 1)
 			return "???";
 		if (children.length == 1)
 			return nodeToString(children[0], parent);
-
-		StringBuilder s = new StringBuilder();
-		String separator = getSeparator(node);
-		for (Node child : children) {
-			s.append(separator);
-			s.append(nodeToString(child, node.getClass()));
-		}
 		
-		String prefix = "";
+		final String[] operands = new String[children.length];
+		for (int i = 0; i < children.length; i++)
+			operands[i] = nodeToString(children[i], node.getClass());
+		String separated = String.join(getSeparator(node), operands);
+		
+		String prefix = null;
 		if (node instanceof Choose)
 			prefix = symbols[6] + ((Choose) node).n;
 		else if (node instanceof AtLeast)
 			prefix = symbols[7] + ((AtLeast) node).min;
 		else if (node instanceof AtMost)
 			prefix = symbols[8] + ((AtMost) node).max;
+		if (prefix != null)
+			return prefix + "(" + separated + ")";
 		
-		int orderParent = order(parent);
-		int orderChild = order(node.getClass());
-		boolean brackets = enforceBrackets
-				|| prefix.length() > 0
-				|| orderParent > orderChild
+		final int orderParent;
+		final int orderChild;
+		final boolean writeBrackets = enforceBrackets
+				|| (orderParent = order(parent)) > (orderChild = order(node.getClass()))
 				|| orderParent == orderChild && orderParent == order(Implies.class);
-		return prefix + (brackets
-				? "(" + s.toString().substring(separator.length()) + ")"
-				: s.toString().substring(separator.length()));
+		if (writeBrackets)
+			return "(" + separated + ")";
+		return separated;
 	}
 	
 	/**
