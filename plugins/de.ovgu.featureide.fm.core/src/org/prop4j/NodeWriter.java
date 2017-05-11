@@ -27,38 +27,87 @@ package org.prop4j;
  * @author Timo Guenther
  */
 public class NodeWriter {
+	/**
+	 * The type of notation of the formula.
+	 * 
+	 * @author Timo Guenther
+	 */
+	public enum Notation {
+		/**
+		 * <p>The infix notation.
+		 * Operators are written between operands where possible.</p>
+		 * 
+		 * <p>Examples:
+		 * <ul>
+		 * <li><em>A & B & C</em></li>
+		 * <li><em>A => B <=> -A | B</em></li>
+		 * <li><em>atleast2(A, B, C, D) & atmost3(A, B, C, D)</em></li>
+		 * </ul>
+		 * </p>
+		 */
+		INFIX,
+		/**
+		 * <p>The prefix notation.
+		 * Operators are written before the operands.</p>
+		 * 
+		 * <p>Examples:
+		 * <ul>
+		 * <li><em>(& A B C)</em></li>
+		 * <li><em>(<=> (=> A B) (| (- A) B)</em></li>
+		 * <li><em>(& (atleast2 A B C D) (atmost3 A B C D))</em></li>
+		 * </ul>
+		 * </p>
+		 */
+		PREFIX,
+		/**
+		 * <p>The postfix notation.
+		 * Operators are written after the operands.</p>
+		 * 
+		 * <p>Examples:
+		 * <ul>
+		 * <li><em>(A B C &)</em></li>
+		 * <li><em>((A B =>) ((A -) B |) <=>)</em></li>
+		 * <li><em>((A B C D atleast2) (A B C D atmost3) &)</em></li>
+		 * </ul>
+		 * </p>
+		 */
+		POSTFIX,
+	}
+	
 	/** Denotes an unsupported symbol. */
-	public static final String noSymbol = " ? ";
+	public static final String noSymbol = "?";
 	/**
 	 * Symbols for a logical representation.
 	 * These are best used for displaying to the user due to brevity and beauty.
 	 * Since they consist of unwieldy Unicode characters, do not use them for editing or serialization;
 	 * in these cases, instead use {@link #textual long} or {@link #shortSymbols short textual symbols} respectively.
 	 */
-	public static final String[] logicalSymbols = new String[] {"\u00AC", " \u2227 ", " \u2228 ", " \u21D2 ", " \u21D4 ", ", ", "choose", "atleast", "atmost"};
+	public static final String[] logicalSymbols = new String[] {"\u00AC", "\u2227", "\u2228", "\u21D2", "\u21D4", ", ", "choose", "atleast", "atmost"};
 	/**
 	 * Symbols for a long textual representation.
 	 * These are best used for editing by the user due to simplicity and ease of handling.
 	 * Use {@link #logicalSymbols logical symbols} for displaying to the user and {@link #shortSymbols short textual symbols} for serialization.
 	 */
-	public static final String[] textualSymbols = new String[] {"not ", " and ", " or ", " implies ", " iff ", ", ", "choose", "atleast", "atmost"};
+	public static final String[] textualSymbols = new String[] {"not", "and", "or", "implies", "iff", ", ", "choose", "atleast", "atmost"};
 	/**
 	 * Symbols for a short textual representation.
 	 * Best used for serialization since they fall in the ASCII range but are still relatively short.
 	 * Use {@link #logicalSymbols} for displaying to the user and {@link #textualSymbols long textual symbols} for editing by the user.
 	 */
-	public static final String[] shortSymbols = new String[] {"-", " & ", " | ", " => ", " <=> ", ", ", "choose", "atleast", "atmost"};
+	public static final String[] shortSymbols = new String[] {"-", "&", "|", "=>", "<=>", ", ", "choose", "atleast", "atmost"};
 	/**
 	 * Symbols for a representation like in Java.
 	 * These are inherently incomplete and should only be used if absolutely necessary.
 	 */
-	public static final String[] javaSymbols = new String[] {"!", " && ", " || ", noSymbol, " == ", ", ", noSymbol, noSymbol, noSymbol};
+	public static final String[] javaSymbols = new String[] {"!", "&&", "||", noSymbol, "==", ", ", noSymbol, noSymbol, noSymbol};
 	
 	/** The propositional node to convert. */
 	private final Node root;
 	
 	/** The symbols for the operations: not, and, or, implies, iff, separator, choose, atleast, atmost. */
 	private String[] symbols = shortSymbols;
+	/** The notation to use. */
+	private Notation notation = Notation.INFIX;
 	/** If true, this writer will always place brackets, even if they are semantically irrelevant. */
 	private boolean enforceBrackets = false;
 	/** If true, this writer will enquote variables if they contain whitespace. */
@@ -66,7 +115,7 @@ public class NodeWriter {
 	
 	/**
 	 * Constructs a new instance of this class with the given node to transform.
-	 * By default, the set of short symbols is used, brackets are only placed if necessary, and variables containing whitespace will not be enquoted.
+	 * By default, the set of short symbols and infix notation are used, brackets are only placed if necessary, and variables containing whitespace will not be enquoted.
 	 * @param propositional node to transform; not null
 	 */
 	public NodeWriter(Node root) {
@@ -104,6 +153,23 @@ public class NodeWriter {
 	 */
 	protected String[] getSymbols() {
 		return symbols;
+	}
+	
+	/**
+	 * Sets the notation to use.
+	 * By default, this is the {@link Notation#INFIX infix} notation.
+	 * @param notation notation to use
+	 */
+	public void setNotation(Notation notation) {
+		this.notation = notation;
+	}
+	
+	/**
+	 * Returns the notation to use.
+	 * @return the notation to use
+	 */
+	protected Notation getNotation() {
+		return notation;
 	}
 	
 	/**
@@ -182,8 +248,23 @@ public class NodeWriter {
 	protected String literalToString(Literal l, Class<? extends Node> parent) {
 		String s = variableToString(l.var);
 		if (!l.positive) {
-			final String operator = getSymbols()[0];
-			s = operator + s;
+			String operator = getSymbols()[0];
+			switch (getNotation()) {
+				case INFIX:
+					if (getSymbols() == textualSymbols) {
+						operator += " ";
+					}
+					s = operator + s;
+					break;
+				case PREFIX:
+					s = String.format("(%s %s)", operator, s);
+					break;
+				case POSTFIX:
+					s = String.format("(%s %s)", s, operator);
+					break;
+				default:
+					throw new IllegalStateException("Unknown notation");
+			}
 		}
 		return s;
 	}
@@ -215,20 +296,39 @@ public class NodeWriter {
 		for (int i = 0; i < children.length; i++)
 			operands[i] = nodeToString(children[i], node.getClass());
 		
-		final String operator = getOperator(node);
+		String operator = getOperator(node);
 		String s;
-		if (isInfixCompatibleOperation(node)) {
-			s = String.join(operator, operands);
-			final int orderParent;
-			final int orderChild;
-			final boolean writeBrackets = isEnforceBrackets()
-					|| (orderParent = getOrder(parent)) > (orderChild = getOrder(node.getClass()))
-					|| orderParent == orderChild && orderParent == getOrder(Implies.class);
-			if (writeBrackets) {
-				s = "(" + s + ")";
-			}
-		} else {
-			s = operator + "(" + String.join(getSymbols()[5], operands) + ")";
+		String allOperands;
+		switch (getNotation()) {
+			case INFIX:
+				if (isInfixCompatibleOperation(node)) {
+					s = String.join(" " + operator + " ", operands);
+					final int orderParent;
+					final int orderChild;
+					final boolean writeBrackets = isEnforceBrackets()
+							|| (orderParent = getOrder(parent)) > (orderChild = getOrder(node.getClass()))
+							|| orderParent == orderChild && orderParent == getOrder(Implies.class);
+					if (writeBrackets) {
+						s = "(" + s + ")";
+					}
+				} else {
+					allOperands = String.join(getSymbols()[5], operands);
+					if (node instanceof Not && getSymbols() == textualSymbols) {
+						operator += " ";
+					}
+					s = String.format("%s(%s)", operator, allOperands);
+				}
+				break;
+			case PREFIX:
+				allOperands = String.join(" ", operands);
+				s = String.format("(%s %s)", operator, allOperands);
+				break;
+			case POSTFIX:
+				allOperands = String.join(" ", operands);
+				s = String.format("(%s %s)", allOperands, operator);
+				break;
+			default:
+				throw new IllegalStateException("Unknown notation");
 		}
 		return s;
 	}

@@ -23,6 +23,7 @@ package org.prop4j;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.prop4j.NodeWriter.Notation;
 
 /**
  * Tests for {@link NodeWriter}.
@@ -476,7 +477,25 @@ public class NodeWriterTests {
 	@Test
 	public void testSymbolsJava() {
 		testSymbols(NodeWriter.javaSymbols,
-				"A && B || (B == !A) || (!B ? C) ||  ? 42(A) ||  ? 24(C, !(!C), C) ||  ? 2(B)");
+				"A && B || (B == !A) || (!B ? C) || ?42(A) || ?24(C, !(!C), C) || ?2(B)");
+	}
+	
+	@Test
+	public void testNotationInfix() {
+		testNotation(Notation.INFIX,
+				"A & B | (B <=> -A) | (-B => C) | choose42(A) | atleast24(C, -(-C), C) | atmost2(B)");
+	}
+	
+	@Test
+	public void testNotationPrefix() {
+		testNotation(Notation.PREFIX,
+				"(| (& A B) (<=> B (- A)) (=> (- B) C) (choose42 A) (atleast24 C (- (- C)) C) (atmost2 B))");
+	}
+	
+	@Test
+	public void testNotationPostfix() {
+		testNotation(Notation.POSTFIX,
+				"((A B &) (B (A -) <=>) ((B -) C =>) (A choose42) (C ((C -) -) C atleast24) (B atmost2) |)");
 	}
 	
 	@Test
@@ -522,6 +541,17 @@ public class NodeWriterTests {
 	private void testSymbols(Node in, String[] symbols, String expected) {
 		final NodeWriter w = new NodeWriter(in);
 		w.setSymbols(symbols);
+		final String actual = w.nodeToString();
+		assertEquals(expected, actual);
+	}
+	
+	private void testNotation(Notation notation, String expected) {
+		testNotation(getDefaultIn(), notation, expected);
+	}
+	
+	private void testNotation(Node in, Notation notation, String expected) {
+		final NodeWriter w = new NodeWriter(in);
+		w.setNotation(notation);
 		final String actual = w.nodeToString();
 		assertEquals(expected, actual);
 	}
