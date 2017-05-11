@@ -88,18 +88,18 @@ public class DimacsReaderTests {
 	@Test
 	public void testWhitespaceTab() throws ParseException {
 		testEquals(""
-				+ "p	cnf	3	2\n"
-				+ "1	-3	0	\n"
-				+ "2	3	-1	0"
+				+ "p\tcnf\t3\t2\n"
+				+ "1\t-3\t0\t\n"
+				+ "2\t3\t-1\t0"
 		);
 	}
 	
 	@Test
 	public void testWhitespaceMixed() throws ParseException {
 		testEquals(""
-				+ "p cnf 3	2\n"
-				+ "1	-3 0\n"
-				+ "2 3	-1 0"
+				+ "p cnf 3\t2\n"
+				+ "1\t-3 0\n"
+				+ "2 3\t-1 0"
 		);
 	}
 	
