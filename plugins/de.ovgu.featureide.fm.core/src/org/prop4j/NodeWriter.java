@@ -257,6 +257,8 @@ public class NodeWriter {
 	 * @throws IllegalArgumentException if the node type is not recognized
 	 */
 	protected int getOrder(Class<? extends Node> nodeClass) throws IllegalArgumentException {
+		if (nodeClass == null)
+			return -1;
 		if (nodeClass.equals(Not.class))
 			return 0;
 		if (nodeClass.equals(AtMost.class) || nodeClass.equals(AtLeast.class) || nodeClass.equals(Choose.class))
