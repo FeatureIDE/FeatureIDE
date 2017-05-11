@@ -358,7 +358,6 @@ public class StringTable {
 	public static final String INVALID_POSITIONING_OF_PARENTHESES = "invalid positioning of parentheses";
 	public static final String INVALID_NUMBER_OF_QUOTATION_MARKS = "Invalid number of quotation marks";
 	public static final String WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED = "Whitespace before and after quoted feature name required";
-	public static final String NO_SYMBOL = " no symbol ";
 	public static final String IS_NOT_SUPPORTED = " is not supported";
 	public static final String EXPRESSION_IS_NOT_IN_CNF = "expression is not in conjunctive normal form";
 	public static final String ONLY = "only ";
