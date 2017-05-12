@@ -1,0 +1,186 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Add Feature
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _YwTqYDawEeeQHa5yuUSOFg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/11/17 6:20 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "HelloWorld-FH-Java/model.xml" | double-click
+with [get-editor "HelloWorld-FH-Java Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Wonderful] {
+            mouse-move 19 6 button3 -height 19 -width 61
+            mouse-press 19 6 button3 -height 19 -width 61
+            mouse-release 19 6 button3 2097152 -height 19 -width 61
+        }
+        get-menu "Create Feature Above" | click
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | activate-direct-edit
+    with [get-editbox] {
+        set-text 1
+        key-type Enter
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        mouse-hover 534 186 -height 689 -width 1094
+        with [get-edit-part -className ModelEditPart | get-edit-part -text 1] {
+            mouse-move 11 4 button3 -height 19 -width 18
+            mouse-press 11 4 button3 -height 19 -width 18
+            mouse-release 11 4 button3 2097152 -height 19 -width 18
+        }
+        get-menu "Create Feature Below (Ins)" | click
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | activate-direct-edit
+    get-diagram | mouse-hover 563 177 -height 689 -width 1094
+    get-editbox | set-text 2
+    get-diagram | mouse-hover 548 177 -height 689 -width 1094
+    get-editbox | key-type "NUMPAD_ENTER" "\\u000D"
+    with [get-diagram] {
+        commit-direct-edit
+        with [get-edit-part -className ModelEditPart | get-edit-part -text 1] {
+            mouse-move 11 12 button1 -height 19 -width 18
+            mouse-press 11 12 button1 -height 19 -width 18
+            mouse-release 11 12 button1 524288 -height 19 -width 18
+            mouse-hover 11 12 -height 19 -width 18
+        }
+        key-type Insert
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | activate-direct-edit
+    get-diagram | mouse-hover 471 282 -height 689 -width 1094
+    with [get-editbox] {
+        set-text 3
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        key-type Insert
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | activate-direct-edit
+    with [get-editbox] {
+        set-text 4
+        key-type Enter
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        with [get-edit-part -className ModelEditPart | get-edit-part -text 4] {
+            mouse-move 9 12 button1 -height 19 -width 18
+            mouse-press 9 12 button1 -height 19 -width 18
+            mouse-release 9 12 button1 524288 -height 19 -width 18
+            mouse-hover 9 12 -height 19 -width 18
+            activate-direct-edit
+        }
+    }
+    get-editbox | set-text ""
+    with [get-diagram] {
+        mouse-move 597 221 button1 -height 689 -width 1094
+        mouse-press 597 221 button1 -height 689 -width 1094
+        commit-direct-edit
+        mouse-release 597 221 button1 524288 -height 689 -width 1094
+        with [get-edit-part -className ModelEditPart | get-edit-part -text 4] {
+            mouse-move 10 6 button1 -height 19 -width 18
+            mouse-press 10 6 button1 -height 19 -width 18
+            mouse-release 10 6 button1 524288 -height 19 -width 18
+        }
+        key-type Del
+    }
+    with [get-diagram] {
+        get-edit-part -className ModelEditPart | get-edit-part -text 3 | mouse-hover 13 8 -height 19 -width 18
+        key-type "M1+z"
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text 4 | activate-direct-edit
+    get-diagram | mouse-hover 815 133 -mask CTRL -height 689 -width 1094
+    get-editbox | key-type "M1+z"
+    get-editbox | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+}
+
+with [get-editor "HelloWorld-FH-Java Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Wonderful] {
+            mouse-move 25 3 button1 -height 19 -width 61
+            mouse-press 25 3 button1 -height 19 -width 61
+            mouse-release 25 3 button1 524288 -height 19 -width 61
+            mouse-hover 25 3 -height 19 -width 61
+        }
+        key-type Insert
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | activate-direct-edit
+    with [get-diagram] {
+        get-edit-part -className ModelEditPart | get-edit-part -text Wonderful | mouse-hover 24 6 -height 19 -width 61
+        mouse-move 477 228 button1 -height 689 -width 1094
+        mouse-press 477 228 button1 -height 689 -width 1094
+        commit-direct-edit
+        mouse-release 477 228 button1 524288 -height 689 -width 1094
+        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1] {
+            mouse-move 24 10 button1 -height 19 -width 76
+            mouse-press 24 10 button1 -height 19 -width 76
+            mouse-release 24 10 button1 524288 -height 19 -width 76
+        }
+        key-type Insert
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text NewFeature2 | activate-direct-edit
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1] {
+            mouse-move 25 8 button1 -height 19 -width 76
+            mouse-press 25 8 button1 -height 19 -width 76
+        }
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | mouse-release 25 8 button1 524288 
+            -height 19 -width 76
+        key-type Insert
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart] {
+        get-edit-part -text NewFeature3 | activate-direct-edit
+        get-edit-part -text NewFeature1 | mouse-hover 25 8 -height 19 -width 76
+    }
+    with [get-diagram] {
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | mouse-press 25 8 button1 -height 19 
+            -width 76
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | mouse-release 25 8 button1 524288 
+            -height 19 -width 76
+        key-type Insert
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart] {
+        get-edit-part -text NewFeature4 | activate-direct-edit
+        get-edit-part -text NewFeature1 | mouse-hover 25 8 -height 19 -width 76
+    }
+    with [get-diagram] {
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | mouse-press 25 8 button1 -height 19 
+            -width 76
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | mouse-release 25 8 button1 524288 
+            -height 19 -width 76
+        key-type Insert
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart] {
+        get-edit-part -text NewFeature5 | activate-direct-edit
+        get-edit-part -text NewFeature1 | mouse-hover 25 8 -height 19 -width 76
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1] {
+            mouse-hover 35 9 -height 19 -width 76
+            mouse-move 35 8 button3 -height 19 -width 76
+            mouse-press 35 8 button3 -height 19 -width 76
+        }
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | mouse-release 35 8 button3 2097152 
+            -height 19 -width 76
+        get-menu "Delete Including Subfeatures (CTRL + D)" | click
+    }
+    get-diagram | mouse-hover 68 304 -height 689 -width 1094
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
