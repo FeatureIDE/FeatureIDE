@@ -70,8 +70,8 @@ public class NodeWriterTests {
 	
 	@Test
 	public void testOr() {
-		testEquals(new And("A", "B")
-				, "A & B"
+		testEquals(new Or("A", "B")
+				, "A | B"
 		);
 	}
 	
