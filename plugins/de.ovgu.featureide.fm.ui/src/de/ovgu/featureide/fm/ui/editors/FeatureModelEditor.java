@@ -173,6 +173,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			diagramEditor.dispose();
 			getFeatureModel().removeListener(diagramEditor);
 			fmManager.removeListener(diagramEditor);
+			fmManager.override();
 		}
 		super.dispose();
 	}
