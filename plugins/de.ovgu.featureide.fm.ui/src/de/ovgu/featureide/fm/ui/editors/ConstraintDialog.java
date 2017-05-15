@@ -97,8 +97,8 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
+import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Constraints;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -545,7 +545,7 @@ public class ConstraintDialog implements GUIDefaults {
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
 
-			initialConstraint = Constraints.autoQuote(constraint);
+			initialConstraint = constraint.getNode().toString(NodeWriter.textualSymbols);
 
 			mode = Mode.UPDATE;
 		}
@@ -858,11 +858,11 @@ public class ConstraintDialog implements GUIDefaults {
 			public void handleEvent(Event event) {
 				TableItem[] selectedItem = featureTable.getSelection();
 				String featureName = selectedItem[0].getText();
-				if (featureName.matches(".*\\s.*")) {
+				if (featureName.matches(".*?\\s+.*")) {
 					featureName = "\"" + featureName + "\"";
 				} else {
 					for (String op : Operator.NAMES) {
-						if (featureName.equals(op.toLowerCase())) {
+						if (featureName.equalsIgnoreCase(op)) {
 							featureName = "\"" + featureName + "\"";
 							break;
 						}
