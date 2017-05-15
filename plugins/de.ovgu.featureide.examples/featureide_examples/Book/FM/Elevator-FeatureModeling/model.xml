@@ -6,20 +6,11 @@
 				<description>
 					The firmware and simulation of an elevator to transport humans from certain floors to other floors.
 				</description>
-				<description>
-					The firmware and simulation of an elevator to transport humans from certain floors to other floors.
-				</description>
 				<and abstract="true" mandatory="true" name="Behavior">
 					<description>
 						The behavior of the elevator in terms handling, ignoring, and prioritizing requests.
 					</description>
-					<description>
-						The behavior of the elevator in terms handling, ignoring, and prioritizing requests.
-					</description>
 					<alt abstract="true" mandatory="true" name="Modes">
-						<description>
-							Modes indicate in which order incoming requests are handled.
-						</description>
 						<description>
 							Modes indicate in which order incoming requests are handled.
 						</description>
@@ -73,9 +64,6 @@
 					<description>
 						Call buttons enable to choose the desired floor in the inside as well as to call the elevator to a certain floor.
 					</description>
-					<description>
-						Call buttons enable to choose the desired floor in the inside as well as to call the elevator to a certain floor.
-					</description>
 					<feature mandatory="true" name="DirectedCall">
 						<description>
 							On each floor, there are separate buttons to go upwards and downwards. The elevator is supposed to only open the doors if it is moving into the same direction as the call.
@@ -91,13 +79,7 @@
 					<description>
 						Variability of the elevator that directly influences security.
 					</description>
-					<description>
-						Variability of the elevator that directly influences security.
-					</description>
 					<or abstract="true" mandatory="true" name="Permission">
-						<description>
-							Permissions enable to specify which floors can be reached by everyone or only with privileges.
-						</description>
 						<description>
 							Permissions enable to specify which floors can be reached by everyone or only with privileges.
 						</description>
@@ -114,9 +96,6 @@
 					</or>
 				</and>
 				<and abstract="true" name="Safety">
-					<description>
-						Variability of the elevator that directly influences safety.
-					</description>
 					<description>
 						Variability of the elevator that directly influences safety.
 					</description>

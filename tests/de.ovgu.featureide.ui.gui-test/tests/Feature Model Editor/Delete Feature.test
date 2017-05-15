@@ -1,0 +1,214 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Delete Feature
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _OWZP0DmbEeeWDJ4Wcr0-Ag
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/15/17 11:25 AM
+Testcase-Type: ecl
+Verifications: _tpAXIDmbEeeWDJ4Wcr0-Ag
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model" | get-diagram] {
+    with [get-edit-part -className ModelEditPart | get-edit-part -text Sabbath] {
+        mouse-move 9 9 button1 -height 19 -width 52
+        mouse-press 9 9 button1 -height 19 -width 52
+        mouse-release 9 9 button1 524288 -height 19 -width 52
+        mouse-hover 9 9 -height 19 -width 52
+    }
+    key-type Del
+}
+get-window "Delete Error" | get-button OK | click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text "CallButtons  ∨  Sabbath"] {
+            mouse-move 23 9 button1 -height 17 -width 130
+            mouse-press 23 9 button1 -height 17 -width 130
+            mouse-release 23 9 button1 524288 -height 17 -width 130
+            mouse-hover 23 9 -height 17 -width 130
+        }
+        key-type Del
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Sabbath] {
+            mouse-move 23 17 button1 -height 19 -width 52
+            mouse-press 23 17 button1 -height 19 -width 52
+            mouse-release 23 17 button1 524288 -height 19 -width 52
+            mouse-hover 23 17 -height 19 -width 52
+        }
+        key-type Del
+    }
+    with [get-diagram] {
+        mouse-hover 210 222 -height 689 -width 1094
+        with [get-edit-part -className ModelEditPart] {
+            get-edit-part -text Modes | mouse-hover 24 12 -height 19 -width 44
+            with [get-edit-part -text Permission] {
+                mouse-move 45 8 button3 -height 19 -width 62
+                mouse-press 45 8 button3 -height 19 -width 62
+                mouse-move 43 8 -mask 2097152 -height 19 -width 62
+            }
+        }
+        mouse-drag 678 148 button3 2097152 -height 689 -width 1094
+        mouse-release 678 148 button3 2097152 -height 689 -width 1094
+        get-menu "Delete Including Subfeatures (CTRL + D)" | click
+    }
+    get-diagram | mouse-hover 732 270 -height 689 -width 1094
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Elevator] {
+            mouse-move 36 7 button3 -height 19 -width 51
+            mouse-press 36 7 button3 -height 19 -width 51
+            mouse-release 36 7 button3 2097152 -height 19 -width 51
+        }
+        mouse-press 985 206 button1 -height 689 -width 1094
+        mouse-move 985 206 -mask 524288 -height 689 -width 1094
+        with [get-edit-part -className ModelEditPart] {
+            mouse-drag 985 206 button1 524288 -height 689 -width 1094
+            mouse-release 985 206 button1 524288 -height 689 -width 1094
+            with [get-edit-part -text CallButtons] {
+                mouse-move 20 10 button3 -height 19 -width 65
+                mouse-press 20 10 button3 -height 19 -width 65
+                mouse-release 20 10 button3 2097152 -height 19 -width 65
+            }
+        }
+        get-menu "Delete (Del)" | click
+    }
+    with [get-diagram] {
+        mouse-hover 104 80 -height 689 -width 1094
+        mouse-move 104 80 button1 -height 689 -width 1094
+        mouse-press 104 80 button1 -height 689 -width 1094
+        mouse-release 104 80 button1 524288 -height 689 -width 1094
+        mouse-hover 104 80 -height 689 -width 1094
+        key-type "M1+z"
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text CallButtons | activate-direct-edit
+    get-editbox | key-type "M1+z"
+    with [get-diagram] {
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text Permission | activate-direct-edit
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text PermissionControl | activate-direct-edit
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text FloorPermission | activate-direct-edit
+    }
+    get-editbox | key-type "M1+z"
+    with [get-diagram] {
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text Sabbath | activate-direct-edit
+    }
+    get-editbox | key-type "M1+z"
+    with [get-diagram] {
+        mouse-press 104 80 button1 -height 689 -width 1094
+        commit-direct-edit
+        mouse-release 104 80 button1 524288 -height 689 -width 1094
+        mouse-hover 104 80 -height 689 -width 1094
+    }
+}
+with [get-editor "Elevator-FeatureModeling Model" | get-diagram] {
+    with [get-edit-part -className ModelEditPart | get-edit-part -text Modes] {
+        mouse-move 22 12 button3 -height 19 -width 44
+        mouse-press 22 12 button3 -height 19 -width 44
+        mouse-release 22 12 button3 2097152 -height 19 -width 44
+    }
+    get-menu "Delete Including Subfeatures (CTRL + D)" | click
+}
+get-window "Delete Error" | get-button OK | click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text "CallButtons  ∨  Sabbath"] {
+            mouse-move 43 11 button1 -height 17 -width 130
+            mouse-press 43 11 button1 -height 17 -width 130
+            mouse-release 43 11 button1 524288 -height 17 -width 130
+            mouse-hover 43 11 -height 17 -width 130
+        }
+        key-type Del
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Modes] {
+            mouse-move 13 13 button3 -height 19 -width 44
+            mouse-press 13 13 button3 -height 19 -width 44
+            mouse-release 13 13 button3 2097152 -height 19 -width 44
+        }
+        get-menu "Delete Including Subfeatures (CTRL + D)" | click
+    }
+}
+get-window "Delete Error" | get-button OK | click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text "DirectedCall  ⇒  ShortestPath"] {
+            mouse-move 16 5 button1 -height 17 -width 155
+            mouse-press 16 5 button1 -height 17 -width 155
+            mouse-release 16 5 button1 524288 -height 17 -width 155
+        }
+        key-type Del
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Modes] {
+            mouse-move 18 12 button3 -height 19 -width 44
+            mouse-press 18 12 button3 -height 19 -width 44
+            mouse-release 18 12 button3 2097152 -height 19 -width 44
+        }
+        get-menu "Delete Including Subfeatures (CTRL + D)" | click
+    }
+}
+get-window "Delete Error" | get-button OK | click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text "UndirectedCall  ⇒  FIFO  ∨  ShortestPath"] {
+            mouse-move 146 9 button1 -height 17 -width 211
+            mouse-press 146 9 button1 -height 17 -width 211
+            mouse-release 146 9 button1 524288 -height 17 -width 211
+        }
+        key-type Del
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Modes] {
+            mouse-move 28 10 button3 -height 19 -width 44
+            mouse-press 28 10 button3 -height 19 -width 44
+            mouse-release 28 10 button3 2097152 -height 19 -width 44
+        }
+        get-menu "Delete Including Subfeatures (CTRL + D)" | click
+    }
+    with [get-diagram] {
+        mouse-hover 368 274 -height 689 -width 1094
+        key-type "M1+z"
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Modes | activate-direct-edit
+    with [get-diagram] {
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text ShortestPath | activate-direct-edit
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text FIFO | activate-direct-edit
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text Sabbath | activate-direct-edit
+    }
+    get-editbox | key-type "M1+z" -times 5
+    with [get-diagram] {
+        mouse-move 368 274 button1 -height 689 -width 1094
+        mouse-press 368 274 button1 -height 689 -width 1094
+        commit-direct-edit
+        mouse-release 368 274 button1 524288 -height 689 -width 1094
+        mouse-move 364 293 button1 -height 689 -width 1094
+        mouse-press 364 293 button1 -height 689 -width 1094
+        mouse-release 364 293 button1 524288 -height 689 -width 1094
+        mouse-hover 364 293 -mask CTRL -height 689 -width 1094
+        key-type "M1+z"
+    }
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+}
+get-editor "Elevator-FeatureModeling Model" | get-tab-folder | get-tab-item Source | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
