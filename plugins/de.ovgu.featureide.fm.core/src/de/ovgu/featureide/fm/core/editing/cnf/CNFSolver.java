@@ -113,7 +113,13 @@ public class CNFSolver implements ICNFSolver {
 				final Literal literal = (Literal) cnf;
 				solver.addClause(new VecInt(new int[] { literal.positive ? varToInt.get(literal.var) : -varToInt.get(literal.var) }));
 			}
-
+			int size = varToInt.size();
+			final VecInt pseudoClause = new VecInt(size + 1);
+			for (int i = 1; i <= size; i++) {
+				pseudoClause.push(i);
+			}
+			pseudoClause.push(-1);
+			solver.addClause(pseudoClause);
 		} catch (ContradictionException e) {
 			//throw new RuntimeException(e);
 			notSolveable = true;
