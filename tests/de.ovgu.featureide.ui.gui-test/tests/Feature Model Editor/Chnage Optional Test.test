@@ -1,0 +1,97 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Chnage Optional Test
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _wYCp4DmTEeeAe9QM5UqT0Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/15/17 10:42 AM
+Tags: Feature Model Editor
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "HelloWorld-FH-Java/model.xml" | double-click
+with [get-editor "HelloWorld-FH-Java Model"] {
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld 
+        | get-target-connection 1] {
+        with [get-figure 0] {
+            mouse-move 6 7 button1 -height 10 -width 10
+            mouse-press 6 7 button1 -height 10 -width 10
+            mouse-release 6 7 button1 524288 -height 10 -width 10
+            mouse-press 6 7 button1 -height 10 -width 10
+            mouse-double-click 6 7 button1 -height 10 -width 10
+        }
+        get-figure 0 | mouse-release 6 7 button1 524288 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld 
+        | get-target-connection 2] {
+        with [get-figure 0] {
+            mouse-hover 4 4 -height 10 -width 10
+            mouse-move 4 4 button1 -height 10 -width 10
+            mouse-press 4 4 button1 -height 10 -width 10
+            mouse-release 4 4 button1 524288 -height 10 -width 10
+            mouse-press 4 4 button1 -height 10 -width 10
+            mouse-double-click 4 4 button1 -height 10 -width 10
+        }
+        get-figure 0 | mouse-release 4 4 button1 524288 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld] {
+        get-target-connection 2 | get-figure 0 | mouse-hover 4 4 -height 10 -width 10
+        with [get-target-connection 0] {
+            with [get-figure 0] {
+                mouse-move 4 4 button1 -height 10 -width 10
+                mouse-press 4 4 button1 -height 10 -width 10
+                mouse-release 4 4 button1 524288 -height 10 -width 10
+                mouse-press 4 4 button1 -height 10 -width 10
+                mouse-double-click 4 4 button1 -height 10 -width 10
+            }
+            get-figure 0 | mouse-release 4 4 button1 524288 -height 10 -width 10
+        }
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart] {
+        with [get-edit-part -text HelloWorld | get-target-connection 1] {
+            with [get-figure 0] {
+                mouse-move 4 3 button1 -height 10 -width 10
+                mouse-press 4 3 button1 -height 10 -width 10
+                mouse-release 4 3 button1 524288 -height 10 -width 10
+                mouse-press 4 3 button1 -height 10 -width 10
+                mouse-double-click 4 3 button1 -height 10 -width 10
+            }
+            get-figure 0 | mouse-move 4 4 -mask 524288 -height 10 -width 10
+        }
+        with [get-edit-part -text Feature] {
+            mouse-drag 23 0 button1 524288 -height 19 -width 48
+            mouse-release 23 0 button1 524288 -height 19 -width 48
+        }
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld 
+        | get-target-connection 2] {
+        with [get-figure 0] {
+            mouse-hover 7 4 -height 10 -width 10
+            mouse-move 7 4 button1 -height 10 -width 10
+            mouse-press 7 4 button1 -height 10 -width 10
+            mouse-release 7 4 button1 524288 -height 10 -width 10
+            mouse-press 7 4 button1 -height 10 -width 10
+            mouse-double-click 7 4 button1 -height 10 -width 10
+        }
+        get-figure 0 | mouse-release 7 4 button1 524288 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld] {
+        get-target-connection 2 | get-figure 0 | mouse-hover 6 4 -height 10 -width 10
+        with [get-target-connection 0] {
+            with [get-figure 0] {
+                mouse-move 6 7 button1 -height 10 -width 10
+                mouse-press 6 7 button1 -height 10 -width 10
+                mouse-release 6 7 button1 524288 -height 10 -width 10
+                mouse-press 6 7 button1 -height 10 -width 10
+                mouse-double-click 6 7 button1 -height 10 -width 10
+            }
+            get-figure 0 | mouse-release 6 7 button1 524288 -height 10 -width 10
+        }
+    }
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

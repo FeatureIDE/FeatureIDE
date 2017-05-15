@@ -6,7 +6,7 @@ Element-Version: 2.0
 Id: _IV9-4DawEeeQHa5yuUSOFg
 Manually-Ordered: true
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/13/17 1:03 PM
+Save-Time: 5/15/17 10:42 AM
 Tags: Feature Model Editor
 
 ------=_testcase-items-62c497da-4241-31f4-811a-6b453a3ecff8
@@ -18,6 +18,7 @@ _QO24oDauEeeQHa5yuUSOFg	// kind: 'test' name: 'Change Feature Name' path: 'tests
 _tSW2UDapEee9mtnaC6ZULQ	// kind: 'test' name: 'Collapse Sub-Trees' path: 'tests/Feature Model Editor/Collapse Sub-Trees.test'
 _YwTqYDawEeeQHa5yuUSOFg	// kind: 'test' name: 'Add Feature' path: 'tests/Feature Model Editor/Add Feature.test'
 _tmyLsDf9EeeWhPO7o9SFAg	// kind: 'test' name: 'Rename Constraint' path: 'tests/Feature Model Editor/Rename Constraint.test'
+_wYCp4DmTEeeAe9QM5UqT0Q	// kind: 'test' name: 'Chnage Optional Test' path: 'tests/Feature Model Editor/Chnage Optional Test.test'
 _OuaGIDf5EeeWhPO7o9SFAg	// kind: 'test' name: 'Dont Save Editor' path: 'tests/Feature Model Editor/Dont Save Editor.test'
 
 ------=_testcase-items-62c497da-4241-31f4-811a-6b453a3ecff8--

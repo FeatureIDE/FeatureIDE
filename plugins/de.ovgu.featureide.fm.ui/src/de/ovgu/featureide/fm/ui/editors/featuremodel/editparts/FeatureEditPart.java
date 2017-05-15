@@ -143,7 +143,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	protected List<FeatureConnection> getModelTargetConnections() {
-		return Collections.<FeatureConnection> emptyList();// getModel().getTargetConnections();
+		return getModel().getTargetConnections();
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
