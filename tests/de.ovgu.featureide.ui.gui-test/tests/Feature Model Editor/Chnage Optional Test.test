@@ -6,42 +6,127 @@ Element-Version: 3.0
 External-Reference: 
 Id: _wYCp4DmTEeeAe9QM5UqT0Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/15/17 10:42 AM
+Save-Time: 5/15/17 2:20 PM
 Tags: Feature Model Editor
 Testcase-Type: ecl
+Verifications: _tpAXIDmbEeeWDJ4Wcr0-Ag
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Package Explorer" | get-tree | select "HelloWorld-FH-Java/model.xml" | double-click
-with [get-editor "HelloWorld-FH-Java Model"] {
-    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld 
-        | get-target-connection 1] {
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Elevator 
+        | get-target-connection 0] {
         with [get-figure 0] {
-            mouse-move 6 7 button1 -height 10 -width 10
-            mouse-press 6 7 button1 -height 10 -width 10
-            mouse-release 6 7 button1 524288 -height 10 -width 10
-            mouse-press 6 7 button1 -height 10 -width 10
-            mouse-double-click 6 7 button1 -height 10 -width 10
+            mouse-move 6 3 button1 -height 10 -width 10
+            mouse-press 6 3 button1 -height 10 -width 10
+            mouse-release 6 3 button1 524288 -height 10 -width 10
+            mouse-press 6 3 button1 -height 10 -width 10
+            mouse-double-click 6 3 button1 -height 10 -width 10
         }
-        get-figure 0 | mouse-release 6 7 button1 524288 -height 10 -width 10
+        get-figure 0 | mouse-release 6 3 button1 524288 -height 10 -width 10
     }
-    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld 
-        | get-target-connection 2] {
-        with [get-figure 0] {
-            mouse-hover 4 4 -height 10 -width 10
-            mouse-move 4 4 button1 -height 10 -width 10
-            mouse-press 4 4 button1 -height 10 -width 10
-            mouse-release 4 4 button1 524288 -height 10 -width 10
-            mouse-press 4 4 button1 -height 10 -width 10
-            mouse-double-click 4 4 button1 -height 10 -width 10
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior | get-target-connection 0 
+        | get-figure 0] {
+        mouse-move 5 3 button1 -height 10 -width 10
+        mouse-press 5 3 button1 -height 10 -width 10
+        mouse-release 5 3 button1 524288 -height 10 -width 10
+        mouse-press 5 3 button1 -height 10 -width 10
+        mouse-double-click 5 3 button1 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart] {
+        get-edit-part -text Behavior | get-target-connection 0 | get-figure 0 | mouse-release 5 3 button1 524288 
+            -height 10 -width 10
+        with [get-edit-part -text Security | get-target-connection 0] {
+            with [get-figure 0] {
+                mouse-move 5 3 button1 -height 10 -width 10
+                mouse-press 5 3 button1 -height 10 -width 10
+                mouse-release 5 3 button1 524288 -height 10 -width 10
+                mouse-press 5 3 button1 -height 10 -width 10
+                mouse-double-click 5 3 button1 -height 10 -width 10
+            }
+            get-figure 0 | mouse-release 5 3 button1 524288 -height 10 -width 10
         }
-        get-figure 0 | mouse-release 4 4 button1 524288 -height 10 -width 10
     }
-    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld] {
-        get-target-connection 2 | get-figure 0 | mouse-hover 4 4 -height 10 -width 10
-        with [get-target-connection 0] {
+    with [get-diagram | get-edit-part -className ModelEditPart] {
+        get-edit-part -text Security | get-target-connection 0 | get-figure 0 | mouse-hover 5 3 -height 10 -width 10
+        with [get-edit-part -text Elevator | get-target-connection 0 | get-figure 0] {
+            mouse-move 6 3 button1 -height 10 -width 10
+            mouse-press 6 3 button1 -height 10 -width 10
+            mouse-release 6 3 button1 524288 -height 10 -width 10
+            mouse-press 6 3 button1 -height 10 -width 10
+            mouse-double-click 6 3 button1 -height 10 -width 10
+        }
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Elevator] {
+        get-target-connection 0 | get-figure 0 | mouse-release 6 3 button1 524288 -height 10 -width 10
+        with [get-target-connection 1] {
+            with [get-figure 0] {
+                mouse-move 4 4 button1 -height 10 -width 10
+                mouse-press 4 4 button1 -height 10 -width 10
+                mouse-release 4 4 button1 524288 -height 10 -width 10
+                mouse-press 4 4 button1 -height 10 -width 10
+                mouse-double-click 4 4 button1 -height 10 -width 10
+            }
+            get-figure 0 | mouse-release 4 4 button1 524288 -height 10 -width 10
+        }
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Elevator | get-target-connection 2 
+        | get-figure 0] {
+        mouse-move 6 5 button1 -height 10 -width 10
+        mouse-press 6 5 button1 -height 10 -width 10
+        mouse-release 6 5 button1 524288 -height 10 -width 10
+        mouse-press 6 5 button1 -height 10 -width 10
+        mouse-double-click 6 5 button1 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Elevator] {
+        get-target-connection 2 | get-figure 0 | mouse-release 6 5 button1 524288 -height 10 -width 10
+        with [get-target-connection 3 | get-figure 0] {
+            mouse-move 3 5 button1 -height 10 -width 10
+            mouse-press 3 5 button1 -height 10 -width 10
+            mouse-release 3 5 button1 524288 -height 10 -width 10
+            mouse-press 3 5 button1 -height 10 -width 10
+            mouse-double-click 3 5 button1 -height 10 -width 10
+        }
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Elevator] {
+        get-target-connection 3 | get-figure 0 | mouse-release 3 5 button1 524288 -height 10 -width 10
+        with [get-target-connection 4] {
+            with [get-figure 0] {
+                mouse-move 3 5 button1 -height 10 -width 10
+                mouse-press 3 5 button1 -height 10 -width 10
+                mouse-release 3 5 button1 524288 -height 10 -width 10
+                mouse-press 3 5 button1 -height 10 -width 10
+                mouse-double-click 3 5 button1 -height 10 -width 10
+            }
+            mouse-release 195 31 button1 524288 -height 36 -width 202
+        }
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Safety | get-target-connection 0 
+        | get-figure 0] {
+        mouse-move 5 4 button1 -height 10 -width 10
+        mouse-press 5 4 button1 -height 10 -width 10
+        mouse-release 5 4 button1 524288 -height 10 -width 10
+        mouse-press 5 4 button1 -height 10 -width 10
+        mouse-double-click 5 4 button1 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart] {
+        get-edit-part -text Safety | get-target-connection 0 | get-figure 0 | mouse-release 5 4 button1 524288 
+            -height 10 -width 10
+        with [get-edit-part -text Security | get-target-connection 0 | get-figure 0] {
+            mouse-move 6 5 button1 -height 10 -width 10
+            mouse-press 6 5 button1 -height 10 -width 10
+            mouse-release 6 5 button1 524288 -height 10 -width 10
+            mouse-press 6 5 button1 -height 10 -width 10
+            mouse-double-click 6 5 button1 -height 10 -width 10
+        }
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart] {
+        get-edit-part -text Security | get-target-connection 0 | get-figure 0 | mouse-release 6 5 button1 524288 
+            -height 10 -width 10
+        with [get-edit-part -text Behavior | get-target-connection 2] {
             with [get-figure 0] {
                 mouse-move 4 4 button1 -height 10 -width 10
                 mouse-press 4 4 button1 -height 10 -width 10
@@ -53,45 +138,140 @@ with [get-editor "HelloWorld-FH-Java Model"] {
         }
     }
     with [get-diagram | get-edit-part -className ModelEditPart] {
-        with [get-edit-part -text HelloWorld | get-target-connection 1] {
+        with [get-edit-part -text Behavior | get-target-connection 1] {
             with [get-figure 0] {
-                mouse-move 4 3 button1 -height 10 -width 10
-                mouse-press 4 3 button1 -height 10 -width 10
-                mouse-release 4 3 button1 524288 -height 10 -width 10
-                mouse-press 4 3 button1 -height 10 -width 10
-                mouse-double-click 4 3 button1 -height 10 -width 10
+                mouse-move 6 5 button1 -height 10 -width 10
+                mouse-press 6 5 button1 -height 10 -width 10
+                mouse-release 6 5 button1 524288 -height 10 -width 10
+                mouse-press 6 5 button1 -height 10 -width 10
+                mouse-double-click 6 5 button1 -height 10 -width 10
             }
-            get-figure 0 | mouse-move 4 4 -mask 524288 -height 10 -width 10
+            mouse-move 7 31 -mask 524288 -height 36 -width 10
         }
-        with [get-edit-part -text Feature] {
-            mouse-drag 23 0 button1 524288 -height 19 -width 48
-            mouse-release 23 0 button1 524288 -height 19 -width 48
+        with [get-edit-part -text Service] {
+            mouse-drag 26 0 button1 524288 -height 19 -width 48
+            mouse-release 26 0 button1 524288 -height 19 -width 48
         }
     }
-    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld 
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior 
+        | get-target-connection 0] {
+        with [get-figure 0] {
+            mouse-move 5 4 button1 -height 10 -width 10
+            mouse-press 5 4 button1 -height 10 -width 10
+            mouse-release 5 4 button1 524288 -height 10 -width 10
+            mouse-press 5 4 button1 -height 10 -width 10
+            mouse-double-click 5 4 button1 -height 10 -width 10
+        }
+        mouse-release 5 30 button1 524288 -height 36 -width 106
+    }
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z" -times 2
+    with [get-diagram] {
+        key-type "M1+z"
+        mouse-hover 142 220 -mask CTRL -height 689 -width 1142
+        key-type "M1+z"
+    }
+    get-diagram | key-type "M1+z" -times 2
+    get-diagram | key-type "M1+z"
+    with [get-diagram] {
+        mouse-hover 139 218 -mask CTRL -height 689 -width 1142
+        key-type "M1+z"
+    }
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    with [get-diagram] {
+        key-type "M1+z"
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Behavior | get-target-connection 0] {
+            mouse-hover 54 16 -height 36 -width 106
+            mouse-move 54 16 button1 -height 36 -width 106
+            mouse-press 54 16 button1 -height 36 -width 106
+            mouse-release 54 16 button1 524288 -height 36 -width 106
+            mouse-press 54 16 button1 -height 36 -width 106
+            mouse-double-click 54 16 button1 -height 36 -width 106
+            mouse-release 54 16 button1 524288 -height 36 -width 106
+        }
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior 
+        | get-target-connection 0] {
+        mouse-hover 49 16 -height 32 -width 112
+        mouse-press 49 16 button1 -height 32 -width 112
+        mouse-release 49 16 button1 524288 -height 32 -width 112
+        mouse-press 49 16 button1 -height 32 -width 112
+        mouse-double-click 49 16 button1 -height 32 -width 112
+        mouse-release 49 16 button1 524288 -height 32 -width 112
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior 
+        | get-target-connection 0] {
+        mouse-hover 49 16 -height 32 -width 112
+        mouse-press 49 16 button1 -height 32 -width 112
+        mouse-release 49 16 button1 524288 -height 32 -width 112
+        mouse-press 49 16 button1 -height 32 -width 112
+        mouse-double-click 49 16 button1 -height 32 -width 112
+        mouse-release 54 16 button1 524288 -height 36 -width 106
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior 
+        | get-target-connection 0] {
+        mouse-hover 54 16 -height 36 -width 106
+        with [get-figure 0] {
+            mouse-move 5 5 button1 -height 10 -width 10
+            mouse-press 5 5 button1 -height 10 -width 10
+            mouse-release 5 5 button1 524288 -height 10 -width 10
+            mouse-press 5 5 button1 -height 10 -width 10
+            mouse-double-click 5 5 button1 -height 10 -width 10
+        }
+        get-figure 0 | mouse-release 5 5 button1 524288 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior 
+        | get-target-connection 0] {
+        with [get-figure 0] {
+            mouse-hover 5 5 -height 10 -width 10
+            mouse-press 5 5 button1 -height 10 -width 10
+            mouse-release 5 5 button1 524288 -height 10 -width 10
+            mouse-press 5 5 button1 -height 10 -width 10
+            mouse-double-click 5 5 button1 -height 10 -width 10
+        }
+        get-figure 0 | mouse-release 5 5 button1 524288 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior | get-target-connection 1 
+        | get-figure 0] {
+        mouse-move 4 5 button1 -height 10 -width 10
+        mouse-press 4 5 button1 -height 10 -width 10
+        mouse-release 4 5 button1 524288 -height 10 -width 10
+        mouse-press 4 5 button1 -height 10 -width 10
+        mouse-double-click 4 5 button1 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior 
+        | get-target-connection 1] {
+        with [get-figure 0] {
+            mouse-release 4 5 button1 524288 -height 10 -width 10
+            mouse-press 4 5 button1 -height 10 -width 10
+            mouse-release 4 5 button1 524288 -height 10 -width 10
+            mouse-press 4 5 button1 -height 10 -width 10
+            mouse-double-click 4 5 button1 -height 10 -width 10
+        }
+        get-figure 0 | mouse-release 4 5 button1 524288 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior | get-target-connection 2 
+        | get-figure 0] {
+        mouse-move 8 6 button1 -height 10 -width 10
+        mouse-press 8 6 button1 -height 10 -width 10
+        mouse-release 8 6 button1 524288 -height 10 -width 10
+        mouse-press 8 6 button1 -height 10 -width 10
+        mouse-double-click 8 6 button1 -height 10 -width 10
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior 
         | get-target-connection 2] {
         with [get-figure 0] {
-            mouse-hover 7 4 -height 10 -width 10
-            mouse-move 7 4 button1 -height 10 -width 10
-            mouse-press 7 4 button1 -height 10 -width 10
-            mouse-release 7 4 button1 524288 -height 10 -width 10
-            mouse-press 7 4 button1 -height 10 -width 10
-            mouse-double-click 7 4 button1 -height 10 -width 10
+            mouse-release 8 6 button1 524288 -height 10 -width 10
+            mouse-press 8 6 button1 -height 10 -width 10
+            mouse-release 8 6 button1 524288 -height 10 -width 10
+            mouse-press 8 6 button1 -height 10 -width 10
+            mouse-double-click 8 6 button1 -height 10 -width 10
         }
-        get-figure 0 | mouse-release 7 4 button1 524288 -height 10 -width 10
+        get-figure 0 | mouse-release 8 6 button1 524288 -height 10 -width 10
     }
-    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text HelloWorld] {
-        get-target-connection 2 | get-figure 0 | mouse-hover 6 4 -height 10 -width 10
-        with [get-target-connection 0] {
-            with [get-figure 0] {
-                mouse-move 6 7 button1 -height 10 -width 10
-                mouse-press 6 7 button1 -height 10 -width 10
-                mouse-release 6 7 button1 524288 -height 10 -width 10
-                mouse-press 6 7 button1 -height 10 -width 10
-                mouse-double-click 6 7 button1 -height 10 -width 10
-            }
-            get-figure 0 | mouse-release 6 7 button1 524288 -height 10 -width 10
-        }
-    }
+    get-tab-folder | get-tab-item Source | click
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

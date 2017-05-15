@@ -6,73 +6,100 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tmyLsDf9EeeWhPO7o9SFAg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/13/17 1:03 PM
+Save-Time: 5/15/17 2:18 PM
 Testcase-Type: ecl
+Verifications: _tpAXIDmbEeeWDJ4Wcr0-Ag
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Package Explorer" | get-tree | select "HelloWorld-FH-Java/model.xml" | double-click
-with [get-editor "HelloWorld-FH-Java Model"] {
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model"] {
     with [get-diagram] {
-        with [get-edit-part -className ModelEditPart | get-edit-part -text Feature] {
-            mouse-move 28 11 button1 -height 21 -width 50
-            mouse-press 28 11 button1 -height 21 -width 50
-            mouse-release 28 11 button1 524288 -height 21 -width 50
-            mouse-hover 28 11 -height 21 -width 50
-        }
-        mouse-hover 131 207 -height 586 -width 400
-        with [get-edit-part -className ModelEditPart | get-edit-part -text Feature] {
-            with [get-handle MoveHandle] {
-                mouse-move 37 22 button1 -height 23 -width 52
-                mouse-press 37 22 button1 -height 23 -width 52
-                mouse-release 37 22 button1 524288 -height 23 -width 52
-                mouse-hover 37 22 -height 23 -width 52
-            }
-            activate-direct-edit
-        }
-        mouse-hover 206 136 -height 586 -width 400
-    }
-    with [get-editbox] {
-        set-text C
-        key-type Enter
-    }
-    with [get-diagram] {
-        commit-direct-edit
-        mouse-move 204 259 button1 -height 586 -width 400
-        mouse-press 204 259 button1 -height 586 -width 400
-        mouse-release 204 259 button1 524288 -height 586 -width 400
         with [get-edit-part -className ModelEditPart] {
-            with [get-edit-part -text "C  ⇒  World"] {
-                mouse-move 38 6 button1 -height 19 -width 72
-                mouse-press 38 6 button1 -height 19 -width 72
-                mouse-release 38 6 button1 524288 -height 19 -width 72
-                mouse-hover 38 6 -height 19 -width 72
+            with [get-edit-part -text CallButtons] {
+                mouse-move 47 7 button1 -height 19 -width 65
+                mouse-press 47 7 button1 -height 19 -width 65
+                mouse-release 47 7 button1 524288 -height 19 -width 65
             }
-            with [get-edit-part -text C] {
-                mouse-move 13 13 button1 -height 21 -width 20
-                mouse-press 13 13 button1 -height 21 -width 20
-                mouse-release 13 13 button1 524288 -height 21 -width 20
-                mouse-hover 13 13 -height 21 -width 20
-            }
+            get-edit-part -text PermissionControl | mouse-hover 21 16 -height 19 -width 95
         }
         key-type F2
-        get-edit-part -className ModelEditPart | get-edit-part -text C | activate-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text CallButtons | activate-direct-edit
     }
     with [get-editbox] {
-        set-text Feature
+        set-text Buttons
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        with [get-edit-part -className ModelEditPart | get-edit-part -text "Buttons  ∨  Sabbath"] {
+            mouse-move 56 7 button1 -height 17 -width 113
+            mouse-press 56 7 button1 -height 17 -width 113
+            mouse-release 56 7 button1 524288 -height 17 -width 113
+            mouse-hover 56 7 -height 17 -width 113
+        }
+        mouse-move 560 319 button1 -height 689 -width 1142
+        mouse-press 560 319 button1 -height 689 -width 1142
+        mouse-release 560 319 button1 524288 -height 689 -width 1142
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Buttons] {
+            mouse-move 21 10 button1 -height 19 -width 48
+            mouse-press 21 10 button1 -height 19 -width 48
+            mouse-release 21 10 button1 524288 -height 19 -width 48
+        }
+        key-type F2
+        get-edit-part -className ModelEditPart | get-edit-part -text Buttons | activate-direct-edit
+    }
+    with [get-editbox] {
+        set-text CallButtons
         key-type Enter
     }
     with [get-diagram] {
         commit-direct-edit
-        with [get-edit-part -className ModelEditPart | get-edit-part -text "Feature  ⇒  World"] {
-            mouse-move 51 12 button1 -height 19 -width 102
-            mouse-press 51 12 button1 -height 19 -width 102
-            mouse-release 51 12 button1 524288 -height 19 -width 102
-            mouse-hover 51 12 -height 19 -width 102
+        mouse-move 605 337 button1 -height 689 -width 1142
+        mouse-press 605 337 button1 -height 689 -width 1142
+        mouse-release 605 337 button1 524288 -height 689 -width 1142
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Sabbath] {
+            mouse-move 15 13 button1 -height 19 -width 52
+            mouse-press 15 13 button1 -height 19 -width 52
+            mouse-release 15 13 button1 524288 -height 19 -width 52
         }
-        mouse-hover 122 312 -height 586 -width 400
+        key-type F2
+        get-edit-part -className ModelEditPart | get-edit-part -text Sabbath | activate-direct-edit
+        mouse-hover 246 257 -height 689 -width 1142
     }
+    with [get-editbox] {
+        set-text Test
+        key-type Enter
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        mouse-hover 246 258 -height 689 -width 1142
+        mouse-move 494 371 button1 -height 689 -width 1142
+        mouse-press 494 371 button1 -height 689 -width 1142
+        mouse-release 494 371 button1 524288 -height 689 -width 1142
+        with [get-edit-part -className ModelEditPart | get-edit-part -text "CallButtons  ∨  Test"] {
+            mouse-move 42 8 button1 -height 17 -width 111
+            mouse-press 42 8 button1 -height 17 -width 111
+            mouse-release 42 8 button1 524288 -height 17 -width 111
+        }
+        mouse-move 433 388 button1 -height 689 -width 1142
+        mouse-press 433 388 button1 -height 689 -width 1142
+        mouse-release 433 388 button1 524288 -height 689 -width 1142
+        mouse-hover 433 388 -height 689 -width 1142
+        key-type "M1+z"
+    }
+    with [get-diagram] {
+        mouse-press 433 388 button1 -height 689 -width 1142
+        mouse-release 433 388 button1 524288 -height 689 -width 1142
+        with [get-edit-part -className ModelEditPart | get-edit-part -text "CallButtons  ∨  Sabbath"] {
+            mouse-move 79 5 button1 -height 17 -width 130
+            mouse-press 79 5 button1 -height 17 -width 130
+            mouse-release 79 5 button1 524288 -height 17 -width 130
+            mouse-hover 79 5 -height 17 -width 130
+        }
+    }
+    get-tab-folder | get-tab-item Source | click
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
