@@ -39,9 +39,6 @@
 						<description>
 							Priorities specify that certain requests are supposed to be processed faster than others.
 						</description>
-						<description>
-							Priorities specify that certain requests are supposed to be processed faster than others.
-						</description>
 						<feature mandatory="true" name="RushHour">
 							<description>
 								During rush hours the elevator moves to a particular floor if there are no requests. In the morning, it will move to the lowest floor and, in the afternoon, it will move to a floor in the center of the building.
