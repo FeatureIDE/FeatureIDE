@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kO7iADmeEeeWDJ4Wcr0-Ag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/15/17 11:46 AM
+Save-Time: 5/15/17 2:25 PM
 Testcase-Type: ecl
 Verifications: _tpAXIDmbEeeWDJ4Wcr0-Ag
 
@@ -16,41 +16,56 @@ Entry-Name: .content
 
 get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
 with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Safety | get-target-connection 0] {
+        with [get-figure 0] {
+            mouse-move 5 5 button1 -height 10 -width 10
+            mouse-press 5 5 button1 -height 10 -width 10
+            mouse-release 5 5 button1 524288 -height 10 -width 10
+            mouse-press 5 5 button1 -height 10 -width 10
+            mouse-double-click 5 5 button1 -height 10 -width 10
+        }
+        get-figure 0 | mouse-release 5 5 button1 524288 -height 10 -width 10
+    }
     with [get-diagram] {
-        with [get-edit-part -className ModelEditPart | get-edit-part -text Priorities] {
-            mouse-move 31 11 button3 -height 19 -width 51
-            mouse-press 31 11 button3 -height 19 -width 51
-            mouse-release 31 11 button3 2097152 -height 19 -width 51
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Permission] {
+            mouse-move 33 9 button1 -height 19 -width 62
+            mouse-press 33 9 button1 -height 19 -width 62
+            mouse-release 33 9 button1 524288 -height 19 -width 62
+            mouse-hover 33 9 -height 19 -width 62
+            mouse-press 33 9 button3 -height 19 -width 62
+            mouse-release 33 9 button3 2097152 -height 19 -width 62
         }
         get-menu "Delete Including Subfeatures (CTRL + D)" | click
     }
-    with [get-diagram] {
-        mouse-move 253 344 button1 -height 689 -width 1094
-        mouse-press 253 344 button1 -height 689 -width 1094
-        mouse-release 253 344 button1 524288 -height 689 -width 1094
-        mouse-hover 253 344 -height 689 -width 1094
-        key-type "M1+z"
-    }
-    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Priorities | activate-direct-edit
+    get-diagram | mouse-hover 756 266 -height 689 -width 1142
+    get-diagram | key-type "M1+z"
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Permission | activate-direct-edit
     with [get-diagram] {
         commit-direct-edit
-        get-edit-part -className ModelEditPart | get-edit-part -text PersonPriority | activate-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text PermissionControl | activate-direct-edit
     }
     with [get-diagram] {
         commit-direct-edit
-        get-edit-part -className ModelEditPart | get-edit-part -text FloorPriority | activate-direct-edit
+        get-edit-part -className ModelEditPart | get-edit-part -text FloorPermission | activate-direct-edit
     }
     with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Safety | get-target-connection 0 
+            | get-figure 0] {
+            mouse-move 6 5 button1 -height 10 -width 10
+            mouse-press 6 5 button1 -height 10 -width 10
+        }
         commit-direct-edit
-        get-edit-part -className ModelEditPart | get-edit-part -text RushHour | activate-direct-edit
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Safety | get-target-connection 0] {
+            with [get-figure 0] {
+                mouse-release 6 5 button1 524288 -height 10 -width 10
+                mouse-press 6 5 button1 -height 10 -width 10
+                mouse-double-click 6 5 button1 -height 10 -width 10
+            }
+            get-figure 0 | mouse-release 6 5 button1 524288 -height 10 -width 10
+        }
     }
-    with [get-diagram] {
-        mouse-hover 250 344 -height 689 -width 1094
-        mouse-move 250 344 button1 -height 689 -width 1094
-        mouse-press 250 344 button1 -height 689 -width 1094
-        commit-direct-edit
-        mouse-release 250 344 button1 524288 -height 689 -width 1094
-    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Safety | get-target-connection 0 
+        | get-figure 0 | mouse-hover 6 5 -height 10 -width 10
     get-tab-folder | get-tab-item Source | click
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
