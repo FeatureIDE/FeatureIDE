@@ -1,0 +1,102 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Features with numbers as names cannot be added to constraints #538
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: https://github.com/FeatureIDE/FeatureIDE/issues/538
+Id: _xWtRwDm4EeeqRIrf0KotuQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/15/17 2:55 PM
+Tags: Feature Model Editor
+Testcase-Type: ecl
+Verifications: _tpAXIDmbEeeWDJ4Wcr0-Ag
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior 
+        | get-target-connection 0] {
+        with [get-figure 0] {
+            mouse-move 3 3 button1 -height 10 -width 10
+            mouse-press 3 3 button1 -height 10 -width 10
+            mouse-release 3 3 button1 524288 -height 10 -width 10
+            mouse-press 3 3 button1 -height 10 -width 10
+            mouse-double-click 3 3 button1 -height 10 -width 10
+        }
+        get-figure 0 | mouse-release 3 3 button1 524288 -height 10 -width 10
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Service] {
+            mouse-move 7 9 button1 -height 19 -width 48
+            mouse-press 7 9 button1 -height 19 -width 48
+            mouse-release 7 9 button1 524288 -height 19 -width 48
+        }
+        mouse-hover 489 236 -height 689 -width 1142
+        key-type F2
+        get-edit-part -className ModelEditPart | get-edit-part -text Service | activate-direct-edit
+    }
+    with [get-editbox] {
+        set-text 123
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        with [get-edit-part -className ModelEditPart | get-edit-part -text 123] {
+            mouse-move 14 12 button3 -height 19 -width 30
+            mouse-press 14 12 button3 -height 19 -width 30
+            mouse-release 14 12 button3 2097152 -height 19 -width 30
+        }
+        get-menu "Create Constraint starting with \"123\"" | click
+    }
+}
+with [get-window "Constraint Dialog"] {
+    get-group Operators | get-button Or | click
+    get-group Features | get-table | select Behavior | double-click
+    get-button "Save (Unchecked)" | click
+}
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        mouse-move 456 410 button1 -height 689 -width 1142
+        mouse-press 456 410 button1 -height 689 -width 1142
+        mouse-release 456 410 button1 524288 -height 689 -width 1142
+        with [get-edit-part -className ModelEditPart | get-edit-part -text "123  ∨  Behavior"] {
+            mouse-move 53 9 button1 -height 17 -width 97
+            mouse-press 53 9 button1 -height 17 -width 97
+            mouse-release 53 9 button1 524288 -height 17 -width 97
+            mouse-hover 51 9 -height 17 -width 97
+        }
+        key-type Del
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text 123] {
+            mouse-move 14 8 button1 -height 19 -width 30
+            mouse-press 14 8 button1 -height 19 -width 30
+            mouse-release 14 8 button1 524288 -height 19 -width 30
+        }
+        mouse-hover 468 437 -height 689 -width 1142
+        key-type F2
+        get-edit-part -className ModelEditPart | get-edit-part -text 123 | activate-direct-edit
+    }
+    with [get-editbox] {
+        set-text Service
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Behavior | get-target-connection 0 
+            | get-figure 0] {
+            mouse-move 6 2 button1 -height 10 -width 10
+            mouse-press 6 2 button1 -height 10 -width 10
+            mouse-release 6 2 button1 524288 -height 10 -width 10
+            mouse-press 6 2 button1 -height 10 -width 10
+            mouse-double-click 6 2 button1 -height 10 -width 10
+        }
+    }
+    get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Behavior | get-target-connection 0 
+        | get-figure 0 | mouse-release 6 2 button1 524288 -height 10 -width 10
+    get-tab-folder | get-tab-item Source | click
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
