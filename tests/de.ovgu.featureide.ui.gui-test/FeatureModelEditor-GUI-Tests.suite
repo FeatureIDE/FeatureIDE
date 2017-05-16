@@ -6,7 +6,7 @@ Element-Version: 2.0
 Id: _IV9-4DawEeeQHa5yuUSOFg
 Manually-Ordered: true
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/15/17 3:16 PM
+Save-Time: 5/15/17 5:06 PM
 Tags: Feature Model Editor
 
 ------=_testcase-items-62c497da-4241-31f4-811a-6b453a3ecff8
@@ -24,5 +24,6 @@ _OWZP0DmbEeeWDJ4Wcr0-Ag	// kind: 'test' name: 'Delete Feature' path: 'tests/Feat
 _kO7iADmeEeeWDJ4Wcr0-Ag	// kind: 'test' name: 'Delete Including Subfeatures' path: 'tests/Feature Model Editor/Delete Including Subfeatures.test'
 _xWtRwDm4EeeqRIrf0KotuQ	// kind: 'test' name: 'Features with numbers as names cannot be added to constraints #538' path: 'tests/Feature Model Editor/Features with numbers as names cannot be added to constraints #538.test'
 _RRInADm5EeeqRIrf0KotuQ	// kind: 'test' name: 'Hyphens in feature names are translated into "not" in Constraint Editor #539' path: 'tests/Feature Model Editor/Hyphens in feature names are translated into _not_ in Constraint Editor #539.test'
+_E6f8UDnLEeeLt_p3oStshg	// kind: 'test' name: 'Selecting several features with the same parent and create a new feature above does not work anymore #427' path: 'tests/Feature Model Editor/Selecting several features with the same parent and create a new feature above does not work anymore #427.test'
 
 ------=_testcase-items-62c497da-4241-31f4-811a-6b453a3ecff8--

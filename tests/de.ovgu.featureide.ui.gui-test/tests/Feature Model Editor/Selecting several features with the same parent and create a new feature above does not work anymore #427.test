@@ -1,0 +1,42 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Selecting several features with the same parent and create a new feature above does not work anymore #427
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: https://github.com/FeatureIDE/FeatureIDE/issues/427
+Id: _E6f8UDnLEeeLt_p3oStshg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/15/17 5:04 PM
+Tags: Feature Model Editor
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model" | get-diagram] {
+    with [get-edit-part -className ModelEditPart] {
+        with [get-edit-part -text Sabbath] {
+            mouse-move 18 7 button1 -height 19 -width 52
+            mouse-press 18 7 button1 -height 19 -width 52
+            mouse-release 18 7 button1 524288 -height 19 -width 52
+        }
+        with [get-edit-part -text FIFO] {
+            mouse-move 12 10 button1 CTRL -height 19 -width 35
+            mouse-press 12 10 button1 CTRL -height 19 -width 35
+            mouse-release 12 10 button1 786432 -height 19 -width 35
+        }
+        with [get-edit-part -text ShortestPath] {
+            mouse-move 27 10 button1 CTRL -height 19 -width 73
+            mouse-press 27 10 button1 CTRL -height 19 -width 73
+            mouse-release 27 10 button1 786432 -height 19 -width 73
+            mouse-hover 27 10 -height 19 -width 73
+            mouse-press 27 10 button3 -height 19 -width 73
+            mouse-release 27 10 button3 2097152 -height 19 -width 73
+        }
+    }
+    get-menu "Create Feature Above" | click
+    mouse-hover 323 238 -height 409 -width 1142
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
