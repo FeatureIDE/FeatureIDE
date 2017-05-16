@@ -1,0 +1,132 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Layout Feature Model
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _jHaU8DnNEeeLt_p3oStshg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/15/17 5:48 PM
+Tags: Feature Model Editor
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        mouse-move 313 296 button3 -height 409 -width 1142
+        mouse-press 313 296 button3 -height 409 -width 1142
+        mouse-release 313 296 button3 2097152 -height 409 -width 1142
+        get-menu "Set Layout/Top-Down (centered)" | click
+    }
+    with [get-diagram] {
+        mouse-move 378 278 button3 -height 409 -width 1142
+        mouse-press 378 278 button3 -height 409 -width 1142
+        mouse-release 378 278 button3 2097152 -height 409 -width 1142
+        get-menu "Set Layout/Top-Down (left-aligned)" | click
+    }
+    with [get-diagram] {
+        mouse-move 433 280 button3 -height 409 -width 1142
+        mouse-press 433 280 button3 -height 409 -width 1142
+        mouse-release 433 280 button3 2097152 -height 409 -width 1142
+        get-menu "Set Layout/Left To Right (ordered)" | click
+    }
+    with [get-diagram] {
+        mouse-move 560 265 button3 -height 445 -width 1125
+        mouse-press 560 265 button3 -height 445 -width 1125
+        mouse-release 560 265 button3 2097152 -height 445 -width 1125
+        get-menu "Set Layout/Top-Down (ordered)" | click
+    }
+    with [get-diagram] {
+        mouse-move 342 263 button3 -height 409 -width 1142
+        mouse-press 342 263 button3 -height 409 -width 1142
+        mouse-release 342 263 button3 2097152 -height 409 -width 1142
+        get-menu "Set Layout/Manual Layout" | click
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text CallButtons] {
+            mouse-move 21 10 button1 -height 19 -width 65
+            mouse-press 21 10 button1 -height 19 -width 65
+            mouse-move 19 10 -mask 524288 -height 19 -width 65
+        }
+        mouse-drag 346 46 button1 524288 -height 409 -width 1142
+        mouse-release 346 46 button1 524288 -height 409 -width 1142
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Elevator] {
+            mouse-move 26 9 button1 -height 19 -width 51
+            mouse-press 26 9 button1 -height 19 -width 51
+            get-target-connection 1 | mouse-move 82 7 -mask 524288 -height 36 -width 97
+        }
+        mouse-drag 395 262 button1 524288 -height 409 -width 1142
+        mouse-release 395 262 button1 524288 -height 409 -width 1142
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text FloorPermission] {
+            mouse-move 50 10 button1 -height 19 -width 85
+            mouse-press 50 10 button1 -height 19 -width 85
+            mouse-move 56 17 -mask 524288 -height 19 -width 85
+        }
+        mouse-drag 778 308 button1 524288 -height 409 -width 1142
+        mouse-release 778 308 button1 524288 -height 409 -width 1142
+    }
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+    get-diagram | key-type "M1+z"
+}
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        mouse-move 258 309 button3 -height 409 -width 1142
+        mouse-press 258 309 button3 -height 409 -width 1142
+        mouse-release 258 309 button3 2097152 -height 409 -width 1142
+        mouse-press 131 232 button1 -height 409 -width 1142
+        mouse-move 131 232 -mask 524288 -height 409 -width 1142
+        mouse-drag 137 238 -mask 524288 -height 409 -width 1142
+        with [get-edit-part -className ModelEditPart] {
+            mouse-drag 131 232 button1 524288 -height 409 -width 1142
+            mouse-release 131 232 button1 524288 -height 409 -width 1142
+        }
+        mouse-hover 131 232 -height 409 -width 1142
+        mouse-move 157 85 button1 -height 409 -width 1142
+        mouse-press 157 85 button1 -height 409 -width 1142
+        mouse-move 158 85 -mask 524288 -height 409 -width 1142
+        with [get-edit-part -className ModelEditPart] {
+            mouse-drag 358 254 button1 524288 -height 409 -width 1142
+            mouse-release 358 254 button1 524288 -height 409 -width 1142
+            with [get-edit-part -text Modes] {
+                mouse-move 19 8 button1 -height 19 -width 44
+                mouse-press 19 8 button1 -height 19 -width 44
+                mouse-move 18 8 -mask 524288 -height 19 -width 44
+            }
+        }
+        mouse-drag 191 100 button1 524288 -height 409 -width 1142
+        mouse-release 191 100 button1 524288 -height 409 -width 1142
+    }
+    with [get-diagram] {
+        mouse-move 646 17 button1 -height 409 -width 1142
+        mouse-press 646 17 button1 -height 409 -width 1142
+        mouse-move 647 19 -mask 524288 -height 409 -width 1142
+        mouse-drag 653 25 -mask 524288 -height 409 -width 1142
+        with [get-edit-part -className ModelEditPart] {
+            mouse-drag 840 274 button1 524288 -height 409 -width 1142
+            mouse-release 840 274 button1 524288 -height 409 -width 1142
+            with [get-edit-part -text PermissionControl] {
+                mouse-move 46 4 button1 -height 19 -width 95
+                mouse-press 46 4 button1 -height 19 -width 95
+                mouse-move 49 10 -mask 524288 -height 19 -width 95
+            }
+        }
+        mouse-drag 941 309 button1 524288 -height 409 -width 1142
+        mouse-release 941 309 button1 524288 -height 409 -width 1142
+    }
+    with [get-diagram] {
+        mouse-move 334 299 button3 -height 409 -width 1142
+        mouse-press 334 299 button3 -height 409 -width 1142
+        mouse-release 334 299 button3 2097152 -height 409 -width 1142
+        get-menu "Set Layout/Top-Down (ordered)" | click
+    }
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -1,0 +1,28 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Htk-MDmaEeeWDJ4Wcr0-Ag
+Element-Name: NullPointer in FeatureModelEditor #526
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: https://github.com/FeatureIDE/FeatureIDE/issues/526
+Id: _6Ghm8DnLEeeLt_p3oStshg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/15/17 5:11 PM
+Tags: Feature Model Editor
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | get-menu "New/Example..." | click
+get-window "New Example" | get-tree | select "FeatureIDE/FeatureIDE Examples" | double-click
+with [get-window "FeatureIDE Example Import"] {
+    get-tab-folder | get-tab-item "Book Example" | click
+    get-tree | select "Part I" 
+        | get-item "Part III/Chapter 11 \\(Feature Traceability for Conditional Compilation\\)/Elevator-Antenna-v1.4" 
+        | check
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.4/model.xml" | double-click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
