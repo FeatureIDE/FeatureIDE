@@ -985,6 +985,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		final EventType prop = event.getEventType();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
+			if (event.getNewValue() != null && event.getNewValue() instanceof IFeature) {
+				IFeature newCompound = (IFeature)event.getNewValue();
+				refreshChildAll(newCompound);
+			}
 			IFeature oldParent = (IFeature) event.getOldValue();
 			if (oldParent != null) {
 				final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
@@ -1131,7 +1135,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					if (extraPath != null) {
 						FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
 					}
-					
+
 					setContents(graphicalFeatureModel);
 					refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 					reload();
@@ -1160,14 +1164,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 			deletedFeature.update(event);
 			oldParent = (IFeature) event.getOldValue();
-			graphicalFeatureModel.init();
-			setContents(graphicalFeatureModel);
-			internRefresh(true);
 			if (oldParent == null) {
 				FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel).update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 			} else {
 				graphicalFeatureModel.getGraphicalFeature(oldParent).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 			}
+			refreshChildAll(oldParent);
+			internRefresh(true);
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
@@ -1304,8 +1307,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						elementNewActiveReasons.get(element)));
 			}
 			LegendFigure legend = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
-			if (legend != null && legend.isVisible())
-			{
+			if (legend != null && legend.isVisible()) {
 				legend.recreateLegend();
 			}
 			break;
