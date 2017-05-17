@@ -55,6 +55,7 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
+import de.ovgu.featureide.core.signature.base.SignaturePosition;
 
 /**
  * TODO description
@@ -132,7 +133,10 @@ public abstract class MungeSignatureBuilder {
 				this.curDeclaration = curDeclaration;
 				final Javadoc javadoc = curDeclaration.getJavadoc();
 				final int startPosition = (javadoc == null) ? curDeclaration.getStartPosition() : curDeclaration.getStartPosition() + javadoc.getLength();
-				curfeatureData = (PreprocessorFeatureData) featureDataConstructor.create(null, cu.getLineNumber(startPosition), cu.getLineNumber(curDeclaration.getStartPosition() + curDeclaration.getLength()));
+				int startRow = cu.getLineNumber(startPosition);
+				int endRow = cu.getLineNumber(curDeclaration.getStartPosition() + curDeclaration.getLength());
+				SignaturePosition pos = new SignaturePosition(startRow, endRow, 0, 0, 0, 0);
+				curfeatureData = (PreprocessorFeatureData) featureDataConstructor.create(null, pos);
 				curSignature.setFeatureData(curfeatureData);
 				map.put(curSignature, curSignature);
 			}
