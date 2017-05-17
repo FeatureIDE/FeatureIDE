@@ -119,7 +119,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	@Override
 	public void override() {
-		localObject.setUndoContext(variableObject.getUndoContext());
+		persistentObject.setUndoContext(variableObject.getUndoContext());
 		super.override();
 	}
 

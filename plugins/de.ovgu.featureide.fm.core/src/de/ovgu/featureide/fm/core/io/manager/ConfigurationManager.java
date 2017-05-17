@@ -65,7 +65,6 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 		variableObject = configuration;
 		synchronized (syncObject) {
 			persistentObject = copyObject(variableObject);
-			localObject = copyObject(variableObject);
 		}
 	}
 

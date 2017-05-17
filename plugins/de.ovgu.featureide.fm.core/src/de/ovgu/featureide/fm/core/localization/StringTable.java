@@ -355,7 +355,7 @@ public class StringTable {
 	public static final String NO_LEFT_SYMBOL_FOUND = "No left symbol found";
 	public static final String NO_RIGHT_SYMBOL_FOUND = "No right symbol found";
 	public static final String NO_SYMBOL_FOUND = "No symbol found";
-	public static final String INVALID_POSITIONING_OF_PARENTHESES = "invalid positioning of parentheses";
+	public static final String INVALID_POSITIONING_OF_PARENTHESES = "Invalid positioning of parentheses";
 	public static final String INVALID_NUMBER_OF_QUOTATION_MARKS = "Invalid number of quotation marks";
 	public static final String WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED = "Whitespace before and after quoted feature name required";
 	public static final String NO_SYMBOL = " no symbol ";
