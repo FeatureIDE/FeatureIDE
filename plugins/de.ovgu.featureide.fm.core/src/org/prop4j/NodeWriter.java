@@ -34,10 +34,13 @@ public class NodeWriter {
 	 */
 	public enum Notation {
 		/**
-		 * <p>The infix notation.
-		 * Operators are written between operands where possible.</p>
+		 * <p>
+		 * The infix notation.
+		 * Operators are written between operands where possible.
+		 * </p>
 		 * 
-		 * <p>Examples:
+		 * <p>
+		 * Examples:
 		 * <ul>
 		 * <li><em>A & B & C</em></li>
 		 * <li><em>A => B <=> -A | B</em></li>
@@ -47,10 +50,13 @@ public class NodeWriter {
 		 */
 		INFIX,
 		/**
-		 * <p>The prefix notation.
-		 * Operators are written before the operands.</p>
+		 * <p>
+		 * The prefix notation.
+		 * Operators are written before the operands.
+		 * </p>
 		 * 
-		 * <p>Examples:
+		 * <p>
+		 * Examples:
 		 * <ul>
 		 * <li><em>(& A B C)</em></li>
 		 * <li><em>(<=> (=> A B) (| (- A) B)</em></li>
@@ -60,10 +66,13 @@ public class NodeWriter {
 		 */
 		PREFIX,
 		/**
-		 * <p>The postfix notation.
-		 * Operators are written after the operands.</p>
+		 * <p>
+		 * The postfix notation.
+		 * Operators are written after the operands.
+		 * </p>
 		 * 
-		 * <p>Examples:
+		 * <p>
+		 * Examples:
 		 * <ul>
 		 * <li><em>(A B C &)</em></li>
 		 * <li><em>((A B =>) ((A -) B |) <=>)</em></li>
@@ -73,7 +82,7 @@ public class NodeWriter {
 		 */
 		POSTFIX,
 	}
-	
+
 	/** Denotes an unsupported symbol. */
 	public static final String noSymbol = "?";
 	/**
@@ -82,28 +91,28 @@ public class NodeWriter {
 	 * Since they consist of unwieldy Unicode characters, do not use them for editing or serialization;
 	 * in these cases, instead use {@link #textual long} or {@link #shortSymbols short textual symbols} respectively.
 	 */
-	public static final String[] logicalSymbols = new String[] {"\u00AC", "\u2227", "\u2228", "\u21D2", "\u21D4", ", ", "choose", "atleast", "atmost"};
+	public static final String[] logicalSymbols = new String[] { "\u00AC", "\u2227", "\u2228", "\u21D2", "\u21D4", ", ", "choose", "atleast", "atmost" };
 	/**
 	 * Symbols for a long textual representation.
 	 * These are best used for editing by the user due to simplicity and ease of handling.
 	 * Use {@link #logicalSymbols logical symbols} for displaying to the user and {@link #shortSymbols short textual symbols} for serialization.
 	 */
-	public static final String[] textualSymbols = new String[] {"not", "and", "or", "implies", "iff", ", ", "choose", "atleast", "atmost"};
+	public static final String[] textualSymbols = new String[] { "not", "and", "or", "implies", "iff", ", ", "choose", "atleast", "atmost" };
 	/**
 	 * Symbols for a short textual representation.
 	 * Best used for serialization since they fall in the ASCII range but are still relatively short.
 	 * Use {@link #logicalSymbols} for displaying to the user and {@link #textualSymbols long textual symbols} for editing by the user.
 	 */
-	public static final String[] shortSymbols = new String[] {"-", "&", "|", "=>", "<=>", ", ", "choose", "atleast", "atmost"};
+	public static final String[] shortSymbols = new String[] { "-", "&", "|", "=>", "<=>", ", ", "choose", "atleast", "atmost" };
 	/**
 	 * Symbols for a representation like in Java.
 	 * These are inherently incomplete and should only be used if absolutely necessary.
 	 */
-	public static final String[] javaSymbols = new String[] {"!", "&&", "||", noSymbol, "==", ", ", noSymbol, noSymbol, noSymbol};
-	
+	public static final String[] javaSymbols = new String[] { "!", "&&", "||", noSymbol, "==", ", ", noSymbol, noSymbol, noSymbol };
+
 	/** The propositional node to convert. */
 	private final Node root;
-	
+
 	/** The symbols for the operations: not, and, or, implies, iff, separator, choose, atleast, atmost. */
 	private String[] symbols = shortSymbols;
 	/** The notation to use. */
@@ -112,16 +121,18 @@ public class NodeWriter {
 	private boolean enforceBrackets = false;
 	/** If true, this writer will enquote variables if they contain whitespace. */
 	private boolean enquoteWhitespace = false;
-	
+
 	/**
 	 * Constructs a new instance of this class with the given node to transform.
-	 * By default, the set of short symbols and infix notation are used, brackets are only placed if necessary, and variables containing whitespace will not be enquoted.
+	 * By default, the set of short symbols and infix notation are used, brackets are only placed if necessary, and variables containing whitespace will not be
+	 * enquoted.
+	 * 
 	 * @param propositional node to transform; not null
 	 */
 	public NodeWriter(Node root) {
 		this.root = root;
 	}
-	
+
 	/**
 	 * Sets the symbols to use for the operations.
 	 * By index, these are:
@@ -137,6 +148,7 @@ public class NodeWriter {
 	 * <li>{@link AtMost}</li>
 	 * </ol>
 	 * By default, the set of {@link shortSymbols short symbols} is used.
+	 * 
 	 * @param symbols symbols for the operations; not null
 	 * @see #logicalSymbols
 	 * @see #textualSymbols
@@ -146,76 +158,85 @@ public class NodeWriter {
 	public void setSymbols(String[] symbols) {
 		this.symbols = symbols;
 	}
-	
+
 	/**
 	 * Returns the symbols to use for the operations.
+	 * 
 	 * @return the symbols to use for the operations
 	 */
 	protected String[] getSymbols() {
 		return symbols;
 	}
-	
+
 	/**
 	 * Sets the notation to use.
 	 * By default, this is the {@link Notation#INFIX infix} notation.
+	 * 
 	 * @param notation notation to use
 	 */
 	public void setNotation(Notation notation) {
 		this.notation = notation;
 	}
-	
+
 	/**
 	 * Returns the notation to use.
+	 * 
 	 * @return the notation to use
 	 */
 	protected Notation getNotation() {
 		return notation;
 	}
-	
+
 	/**
 	 * Sets the enforcing brackets flag.
-	 * If true, this writer will always place brackets, even if they are semantically irrelevant. 
+	 * If true, this writer will always place brackets, even if they are semantically irrelevant.
+	 * 
 	 * @param enforceBrackets
 	 */
 	public void setEnforceBrackets(boolean enforceBrackets) {
 		this.enforceBrackets = enforceBrackets;
 	}
-	
+
 	/**
 	 * Returns the enforcing brackets flag.
+	 * 
 	 * @return the enforcing brackets flag
 	 */
 	protected boolean isEnforceBrackets() {
 		return enforceBrackets;
 	}
-	
+
 	/**
 	 * Sets the enquoting whitespace flag.
 	 * If true, this writer will enquote variables if they contain whitespace.
+	 * 
 	 * @param enquoteWhitespace
 	 */
 	public void setEnquoteWhitespace(boolean enquoteWhitespace) {
 		this.enquoteWhitespace = enquoteWhitespace;
 	}
-	
+
 	/**
 	 * Returns the enquoting whitespace flag.
+	 * 
 	 * @return the enquoting whitespace flag
 	 */
 	protected boolean isEnquoteWhitespace() {
 		return enquoteWhitespace;
 	}
-	
+
 	/**
 	 * Converts the given node into the specified textual representation.
+	 * 
 	 * @return the textual representation; not null
 	 */
 	public String nodeToString() {
 		return nodeToString(root, null);
 	}
-	
+
 	/**
 	 * Converts a node into the specified textual representation.
+	 * 
 	 * @param node propositional node to convert; not null
 	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
 	 * @return the textual representation; not null
@@ -228,9 +249,7 @@ public class NodeWriter {
 			final Node child = node.children[0];
 			if (child instanceof Literal) {
 				final Literal l = (Literal) child;
-				if (l.positive) {
-					node = new Literal(l.var, !l.positive);
-				}
+				node = new Literal(l.var, !l.positive);
 			}
 		}
 		if (node instanceof Literal) {
@@ -238,9 +257,10 @@ public class NodeWriter {
 		}
 		return operationToString(node, parent);
 	}
-	
+
 	/**
 	 * Converts a literal into the specified textual representation.
+	 * 
 	 * @param l a literal to convert; not null
 	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
 	 * @return the textual representation; not null
@@ -248,97 +268,90 @@ public class NodeWriter {
 	protected String literalToString(Literal l, Class<? extends Node> parent) {
 		String s = variableToString(l.var);
 		if (!l.positive) {
-			String operator = getSymbols()[0];
-			switch (getNotation()) {
-				case INFIX:
-					if (getSymbols() == textualSymbols) {
-						operator += " ";
-					}
-					s = operator + s;
-					break;
-				case PREFIX:
-					s = String.format("(%s %s)", operator, s);
-					break;
-				case POSTFIX:
-					s = String.format("(%s %s)", s, operator);
-					break;
-				default:
-					throw new IllegalStateException("Unknown notation");
+			final Notation notation = getNotation();
+			switch (notation) {
+			case INFIX:
+				return getSymbols()[0] + ((getSymbols() == textualSymbols) ? " " : "") + s;
+			case PREFIX:
+				return String.format("(%s %s)", getSymbols()[0], s);
+			case POSTFIX:
+				return String.format("(%s %s)", s, getSymbols()[0]);
+			default:
+				throw new IllegalStateException("Unknown notation: " + notation);
 			}
 		}
 		return s;
 	}
-	
+
 	/**
 	 * Converts a variable into the specified textual representation.
+	 * 
 	 * @param variable a variable to convert; not null
 	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
 	 * @return the textual representation; not null
 	 */
 	protected String variableToString(Object variable) {
-		String s = String.valueOf(variable);
-		if (isEnquoteWhitespace() && containsWhitespace(s)) {
-			s = '"' + s + '"';
-		}
-		return s;
+		final String s = String.valueOf(variable);
+		return (isEnquoteWhitespace() && (containsWhitespace(s) || equalsSymbol(s))) ? '"' + s + '"' : s;
 	}
-	
+
 	/**
 	 * Converts an operation (i.e. a node that is not a literal) into the specified textual representation.
+	 * 
 	 * @param node an operation to convert; not null
 	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
 	 * @return the textual representation; not null
 	 */
 	protected String operationToString(Node node, Class<? extends Node> parent) {
 		final Node[] children = node.getChildren();
-		
+
 		final String[] operands = new String[children.length];
-		for (int i = 0; i < children.length; i++)
+		for (int i = 0; i < children.length; i++) {
 			operands[i] = nodeToString(children[i], node.getClass());
-		
-		String operator = getOperator(node);
-		String s;
-		String allOperands;
-		switch (getNotation()) {
-			case INFIX:
-				if (isInfixCompatibleOperation(node)) {
-					s = String.join(" " + operator + " ", operands);
-					final int orderParent;
-					final int orderChild;
-					final boolean writeBrackets = isEnforceBrackets()
-							|| (orderParent = getOrder(parent)) > (orderChild = getOrder(node.getClass()))
-							|| orderParent == orderChild && orderParent == getOrder(Implies.class);
-					if (writeBrackets) {
-						s = "(" + s + ")";
-					}
-				} else {
-					allOperands = String.join(getSymbols()[5], operands);
-					if (node instanceof Not && getSymbols() == textualSymbols) {
-						operator += " ";
-					}
-					s = String.format("%s(%s)", operator, allOperands);
-				}
-				break;
-			case PREFIX:
-				allOperands = String.join(" ", operands);
-				s = String.format("(%s %s)", operator, allOperands);
-				break;
-			case POSTFIX:
-				allOperands = String.join(" ", operands);
-				s = String.format("(%s %s)", allOperands, operator);
-				break;
-			default:
-				throw new IllegalStateException("Unknown notation");
 		}
-		return s;
+
+		final String operator = getOperator(node);
+		final Notation notation = getNotation();
+		switch (notation) {
+		case INFIX:
+			if (isInfixCompatibleOperation(node)) {
+				final String s = join(" " + operator + " ", operands);
+				final int orderParent;
+				final int orderChild;
+				return (isEnforceBrackets() || ((orderParent = getOrder(parent)) > (orderChild = getOrder(node.getClass())))
+						|| (orderParent == orderChild && orderParent == getOrder(Implies.class))) ? "(" + s + ")" : s;
+			} else {
+				return String.format("%s(%s)", operator + ((node instanceof Not && getSymbols() == textualSymbols) ? " " : ""),
+						join(getSymbols()[5], operands));
+			}
+		case PREFIX:
+			return String.format("(%s %s)", operator, join(" ", operands));
+		case POSTFIX:
+			return String.format("(%s %s)", join(" ", operands), operator);
+		default:
+			throw new IllegalStateException("Unknown notation: " + notation);
+		}
 	}
-	
+
+	private String join(String separator, String... strings) {
+		if (strings.length > 0) {
+			final StringBuilder sb = new StringBuilder(strings[0]);
+			for (int i = 1; i < strings.length; i++) {
+				sb.append(separator);
+				sb.append(strings[i]);
+			}
+			return sb.toString();
+		}
+		return "";
+	}
+
 	/**
 	 * Returns true iff the given operation can be written in infix notation.
 	 * For example, this is true for operations such as {@link And},
 	 * which can be written as <em>A and B</em> instead of <em>and(A, B)</em>.
 	 * By contrast, this is false for unary operations (i.e. {@link Not}).
 	 * This is also false for {@link Choose}, {@link AtLeast} and {@link AtMost}.
+	 * 
 	 * @param node operation in question
 	 * @return true iff the given operation can be written in infix notation
 	 */
@@ -348,10 +361,11 @@ public class NodeWriter {
 				|| node instanceof Implies
 				|| node instanceof Equals;
 	}
-	
+
 	/**
 	 * Assigns a number to every type of node.
 	 * For instance, that {@link And} has a higher order than {@link Or} means that <em>(A and B or C)</em> is equal to <em>((A and B) or C)</em>.
+	 * 
 	 * @param nodeClass type of node; not null
 	 * @return the order assigned to the type of node
 	 * @throws IllegalArgumentException if the node type is not recognized
@@ -373,9 +387,10 @@ public class NodeWriter {
 			return 5;
 		throw new IllegalArgumentException("Unrecognized node type: " + nodeClass);
 	}
-	
+
 	/**
 	 * Returns the operator for the given node.
+	 * 
 	 * @param node an operation; not null
 	 * @return the operator
 	 * @throws IllegalArgumentException if the node type is not recognized
@@ -399,15 +414,26 @@ public class NodeWriter {
 			return getSymbols()[8] + ((AtMost) node).max;
 		throw new IllegalArgumentException("Unrecognized node type: " + node.getClass());
 	}
-	
+
 	/**
 	 * Returns true iff the given string contains a whitespace character.
+	 * 
 	 * @param s string potentially containing whitespace; not null
 	 * @return whether the string contains whitespace
 	 */
 	private static boolean containsWhitespace(String s) {
-		for (int i = 0; i < s.length(); i++) {
-			if (Character.isWhitespace(s.codePointAt(i))) {
+		return s.matches(".*?\\s+.*");
+	}
+
+	/**
+	 * Returns true iff the given string equals one of the symbols.
+	 * 
+	 * @param s string potentially equaling a symbol; not null
+	 * @return whether the string equals one of the symbols
+	 */
+	private boolean equalsSymbol(String s) {
+		for (final String symbol : getSymbols()) {
+			if (s.equalsIgnoreCase(symbol)) {
 				return true;
 			}
 		}
