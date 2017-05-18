@@ -38,104 +38,79 @@ import org.prop4j.Or;
  * @author Timo Guenther
  */
 public class DimacsWriterTests {
+
+	private static String lineSeparator = System.lineSeparator();
+
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
-	
+
 	@Test
 	public void testSimple() {
-		testEquals(new And(
-				new Or("A", new Literal("B", false)),
-				new Or("C", "B", new Literal("A", false)))
-		);
+		testEquals(new And(new Or("A", new Literal("B", false)), new Or("C", "B", new Literal("A", false))));
 	}
-	
+
 	@Test
 	public void testVariablesFoo() {
-		testEquals(new And(
-				new Or("Foo", new Literal("Bar", false)),
-				new Or("Baz", "Bar", new Literal("Foo", false)))
-		);
+		testEquals(new And(new Or("Foo", new Literal("Bar", false)), new Or("Baz", "Bar", new Literal("Foo", false))));
 	}
-	
+
 	@Test
 	public void testVariablesNumbersStrings() {
-		testEquals(new And(
-				new Or("1", new Literal("2", false)),
-				new Or("3", "2", new Literal("1", false)))
-		);
+		testEquals(new And(new Or("1", new Literal("2", false)), new Or("3", "2", new Literal("1", false))));
 	}
-	
+
 	@Test
 	public void testVariablesNumbersIntegers() {
-		testEquals(new And(
-				new Or(1, new Literal(2, false)),
-				new Or(3, 2, new Literal(1, false)))
-		);
+		testEquals(new And(new Or(1, new Literal(2, false)), new Or(3, 2, new Literal(1, false))));
 	}
-	
+
 	@Test
 	public void testAnd() {
-		testEquals(new And("A", new Literal("B", false))
-				, ""
-						+ "p cnf 2 2\n"
-						+ "1 0\n"
-						+ "-2 0\n"
-		);
+		testEquals(new And("A", new Literal("B", false)), "" + "p cnf 2 2" + lineSeparator + "1 0" + lineSeparator + "-2 0" + lineSeparator);
 	}
-	
+
 	@Test
 	public void testOr() {
-		testEquals(new Or(new Literal("A", false), "B")
-				, ""
-						+ "p cnf 2 1\n"
-						+ "-1 2 0\n"
-		);
+		testEquals(new Or(new Literal("A", false), "B"), "" + "p cnf 2 1" + lineSeparator + "-1 2 0" + lineSeparator);
 	}
-	
+
 	@Test
 	public void testNotLiteral() {
-		testEquals(new Literal("A", false)
-				, ""
-						+ "p cnf 1 1\n"
-						+ "-1 0\n"
-		);
+		testEquals(new Literal("A", false), "" + "p cnf 1 1" + lineSeparator + "-1 0" + lineSeparator);
 	}
-	
+
 	@Test
 	public void testNotNode() {
 		final Node in = new Not("A");
 		exception.expect(IllegalArgumentException.class);
 		new DimacsWriter(in);
 	}
-	
+
 	@Test
 	public void testImplies() {
 		final Node in = new Implies("A", "B");
 		exception.expect(IllegalArgumentException.class);
 		new DimacsWriter(in);
 	}
-	
+
 	@Test
 	public void testNull() {
 		final Node in = null;
 		exception.expect(IllegalArgumentException.class);
 		new DimacsWriter(in);
 	}
-	
+
 	private void testEquals(Node in) {
 		testEquals(in, getDefaultExpected());
 	}
-	
+
 	private void testEquals(Node in, String expected) {
 		final DimacsWriter w = new DimacsWriter(in);
 		final String actual = w.write();
 		assertEquals(expected, actual);
 	}
-	
+
 	private String getDefaultExpected() {
-		return ""
-				+ "p cnf 3 2\n"
-				+ "1 -2 0\n"
-				+ "3 2 -1 0\n";
+		return "" + "p cnf 3 2" + lineSeparator + "1 -2 0" + lineSeparator + "3 2 -1 0" + lineSeparator;
 	}
 }
