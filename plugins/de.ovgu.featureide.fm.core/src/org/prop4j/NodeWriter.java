@@ -333,18 +333,6 @@ public class NodeWriter {
 		}
 	}
 
-	private String join(String separator, String... strings) {
-		if (strings.length > 0) {
-			final StringBuilder sb = new StringBuilder(strings[0]);
-			for (int i = 1; i < strings.length; i++) {
-				sb.append(separator);
-				sb.append(strings[i]);
-			}
-			return sb.toString();
-		}
-		return "";
-	}
-
 	/**
 	 * Returns true iff the given operation can be written in infix notation.
 	 * For example, this is true for operations such as {@link And},
@@ -416,16 +404,6 @@ public class NodeWriter {
 	}
 
 	/**
-	 * Returns true iff the given string contains a whitespace character.
-	 * 
-	 * @param s string potentially containing whitespace; not null
-	 * @return whether the string contains whitespace
-	 */
-	private static boolean containsWhitespace(String s) {
-		return s.matches(".*?\\s+.*");
-	}
-
-	/**
 	 * Returns true iff the given string equals one of the symbols.
 	 * 
 	 * @param s string potentially equaling a symbol; not null
@@ -438,5 +416,34 @@ public class NodeWriter {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Returns true iff the given string contains a whitespace character.
+	 * 
+	 * @param s string potentially containing whitespace; not null
+	 * @return whether the string contains whitespace
+	 */
+	private static boolean containsWhitespace(String s) {
+		return s.matches(".*?\\s+.*");
+	}
+
+	/**
+	 * Returns the given strings concatenated with the given separator.
+	 * 
+	 * @param separator string to insert between the given strings
+	 * @param strings strings to join
+	 * @return the given strings concatenated with the given separator
+	 */
+	private static String join(String separator, String... strings) {
+		if (strings.length > 0) {
+			final StringBuilder sb = new StringBuilder(strings[0]);
+			for (int i = 1; i < strings.length; i++) {
+				sb.append(separator);
+				sb.append(strings[i]);
+			}
+			return sb.toString();
+		}
+		return "";
 	}
 }
