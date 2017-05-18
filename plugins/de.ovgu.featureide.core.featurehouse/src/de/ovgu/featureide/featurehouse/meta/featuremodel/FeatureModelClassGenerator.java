@@ -66,6 +66,10 @@ public class FeatureModelClassGenerator {
 			featureModelClass = new FeatureModelJPFCore(featureModel);
 		} else if (method.equals(IFeatureProject.META_VAREXJ)) {
 			featureModelClass = new FeatureModelVarexJ(featureModel);
+		} else if (method.equals(IFeatureProject.META_ASMETAL)) {
+			featureModelClass = new FeatureModelAsmetaL(featureModel);
+			printAsmetaLModel();
+			return;
 		} else {
 			return;
 		}
@@ -86,14 +90,24 @@ public class FeatureModelClassGenerator {
 			featureModelClass = new FeatureModelJPFCore(featureProject.getFeatureModel());
 		} else if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_VAREXJ)) {
 			featureModelClass = new FeatureModelVarexJ(featureProject.getFeatureModel());
+		} else if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_ASMETAL)) {
+			featureModelClass = new FeatureModelAsmetaL(featureProject.getFeatureModel());
 		} else {
 			return;
 		}	
-		printModel();
+		if (!featureProject.getMetaProductGeneration().equals(IFeatureProject.META_ASMETAL)) {
+						printModel();
+					} else {
+						printAsmetaLModel();
+					}
 		IFolder FMFolder = featureProject.getBuildFolder().getFolder("FM");
 		try {
 			FMFolder.create(true, true, null);
-			saveToFile(FMFolder.getFile("FeatureModel.java"));
+			if (!featureProject.getMetaProductGeneration().equals(IFeatureProject.META_ASMETAL)) {
+								saveToFile(FMFolder.getFile("FeatureModel.java"));
+							} else {
+								saveToFile(FMFolder.getFile("FeatureModel.asm"));
+							}
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
@@ -136,5 +150,25 @@ public class FeatureModelClassGenerator {
 		stringBuilder.append(featureModelClass.getSelection());
 		stringBuilder.append(NEWLINE);
 		stringBuilder.append("}");
+	}
+	
+	/**
+	 * Fills the {@link StringBuilder} with the file content.
+	 */
+	private void printAsmetaLModel() {
+		stringBuilder.append(featureModelClass.getHead());
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append(featureModelClass.getImports());
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append("signature:\r\n");
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append(featureModelClass.getFeatureFields());
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append("definitions:\r\n");
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append(featureModelClass.getFormula());
+		stringBuilder.append(featureModelClass.getGetter());
+		stringBuilder.append(featureModelClass.getSelection());
 	}
 }

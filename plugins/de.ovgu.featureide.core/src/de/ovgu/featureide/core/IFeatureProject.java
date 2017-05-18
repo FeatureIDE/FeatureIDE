@@ -60,12 +60,14 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	String DEFAULT_CONTRACT_COMPOSITION= "None";
 	
 	// TODO revise with enum
+	// TODO ASM META
 	String META_THEOREM_PROVING = THEOREM_PROVING;
 	String META_MODEL_CHECKING = "Model Checking (JPF-core)";
 	String META_MODEL_CHECKING_BDD_JAVA_JML = "Model Checking (JPF-BDD Java JML)";
 	String META_VAREXJ = VARIABILITY_AWARE_TESTING;
 	String META_MODEL_CHECKING_BDD_JAVA = "Model Checking (JPF-BDD Java)";
 	String META_MODEL_CHECKING_BDD_C = "Model Checking (JPF-BDD C)";
+	String META_ASMETAL = "Meta Model for ASMetaL";
 	
 	String DEFAULT_COMPOSITION_MECHANISM = "Mixin";
 	QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");

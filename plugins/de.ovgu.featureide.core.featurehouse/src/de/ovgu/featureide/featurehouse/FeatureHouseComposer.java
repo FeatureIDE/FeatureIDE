@@ -392,6 +392,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				buildDefaultMetaProduct(configPath, basePath, outputPath);
 			} else if (IFeatureProject.META_MODEL_CHECKING_BDD_C.equals(featureProject.getMetaProductGeneration())) {
 				buildBDDMetaProduct(configPath, basePath, outputPath, "c");
+			} else if (IFeatureProject.META_ASMETAL.equals(featureProject.getMetaProductGeneration())) {
+				// TODO ASM META
+				System.out.println("ASM "+outputPath);
+				buildDefaultMetaProduct(configPath, basePath, outputPath);
 			} else {
 				buildDefaultMetaProduct(configPath, basePath, outputPath);
 			}
@@ -585,7 +589,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private void buildDefaultMetaProduct(final String configPath, final String basePath, final String outputPath) {
 		new FeatureModelClassGenerator(featureProject);
 		FSTGenComposerExtension.key = IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration()) || IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML.equals(featureProject.getMetaProductGeneration())
-				|| IFeatureProject.META_VAREXJ.equals(featureProject.getMetaProductGeneration());
+				|| IFeatureProject.META_VAREXJ.equals(featureProject.getMetaProductGeneration()) || IFeatureProject.META_ASMETAL.equals(featureProject.getMetaProductGeneration());
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addCompositionErrorListener(compositionErrorListener);
@@ -891,8 +895,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath, 
 				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath, 
 				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
-				CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, contract,
-				CmdLineInterpreter.INPUT_OPTION_NO_CONFIG_OUTPUT_DIR};
+				CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, contract};
 	}
 
 	private String getContractParameter() {
@@ -963,25 +966,25 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
-		super.postCompile(delta, file);
-		
-		try {
-			if (!file.getWorkspace().isTreeLocked()) {
-				file.refreshLocal(IResource.DEPTH_ZERO, null);
-			}
-			if (errorPropagation == null) {
-				errorPropagation = ErrorPropagation.createErrorPropagation(file);
-			}
-			if (delta == null) {
-				errorPropagation.force = true;
-			}			
-			if (errorPropagation != null) {
-				errorPropagation.addFile(file);
-			}
-		} catch (CoreException e) {
-			LOGGER.logError(e);
-		}
-	}
+		super.postCompile(delta, file);}
+//		
+//		try {
+//			if (!file.getWorkspace().isTreeLocked()) {
+//				file.refreshLocal(IResource.DEPTH_ZERO, null);
+//			}
+//			if (errorPropagation == null) {
+//				errorPropagation = ErrorPropagation.createErrorPropagation(file);
+//			}
+//			if (delta == null) {
+//				errorPropagation.force = true;
+//			}			
+//			if (errorPropagation != null) {
+//				errorPropagation.addFile(file);
+//			}
+//		} catch (CoreException e) {
+//			LOGGER.logError(e);
+//		}
+//	}
 
 	@Override
 	public int getDefaultTemplateIndex() {
