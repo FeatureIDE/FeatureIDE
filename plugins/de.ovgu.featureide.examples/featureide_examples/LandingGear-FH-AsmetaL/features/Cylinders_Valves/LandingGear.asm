@@ -1,7 +1,8 @@
 asm LandingGear
 
-signature:
 
+
+signature:
 	enum domain CylinderStatus = {CYLINDER_RETRACTED | CYLINDER_EXTENDING | CYLINDER_EXTENDED | CYLINDER_RETRACTING}
 
 	derived cylindersDoors: CylinderStatus
@@ -13,11 +14,6 @@ signature:
 	dynamic controlled retractGearsElectroValve: Boolean
 	dynamic controlled extendGearsElectroValve: Boolean
 
-	derived gearsExtended: Boolean
-	derived gearsRetracted: Boolean
-	derived doorsClosed: Boolean
-	derived doorsOpen: Boolean
-	derived gearsShockAbsorber: Boolean
 
 definitions:
 	function cylindersDoors =
@@ -44,8 +40,9 @@ definitions:
 				CYLINDER_RETRACTING
 		endswitch
 
-	rule r_closeDoor =
-		/*@extend_original#doors*/ switch doors
+rule r_closeDoor =
+	/*@extend_original#doors*/ switch doors /*@extendable#doors*/
+
 			case OPEN:
 				par
 					closeDoorsElectroValve := true
@@ -53,7 +50,8 @@ definitions:
 				endpar
 			case CLOSING:
 				par
-					generalElectroValve := false //quando si chiude la porta vuol dire che una manovra è terminata. quindi si può spegnere la valvola generale
+
+					generalElectroValve := false
 					closeDoorsElectroValve := false
 					@original#doors
 				endpar
@@ -64,13 +62,15 @@ definitions:
 					@original#doors
 				endpar
 		endswitch
+ 
 
-	rule r_retractionSequence =
+rule r_retractionSequence =
 		if gears != RETRACTED then
-			/*@extend_original#doors*/ switch doors
+
+			/*@extend_original#doors*/ switch doors /*@extendable#doors*/
 				case CLOSED:
 					par
-						generalElectroValve := true //si apre la valvola generale quando la porta è chiusa con le ruote estese (e si riceve il segnale UP)
+						generalElectroValve := true
 						openDoorsElectroValve := true
 						@original#doors
 					endpar
@@ -85,36 +85,40 @@ definitions:
 						openDoorsElectroValve := false
 						@original#doors
 					endpar
-				case OPEN:
-					/*@extend_original#gears*/ switch gears
+	
+			endswitch
+		else
+			r_closeDoor[]
+		endif
+
+rule r_outgoingSequenceGears =
+
+	/*@extend_original#gearso*/ switch gears /*@extendable#gearso*/
 						case EXTENDED:
 							par
 								retractGearsElectroValve := true
-								@original#gears
+								@original#gearso
 							endpar
 						case RETRACTING:
 							par
 								retractGearsElectroValve := false
-								@original#gears
+								@original#gearso
 							endpar
 						case EXTENDING:
 							par
 								extendGearsElectroValve := false
 								retractGearsElectroValve := true
-								@original#gears
+								@original#gearso
 							endpar
 					endswitch
-			endswitch
-		else
-			r_closeDoor[]
-		endif
+
 
 	rule r_outgoingSequence =
 		if gears != EXTENDED then
-			/*@extend_original#doors*/ switch doors
+			/*@extend_original#doors*/ switch doors /*@extendable#doors*/
 				case CLOSED:
 					par
-						generalElectroValve := true //si apre la valvola generale quando la porta è chiusa con le ruote retratte (e si riceve il segnale DOWN)
+						generalElectroValve := true
 						openDoorsElectroValve := true
 						@original#doors
 					endpar
@@ -129,33 +133,34 @@ definitions:
 						openDoorsElectroValve := true
 						@original#doors
 					endpar
-				case OPEN:
-					/*@extend_original#gears*/ switch gears
-						case RETRACTED:
-							par
-								extendGearsElectroValve := true
-								@original#gears
-							endpar
-						case EXTENDING:
-							par
-								extendGearsElectroValve := false
-								@original#gears
-							endpar
-						case RETRACTING:
-							par
-								extendGearsElectroValve := true
-								retractGearsElectroValve := false
-								@original#gears
-							endpar
-					endswitch
+
 			endswitch
 		else
 			r_closeDoor[]
 		endif
 
+	CTLSPEC ag(generalElectroValve implies ef(not(generalElectroValve)))
+	//R31
+	CTLSPEC ag((extendGearsElectroValve or retractGearsElectroValve) implies doors = OPEN)
+	LTLSPEC g((extendGearsElectroValve or retractGearsElectroValve) implies doors = OPEN)
+	//R32
+	CTLSPEC ag((openDoorsElectroValve or closeDoorsElectroValve) implies (gears = RETRACTED or gears = EXTENDED))
+	LTLSPEC g((openDoorsElectroValve or closeDoorsElectroValve) implies (gears = RETRACTED or gears = EXTENDED))
+	//R41
+	CTLSPEC ag(not(openDoorsElectroValve and closeDoorsElectroValve))
+	LTLSPEC g(not(openDoorsElectroValve and closeDoorsElectroValve))
+	//R42
+	CTLSPEC ag(not(extendGearsElectroValve and retractGearsElectroValve))
+	LTLSPEC g(not(extendGearsElectroValve and retractGearsElectroValve))
+	//R51
+	CTLSPEC ag((openDoorsElectroValve or closeDoorsElectroValve or extendGearsElectroValve or retractGearsElectroValve) implies generalElectroValve)
+	LTLSPEC g((openDoorsElectroValve or closeDoorsElectroValve or extendGearsElectroValve or retractGearsElectroValve) implies generalElectroValve)
+	
+	
+
 default init s0:
-	@original()
-	function generalElectroValve = false
+		@original()
+		function generalElectroValve = false
 	function extendGearsElectroValve = false
 	function retractGearsElectroValve = false
 	function openDoorsElectroValve = false

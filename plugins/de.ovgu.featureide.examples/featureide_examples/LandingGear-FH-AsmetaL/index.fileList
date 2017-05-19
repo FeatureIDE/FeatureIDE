@@ -9,4 +9,7 @@ features/Landing_Sets/LandingGear.asm
 features/Sensors/LandingGear.asm
 features/Sensors_v2/LandingGear.asm
 model.xml
-StandardLibrary.asm
+STDL/StandardLibrary.asm
+STDL/LTLlibrary.asm
+STDL/MAPEpatterns.asm
+STDL/CTLLibrary.asm
