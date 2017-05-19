@@ -29,67 +29,73 @@ import org.eclipse.jface.viewers.Viewer;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * ContentProvider for the tree ConfigurationMap 
+ * ContentProvider for the tree ConfigurationMap
  * 
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
 public class ConfigurationMapTreeContentProvider implements ITreeContentProvider, IConfigurationMapFilterable {
 
+	private static final Object[] emptyRoot = new Object[] { StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT };
+
 	private IFeatureProject featureProject;
-	private Object[] featureRoots;
+	private Object[] featureRoots = emptyRoot;
 
 	private ConfigurationMap configurationMap;
-	private List<IConfigurationMapFilter> filters;
 
 	public ConfigurationMapTreeContentProvider(ConfigurationMap configurationMap) {
 		this.configurationMap = configurationMap;
-		this.filters = new ArrayList<>();
 	}
 
 	@Override
 	public boolean addFilter(IConfigurationMapFilter filter) {
-		if (this.filters.add(filter)) {
-			filter.initialize(this.configurationMap);
-			updateElements();
-			return true;
+		if (featureProject != null) {
+			if (configurationMap.getFilters().add(filter)) {
+				filter.initialize(this.configurationMap);
+				updateElements();
+				return true;
+			}
 		}
-		
 		return false;
 	}
 
 	@Override
 	public boolean removeFilter(IConfigurationMapFilter filter) {
-		if (this.filters.remove(filter)) {
-			updateElements();
-			return true;
+		if (featureProject != null) {
+			if (configurationMap.getFilters().remove(filter)) {
+				updateElements();
+				return true;
+			}
 		}
-		
+
 		return false;
 	}
 
 	@Override
 	public boolean hasFilter(IConfigurationMapFilter filter) {
-		return this.filters.contains(filter);
+		return configurationMap.getFilters().contains(filter);
 	}
 
-	/**
-	 * @param featureProject
-	 */
 	public void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
 			this.featureProject = featureProject;
-			for (IConfigurationMapFilter filter : this.filters)
-				filter.initialize(this.configurationMap);
+			if (featureProject != null) {
+				for (IConfigurationMapFilter filter : configurationMap.getFilters()) {
+					filter.initialize(this.configurationMap);
+				}
+			}
 			updateElements();
 		}
 	}
 
 	public void updateElements() {
-		if (featureProject == null)
+		if (featureProject == null) {
+			featureRoots = emptyRoot;
 			return;
+		}
 
 		List<Object> featureRootList = new ArrayList<>();
 
@@ -100,7 +106,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 				featureRootList.add(feature);
 
 		featureRoots = featureRootList.toArray();
-		
+
 		this.configurationMap.updateTree();
 	}
 
@@ -164,9 +170,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 			IFeature feature = (IFeature) element;
 			IFeatureStructure parentStructure = feature.getStructure().getParent();
 			if (parentStructure != null) {
-				IFeature parent = parentStructure.getFeature();
-				if (filter(parent))
-					return parent;
+				return filter(parentStructure.getFeature());
 			}
 		}
 		return null;
@@ -189,11 +193,8 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 			IFeature f = (IFeature) element;
 
 			for (IFeatureStructure childStruct : f.getStructure().getChildren()) {
-				IFeature child = childStruct.getFeature();
-
 				// If at least one child is valid, the feature has children.
-				if (filter(child))
-					return true;
+				return filter(childStruct.getFeature());
 			}
 		}
 
@@ -202,7 +203,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 
 	private boolean filter(IFeature feature) {
 		// OR
-		for (IConfigurationMapFilter filter : filters) {
+		for (IConfigurationMapFilter filter : configurationMap.getFilters()) {
 			if (filter.test(this.configurationMap, feature))
 				return true;
 		}
@@ -210,17 +211,12 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-	 */
 	@Override
 	public void dispose() {
 	}
+
 }

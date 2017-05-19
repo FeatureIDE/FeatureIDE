@@ -33,6 +33,8 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.VirtualFileManager;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -101,8 +103,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	private void insertFeatureModel(Composite comp) {
 		FeatureModelAnalyzer analyzer = subtreeModel.getAnalyser();
 
-		FeatureModelEditor modeleditor = new FeatureModelEditor();
-		modeleditor.setFeatureModel(subtreeModel);
+		FeatureModelEditor modeleditor = new FeatureModelEditor(new VirtualFileManager<IFeatureModel>(subtreeModel, new XmlFeatureModelFormat()));
 		FeatureDiagramEditor diagramEditor = new FeatureDiagramEditor(modeleditor, comp, subtreeModel);
 		subtreeModel.addListener(diagramEditor);
 

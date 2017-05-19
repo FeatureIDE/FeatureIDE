@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.Node;
@@ -33,9 +32,9 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
  * 
  * @author Sebastian Krieter
  */
-public interface IConfigurationPropagator {
 
-	LongRunningMethod<LinkedList<List<String>>> getSolutions(int max) throws TimeoutException;
+public interface IConfigurationPropagator {
+	LongRunningMethod<List<List<String>>> getSolutions(int max) throws TimeoutException;
 
 	/**
 	 * Checks that all manual and automatic selections are valid.<br>
@@ -71,7 +70,9 @@ public interface IConfigurationPropagator {
 	 */
 	LongRunningMethod<Long> number(long timeout);
 
-	LongRunningMethod<List<String>> update(boolean redundantManual, String startFeatureName);
+	LongRunningMethod<Void> update(boolean redundantManual, List<SelectableFeature> featureOrder);
+	LongRunningMethod<Void> update(boolean redundantManual);
+	LongRunningMethod<Void> update();
 	
 	LongRunningMethod<List<Node>> findOpenClauses(List<SelectableFeature> featureList);
 

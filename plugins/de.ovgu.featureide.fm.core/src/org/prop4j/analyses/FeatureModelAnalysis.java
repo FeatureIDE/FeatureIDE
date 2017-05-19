@@ -21,13 +21,11 @@
 package org.prop4j.analyses;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.prop4j.Equals;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
@@ -39,15 +37,12 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
@@ -101,14 +96,12 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	private final List<IFeature> falseOptionalFeatures;
 
 	private final IFeatureModel fm;
-	private final IFeatureModelFactory factory;
 	private final AdvancedNodeCreator nodeCreator;
 
 	private IMonitor monitor = new NullMonitor();
 
 	public FeatureModelAnalysis(IFeatureModel fm) {
 		this.fm = fm;
-		this.factory = FMFactoryManager.getFactory(fm);
 
 		deadFeatures = new ArrayList<>();
 		coreFeatures = new ArrayList<>();
@@ -513,68 +506,21 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		if (!fm.getStructure().hasHidden()) {
 			return;
 		}
-		/**
-		 * First every relevant constraint of every hidden feature is checked if its form equals
-		 * HIDDEN_FEATURE <=> A
-		 * where A is an expression containing only non hidden features
-		 * If there is a constraint of that kind for a hidden feature it is added to a list.
-		 */
-		Collection<IFeature> list = new LinkedList<>();
-		Collection<IFeature> hiddenFeatures = Functional.toList(Functional.filter(features, new HiddenFeatureFilter()));
-		for (IFeature feature : hiddenFeatures) {
-			monitor.checkCancel();
-			for (IConstraint constraint : feature.getStructure().getRelevantConstraints()) {
-				Node node = constraint.getNode();
-				if (node instanceof Equals) {
-					Node[] children = node.getChildren();
-					Node leftChild = children[0];
-					Node rightChild = children[1];
-					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint rightConstraint = factory.createConstraint(fm, rightChild);
-						rightConstraint.setContainedFeatures();
-						if (!rightConstraint.hasHiddenFeatures()) {
-							list.add(feature);
-							break;
-						}
-					}
-					if (rightChild instanceof Literal && ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint leftConstraint = factory.createConstraint(fm, leftChild);
-						leftConstraint.setContainedFeatures();
-						if (!leftConstraint.hasHiddenFeatures()) {
-							list.add(feature);
-							break;
-						}
-					}
-				}
-			}
-		}
 
-		/**
-		 * Additionally each Node is checked if the atomic set containing it, consists of indeterminate hidden nodes only.
-		 * If this is the case it's also indeterminate.
-		 * A node is therefore not marked indeterminate if it either
-		 * - has a non-hidden Node in its atomic set defining its state or
-		 * - if a Node of its atomic set is determined by a constraint of the above form.
-		 */
-		FeatureDependencies featureDependencies = new FeatureDependencies(fm, false);
-		for (IFeature feature : hiddenFeatures) {
-			monitor.checkCancel();
-			if (!list.contains(feature)) {
-				Collection<IFeature> set = featureDependencies.getImpliedFeatures(feature);
-				boolean noHidden = false;
-				for (IFeature f : set) {
-					if (!f.getStructure().isHidden() && !f.getStructure().hasHiddenParent() || list.contains(f)) {
-						if (featureDependencies.isAlways(f, feature)) {
-							noHidden = true;
-							break;
-						}
-					}
-				}
+		nodeCreator.setModelType(ModelType.All);
+		final SatInstance si = new SatInstance(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 
-				if (!noHidden) {
-					setFeatureAttribute(feature, FeatureStatus.INDETERMINATE_HIDDEN);
-				}
+		final Iterable<IFeature> hiddenFeatures = Functional.filter(features, new HiddenFeatureFilter());
+		List<String> hiddenLiterals = Functional.toList(Functional.map(hiddenFeatures, new Functional.IFunction<IFeature, String>() {
+			@Override
+			public String invoke(IFeature feature) {
+				return feature.getName();
 			}
+		}));
+		
+		final int[] determinedHidden = LongRunningWrapper.runMethod(new IndeterminedAnalysis(si, hiddenLiterals));
+		for (int feature : determinedHidden) {
+			setFeatureAttribute(fm.getFeature(si.getVariableObject(feature).toString()), FeatureStatus.INDETERMINATE_HIDDEN);
 		}
 	}
 

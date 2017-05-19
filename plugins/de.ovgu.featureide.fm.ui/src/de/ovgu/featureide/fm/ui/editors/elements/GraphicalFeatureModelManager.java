@@ -41,7 +41,6 @@ public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeature
 
 	public static GraphicalFeatureModelManager getInstance(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {
 		final GraphicalFeatureModelManager manager = FileManagerMap.getInstance(model, absolutePath, format, GraphicalFeatureModelManager.class, IGraphicalFeatureModel.class);
-		manager.read();
 		return manager;
 	}
 

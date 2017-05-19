@@ -122,7 +122,7 @@ public class DefaultFormat implements IConfigurationFormat {
 			return warnings;
 		}
 		configuration.setPropagate(orgPropagate);
-		configuration.update();
+		configuration.update(true, null);
 		return warnings;
 	}
 

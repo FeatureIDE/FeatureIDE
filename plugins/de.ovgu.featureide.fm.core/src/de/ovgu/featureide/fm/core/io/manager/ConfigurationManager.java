@@ -49,7 +49,6 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 	public static ConfigurationManager getInstance(Configuration configuration, String absolutePath, IPersistentFormat<Configuration> format) {
 		final ConfigurationManager instance = FileManagerMap.getInstance(configuration, absolutePath, format, ConfigurationManager.class, Configuration.class);
-		instance.read();
 		return instance;
 	}
 
@@ -64,7 +63,9 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 	public void setConfiguration(Configuration configuration) {
 		variableObject = configuration;
-		persist();
+		synchronized (syncObject) {
+			persistentObject = copyObject(variableObject);
+		}
 	}
 
 }

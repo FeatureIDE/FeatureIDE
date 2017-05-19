@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public abstract class FileManagerMap {
 
-	private static final Map<String, IFileManager> map = new HashMap<>();
+	private static final Map<String, IFileManager<?>> map = new HashMap<>();
 
 	public static String constructExtraPath(String path, IPersistentFormat<?> format) throws IllegalArgumentException {
 		final Path mainPath = Paths.get(path).toAbsolutePath();
@@ -80,7 +80,7 @@ public abstract class FileManagerMap {
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
 	 */
 	@CheckForNull
-	public static IFileManager getFileManager(String path) {
+	public static IFileManager<?> getFileManager(String path) {
 		return map.get(constructAbsolutePath(path));
 	}
 
@@ -111,7 +111,7 @@ public abstract class FileManagerMap {
 
 	public static <T, R extends AFileManager<T>> R getInstance(T object, String path, IPersistentFormat<T> format, Class<R> c, Class<T> t) {
 		final String absolutePath = constructAbsolutePath(path);
-		final IFileManager manager = map.get(absolutePath);
+		final IFileManager<?> manager = map.get(absolutePath);
 		if (manager != null) {
 			return c.cast(manager);
 		} else {
@@ -128,7 +128,7 @@ public abstract class FileManagerMap {
 		}
 	}
 
-	public static IFileManager remove(String path) {
+	public static IFileManager<?> remove(String path) {
 		return map.remove(constructAbsolutePath(path));
 	}
 

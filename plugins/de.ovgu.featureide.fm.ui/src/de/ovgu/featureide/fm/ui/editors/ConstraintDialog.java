@@ -97,8 +97,8 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
+import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Constraints;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -377,7 +377,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		static final String CONSTRAINT_CONTAINS_UNKNOWN_FEATURES = "Constraint contains %s unknown feature names.";
 
-		static final String CONSTRAINT_CONNOT_BE_SAVED = "Your constraint is invalid and can not be saved: %s";
+		static final String CONSTRAINT_CONNOT_BE_SAVED = "Your constraint is invalid and can not be saved:\n%s";
 
 	}
 
@@ -545,7 +545,7 @@ public class ConstraintDialog implements GUIDefaults {
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
 
-			initialConstraint = Constraints.autoQuote(constraint);
+			initialConstraint = constraint.getNode().toString(NodeWriter.textualSymbols);
 
 			mode = Mode.UPDATE;
 		}
@@ -858,11 +858,11 @@ public class ConstraintDialog implements GUIDefaults {
 			public void handleEvent(Event event) {
 				TableItem[] selectedItem = featureTable.getSelection();
 				String featureName = selectedItem[0].getText();
-				if (featureName.matches(".*\\s.*")) {
+				if (featureName.matches(".*?\\s+.*")) {
 					featureName = "\"" + featureName + "\"";
 				} else {
 					for (String op : Operator.NAMES) {
-						if (featureName.equals(op.toLowerCase())) {
+						if (featureName.equalsIgnoreCase(op)) {
 							featureName = "\"" + featureName + "\"";
 							break;
 						}
@@ -994,7 +994,8 @@ public class ConstraintDialog implements GUIDefaults {
 			public void run() {
 				final String text = constraintText.getText();
 				final List<String> featureNamesList = FeatureUtils.getFeatureNamesList(featureModel);
-				final boolean wellFormed = new NodeReader().isWellFormed(text.trim(), featureNamesList);
+				final NodeReader nodeReader = new NodeReader();
+				final boolean wellFormed = nodeReader.isWellFormed(text.trim(), featureNamesList);
 
 				constraintText.underlineEverything(!wellFormed && constraintText.getUnknownWords().isEmpty());
 
@@ -1004,18 +1005,8 @@ public class ConstraintDialog implements GUIDefaults {
 							onIsNotSatisfiable);
 					updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
 				} else {
-					headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, getDetails()), HeaderPanel.HeaderDescriptionImage.ERROR);
+					headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()), HeaderPanel.HeaderDescriptionImage.ERROR);
 					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
-				}
-			}
-
-			private String getDetails() {
-				if (constraintText.getUnknownWords().isEmpty()) {
-					return StringTable.CONSTRAINT_CONTAINS_SYNTAX_ERRORS;
-				} else {
-					int count = constraintText.getUnknownWords().size();
-					return (count == 1 ? StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURE
-							: String.format(StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURES, count));
 				}
 			}
 		});

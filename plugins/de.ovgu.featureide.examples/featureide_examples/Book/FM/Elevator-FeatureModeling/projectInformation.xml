@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<exampleWizard>
+	<contentProvider name="Book Example">
+		<path>Part II/Chapter 5 (Feature Modeling)</path>
+	</contentProvider>
+	<contentProvider name="Feature Modeling">
+		<path>FeatureIDE Format</path>
+	</contentProvider>
+</exampleWizard>

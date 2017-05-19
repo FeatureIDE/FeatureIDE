@@ -32,10 +32,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -114,15 +114,15 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_FEATURE_BORDER = null;
 	}
 
-	private static LinkedList<IFeatureModel> featureModels = new LinkedList<IFeatureModel>();
+	private static LinkedList<FeatureModelEditor> editors = new LinkedList<>();
 
 	/**
 	 * Register the model for property changes.
 	 * 
 	 * @param model
 	 */
-	public static void registerEditor(IFeatureModel model) {
-		featureModels.add(model);
+	public static void registerEditor(FeatureModelEditor model) {
+		editors.add(model);
 	}
 
 	/**
@@ -130,16 +130,16 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * 
 	 * @param model
 	 */
-	public static void unregisterEditor(IFeatureModel model) {
-		featureModels.remove(model);
+	public static void unregisterEditor(FeatureModelEditor model) {
+		editors.remove(model);
 	}
 
 	/**
 	 * Refreshes registered models.
 	 */
 	public static void updateEditors() {
-		for (IFeatureModel model : featureModels) {
-			model.fireEvent(new FeatureIDEEvent(model, EventType.MODEL_DATA_LOADED));
+		for (FeatureModelEditor model : editors) {
+			model.propertyChange(new FeatureIDEEvent(model, EventType.REDRAW_DIAGRAM));
 		}
 	}
 

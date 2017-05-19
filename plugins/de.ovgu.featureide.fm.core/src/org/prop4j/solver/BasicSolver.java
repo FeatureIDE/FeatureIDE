@@ -20,8 +20,8 @@
  */
 package org.prop4j.solver;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -84,9 +84,18 @@ public class BasicSolver implements ISatSolver {
 	}
 
 	private void addVariables() throws ContradictionException {
-		solver.newVar(satInstance.getNumberOfVariables());
-		solver.setExpectedNumberOfClauses(satInstance.getCnf().getChildren().length);
-		addCNF(satInstance.getCnf().getChildren());
+		final int size = satInstance.getNumberOfVariables();
+		if (size > 0) {
+			solver.newVar(size);
+			solver.setExpectedNumberOfClauses(satInstance.getCnf().getChildren().length + 1);
+			addCNF(satInstance.getCnf().getChildren());
+			final VecInt pseudoClause = new VecInt(size + 1);
+			for (int i = 1; i <= size; i++) {
+				pseudoClause.push(i);
+			}
+			pseudoClause.push(-1);
+			solver.addClause(pseudoClause);
+		}
 		fixOrder();
 		solver.getOrder().init();
 	}
@@ -105,17 +114,21 @@ public class BasicSolver implements ISatSolver {
 	}
 
 	protected List<IConstr> addCNF(final Node[] cnfChildren) throws ContradictionException {
-		final List<IConstr> result = new LinkedList<>();
+		final List<IConstr> result = new ArrayList<>(cnfChildren.length);
 		for (Node node : cnfChildren) {
-			final Node[] children = node.getChildren();
-			final int[] clause = new int[children.length];
-			for (int i = 0; i < children.length; i++) {
-				final Literal literal = (Literal) children[i];
-				clause[i] = satInstance.getSignedVariable(literal);
-			}
-			result.add(solver.addClause(new VecInt(clause)));
+			result.add(addClause(node));
 		}
 		return result;
+	}
+
+	protected IConstr addClause(final Node node) throws ContradictionException {
+		final Node[] children = node.getChildren();
+		final int[] clause = new int[children.length];
+		for (int i = 0; i < children.length; i++) {
+			final Literal literal = (Literal) children[i];
+			clause[i] = satInstance.getSignedVariable(literal);
+		}
+		return solver.addClause(new VecInt(clause));
 	}
 
 	@Override

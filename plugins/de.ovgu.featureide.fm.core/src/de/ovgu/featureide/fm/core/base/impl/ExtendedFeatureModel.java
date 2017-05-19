@@ -96,22 +96,53 @@ public class ExtendedFeatureModel extends FeatureModel {
 		}
 	}
 
-	protected final List<String> imports = new LinkedList<String>();
+	protected final FeatureAttributeMap<Integer> integerAttributes;
+	protected final FeatureAttributeMap<Boolean> booleanAttributes;
+	protected final FeatureAttributeMap<String> stringAttributes;
 
-	protected final FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
-	protected final FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
-	protected final FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
-	protected final LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
+	protected final Map<String, UsedModel> usedModels;
 
-	protected final Map<String, UsedModel> usedModels = new HashMap<String, UsedModel>();
-	protected final List<IConstraint> ownConstraints = new LinkedList<IConstraint>();
+	protected final List<Equation> attributeConstraints;
+	protected final List<String> imports;
+	protected final List<IConstraint> ownConstraints;
 
-	protected IFeatureModel mappingModel = null;
+	protected IFeatureModel mappingModel;
 
-	private boolean isInterface = false;
+	private boolean isInterface;
 
 	public ExtendedFeatureModel(String factoryID) {
 		super(factoryID);
+
+		this.integerAttributes = new FeatureAttributeMap<>();
+		this.booleanAttributes = new FeatureAttributeMap<>();
+		this.stringAttributes = new FeatureAttributeMap<>();
+
+		this.usedModels = new HashMap<>();
+
+		this.attributeConstraints = new LinkedList<>();
+		this.imports = new LinkedList<>();
+		this.ownConstraints = new LinkedList<>();
+
+		this.mappingModel = null;
+		this.isInterface = false;
+	}
+
+	protected ExtendedFeatureModel(ExtendedFeatureModel extendedFeatureModel, IFeature newRoot) {
+		super(extendedFeatureModel, newRoot);
+
+		this.integerAttributes = new FeatureAttributeMap<>(extendedFeatureModel.integerAttributes);
+		this.booleanAttributes = new FeatureAttributeMap<>(extendedFeatureModel.booleanAttributes);
+		this.stringAttributes = new FeatureAttributeMap<>(extendedFeatureModel.stringAttributes);
+
+		this.usedModels = new HashMap<>(extendedFeatureModel.usedModels);
+
+		this.attributeConstraints = new LinkedList<>(extendedFeatureModel.attributeConstraints);
+		this.imports = new LinkedList<>(extendedFeatureModel.imports);
+		this.ownConstraints = new LinkedList<>(extendedFeatureModel.ownConstraints);
+
+		this.mappingModel = extendedFeatureModel.mappingModel;
+
+		this.isInterface = extendedFeatureModel.isInterface;
 	}
 
 	public List<String> getImports() {
@@ -187,7 +218,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 		return usedModels.get(varName);
 	}
 
-	public LinkedList<Equation> getAttributConstraints() {
+	public List<Equation> getAttributConstraints() {
 		return this.attributeConstraints;
 	}
 
@@ -312,6 +343,10 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	public void setInterface(boolean isInterface) {
 		this.isInterface = isInterface;
+	}
+
+	public FeatureModel clone() {
+		return new ExtendedFeatureModel(this, null);
 	}
 
 }

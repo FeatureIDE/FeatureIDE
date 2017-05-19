@@ -35,14 +35,14 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 	protected final List<IEventListener> listenerList = new LinkedList<>();
 
 	@Override
-	public void addListener(IEventListener listener) {
+	public synchronized void addListener(IEventListener listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
 	}
 
 	@Override
-	public void fireEvent(FeatureIDEEvent event) {
+	public synchronized void fireEvent(FeatureIDEEvent event) {
 		for (final IEventListener listener : listenerList) {
 			callListener(event, listener);
 		}
@@ -57,7 +57,7 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 	}
 
 	@Override
-	public void removeListener(IEventListener listener) {
+	public synchronized void removeListener(IEventListener listener) {
 		listenerList.remove(listener);
 	}
 

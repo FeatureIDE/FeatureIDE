@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * Feature for the {@link ExtendedFeatureModel}.
@@ -38,6 +40,13 @@ public class ExtendedFeature extends Feature {
 
 	public ExtendedFeature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
+	}
+
+	public ExtendedFeature(ExtendedFeature extendedFeature, IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		super(extendedFeature, newFeatureModel, newStructure);
+		this.type = extendedFeature.type;
+		this.externalModelName = extendedFeature.externalModelName;
+		this.newDefined = extendedFeature.newDefined;
 	}
 
 	@Override
@@ -83,6 +92,11 @@ public class ExtendedFeature extends Feature {
 
 	public void setNewDefined(boolean newDefined) {
 		this.newDefined = newDefined;
+	}
+
+	@Override
+	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		return new ExtendedFeature(this, newFeatureModel, newStructure);
 	}
 
 }

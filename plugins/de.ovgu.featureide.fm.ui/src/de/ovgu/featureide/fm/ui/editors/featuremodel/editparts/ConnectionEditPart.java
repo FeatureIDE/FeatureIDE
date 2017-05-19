@@ -147,6 +147,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 					final Rectangle decoratorBounds = new Rectangle(((CircleDecoration) child).getBounds());
 					if (request instanceof SelectionRequest) {
 						final Point requestLocation = ((SelectionRequest) request).getLocation();
+						((CircleDecoration) child).translateToRelative(requestLocation);
 						if (decoratorBounds.contains(requestLocation)) {
 							final IFeatureModel featureModel = feature.getFeatureModel();
 							final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);

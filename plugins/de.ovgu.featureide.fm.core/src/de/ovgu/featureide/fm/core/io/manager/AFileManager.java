@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -41,7 +42,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFileManager<T> implements IFileManager, IEventManager {
+public abstract class AFileManager<T> implements IFileManager<T>, IEventManager {
 
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
@@ -49,8 +50,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 
 	private final ProblemList lastProblems = new ProblemList();
 
-	private final Object syncObject = new Object();
-	private final Object saveSyncObject = new Object();
+	protected final Object syncObject = new Object();
 
 	protected final IPersistentFormat<T> format;
 
@@ -59,10 +59,9 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 
 	protected T persistentObject;
 	protected T variableObject;
+	protected T emptyObject;
 
-	public IPersistentFormat<T> getFormat() {
-		return format;
-	}
+	private boolean modifying = false;
 
 	protected AFileManager(T object, String absolutePath, IPersistentFormat<T> format) {
 		this.format = format;
@@ -70,75 +69,20 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 		path = Paths.get(absolutePath);
 
 		variableObject = object;
+		emptyObject = copyObject(object);
+
+		if (FileSystem.exists(path)) {
+			try {
+				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+				final ProblemList problems = format.getInstance().read(variableObject, content);
+				if (problems != null) {
+					lastProblems.addAll(problems);
+				}
+			} catch (Exception e) {
+				handleException(e);
+			}
+		}
 		persistentObject = copyObject(variableObject);
-	}
-
-	public T getObject() {
-		synchronized (syncObject) {
-			return persistentObject;
-		}
-	}
-
-	public T editObject() {
-		synchronized (saveSyncObject) {
-			return variableObject;
-		}
-	}
-
-	public ProblemList getLastProblems() {
-		return lastProblems;
-	}
-
-	public boolean read() {
-		if (!FileSystem.exists(path)) {
-			return false;
-		}
-		lastProblems.clear();
-		try {
-			final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
-			List<Problem> problemList;
-			synchronized (saveSyncObject) {
-				problemList = format.getInstance().read(variableObject, content);
-			}
-			if (problemList != null) {
-				lastProblems.addAll(problemList);
-			}
-			persist();
-			fireEvent(new FeatureIDEEvent(persistentObject, EventType.MODEL_DATA_LOADED));
-		} catch (Exception e) {
-			handleException(e);
-		}
-		return lastProblems.isEmpty();
-	}
-
-	/**
-	 * Copy on write.
-	 */
-	protected void persist() {
-		synchronized (syncObject) {
-			persistentObject = copyObject(variableObject);
-		}
-	}
-
-	protected abstract T copyObject(T oldObject);
-
-	public boolean save() {
-		lastProblems.clear();
-		try {
-			final byte[] content = format.getInstance().write(variableObject).getBytes(DEFAULT_CHARSET);
-			synchronized (saveSyncObject) {
-				FileSystem.write(path, content);
-			}
-			persist();
-			fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
-		} catch (Exception e) {
-			handleException(e);
-		}
-		return lastProblems.isEmpty();
-	}
-
-	private void handleException(Exception e) {
-		lastProblems.add(new Problem(e));
 	}
 
 	@Override
@@ -146,9 +90,84 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 		eventManager.addListener(listener);
 	}
 
+	protected abstract T copyObject(T oldObject);
+
+	public T getObject() {
+		return persistentObject;
+	}
+
+	public T editObject() {
+		return variableObject;
+	}
+
+	public void setModifying(boolean modifying) {
+		synchronized (syncObject) {
+			this.modifying = modifying;
+		}
+	}
+
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
+	}
+
+	public IPersistentFormat<T> getFormat() {
+		return format;
+	}
+
+	public ProblemList getLastProblems() {
+		return lastProblems;
+	}
+
+	private void handleException(Exception e) {
+		lastProblems.add(new Problem(e));
+	}
+
+	public boolean read() {
+		if (!FileSystem.exists(path)) {
+			return false;
+		}
+		final boolean success, changed;
+		synchronized (syncObject) {
+			if (modifying) {
+				return true;
+			}
+			lastProblems.clear();
+			final T tempObject = copyObject(emptyObject);
+			try {
+				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+				final List<Problem> problemList = format.getInstance().read(tempObject, content);
+				if (problemList != null) {
+					lastProblems.addAll(problemList);
+				}
+				changed = !compareObjects(tempObject, persistentObject);
+			} catch (Exception e) {
+				handleException(e);
+				return false;
+			}
+			if (changed) {
+				persistentObject = tempObject;
+			}
+			success = lastProblems.isEmpty();
+		}
+		if (changed) {
+			ExternalChangeListener.update(this);
+		}
+		return success;
+	}
+
+	// TODO Quickfix for #501. Should be implemented by overriding the current instance pointer.
+	public void override() {
+		synchronized (syncObject) {
+			if (modifying) {
+				return;
+			}
+			final String write = format.getInstance().write(persistentObject);
+			format.getInstance().read(variableObject, write);
+			//			variableObject = copyObject(localObject);
+			//			persistentObject = copyObject(localObject);
+		}
+		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_OVERRIDDEN));
 	}
 
 	@Override
@@ -156,17 +175,85 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 		eventManager.removeListener(listener);
 	}
 
+	/**
+	 * Compares two object for equality.<br/>
+	 * Subclasses should override (implement) this method.
+	 * 
+	 * @param o1 First object.
+	 * @param o2 Second object.
+	 * @return {@code true} if objects are considered equal, {@code false} otherwise.
+	 */
+	protected boolean compareObjects(T o1, T o2) {
+		final String s1 = format.getInstance().write(o1);
+		final String s2 = format.getInstance().write(o2);
+		return s1.equals(s2);
+	}
+
+	public boolean save() {
+		final boolean success;
+		synchronized (syncObject) {
+			lastProblems.clear();
+			try {
+				if (modifying) {
+					return true;
+				}
+				modifying = true;
+				final T tempObject = copyObject(variableObject);
+				final byte[] content = format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET);
+				FileSystem.write(path, content);
+				persistentObject = copyObject(tempObject);
+			} catch (Exception e) {
+				handleException(e);
+				return false;
+			} finally {
+				modifying = false;
+			}
+			success = lastProblems.isEmpty();
+		}
+		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
+		return success;
+	}
+
+	public boolean externalSave(Runnable externalSaveMethod) {
+		final boolean success;
+		synchronized (syncObject) {
+			lastProblems.clear();
+			try {
+				if (modifying) {
+					return true;
+				}
+				modifying = true;
+				final T tempObject = copyObject(variableObject);
+				externalSaveMethod.run();
+				persistentObject = copyObject(tempObject);
+			} catch (Exception e) {
+				handleException(e);
+				return false;
+			} finally {
+				modifying = false;
+			}
+			success = lastProblems.isEmpty();
+		}
+		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
+		return success;
+	}
+
 	@Override
 	public void dispose() {
 		FileManagerMap.remove(absolutePath);
-
-		persistentObject = null;
-		variableObject = null;
+		synchronized (syncObject) {
+			persistentObject = null;
+			variableObject = null;
+		}
 	}
 
 	@Override
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	public Path getPath() {
+		return path;
 	}
 
 	@Override

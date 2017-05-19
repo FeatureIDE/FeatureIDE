@@ -527,9 +527,6 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			unsupportedModelException.addSuppressed(re);
 			throw unsupportedModelException;
 		}
-
-		// Update the FeatureModel in Editor
-		extFeatureModel.handleModelDataLoaded();
 	}
 
 	private ExtendedFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,

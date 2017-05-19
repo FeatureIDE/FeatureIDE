@@ -32,6 +32,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,8 +87,8 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -181,8 +183,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private ToolItem dropDownMenu;
 
 	public void setDirty() {
-		dirty = true;
-		firePropertyChange(PROP_DIRTY);
+		if (!dirty) {
+			dirty = true;
+			firePropertyChange(PROP_DIRTY);
+		}
 	}
 
 	@Override
@@ -202,11 +206,30 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	@Override
 	public void propertyChange(FeatureIDEEvent evt) {
-		if (evt == null || !EventType.MODEL_DATA_SAVED.equals(evt.getEventType())) {
-			return;
+		if (evt != null) {
+			if (evt.getSource() instanceof IFeatureModel) {
+				switch (evt.getEventType()) {
+				case MODEL_DATA_SAVED:
+				case MODEL_DATA_OVERRIDDEN:
+					refreshPage();
+					break;
+				default:
+					break;
+				}
+			} else if (evt.getSource() instanceof Configuration) {
+				switch (evt.getEventType()) {
+				case MODEL_DATA_SAVED:
+					dirty = false;
+					break;
+				case MODEL_DATA_OVERRIDDEN:
+					refreshPage();
+					setDirty();
+					break;
+				default:
+					break;
+				}
+			}
 		}
-		refreshPage();
-		setDirty();
 	}
 
 	protected final void refreshPage() {
@@ -607,52 +630,32 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		dirty = false;
 	}
 
-	protected void set(SelectableFeature feature, Selection selection) {
-		configurationEditor.getConfiguration().setManual(feature, selection);
-	}
-
-	protected void changeSelection(final TreeItem item, final boolean select) {
-		SelectableFeature feature = (SelectableFeature) item.getData();
+	protected void setManual(final TreeItem item, Selection manualSelection) {
+		final SelectableFeature feature = (SelectableFeature) item.getData();
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
-			switch (feature.getManual()) {
-			case SELECTED:
-				set(feature, (select) ? Selection.UNDEFINED : Selection.UNSELECTED);
-				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
+			configurationEditor.getConfiguration().setManual(feature, manualSelection);
+			if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
+				switch (manualSelection) {
+				case SELECTED:
+					expandSingleChildren(item);
+					break;
+				case UNSELECTED:
 					item.setExpanded(false);
+					break;
+				case UNDEFINED:
+					break;
+				default:
+					throw new AssertionError(manualSelection);
 				}
-				break;
-			case UNSELECTED:
-				set(feature, (select) ? Selection.SELECTED : Selection.UNDEFINED);
-				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
-					if (select) {
-						expandSingleChildren(item);
-					} else {
-						item.setExpanded(false);
-					}
-				}
-				break;
-			case UNDEFINED:
-				set(feature, (select) ? Selection.SELECTED : Selection.UNSELECTED);
-				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
-					if (select) {
-						expandSingleChildren(item);
-					} else {
-						item.setExpanded(false);
-					}
-				}
-				break;
-			default:
-				set(feature, Selection.UNDEFINED);
 			}
-			if (!dirty) {
-				setDirty();
-			}
+			setDirty();
+
 			if (configurationEditor.isAutoSelectFeatures()) {
 				computeTree(true);
 			} else {
 				item.setForeground(null);
 				item.setFont(treeItemStandardFont);
-				refreshItem(item, feature);
+				refreshItem(item);
 				if (configurationEditor.getConfiguration().canBeValid()) {
 					invalidFeatures.clear();
 				} else {
@@ -660,6 +663,23 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 			//	updateInfoLabel();
+		}
+	}
+
+	protected void changeSelection(final TreeItem item, final boolean select) {
+		final Selection manualSelection = ((SelectableFeature) item.getData()).getManual();
+		switch (manualSelection) {
+		case SELECTED:
+			setManual(item, (select) ? Selection.UNDEFINED : Selection.UNSELECTED);
+			break;
+		case UNSELECTED:
+			setManual(item, (select) ? Selection.SELECTED : Selection.UNDEFINED);
+			break;
+		case UNDEFINED:
+			setManual(item, (select) ? Selection.SELECTED : Selection.UNSELECTED);
+			break;
+		default:
+			throw new AssertionError(manualSelection);
 		}
 	}
 
@@ -728,7 +748,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * Applies the selected expand algorithm.
 	 */
 	private void autoExpand() {
-		switch (configurationEditor.getExpandAlgorithm()) {
+		final EXPAND_ALGORITHM expandAlgorithm = configurationEditor.getExpandAlgorithm();
+		switch (expandAlgorithm) {
 		case DEFUALT:
 			break;
 		case CHILDREN:
@@ -744,7 +765,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			groupExpand(false);
 			break;
 		default:
-			throw new RuntimeException("case " + configurationEditor.getExpandAlgorithm() + " not supported!");
+			throw new AssertionError("case " + expandAlgorithm + " not supported!");
 		}
 	}
 
@@ -826,26 +847,30 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return false;
 	}
 
-	protected void refreshItem(TreeItem item, SelectableFeature feature) {
-		item.setBackground(null);
-		item.setFont(treeItemStandardFont);
-		item.setText(feature.getName());
-		switch (feature.getAutomatic()) {
-		case SELECTED:
-			item.setGrayed(true);
-			item.setForeground(null);
-			item.setChecked(true);
-			break;
-		case UNSELECTED:
-			item.setGrayed(true);
-			item.setForeground(gray);
-			item.setChecked(false);
-			break;
-		case UNDEFINED:
-			item.setGrayed(false);
-			item.setForeground(null);
-			item.setChecked(feature.getManual() == Selection.SELECTED);
-			break;
+	protected void refreshItem(TreeItem item) {
+		final Object data = item.getData();
+		if (data instanceof SelectableFeature) {
+			final SelectableFeature feature = (SelectableFeature) data;
+			item.setBackground(null);
+			item.setFont(treeItemStandardFont);
+			item.setText(feature.getName());
+			switch (feature.getAutomatic()) {
+			case SELECTED:
+				item.setGrayed(true);
+				item.setForeground(null);
+				item.setChecked(true);
+				break;
+			case UNSELECTED:
+				item.setGrayed(true);
+				item.setForeground(gray);
+				item.setChecked(false);
+				break;
+			case UNDEFINED:
+				item.setGrayed(false);
+				item.setForeground(null);
+				item.setChecked(feature.getManual() == Selection.SELECTED);
+				break;
+			}
 		}
 	}
 
@@ -886,7 +911,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					selectableFeature.clearOpenClauses();
 					final TreeItem item = itemMap.get(selectableFeature);
 					if (item != null) {
-						refreshItem(item, selectableFeature);
+						refreshItem(item);
 					}
 				}
 			}
@@ -894,7 +919,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		curGroup = 0;
 
 		if (useRecommendation) {
-			final ConfigurationMatrix configurationMatrix = ((ConfigurationEditor) configurationEditor).getConfigurationMatrix();
+			final ConfigurationMatrix configurationMatrix = new ConfigurationMatrix(configurationEditor.getConfiguration().getFeatureModel(),
+					Paths.get(configurationEditor.getFile().getParent().getLocationURI()));
+			configurationMatrix.readConfigurations(configurationEditor.getFile().getName());
 			configurationMatrix.calcRec(configurationEditor.getConfiguration());
 			final double[] rec = configurationMatrix.getRec();
 			if (rec != null) {
@@ -1007,15 +1034,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return job;
 	}
 
-	protected LongRunningJob<List<String>> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
+	protected LongRunningJob<Void> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures()) {
 			return null;
 		}
 		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
-		final LongRunningMethod<List<String>> update = configurationEditor.getConfiguration().getPropagator()
-				.update(redundantManual, feature.getFeature().getName());
-		final LongRunningJob<List<String>> job = new LongRunningJob<>("", update);
+		final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator()
+				.update(redundantManual, Arrays.asList(feature));
+		final LongRunningJob<Void> job = new LongRunningJob<>("", update);
 		job.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
 			public void invoke(Object t) {
@@ -1029,7 +1056,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						@Override
 						public void run() {
 							updateFeatures.remove(feature);
-							refreshItem(item, feature);
+							refreshItem(item);
 						}
 					});
 				}
@@ -1052,7 +1079,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		updateInfoLabel(null);
 
-		final LongRunningJob<List<String>> updateJob = computeFeatures(redundantManual, currentDisplay);
+		final LongRunningJob<Void> updateJob = computeFeatures(redundantManual, currentDisplay);
 		if (updateJob != null) {
 			updateJob.addJobFinishedListener(new JobFinishListener<List<String>>() {
 				@Override

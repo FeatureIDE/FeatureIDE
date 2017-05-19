@@ -1,6 +1,7 @@
 .classpath
 .project
 configs/BeautifulWorld.config
+configs/Hello.config
 configs/HelloWorld.config
 configs/WonderfulWorld.config
 features/Beautiful/.classpath
@@ -20,6 +21,6 @@ features/World/.project
 features/World/info.xml
 features/World/src/World.java
 model.xml
+src/HelloWorld.java
 src/interfaces/IMessage.java
 src/loader/PluginLoader.java
-src/HelloWorld.java

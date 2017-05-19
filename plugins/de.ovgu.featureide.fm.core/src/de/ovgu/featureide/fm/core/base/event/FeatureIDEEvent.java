@@ -154,6 +154,10 @@ public class FeatureIDEEvent {
 		 */
 		MODEL_DATA_LOADED,
 		/**
+		 * The model data loaded from a file has overridden the internal model instance.
+		 */
+		MODEL_DATA_OVERRIDDEN,
+		/**
 		 * The diagram was redrawn.
 		 */
 		REDRAW_DIAGRAM,

@@ -78,6 +78,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
@@ -268,7 +269,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		initializeGraphicalViewer();
 
 		FeatureColorManager.addListener(this);
-		
+
 		if (isEditable) {
 			setEditDomain(new DefaultEditDomain(featureModelEditor));
 		}
@@ -452,6 +453,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void setActiveExplanation(Explanation activeExplanation) {
 		final Explanation oldActiveExplanation = this.activeExplanation;
 		this.activeExplanation = activeExplanation;
+		graphicalFeatureModel.setActiveExplanation(activeExplanation);
 		getFeatureModel().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
 	}
 
@@ -466,10 +468,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	public IFeatureModel getFeatureModel() {
 		return featureModelEditor.getFeatureModel();
-	}
-
-	public void setFeatureModel(IFeatureModel fm) {
-		featureModelEditor.setFeatureModel(fm);
 	}
 
 	private void createActions() {
@@ -709,8 +707,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		boolean isEmpty = true;
 		for (Object obj : ((StructuredSelection) getSelection()).toArray()) {
-			if (obj instanceof FeatureEditPart || obj instanceof IFeature)
-			{
+			if (obj instanceof FeatureEditPart || obj instanceof IFeature) {
 				isEmpty = false;
 			}
 		}
@@ -940,7 +937,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					}
 				}
 				setActiveExplanation();
-				getContents().refresh(); // call refresh to redraw legend
+				getContents().refresh();
 				return Status.OK_STATUS;
 			}
 
@@ -1122,20 +1119,33 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
 			break;
-		case MODEL_DATA_LOADED:
+		case MODEL_DATA_OVERRIDDEN:
+			if (extraPath != null) {
+				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			}
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					deregisterEditParts();
+					graphicalFeatureModel.init();
+					if (extraPath != null) {
+						FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
+					}
+					
+					setContents(graphicalFeatureModel);
+					refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+					reload();
+				}
+			});
+			featureModelEditor.setPageModified(false);
+			analyzeFeatureModel();
+			break;
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			if (extraPath != null) {
 				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
 			}
-			final Map<?, ?> registry = getEditPartRegistry();
-			for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
-				registry.remove(f);
-				registry.remove(f.getSourceConnection());
-			}
-			for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
-				registry.remove(f);
-			}
+			deregisterEditParts();
 			graphicalFeatureModel.init();
 			if (extraPath != null) {
 				FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
@@ -1213,7 +1223,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				centerPointOnScreen((IFeature) event.getSource());
 			}
 
-			//redraw the explanation after collaspse
+			//redraw the explanation after collapse
 			propertyChange(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, activeExplanation, activeExplanation));
 			break;
 		case COLLAPSED_ALL_CHANGED:
@@ -1226,7 +1236,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			//Center root feature after operation
 			centerPointOnScreen(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 
-			//redraw the explanation after collaspse
+			//redraw the explanation after collapse
 			propertyChange(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, activeExplanation, activeExplanation));
 			break;
 		case COLOR_CHANGED:
@@ -1246,7 +1256,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						features = new ArrayList<>();
 						// ... get the IGraphicalFeatures, if Features are passed
 						if (firstElement instanceof IFeature) {
-
 							for (Object featureObj : srcList) {
 								features.add(graphicalFeatureModel.getGraphicalFeature((IFeature) featureObj));
 							}
@@ -1283,7 +1292,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						getGraphicalFeatureModel());
 				defectElement.update(event);
 			}
-			FeatureUIHelper.setCurrentExpalantion(newActiveExplanation);
 
 			//Notify each affected element of its new active reason.
 			final Map<IGraphicalElement, Explanation.Reason> elementOldActiveReasons = getGraphicalElementReasons(oldActiveExplanation);
@@ -1295,13 +1303,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, elementOldActiveReasons.get(element),
 						elementNewActiveReasons.get(element)));
 			}
-			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
-			if(legendFigure != null && legendFigure.isVisible())
+			LegendFigure legend = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
+			if (legend != null && legend.isVisible())
 			{
-				legendFigure.refreshExplanation();
+				legend.recreateLegend();
 			}
 			break;
-
 		case DEFAULT:
 			break;
 		default:
@@ -1315,6 +1322,17 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		setLayout();
 
+	}
+
+	private void deregisterEditParts() {
+		final Map<?, ?> registry = getEditPartRegistry();
+		for (IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+			registry.remove(f);
+			registry.remove(f.getSourceConnection());
+		}
+		for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
+			registry.remove(f);
+		}
 	}
 
 	/**

@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.constraint;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Maps a {@link FeatureAttribute} to its name and feature.
@@ -31,7 +32,26 @@ import java.util.Map;
  */
 public class FeatureAttributeMap<T> {
 
-	private Map<String, Map<String, FeatureAttribute<T>>> attrs = new HashMap<String, Map<String, FeatureAttribute<T>>>();
+	private final Map<String, Map<String, FeatureAttribute<T>>> attrs;
+
+	public FeatureAttributeMap() {	
+		 attrs = new HashMap<>();
+	}
+	
+	public FeatureAttributeMap(FeatureAttributeMap<T> oldMap) {	
+		this.attrs = new HashMap<>((int) (1.5 * oldMap.attrs.size()));
+		
+		for (Entry<String, Map<String, FeatureAttribute<T>>> mapEntry : oldMap.attrs.entrySet()) {
+			final Map<String, FeatureAttribute<T>> value = mapEntry.getValue();
+			final Map<String, FeatureAttribute<T>> newFeatureMap = new HashMap<>((int) (1.5 * value.size()));
+			for (Entry<String, FeatureAttribute<T>> attributeEntry : value.entrySet()) {
+				final FeatureAttribute<T> v = attributeEntry.getValue();
+				newFeatureMap.put(attributeEntry.getKey(), new FeatureAttribute<>(v.getAttributeName(), v.getFeatureName(), v.getValue()));
+			}
+			this.attrs.put(mapEntry.getKey(), newFeatureMap);
+		}
+	}
+
 
 	public boolean hasAttribute(String featureName, String attributeName) {
 		return attrs.containsKey(attributeName) && attrs.get(attributeName).containsKey(featureName);

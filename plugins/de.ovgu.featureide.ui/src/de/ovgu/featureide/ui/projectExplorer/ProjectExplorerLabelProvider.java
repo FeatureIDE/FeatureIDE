@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.projectExplorer;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,8 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -63,7 +66,7 @@ import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.Explore
 public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 	private List<String> selectedFeatures = new ArrayList<String>();
-	
+
 	public ProjectExplorerLabelProvider() {
 		super(new PackageExplorerContentProvider(true));
 	}
@@ -93,9 +96,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject == null) {
 				return superImage;
 			}
-			
+
 			readCurrentConfiguration(featureProject);
-			
+
 			IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return superImage;
@@ -145,6 +148,24 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (model == null || model.getClasses().isEmpty()) {
 				return superImage;
 			}
+
+			//Return folder package images for the source folder when working with munge composer
+			if (composer.getName().equals("Munge")) {
+				if (element instanceof IFile) {
+					IFile file = (IFile) element;
+					if (isInMungeSource(file)) {
+						getColors(elementColors, file, model, true);
+						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, new ArrayList<Integer>(elementColors), null, superImage);
+					}
+				}
+				if (element instanceof IFolder && ((IFolder) element).getName().equals("source")) {
+					IFolder folder = (IFolder) element;
+					getPackageColors(folder, elementColors, model, true);
+					return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), null, superImage);
+				}
+
+			}
+
 			if (!composer.getName().equals("AHEAD")) {
 				if (composer.hasFeatureFolder()) {
 					if (element instanceof IFolder) {
@@ -212,7 +233,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (!composer.getName().equals("AHEAD")) {
 				if (cu.getParent() instanceof PackageFragment) {
 					parentColors = new HashSet<Integer>();
-					getAllPackageColors((IFolder) cu.getParent().getResource(), parentColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					getAllPackageColors((IFolder) cu.getParent().getResource(), parentColors, model,
+							!composer.hasFeatureFolder() && !composer.hasSourceFolder());
 				}
 				getColors(elementColors, myfile, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 				return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors),
@@ -221,6 +243,23 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		}
 
 		return superImage;
+	}
+
+	/**
+	 * Check if the given file is within munges "source" folder. Not the "src" folder.
+	 * 
+	 * @param file The file to check
+	 * @return true-When file is inside the munge source folder.
+	 */
+	private boolean isInMungeSource(IFile file) {
+		IResource currentObject = file;
+		while (currentObject.getParent() != null) {
+			currentObject = currentObject.getParent();
+			if (currentObject.getName().equals("source")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -261,6 +300,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 * @return colors for files
 	 */
 	private void getColors(Set<Integer> myColors, IFile myfile, FSTModel model, boolean colorUnselectedFeature) {
+		if (model == null)
+			return;
 		FSTClass clazz = model.getClass(model.getAbsoluteClassName(myfile));
 		if (clazz == null) {
 			return;
@@ -357,8 +398,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	@Override
 	public String getText(Object element) {
 		Set<Integer> elementColors = new HashSet<Integer>();
-
-		SPACE_STRING = " ";
+		SPACE_STRING = "";
 
 		//text for Packages
 		if (element instanceof PackageFragment) {
@@ -373,7 +413,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			}
 
 			readCurrentConfiguration(featureProject);
-			
+
 			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return null;
@@ -427,6 +467,32 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				} else if (isInBuildFolder(res) || isInSourceFolder(res)) {
 					return SPACE_STRING + res.getName();
 				}
+
+				//Return spaces for the source folder when working with munge composer
+				if (composer.getName().equals("Munge")) {
+					FSTModel model = featureProject.getFSTModel();
+					if (model == null || model.getClasses().isEmpty()) {
+						return SPACE_STRING + res.getName();
+					}
+					//Return text for munge source folder
+					if (element instanceof IFolder && ((IFolder) element).getName().equals("source")) {
+						IFolder folder = (IFolder) element;
+						getPackageColors(folder, elementColors, model, true);
+						for (int i = 0; i < elementColors.size(); i++)
+							SPACE_STRING += " ";
+						return SPACE_STRING + res.getName();
+					}
+					if (element instanceof IFile) {
+						IFile file = (IFile) element;
+						if (isInMungeSource(file)) {
+							getColors(elementColors, file, model, true);
+							for (int i = 0; i < elementColors.size(); i++)
+								SPACE_STRING += " ";
+							return SPACE_STRING + res.getName();
+						}
+					}
+				}
+
 			}
 
 		}
