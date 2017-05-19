@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -36,6 +37,8 @@ import org.prop4j.Node;
  * @author Timo Guenther
  */
 public class DimacsWriter {
+	/** Token leading a (single-line) comment. */
+	private static final String COMMENT = "c";
 	/** Token leading the problem definition. */
 	private static final String PROBLEM = "p";
 	/** Token identifying the problem type as CNF. */
@@ -47,6 +50,9 @@ public class DimacsWriter {
 	private final List<Node> clauses;
 	/** Maps variables to indexes. */
 	private final Map<Object, Integer> variableIndexes;
+	
+	/** Whether the writer should write a variable directory listing the names of the variables. */
+	private boolean writingVariableDirectory = false;
 	
 	/**
 	 * Constructs a new instance of this class with the given CNF.
@@ -81,17 +87,59 @@ public class DimacsWriter {
 	}
 	
 	/**
+	 * <p>
+	 * Sets the writing variable directory flag.
+	 * If true, the writer will write a variable directory at the start of the output.
+	 * This is a set of comments naming the variables.
+	 * This can later be used during reading so the variables are not just numbers.
+	 * </p>
+	 * 
+	 * <p>
+	 * Defaults to false.
+	 * </p>
+	 * @param writingVariableDirectory whether to write the variable directory
+	 */
+	public void setWritingVariableDirectory(boolean writingVariableDirectory) {
+		this.writingVariableDirectory = writingVariableDirectory;
+	}
+	
+	/**
 	 * Writes the DIMACS CNF file format.
 	 * @return the transformed CNF; not null
 	 */
 	public String write() {
-		String s = writeProblem();
-		s += System.lineSeparator();
-		for (final Node clause : clauses) {
-			s += writeClause(clause);
-			s += System.lineSeparator();
+		String s = "";
+		if (writingVariableDirectory) {
+			s += writeVariableDirectory();
+		}
+		s += writeProblem();
+		s += writeClauses();
+		return s;
+	}
+	
+	/**
+	 * Writes the variable directory.
+	 * @return the variable directory; not null
+	 */
+	private String writeVariableDirectory() {
+		String s = "";
+		for (final Entry<Object, Integer> e : variableIndexes.entrySet()) {
+			s += writeVariableDirectoryEntry(e.getKey(), e.getValue());
 		}
 		return s;
+	}
+	
+	/**
+	 * Writes an entry of the variable directory.
+	 * @param variable variable to list in the entry
+	 * @param index index of the variable
+	 * @return an entry of the variable directory; not null
+	 */
+	private String writeVariableDirectoryEntry(Object variable, int index) {
+		return String.format("%s %d %s%n",
+				COMMENT,
+				index,
+				String.valueOf(variable));
 	}
 	
 	/**
@@ -99,11 +147,23 @@ public class DimacsWriter {
 	 * @return the problem description; not null
 	 */
 	private String writeProblem() {
-		return String.format("%s %s %d %d",
+		return String.format("%s %s %d %d%n",
 				PROBLEM,
 				CNF,
 				variableIndexes.size(),
 				clauses.size());
+	}
+	
+	/**
+	 * Writes all clauses.
+	 * @return all transformed clauses; not null
+	 */
+	private String writeClauses() {
+		String s = "";
+		for (final Node clause : clauses) {
+			s += writeClause(clause);
+		}
+		return s;
 	}
 	
 	/**
@@ -117,6 +177,7 @@ public class DimacsWriter {
 			s += writeLiteral(l) + " ";
 		}
 		s += CLAUSE_END;
+		s += System.lineSeparator();
 		return s;
 	}
 	

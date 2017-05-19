@@ -502,6 +502,159 @@ public class DimacsReaderTests {
 		r.read();
 	}
 	
+	@Test
+	public void testVariableDirectoryFoo() throws ParseException {
+		final String s = ""
+				+ "c 1 Foo\n"
+				+ "c 2 Bar\n"
+				+ "c 3 Baz\n"
+				+ "p cnf 3 2\n"
+				+ "1 -3 0\n"
+				+ "2 3 -1 0"
+		;
+		final DimacsReader r = new DimacsReader(s);
+		r.setReadingVariableDirectory(true);
+		final Node actual = r.read();
+		final Node expected = new And(
+				new Or("Foo", new Literal("Baz", false)),
+				new Or("Bar", "Baz", new Literal("Foo", false)));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testVariableDirectoryWhitespace() throws ParseException {
+		final String s = ""
+				+ "c 1 Variable\twith\twhitespace\n"
+				+ "c 2  \n"
+				+ "c 3   Surrounding whitespace  \n"
+				+ "p cnf 3 2\n"
+				+ "1 -3 0\n"
+				+ "2 3 -1 0"
+		;
+		final DimacsReader r = new DimacsReader(s);
+		r.setReadingVariableDirectory(true);
+		final Node actual = r.read();
+		final Node expected = new And(
+				new Or("Variable\twith\twhitespace", new Literal("  Surrounding whitespace  ", false)),
+				new Or(" ", "  Surrounding whitespace  ", new Literal("Variable\twith\twhitespace", false)));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testVariableDirectoryFormat() throws ParseException {
+		final String s = ""
+				+ "c 1\n"
+				+ "c 2 \n"
+				+ "c\t\t3 c 3 Foo\n"
+				+ "p cnf 3 2\n"
+				+ "1 -3 0\n"
+				+ "2 3 -1 0"
+		;
+		final DimacsReader r = new DimacsReader(s);
+		r.setReadingVariableDirectory(true);
+		final Node actual = r.read();
+		final Node expected = new And(
+				new Or("1", new Literal("c 3 Foo", false)),
+				new Or("2", "c 3 Foo", new Literal("1", false)));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testVariableDirectoryOrder() throws ParseException {
+		final String s = ""
+				+ "c 3 Baz\n"
+				+ "c 2 Bar\n"
+				+ "c 1 Foo\n"
+				+ "p cnf 3 2\n"
+				+ "1 -3 0\n"
+				+ "2 3 -1 0"
+		;
+		final DimacsReader r = new DimacsReader(s);
+		r.setReadingVariableDirectory(true);
+		final Node actual = r.read();
+		final Node expected = new And(
+				new Or("Foo", new Literal("Baz", false)),
+				new Or("Bar", "Baz", new Literal("Foo", false)));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testVariableDirectoryMultiple() throws ParseException {
+		final String s = ""
+				+ "c 1 Foo\n"
+				+ "c 1 Overwritten\n"
+				+ "c 2 Bar\n"
+				+ "c 3 Baz\n"
+				+ "p cnf 3 2\n"
+				+ "1 -3 0\n"
+				+ "2 3 -1 0"
+		;
+		final DimacsReader r = new DimacsReader(s);
+		r.setReadingVariableDirectory(true);
+		final Node actual = r.read();
+		final Node expected = new And(
+				new Or("Foo", new Literal("Baz", false)),
+				new Or("Bar", "Baz", new Literal("Foo", false)));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testVariableDirectoryMiddle() throws ParseException {
+		final String s = ""
+				+ "p cnf 3 2\n"
+				+ "c 1 Foo\n"
+				+ "c 2 Bar\n"
+				+ "c 3 Baz\n"
+				+ "1 -3 0\n"
+				+ "2 3 -1 0"
+		;
+		final DimacsReader r = new DimacsReader(s);
+		r.setReadingVariableDirectory(true);
+		final Node actual = r.read();
+		final Node expected = new And(
+				new Or("Foo", new Literal("Baz", false)),
+				new Or("Bar", "Baz", new Literal("Foo", false)));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testVariableDirectorySplit() throws ParseException {
+		final String s = ""
+				+ "c 1 Foo\n"
+				+ "c 2 Bar\n"
+				+ "p cnf 3 2\n"
+				+ "c 3 Baz\n"
+				+ "1 -3 0\n"
+				+ "2 3 -1 0"
+		;
+		final DimacsReader r = new DimacsReader(s);
+		r.setReadingVariableDirectory(true);
+		final Node actual = r.read();
+		final Node expected = new And(
+				new Or("Foo", new Literal("Baz", false)),
+				new Or("Bar", "Baz", new Literal("Foo", false)));
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testVariableDirectoryStraggler() throws ParseException {
+		final String s = ""
+				+ "c 1 Foo\n"
+				+ "c 2 Bar\n"
+				+ "p cnf 3 2\n"
+				+ "1 -3 0\n"
+				+ "c 3 Baz\n"
+				+ "2 3 -1 0"
+		;
+		final DimacsReader r = new DimacsReader(s);
+		r.setReadingVariableDirectory(true);
+		final Node actual = r.read();
+		final Node expected = new And(
+				new Or("Foo", new Literal("3", false)),
+				new Or("Bar", "3", new Literal("Foo", false)));
+		assertEquals(expected, actual);
+	}
+	
 	private void testEquals(String s) throws ParseException {
 		testEquals(s, getDefaultExpected());
 	}

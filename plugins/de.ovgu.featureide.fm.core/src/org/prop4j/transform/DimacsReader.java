@@ -67,6 +67,8 @@ public class DimacsReader {
 	 * However, if it exists, any non-comment data past it is illegal.
 	 */
 	private boolean lastClause = false;
+	/** True to read the variable directory for naming variables. */
+	private boolean readingVariableDirectory = false;
 	
 	/**
 	 * Constructs a new instance of this class with the given string.
@@ -85,6 +87,22 @@ public class DimacsReader {
 	}
 	
 	/**
+	 * <p>
+	 * Sets the reading variable directory flag.
+	 * If true, the reader will look for a variable directory in the comments.
+	 * This contains names for the variables which would otherwise just be numbers.
+	 * </p>
+	 * 
+	 * <p>
+	 * Defaults to false.
+	 * </p>
+	 * @param readingVariableDirectory whether to read the variable directory
+	 */
+	public void setReadingVariableDirectory(boolean readingVariableDirectory) {
+		this.readingVariableDirectory = readingVariableDirectory;
+	}
+	
+	/**
 	 * Reads the next non-comment token.
 	 * Also reads any comments before it.
 	 * @return the next token; null if already completely read and empty
@@ -99,7 +117,7 @@ public class DimacsReader {
 		}
 		final String token = scanner.next();
 		if (COMMENT.equals(token)) {
-			scanner.nextLine();
+			readComment(scanner.nextLine());
 			return readToken();
 		}
 		return token;
@@ -226,8 +244,50 @@ public class DimacsReader {
 			return null;
 		}
 		final Integer key = Math.abs(index);
-		final Object variable = String.valueOf(key);
-		indexVariables.put(key, variable);
+		Object variable = indexVariables.get(key);
+		if (variable == null) {
+			variable = String.valueOf(key);
+			indexVariables.put(key, variable);
+		}
 		return new Literal(variable, index > 0);
+	}
+	
+	/**
+	 * Called when a comment is read.
+	 * @param comment content of the comment; not null
+	 * @return whether the comment was consumed logically
+	 */
+	private boolean readComment(String comment) {
+		if (readingVariableDirectory && readVariableDirectoryEntry(comment)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Reads an entry of the variable directory.
+	 * @param entry variable directory entry
+	 * @return true if an entry was found
+	 */
+	private boolean readVariableDirectoryEntry(String entry) {
+		try (final Scanner sc = new Scanner(entry)) {
+			if (!sc.hasNextInt()) {
+				return false;
+			}
+			final int index = sc.nextInt();
+			if (!sc.hasNextLine()) {
+				return false;
+			}
+			String variable = sc.nextLine();
+			if (variable.length() >= 2 && Character.isWhitespace(variable.codePointAt(0))) {
+				variable = variable.substring(1); //remove a single separating whitespace character (but allow variables with whitespace after that)
+			} else {
+				return false;
+			}
+			if (!indexVariables.containsKey(index)) {
+				indexVariables.put(index, variable);
+			}
+			return true;
+		}
 	}
 }

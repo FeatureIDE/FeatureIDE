@@ -38,8 +38,7 @@ import org.prop4j.Or;
  * @author Timo Guenther
  */
 public class DimacsWriterTests {
-
-	private static String lineSeparator = System.lineSeparator();
+	private static final String LN = System.lineSeparator();
 
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
@@ -66,17 +65,17 @@ public class DimacsWriterTests {
 
 	@Test
 	public void testAnd() {
-		testEquals(new And("A", new Literal("B", false)), "" + "p cnf 2 2" + lineSeparator + "1 0" + lineSeparator + "-2 0" + lineSeparator);
+		testEquals(new And("A", new Literal("B", false)), "p cnf 2 2" + LN + "1 0" + LN + "-2 0" + LN);
 	}
 
 	@Test
 	public void testOr() {
-		testEquals(new Or(new Literal("A", false), "B"), "" + "p cnf 2 1" + lineSeparator + "-1 2 0" + lineSeparator);
+		testEquals(new Or(new Literal("A", false), "B"), "p cnf 2 1" + LN + "-1 2 0" + LN);
 	}
 
 	@Test
 	public void testNotLiteral() {
-		testEquals(new Literal("A", false), "" + "p cnf 1 1" + lineSeparator + "-1 0" + lineSeparator);
+		testEquals(new Literal("A", false), "p cnf 1 1" + LN + "-1 0" + LN);
 	}
 
 	@Test
@@ -99,6 +98,16 @@ public class DimacsWriterTests {
 		exception.expect(IllegalArgumentException.class);
 		new DimacsWriter(in);
 	}
+	
+	@Test
+	public void testVariableDirectory() {
+		final Node in = new And(new Or("A", new Literal("B", false)), new Or("C", "B", new Literal("A", false)));
+		final DimacsWriter w = new DimacsWriter(in);
+		w.setWritingVariableDirectory(true);
+		final String actual = w.write();
+		final String expected = "c 1 A" + LN + "c 2 B" + LN + "c 3 C" + LN + getDefaultExpected();
+		assertEquals(expected, actual);
+	}
 
 	private void testEquals(Node in) {
 		testEquals(in, getDefaultExpected());
@@ -111,6 +120,6 @@ public class DimacsWriterTests {
 	}
 
 	private String getDefaultExpected() {
-		return "" + "p cnf 3 2" + lineSeparator + "1 -2 0" + lineSeparator + "3 2 -1 0" + lineSeparator;
+		return "p cnf 3 2" + LN + "1 -2 0" + LN + "3 2 -1 0" + LN;
 	}
 }
