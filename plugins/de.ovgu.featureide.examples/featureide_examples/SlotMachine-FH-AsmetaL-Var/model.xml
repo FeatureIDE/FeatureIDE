@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="SlotMachine">
+				<and mandatory="true" name="GroundModel">
+					<and name="Money">
+						<feature name="Betting"/>
+					</and>
+					<feature name="FiveSlots"/>
+				</and>
+				<and abstract="true" hidden="true" mandatory="true" name="derivatives">
+					<feature name="FiveSlots_Betting"/>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<eq>
+					<conj>
+						<var>FiveSlots</var>
+						<var>Betting</var>
+					</conj>
+					<var>FiveSlots_Betting</var>
+				</eq>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

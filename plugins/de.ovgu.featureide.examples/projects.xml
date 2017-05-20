@@ -97,6 +97,8 @@
 		<project name="Numbers-overriding-FH-JML" path="featureide_examples/Numbers-overriding-FH-JML/.project"/>
 		<project name="Paycard-FH-JML" path="featureide_examples/Paycard-FH-JML/.project"/>
 		<project name="PokerSPL-FH-JML" path="featureide_examples/PokerSPL-FH-JML/.project"/>
+		<project name="SlotMachine-FH-AsmetaL-Ref" path="featureide_examples/SlotMachine-FH-AsmetaL-Ref/.project"/>
+		<project name="SlotMachine-FH-AsmetaL-Var" path="featureide_examples/SlotMachine-FH-AsmetaL-Var/.project"/>
 		<project name="SnakeFOP" path="featureide_examples/SnakeFOP/.project"/>
 		<project name="Spacewar Example-AspectJ" path="featureide_examples/Spacewar Example-AspectJ/.project"/>
 		<project name="Stack-FH-Java" path="featureide_examples/Stack-FH-Java/.project"/>

@@ -3,13 +3,12 @@
 configs/default.config
 features/Base/LandingGear.asm
 features/Cylinders_Valves/LandingGear.asm
-features/Cylinder_Valves_v2/LandingGear.asm
 features/HealthMonitor/LandingGear.asm
 features/Landing_Sets/LandingGear.asm
 features/Sensors/LandingGear.asm
-features/Sensors_v2/LandingGear.asm
 model.xml
-STDL/StandardLibrary.asm
+StandardLibrary.asm
+STDL/CTLlibrary.asm
 STDL/LTLlibrary.asm
 STDL/MAPEpatterns.asm
-STDL/CTLLibrary.asm
+STDL/StandardLibrary.asm
