@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +73,7 @@ public class ProjectRecord {
 	private boolean hasWarnings = false;
 	private boolean hasErrors = false;
 	private boolean updated = false;
+	private boolean needsComposer = true;
 
 	/**
 	 * Create a record for a project based on the info given in the file.
@@ -173,13 +175,18 @@ public class ProjectRecord {
 	}
 
 	private void performRequirementCheck() {
-		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
-
+		String[] natures = projectDescription.getNatureIds();
+		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(natures);
+		
+		if (natures.length == 1 && natures[0].equals("org.eclipse.jdt.core.javanature")) {
+			needsComposer = false;
+		}
+		
 		if (status.isOK()) {
 			status = CorePlugin.getDefault().isComposable(projectDescription);
 		}
 
-		if (!status.isOK()) {
+		if (!status.isOK() && needsComposer) {
 			warning = status.getMessage();
 			if (status instanceof MultiStatus) {
 				MultiStatus multi = (MultiStatus) status;
@@ -243,6 +250,10 @@ public class ProjectRecord {
 
 	public String getErrorText() {
 		return error;
+	}
+	
+	public boolean needsComposer() {
+		return needsComposer;
 	}
 
 	/**
