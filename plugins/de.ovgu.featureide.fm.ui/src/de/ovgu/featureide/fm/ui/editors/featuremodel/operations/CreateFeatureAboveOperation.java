@@ -90,12 +90,12 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 		final IFeatureStructure parent = newCompound.getStructure().getParent();
 		if(parent != null)
 		{
+			newCompound.getStructure().setChildren(Collections.<IFeatureStructure>emptyList());
+			featureModel.deleteFeature(newCompound);
 			for(IFeature iFeature : children.keySet())
 			{
 				parent.addChildAtPosition(children.get(iFeature), iFeature.getStructure());
 			}
-			newCompound.getStructure().setChildren(Collections.<IFeatureStructure>emptyList());
-			featureModel.deleteFeature(newCompound);
 		} else {
 			featureModel.getStructure().replaceRoot(child.getStructure());
 			return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, null, null);
