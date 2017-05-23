@@ -52,7 +52,7 @@ import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
+import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
 
 /**
  * ColorSelectedFeatureAction is the action that opens the ColorSelectedFeatureDialog
@@ -195,9 +195,9 @@ public class SetFeatureColorAction extends Action {
 			if (featureModel != null) {
 				// only allow coloration if the active profile is not the default profile
 				if (FeatureColorManager.isDefault(featureModel)) {
-					Wizard selectColorSchemeWizard = new SelectColorSchemeWizard(featureModel);
+					Wizard colorSchemeWizard = new ColorSchemeWizard(featureModel);
 
-					WizardDialog dialog = new WizardDialog(shell, selectColorSchemeWizard);
+					WizardDialog dialog = new WizardDialog(shell, colorSchemeWizard);
 					dialog.create();
 
 					if (dialog.open() == Dialog.CANCEL) {
