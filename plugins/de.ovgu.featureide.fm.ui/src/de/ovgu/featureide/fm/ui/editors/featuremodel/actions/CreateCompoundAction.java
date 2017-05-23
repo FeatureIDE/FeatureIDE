@@ -82,9 +82,9 @@ public class CreateCompoundAction extends Action {
 
 	@Override
 	public void run() {
-		if (selectedFeatures.size() != 1)
-			throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
-		CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures.get(0));
+		//if (selectedFeatures.size() != 1)
+			//throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
+		CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
