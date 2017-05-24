@@ -48,6 +48,9 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	private final IFeature child;
 	LinkedList<IFeature> selectedFeatures;
 	HashMap<IFeature, Integer> children = new HashMap<>();
+
+	boolean parentOr = false;
+	boolean parentAlternative = false;
 	
 	public CreateFeatureAboveOperation(IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
 		super(featureModel, CREATE_COMPOUND);
@@ -63,7 +66,9 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent operation() {
 		IFeatureStructure parent = child.getStructure().getParent();
 		if (parent != null) {
-			newCompound.getStructure().setAND(true);
+			parentOr = parent.isOr();
+			parentAlternative = parent.isAlternative();
+			
 			newCompound.getStructure().setMultiple(parent.isMultiple());
 			final int index = parent.getChildIndex(child.getStructure());
 			for (IFeature iFeature : selectedFeatures) {
@@ -76,6 +81,15 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			for (IFeature iFeature : selectedFeatures) {
 				newCompound.getStructure().addChild(iFeature.getStructure());
 			}
+			
+			if(parentOr){
+				newCompound.getStructure().changeToOr();
+			} else if (parentAlternative){
+				newCompound.getStructure().changeToAlternative();
+			} else {
+				newCompound.getStructure().changeToAnd();
+			}
+			parent.changeToAnd();
 			featureModel.addFeature(newCompound);
 		} else {
 			newCompound.getStructure().addChild(child.getStructure());
@@ -95,6 +109,14 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			for(IFeature iFeature : children.keySet())
 			{
 				parent.addChildAtPosition(children.get(iFeature), iFeature.getStructure());
+			}
+
+			if(parentOr){
+				parent.changeToOr();
+			} else if (parentAlternative){
+				parent.changeToAlternative();
+			} else {
+				parent.changeToAnd();
 			}
 		} else {
 			featureModel.getStructure().replaceRoot(child.getStructure());

@@ -763,9 +763,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				orAction.setText(OR);
 				alternativeAction.setText(ALTERNATIVE);
 			}
-			menu.add(andAction);
-			menu.add(orAction);
-			menu.add(alternativeAction);
+			if (andAction.isEnabled() || andAction.isChecked()) {
+				menu.add(andAction);
+			}
+			if (orAction.isEnabled() || orAction.isChecked()) {
+				menu.add(orAction);
+			}
+			if (alternativeAction.isEnabled() || alternativeAction.isChecked()) {
+				menu.add(alternativeAction);
+			}
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		}
 	}
@@ -987,8 +993,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case FEATURE_ADD_ABOVE:
 			IFeature newCompound = null;
 			if (event.getNewValue() != null && event.getNewValue() instanceof IFeature) {
-				newCompound = (IFeature)event.getNewValue();
-				for(IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound).getGraphicalChildren()){
+				newCompound = (IFeature) event.getNewValue();
+				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound).getGraphicalChildren()) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
 				IFeature oldParent = (IFeature) event.getOldValue();
@@ -1170,17 +1176,18 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			deletedFeature.update(event);
 			IFeature oldParent = (IFeature) event.getOldValue();
 			//Update the parent from 
-			if(oldParent != null){
+			if (oldParent != null) {
 				graphicalFeatureModel.getGraphicalFeature(oldParent).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 				//and update the children that their parent changed
-				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(oldParent).getGraphicalChildren()){
+				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(oldParent).getGraphicalChildren()) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
 				refreshChildAll(oldParent);
 			} else {
 				//No old parent so the new feature was the root
 				//Now update roots parent
-				IGraphicalFeature root = graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+				IGraphicalFeature root = graphicalFeatureModel
+						.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 				root.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				refreshChildAll(root.getObject());
 			}
