@@ -99,16 +99,19 @@ public class FeatureColorManager implements IEventListener {
 	 * Deletes the profile with the given name.
 	 */
 	public static void removeCurrentColorScheme(final IFeatureModel featureModel) {
+		removeColorScheme(featureModel, getCurrentColorScheme(featureModel).getName());
+	}
+
+	public static void removeColorScheme(final IFeatureModel featureModel, final String currentName) {
 		final IProject project = getProject(featureModel);
 		final IFolder profileFolder = project.getFolder(".profiles");
 		if (!profileFolder.exists()) {
 			return;
 		}
-		final String currentName = getCurrentColorScheme(featureModel).getName();
 		if (DefaultColorScheme.defaultName.equals(currentName)) {
-			throw new RuntimeException("Default color schme cannot be removed!");
+			throw new RuntimeException("Default color scheme cannot be removed!");
 		}
-		colorSchemes.get(project).remove(currentName);
+		final ColorScheme removedColorScheme = colorSchemes.get(project).remove(currentName);
 		final IFile file = profileFolder.getFile(currentName + ".profile");
 		if (!file.exists()) {
 			Logger.logWarning(file + " does not exist");
@@ -119,7 +122,9 @@ public class FeatureColorManager implements IEventListener {
 		} catch (CoreException e) {
 			Logger.logError(e);
 		}
-		setActive(project, DefaultColorScheme.defaultName, true);
+		if (removedColorScheme.isCurrent()) {
+			setActive(project, DefaultColorScheme.defaultName, true);
+		}
 	}
 
 	/**
@@ -338,11 +343,14 @@ public class FeatureColorManager implements IEventListener {
 	 * Changes the name of the color scheme.
 	 */
 	public static void renameColorScheme(IFeatureModel featureModel, String newName) {
+		renameColorScheme(featureModel, getCurrentColorScheme(featureModel).getName(), newName);
+	}
+
+	public static void renameColorScheme(IFeatureModel featureModel, String oldName, String newName) {
 		IProject project = getProject(featureModel);
 		Map<String, ColorScheme> currentColorSchemes = colorSchemes.get(project);
-		String oldName = getCurrentColorScheme(featureModel).getName();
 		ColorScheme scheme = currentColorSchemes.get(oldName);
-		removeCurrentColorScheme(featureModel);
+		removeColorScheme(featureModel, oldName);
 		scheme.setName(newName);
 		currentColorSchemes.put(newName, scheme);
 		writeColors(project, scheme);
@@ -447,6 +455,7 @@ public class FeatureColorManager implements IEventListener {
 
 	/**
 	 * Removes the listener from the notification list.
+	 * 
 	 * @param listener
 	 */
 	public static void removeListener(IEventListener listener) {
