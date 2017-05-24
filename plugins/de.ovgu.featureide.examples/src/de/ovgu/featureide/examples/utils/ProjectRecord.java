@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -100,7 +99,9 @@ public class ProjectRecord {
 
 	private void initFields() {
 		warning = "";
+		hasWarnings = false;
 		error = "";
+		hasErrors = false;
 		contentProviderItems = new ArrayList<>();
 	}
 
@@ -116,6 +117,7 @@ public class ProjectRecord {
 		}
 
 		public ProjectRecord getRecord() {
+			init();
 			return ProjectRecord.this;
 		}
 
@@ -168,6 +170,8 @@ public class ProjectRecord {
 	}
 
 	private void performAlreadyExistsCheck() {
+		hasErrors = false;
+		error = "";
 		if (isProjectInWorkspace(getProjectName())) {
 			error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
 			hasErrors = true;
@@ -175,18 +179,20 @@ public class ProjectRecord {
 	}
 
 	private void performRequirementCheck() {
+		hasWarnings = false;
+		warning = "";
 		String[] natures = projectDescription.getNatureIds();
 		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(natures);
-		
+
 		if (natures.length == 1 && natures[0].equals("org.eclipse.jdt.core.javanature")) {
 			needsComposer = false;
 		}
-		
-		if (status.isOK()) {
+
+		if (status.isOK() && needsComposer) {
 			status = CorePlugin.getDefault().isComposable(projectDescription);
 		}
 
-		if (!status.isOK() && needsComposer) {
+		if (!status.isOK()) {
 			warning = status.getMessage();
 			if (status instanceof MultiStatus) {
 				MultiStatus multi = (MultiStatus) status;
@@ -251,7 +257,7 @@ public class ProjectRecord {
 	public String getErrorText() {
 		return error;
 	}
-	
+
 	public boolean needsComposer() {
 		return needsComposer;
 	}
@@ -363,5 +369,5 @@ public class ProjectRecord {
 	public String getProjectDescriptionRelativePath() {
 		return projectDescriptionRelativePath;
 	}
-	
+
 }
