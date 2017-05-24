@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="EmailSystem">
 				<feature mandatory="true" name="Base"/>
@@ -14,19 +15,21 @@
 				<feature name="Verify"/>
 				<feature name="MessageID"/>
 				<alt abstract="true" name="tests">
-					<feature mandatory="true" name="DecryptForward"/>
-					<feature mandatory="true" name="AddressBookEncrypt"/>
-					<feature mandatory="true" name="VerifyForward"/>
-					<feature mandatory="true" name="DecryptAutoResponder"/>
-					<feature mandatory="true" name="SignVerify"/>
-					<feature mandatory="true" name="SignForward"/>
-					<feature mandatory="true" name="EncryptDecrypt"/>
-					<feature mandatory="true" name="EncryptVerify"/>
-					<feature mandatory="true" name="EncryptAutoresponder"/>
-					<feature mandatory="true" name="EncryptForward"/>
+					<feature name="DecryptForward"/>
+					<feature name="AddressBookEncrypt"/>
+					<feature name="VerifyForward"/>
+					<feature name="DecryptAutoResponder"/>
+					<feature name="SignVerify"/>
+					<feature name="SignForward"/>
+					<feature name="EncryptDecrypt"/>
+					<feature name="EncryptVerify"/>
+					<feature name="EncryptAutoresponder"/>
+					<feature name="EncryptForward"/>
 				</alt>
 			</and>
 		</struct>
 		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

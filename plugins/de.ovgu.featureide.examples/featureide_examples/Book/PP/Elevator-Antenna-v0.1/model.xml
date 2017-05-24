@@ -3,19 +3,8 @@
 		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="Elevator">
-				<description>
-					
-				</description>
-				<feature mandatory="true" name="Sabbath">
-					<description>
-						
-					</description>
-				</feature>
-				<feature name="Service">
-					<description>
-						
-					</description>
-				</feature>
+				<feature mandatory="true" name="Sabbath"/>
+				<feature name="Service"/>
 			</and>
 		</struct>
 		<constraints/>

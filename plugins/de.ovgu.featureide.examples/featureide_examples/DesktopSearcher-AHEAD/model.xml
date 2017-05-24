@@ -1,55 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="Root">
 				<or abstract="true" mandatory="true" name="ContentHandler">
-					<feature mandatory="true" name="HTML"/>
-					<feature mandatory="true" name="TXT"/>
-					<feature mandatory="true" name="LATEX"/>
+					<feature name="HTML"/>
+					<feature name="TXT"/>
+					<feature name="LATEX"/>
 				</or>
 				<feature mandatory="true" name="Base"/>
 				<alt mandatory="true" name="User_Interface">
-					<and mandatory="true" name="GUI">
+					<and name="GUI">
 						<or abstract="true" name="History">
-							<feature mandatory="true" name="Query_History"/>
-							<feature mandatory="true" name="Index_History"/>
+							<feature name="Query_History"/>
+							<feature name="Index_History"/>
 						</or>
 						<alt abstract="true" mandatory="true" name="Index">
-							<feature mandatory="true" name="Single_Directory"/>
-							<feature mandatory="true" name="Multi_Directory"/>
+							<feature name="Single_Directory"/>
+							<feature name="Multi_Directory"/>
 						</alt>
 						<feature name="Gui_Preferences"/>
 						<alt abstract="true" mandatory="true" name="View">
-							<feature mandatory="true" name="Tree_View"/>
-							<feature mandatory="true" name="Normal_View"/>
+							<feature name="Tree_View"/>
+							<feature name="Normal_View"/>
 						</alt>
 					</and>
-					<feature mandatory="true" name="Commandline"/>
+					<feature name="Commandline"/>
 				</alt>
 				<alt abstract="true" mandatory="true" name="OS">
-					<feature mandatory="true" name="Windows"/>
-					<feature mandatory="true" name="Linux"/>
+					<feature name="Windows"/>
+					<feature name="Linux"/>
 				</alt>
 			</and>
 		</struct>
 		<constraints/>
-		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="true">
-			<feature name="Base"/>
-			<feature name="User_Interface"/>
-			<feature name="GUI"/>
-			<feature name="Commandline"/>
-			<feature name="Single_Directory"/>
-			<feature name="Multi_Directory"/>
-			<feature name="Query_History"/>
-			<feature name="Index_History"/>
-			<feature name="Tree_View"/>
-			<feature name="Normal_View"/>
 			<feature name="HTML"/>
 			<feature name="TXT"/>
 			<feature name="LATEX"/>
+			<feature name="Base"/>
+			<feature name="User_Interface"/>
+			<feature name="GUI"/>
+			<feature name="Query_History"/>
+			<feature name="Index_History"/>
+			<feature name="Single_Directory"/>
+			<feature name="Multi_Directory"/>
 			<feature name="Gui_Preferences"/>
+			<feature name="Tree_View"/>
+			<feature name="Normal_View"/>
+			<feature name="Commandline"/>
 			<feature name="Windows"/>
 			<feature name="Linux"/>
 		</featureOrder>
