@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,64 +20,61 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * Job that wraps the functionality of a {@link LongRunningMethod}.
  * 
  * @author Sebastian Krieter
  */
-public abstract class LongRunningWrapper {
+public final class LongRunningWrapper {
 
-	public static <T> LongRunningJob<T> createJob(String name, LongRunningMethod<T> method) {
-		return new LongRunningJob<T>(name, method);
-	}
+	public static LongRunningCore INSTANCE = new LongRunningCore();
 
-	public static <T> LongRunningJob<T> startJob(String name, LongRunningMethod<T> method) {
-		final LongRunningJob<T> job = new LongRunningJob<T>(name, method);
-		job.schedule();
-		return job;
-	}
-
-	public static Thread createThread(final LongRunningMethod<?> method) {
-		return new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					method.execute(new WorkMonitor());
-				} catch (Exception e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
-			}
-		});
-	}
-
-	public static Thread startThread(final LongRunningMethod<?> method) {
-		final Thread thread = createThread(method);
-		thread.start();
-		return thread;
+	private LongRunningWrapper() {
 	}
 
 	public static <T> T runMethod(LongRunningMethod<T> method) {
-		try {
-			return method.execute(new WorkMonitor());
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-			return null;
-		}
+		return runMethod(method, null);
 	}
 
-	public static <T> T runMethod(LongRunningMethod<T> method, WorkMonitor monitor) {
+	public static <T> T runMethod(LongRunningMethod<T> method, IMonitor monitor) {
+		monitor = monitor != null ? monitor : new NullMonitor();
 		try {
-			monitor = monitor != null ? monitor : new WorkMonitor();
-			monitor.begin("");
-			final T result = method.execute(monitor);
-			monitor.done();
-			return result;
+			return method.execute(monitor);
 		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+			e.printStackTrace();
+			Logger.logError(e);
 			return null;
+		} finally {
+			monitor.done();
 		}
+	}
+	
+	public static <T> IRunner<T> getRunner(LongRunningMethod<T> method) {
+		return getRunner(method, "");
+	}
+
+	public static <T> IRunner<T> getRunner(LongRunningMethod<T> method, String name) {
+		return INSTANCE.getRunner(method, name);
+	}
+
+	public static <T> IRunner<T> getThread(LongRunningMethod<T> method) {
+		return getThread(method, "", null);
+	}
+
+	public  static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name) {
+		return getThread(method, name, null);
+	}
+
+	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, IMonitor monitor) {
+		return getThread(method, "", monitor);
+	}
+
+	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name, IMonitor monitor) {
+		return new LongRunningThread<>(name, method, monitor);
 	}
 
 }

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<and mandatory="true" name="GraphLibrary">
 				<alt mandatory="true" name="Edges">
-					<feature mandatory="true" name="Directed"/>
-					<feature mandatory="true" name="Undirected"/>
+					<feature name="Directed"/>
+					<feature name="Undirected"/>
 				</alt>
 				<or name="Algorithms">
-					<feature mandatory="true" name="Number"/>
-					<feature mandatory="true" name="Cycle"/>
+					<feature name="Number"/>
+					<feature name="Cycle"/>
 				</or>
 			</and>
 		</struct>
@@ -20,5 +21,7 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

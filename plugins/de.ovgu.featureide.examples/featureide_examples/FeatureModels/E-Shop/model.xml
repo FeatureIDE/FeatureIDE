@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="eShop">
 				<and abstract="true" mandatory="true" name="Store_front">
 					<and abstract="true" name="Home_page">
 						<or abstract="true" mandatory="true" name="sg_Home_page6">
-							<feature mandatory="true" name="Static_content_7"/>
-							<and abstract="true" mandatory="true" name="Dynamic_content8">
+							<feature name="Static_content_7"/>
+							<and abstract="true" name="Dynamic_content8">
 								<and abstract="true" mandatory="true" name="Content_type9">
 									<or abstract="true" mandatory="true" name="sg_Content_type910">
-										<feature mandatory="true" name="Welcome_message11"/>
-										<feature mandatory="true" name="Special_offers"/>
+										<feature name="Welcome_message11"/>
+										<feature name="Special_offers"/>
 									</or>
 								</and>
 								<and abstract="true" mandatory="true" name="Variation_source13">
 									<or abstract="true" mandatory="true" name="sg_Variation_source1314">
-										<feature mandatory="true" name="Time_dependent15"/>
-										<feature mandatory="true" name="Personalized16"/>
+										<feature name="Time_dependent15"/>
+										<feature name="Personalized16"/>
 									</or>
 								</and>
 							</and>
@@ -25,9 +26,9 @@
 					<and abstract="true" name="Registration">
 						<and abstract="true" mandatory="true" name="Registration_enforcement">
 							<or abstract="true" mandatory="true" name="sg_Registration_enforcement19">
-								<feature mandatory="true" name="Register_to_browse20"/>
-								<feature mandatory="true" name="Register_to_buy"/>
-								<feature mandatory="true" name="None22"/>
+								<feature name="Register_to_browse20"/>
+								<feature name="Register_to_buy"/>
+								<feature name="None22"/>
 							</or>
 						</and>
 						<and abstract="true" mandatory="true" name="Registration_information23">
@@ -46,18 +47,18 @@
 							</and>
 							<and abstract="true" name="Demographics34">
 								<or abstract="true" mandatory="true" name="sg_Demographics3435">
-									<feature mandatory="true" name="Age36"/>
-									<feature mandatory="true" name="Income37"/>
-									<feature mandatory="true" name="Education38"/>
-									<feature mandatory="true" name="Custom_Demographic_field39"/>
+									<feature name="Age36"/>
+									<feature name="Income37"/>
+									<feature name="Education38"/>
+									<feature name="Custom_Demographic_field39"/>
 								</or>
 							</and>
 							<feature name="Personal_Information40"/>
 							<and abstract="true" name="Preferences">
 								<or abstract="true" mandatory="true" name="sg_Preferences42">
-									<feature mandatory="true" name="Site_layout43"/>
-									<feature mandatory="true" name="List_size44"/>
-									<feature mandatory="true" name="Language45"/>
+									<feature name="Site_layout43"/>
+									<feature name="List_size44"/>
+									<feature name="Language45"/>
 								</or>
 							</and>
 							<feature name="Reminders46"/>
@@ -70,9 +71,9 @@
 						<and abstract="true" mandatory="true" name="Product_Information">
 							<and abstract="true" mandatory="true" name="Product_type">
 								<or abstract="true" mandatory="true" name="sg_Product_type53">
-									<feature mandatory="true" name="Eletronic_goods"/>
-									<feature mandatory="true" name="Physical_goods"/>
-									<feature mandatory="true" name="Services"/>
+									<feature name="Eletronic_goods"/>
+									<feature name="Physical_goods"/>
+									<feature name="Services"/>
 								</or>
 							</and>
 							<feature mandatory="true" name="Basic_information"/>
@@ -81,21 +82,21 @@
 							<feature name="Customer_reviews"/>
 							<and abstract="true" name="Associated_assets">
 								<or abstract="true" mandatory="true" name="sg_Associated_assets62">
-									<feature mandatory="true" name="Documents63"/>
-									<and abstract="true" mandatory="true" name="Media_files64">
+									<feature name="Documents63"/>
+									<and abstract="true" name="Media_files64">
 										<or abstract="true" mandatory="true" name="sg_Media_files6465">
-											<and abstract="true" mandatory="true" name="Image66">
+											<and abstract="true" name="Image66">
 												<or abstract="true" mandatory="true" name="sg_Image6667">
-													<feature mandatory="true" name="Thumbnail68"/>
-													<feature mandatory="true" name="a2D_image69"/>
-													<feature mandatory="true" name="a3D_image70"/>
-													<feature mandatory="true" name="a360_degrees_image71"/>
-													<feature mandatory="true" name="Different_perspectives72"/>
-													<feature mandatory="true" name="Gallery73"/>
+													<feature name="Thumbnail68"/>
+													<feature name="a2D_image69"/>
+													<feature name="a3D_image70"/>
+													<feature name="a360_degrees_image71"/>
+													<feature name="Different_perspectives72"/>
+													<feature name="Gallery73"/>
 												</or>
 											</and>
-											<feature mandatory="true" name="Video74"/>
-											<feature mandatory="true" name="Sound75"/>
+											<feature name="Video74"/>
+											<feature name="Sound75"/>
 										</or>
 									</and>
 								</or>
@@ -119,8 +120,8 @@
 						<feature name="Multiple_catalogs87"/>
 						<and abstract="true" name="Searching88">
 							<or abstract="true" mandatory="true" name="sg_Searching8889">
-								<feature mandatory="true" name="Basic_search90"/>
-								<feature mandatory="true" name="Advanced_search91"/>
+								<feature name="Basic_search90"/>
+								<feature name="Advanced_search91"/>
 							</or>
 						</and>
 						<and abstract="true" name="Browsing92">
@@ -129,11 +130,11 @@
 							<and abstract="true" name="Index_page95">
 								<and abstract="true" name="Sorting_filters96">
 									<or abstract="true" mandatory="true" name="sg_Sorting_filters9697">
-										<feature mandatory="true" name="Price98"/>
-										<feature mandatory="true" name="Quality99"/>
-										<feature mandatory="true" name="Price_Quality_ratio_100"/>
-										<feature mandatory="true" name="Manufacturer_name101"/>
-										<feature mandatory="true" name="Custom_filter102"/>
+										<feature name="Price98"/>
+										<feature name="Quality99"/>
+										<feature name="Price_Quality_ratio_100"/>
+										<feature name="Manufacturer_name101"/>
+										<feature name="Custom_filter102"/>
 									</or>
 								</and>
 							</and>
@@ -149,9 +150,9 @@
 						<feature name="Multiple_wish_lists109"/>
 						<and abstract="true" name="Permissions">
 							<or abstract="true" mandatory="true" name="sg_Permissions111">
-								<feature mandatory="true" name="Public_access112"/>
-								<feature mandatory="true" name="Restricted_access113"/>
-								<feature mandatory="true" name="Private_access114"/>
+								<feature name="Public_access112"/>
+								<feature name="Restricted_access113"/>
+								<feature name="Private_access114"/>
 							</or>
 						</and>
 					</and>
@@ -165,12 +166,12 @@
 						<and abstract="true" mandatory="true" name="Checkout121">
 							<and abstract="true" mandatory="true" name="Checkout_type122">
 								<or abstract="true" mandatory="true" name="sg_Checkout_type122123">
-									<and abstract="true" mandatory="true" name="Registered_checkout">
+									<and abstract="true" name="Registered_checkout">
 										<and abstract="true" name="Quick_checkout">
 											<feature name="Enable_profile_update_on_checkout_126"/>
 										</and>
 									</and>
-									<feature mandatory="true" name="Guest_checkout127"/>
+									<feature name="Guest_checkout127"/>
 								</or>
 							</and>
 							<and abstract="true" name="Shipping_options">
@@ -182,11 +183,11 @@
 							</and>
 							<and abstract="true" mandatory="true" name="Taxation_options134">
 								<or abstract="true" mandatory="true" name="sg_Taxation_options134135">
-									<and abstract="true" mandatory="true" name="Custom_taxation136">
+									<and abstract="true" name="Custom_taxation136">
 										<and abstract="true" mandatory="true" name="Type137">
 											<or abstract="true" mandatory="true" name="sg_Type137138">
-												<feature mandatory="true" name="Fixed_rate_taxation139"/>
-												<and abstract="true" mandatory="true" name="Rule_based_taxation140">
+												<feature name="Fixed_rate_taxation139"/>
+												<and abstract="true" name="Rule_based_taxation140">
 													<feature mandatory="true" name="Tax_codes141"/>
 													<and abstract="true" mandatory="true" name="Address142">
 														<feature mandatory="true" name="Shipping"/>
@@ -194,9 +195,9 @@
 													</and>
 													<and abstract="true" name="Resolution145">
 														<or abstract="true" mandatory="true" name="sg_Resolution145146">
-															<feature mandatory="true" name="Country147"/>
-															<feature mandatory="true" name="Region148"/>
-															<feature mandatory="true" name="City149"/>
+															<feature name="Country147"/>
+															<feature name="Region148"/>
+															<feature name="City149"/>
 														</or>
 													</and>
 												</and>
@@ -204,16 +205,16 @@
 										</and>
 										<and abstract="true" mandatory="true" name="Ammount_specification150">
 											<or abstract="true" mandatory="true" name="sg_Ammount_specification150151">
-												<feature mandatory="true" name="Surcharge152"/>
-												<feature mandatory="true" name="Percentage153"/>
+												<feature name="Surcharge152"/>
+												<feature name="Percentage153"/>
 											</or>
 										</and>
 									</and>
-									<and abstract="true" mandatory="true" name="Tax_gateways154">
+									<and abstract="true" name="Tax_gateways154">
 										<or abstract="true" mandatory="true" name="sg_Tax_gateways154155">
-											<feature mandatory="true" name="CertiTAX156"/>
-											<feature mandatory="true" name="CyberSource157"/>
-											<feature mandatory="true" name="Custom_tax_gateway158"/>
+											<feature name="CertiTAX156"/>
+											<feature name="CyberSource157"/>
+											<feature name="Custom_tax_gateway158"/>
 										</or>
 									</and>
 								</or>
@@ -221,60 +222,60 @@
 							<and abstract="true" mandatory="true" name="Payment_options159">
 								<and abstract="true" mandatory="true" name="Payment_types160">
 									<or abstract="true" mandatory="true" name="sg_Payment_types160161">
-										<feature mandatory="true" name="COD162"/>
-										<feature mandatory="true" name="Credit_card163"/>
-										<feature mandatory="true" name="Debit_card164"/>
-										<feature mandatory="true" name="Eletronic_cheque165"/>
-										<feature mandatory="true" name="Fax_mail_order166"/>
-										<feature mandatory="true" name="Purchase_order167"/>
-										<feature mandatory="true" name="Gift_certificate168"/>
-										<feature mandatory="true" name="Phone_order169"/>
-										<feature mandatory="true" name="Custom_payment_type170"/>
+										<feature name="COD162"/>
+										<feature name="Credit_card163"/>
+										<feature name="Debit_card164"/>
+										<feature name="Eletronic_cheque165"/>
+										<feature name="Fax_mail_order166"/>
+										<feature name="Purchase_order167"/>
+										<feature name="Gift_certificate168"/>
+										<feature name="Phone_order169"/>
+										<feature name="Custom_payment_type170"/>
 									</or>
 								</and>
 								<feature name="Fraud_detection171"/>
 								<and abstract="true" name="Payment_gateways172">
 									<or abstract="true" mandatory="true" name="sg_Payment_gateways172173">
-										<feature mandatory="true" name="Authorize_Net174"/>
-										<feature mandatory="true" name="CyberSource175"/>
-										<feature mandatory="true" name="LinkPoint176"/>
-										<feature mandatory="true" name="Paradata177"/>
-										<feature mandatory="true" name="SkipJack178"/>
-										<feature mandatory="true" name="Verisign_Payflow_Pro179"/>
-										<feature mandatory="true" name="Custom_payment_gateway180"/>
+										<feature name="Authorize_Net174"/>
+										<feature name="CyberSource175"/>
+										<feature name="LinkPoint176"/>
+										<feature name="Paradata177"/>
+										<feature name="SkipJack178"/>
+										<feature name="Verisign_Payflow_Pro179"/>
+										<feature name="Custom_payment_gateway180"/>
 									</or>
 								</and>
 							</and>
 						</and>
 						<and abstract="true" mandatory="true" name="Order_confirmation181">
 							<or abstract="true" mandatory="true" name="sg_Order_confirmation181182">
-								<feature mandatory="true" name="Eletronic_page183"/>
-								<feature mandatory="true" name="E_mail184"/>
-								<feature mandatory="true" name="Phone185"/>
-								<feature mandatory="true" name="Mail186"/>
+								<feature name="Eletronic_page183"/>
+								<feature name="E_mail184"/>
+								<feature name="Phone185"/>
+								<feature name="Mail186"/>
 							</or>
 						</and>
 					</and>
 					<and abstract="true" name="Customer_service">
 						<or abstract="true" mandatory="true" name="sg_Customer_service188">
-							<and abstract="true" mandatory="true" name="Question_and_feedback_forms189">
+							<and abstract="true" name="Question_and_feedback_forms189">
 								<feature name="Question_and_feedback_tracking190"/>
 							</and>
-							<feature mandatory="true" name="Product_returns191"/>
-							<and abstract="true" mandatory="true" name="Order_status_review192">
+							<feature name="Product_returns191"/>
+							<and abstract="true" name="Order_status_review192">
 								<and abstract="true" mandatory="true" name="Filtering_criteria193">
 									<or abstract="true" mandatory="true" name="sg_Filtering_criteria193194">
-										<feature mandatory="true" name="Order_number195"/>
-										<feature mandatory="true" name="Order_date196"/>
-										<feature mandatory="true" name="Order_status197"/>
+										<feature name="Order_number195"/>
+										<feature name="Order_date196"/>
+										<feature name="Order_status197"/>
 									</or>
 								</and>
 								<feature name="Request_order_hardcopy198"/>
 							</and>
-							<and abstract="true" mandatory="true" name="Shipment_status_tracking_199">
+							<and abstract="true" name="Shipment_status_tracking_199">
 								<or abstract="true" mandatory="true" name="sg_Shipment_status_tracking_199200">
-									<feature mandatory="true" name="Internal_tracking201"/>
-									<feature mandatory="true" name="Partner_tracking202"/>
+									<feature name="Internal_tracking201"/>
+									<feature name="Partner_tracking202"/>
 								</or>
 							</and>
 						</or>
@@ -282,9 +283,9 @@
 					<and abstract="true" name="User_behaviour_tracking">
 						<and abstract="true" mandatory="true" name="Behaviour_tracked204">
 							<or abstract="true" mandatory="true" name="sg_Behaviour_tracked204205">
-								<feature mandatory="true" name="Locally_visited_pages"/>
-								<feature mandatory="true" name="External_referring_pages"/>
-								<feature mandatory="true" name="Previous_purchases"/>
+								<feature name="Locally_visited_pages"/>
+								<feature name="External_referring_pages"/>
+								<feature name="Previous_purchases"/>
 							</or>
 						</and>
 					</and>
@@ -293,40 +294,40 @@
 					<and abstract="true" mandatory="true" name="Order_management210">
 						<and abstract="true" mandatory="true" name="Fulfillment211">
 							<or abstract="true" mandatory="true" name="sg_Fulfillment211212">
-								<and abstract="true" mandatory="true" name="Physical_goods_fulfillment">
+								<and abstract="true" name="Physical_goods_fulfillment">
 									<feature mandatory="true" name="Warehouse_management"/>
 									<and abstract="true" mandatory="true" name="shipping">
 										<or abstract="true" mandatory="true" name="sg_shipping216">
-											<and abstract="true" mandatory="true" name="Custom_shipping_method217">
+											<and abstract="true" name="Custom_shipping_method217">
 												<and abstract="true" mandatory="true" name="Pricing218">
 													<feature mandatory="true" name="Flat_rate219"/>
 													<and abstract="true" name="Rate_factors220">
 														<or abstract="true" mandatory="true" name="sg_Rate_factors220221">
-															<feature mandatory="true" name="Quantity_purchased222"/>
-															<feature mandatory="true" name="Order_total223"/>
-															<feature mandatory="true" name="Weight224"/>
-															<feature mandatory="true" name="Product_classification225"/>
+															<feature name="Quantity_purchased222"/>
+															<feature name="Order_total223"/>
+															<feature name="Weight224"/>
+															<feature name="Product_classification225"/>
 														</or>
 													</and>
 												</and>
 											</and>
-											<and abstract="true" mandatory="true" name="Shipping_gateways226">
+											<and abstract="true" name="Shipping_gateways226">
 												<or abstract="true" mandatory="true" name="sg_Shipping_gateways226227">
-													<feature mandatory="true" name="FedEX228"/>
-													<feature mandatory="true" name="UPS229"/>
-													<feature mandatory="true" name="USPS230"/>
-													<feature mandatory="true" name="Canada_Post231"/>
-													<feature mandatory="true" name="Custom_shipping_gateway232"/>
+													<feature name="FedEX228"/>
+													<feature name="UPS229"/>
+													<feature name="USPS230"/>
+													<feature name="Canada_Post231"/>
+													<feature name="Custom_shipping_gateway232"/>
 												</or>
 											</and>
 										</or>
 									</and>
 								</and>
-								<and abstract="true" mandatory="true" name="Eletronic_goods_fulfillment">
+								<and abstract="true" name="Eletronic_goods_fulfillment">
 									<feature mandatory="true" name="File_repository234"/>
 									<feature mandatory="true" name="License_management235"/>
 								</and>
-								<and abstract="true" mandatory="true" name="Services_fulfillment">
+								<and abstract="true" name="Services_fulfillment">
 									<feature name="Appointment_scheduling237"/>
 									<feature name="Resource_planning238"/>
 								</and>
@@ -336,30 +337,30 @@
 					<and abstract="true" name="Targeting239">
 						<and abstract="true" mandatory="true" name="Targeting_criteria240">
 							<or abstract="true" mandatory="true" name="sg_Targeting_criteria240241">
-								<feature mandatory="true" name="Customer_preferences"/>
-								<feature mandatory="true" name="Personal_information243"/>
-								<feature mandatory="true" name="Demographics244"/>
-								<feature mandatory="true" name="targeting_criteria_previous_purchases"/>
-								<feature mandatory="true" name="Shopping_cart_content246"/>
-								<feature mandatory="true" name="Wish_list_content"/>
-								<feature mandatory="true" name="Previously_visited_pages"/>
-								<feature mandatory="true" name="Date_and_time249"/>
-								<feature mandatory="true" name="Custom_target_criteria250"/>
+								<feature name="Customer_preferences"/>
+								<feature name="Personal_information243"/>
+								<feature name="Demographics244"/>
+								<feature name="targeting_criteria_previous_purchases"/>
+								<feature name="Shopping_cart_content246"/>
+								<feature name="Wish_list_content"/>
+								<feature name="Previously_visited_pages"/>
+								<feature name="Date_and_time249"/>
+								<feature name="Custom_target_criteria250"/>
 							</or>
 						</and>
 						<and abstract="true" mandatory="true" name="Targeting_mechanisms251">
 							<or abstract="true" mandatory="true" name="sg_Targeting_mechanisms251252">
-								<and abstract="true" mandatory="true" name="Advertisements253">
+								<and abstract="true" name="Advertisements253">
 									<and abstract="true" mandatory="true" name="Advertisement_types254">
 										<or abstract="true" mandatory="true" name="sg_Advertisement_types254255">
-											<feature mandatory="true" name="Banner_ads256"/>
-											<feature mandatory="true" name="Pop_up_ads257"/>
+											<feature name="Banner_ads256"/>
+											<feature name="Pop_up_ads257"/>
 										</or>
 									</and>
 									<and abstract="true" mandatory="true" name="Advertisement_sources258">
 										<or abstract="true" mandatory="true" name="sg_Advertisement_sources258259">
-											<feature mandatory="true" name="House_advertisements260"/>
-											<and abstract="true" mandatory="true" name="Paid_advertisements261">
+											<feature name="House_advertisements260"/>
+											<and abstract="true" name="Paid_advertisements261">
 												<feature mandatory="true" name="Advertisement_management_interface262"/>
 											</and>
 										</or>
@@ -367,7 +368,7 @@
 									<feature name="Advertisement_response_tracking263"/>
 									<feature name="Context_sensitive_ads264"/>
 								</and>
-								<and abstract="true" mandatory="true" name="Discounts">
+								<and abstract="true" name="Discounts">
 									<and abstract="true" mandatory="true" name="Discount_conditions266">
 										<feature mandatory="true" name="Product_and_quantity_scope267"/>
 										<feature mandatory="true" name="Time_scope268"/>
@@ -375,9 +376,9 @@
 									</and>
 									<and abstract="true" mandatory="true" name="Award270">
 										<or abstract="true" mandatory="true" name="sg_Award270271">
-											<feature mandatory="true" name="Percentage_discount272"/>
-											<feature mandatory="true" name="Fixed_discount273"/>
-											<feature mandatory="true" name="Free_item274"/>
+											<feature name="Percentage_discount272"/>
+											<feature name="Fixed_discount273"/>
+											<feature name="Free_item274"/>
 										</or>
 									</and>
 									<and abstract="true" mandatory="true" name="Eligibility_requirements275">
@@ -386,20 +387,20 @@
 									</and>
 									<and abstract="true" mandatory="true" name="Graduation_by278">
 										<or abstract="true" mandatory="true" name="sg_Graduation_by278279">
-											<feature mandatory="true" name="Purchase_value280"/>
-											<feature mandatory="true" name="Quantity281"/>
+											<feature name="Purchase_value280"/>
+											<feature name="Quantity281"/>
 										</or>
 									</and>
 									<feature name="Coupons282"/>
 									<feature mandatory="true" name="Handling_multiple_discounts283"/>
 								</and>
-								<and abstract="true" mandatory="true" name="Sell_strategies284">
+								<and abstract="true" name="Sell_strategies284">
 									<or abstract="true" mandatory="true" name="sg_Sell_strategies284285">
-										<feature mandatory="true" name="Product_kitting286"/>
-										<and abstract="true" mandatory="true" name="Up_selling287">
+										<feature name="Product_kitting286"/>
+										<and abstract="true" name="Up_selling287">
 											<feature mandatory="true" name="Substitute_products288"/>
 										</and>
-										<and abstract="true" mandatory="true" name="Cross_selling289">
+										<and abstract="true" name="Cross_selling289">
 											<feature mandatory="true" name="Past_customers_also_bought290"/>
 										</and>
 									</or>
@@ -408,9 +409,9 @@
 						</and>
 						<and abstract="true" mandatory="true" name="Display_and_notification291">
 							<or abstract="true" mandatory="true" name="sg_Display_and_notification291292">
-								<feature mandatory="true" name="Assignment_to_page_types_for_display293"/>
-								<feature mandatory="true" name="Product_flagging294"/>
-								<and abstract="true" mandatory="true" name="E_mails295">
+								<feature name="Assignment_to_page_types_for_display293"/>
+								<feature name="Product_flagging294"/>
+								<and abstract="true" name="E_mails295">
 									<feature name="Personalized"/>
 									<feature name="Response_tracking297"/>
 								</and>
@@ -440,10 +441,10 @@
 					</and>
 					<and abstract="true" name="External_systems_integration313">
 						<or abstract="true" mandatory="true" name="sg_External_systems_integration313314">
-							<feature mandatory="true" name="Fulfillment_system"/>
-							<feature mandatory="true" name="Inventory_management_system316"/>
-							<feature mandatory="true" name="Procurement_system"/>
-							<feature mandatory="true" name="External_distributor_system318"/>
+							<feature name="Fulfillment_system"/>
+							<feature name="Inventory_management_system316"/>
+							<feature name="Procurement_system"/>
+							<feature name="External_distributor_system318"/>
 						</or>
 					</and>
 					<and abstract="true" mandatory="true" name="Administration319">
@@ -633,5 +634,7 @@
 				</disj>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

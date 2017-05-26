@@ -4,7 +4,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_HAS_CONTR
 
 import java.io.File;
 
-import scala.Function3;
 import br.ufal.ic.colligens.models.FileProxy;
 import br.ufal.ic.colligens.models.RenderParserError;
 import br.ufal.ic.colligens.models.RenderTypeError;
@@ -23,6 +22,7 @@ import de.fosd.typechef.parser.c.ParserMain;
 import de.fosd.typechef.parser.c.TranslationUnit;
 import de.fosd.typechef.typesystem.CTypeSystemFrontend;
 import de.fosd.typechef.typesystem.linker.CInterface;
+import scala.Function3;
 
 public final class TypeChefFrontend {
 

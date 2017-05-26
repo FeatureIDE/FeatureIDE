@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -62,21 +62,37 @@ public class AddRoleAction extends Action {
 
 		String feature = getFeatureName();
 		String clss = "";
+		String pack = "";
 
 		if (selectedItem != null) {
 			if (selectedItem instanceof CollaborationEditPart) {
 				feature = ((CollaborationEditPart) selectedItem).getCollaborationModel().getName();
 			} else if (selectedItem instanceof RoleEditPart) {
 				feature = ((RoleEditPart) selectedItem).getRoleModel().getFeature().getName();
-			} else if (selectedItem instanceof ClassEditPart) {
-				clss = ((ClassEditPart) selectedItem).getClassModel().getName();
+				clss = ((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getName();
+				pack = ((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getPackage();
 				if (clss.contains("."))
 					clss = clss.substring(0, clss.lastIndexOf('.'));
+				if (clss.contains("/"))
+					clss = clss.substring(clss.lastIndexOf("/") + 1, clss.length());
+			} else if (selectedItem instanceof ClassEditPart) {
+				clss = ((ClassEditPart) selectedItem).getClassModel().getName();
+				pack = ((ClassEditPart) selectedItem).getClassModel().getName().replace("/", ".");
+				if (pack.indexOf(".") != pack.lastIndexOf(".")) {
+					pack = pack.substring(0, pack.lastIndexOf("."));
+					pack = pack.substring(0, pack.lastIndexOf('.'));
+				} else {
+					pack = "";
+				}
+				if (clss.contains("."))
+					clss = clss.substring(0, clss.lastIndexOf('.'));
+				if (clss.contains("/"))
+					clss = clss.substring(clss.lastIndexOf("/") + 1, clss.length());
 			}
 		}
 
 		NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
-		wizard.init(PlatformUI.getWorkbench(), selection, feature, clss);
+		wizard.init(PlatformUI.getWorkbench(), selection, feature, clss, pack);
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
@@ -108,8 +124,7 @@ public class AddRoleAction extends Action {
 					Object edit = list.get(index + 1);
 					if (edit instanceof CollaborationEditPart) {
 
-						CollaborationFigure nextCollFigure = ((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure())
-								.getCollaborationFigure();
+						CollaborationFigure nextCollFigure = ((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure()).getCollaborationFigure();
 
 						max = nextCollFigure.getBounds().y - 4;
 					} else if (edit instanceof ClassEditPart) {

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,8 +35,8 @@ import org.sat4j.specs.IteratorInt;
 
 /**
  * Represents an instance of a satisfiability problem in CNF.</br>
- * Use a {@link ISolverProvider solver provider} or the {@link #getSolver()} method
- * to get a {@link BasicSolver solver} for this problem.
+ * Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()}
+ * method to get a {@link BasicSolver solver} for this problem.
  * 
  * @author Sebastian Krieter
  */
@@ -48,6 +48,19 @@ public class SatInstance {
 			final int y = model2[i];
 			if (x != y) {
 				model1[i] = 0;
+			}
+		}
+	}
+
+	public static void updateModel(final int[] model1, Iterable<int[]> models) {
+		for (int i = 0; i < model1.length; i++) {
+			final int x = model1[i];
+			for (int[] model2 : models) {
+				final int y = model2[i];
+				if (x != y) {
+					model1[i] = 0;
+					break;
+				}
 			}
 		}
 	}
@@ -105,7 +118,7 @@ public class SatInstance {
 				if (includePositive) {
 					resultList.add(intToVar[Math.abs(var)].toString());
 				}
-			} else {
+			} else if (var < 0) {
 				if (includeNegative) {
 					resultList.add("-" + intToVar[Math.abs(var)].toString());
 				}
@@ -145,6 +158,10 @@ public class SatInstance {
 			resultList.add(new Literal(intToVar[Math.abs(var)], (var > 0)));
 		}
 		return resultList;
+	}
+
+	public Literal convertToLiteral(int var) {
+		return new Literal(intToVar[Math.abs(var)], (var > 0));
 	}
 
 	protected List<String> convertToString(IVecInt model) {

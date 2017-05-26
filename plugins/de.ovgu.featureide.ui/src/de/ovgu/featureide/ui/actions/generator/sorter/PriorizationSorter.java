@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,7 +34,7 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
@@ -58,7 +58,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	private int configurationCounter = 1;
 
 	@Override
-	protected int sort(final WorkMonitor monitor) {
+	protected int sort(final IMonitor monitor) {
 		if (configurations.isEmpty()) {
 			return 0;
 		}
@@ -83,7 +83,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		return new BuilderConfiguration(configuration, i);
 	}
 
-	protected List<List<String>> sortConfigs(List<List<String>> configs, WorkMonitor monitor) {
+	protected List<List<String>> sortConfigs(List<List<String>> configs, IMonitor monitor) {
 		// bring the first product with maximum number of optional feature.\
 		System.err.println("START sort");
 		allconfigs.addAll(configs);
@@ -93,9 +93,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		System.err.println("allyes");
 		allyesconfig();
 		while (!allconfigs.isEmpty()) {
-			if (monitor.checkCancel()) {
-				break;
-			}
+			monitor.checkCancel();
 			selectConfig();
 		}
 		return allsortedconfigs;
@@ -106,13 +104,11 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		return allconfigs.size() + configurations.size();
 	}
 	
-	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, WorkMonitor monitor) {
+	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, IMonitor monitor) {
 		configsDistancesResult = new HashMap<String, Double>();
 		String mapKey;
 		for (int i = 0; i < allConfig.size(); i++) {
-			if (monitor.checkCancel()) {
-				break;
-			}
+			monitor.checkCancel();
 			for (int j = i + 1; j < allConfig.size(); j++) {
 				int xHashCode = allConfig.get(i).hashCode();
 				int yHashCode = allConfig.get(j).hashCode();

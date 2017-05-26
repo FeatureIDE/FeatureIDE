@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,12 +20,11 @@
  */
 package de.ovgu.featureide.featurehouse;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.LOADING_SIGNATURES_FOR;
-
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Loads the signatures from Fuji.
@@ -34,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.AStoppableJob;
  * @author Marcus Pinnecke
  */
 //@SuppressWarnings(RESTRICTION)
-public class ExtendedFujiSignaturesJob extends AStoppableJob {
+public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSignatures> {
 
 //	private static final class SignatureReference {
 //		private final HashMap<Integer, FOPFeatureData> ids = new HashMap<>();
@@ -164,7 +163,6 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 	}
 	
 	public ExtendedFujiSignaturesJob(IFeatureProject featureProject) {
-		super(LOADING_SIGNATURES_FOR + featureProject.getProjectName());
 		this.featureProject = featureProject;
 		this.projectSignatures = new ProjectSignatures(this.featureProject.getFeatureModel());
 //		this.featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_FOP);
@@ -215,9 +213,9 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 //		String featurename = featureModulePathnames.get(featureID);
 //		return featurename.substring(featurename.lastIndexOf('\\') + 1);
 //	}
-	
+
 	@Override
-	protected boolean work() {
+	public ProjectSignatures execute(IMonitor monitor) throws Exception {
 //		IFeatureModel fm = featureProject.getFeatureModel();
 //		fm.getAnalyser().setDependencies();
 //
@@ -228,7 +226,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 //		SPLStructure spl = null;
 //		Program ast;
 //		try {
-			throw new UnsupportedOperationException("Fuji is not supported currently");
+			throw new UnsupportedOperationException("Fuji is currently not supported.");
 //			Main fuji = new Main(fujiOptions, new FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(fm), FeatureUtils.CHARSQUENCE_TO_STRING);
 //			
 //			Composition composition = fuji.getComposition(fuji);

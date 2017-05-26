@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -63,7 +63,7 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if (editPart instanceof ConstraintEditPart) {
-				constraint = ((ConstraintEditPart) editPart).getConstraintModel().getObject();
+				constraint = ((ConstraintEditPart) editPart).getModel().getObject();
 				return true;
 			}
 			if (editPart instanceof IConstraint) {

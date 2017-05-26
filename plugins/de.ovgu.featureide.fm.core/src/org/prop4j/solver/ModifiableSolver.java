@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,7 +20,8 @@
  */
 package org.prop4j.solver;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.prop4j.Literal;
@@ -33,7 +34,8 @@ import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 
 /**
  * Finds certain solutions of propositional formulas.
@@ -42,6 +44,8 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * @author Sebastian Krieter
  */
 public class ModifiableSolver extends BasicSolver {
+	
+	protected ArrayList<IConstr> constrList;
 
 	public ModifiableSolver(SatInstance satInstance) throws ContradictionException {
 		super(satInstance);
@@ -58,13 +62,28 @@ public class ModifiableSolver extends BasicSolver {
 		solver.setVerbose(false);
 		return solver;
 	}
-
-	public List<IConstr> addClauses(Node constraint) throws ContradictionException {
-		return addCNF(constraint.getChildren());
+	
+	public List<IConstr> addCNF(final Collection<? extends Clause> cnfChildren) throws ContradictionException {
+		if (constrList == null) {
+			constrList = new ArrayList<>();
+		}
+		final int oldSize = constrList.size();
+		try {
+			for (Clause clause : cnfChildren) {
+				constrList.add(solver.addClause(new VecInt(clause.getLiterals())));
+			}
+		} catch (ContradictionException e) {
+			removeLastClauses(constrList.size() - oldSize);
+			throw e;
+		}
+		return new ArrayList<>(constrList.subList(oldSize, constrList.size()));
 	}
 
 	protected List<IConstr> addCNF(final Node[] cnfChildren) throws ContradictionException {
-		final List<IConstr> result = new LinkedList<>();
+		if (constrList == null) {
+			constrList = new ArrayList<>();
+		}
+		final int oldSize = constrList.size();
 		try {
 			for (Node node : cnfChildren) {
 				final Node[] children = node.getChildren();
@@ -73,21 +92,19 @@ public class ModifiableSolver extends BasicSolver {
 					final Literal literal = (Literal) children[i];
 					clause[i] = satInstance.getSignedVariable(literal);
 				}
-				result.add(solver.addClause(new VecInt(clause)));
+				constrList.add(solver.addClause(new VecInt(clause)));
 			}
 		} catch (ContradictionException e) {
-			for (IConstr constr : result) {
-				if (constr != null) {
-					solver.removeConstr(constr);
-				}
-			}
+			removeLastClauses(constrList.size() - oldSize);
 			throw e;
 		}
-		return result;
+		return new ArrayList<>(constrList.subList(oldSize, constrList.size()));
 	}
 
 	public void removeConstraint(IConstr constr) {
-		solver.removeConstr(constr);
+		if (constr != null) {
+			solver.removeConstr(constr);
+		}
 	}
 
 	public boolean isImplied(Node... or) {
@@ -99,14 +116,28 @@ public class ModifiableSolver extends BasicSolver {
 		try {
 			return !solver.isSatisfiable(backbone);
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return false;
 	}
 
+	public void removeLastClauses(int numberOfClauses) {
+		for (int i = 0; i < numberOfClauses; i++) {
+			final IConstr removeLast = constrList.remove(constrList.size() - 1);
+			if (removeLast != null) {
+				solver.removeSubsumedConstr(removeLast);
+			}
+		}
+		solver.clearLearntClauses();
+	}
+
 	@Override
 	public ModifiableSolver clone() {
-		return new ModifiableSolver(this);
+		if (this.getClass() == ModifiableSolver.class) {
+			return new ModifiableSolver(this);
+		} else {
+			throw new RuntimeException("Cloning not supported for " + this.getClass().toString());
+		}
 	}
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,14 +24,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_FEATURE_NAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -50,11 +48,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -71,8 +70,10 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
  * @author Sebastian Krieter
  */
 public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
-	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + XmlFeatureModelFormat.class.getSimpleName();
+
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + XmlFeatureModelFormat.class.getSimpleName();
+
+	private IFeatureModelFactory factory;
 
 	@Override
 	public boolean supportsRead() {
@@ -87,6 +88,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
+
+		factory = FMFactoryManager.getFactory(object);
+
 		final Collection<PropertiesParser> customProperties = new ArrayList<>();
 
 		for (final Element e : getElements(doc.getElementsByTagName(FEATURE_MODEL))) {
@@ -104,8 +108,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		importCustomProperties(customProperties, object);
-
-		object.handleModelDataLoaded();
 	}
 
 	@Override
@@ -250,23 +252,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param feat current feature
 	 */
 	private void createXmlDocRec(Document doc, Element node, IFeature feat) {
-
 		if (feat == null) {
 			return;
 		}
 
-		Element fnod;
-		List<IFeature> children;
+		final List<IFeature> children = FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
 
-		children = FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
+		final Element fnod;
 		if (children.isEmpty()) {
 			fnod = doc.createElement(FEATURE);
-			final String description = feat.getProperty().getDescription();
-			if (description != null) {
-				final Element descr = doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-				fnod.appendChild(descr);
-			}
+			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 		} else {
 			if (feat.getStructure().isAnd()) {
@@ -276,21 +271,23 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else if (feat.getStructure().isAlternative()) {
 				fnod = doc.createElement(ALT);
 			} else {
-				fnod = doc.createElement(UNKNOWN);//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
+				fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
-			final String description = feat.getProperty().getDescription();
-			if (description != null) {
-				final Element descr = doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-				fnod.appendChild(descr);
-			}
-
+			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 
-			final Iterator<IFeature> i = children.iterator();
-			while (i.hasNext()) {
-				createXmlDocRec(doc, fnod, i.next());
+			for (IFeature feature : children) {
+				createXmlDocRec(doc, fnod, feature);
 			}
+		}
+	}
+
+	protected void addDescription(Document doc, IFeature feat, Element fnod) {
+		final String description = feat.getProperty().getDescription();
+		if (description != null && !description.trim().isEmpty()) {
+			final Element descr = doc.createElement(DESCRIPTION);
+			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
+			fnod.appendChild(descr);
 		}
 	}
 
@@ -387,7 +384,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			for (final Element child : getElements(e.getChildNodes())) {
 				final String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					final IConstraint c = FMFactoryManager.getFactory().createConstraint(object, parseConstraints2(child.getChildNodes()).getFirst());
+					final IConstraint c = factory.createConstraint(object, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						final NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {
@@ -445,7 +442,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * Parses the feature order section.
 	 */
 	private void parseFeatureOrder(NodeList nodeList) throws UnsupportedModelException {
-		final ArrayList<String> order = new ArrayList<String>(object.getNumberOfFeatures());
+		final ArrayList<String> order = new ArrayList<>(object.getNumberOfFeatures());
 		for (final Element e : getElements(nodeList)) {
 			if (e.hasAttributes()) {
 				final NamedNodeMap nodeMap = e.getAttributes();
@@ -482,7 +479,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (nodeName.equals(DESCRIPTION)) {
 				/* case: description */
 				String nodeValue = e.getFirstChild().getNodeValue();
-				if (nodeValue != null) {
+				if (nodeValue != null && !nodeValue.isEmpty()) {
 					nodeValue = nodeValue.replace("\t", "");
 					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
 					nodeValue = nodeValue.trim();
@@ -521,10 +518,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (object.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
-			if (!object.getFMComposerExtension().isValidFeatureName(name)) {
-				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
-			}
-			final IFeature f = FMFactoryManager.getFactory().createFeature(object, name);
+			// TODO Consider feature name validity in all readers
+			//			if (!object.getFMComposerExtension().isValidFeatureName(name)) {
+			//				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
+			//			}
+			final IFeature f = factory.createFeature(object, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.getStructure().setAnd();
@@ -569,13 +567,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param tempNode The node that causes the error. this node is used for positioning.
 	 */
 	private void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
-		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
+		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
 	}
 
-	// TODO implement
+	// TODO implement warnings
 	@SuppressWarnings("unused")
 	private void throwWarning(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
-		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
+		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
 	}
 
 	private void writeAttributes(Element node, Element fnod, IFeature feat) {
@@ -584,7 +582,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod.setAttribute(HIDDEN, TRUE);
 		}
 		if (feat.getStructure().isMandatory()) {
-			fnod.setAttribute(MANDATORY, TRUE);
+			if(feat.getStructure().getParent() != null && feat.getStructure().getParent().isAnd()){
+				fnod.setAttribute(MANDATORY, TRUE);
+			} else if (feat.getStructure().getParent() == null){
+				fnod.setAttribute(MANDATORY, TRUE);
+			}
 		}
 		if (feat.getStructure().isAbstract()) {
 			fnod.setAttribute(ABSTRACT, TRUE);

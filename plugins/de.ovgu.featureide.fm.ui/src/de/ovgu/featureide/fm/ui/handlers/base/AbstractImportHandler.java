@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -100,7 +101,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 				}
 				MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
 			} else {
-				FileHandler.save(Paths.get(outputFile.getLocationURI()), fm, modelFormat);
+				FileHandler.save(Paths.get(outputFile.getLocationURI()), fm, new XmlFeatureModelFormat());
 				try {
 					openFileInEditor(outputFile);
 				} catch (PartInitException e) {
@@ -136,10 +137,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	}
 
 	/**
-	 * Returns an instance of IFeatureModelReader.
-	 * 
-	 * @param fm
-	 *            the feature model to initialize the IFeatureModelReader
+	 * Returns an instance of {@link IFeatureModelFormat}.
 	 */
 	protected abstract IFeatureModelFormat setModelReader();
 }

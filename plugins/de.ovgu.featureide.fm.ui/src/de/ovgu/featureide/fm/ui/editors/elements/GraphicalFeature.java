@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,6 +54,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
+	protected boolean collapsed;
+	
 	protected Point location = new Point(0, 0);
 
 	protected Dimension dimension = new Dimension(10, 10);
@@ -140,14 +144,22 @@ public class GraphicalFeature implements IGraphicalFeature {
 		final List<FeatureConnection> list;
 		list = new LinkedList<>();
 		list.add(getSourceConnection());
+		if(isCollapsed())
+		{
+			FeatureConnection collapsedConnection = new FeatureConnection(this);
+			collapsedConnection.setTarget(this);
+			list.add(collapsedConnection);
+		}
 		return (list);
 	}
-	
+
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
 		for (IFeatureStructure child : feature.getStructure().getChildren()) {
-			targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
+			IGraphicalFeature graphicalChild = graphicalFeatureModel.getGraphicalFeature(child.getFeature());
+			if (!(child.hasHiddenParent() && !graphicalFeatureModel.getLayout().showHiddenFeatures()) && !graphicalChild.hasCollapsedParent())
+				targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
 		}
 		return targetConnections;
 	}
@@ -195,7 +207,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void update(FeatureIDEEvent event) {
 		if (uiObject != null) {
@@ -206,6 +218,49 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void registerUIObject(IEventListener listener) {
 		this.uiObject = listener;
+	}
+
+	@Override
+	public boolean isCollapsed() {
+		if(!getObject().getStructure().hasChildren())
+		{
+			return false;
+		}
+		return collapsed;
+	}
+
+	@Override
+	public void setCollapsed(boolean collapse) {
+		collapsed = collapse;		
+	}
+
+	public boolean hasCollapsedParent() {
+		IFeatureStructure parent = getObject().getStructure().getParent();
+		if (parent == null)
+			return false;
+
+		while (parent != null) {
+			IGraphicalFeature graphicParent = getGraphicalModel().getGraphicalFeature(parent.getFeature());
+
+			if (graphicParent.isCollapsed())
+				return true;
+
+			parent = parent.getFeature().getStructure().getParent();
+		}
+		return false;
+	}
+
+
+	@Override
+	public List<IGraphicalFeature> getGraphicalChildren() {
+		List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (IFeatureStructure f : getObject().getStructure().getChildren()) {
+			IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
+			if (!gf.hasCollapsedParent()) {
+				features.add(gf);
+			}
+		}
+		return Collections.unmodifiableList(features);
 	}
 
 }

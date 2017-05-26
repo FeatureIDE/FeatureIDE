@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,7 @@
  */
 package org.prop4j;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
@@ -38,10 +39,15 @@ public class Literal extends Node implements Cloneable {
 	//annotate each literal of a formula with an attribute for explanation. If "Up", explain child relationship
 	// to parent from feature-tree. If "Constraint", explain using cross-tree constraint.
 	public enum FeatureAttribute {
-		Undef, Up, Down, Root, Constraint
+		UNDEFINED,
+		CHILD,
+		PARENT,
+		ROOT,
+		CONSTRAINT
 	};
 
-	public int origin; // combined member of sourceIndex for cross-tree constraint and of enum type, used for explanations
+	public int origin; // attribute encodes relevant information for generating explanations
+
 
 	public Literal(Object var, boolean positive) {
 		this.var = var;
@@ -52,52 +58,81 @@ public class Literal extends Node implements Cloneable {
 		this.var = var;
 		positive = true;
 	}
-
+	
+	/**
+	 * Encodes a literal from the tree topology.
+	 * FeatureAttribute must not have the value Constraint.
+	 * Example with root as FeatureAttribute: origin = -1 * 5 + 3 = -2 
+	 * @param var The variable 
+	 * @param FeatureAttribute The Enumeration element  
+	 */
 	public Literal(Object var, FeatureAttribute a) {
 		this(var);
-		this.origin = -1 * FeatureAttribute.values().length + a.ordinal(); // encodes an enumeration type with an int member for explanations  
-	}																	   // example with root as feature attribute: origin = -1 * 5 + 3 = -2 
+		if (a == FeatureAttribute.CONSTRAINT) {
+			throw new InvalidParameterException("Parameter Constraint is not allowed");
+		}
+		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();  
+	}																	   
 
+	/**
+	 * Encodes a literal from a constraint.
+	 * @param var The variable
+	 * @param constraintIndex The index of a constraint  
+	 */
 	public Literal(Object var, int constraintIndex) {
 		this(var);
-		setOriginConstraint(constraintIndex); //encodes a constraint index with the same int member as for an enumeration type 
+		setOriginConstraint(constraintIndex);  
 	}										  
 
 	/**
 	 * Decodes a constraint index.    
 	 * Example with origin = 4: origin = 4 / 5 = 0. Returns a constraint with index 0.
 	 * 
-	 * @return the index of a constraint
+	 * @return The constraint-index
 	 */
 	public int getSourceIndex() {
+		if (getSourceAttribute() != FeatureAttribute.CONSTRAINT) {
+			throw new IllegalStateException("origin is not Constraint");
+		}
 		return origin / FeatureAttribute.values().length;
 	}
 
 	/**
-	 * Decodes a feature attribute from the feature tree topology. 
-	 * Example with feature attribute root and origin = -2: -2 % 5 + 5 = 3. Returns a feature attribute at position 3.   
+	 * Decodes a FeatureAttribute. 
+	 * Example with FeatureAttribute root and origin of -2: -2 % 5 + 5 = 3. 
+	 * Returns a FeatureAttribute with value 3 (ordinal).   
 	 * 
-	 * @return an enumeration type of a feature attribute
+	 * @return FeatureAttribute The Enumeration element  
 	 */
 	public FeatureAttribute getSourceAttribute() {
 		int index = origin % FeatureAttribute.values().length;
 		if (index < 0) {
-			index += FeatureAttribute.values().length; // add number of enum types to get positive index
+			index += FeatureAttribute.values().length;
 		}
 		return FeatureAttribute.values()[index];
 	}
 
 	/**
-	 * Encodes a constraint index with an combined integer for explaining feature attributes and cross-tree constraints.  
+	 * Encodes a constraint-index.  
 	 * Example with constraintIndex = 0: origin = 0 * 5 + 4 = 4
-	 * @param constrIndex
+	 * @param constrIndex The index of a constraint
 	 */
 	public void setOriginConstraint(int constrIndex) {
-		this.origin = constrIndex * FeatureAttribute.values().length + FeatureAttribute.Constraint.ordinal();
+		this.origin = constrIndex * FeatureAttribute.values().length + FeatureAttribute.CONSTRAINT.ordinal();
 	}
 
 	public void flip() {
 		positive = !positive;
+	}
+
+	@Override
+	public boolean isConjunctiveNormalForm() {
+		return true;
+	}
+
+	@Override
+	public boolean isClausalNormalForm() {
+		return false;
 	}
 
 	@Override
@@ -121,14 +156,6 @@ public class Literal extends Node implements Cloneable {
 	public void simplify() {
 		//nothing to do (recursive calls reached lowest node)
 	}
-
-	/*	@Override
-		public Literal clone() { 
-			Literal copy = new Literal (var,positive);
-			copy.setSourceIndex(this.srcIndex);
-			copy.setFeatureAttribute(this.srcAttribute);
-			return copy;
-		}*/
 
 	@Override
 	public Literal clone() {

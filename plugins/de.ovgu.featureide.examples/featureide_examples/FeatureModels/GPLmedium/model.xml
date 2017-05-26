@@ -1,51 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<alt abstract="true" mandatory="true" name="GPL">
-				<and abstract="true" mandatory="true" name="MainGpl">
+				<and abstract="true" name="MainGpl">
 					<feature mandatory="true" name="TestProg"/>
 					<or abstract="true" mandatory="true" name="Alg">
-						<feature mandatory="true" name="Number"/>
-						<feature mandatory="true" name="Connected"/>
-						<and abstract="true" mandatory="true" name="StrongC">
+						<feature name="Number"/>
+						<feature name="Connected"/>
+						<and abstract="true" name="StrongC">
 							<feature mandatory="true" name="Transpose"/>
 							<feature mandatory="true" name="StronglyConnected"/>
 						</and>
-						<feature mandatory="true" name="Cycle"/>
-						<feature mandatory="true" name="MSTPrim"/>
-						<feature mandatory="true" name="MSTKruskal"/>
+						<feature name="Cycle"/>
+						<feature name="MSTPrim"/>
+						<feature name="MSTKruskal"/>
 					</or>
 					<alt abstract="true" name="Src">
-						<feature mandatory="true" name="BFS"/>
-						<feature mandatory="true" name="DFS"/>
+						<feature name="BFS"/>
+						<feature name="DFS"/>
 					</alt>
 					<alt abstract="true" hidden="true" mandatory="true" name="HiddenWgt">
-						<and abstract="true" mandatory="true" name="WeightOptions">
+						<and abstract="true" name="WeightOptions">
 							<feature name="WeightedWithEdges"/>
 							<feature name="WeightedWithNeighbors"/>
 							<feature name="WeightedOnlyVertices"/>
 						</and>
 					</alt>
 					<alt abstract="true" mandatory="true" name="Wgt">
-						<feature mandatory="true" name="Weighted"/>
-						<feature mandatory="true" name="Unweighted"/>
+						<feature name="Weighted"/>
+						<feature name="Unweighted"/>
 					</alt>
 					<alt abstract="true" hidden="true" mandatory="true" name="HiddenGtp">
-						<feature mandatory="true" name="DirectedWithEdges"/>
-						<feature mandatory="true" name="DirectedWithNeighbors"/>
-						<feature mandatory="true" name="DirectedOnlyVertices"/>
-						<feature mandatory="true" name="UndirectedWithEdges"/>
-						<feature mandatory="true" name="UndirectedWithNeighbors"/>
-						<feature mandatory="true" name="UndirectedOnlyVertices"/>
+						<feature name="DirectedWithEdges"/>
+						<feature name="DirectedWithNeighbors"/>
+						<feature name="DirectedOnlyVertices"/>
+						<feature name="UndirectedWithEdges"/>
+						<feature name="UndirectedWithNeighbors"/>
+						<feature name="UndirectedOnlyVertices"/>
 					</alt>
 					<alt abstract="true" mandatory="true" name="Gtp">
-						<feature mandatory="true" name="Directed"/>
-						<feature mandatory="true" name="Undirected"/>
+						<feature name="Directed"/>
+						<feature name="Undirected"/>
 					</alt>
 					<alt abstract="true" mandatory="true" name="Implementation">
-						<feature mandatory="true" name="OnlyVertices"/>
-						<feature mandatory="true" name="WithNeighbors"/>
-						<feature mandatory="true" name="WithEdges"/>
+						<feature name="OnlyVertices"/>
+						<feature name="WithNeighbors"/>
+						<feature name="WithEdges"/>
 					</alt>
 					<feature mandatory="true" name="Base"/>
 				</and>
@@ -196,11 +197,13 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments>
-			<c>* GPL domain model March 2006 */</c>
-			<c> grammar of feature model</c>
-			<c> implementation constraints </c>
-			<c> domain constraints</c>
-			<c> formatting</c>
+			<c>* GPL domain model March 2006 *</c>
+			<c>grammar of feature model</c>
+			<c>implementation constraints</c>
+			<c>domain constraints</c>
+			<c>formatting</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>

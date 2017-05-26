@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for AHEAD
 Bundle-SymbolicName: de.ovgu.featureide.core.ahead;singleton:=true
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 3.3.1.qualifier
 Bundle-Activator: de.ovgu.featureide.ahead.AheadCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -17,4 +17,7 @@ Bundle-ClassPath: lib/jak2java.jar,
  .
 Export-Package: de.ovgu.featureide.ahead,
  de.ovgu.featureide.ahead.model,
- de.ovgu.featureide.ahead.wrapper
+ de.ovgu.featureide.ahead.wrapper,
+ jak2java,
+ jampack,
+ mixin

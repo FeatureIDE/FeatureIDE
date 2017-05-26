@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,7 +30,6 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
  * Writes a feature model in the GUIDSL format (grammar).
@@ -38,16 +37,9 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class GuidslWriter extends AbstractFeatureModelWriter {
+public class GuidslWriter {
 
-	/**
-	 * Creates a new writer and sets the feature model to write out.
-	 * 
-	 * @param featureModel the structure to write
-	 */
-	public GuidslWriter(IFeatureModel featureModel) {
-		setFeatureModel(featureModel);
-	}
+	private IFeatureModel object;
 	
 	private boolean hasHiddenFeatures(){
 		for(IFeature feat : object.getFeatures())
@@ -55,7 +47,8 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 		return false;
 	}
 	
-	public String writeToString() {
+	public String writeToString(IFeatureModel featureModel) {
+		this.object = featureModel;
 		//open a string buffer for writing
 		StringBuilder out = new StringBuilder();// = new BufferedWriter(new FileWriter(file));
 
@@ -75,7 +68,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 		// write hidden features
 		if(hasHiddenFeatures()){
 			out.append("##\r\n\r\n");
-			for (IFeature feat : object.getFeatures())
+			for (IFeature feat : featureModel.getFeatures())
 				if (feat.getStructure().isHidden()) out.append(feat.getName() +  " { hidden } \r\n");
 		}
 

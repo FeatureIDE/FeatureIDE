@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -64,7 +64,7 @@ public class AlternativeAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		boolean alt = feature.getStructure().isAlternative();
-		setEnabled(!alt && feature.getStructure().hasChildren());
+		setEnabled(!alt && feature.getStructure().hasChildren() && feature.getStructure().getChildrenCount() > 1);
 		setChecked(alt);
 	}
 

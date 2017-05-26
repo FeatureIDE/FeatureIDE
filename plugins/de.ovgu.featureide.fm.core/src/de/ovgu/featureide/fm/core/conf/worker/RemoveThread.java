@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,9 +26,9 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
-import de.ovgu.featureide.fm.core.job.ConsoleProgressMonitor;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class RemoveThread extends AWorkerThread<Collection<String>> {
 
 	private final SharedObjects sharedObjects;
 
-	public RemoveThread(WorkMonitor monitor, Collection<Node> nodeList, Node completeNode) {
+	public RemoveThread(IMonitor monitor, Collection<Node> nodeList, Node completeNode) {
 		super(monitor);
 		sharedObjects = new SharedObjects(nodeList, completeNode);
 	}
@@ -62,9 +62,9 @@ public class RemoveThread extends AWorkerThread<Collection<String>> {
 
 	@Override
 	protected void work(Collection<String> removeFeatures) {
-		WorkMonitor wm = new WorkMonitor();
-		wm.setMonitor(new ConsoleProgressMonitor());
-		final Node subNode = LongRunningWrapper.runMethod(new FeatureRemover(sharedObjects.completeNode, removeFeatures), wm);
+		IMonitor wm = new ConsoleMonitor();
+		final FeatureRemover remover = new FeatureRemover(sharedObjects.completeNode, removeFeatures);
+		final Node subNode = remover.createNewClauseList(LongRunningWrapper.runMethod(remover, wm));
 		if (subNode.getChildren().length > 0 && !(subNode.getChildren().length == 1 && subNode.getChildren()[0].getChildren().length == 0)) {
 			addNode(subNode);
 		}

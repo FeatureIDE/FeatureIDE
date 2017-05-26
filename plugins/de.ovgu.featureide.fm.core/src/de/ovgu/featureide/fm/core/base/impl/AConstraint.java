@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -59,7 +59,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	boolean featureSelected;
 	boolean isImplicit;
 
-
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
 		this.propNode = oldConstraint.propNode;
@@ -85,10 +84,12 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	 */
 	@Override
 	public Collection<IFeature> getContainedFeatures() {
-		if (containedFeatureList.isEmpty()) {
-			setContainedFeatures();
+		synchronized (containedFeatureList) {
+			if (containedFeatureList.isEmpty()) {
+				setContainedFeatures();
+			}
+			return containedFeatureList;
 		}
-		return containedFeatureList;
 	}
 
 	@Override
@@ -98,7 +99,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	@Override
 	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers) {
-		
+
 		final Collection<IFeature> deadFeatures;
 		final Node propNode = getNode();
 		final Comparator<IFeature> featComp = new FeatureComparator(true);
@@ -152,9 +153,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	 */
 	@Override
 	public void setContainedFeatures() {
-		containedFeatureList.clear();
-		for (final String featureName : propNode.getContainedFeatures()) {
-			containedFeatureList.add(featureModel.getFeature(featureName));
+		synchronized (containedFeatureList) {
+			containedFeatureList.clear();
+			for (final String featureName : propNode.getContainedFeatures()) {
+				containedFeatureList.add(featureModel.getFeature(featureName));
+			}
 		}
 	}
 
@@ -177,7 +180,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		falseOptionalFeatures.clear();
 		this.falseOptionalFeatures.addAll(Functional.toList(foFeatures));
 	}
-	
+
 	public void setNode(Node node) {
 		this.propNode = node;
 	}

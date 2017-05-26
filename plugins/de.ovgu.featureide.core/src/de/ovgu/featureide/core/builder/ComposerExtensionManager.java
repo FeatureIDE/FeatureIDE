@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -49,7 +49,11 @@ public class ComposerExtensionManager extends ExtensionManager<IComposerExtensio
 			protected IComposerExtension parseExtension(IConfigurationElement configurationElement) {
 				if (!IComposerExtension.extensionID.equals(configurationElement.getName()))
 					return null;
-				return new ComposerExtensionProxy(configurationElement);
+				try {
+					return new ComposerExtensionProxy(configurationElement);
+				} catch (Exception e) {
+					return null;
+				}
 			}
 		});
 	}

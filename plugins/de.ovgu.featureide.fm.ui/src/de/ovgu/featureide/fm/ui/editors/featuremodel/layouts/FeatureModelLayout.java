@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,6 +30,7 @@ import org.eclipse.draw2d.geometry.Point;
 public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private boolean autoLayoutLegend;
 	private boolean showHiddenFeatures;
+	private boolean showCollapsedConstraints;
 	private boolean hasVerticalLayout;
 	private Point legendPos;
 
@@ -39,6 +40,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	public FeatureModelLayout() {
 		this.autoLayoutLegend = true;
 		this.showHiddenFeatures = true;
+		this.showCollapsedConstraints = true;
 		this.hasVerticalLayout = true;
 		this.legendPos = new Point(0, 0);
 		this.selectedLayoutAlgorithm = 1;
@@ -47,6 +49,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
 		this.autoLayoutLegend = featureModelLayout.autoLayoutLegend;
 		this.showHiddenFeatures = featureModelLayout.showHiddenFeatures;
+		this.showCollapsedConstraints = featureModelLayout.showCollapsedConstraints;
 		this.hasVerticalLayout = featureModelLayout.hasVerticalLayout;
 		this.legendPos = featureModelLayout.legendPos.getCopy();
 		this.selectedLayoutAlgorithm = featureModelLayout.selectedLayoutAlgorithm;
@@ -80,6 +83,16 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	@Override
 	public void showHiddenFeatures(boolean b) {
 		showHiddenFeatures = b;
+	}
+	
+	@Override
+	public boolean showCollapsedConstraints() {
+		return showCollapsedConstraints;
+	}
+
+	@Override
+	public void showCollapsedConstraints(boolean b) {
+		showCollapsedConstraints = b;
 	}
 
 	@Override

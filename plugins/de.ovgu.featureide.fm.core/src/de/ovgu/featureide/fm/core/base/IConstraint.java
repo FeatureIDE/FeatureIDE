@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,6 +26,9 @@ import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.base.impl.AConstraint;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -334,7 +337,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @return <b>true</b> if a feature (or a features parent) is marked as <i>hidden</i> and contained in the formula of this constraint
 	 */
 	boolean hasHiddenFeatures();
-
+		
 	/**
 	 * Sets the analysis attribute for this constraints which determine how this constraint affects features.
 	 * <br/><br/>

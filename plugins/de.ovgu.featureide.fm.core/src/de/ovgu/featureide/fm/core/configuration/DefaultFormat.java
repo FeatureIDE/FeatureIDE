@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -53,7 +53,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class DefaultFormat implements IConfigurationFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + DefaultFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + DefaultFormat.class.getSimpleName();
 
 	private static final String NEWLINE = System.lineSeparator();
 
@@ -122,7 +122,7 @@ public class DefaultFormat implements IConfigurationFormat {
 			return warnings;
 		}
 		configuration.setPropagate(orgPropagate);
-		configuration.update();
+		configuration.update(true, null);
 		return warnings;
 	}
 

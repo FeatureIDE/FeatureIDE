@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHandler {
 
-	private static final String MODEL_MARKER = FMCorePlugin.PLUGIN_ID + ".featureModelMarker";
+	private static final String MODEL_MARKER = PluginID.PLUGIN_ID + ".featureModelMarker";
 
 	private final T modelFile;
 
@@ -60,7 +60,7 @@ public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHand
 				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 			}
 		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHand
 		try {
 			resource.deleteMarkers(MODEL_MARKER, false, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 
@@ -91,7 +91,7 @@ public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHand
 		try {
 			return resource.findMarkers(MODEL_MARKER, false, IResource.DEPTH_ZERO).length > 0;
 		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return true;
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -42,6 +42,7 @@ public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOp
 	@Override
 	public FeatureIDEEvent operation() {
 		graphicalFeatureModel.getLayout().showHiddenFeatures(!graphicalFeatureModel.getLayout().showHiddenFeatures());
+		// TODO add specific handling in FeatureDiagram editor so not everything needs to be reloaded
 		return new FeatureIDEEvent(graphicalFeatureModel, EventType.MODEL_DATA_CHANGED);
 	}
 

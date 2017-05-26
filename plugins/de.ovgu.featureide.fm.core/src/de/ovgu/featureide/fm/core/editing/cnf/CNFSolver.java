@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.editing.cnf;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -45,10 +46,11 @@ public class CNFSolver implements ICNFSolver {
 
 	private HashMap<Object, Integer> varToInt = null;
 	private final ISolver solver;
+	
+	private boolean notSolveable = false;
 
 	public CNFSolver(Node cnf) {
 		varToInt = new HashMap<Object, Integer>();
-
 		if (cnf instanceof And) {
 			for (Node clause : cnf.getChildren()) {
 				if (clause instanceof Or) {
@@ -111,25 +113,40 @@ public class CNFSolver implements ICNFSolver {
 				final Literal literal = (Literal) cnf;
 				solver.addClause(new VecInt(new int[] { literal.positive ? varToInt.get(literal.var) : -varToInt.get(literal.var) }));
 			}
-
+			int size = varToInt.size();
+			final VecInt pseudoClause = new VecInt(size + 1);
+			for (int i = 1; i <= size; i++) {
+				pseudoClause.push(i);
+			}
+			pseudoClause.push(-1);
+			solver.addClause(pseudoClause);
 		} catch (ContradictionException e) {
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
+			notSolveable = true;
 		}
 	}
 
 	public CNFSolver(Collection<? extends Clause> clauses, int size) {
 		solver = createSolver(size);
+		addClauses(clauses);
+	}
 
+	public CNFSolver(int size) {
+		solver = createSolver(size);
+	}
+
+	public void addClauses(Collection<? extends Clause> clauses) {
+		//Before adding new clauses reset not solveable tag
+		notSolveable = false;
+		
 		try {
 			for (Clause node : clauses) {
 				final int[] literals = node.getLiterals();
-				int[] clause = new int[literals.length];
-				System.arraycopy(literals, 0, clause, 0, clause.length);
-
-				solver.addClause(new VecInt(clause));
+				solver.addClause(new VecInt(Arrays.copyOf(literals, literals.length)));
 			}
 		} catch (ContradictionException e) {
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
+			notSolveable = true; // Tag the CNF as not solvable
 		}
 	}
 
@@ -141,6 +158,7 @@ public class CNFSolver implements ICNFSolver {
 	}
 
 	public boolean isSatisfiable(int[] literals) throws TimeoutException {
+		if(notSolveable) return false;
 		final int[] unitClauses = new int[literals.length];
 		System.arraycopy(literals, 0, unitClauses, 0, unitClauses.length);
 
@@ -148,6 +166,7 @@ public class CNFSolver implements ICNFSolver {
 	}
 
 	public boolean isSatisfiable(Literal[] literals) throws TimeoutException, UnkownLiteralException {
+		if(notSolveable) return false;
 		final int[] unitClauses = new int[literals.length];
 		int i = 0;
 		for (Literal literal : literals) {
@@ -164,18 +183,14 @@ public class CNFSolver implements ICNFSolver {
 		solver.reset();
 	}
 
-	/**
-	 * @param mainClause
-	 */
 	public void addClause(DeprecatedClause mainClause) {
 		final int[] literals = mainClause.literals;
-		final int[] unitClauses = new int[literals.length];
-		System.arraycopy(literals, 0, unitClauses, 0, unitClauses.length);
 
 		try {
-			solver.addClause(new VecInt(unitClauses));
+			solver.addClause(new VecInt(Arrays.copyOf(literals, literals.length)));
 		} catch (ContradictionException e) {
-			throw new RuntimeException(e);
+//			throw new RuntimeException(e);
+			notSolveable = true; // Tag the CNF as not solvable
 		}
 
 	}

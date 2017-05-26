@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,15 +29,20 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * This Wrapper makes it possible, to write feature models to IFiles, e.g. if
  * working with Eclipse plugins Otherwise only the classes extending
  * {@link AbstractFeatureModelWriter} are needed
  * 
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br/>
+ * {@link IFile} can be converted via {@code Paths.getPath(ifile.getLocationURI())}.
+ * 
  * @author S�nke Holthusen
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 
 	private IFeatureModelWriter writer;

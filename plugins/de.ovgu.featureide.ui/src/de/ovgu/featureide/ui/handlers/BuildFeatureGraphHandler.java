@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,12 +20,21 @@
  */
 package de.ovgu.featureide.ui.handlers;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 
+import org.prop4j.analyses.FGBuilder;
+
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.conf.CreateFeatureGraphJob;
-import de.ovgu.featureide.fm.core.job.IProjectJob;
-import de.ovgu.featureide.fm.core.job.util.JobSequence;
+import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
 public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
@@ -39,17 +48,18 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 
 	@Override
 	protected void endAction() {
-		final JobSequence global = new JobSequence();
 		for (IFeatureProject project : projectList) {
-			final JobSequence j = new JobSequence();
-			final IProjectJob newJob = new CreateFeatureGraphJob.Arguments(project.getFeatureModel()).createJob();
-			newJob.setProject(project.getProject());
-			j.addJob(newJob);
-			j.setIgnorePreviousJobFail(false);
-			global.addJob(j);
+			final Path path = Paths.get(project.getProject().getFile("model.fg").getLocationURI());
+			final IRunner<IFeatureGraph> runner = LongRunningWrapper.getRunner(new FGBuilder(AdvancedNodeCreator.createSatInstance(project.getFeatureModel())));
+			runner.addJobFinishedListener(new JobFinishListener<IFeatureGraph>() {
+				@Override
+				public void jobFinished(IJob<IFeatureGraph> finishedJob) {
+					FileHandler.save(path, finishedJob.getResults(), new FeatureGraphFormat());
+				}
+			});
+			runner.schedule();
 		}
 		projectList.clear();
-		global.schedule();
 	}
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,10 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
  * A factory workspace maps feature model {@link IFeatureModelFormat formats} to a feature model {@link IFeatureModelFactory factory}.
@@ -33,7 +37,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
  */
 public class FactoryWorkspace {
 
-	protected final HashMap<String, String> map;
+	protected final Map<String, String> map;
 
 	private String defaultFactoryID;
 
@@ -47,7 +51,7 @@ public class FactoryWorkspace {
 		this.map = new HashMap<>();
 	}
 
-	public String getID(IFeatureModelFormat format) {
+	public String getID(IPersistentFormat<IFeatureModel> format) {
 		return getID(format.getId());
 	}
 
@@ -70,6 +74,10 @@ public class FactoryWorkspace {
 
 	public void assignID(String formatID, String factoryID) {
 		map.put(formatID, factoryID);
+	}
+
+	public Map<String, String> getMap() {
+		return Collections.unmodifiableMap(map);
 	}
 
 	@Override

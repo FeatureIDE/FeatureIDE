@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint constraint;
-
+	private IFeatureModel	featureModel;
 	/**
 	 * @param node
 	 *            the node representing the constraint to be added
@@ -48,12 +48,20 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
 		super(featureModel, CREATE_CONSTRAINT);
-		constraint = FMFactoryManager.getFactory().createConstraint(featureModel, node);
+		constraint = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, node);
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
 		featureModel.addConstraint(constraint);
+
+//		ExpandConstraintOperation operation = new ExpandConstraintOperation(featureModel, constraint);
+//		try {
+//			operation.execute(null,  null);
+//		} catch (ExecutionException e) {
+//			FMUIPlugin.getDefault().logError(e);
+//		}
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_ADD, null, constraint);
 	}
 

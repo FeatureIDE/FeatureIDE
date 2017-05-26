@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class NNFConverter implements IConverterStrategy {
 	/** Feature model factory */
-	protected static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	protected IFeatureModelFactory factory;
 	/** Working feature model */
 	protected IFeatureModel fm;
 	/** Preserving configuration semantics */
@@ -223,6 +223,7 @@ public class NNFConverter implements IConverterStrategy {
 	@Override
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
 		this.fm = fm.clone();
+		this.factory = FMFactoryManager.getFactory(fm);
 		this.preserve = preserve;
 		
 		if(nodes.isEmpty())

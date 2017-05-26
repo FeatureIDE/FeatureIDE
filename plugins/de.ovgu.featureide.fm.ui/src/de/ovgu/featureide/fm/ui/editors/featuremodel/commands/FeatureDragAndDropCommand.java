@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -86,7 +86,7 @@ public class FeatureDragAndDropCommand extends Command {
 			if (next == null) {
 				return false;
 			}
-
+			
 			// calculate new parent (if exists)
 			if (!calculateNewParentAndIndex(next))
 				return false;
@@ -109,7 +109,6 @@ public class FeatureDragAndDropCommand extends Command {
 		}
 		return true;
 	}
-	
 
 	@Override
 	public void execute() {
@@ -196,10 +195,9 @@ public class FeatureDragAndDropCommand extends Command {
 	public IGraphicalFeature calculateNext(final Point referencePoint) {
 		IGraphicalFeature next = null;
 		int distance = Integer.MAX_VALUE;
-		for (IGraphicalFeature child : featureModel.getFeatures()) {
+		for (IGraphicalFeature child : featureModel.getVisibleFeatures()) {
 			final Point targetLocation = FeatureUIHelper.getTargetLocation(child);
-			if ( hasVerticalLayout && targetLocation.x < referencePoint.x ||
-				!hasVerticalLayout && targetLocation.y < referencePoint.y) {
+			if (hasVerticalLayout && targetLocation.x < referencePoint.x || !hasVerticalLayout && targetLocation.y < referencePoint.y) {
 				int newDistance = (int) targetLocation.getDistance(referencePoint);
 				if (newDistance > 0 && newDistance < distance) {
 					next = child;

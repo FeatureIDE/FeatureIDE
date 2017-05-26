@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
@@ -44,25 +46,30 @@ public abstract class LazyParent extends Parent {
 		
 		private final boolean expand;
 
-		private StatisticTreeJob(String name, Parent calculated, boolean expand) {
-			super(name, calculated);
+		private StatisticTreeJob(Parent calculated, boolean expand) {
+			super(calculated);
 			this.expand = expand;
-		}
-
-		@Override
-		public boolean work() {
-			initChildren();
-			return true;
-		}
-
-		@Override
-		protected void finalWork(boolean success) {
-			setCalculating(false);
 		}
 
 		public boolean isExpand() {
 			return expand;
 		}
+
+		@Override
+		public Boolean execute(IMonitor monitor) throws Exception {
+			try {
+				initChildren();
+			} finally {
+				setCalculating(false);
+			}
+			return true;
+		}
+
+		@Override
+		public boolean cancel() {
+			return false;
+		}
+
 	}
 
 	protected boolean lazy = true;
@@ -78,13 +85,14 @@ public abstract class LazyParent extends Parent {
 	 */
 	protected Parent[] calculateChidren(boolean expand) {
 		if (lazy) {
-			final TreeJob job = new StatisticTreeJob(CALCULATE + this.getClass().getName(), this, expand);
-			setPriority(job);
+			final TreeJob job = new StatisticTreeJob(this, expand);
+			LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATE + this.getClass().getName(), job);
+			runner.setPriority(Job.SHORT);
 			final JobDoneListener listener = JobDoneListener.getInstance();
 			if (listener != null) {
-				job.addJobChangeListener(listener);
+				runner.addJobChangeListener(listener);
 			}
-			job.schedule();
+			runner.schedule();
 		}
 		lazy = false;
 		return super.getChildren();

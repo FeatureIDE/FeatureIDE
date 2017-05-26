@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,15 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_COMPLETE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RUNNING_ADDITIONAL_CHECKS___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_UP___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_DEAD_FEATURES___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_FALSE_OPTIONAL_FEATURES___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_REDUNDANCY___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_SATISFIABLE_CHECK___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_VOIDS_MODEL___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_TAUTOLOGY_CHECK___;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +34,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.progress.UIJob;
+import org.prop4j.Implies;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.Not;
@@ -55,8 +48,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.editing.Comparison;
-import de.ovgu.featureide.fm.core.editing.ModelComparator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -143,7 +135,7 @@ public final class ConstraintTextValidator {
 		return featureString.toString();
 	}
 
-	private List<IFeature> getFalseOptional(String input, IFeatureModel model) {
+	private List<IFeature> getFalseOptional(IConstraint constraint, String input, IFeatureModel model) {
 		List<IFeature> list = new ArrayList<IFeature>();
 		IFeatureModel clonedModel = model.clone(null);
 
@@ -151,6 +143,14 @@ public final class ConstraintTextValidator {
 
 		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
+		// The following code fixes issue #406; should be enhanced in further development 
+		// to not always clone the whole feature model for every performed analysis
+		if (propNode != null) {
+			if (constraint != null) {
+				clonedModel.removeConstraint(constraint);
+			}
+		}
+		
 		for (IFeature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
 				//if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
@@ -178,17 +178,31 @@ public final class ConstraintTextValidator {
 	 *            The actual {@link IConstraint}
 	 * @return <code>true</code> if the {@link IConstraint} is redundant
 	 */
-	private boolean isRedundant(final IFeatureModel featureModel, String constraint) {
-		if (constraint.length() == 0) {
+	private boolean isRedundant(IConstraint constraint, final IFeatureModel featureModel, String input, final int timeOut) {
+		if (input.length() == 0) {
 			return false;
 		}
 		IFeatureModel clonedModel = featureModel.clone(null);
-		Node propNode = new NodeReader().stringToNode(constraint, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
-		clonedModel.addConstraint(new Constraint(clonedModel, propNode));
-		if (new ModelComparator(20000).compare(featureModel, clonedModel) == Comparison.REFACTORING) {
+		Node propNode = new NodeReader().stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
+		
+		// The following code fixes issue #406; should be enhanced in further development 
+		// to not always clone the whole feature model for every performed analysis
+		if (propNode != null) {
+			if (constraint != null) {
+				clonedModel.removeConstraint(constraint);
+			}
+		}
+		
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(clonedModel);
+		Node check = new Implies(nodeCreator.createNodes(), propNode);
+		
+		SatSolver satsolver = new SatSolver(new Not(check), timeOut);
+
+		try {
+			return !satsolver.isSatisfiable();
+		} catch (TimeoutException e) {
 			return true;
 		}
-		return false;
 	}
 
 	/**
@@ -267,24 +281,6 @@ public final class ConstraintTextValidator {
 		OK, NOT_WELLFORMED, IS_TAUTOLOGY, IS_NOT_SATISFIABLE, VOIDS_MODEL, FALSE_OPTIONAL_FEATURE, DEAD_FEATURE, REDUNDANT
 	}
 
-	/**
-	 * Runs tests blocking the current GUI thread. The result will be returned immediately. It will return
-	 * ValidationResult.NOT_WELLFORMED if the constraint text is not well formed nad ValidationResult.OK otherwise.
-	 * 
-	 * @param featureModel Feature model
-	 * @param constraintText Text which should be validated
-	 * @return
-	 */
-	public ValidationResult validateSync(final IFeatureModel featureModel, final String constraintText) {
-
-		final String con = constraintText.trim();
-
-		if (!isWellformed(featureModel, con))
-			return ValidationResult.NOT_WELLFORMED;
-
-		return ValidationResult.OK;
-	}
-
 	private ValidationJob asyncCheckJob = null;
 
 	public void cancelValidation() {
@@ -338,147 +334,82 @@ public final class ConstraintTextValidator {
 
 			protected IStatus run(IProgressMonitor monitor) {
 
-				new UIJob(STARTING_UP___) {
-
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						if (!canceled) {
-							onCheckStarted.invoke(new ValidationMessage());
-						}
-						return Status.OK_STATUS;
-					}
-
-				}.schedule();
+				updateUI(onCheckStarted, "");
 				// ---------------------------------------------------------
 				if (!canceled) {
 					final boolean problemFoundTautology = isTautology(con, timeOut);
 
-					new UIJob(UPDATING_RESULTS_TAUTOLOGY_CHECK___) {
-
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (!canceled) {
-								onIsTautology.invoke(new ValidationMessage(!problemFoundTautology ? ValidationResult.OK : ValidationResult.IS_TAUTOLOGY));
-							}
-							return Status.OK_STATUS;
-						}
-
-					}.schedule();
-
-					if (problemFoundTautology)
+					if (problemFoundTautology) {
+						updateUI(onIsTautology, "");
 						return Status.OK_STATUS;
+					}
 				}
-
+				
 				// ---------------------------------------------------------
 				if (!canceled) {
 					final boolean problemFoundNotSatisfiable = !isSatisfiable(con, timeOut);
 
-					new UIJob(UPDATING_RESULTS_FOR_SATISFIABLE_CHECK___) {
-
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (!canceled) {
-								onIsNotSatisfiable.invoke(new ValidationMessage(!problemFoundNotSatisfiable ? ValidationResult.OK
-										: ValidationResult.IS_NOT_SATISFIABLE));
-							}
-							return Status.OK_STATUS;
-						}
-					}.schedule();
-
-					if (problemFoundNotSatisfiable)
+					if (problemFoundNotSatisfiable) {
+						updateUI(onIsNotSatisfiable, "");
 						return Status.OK_STATUS;
+					}
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
 					final boolean problemFoundVoidsModel = isVoidsModel(featureModel, con, constraint);
 
-					new UIJob(UPDATING_RESULTS_FOR_VOIDS_MODEL___) {
-
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (!canceled) {
-								onVoidsModelCheckComplete.invoke(new ValidationMessage(!problemFoundVoidsModel ? ValidationResult.OK
-										: ValidationResult.VOIDS_MODEL));
-							}
-							return Status.OK_STATUS;
-						}
-					}.schedule();
-
-					if (problemFoundVoidsModel)
+					if (problemFoundVoidsModel) {
+						updateUI(onVoidsModelCheckComplete, "");
 						return Status.OK_STATUS;
+					}
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
-					final List<IFeature> falseOptionalFeatures = getFalseOptional(con, featureModel);
+					final List<IFeature> falseOptionalFeatures = getFalseOptional(constraint, con, featureModel);
 
-					new UIJob(UPDATING_RESULTS_FOR_FALSE_OPTIONAL_FEATURES___) {
-
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (!canceled) {
-								onFalseOptionalCheckComplete.invoke(new ValidationMessage(falseOptionalFeatures.isEmpty() ? ValidationResult.OK
-										: ValidationResult.FALSE_OPTIONAL_FEATURE, getFalseOptionalString(falseOptionalFeatures)));
-							}
-							return Status.OK_STATUS;
-						}
-					}.schedule();
-
-					if (!falseOptionalFeatures.isEmpty())
+					if (!falseOptionalFeatures.isEmpty()) {
+						updateUI(onFalseOptionalCheckComplete, getFalseOptionalString(falseOptionalFeatures));
 						return Status.OK_STATUS;
+					}
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
 					final Set<IFeature> deadFeatuers = getDeadFeatures(constraint, con, featureModel);
 
-					new UIJob(UPDATING_RESULTS_FOR_DEAD_FEATURES___) {
-
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (!canceled) {
-								onDeadFeatureCheckComplete.invoke(new ValidationMessage(deadFeatuers.isEmpty() ? ValidationResult.OK
-										: ValidationResult.FALSE_OPTIONAL_FEATURE, getDeadFeatureString(deadFeatuers)));
-							}
-							return Status.OK_STATUS;
-						}
-					}.schedule();
-
-					if (!deadFeatuers.isEmpty())
+					if (!deadFeatuers.isEmpty()) {
+						updateUI(onDeadFeatureCheckComplete, getDeadFeatureString(deadFeatuers));
 						return Status.OK_STATUS;
+					}
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
-					final boolean problemFoundRedundant = isRedundant(featureModel, con);
+					final boolean problemFoundRedundant = isRedundant(constraint, featureModel, con, timeOut);
 
-					new UIJob(UPDATING_RESULTS_FOR_REDUNDANCY___) {
-
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (!canceled) {
-								onIsRedundantCheckComplete.invoke(new ValidationMessage(!problemFoundRedundant ? ValidationResult.OK
-										: ValidationResult.FALSE_OPTIONAL_FEATURE, ""));
-							}
-							return Status.OK_STATUS;
-						}
-					}.schedule();
-
-					if (problemFoundRedundant)
+					if (problemFoundRedundant) {
+						updateUI(onIsRedundantCheckComplete, "");
 						return Status.OK_STATUS;
+					}
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
-					new UIJob(CHECKING_COMPLETE_) {
-
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (!canceled) {
-								onCheckEnded.invoke(new ValidationMessage());
-							}
-							return Status.OK_STATUS;
-						}
-					}.schedule();
+					updateUI(onCheckEnded, "");
 				}
 
 				return Status.OK_STATUS;
+			}
+
+			private void updateUI(final IConsumer<ValidationMessage> consumer, final String message) {
+				if (!canceled) {
+					new UIJob("Updating ConstraintDialog Message") {
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor) {
+							if (!canceled) {
+								consumer.invoke(new ValidationMessage(null, message));
+							}
+							return Status.OK_STATUS;
+						}
+					}.schedule();
+				}
 			}
 
 		};
@@ -501,17 +432,6 @@ public final class ConstraintTextValidator {
 	}
 
 	/**
-	 * @throws SyntaxErrorValidatorException
-	 * 
-	 */
-	private boolean isWellformed(IFeatureModel featureModel, String con) {
-		NodeReader nodereader = new NodeReader();
-		boolean isWellformed = nodereader.isWellFormed(con, Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
-
-		return isWellformed;
-	}
-
-	/**
 	 * returns true if the constraint causes the feature model to be void
 	 * otherwise false
 	 * 
@@ -523,7 +443,6 @@ public final class ConstraintTextValidator {
 	 *            * @throws TimeoutException
 	 */
 	private boolean voidsModel(final IConstraint constraint, String input, IFeatureModel model) throws TimeoutException {
-
 		if (!model.getAnalyser().isValid()) {
 
 			return false;

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,8 +35,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -50,7 +55,7 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics;
  */
 public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
-	private AStoppableJob number;
+	private LongRunningJob<Boolean> number;
 
 	/**
 	 * @param builder
@@ -58,9 +63,9 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	 */
 	public AllConfigrationsGenerator(final ConfigurationBuilder builder, final IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
-		number = new AStoppableJob(IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS) {
+		number = new LongRunningJob<>(IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS, new LongRunningMethod<Boolean>() {
 			@Override
-			protected boolean work() {
+			public Boolean execute(IMonitor workMonitor) throws Exception {
 				builder.configurationNumber = Math.min(new Configuration(featureModel, false, false).number(1000000), builder.configurationNumber);
 				if (builder.configurationNumber < 0) {
 					UIPlugin.getDefault().logWarning(StringTable.SATSOLVER_COMPUTATION_TIMEOUT);
@@ -68,7 +73,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 				}
 				return true;
 			}
-		};
+		});
 		number.setPriority(Job.LONG);
 		number.schedule();
 	}
@@ -83,7 +88,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	private int maxBufferSize = 5000;
 	
 	@Override
-	public Void execute(WorkMonitor monitor) throws Exception {
+	public Void execute(IMonitor monitor) throws Exception {
 		try {
 			buildAll(featureModel.getStructure().getRoot().getFeature(), monitor);
 		} finally {
@@ -104,16 +109,18 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	 *            The root feature of the feature model
 	 * @param monitor
 	 */
-	private void buildAll(IFeature root, WorkMonitor monitor) {
+	private void buildAll(IFeature root, IMonitor monitor) {
 		LinkedList<IFeature> selectedFeatures2 = new LinkedList<IFeature>();
 		selectedFeatures2.add(root);
-		rootNode = AdvancedNodeCreator.createCNFWithoutAbstract(featureModel);
+		rootNode = AdvancedNodeCreator.createNodes(featureModel, new AbstractFeatureFilter(), CNFType.Compact, ModelType.All, true);
 		children = new LinkedList<Node>();
 		build(root, "", selectedFeatures2, monitor);
 	}
 
-	private void build(IFeature currentFeature, String selected, LinkedList<IFeature> selectedFeatures2, WorkMonitor monitor) {
-		if (monitor.checkCancel()) {
+	private void build(IFeature currentFeature, String selected, LinkedList<IFeature> selectedFeatures2, IMonitor monitor) {
+		try {
+			monitor.checkCancel();
+		} catch (MethodCancelException e) {
 			number.cancel();
 			cancelGenerationJobs();
 			return;
@@ -124,7 +131,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 		if (featureModel.getConstraintCount() > 0) {
 			children.clear();
-			for (String feature : selected.split("\\s+")) {
+			for (String feature : selected.split("\"")) {
 				children.add(new Literal(feature, true));
 			}
 			try {
@@ -140,20 +147,20 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			configuration.resetValues();
 
 			if (!selected.isEmpty()) {
-				for (final String feature : selected.split("\\s+")) {
+				for (final String feature : selected.split("\"")) {
 					configuration.setManual((feature), Selection.SELECTED);
 				}
 
 			}
 			if (configuration.isValid()) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
-				for (String f : selected.split("\\s+")) {
+				for (String f : selected.split("\"")) {
 					if (!"".equals(f)) {
 						selectedFeatures3.add(f);
 					}
 				}
 				for (IFeature f : configuration.getSelectedFeatures()) {
-					if (f.getStructure().isConcrete()) {
+					if (isSelectable(f)) {
 						if (!selectedFeatures3.contains(f.getName())) {
 							return;
 						}
@@ -170,7 +177,9 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 				if (builder.sorter.getBufferSize() >= maxBufferSize) {
 					synchronized (this) {
 						while (builder.sorter.getBufferSize() >= maxBufferSize) {
-							if (monitor.checkCancel()) {
+							try {
+								monitor.checkCancel();
+							} catch (MethodCancelException e) {
 								number.cancel();
 								return;
 							}
@@ -195,15 +204,15 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		}
 	}
 
-	private void buildAlternative(String selected, LinkedList<IFeature> selectedFeatures2, WorkMonitor monitor) {
+	private void buildAlternative(String selected, LinkedList<IFeature> selectedFeatures2, IMonitor monitor) {
 		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
+		if (isSelectable(currentFeature)) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {
@@ -224,15 +233,15 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		}
 	}
 
-	private void buildOr(String selected, LinkedList<IFeature> selectedFeatures2, WorkMonitor monitor) {
+	private void buildOr(String selected, LinkedList<IFeature> selectedFeatures2, IMonitor monitor) {
 		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
+		if (isSelectable(currentFeature)) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {
@@ -245,17 +254,13 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			build(currentFeature, selected, selectedFeatures3, monitor);
 			return;
 		}
-		int k2;
-		int i2 = 1;
-		if (getChildren(currentFeature).size() < currentFeature.getStructure().getChildren().size()) {
-			i2 = 0;
-		}
-		for (; i2 < (int) java.lang.Math.pow(2, getChildren(currentFeature).size()); i2++) {
-			k2 = i2;
+		final LinkedList<IFeature> children2 = getChildren(currentFeature);
+		for (int i2 = (int) java.lang.Math.pow(2, children2.size()) - 1; i2 > 0; i2--) {
+			int k2 = i2;
 			selectedFeatures3 = new LinkedList<IFeature>();
-			for (int j = 0; j < getChildren(currentFeature).size(); j++) {
+			for (int j = 0; j < children2.size(); j++) {
 				if (k2 % 2 != 0) {
-					selectedFeatures3.add(getChildren(currentFeature).get(j));
+					selectedFeatures3.add(children2.get(j));
 				}
 				k2 = k2 / 2;
 			}
@@ -264,14 +269,14 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		}
 	}
 
-	private void buildAnd(String selected, LinkedList<IFeature> selectedFeatures2, WorkMonitor monitor) {
+	private void buildAnd(String selected, LinkedList<IFeature> selectedFeatures2, IMonitor monitor) {
 		IFeature currentFeature = selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
+		if (isSelectable(currentFeature)) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {
@@ -311,7 +316,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 	/**
 	 * Returns all children of a feature if it is a layer or if it has a child
-	 * that is a layer.
+	 * that is concrete.
 	 * 
 	 * @param currentFeature
 	 *            The feature
@@ -321,7 +326,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		LinkedList<IFeature> children = new LinkedList<IFeature>();
 		for (IFeatureStructure childStructure : currentFeature.getStructure().getChildren()) {
 			IFeature child = childStructure.getFeature();
-			if (child.getStructure().isConcrete() || hasLayerChild(child)) {
+			if (isSelectable(child) || hasLayerChild(child)) {
 				children.add(child);
 			}
 		}
@@ -332,18 +337,27 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	 * @param feature
 	 *            The feature
 	 * @return <code>true</code> if the feature is a layer or if it has a child
-	 *         that is a layer
+	 *         that is a concrete
 	 */
 	private boolean hasLayerChild(IFeature feature) {
 		if (feature.getStructure().hasChildren()) {
 			for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
 				IFeature child = childStructure.getFeature();
-				if (child.getStructure().isConcrete() || hasLayerChild(child)) {
+				if (isSelectable(child) || hasLayerChild(child)) {
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Checks whether the concrete feature can be selected manually. 
+	 */
+	private boolean isSelectable(final IFeature child) {
+		final IFeatureStructure structure = child.getStructure();
+		boolean concrete = structure.isConcrete();
+		return concrete && !structure.isHidden();
 	}
 	
 }

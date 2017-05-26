@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -72,7 +72,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		s = FeatureUIHelper.getSourceLocation(editPart.getFeature());
+		s = FeatureUIHelper.getSourceLocation(editPart.getModel());
 		Point s2 = s.getCopy();
 		getHostFigure().translateToAbsolute(s2);
 

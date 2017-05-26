@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.constraint.analysis;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +32,6 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -61,8 +59,8 @@ public class Translator {
 	 * @param fm The feature model.
 	 * @return 1-to-1 mapping of natural numbers to features.
 	 */
-	public static BiMap<String, Integer> buildFeatureNameMap(IFeatureModel fm, UniqueId idGen) {
-		BiMap<String, Integer> m = HashBiMap.create();
+	public static HashMap<String, Integer> buildFeatureNameMap(IFeatureModel fm, UniqueId idGen) {
+		HashMap<String, Integer> m = new HashMap<>();
 
 		for (CharSequence f : Functional.mapToString(fm.getFeatures())) {
 			m.put(f.toString(), idGen.getNext());
@@ -79,7 +77,7 @@ public class Translator {
 	 * @param fm The feature model.
 	 * @param idGen
 	 */
-	public static void extendFeatureNameMap(BiMap<String, Integer> m, IFeatureModel fm, UniqueId idGen) {
+	public static void extendFeatureNameMap(HashMap<String, Integer> m, IFeatureModel fm, UniqueId idGen) {
 
 		for (CharSequence f : Functional.mapToString(fm.getFeatures())) {
 			if (!m.containsKey(f)) {

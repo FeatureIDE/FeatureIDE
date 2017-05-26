@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -48,7 +48,7 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 		this.extensionLoader = extensionLoader;
 	}
 
-	protected boolean addExtension(T extension) {
+	public boolean addExtension(T extension) {
 		for (T t : extensions) {
 			if (t.getId().equals(extension.getId())) {
 				return false;

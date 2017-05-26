@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,18 +24,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.FreeformLayer;
-import org.eclipse.draw2d.FreeformLayout;
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.MarginBorder;
-import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.RootEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
-import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ModelFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -49,34 +46,44 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Marcus Pinnecke
  */
 public class ModelEditPart extends AbstractGraphicalEditPart {
-
-	ModelEditPart(Object featureModel) {
-		super();
+	ModelEditPart(IGraphicalFeatureModel featureModel) {
 		setModel(featureModel);
 	}
 
 	public IGraphicalFeatureModel getFeatureModel() {
 		return (IGraphicalFeatureModel) getModel();
 	}
+	
+	@Override
+	public RootEditPart getParent() {
+		return (RootEditPart) super.getParent();
+	}
+	
+	@Override
+	public IGraphicalFeatureModel getModel() {
+		return (IGraphicalFeatureModel) super.getModel();
+	}
+	
+	@Override
+	public ModelFigure getFigure() {
+		return (ModelFigure) super.getFigure();
+	}
 
-	protected IFigure createFigure() {
-		Figure fig = new FreeformLayer();
-		fig.setLayoutManager(new FreeformLayout());
-		fig.setBorder(new MarginBorder(5));
-		return fig;
+	protected ModelFigure createFigure() {
+		return new ModelFigure();
 	}
 
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ModelLayoutEditPolicy(getFeatureModel()));
+		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ModelLayoutEditPolicy(getModel()));
 	}
 
 	@Override
 	protected List<Object> getModelChildren() {
-		final IGraphicalFeatureModel fm = getFeatureModel();
+		final IGraphicalFeatureModel fm = getModel();
 
-		final List<?> constraints = fm.getConstraints();
-		final Collection<?> features = Functional.toList(fm.getFeatures());
+		final List<IGraphicalConstraint> constraints = fm.getVisibleConstraints();
+		final Collection<IGraphicalFeature> features = fm.getVisibleFeatures();
 
 		final ArrayList<Object> list = new ArrayList<>(constraints.size() + features.size() + 1);
 
@@ -88,13 +95,5 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		}
 
 		return list;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#createChild(java.lang.Object)
-	 */
-	@Override
-	public EditPart createChild(Object model) {
-		return super.createChild(model);
 	}
 }

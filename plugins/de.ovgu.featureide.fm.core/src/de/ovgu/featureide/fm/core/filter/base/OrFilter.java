@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.filter.base;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Returns the disjunction of multiple {@link IFilter}s.
@@ -32,6 +33,18 @@ import java.util.ArrayList;
 public class OrFilter<T> extends ArrayList<IFilter<T>> implements IFilter<T> {
 
 	private static final long serialVersionUID = 1L;
+
+	public OrFilter() {
+		super();
+	}
+
+	public OrFilter(Collection<? extends IFilter<T>> c) {
+		super(c);
+	}
+
+	public OrFilter(int initialCapacity) {
+		super(initialCapacity);
+	}
 
 	@Override
 	public boolean isValid(T object) {

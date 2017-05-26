@@ -2,16 +2,14 @@ package de.ovgu.featureide.common;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -64,6 +62,9 @@ public class Commons {
 
 	public static final String FEATURE_MODEL_BENCHMARK_PATH_REMOTE = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/";
 	public static final String FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH = "benchmarkFeatureModels";
+	
+	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/";
+	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH = "testFeatureModels";
 
 	/**
 	 * Returns a file reference to <code>remotePath</code> via a absolute path on TeamCity build server or
@@ -124,21 +125,18 @@ public class Commons {
 	 */
 	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final String remotePath,
 			final String localClassPath) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		File modelFileFolder = getFile(remotePath, localClassPath);
-		for (File f : modelFileFolder.listFiles(filter)) {
+		final File modelFileFolder = getFile(remotePath, localClassPath);
+		assert modelFileFolder != null;
+		
+		final File[] files = modelFileFolder.listFiles(filter);
+		assert files != null;
+		
+		for (File f : files) {
 			if (f.getName().equals(featureModelXmlFilename)) {
-				try {
-					new XmlFeatureModelReader(fm).readFromFile(f);
-					break;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (UnsupportedModelException e) {
-					e.printStackTrace();
-				}
+				return FeatureModelManager.readFromFile(f.toPath());
 			}
 		}
-		return fm;
+		return FMFactoryManager.getEmptyFeatureModel();
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

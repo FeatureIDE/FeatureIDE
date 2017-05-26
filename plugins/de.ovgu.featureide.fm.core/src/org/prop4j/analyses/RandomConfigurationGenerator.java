@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,36 +22,31 @@ package org.prop4j.analyses;
 
 import java.util.List;
 
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Finds random solutions of propositional formulas.
  * 
  * @author Sebastian Krieter
  */
 public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator {
 
-	private final int maxValue;
-
-	public RandomConfigurationGenerator(SatInstance satInstance, int maxValue) {
-		super(satInstance, 0);
-		this.maxValue = maxValue;
+	public RandomConfigurationGenerator(SatInstance satInstance, int maxNumber) {
+		super(satInstance, maxNumber);
 	}
 
 	@Override
-	public List<List<String>> analyze(WorkMonitor monitor) throws Exception {
+	public List<List<String>> analyze(IMonitor monitor) throws Exception {
 		time = System.nanoTime();
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
-		for (int i = 0; i < maxValue; i++) {
-			if (monitor.checkCancel()) {
-				break;
-			}
+		for (int i = 0; i < maxNumber; i++) {
+			monitor.checkCancel();
 			if (handleNewConfig(solver.findModel())) {
 				break;
 			}

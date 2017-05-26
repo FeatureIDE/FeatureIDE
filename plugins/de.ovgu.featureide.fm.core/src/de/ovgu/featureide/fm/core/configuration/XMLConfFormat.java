@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,13 +23,15 @@ package de.ovgu.featureide.fm.core.configuration;
 import java.util.List;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
+import de.ovgu.featureide.fm.core.io.xml.PositionalXMLHandler;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -39,12 +41,16 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
+	private static final String NODE_FEATURE = "feature";
+	private static final String ATTRIBUTE_NAME = "name";
+	private static final String ATTRIBUTE_MANUAL = "manual";
+	private static final String ATTRIBUTE_AUTOMATIC = "automatic";
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
 
 	@Override
 	public IPersistentFormat<Configuration> getInstance() {
-		return null;
+		return this;
 	}
 
 	@Override
@@ -59,12 +65,93 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+		final Element root = doc.getDocumentElement();
+		if (root == null) {
+			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));
+			return;
+		}
+		if (root.getNodeName().equals("configuration")) {
+			for (Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
+				final SelectableFeature selectablefeature;
+				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
+					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
+					selectablefeature = object.getSelectablefeature(featureName);
+					if (selectablefeature == null) {
+						createWarning("Invalid feature name: " + featureName, feature, warnings);
+						continue;
+					}
+				} else {
+					createWarning("No feature name specified", feature, warnings);
+					continue;
+				}
 
+				if (feature.hasAttribute(ATTRIBUTE_AUTOMATIC)) {
+					selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC), feature, warnings));
+				} else {
+					createWarning("No automatic selection state specified", feature, warnings);
+					continue;
+				}
+
+				if (feature.hasAttribute(ATTRIBUTE_MANUAL)) {
+					selectablefeature.setManual(getSelection(feature.getAttribute(ATTRIBUTE_MANUAL), feature, warnings));
+				} else {
+					createWarning("No manual selection state specified", feature, warnings);
+					continue;
+				}
+			}
+		} else {
+			warnings.add(new Problem("Root element must be <configuration>", 1, Problem.Severity.ERROR));
+		}
+	}
+
+	protected void createWarning(final String message, Element feature, List<Problem> warnings) {
+		final Object lineNumber = feature.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
+		warnings.add(new Problem(message, (lineNumber instanceof Integer) ? (int) lineNumber : 1, Problem.Severity.WARNING));
+	}
+
+	private Selection getSelection(String selection, Element feature, List<Problem> warnings) {
+		if (selection == null) {
+			createWarning("Selection state not specified" + selection, feature, warnings);
+			return Selection.UNDEFINED;
+		} else {
+			switch (selection) {
+			case "selected":
+				return Selection.SELECTED;
+			case "undefined":
+				return Selection.UNDEFINED;
+			case "unselected":
+				return Selection.UNSELECTED;
+			default:
+				createWarning("Invalid selection state: " + selection, feature, warnings);
+				return Selection.UNDEFINED;
+			}
+		}
+	}
+
+	private String getSelectionString(Selection selection) {
+		switch (selection) {
+		case SELECTED:
+			return "selected";
+		case UNDEFINED:
+			return "undefined";
+		case UNSELECTED:
+			return "unselected";
+		default:
+			throw new RuntimeException(selection.toString());
+		}
 	}
 
 	@Override
 	protected void writeDocument(Document doc) {
-
+		Element root = doc.createElement("configuration");
+		doc.appendChild(root);
+		for (SelectableFeature feature : object.getFeatures()) {
+			Element featureNode = doc.createElement(NODE_FEATURE);
+			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
+			featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
+			featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));
+			root.appendChild(featureNode);
+		}
 	}
 
 	@Override

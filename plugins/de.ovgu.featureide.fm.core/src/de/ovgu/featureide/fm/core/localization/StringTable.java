@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.fm.core.localization;
 
 /**
@@ -86,7 +106,8 @@ public class StringTable {
 	public static final String GET_FALSE_OPTIONAL_FEATURES = "get false optional features";
 	public static final String GET_UNUSED_FEATURES = "get unused features";
 	public static final String REFESH_CONFIGURATION_FOLER = "refesh configuration foler";
-	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = "Error while loading feature model from ";
+	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL = "Error while loading feature model from ";
+	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = ERROR_WHILE_LOADING_FEATURE_MODEL + " from ";
 	public static final String THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_ = "This annotation is not supported yet - moved to the comment section.";
 	public static final String PERFORMING_FULL_BUILD = "Performing full build";
 	public static final String THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_ = "The feature module is empty. You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
@@ -94,7 +115,7 @@ public class StringTable {
 	public static final String LOAD_MODEL = "Load Model";
 	public static final String CHECKING_CONFIGURATIONS = "Checking configurations";
 	public static final String DELETE_CONFIGURATION_MARKERS = "Delete Configuration Markers";
-	public static final String CHECK_VALIDITY_OF = "Check validity of ";
+	public static final String CHECK_VALIDITY_OF = "Checking validity";
 	public static final String CONFIGURATION_ = "Configuration '";
 	public static final String NO_COMPOSER_COULD_BE_CREATED_FOR_ID = "No composer could be created for ID ";
 	public static final String REMOVE_PROJECT = "Remove project";
@@ -334,7 +355,7 @@ public class StringTable {
 	public static final String NO_LEFT_SYMBOL_FOUND = "No left symbol found";
 	public static final String NO_RIGHT_SYMBOL_FOUND = "No right symbol found";
 	public static final String NO_SYMBOL_FOUND = "No symbol found";
-	public static final String INVALID_POSITIONING_OF_PARENTHESES = "invalid positioning of parentheses";
+	public static final String INVALID_POSITIONING_OF_PARENTHESES = "Invalid positioning of parentheses";
 	public static final String INVALID_NUMBER_OF_QUOTATION_MARKS = "Invalid number of quotation marks";
 	public static final String WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED = "Whitespace before and after quoted feature name required";
 	public static final String NO_SYMBOL = " no symbol ";
@@ -425,9 +446,11 @@ public class StringTable {
 	public static final String CHANGE_DESCRIPTION = "Change Description";
 	public static final String FEATURE_DESCRIPTION = "Feature Description";
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
-	public static final String CALCULATE_DEPENDENCY = "Calculate Dependencies of Sub Feature Model";
+	public static final String CALCULATE_DEPENDENCY = "Show Hidden Dependencies of Submodel";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
-	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures";
+	public static final String EXPAND_CONSTRAINT = "Show contained features";
+	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures (CTRL + D)";
+	public static final String COLLAPSE_FEATURE = "Collapse (CTRL + C)";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
 	public static final String EXPORT_AS = "Export As";
 	public static final String HIDE_LEGEND = "Hide Legend";
@@ -437,6 +460,7 @@ public class StringTable {
 	public static final String REVERSE_FEATURE_ORDER = "Reverse Feature Order";
 	public static final String SELECTION = "Selection";
 	public static final String SHOW_HIDDEN_FEATURES = "Show Hidden Features";
+	public static final String SHOW_COLLAPSED_CONSTRAINTS = "Show Collapsed Constraints";
 	public static final String RENAMING_FEATURE = "Renaming feature ";
 	public static final String IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME = "It is not recommended to change upper and lower case. You currently try to rename ";
 	public static final String THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_ = "This name is already used for another feature.";
@@ -532,6 +556,7 @@ public class StringTable {
 	public static final String VON_INTERFACE = "von Interface";
 	public static final String KONKRET = "Konkret";
 	public static final String VERSTECKT = "Versteckt";
+	public static final String EINGEKLAPPT = "Eingeklappt";
 	public static final String FALSCH_OPTIONALES_FEATURE = "Falsch-optionales Feature";
 	public static final String ODER = "Oder";
 	public static final String UNBESTIMMBAR_VERSTECKTES_FEATURE = "Unbestimmbar verstecktes Feature";
@@ -586,6 +611,7 @@ public class StringTable {
 	public static final String CONSTRAINT_ELEMENT = "constraint element";
 	public static final String COLLAPSE_ALL = "Collapse All";
 	public static final String EXPAND_ALL = "Expand All";
+	public static final String COLLAPSE_ALL_BUT_EXPLANATION = "Collapse All But Explanation";
 	public static final String CREATE_FEATURE_BELOW = "Create Feature Below";
 	public static final String RENAME = "Rename";
 	public static final String NO_DATA_TO_DISPLAY_AVAILABLE_ = "No data to display available.";
@@ -659,7 +685,7 @@ public class StringTable {
 	public static final String INTERACTIONS = "Interactions";
 	public static final String DISSIMILARITY = "Dissimilarity";
 	public static final String CHVATAL = "Chvatal";
-	public static final String CASA = "CASA";
+	public static final String CASA = "CASA (experimental)";
 	public static final String ICPL = "ICPL";
 	public static final String INCLING = "IncLing";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";
@@ -739,9 +765,9 @@ public class StringTable {
 	public static final String PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT = "Please open a file from a FeatureIDE project";
 	public static final String STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String STATISTICS_OF_PRODUCT_LINE_SPECIFICATION = "Statistics of product-line specification";
-	public static final String VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL = "Valid configurations of the feature model";
+	public static final String SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL = "Semantical statistics";
 	public static final String ATOMIC_SETS_OF_THE_FEATURE_MODEL = "Number of atomic sets";
-	public static final String FEATURE_STATISTICS = "Feature statistics";
+	public static final String SYNTACTICAL_STATISTICS_OF_THE_FEATURE_MODEL = "Syntactical statistics";
 	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
 	public static final String NUMBER_OF_FEATURES = "Number of features";
 	public static final String NUMBER_OF_CONCRETE_FEATURES = "Number of concrete features";
@@ -825,6 +851,7 @@ public class StringTable {
 	public static final String HIDE_FIELDS = "Hide Fields";
 	public static final String HIDE_METHODS = "Hide Methods";
 	public static final String SORT_BY_FEATURE = "Sort By Feature";
+	public static final String SYNC_COLLAPSED_FEATURES = "Sync collapsed states with FM";
 	public static final String EMPTY_OUTLINE = "Empty Outline";
 	public static final String AN_OUTLINE_IS_NOT_AVAILABLE_ = "An outline is not available.";
 	public static final String THIS_IS_NO_FEATURE_PROJECT = "Not a FeatureIDE project";
@@ -998,9 +1025,21 @@ public class StringTable {
 	public static final String SELECTED_FEATURE_ALL_CHILDREN = "Children (all)";
 	public static final String SELECTED_FEATURE_SIBLINGS = "Current selection and all siblings";
 	public static final String COLORATION_DIALOG = "Set Feature Colors";
-	public static final String CHOOSE_COLOR_ = "Choose Color:";
-	public static final String CHOOSE_ACTION_ = "Choose Action:";
+	public static final String CHOOSE_COLOR = "Choose Color:";
+	public static final String CHOOSE_ACTION = "Choose Action:";
 	public static final String FEATURES_ = "Features:";
 	public static final String FIDECONF = "fideconf";
 	public static final String PARAMETER_IS_EXPECTED_TO_BE_NON_NULL = "The method parameter is expected to be non-null";
+	public static final String SELECT_COLOR_SCHEME = "Select color scheme";
+	public static final String SET_FEATURE_COLLAPSED = "Set Feature Collapsed";
+	public static final String SET_FEATURE_EXPANDED = "Set Feature Expanded";
+	public static final String COLLAPSE_SIBLINGS = "Collapse siblings";
+	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust model to editor size";
+	public static final String CALCULATE_VOID_FEATURES = "Calculate Void Features";
+	public static final String CALCULATE_FALSE_OPTIONAL_FEATURES = "Calculate False Optional Features";
+	public static final String CALCULATE_DEAD_FEATURES = "Calculate Dead Features";
+	
+	public static final String PUBLIC_CLASS = "public class";
+	public static final String PUBLIC_INTERFACE = "public interface";
+	
 }

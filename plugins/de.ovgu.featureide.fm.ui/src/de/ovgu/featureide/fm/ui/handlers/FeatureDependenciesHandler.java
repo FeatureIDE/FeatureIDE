@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,10 +41,8 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
@@ -131,19 +130,7 @@ public class FeatureDependenciesHandler extends AFileHandler {
 	 * @throws FileNotFoundException
 	 */
 	private IFeatureModel readModel(IFile inputFile) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		// XmlFeatureModelReader fmReader = new
-		// XmlFeatureModelReader(fm,inputFile.getProject());
-		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
-
-		try {
-			fmReader.readFromFile(inputFile);
-		} catch (FileNotFoundException e) {
-			FMUIPlugin.getDefault().logError(e);
-		} catch (UnsupportedModelException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-		return fm;
+		return FeatureModelManager.readFromFile(Paths.get(inputFile.getLocationURI()));
 	}
 
 }

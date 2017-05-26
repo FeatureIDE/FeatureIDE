@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,13 +20,17 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import de.ovgu.featureide.fm.core.CoreExtensionLoader;
 import de.ovgu.featureide.fm.core.ExtensionManager;
 import de.ovgu.featureide.fm.core.IExtensionLoader;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
 
 /**
  * Returns custom factories to create {@link IFeatureModel}, {@link IFeature}, and {@link IConstraint} instances.
@@ -38,11 +42,11 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	public static IFactoryWorkspaceProvider factoryWorkspaceProvider = new CoreFactoryWorkspaceProvider();
 
 	private FMFactoryManager() {
+		setExtensionLoaderInternal(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
+		factoryWorkspaceProvider.getFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
 	}
 
 	private static FMFactoryManager instance = new FMFactoryManager();
-
-	private static IFeatureModelFactory defaultFactory = DefaultFeatureModelFactory.getInstance();
 
 	public static FMFactoryManager getInstance() {
 		return instance;
@@ -50,6 +54,10 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 
 	public static void setExtensionLoader(IExtensionLoader<IFeatureModelFactory> extensionLoader) {
 		instance.setExtensionLoaderInternal(extensionLoader);
+	}
+
+	public static void addFactoryWorkspace(String path, FactoryWorkspace workspace) {
+		factoryWorkspaceProvider.addFactoryWorkspace(path, workspace);
 	}
 
 	/**
@@ -69,8 +77,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	public static void setDefaultFactory(String id) throws NoSuchExtensionException {
-		defaultFactory = getFactoryById(id);
-		factoryWorkspaceProvider.getFactoryWorkspace().setDefaultFactoryID(defaultFactory.getId());
+		factoryWorkspaceProvider.getFactoryWorkspace().setDefaultFactoryID(id);
 	}
 
 	public static FactoryWorkspace getFactoryWorkspace() {
@@ -80,25 +87,96 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	public static FactoryWorkspace getFactoryWorkspace(String path) {
 		return factoryWorkspaceProvider.getFactoryWorkspace(path);
 	}
-
+	
 	/**
-	 * @return Returns the default instance of the built-in {@link DefaultFeatureModelFactory} which provides access to the default {@link IFeatureModel} and
-	 *         {@link IFeature} implementations of FeatureIDE
+	 * Returns the feature model factory that was used to create the given model.
+	 * (if the factory is not available the default factory is returned).
+	 * 
+	 * @param featureModel the feature model
+	 * 
+	 * @return Returns the feature model factory for the given feature model.
 	 */
-	public static IFeatureModelFactory getFactory() {
-		return defaultFactory;
+	public static IFeatureModelFactory getFactory(IFeatureModel featureModel) {
+		try {
+			return getFactoryById(featureModel.getFactoryID());
+		} catch (NoSuchExtensionException e) {
+			Logger.logError(e);
+			return DefaultFeatureModelFactory.getInstance();
+		}
 	}
 
-	public static IFeatureModelFactory getFactory(String path) throws NoSuchExtensionException {
+
+	/**
+	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br/>
+	 * <br/>
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IFeatureModelFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
+	 * underlying feature model file.
+	 * 
+	 * @return Returns the default feature model factory.
+	 */
+	public static IFeatureModelFactory getDefaultFactory() {
+		try {
+			return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace().getDefaultFactoryID());
+		} catch (NoSuchExtensionException e) {
+			Logger.logError(e);
+			return DefaultFeatureModelFactory.getInstance();
+		}
+	}
+
+	/**
+	 * Returns the currently set default factory for the given path
+	 * (if none is specified an instance of the default factory is returned).<br/>
+	 * <br/>
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IFeatureModelFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
+	 * underlying feature model file.
+	 * 
+	 * @param path
+	 * 
+	 * @return Returns the default feature model factory for a certain path.
+	 * 
+	 * @throws NoSuchExtensionException
+	 */
+	public static IFeatureModelFactory getDefaultFactoryForPath(String path) throws NoSuchExtensionException {
 		return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace(path).getDefaultFactoryID());
 	}
 
-	public static IFeatureModelFactory getFactory(String path, IFeatureModelFormat format) throws NoSuchExtensionException {
+	/**
+	 * Returns the feature model factory for the given path and format.
+	 * (if none is specified an instance of the default factory is returned).
+	 * 
+	 * @param path
+	 * @param format
+	 * 
+	 * @return Returns the feature model factory for a certain path and format.
+	 * 
+	 * @throws NoSuchExtensionException
+	 */
+	public static IFeatureModelFactory getFactory(String path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
 		return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace(path).getID(format));
 	}
 
-	public static IFeatureModelFactory getFactory(IFeatureModelFormat format) throws NoSuchExtensionException {
+	/**
+	 * Returns the currently set default factory for the given format
+	 * (if none is specified an instance of the default factory is returned).<br/>
+	 * <br/>
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IFeatureModelFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
+	 * underlying feature model file.
+	 * 
+	 * @param format
+	 * 
+	 * @return Returns the default feature model factory for a certain format.
+	 * 
+	 * @throws NoSuchExtensionException
+	 */
+	public static IFeatureModelFactory getDefaultFactoryForFormat(IFeatureModelFormat format) throws NoSuchExtensionException {
 		return getFactoryById(factoryWorkspaceProvider.getFactoryWorkspace().getID(format));
+	}
+
+	/**
+	 * @return An empty feature model from the default factory.
+	 */
+	public static IFeatureModel getEmptyFeatureModel() {
+		return getDefaultFactory().createFeatureModel();
 	}
 
 }

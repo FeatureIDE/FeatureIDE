@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.featurehouse.ui.handlers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STUBS_GENERATION_STARTED_;
+
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.featurehouse.meta.FeatureStubsGenerator;

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,9 +36,13 @@ public interface IGraphicalFeature extends IGraphicalElement {
 
 	IFeature getObject();
 
+	boolean isCollapsed();
+	
 	boolean isConstraintSelected();
 
 	void setConstraintSelected(boolean selection);
+	
+	void setCollapsed(boolean collapse);
 	
 	void addTargetConnection(FeatureConnection connection);
 	
@@ -50,5 +54,11 @@ public interface IGraphicalFeature extends IGraphicalElement {
 	List<FeatureConnection> getTargetConnections();
 
 	IGraphicalFeature clone();
+	
+	boolean hasCollapsedParent();
+
+	List<IGraphicalFeature> getGraphicalChildren();
+	
+	
 
 }

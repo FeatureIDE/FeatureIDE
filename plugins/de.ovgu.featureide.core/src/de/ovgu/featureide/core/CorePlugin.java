@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,7 +27,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COULD_NOT_SET_PERSISTANT_PROPERTY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_CREATING_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IN_PROJECT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSER_FOUND_IN_DESCRIPTION_;
@@ -38,6 +37,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -97,13 +99,18 @@ import de.ovgu.featureide.core.signature.documentation.SPLMerger;
 import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -280,6 +287,9 @@ public class CorePlugin extends AbstractCorePlugin {
 			return;
 
 		IFeatureProject featureProject = featureProjectMap.remove(project);
+		// Quick fix #402 
+		featureProject.dispose();
+		
 		logInfo(project.getName() + REMOVED);
 
 		for (IProjectListener listener : projectListeners)
@@ -353,7 +363,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * after adding the FeatureIDE nature to a project.
 	 */
 	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath) {
-		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false);
+		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false);
 
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
 		try {
@@ -368,7 +378,8 @@ public class CorePlugin extends AbstractCorePlugin {
 							}
 
 							public void run() throws Exception {
-								runProjectConversion(project, sourcePath, configPath, buildPath, (IComposerExtensionClass) o);
+								runProjectConversion(project, sourcePath, configPath, buildPath, (IComposerExtensionClass) o);	
+								addFeatureNatureToProject(project);							
 							}
 						};
 						SafeRunner.run(runnable);
@@ -379,7 +390,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		} catch (CoreException e) {
 			getDefault().logError(e);
 		}
-
 	}
 
 	/**
@@ -433,6 +443,7 @@ public class CorePlugin extends AbstractCorePlugin {
 				fw.close();
 			}
 		}
+
 	}
 
 	/**
@@ -445,7 +456,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param addCompiler <code>false</code> if the project already has a compiler
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addCompiler) {
+			final String buildPath, boolean addCompiler, boolean addNature) {
 		createProjectStructure(project, sourcePath, configPath, buildPath);
 
 		if (addCompiler) {
@@ -487,7 +498,10 @@ public class CorePlugin extends AbstractCorePlugin {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
 		}
-		addFeatureNatureToProject(project);
+		if(addNature)
+		{
+			addFeatureNatureToProject(project);
+		}
 	}
 
 	private static void addFeatureNatureToProject(IProject project) {
@@ -558,15 +572,21 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, sourcePath);
 		createFolder(project, configPath);
 		createFolder(project, buildPath);
-		IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
-		featureModel.initFMComposerExtension(project);
-		featureModel.createDefaultValues(project.getName());
-		try {
-			new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(project.getFile("model.xml"));
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(ERROR_WHILE_CREATING_FEATURE_MODEL, e);
-		}
+		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
+		final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+		IFeatureModelFactory factory;
+		try {
+			factory = FMFactoryManager.getFactory(modelPath.toString(), format);
+		} catch (NoSuchExtensionException e) {
+			Logger.logError(e);
+			factory = FMFactoryManager.getDefaultFactory();
+		}
+		IFeatureModel featureModel = factory.createFeatureModel();
+		FMComposerManager.getFMComposerExtension(project);
+		featureModel.createDefaultValues(project.getName());
+
+		FileHandler.save(modelPath, featureModel, format);
 	}
 
 	/**
@@ -775,29 +795,37 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void buildContextDocumentation(List<IProject> pl, String options, String featureName) {
-		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_Context_" + featureName, options.split("\\s+"),
-				new ContextMerger(), featureName);
-
-		FMCorePlugin.getDefault().startJobs(pl, args, true);
+		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
+		for (IProject iProject : pl) {
+			arguments.add(new PrintDocumentationJob.Arguments("Docu_Context_" + featureName, options.split("\\s+"),
+					new ContextMerger(), featureName, iProject));
+		}
+		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 
 	public void buildVariantDocumentation(List<IProject> pl, String options) {
-		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_Variant", options.split("\\s+"), new VariantMerger(), null);
-
-		FMCorePlugin.getDefault().startJobs(pl, args, true);
+		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
+		for (IProject iProject : pl) {
+			arguments.add(new PrintDocumentationJob.Arguments("Docu_Variant", options.split("\\s+"), new VariantMerger(), null, iProject));
+		}
+		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 
 	public void buildFeatureDocumentation(List<IProject> pl, String options, String featureName) {
-		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_Feature_" + featureName, options.split("\\s+"),
-				new FeatureModuleMerger(), featureName);
-
-		FMCorePlugin.getDefault().startJobs(pl, args, true);
+		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
+		for (IProject iProject : pl) {
+			arguments.add(new PrintDocumentationJob.Arguments("Docu_Feature_" + featureName, options.split("\\s+"),
+					new FeatureModuleMerger(), featureName, iProject));
+		}
+		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 
 	public void buildSPLDocumentation(List<IProject> pl, String options) {
-		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_SPL", options.split("\\s+"), new SPLMerger(), null);
-
-		FMCorePlugin.getDefault().startJobs(pl, args, true);
+		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
+		for (IProject iProject : pl) {
+			arguments.add(new PrintDocumentationJob.Arguments("Docu_SPL", options.split("\\s+"), new SPLMerger(), null, iProject));
+		}
+		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 	
 	public static Node removeFeatures(IFeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {

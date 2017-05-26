@@ -3,7 +3,6 @@
 	<name>de.ovgu.featureide.fm.core-test</name>
 	<comment></comment>
 	<projects>
-		<project>de.ovgu.featureide.fm.core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

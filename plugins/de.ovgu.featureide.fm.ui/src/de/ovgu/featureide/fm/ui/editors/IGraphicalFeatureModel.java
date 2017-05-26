@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,6 +27,8 @@ import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
@@ -47,8 +49,13 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	void redrawDiagram();
 
 	void refreshContextMenu();
-	
+
 	Collection<IGraphicalFeature> getFeatures();
+	
+	Collection<IGraphicalFeature> getAllFeatures();
+
+	void setActiveExplanation(Explanation exp);
+	Explanation getActiveExplanation();
 
 	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
 
@@ -59,5 +66,47 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	IGraphicalFeatureModel clone();
 	
 	void init();
+
+	/**
+	 * Returns the list of not collapsed constraints stored in this feature model.
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.3
+	 * 
+	 * @return All not collapsed constraints stored in this feature model.
+	 */
+	List<IGraphicalConstraint> getVisibleConstraints();
+
+	/**
+	 * Returns the list of not collapsed features stored in this feature model.
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * 
+	 * @since 3.3
+	 * 
+	 * @return All not collapsed constraints stored in this feature model.
+	 */
+	List<IGraphicalFeature> getVisibleFeatures();
+
+	/**
+	 * return the current index of the constraint. It will olny count constaints that are currently visible.
+	 * @param constraint
+	 * @return
+	 */
+	int getConstraintIndex(Constraint constraint);
+
 
 }

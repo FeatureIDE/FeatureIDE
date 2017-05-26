@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.FileLocator;
@@ -38,12 +39,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.internal.util.BundleUtility;
 import org.osgi.framework.Bundle;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
@@ -59,23 +59,19 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 	@Override
 	protected void singleAction(IFile modelfile) {
 		try {
-			String jakarta = getFileFromPlugin(FMCorePlugin.PLUGIN_ID, "lib/jakarta.jar");
-			String guidsl = getFileFromPlugin(FMCorePlugin.PLUGIN_ID, "lib/guidsl.jar");
+			String jakarta = getFileFromPlugin(PluginID.PLUGIN_ID, "lib/jakarta.jar");
+			String guidsl = getFileFromPlugin(PluginID.PLUGIN_ID, "lib/guidsl.jar");
 			String command = "java -cp \"" + jakarta + "\"";
 			command += " -jar \"" + guidsl + "\"";
 
-			IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-			FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
-
-			fmReader.readFromFile(modelfile);
-			GuidslWriter fmWriter = new GuidslWriter(fm);
+			IFeatureModel fm = FeatureModelManager.readFromFile(Paths.get(modelfile.getLocationURI()));
 
 			// Parse XML to GUIDSL and save file as model.m
 			String loc = modelfile.getLocation().toOSString();
 			String dirpath = loc.substring(0, loc.length() - 10);
 			String filepath = loc.substring(0, loc.length() - 4) + ".m";
 			File outputfile = new File(filepath);
-			fmWriter.writeToFile(outputfile);
+			FileHandler.save(outputfile.toPath(), fm, new GuidslFormat());
 
 			command += " \"" + filepath + "\"";
 

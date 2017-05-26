@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -49,6 +49,7 @@ public class English implements ILanguage {
 	private static final String INTERFACED = FROM_INTERFACE;
 	private static final String CONCRETE = "Concrete";
 	private static final String HIDDEN = "Hidden";
+	private static final String COLLAPSED = "Collapsed";
 	private static final String DEAD = "Dead feature";
 	private static final String FALSE_OPTIONAL = FALSE_OPTIONAL_FEATURE;
 	private static final String OPTIONAL = "Optional";
@@ -132,6 +133,11 @@ public class English implements ILanguage {
 	@Override
 	public String getHidden() {
 		return HIDDEN;
+	}
+	
+	@Override
+	public String getCollapsed() {
+		return COLLAPSED;
 	}
 
 	@Override

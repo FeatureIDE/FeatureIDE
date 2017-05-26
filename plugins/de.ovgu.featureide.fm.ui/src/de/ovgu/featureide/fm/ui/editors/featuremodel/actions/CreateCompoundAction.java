@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -72,7 +72,6 @@ public class CreateCompoundAction extends Action {
 	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
 		super(CREATE_FEATURE_ABOVE, createImage);
 		this.featureModel = featureModel;
-
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -83,9 +82,9 @@ public class CreateCompoundAction extends Action {
 
 	@Override
 	public void run() {
-		if (selectedFeatures.size() != 1)
-			throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
-		CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures.get(0));
+		//if (selectedFeatures.size() != 1)
+			//throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
+		CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -110,7 +109,7 @@ public class CreateCompoundAction extends Action {
 			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart)
-				feature = ((FeatureEditPart) editPart).getFeature().getObject();
+				feature = ((FeatureEditPart) editPart).getModel().getObject();
 			else
 				feature = (IFeature) editPart;
 
@@ -123,7 +122,7 @@ public class CreateCompoundAction extends Action {
 					return false;
 				}
 			}
-			
+
 			selectedFeatures.add(feature);
 		}
 		return !selectedFeatures.isEmpty();

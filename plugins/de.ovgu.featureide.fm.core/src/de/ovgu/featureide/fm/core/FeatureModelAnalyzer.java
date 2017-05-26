@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,9 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.CheckForNull;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.prop4j.And;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
@@ -54,14 +51,21 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
@@ -73,24 +77,33 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelAnalyzer {
-
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint.
-	 * Key = constraintIndex, Value = explanation
+	 * Remembers explanations for dead features.
 	 */
-	public HashMap<Integer, List<String>> redundantConstrExpl = new HashMap<>();
-
+	private final Map<IFeature, Explanation> deadFeatureExplanations = new HashMap<>();
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint.
-	 * Key = constraintIndex, Value = explanation
+	 * Remembers explanations for false-optional features.
 	 */
-	public HashMap<IFeature, List<String>> deadFeatureExpl = new HashMap<>();
-
+	private final Map<IFeature, Explanation> falseOptionalFeatureExplanations = new HashMap<>();
 	/**
-	 * Used for tool tip: remember explanation for redundant constraint.
-	 * Key = constraintIndex, Value = explanation
+	 * Remembers explanations for redundant constraints.
 	 */
-	public HashMap<IFeature, List<String>> falseOptFeatureExpl = new HashMap<>();
+	private final Map<IConstraint, Explanation> redundantConstraintExplanations = new HashMap<>();
+	/**
+	 * Creates explanations for dead features.
+	 * Stored for performance so the underlying CNF is not recreated for every explanation.
+	 */
+	private final DeadFeatureExplanationCreator deadFeatureExplanationCreator = new DeadFeatureExplanationCreator();
+	/**
+	 * Creates explanations for false-optional features.
+	 * Stored for performance so the underlying CNF is not recreated for every explanation.
+	 */
+	private final FalseOptionalFeatureExplanationCreator falseOptionalFeatureExplanationCreator = new FalseOptionalFeatureExplanationCreator();
+	/**
+	 * Creates explanations for redundant constraints.
+	 * Stored for performance so the underlying CNF is not recreated for every explanation.
+	 */
+	private final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = new RedundantConstraintExplanationCreator();
 
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
@@ -106,7 +119,7 @@ public class FeatureModelAnalyzer {
 
 	private boolean cachedValidity = true;
 
-	private IFeatureModel fm;
+	private final IFeatureModel fm;
 
 	/**
 	 * Defines whether features should be included into calculations.
@@ -139,8 +152,7 @@ public class FeatureModelAnalyzer {
 	 */
 	private boolean cancel = false;
 
-	@CheckForNull
-	private IProgressMonitor monitor;
+	private IMonitor monitor = new NullMonitor();
 
 	private FeatureDependencies dependencies;
 
@@ -156,6 +168,7 @@ public class FeatureModelAnalyzer {
 
 	public FeatureModelAnalyzer(IFeatureModel fm) {
 		this.fm = fm;
+		clearExplanations();
 	}
 
 	/**
@@ -245,7 +258,7 @@ public class FeatureModelAnalyzer {
 		try {
 			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return false;
 		}
 	}
@@ -551,9 +564,8 @@ public class FeatureModelAnalyzer {
 	 * Hashing might be fast for locating features, but creating a HashSet is costly 
 	 * So LinkedLists are much faster because the number of feature in the set is usually small (e.g. dead features)
 	 */
-	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
-		final WorkMonitor workMonitor = new WorkMonitor();
-		workMonitor.setMonitor(monitor);
+	public HashMap<Object, Object> analyzeFeatureModel(IMonitor monitor) {
+		this.monitor = monitor == null ? new NullMonitor() : monitor;
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(calculateFeatures);
 		analysis.setCalculateConstraints(calculateConstraints);
@@ -561,28 +573,24 @@ public class FeatureModelAnalyzer {
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
 		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
 		analysis.setCalculateFOConstraints(calculateFOConstraints);
-		final HashMap<Object, Object> newAttributes = LongRunningWrapper.runMethod(analysis, workMonitor);
+		final HashMap<Object, Object> newAttributes = LongRunningWrapper.runMethod(analysis, this.monitor);
 		cachedValidity = analysis.isValid();
 		cachedCoreFeatures = analysis.getCoreFeatures();
 		cachedDeadFeatures = analysis.getDeadFeatures();
 		cachedFalseOptionalFeatures = analysis.getFalseOptionalFeatures();
-		deadFeatureExpl = analysis.deadFeatureExpl;
-		falseOptFeatureExpl = analysis.falseOptFeatureExpl;
-		redundantConstrExpl = analysis.redundantConstrExpl;
+		clearExplanations();
 		return newAttributes;
 	}
 
 	private void beginTask(int totalWork) {
-		if (monitor != null) {
-			monitor.beginTask(ANALYZE, totalWork);
-		}
+		monitor.setTaskName(ANALYZE);
+		monitor.setRemainingWork(totalWork);
 	}
 
 	public void updateConstraints() {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(false);
 		analysis.setCalculateConstraints(true);
-		analysis.setCalculateExplanations(false);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
 		analysis.setCalculateTautologyConstraints(calculateTautologyConstraints);
 		analysis.setCalculateDeadConstraints(calculateDeadConstraints);
@@ -592,26 +600,18 @@ public class FeatureModelAnalyzer {
 	}
 
 	private boolean canceled() {
-		return cancel || (monitor != null ? monitor.isCanceled() : false);
+		monitor.checkCancel();
+		return cancel;
 	}
 
 	private void worked(int workDone) {
-		if (monitor != null) {
-			monitor.worked(workDone);
-		}
-	}
-
-	private void setSubTask(String name) {
-		if (monitor != null) {
-			monitor.subTask(name);
-		}
+		monitor.step();
 	}
 
 	public void updateFeatures() {
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(true);
 		analysis.setCalculateConstraints(false);
-		analysis.setCalculateExplanations(false);
 		analysis.updateFeatures();
 		cachedValidity = analysis.isValid();
 		cachedCoreFeatures = analysis.getCoreFeatures();
@@ -628,13 +628,14 @@ public class FeatureModelAnalyzer {
 		if (!fm.getStructure().hasHidden()) {
 			return;
 		}
-		setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
+		monitor.setTaskName(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
 		/**
 		 * First every relevant constraint of every hidden feature is checked if its form equals
 		 * HIDDEN_FEATURE <=> A
 		 * where A is an expression containing only non hidden features
 		 * If there is a constraint of that kind for a hidden feature it is added to a list.
 		 */
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
 		Collection<IFeature> list = new LinkedList<IFeature>();
 		Collection<IFeature> hiddenFeatures = getHiddenFeatures();
 		for (IFeature feature : hiddenFeatures) {
@@ -645,7 +646,7 @@ public class FeatureModelAnalyzer {
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint rightConstraint = FMFactoryManager.getFactory().createConstraint(fm, rightChild);
+						IConstraint rightConstraint = factory.createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -653,7 +654,7 @@ public class FeatureModelAnalyzer {
 						}
 					}
 					if (rightChild instanceof Literal && ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint leftConstraint = FMFactoryManager.getFactory().createConstraint(fm, leftChild);
+						IConstraint leftConstraint = factory.createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -677,7 +678,7 @@ public class FeatureModelAnalyzer {
 			if (canceled()) {
 				return;
 			}
-			setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
+			monitor.setTaskName(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
 			if (!list.contains(feature)) {
 				Collection<IFeature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;
@@ -725,8 +726,7 @@ public class FeatureModelAnalyzer {
 		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000);
 		for (IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure = feature.getStructure();
-
-			if (!FeatureUtils.getRoot(fm).toString().equals(feature.toString())) { // this might be indeed the case within the analysis for subtree dependencies
+			if (!FeatureUtils.getRoot(fm).getName().equals(feature.getName())) { // this might be indeed the case within the analysis for subtree dependencies
 				final IFeature parent = FeatureUtils.getParent(feature);
 				if (!structure.isMandatory() && parent != null && solver.isImplied(new Literal(parent.getName(), false), new Literal(feature.getName()))) {
 					falseOptionalFeatures.add(feature);
@@ -783,4 +783,207 @@ public class FeatureModelAnalyzer {
 		return Collections.unmodifiableList(cachedFalseOptionalFeatures);
 	}
 
+	/**
+	 * Returns an explanation why the given feature model element is defect or null if it cannot be explained.
+	 * @param modelElement potentially defect feature model element
+	 * @return an explanation why the given feature model element is defect or null if it cannot be explained
+	 */
+	public Explanation getExplanation(IFeatureModelElement modelElement) {
+		Explanation explanation = null;
+		if (modelElement instanceof IFeature) {
+			final IFeature feature = (IFeature) modelElement;
+			switch (feature.getProperty().getFeatureStatus()) {
+				case DEAD:
+					explanation = getDeadFeatureExplanation(feature);
+					break;
+				case FALSE_OPTIONAL:
+					explanation = getFalseOptionalFeatureExplanation(feature);
+					break;
+				default:
+					break;
+			}
+		} else if (modelElement instanceof IConstraint) {
+			final IConstraint constraint = (IConstraint) modelElement;
+			switch (constraint.getConstraintAttribute()) {
+				case REDUNDANT:
+				case TAUTOLOGY:
+				case IMPLICIT:
+					explanation = getRedundantConstraintExplanation(constraint);
+					break;
+				default:
+					break;
+			}
+		}
+		return explanation;
+	}
+	
+	/**
+	 * Adds an explanation why the given feature model element is defect.
+	 * Uses the default feature model stored in this instance.
+	 * @param modelElement potentially defect feature model element
+	 */
+	public void addExplanation(IFeatureModelElement modelElement) {
+		addExplanation(fm, modelElement);
+	}
+	
+	/**
+	 * Adds an explanation why the given feature model element is defect.
+	 * Uses the given feature model, which may differ from the default feature model stored in this instance.
+	 * @param fm feature model containing the feature model element
+	 * @param modelElement potentially defect feature model element
+	 */
+	public void addExplanation(IFeatureModel fm, IFeatureModelElement modelElement) {
+		if (modelElement instanceof IFeature) {
+			final IFeature feature = (IFeature) modelElement;
+			switch (feature.getProperty().getFeatureStatus()) {
+				case DEAD:
+					addDeadFeatureExplanation(fm, feature);
+					break;
+				case FALSE_OPTIONAL:
+					addFalseOptionalFeatureExplanation(fm, feature);
+					break;
+				default:
+					break;
+			}
+		} else if (modelElement instanceof IConstraint) {
+			final IConstraint constraint = (IConstraint) modelElement;
+			switch (constraint.getConstraintAttribute()) {
+				case REDUNDANT:
+				case TAUTOLOGY:
+				case IMPLICIT:
+					addRedundantConstraintExplanation(fm, constraint);
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	
+	/**
+	 * Returns an explanation why the feature model is void or null if it cannot be explained.
+	 * That is the same explanation for why its root feature is dead.
+	 * Uses the default feature model stored in this instance.
+	 * @return an explanation why the feature model is dead or null if it cannot be explained
+	 */
+	public Explanation getVoidFeatureModelExplanation() {
+		return getDeadFeatureExplanation(FeatureUtils.getRoot(fm));
+	}
+	
+	/**
+	 * Adds an explanation why the feature model is void.
+	 * That is the same explanation for why its root feature is dead.
+	 * Uses the default feature model stored in this instance.
+	 */
+	public void addVoidFeatureModelExplanation() {
+		addDeadFeatureExplanation(FeatureUtils.getRoot((fm)));
+	}
+	
+	/**
+	 * Returns an explanation why the given feature is dead or null if it cannot be explained.
+	 * @param feature potentially dead feature
+	 * @return an explanation why the given feature is dead or null if it cannot be explained
+	 */
+	public Explanation getDeadFeatureExplanation(IFeature feature) {
+		return deadFeatureExplanations.get(feature);
+	}
+	
+	/**
+	 * Adds an explanation why the given feature is dead.
+	 * Uses the default feature model stored in this instance.
+	 * @param feature potentially dead feature
+	 */
+	public void addDeadFeatureExplanation(IFeature feature) {
+		addDeadFeatureExplanation(fm, feature);
+	}
+	
+	/**
+	 * Adds an explanation why the given feature is dead.
+	 * Uses the given feature model, which may differ from the default feature model stored in this instance.
+	 * @param fm feature model containing the feature
+	 * @param feature potentially dead feature
+	 */
+	public void addDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
+		final DeadFeatureExplanationCreator creator = fm == this.fm
+				? deadFeatureExplanationCreator
+				: new DeadFeatureExplanationCreator(fm);
+		creator.setDeadFeature(feature);
+		deadFeatureExplanations.put(feature, creator.getExplanation());
+	}
+	
+	/**
+	 * Returns an explanation why the given feature is false-optional or null if it cannot be explained.
+	 * @param feature potentially false-optional feature
+	 * @return an explanation why the given feature is false-optional or null if it cannot be explained
+	 */
+	public Explanation getFalseOptionalFeatureExplanation(IFeature feature) {
+		return falseOptionalFeatureExplanations.get(feature);
+	}
+	
+	/**
+	 * Adds an explanation why the given feature is false-optional.
+	 * Uses the default feature model stored in this instance.
+	 * @param feature potentially false-optional feature
+	 */
+	public void addFalseOptionalFeatureExplanation(IFeature feature) {
+		addFalseOptionalFeatureExplanation(fm, feature);
+	}
+	
+	/**
+	 * Adds an explanation why the given feature is false-optional.
+	 * Uses the given feature model, which may differ from the default feature model stored in this instance.
+	 * @param fm feature model containing the feature
+	 * @param feature potentially false-optional feature
+	 */
+	public void addFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
+		final FalseOptionalFeatureExplanationCreator creator = fm == this.fm
+				? falseOptionalFeatureExplanationCreator
+				: new FalseOptionalFeatureExplanationCreator(fm);
+		creator.setFalseOptionalFeature(feature);
+		falseOptionalFeatureExplanations.put(feature, creator.getExplanation());
+	}
+	
+	/**
+	 * Returns an explanation why the given constraint is redundant or null if it cannot be explained.
+	 * @param constraint potentially redundant constraint
+	 * @return an explanation why the given constraint is redundant or null if it cannot be explained
+	 */
+	public Explanation getRedundantConstraintExplanation(IConstraint constraint) {
+		return redundantConstraintExplanations.get(constraint);
+	}
+	
+	/**
+	 * Adds an explanation why the given constraint is redundant.
+	 * Uses the default feature model stored in this instance.
+	 * @param constraint possibly redundant constraint
+	 */
+	public void addRedundantConstraintExplanation(IConstraint constraint) {
+		addRedundantConstraintExplanation(fm, constraint);
+	}
+	
+	/**
+	 * Adds an explanation why the given constraint is redundant.
+	 * Uses the given feature model, which may differ from the default feature model stored in this instance.
+	 * This is for example the case when explaining implicit constraints in subtree models.
+	 * @param fm feature model containing the constraint
+	 * @param constraint potentially redundant constraint
+	 */
+	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
+		final RedundantConstraintExplanationCreator creator = fm == this.fm
+				? redundantConstraintExplanationCreator
+				: new RedundantConstraintExplanationCreator(fm);
+		creator.setRedundantConstraint(constraint);
+		redundantConstraintExplanations.put(constraint, creator.getExplanation());
+	}
+	
+	/**
+	 * Clears all explanations.
+	 */
+	public void clearExplanations() {
+		deadFeatureExplanations.clear();
+		falseOptionalFeatureExplanations.clear();
+		redundantConstraintExplanations.clear();
+		deadFeatureExplanationCreator.setFeatureModel(fm);
+		falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
+		redundantConstraintExplanationCreator.setFeatureModel(fm);
+	}
 }

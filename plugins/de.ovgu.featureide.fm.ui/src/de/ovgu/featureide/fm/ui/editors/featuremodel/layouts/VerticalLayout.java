@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -49,12 +49,13 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	private int height;
 
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
+
 		heightStep = FeatureUIHelper.getGraphicalRootFeature(featureModel).getSize().height + featureSpaceY;
 		height = FMPropertyManager.getLayoutMarginX() - heightStep;
 
 		calculateLevelWidth(FeatureUIHelper.getGraphicalRootFeature(featureModel));
 		centerOther(FeatureUIHelper.getGraphicalRootFeature(featureModel), 0);
-		layout(height, featureModel.getConstraints());
+		layout(height, featureModel.getVisibleConstraints());
 	}
 
 	/**
@@ -62,7 +63,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	 * (centered by their children's positions
 	 */
 	private int centerOther(IGraphicalFeature parent, int level) {
-		final Iterable<? extends IGraphicalFeature> children = FeatureUIHelper.getGraphicalChildren(parent);
+		final Iterable<? extends IGraphicalFeature> children = getChildren(parent);
 		if (!children.iterator().hasNext()) {
 			height += heightStep;
 			setLocation(parent, new Point(levelWidth.get(level), height));
@@ -100,7 +101,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 			levelWidth.set(level, parentWidth);
 		}
 
-		for (IGraphicalFeature feature : FeatureUIHelper.getGraphicalChildren(parent)) {
+		for (IGraphicalFeature feature : getChildren(parent)) {
 			calculateLevelWidth(feature, level + 1);
 		}
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,14 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -41,7 +43,11 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class SimpleFileHandler<T> {
 
-	private static final String DEFAULT_CHARSET = "UTF-8";
+	private static final Charset DEFAULT_CHARSET;
+	static {
+		final Charset utf8 = Charset.forName("UTF-8");
+		DEFAULT_CHARSET = utf8 != null ? utf8 : Charset.defaultCharset();
+	}
 
 	private IPersistentFormat<T> format;
 
@@ -57,10 +63,36 @@ public class SimpleFileHandler<T> {
 		return fileHandler.getLastProblems();
 	}
 
+	public static <T> ProblemList load(InputStream inputStream, T object, IPersistentFormat<T> format) {
+		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(null, object, format);
+		fileHandler.read(inputStream);
+		return fileHandler.getLastProblems();
+	}
+
 	public static <T> ProblemList save(Path path, T object, IPersistentFormat<T> format) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
 		fileHandler.write();
 		return fileHandler.getLastProblems();
+	}
+	
+	public static <T> ProblemList convert(Path inPath, Path outPath, T object, IPersistentFormat<T> inFormat, IPersistentFormat<T> outFormat) {
+		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(inPath, object, inFormat);
+		ProblemList pl = new ProblemList();
+		fileHandler.read();
+		pl.addAll(fileHandler.getLastProblems());
+		fileHandler.setPath(outPath);
+		fileHandler.setFormat(outFormat);
+		fileHandler.write();
+		pl.addAll(fileHandler.getLastProblems());
+		return pl;
+	}
+	
+	public static <T> String saveToString(T object, IPersistentFormat<T> format) {
+		return format.write(object);
+	}
+	
+	public static <T> ProblemList loadFromString(String source, T object, IPersistentFormat<T> format) {
+		return format.read(object, source);
 	}
 
 	public SimpleFileHandler(Path path, T object, IPersistentFormat<T> format) {
@@ -106,8 +138,32 @@ public class SimpleFileHandler<T> {
 		try {
 			final T newObject = object;
 
-			final String content = new String(Files.readAllBytes(path), Charset.forName(DEFAULT_CHARSET));
+			final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
 			final List<Problem> problemList = format.getInstance().read(newObject, content);
+			if (problemList != null) {
+				lastProblems.addAll(problemList);
+			}
+		} catch (final Exception e) {
+			handleException(e);
+		}
+		return !lastProblems.containsError();
+	}
+
+	public boolean read(InputStream inputStream) {
+		lastProblems.clear();
+		try {
+			final T newObject = object;
+
+			final StringBuilder sb = new StringBuilder();
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, DEFAULT_CHARSET))) {
+				String line;
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+					sb.append(System.lineSeparator());
+				}
+			}
+
+			final List<Problem> problemList = format.getInstance().read(newObject, sb.toString());
 			if (problemList != null) {
 				lastProblems.addAll(problemList);
 			}
@@ -120,17 +176,16 @@ public class SimpleFileHandler<T> {
 	public boolean write() {
 		lastProblems.clear();
 		try {
-			final byte[] content = format.getInstance().write(object).getBytes(Charset.forName(DEFAULT_CHARSET));
-			Files.write(path, content, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			final byte[] content = format.getInstance().write(object).getBytes(DEFAULT_CHARSET);
+			FileSystem.write(path, content);
 		} catch (final Exception e) {
 			handleException(e);
 		}
-		return lastProblems.containsError();
+		return !lastProblems.containsError();
 	}
 
 	private void handleException(Exception e) {
 		lastProblems.add(new Problem(e));
-		FMCorePlugin.getDefault().logError(e);
 	}
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,64 +37,64 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver;
-import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver2;
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 import de.ovgu.featureide.fm.core.editing.cnf.ICNFSolver;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureRemover implements LongRunningMethod<Node> {
+public class FeatureRemover implements LongRunningMethod<List<? extends Clause>> {
 
-	public static final int RR_NONE = 0;
-	public static final int RR_SIMPLE = 1;
-	public static final int RR_COMPLEX = 2;
-	
-	public static final int FO_PREORDER = 0;
-	public static final int FO_MINCLAUSE = 1;
-	public static final int FO_POSTORDER = 2;
-	public static final int FO_REV_LEVELORDER = 4;
-	
-	public static int PARAM_REDUNDANCY_REMOVAL = 3;
-	public static int PARAM_FEATURE_ORDER = 1;
-	public static IFeatureModel featureModel = null;
+	/**
+	 * For sorting clauses by length.
+	 * Starting with the longest.
+	 */
+	private static final class LengthComparator implements Comparator<Clause> {
+		@Override
+		public int compare(Clause o1, Clause o2) {
+			return o2.getLiterals().length - o1.getLiterals().length;
+		}
+	}
 
-	private final Node fmNode;
+	protected static final Comparator<Clause> lengthComparator = new LengthComparator();
 
-	private final Collection<String> features;
+	protected final Node fmNode;
 
-	private final boolean includeBooleanValues;
-	private final boolean regularCNF;
+	protected final boolean includeBooleanValues;
+	protected final boolean regularCNF;
 
-	private final List<DeprecatedClause> newRelevantClauseList = new ArrayList<>();
+	protected final List<DeprecatedClause> newDirtyClauseList = new ArrayList<>();
+	protected final List<DeprecatedClause> newCleanClauseList = new ArrayList<>();
+	protected final List<DeprecatedClause> dirtyClauseList = new ArrayList<>();
+	protected final List<DeprecatedClause> cleanClauseList = new ArrayList<>();
+	protected final Set<DeprecatedClause> dirtyClauseSet = new HashSet<>();
+	protected final Set<DeprecatedClause> cleanClauseSet = new HashSet<>();
 
-	private List<DeprecatedClause> relevantClauseList;
-	private Set<DeprecatedClause> relevantClauseSet;
-	private Set<DeprecatedClause> newClauseSet;
-	private List<DeprecatedClause> orgClauseList;
-	private Set<String> retainedFeatures;
-	private Map<Object, Integer> idMap;
+	protected final Collection<String> cleanFeatures = new HashSet<>();
+	protected final Collection<String> dirtyfeatures;
 
-	private String[] featureNameArray;
-	private boolean[] removedFeatures;
+	protected Map<Object, Integer> idMap;
+	protected String[] featureNameArray;
 
-	private ICNFSolver solver;
+	protected int[] helper;
+	protected DeprecatedFeature[] map;
+	protected AFeatureOrderHeuristic heuristic;
+	private ICNFSolver newSolver;
 
-	private DeprecatedFeature[] map;
-	private AFeatureOrderHeuristic heuristic;
+	private boolean first = false;
 
-	private int globalMixedClauseCount = 0;
+	protected int globalMixedClauseCount = 0;
 
-	int relevantPosIndex = 0;
-	int relevantNegIndex = 0;
+	protected int dirtyListPosIndex = 0;
+	protected int dirtyListNegIndex = 0;
+	protected int newDirtyListDelIndex = 0;
 
 	public FeatureRemover(Node cnf, Collection<String> features) {
 		this(cnf, features, true, false);
@@ -103,457 +104,23 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		this(cnf, features, includeBooleanValues, false);
 	}
 
-	public FeatureRemover(Node cnf, Collection<String> features, boolean includeBooleanValues, boolean regularCNF) {
+	public FeatureRemover(Node cnf, Collection<String> dirtyFeatures, boolean includeBooleanValues, boolean regularCNF) {
 		this.fmNode = cnf;
-		this.features = features;
+		this.dirtyfeatures = dirtyFeatures;
 		this.includeBooleanValues = includeBooleanValues;
 		this.regularCNF = regularCNF;
 	}
 
-	private void addLiteral(Set<String> retainedFeatures, Node orChild) {
-		final Literal literal = (Literal) orChild;
-		if (literal.var instanceof String) {
-			retainedFeatures.add((String) literal.var);
-		}
-	}
-
-	private void collectFeatures() {
-		if (fmNode instanceof And) {
-			for (Node andChild : fmNode.getChildren()) {
-				if (andChild instanceof Or) {
-					for (Node orChild : andChild.getChildren()) {
-						addLiteral(retainedFeatures, orChild);
-					}
-				} else {
-					addLiteral(retainedFeatures, andChild);
-				}
-			}
-		} else if (fmNode instanceof Or) {
-			for (Node orChild : fmNode.getChildren()) {
-				addLiteral(retainedFeatures, orChild);
-			}
-		} else {
-			addLiteral(retainedFeatures, fmNode);
-		}
-
-		assert (retainedFeatures.containsAll(features));
-	}
-
-	private void init() {
-		retainedFeatures = new HashSet<>();
-
-		collectFeatures();
-
-		removedFeatures = new boolean[retainedFeatures.size() + 1];
-
-		featureNameArray = new String[retainedFeatures.size() + 1];
-		idMap = new HashMap<>(retainedFeatures.size() << 1);
-
-		int id = 1;
-		for (String name : features) {
-			idMap.put(name, id);
-			featureNameArray[id] = name;
-			id++;
-		}
-
-		retainedFeatures.removeAll(features);
-
-		for (String name : retainedFeatures) {
-			idMap.put(name, id);
-			featureNameArray[id] = name;
-			id++;
-		}
-	}
-
-	public Node execute(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		// Collect all features in the prop node and remove TRUE and FALSE
-		init();
-
-		// CNF with more than one clause
-		if (fmNode instanceof And) {
-			return handleComplexFormula(workMonitor);
-		} else if (fmNode instanceof Or) {
-			return handleSingleClause(workMonitor);
-		} else {
-			return handleSingleLiteral(workMonitor);
-		}
-	}
-
-	public Node handleSingleClause(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		for (Node clauseChildren : fmNode.getChildren()) {
-			final Literal literal = (Literal) clauseChildren;
-			if (features.contains(literal.var)) {
-				return includeBooleanValues ? (regularCNF ? new Or(new Literal(NodeCreator.varTrue, true)) : new Literal(NodeCreator.varTrue, true))
-						: new And();
-			}
-		}
-		return fmNode.clone();
-	}
-
-	public Node handleSingleLiteral(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		return (features.contains(((Literal) fmNode).var)) ? (includeBooleanValues ? new Literal(NodeCreator.varTrue) : new And()) : fmNode.clone();
-	}
-
-	public Node handleComplexFormula(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		final Node[] andChildren = fmNode.getChildren();
-
-		relevantClauseList = new ArrayList<>(andChildren.length);
-		relevantClauseSet = new HashSet<>(andChildren.length << 1);
-		newClauseSet = new HashSet<>(andChildren.length << 1);
-		map = new DeprecatedFeature[idMap.size() + 1];
-		for (String curFeature : features) {
-			map[idMap.get(curFeature)] = new DeprecatedFeature(curFeature);
-		}
-		switch (PARAM_FEATURE_ORDER) {
-		case FO_PREORDER:
-			heuristic = new PreorderHeuristic(map, features.size(), featureModel);
-			break;
-		case FO_POSTORDER:
-			heuristic = new PostorderHeuristic(map, features.size(), featureModel);
-			break;
-		case FO_REV_LEVELORDER:
-			heuristic = new ReverseLevelOrderHeuristic(map, features.size(), featureModel);
-			break;
-		case FO_MINCLAUSE:
-			heuristic = new MinimumClauseHeuristic(map, features.size());
-			break;
-		default:
-			return null;
-		}
-
-		// fill sets
-		createClauseList(andChildren);
-		relevantClauseList.addAll(newRelevantClauseList);
-		newRelevantClauseList.clear();
-
-		createSolver();
-
-		workMonitor.setMaxAbsoluteWork(heuristic.size() + 1);
-
-		final double localFactor = 1.2;
-		final double globalFactor = 1.5;
-
-		final int maxClauseCountLimit = (int) Math.floor(globalFactor * relevantClauseList.size());
-
-		relevantPosIndex = 0;
-		relevantNegIndex = relevantClauseList.size();
-
-		while (heuristic.hasNext()) {
-			if (workMonitor.step()) {
-				return null;
-			}
-			final DeprecatedFeature next = heuristic.next();
-			final String curFeature = next.getFeature();
-			final int curFeatureID = idMap.get(curFeature);
-
-			if (PARAM_REDUNDANCY_REMOVAL > 0) {
-				final long estimatedClauseCount = next.getClauseCount();
-				final int curClauseCountLimit = (int) Math.floor(localFactor * ((relevantNegIndex - relevantPosIndex) + newRelevantClauseList.size()));
-
-				if ((estimatedClauseCount > maxClauseCountLimit) || (estimatedClauseCount > curClauseCountLimit)) {
-					if ((PARAM_REDUNDANCY_REMOVAL & RR_SIMPLE) != 0) {
-						detectRedundantConstraintsSimple();
-					}
-					if ((PARAM_REDUNDANCY_REMOVAL & RR_COMPLEX) != 0) {
-						detectRedundantConstraintsComplex();
-					}
-				}
-			}
-
-			removeOldClauses();
-
-			// ... create list of clauses that contain this feature
-			sortRelevantList(curFeatureID);
-
-			// Remove variable
-			resolution(curFeatureID);
-
-			removedFeatures[curFeatureID] = true;
-
-			if (globalMixedClauseCount == 0) {
-				break;
-			}
-		}
-
-		release();
-
-		// create new clauses list
-		final Node[] newClauses = createNewClauseList();
-		workMonitor.step();
-
-		return new And(newClauses);
-	}
-
-	private void release() {
-		relevantClauseList.clear();
-		relevantClauseSet.clear();
-		solver.reset();
-
-		solver = null;
-		relevantClauseList = null;
-		relevantClauseSet = null;
-		removedFeatures = null;
-	}
-
-	private void detectRedundantConstraintsComplex() {
-		createOrgSolver();
-		for (int i = relevantPosIndex; i < relevantNegIndex; i++) {
-			final DeprecatedClause mainClause = relevantClauseList.get(i);
-			if (remove(mainClause)) {
-				Collections.swap(relevantClauseList, i, --relevantNegIndex);
-				i--;
-			} else {
-				solver.addClause(mainClause);
-			}
-		}
-
-		int tempIndex = 0;
-		int i = 0;
-		for (DeprecatedClause mainClause : newRelevantClauseList) {
-			if (remove(mainClause)) {
-				Collections.swap(newRelevantClauseList, i, tempIndex++);
-			} else {
-				solver.addClause(mainClause);
-			}
-			i++;
-		}
-		final List<DeprecatedClause> subList = newRelevantClauseList.subList(0, tempIndex);
-		for (DeprecatedClause deprecatedClause : subList) {
-			if (deprecatedClause.delete(map)) {
-				globalMixedClauseCount--;
-			}
-		}
-		subList.clear();
-	}
-
-	private void detectRedundantConstraintsSimple() {
-		for (int i = relevantPosIndex; i < relevantNegIndex; i++) {
-			final DeprecatedClause mainClause = relevantClauseList.get(i);
-			for (int j = i + 1; j < relevantNegIndex; j++) {
-				final DeprecatedClause subClause = relevantClauseList.get(j);
-				final Clause contained = Clause.contained(mainClause, subClause);
-				if (contained != null) {
-					if (subClause == contained) {
-						Collections.swap(relevantClauseList, j, --relevantNegIndex);
-						j--;
-					} else {
-						Collections.swap(relevantClauseList, i, --relevantNegIndex);
-						i--;
-						break;
-					}
-				}
-			}
-		}
-
-		int tempIndex = newRelevantClauseList.size();
-		if (tempIndex > 0) {
-			for (int i = 0; i < tempIndex; i++) {
-				final DeprecatedClause mainClause = newRelevantClauseList.get(i);
-				for (int j = i + 1; j < tempIndex; j++) {
-					final DeprecatedClause subClause = newRelevantClauseList.get(j);
-					final Clause contained = Clause.contained(mainClause, subClause);
-					if (contained != null) {
-						if (subClause == contained) {
-							Collections.swap(newRelevantClauseList, j, --tempIndex);
-							j--;
-						} else {
-							Collections.swap(newRelevantClauseList, i, --tempIndex);
-							i--;
-							break;
-						}
-					}
-				}
-			}
-
-			for (int i = relevantPosIndex; i < relevantNegIndex; i++) {
-				final DeprecatedClause mainClause = relevantClauseList.get(i);
-				for (int j = 0; j < tempIndex; j++) {
-					final DeprecatedClause subClause = newRelevantClauseList.get(j);
-					final Clause contained = Clause.contained(mainClause, subClause);
-					if (contained != null) {
-						if (subClause == contained) {
-							Collections.swap(newRelevantClauseList, j, --tempIndex);
-							j--;
-						} else {
-							Collections.swap(relevantClauseList, i, --relevantNegIndex);
-							i--;
-							break;
-						}
-					}
-				}
-			}
-
-			if (tempIndex < newRelevantClauseList.size()) {
-				final List<DeprecatedClause> subList = newRelevantClauseList.subList(tempIndex, newRelevantClauseList.size());
-				for (DeprecatedClause deprecatedClause : subList) {
-					deprecatedClause.delete(map);
-				}
-				subList.clear();
-			}
-		}
-	}
-
-	private void removeOldClauses() {
-		for (int i = 0; i < relevantPosIndex; i++) {
-			relevantClauseList.get(i).delete(map);
-		}
-		for (int i = relevantNegIndex; i < relevantClauseList.size(); i++) {
-			relevantClauseList.get(i).delete(map);
-		}
-		relevantClauseSet.removeAll(relevantClauseList.subList(0, relevantPosIndex));
-		if (relevantNegIndex < relevantClauseList.size()) {
-			relevantClauseSet.removeAll(relevantClauseList.subList(relevantNegIndex, relevantClauseList.size()));
-		}
-		final List<DeprecatedClause> subList = relevantClauseList.subList(relevantPosIndex, relevantNegIndex);
-		final ArrayList<DeprecatedClause> tempRelevantClauseList = new ArrayList<>(subList.size() + newRelevantClauseList.size());
-		tempRelevantClauseList.addAll(subList);
-		tempRelevantClauseList.addAll(newRelevantClauseList);
-		newRelevantClauseList.clear();
-		relevantClauseList.clear();
-
-		relevantClauseList = tempRelevantClauseList;
-	}
-
-	private void sortRelevantList(int curFeatureID) {
-		relevantPosIndex = 0;
-		relevantNegIndex = relevantClauseList.size();
-		for (int i = 0; i < relevantNegIndex; i++) {
-			final Clause clause = relevantClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
-				if (Math.abs(literal) == curFeatureID) {
-					if (literal > 0) {
-						Collections.swap(relevantClauseList, i, relevantPosIndex);
-						relevantPosIndex++;
-					} else {
-						relevantNegIndex--;
-						Collections.swap(relevantClauseList, i, relevantNegIndex);
-						i--;
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	private void resolution(final int curFeatureID) {
-		for (int i = 0; i < relevantPosIndex; i++) {
-			final int[] orChildren = relevantClauseList.get(i).getLiterals();
-			for (int j = relevantNegIndex; j < relevantClauseList.size(); j++) {
-				final int[] children2 = relevantClauseList.get(j).getLiterals();
-				final int[] newChildren = new int[orChildren.length + children2.length];
-
-				System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
-				System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
-
-				addNewClause(DeprecatedClause.createClause(newChildren, curFeatureID));
-			}
-		}
-	}
-
-	private void createClauseList(final Node[] andChildren) {
-		for (int i = 0; i < andChildren.length; i++) {
-			Node andChild = andChildren[i];
-
-			final DeprecatedClause curClause;
-
-			if (andChild instanceof Or) {
-				int absoluteValueCount = 0;
-				boolean valid = true;
-
-				final Literal[] children = Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class);
-				for (int j = 0; j < children.length; j++) {
-					final Literal literal = children[j];
-
-					// sort out obvious tautologies
-					if (literal.var.equals(NodeCreator.varTrue)) {
-						if (literal.positive) {
-							valid = false;
-						} else {
-							absoluteValueCount++;
-							children[j] = null;
-						}
-					} else if (literal.var.equals(NodeCreator.varFalse)) {
-						if (literal.positive) {
-							absoluteValueCount++;
-							children[j] = null;
-						} else {
-							valid = false;
-						}
-					}
-				}
-
-				if (valid) {
-					if (absoluteValueCount > 0) {
-						if (children.length == absoluteValueCount) {
-							throw new RuntimeException("Model is void!");
-						}
-						Literal[] newChildren = new Literal[children.length - absoluteValueCount];
-						int k = 0;
-						for (int j = 0; j < children.length; j++) {
-							final Literal literal = children[j];
-							if (literal != null) {
-								newChildren[k++] = literal;
-							}
-						}
-						curClause = DeprecatedClause.createClause(convert(newChildren));
-					} else {
-						curClause = DeprecatedClause.createClause(convert(children));
-					}
-				} else {
-					curClause = null;
-				}
-			} else {
-				final Literal literal = (Literal) andChild;
-				if (literal.var.equals(NodeCreator.varTrue)) {
-					if (!literal.positive) {
-						throw new RuntimeException("Model is void!");
-					}
-					curClause = null;
-				} else if (literal.var.equals(NodeCreator.varFalse)) {
-					if (literal.positive) {
-						throw new RuntimeException("Model is void!");
-					}
-					curClause = null;
-				} else {
-					curClause = DeprecatedClause.createClause(convert(new Literal[] { literal }));
-				}
-			}
-
-			addNewClause(curClause);
-		}
-		//		orgClauseList = new ArrayList<>(newClauseSet);
-	}
-
-	@SuppressWarnings("unused")
-	private void removeRedundantConstraintsComplex() {
-		if (solver != null) {
-			solver.reset();
-		}
-		solver = new CNFSolver(orgClauseList, retainedFeatures.size());
-		newClauseSet.removeAll(orgClauseList);
-
-		for (DeprecatedClause mainClause : newClauseSet) {
-			if (!remove(mainClause)) {
-				solver.addClause(mainClause);
-				orgClauseList.add(mainClause);
-			}
-		}
-	}
-
-	private Node[] createNewClauseList() {
-		//		removeRedundantConstraintsComplex();
-		//		Collection<DeprecatedClause> clauses = orgClauseList;
-		final Collection<DeprecatedClause> clauses = newClauseSet;
-
+	public final Node createNewClauseList(Collection<? extends Clause> clauses) {
 		final int newClauseSize = clauses.size();
 		final Node[] newClauses;
 		if (includeBooleanValues) {
 			newClauses = new Node[newClauseSize + 3];
 
-			// create clause that contains all retained features
-			final Node[] allLiterals = new Node[retainedFeatures.size() + 1];
+			// Create clause that contains all clean features
+			final Node[] allLiterals = new Node[cleanFeatures.size() + 1];
 			int i = 0;
-			for (String featureName : retainedFeatures) {
+			for (String featureName : cleanFeatures) {
 				allLiterals[i++] = new Literal(featureName);
 			}
 			allLiterals[i] = new Literal(NodeCreator.varTrue);
@@ -580,24 +147,71 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			}
 			newClauses[j++] = new Or(literals);
 		}
-		return newClauses;
+		return new And(newClauses);
 	}
 
-	private void createSolver() {
-		if (solver != null) {
-			solver.reset();
+	public final List<? extends Clause> execute(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+		// Collect all features in the prop node and remove TRUE and FALSE
+		init();
+
+		// CNF with more than one clause
+		if (fmNode instanceof And) {
+			return handleComplexFormula(workMonitor);
+		} else if (fmNode instanceof Or) {
+			return handleSingleClause(workMonitor);
+		} else {
+			return handleSingleLiteral(workMonitor);
 		}
-		final List<Clause> clauseList = new ArrayList<>(relevantClauseList.size() + newClauseSet.size());
-		clauseList.addAll(relevantClauseList);
-		clauseList.addAll(newClauseSet);
-		solver = new CNFSolver(clauseList, idMap.size());
 	}
 
-	private void createOrgSolver() {
-		if (solver != null) {
-			solver.reset();
+	private void addLiteral(Collection<String> cleanFeatures, Node orChild) {
+		final Literal literal = (Literal) orChild;
+		if (literal.var instanceof String) {
+			cleanFeatures.add((String) literal.var);
 		}
-		solver = new CNFSolver2(newClauseSet, removedFeatures);
+	}
+
+	private void addNewClause(final DeprecatedClause curClause) {
+		if (curClause != null) {
+			if (curClause.computeRelevance(map)) {
+				globalMixedClauseCount++;
+			}
+			if (curClause.getRelevance() == 0) {
+				if (cleanClauseSet.add(curClause)) {
+					newCleanClauseList.add(curClause);
+				} else {
+					deleteClause(curClause);
+				}
+			} else {
+				if (dirtyClauseSet.add(curClause)) {
+					newDirtyClauseList.add(curClause);
+				} else {
+					deleteClause(curClause);
+				}
+			}
+		}
+	}
+
+	private void collectFeatures() {
+		if (fmNode instanceof And) {
+			for (Node andChild : fmNode.getChildren()) {
+				if (andChild instanceof Or) {
+					for (Node orChild : andChild.getChildren()) {
+						addLiteral(cleanFeatures, orChild);
+					}
+				} else {
+					addLiteral(cleanFeatures, andChild);
+				}
+			}
+		} else if (fmNode instanceof Or) {
+			for (Node orChild : fmNode.getChildren()) {
+				addLiteral(cleanFeatures, orChild);
+			}
+		} else {
+			addLiteral(cleanFeatures, fmNode);
+		}
+
+		assert (cleanFeatures.containsAll(dirtyfeatures));
 	}
 
 	private int[] convert(Literal[] newChildren) {
@@ -609,26 +223,258 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		return literals;
 	}
 
-	private void addNewClause(final DeprecatedClause curClause) {
-		if (curClause != null) {
-			if (curClause.computeRelevance(map)) {
-				globalMixedClauseCount++;
+	private void createClauseLists(final Node[] andChildren) {
+		for (int i = 0; i < andChildren.length; i++) {
+			addNewClause(getClause(andChildren[i]));
+		}
+
+		cleanClauseList.addAll(newCleanClauseList);
+		dirtyClauseList.addAll(newDirtyClauseList);
+		newDirtyClauseList.clear();
+		newCleanClauseList.clear();
+
+		dirtyListPosIndex = dirtyClauseList.size();
+		dirtyListNegIndex = dirtyClauseList.size();
+	}
+
+	protected final void deleteClause(final DeprecatedClause curClause) {
+		if (curClause.delete(map)) {
+			globalMixedClauseCount--;
+		}
+	}
+
+	protected final void deleteOldDirtyClauses() {
+		if (dirtyListPosIndex < dirtyClauseList.size()) {
+			final List<DeprecatedClause> subList = dirtyClauseList.subList(dirtyListPosIndex, dirtyClauseList.size());
+			dirtyClauseSet.removeAll(subList);
+			for (DeprecatedClause deprecatedClause : subList) {
+				deleteClause(deprecatedClause);
 			}
-			if (curClause.getRelevance() == 0) {
-				if (!newClauseSet.add(curClause)) {
-					curClause.delete(map);
+			subList.clear();
+		}
+	}
+
+	protected final void deleteNewDirtyClauses() {
+		if (newDirtyListDelIndex < newDirtyClauseList.size()) {
+			final List<DeprecatedClause> subList = newDirtyClauseList.subList(newDirtyListDelIndex, newDirtyClauseList.size());
+			dirtyClauseSet.removeAll(subList);
+			for (DeprecatedClause deprecatedClause : subList) {
+				deleteClause(deprecatedClause);
+			}
+		}
+	}
+
+	private DeprecatedClause getClause(Node andChild) {
+		if (andChild instanceof Or) {
+			int absoluteValueCount = 0;
+			boolean valid = true;
+
+			final Literal[] children = Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class);
+			for (int j = 0; j < children.length; j++) {
+				final Literal literal = children[j];
+
+				// sort out obvious tautologies
+				if (literal.var.equals(NodeCreator.varTrue)) {
+					if (literal.positive) {
+						valid = false;
+					} else {
+						absoluteValueCount++;
+						children[j] = null;
+					}
+				} else if (literal.var.equals(NodeCreator.varFalse)) {
+					if (literal.positive) {
+						absoluteValueCount++;
+						children[j] = null;
+					} else {
+						valid = false;
+					}
+				}
+			}
+
+			if (valid) {
+				if (absoluteValueCount > 0) {
+					if (children.length == absoluteValueCount) {
+						throw new RuntimeException("Model is void!");
+					}
+					Literal[] newChildren = new Literal[children.length - absoluteValueCount];
+					int k = 0;
+					for (int j = 0; j < children.length; j++) {
+						final Literal literal = children[j];
+						if (literal != null) {
+							newChildren[k++] = literal;
+						}
+					}
+					return DeprecatedClause.createClause(convert(newChildren));
+				} else {
+					return DeprecatedClause.createClause(convert(children));
 				}
 			} else {
-				if (relevantClauseSet.add(curClause)) {
-					newRelevantClauseList.add(curClause);
-				} else {
-					curClause.delete(map);
+				return null;
+			}
+		} else {
+			final Literal literal = (Literal) andChild;
+			if (literal.var.equals(NodeCreator.varTrue)) {
+				if (!literal.positive) {
+					throw new RuntimeException("Model is void!");
+				}
+				return null;
+			} else if (literal.var.equals(NodeCreator.varFalse)) {
+				if (literal.positive) {
+					throw new RuntimeException("Model is void!");
+				}
+				return null;
+			} else {
+				return DeprecatedClause.createClause(convert(new Literal[] { literal }));
+			}
+		}
+	}
+
+	private List<? extends Clause> handleComplexFormula(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+		map = new DeprecatedFeature[idMap.size() + 1];
+		for (String curFeature : dirtyfeatures) {
+			final Integer id = idMap.get(curFeature);
+			map[id] = new DeprecatedFeature(curFeature, id);
+		}
+		helper = new int[featureNameArray.length];
+
+		// Initialize lists and sets
+		createClauseLists(fmNode.getChildren());
+
+		prepareHeuristics();
+
+		while (heuristic.hasNext()) {
+			workMonitor.checkCancel();
+			final DeprecatedFeature nextFeature = heuristic.next();
+			if (nextFeature == null) {
+				break;
+			}
+
+			// Remove redundant dirty clauses
+			firstRedundancyCheck(nextFeature);
+
+			// Partition dirty list into clauses that contain the current variable and clauses that don't
+			partitionDirtyList(nextFeature);
+
+			// Remove variable & create transitive clauses
+			resolution(nextFeature);
+
+			// Remove redundant clauses
+			detectRedundancy(nextFeature);
+
+			// Merge new dirty list into the old list
+			updateLists();
+
+			// If ALL dirty clauses exclusively consists of dirty features, they can just be removed without applying resolution
+			if (globalMixedClauseCount == 0) {
+				break;
+			}
+		}
+
+		addCleanClauses();
+
+		release();
+
+		return cleanClauseList;
+	}
+
+	private List<? extends Clause> handleSingleClause(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+		for (Node clauseChildren : fmNode.getChildren()) {
+			final Literal literal = (Literal) clauseChildren;
+			if (dirtyfeatures.contains(literal.var)) {
+				return Arrays.asList(new Clause());
+			}
+		}
+		return Arrays.asList(getClause(fmNode));
+	}
+
+	private List<? extends Clause> handleSingleLiteral(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+		if (dirtyfeatures.contains(((Literal) fmNode).var)) {
+			return Arrays.asList(new Clause());
+		}
+		return Arrays.asList(getClause(fmNode));
+	}
+
+	private void init() {
+		release();
+		cleanClauseList.clear();
+
+		collectFeatures();
+
+		featureNameArray = new String[cleanFeatures.size() + 1];
+		idMap = new HashMap<>(cleanFeatures.size() << 1);
+
+		int id = 1;
+		for (String name : dirtyfeatures) {
+			idMap.put(name, id);
+			featureNameArray[id] = name;
+			id++;
+		}
+
+		cleanFeatures.removeAll(dirtyfeatures);
+
+		for (String name : cleanFeatures) {
+			idMap.put(name, id);
+			featureNameArray[id] = name;
+			id++;
+		}
+	}
+
+	private void resolution(DeprecatedFeature nextFeature) {
+		final int curFeatureID = nextFeature.getId();
+		for (int i = dirtyListPosIndex; i < dirtyListNegIndex; i++) {
+			final int[] posOrChildren = dirtyClauseList.get(i).getLiterals();
+			for (int j = dirtyListNegIndex; j < dirtyClauseList.size(); j++) {
+				final int[] negOrChildren = dirtyClauseList.get(j).getLiterals();
+				final int[] newChildren = new int[posOrChildren.length + negOrChildren.length];
+
+				System.arraycopy(posOrChildren, 0, newChildren, 0, posOrChildren.length);
+				System.arraycopy(negOrChildren, 0, newChildren, posOrChildren.length, negOrChildren.length);
+
+				addNewClause(DeprecatedClause.createClause(newChildren, curFeatureID, helper));
+			}
+		}
+		newDirtyListDelIndex = newDirtyClauseList.size();
+	}
+
+	private void partitionDirtyList(DeprecatedFeature nextFeature) {
+		final int curFeatureID = nextFeature.getId();
+		for (int i = 0; i < dirtyListNegIndex; i++) {
+			final Clause clause = dirtyClauseList.get(i);
+			for (int literal : clause.getLiterals()) {
+				if (literal == -curFeatureID) {
+					Collections.swap(dirtyClauseList, i--, --dirtyListNegIndex);
+					break;
+				}
+			}
+		}
+		dirtyListPosIndex = dirtyListNegIndex;
+		for (int i = 0; i < dirtyListPosIndex; i++) {
+			final Clause clause = dirtyClauseList.get(i);
+			for (int literal : clause.getLiterals()) {
+				if (literal == curFeatureID) {
+					Collections.swap(dirtyClauseList, i--, --dirtyListPosIndex);
+					break;
 				}
 			}
 		}
 	}
 
-	private boolean remove(DeprecatedClause curClause) {
+	private void updateLists() {
+		// delete old & redundant dirty clauses
+		deleteOldDirtyClauses();
+
+		// delete new & redundant dirty clauses
+		deleteNewDirtyClauses();
+
+		dirtyClauseList.addAll(newDirtyClauseList.subList(0, newDirtyListDelIndex));
+		newDirtyClauseList.clear();
+
+		dirtyListPosIndex = dirtyClauseList.size();
+		dirtyListNegIndex = dirtyClauseList.size();
+		newDirtyListDelIndex = 0;
+	}
+
+	protected final boolean isRedundant(ICNFSolver solver, Clause curClause) {
 		final int[] literals = curClause.getLiterals();
 		final int[] literals2 = new int[literals.length];
 		for (int i = 0; i < literals.length; i++) {
@@ -641,6 +487,83 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			e.printStackTrace();
 		}
 		return remove;
+	}
+
+	protected void detectRedundancy(DeprecatedFeature nextFeature) {
+		if (nextFeature.getClauseCount() > 0) {
+			addCleanClauses();
+
+			final CNFSolver solver = new CNFSolver(featureNameArray.length - 1);
+			solver.addClauses(cleanClauseList);
+			solver.addClauses(dirtyClauseList.subList(0, dirtyListPosIndex));
+
+			Collections.sort(newDirtyClauseList.subList(0, newDirtyListDelIndex), lengthComparator);
+			for (int i = newDirtyListDelIndex - 1; i >= 0; --i) {
+				final DeprecatedClause curClause = newDirtyClauseList.get(i);
+				if (isRedundant(solver, curClause)) {
+					Collections.swap(newDirtyClauseList, i, --newDirtyListDelIndex);
+				} else {
+					solver.addClause(curClause);
+				}
+			}
+		}
+	}
+
+	protected void addCleanClauses() {
+		Collections.sort(newCleanClauseList, lengthComparator);
+
+		for (int i = newCleanClauseList.size() - 1; i >= 0; --i) {
+			final DeprecatedClause clause = newCleanClauseList.get(i);
+			if (isRedundant(newSolver, clause)) {
+				deleteClause(clause);
+			} else {
+				newSolver.addClause(clause);
+				cleanClauseList.add(clause);
+			}
+		}
+		newCleanClauseList.clear();
+	}
+
+	protected void firstRedundancyCheck(DeprecatedFeature nextFeature) {
+		if (first && nextFeature.getClauseCount() > 0) {
+			first = false;
+			Collections.sort(dirtyClauseList, lengthComparator);
+
+			addCleanClauses();
+			CNFSolver solver = new CNFSolver(cleanClauseList, featureNameArray.length - 1);
+
+			// SAT Relevant
+			for (int i = dirtyListPosIndex - 1; i >= 0; --i) {
+				final DeprecatedClause mainClause = dirtyClauseList.get(i);
+				if (isRedundant(solver, mainClause)) {
+					Collections.swap(dirtyClauseList, i, --dirtyListPosIndex);
+				} else {
+					solver.addClause(mainClause);
+				}
+			}
+			deleteOldDirtyClauses();
+
+			dirtyListPosIndex = dirtyClauseList.size();
+			dirtyListNegIndex = dirtyClauseList.size();
+		}
+	}
+
+	protected void prepareHeuristics() {
+		heuristic = new MinimumClauseHeuristic(map, dirtyfeatures.size());
+		first = true;
+		newSolver = new CNFSolver(cleanClauseList, featureNameArray.length - 1);
+	}
+
+	protected void release() {
+		newDirtyClauseList.clear();
+		newCleanClauseList.clear();
+		dirtyClauseSet.clear();
+		cleanClauseSet.clear();
+		dirtyClauseList.clear();
+
+		if (newSolver != null) {
+			newSolver.reset();
+		}
 	}
 
 }

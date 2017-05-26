@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,76 +25,94 @@ import org.junit.Test;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
+import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 public class ConstraintToStringTest {
 	
+	private IFeatureModelFactory getFMFactory() {
+		return FMFactoryManager.getDefaultFactory();
+	}
+	
 	@Test
 	public void testIffQuoteToString() {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Equals(new Literal("A"), new Literal("implies")));
-		final String s = Constraints.autoQuote(c);
+		final IFeatureModelFactory factory = getFMFactory();
+		final IFeatureModel fm = factory.createFeatureModel();
+		final IConstraint c = factory.createConstraint(fm, new Equals(new Literal("A"), new Literal("implies")));
+		final String s = c.getNode().toString(NodeWriter.textualSymbols);
 		
 		Assert.assertEquals("A iff \"implies\"", s);
 	}
 	
 	@Test
 	public void testStandardToString() {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
-		Assert.assertEquals("A implies implies", c.getNode().toString(NodeWriter.textualSymbols));
+		final IFeatureModelFactory factory = getFMFactory();
+		final IFeatureModel fm = factory.createFeatureModel();
+		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
+		Assert.assertEquals("A implies implies", NodeWriter.nodeToString(c.getNode(), NodeWriter.textualSymbols, false, false));
 	}
-	
+
 	@Test
 	public void testAutoQuoteToString() {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
-		Assert.assertEquals("A implies \"implies\"", Constraints.autoQuote(c));
+		final IFeatureModelFactory factory = getFMFactory();
+		final IFeatureModel fm = factory.createFeatureModel();
+		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
+		Assert.assertEquals("A implies \"implies\"", c.getNode().toString(NodeWriter.textualSymbols));
 	}
 	
 	@Test
 	public void testAutoQuoteToString2() {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("A B"), new Literal("implies")));
-		Assert.assertEquals("\"A B\" implies \"implies\"", Constraints.autoQuote(c));
+		final IFeatureModelFactory factory = getFMFactory();
+		final IFeatureModel fm = factory.createFeatureModel();
+		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("A B"), new Literal("implies")));
+		Assert.assertEquals("\"A B\" implies \"implies\"", c.getNode().toString(NodeWriter.textualSymbols));
 	}
 	
 	@Test
 	public void testAutoQuoteToString3() {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("    A B    "), new Literal("implies")));
-		Assert.assertEquals("\"    A B    \" implies \"implies\"", Constraints.autoQuote(c));
+		final IFeatureModelFactory factory = getFMFactory();
+		final IFeatureModel fm = factory.createFeatureModel();
+		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("    A B    "), new Literal("implies")));
+		Assert.assertEquals("\"    A B    \" implies \"implies\"", c.getNode().toString(NodeWriter.textualSymbols));
 	}
 	
 	@Test
 	public void testAutoQuoteToString4() {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("    A B    "), new Literal(" a b ")));
-		Assert.assertEquals("\"    A B    \" implies \" a b \"", Constraints.autoQuote(c));
+		final IFeatureModelFactory factory = getFMFactory();
+		final IFeatureModel fm = factory.createFeatureModel();
+		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("    A B    "), new Literal(" a b ")));
+		Assert.assertEquals("\"    A B    \" implies \" a b \"", c.getNode().toString(NodeWriter.textualSymbols));
 	}
 	
 	@Test
 	public void testAutoQuoteToString5() {
-		IConstraint c = FMFactoryManager.getFactory().createConstraint(FMFactoryManager.getFactory().createFeatureModel(), new Implies(new Literal("a"), new Literal("b")));
-		Assert.assertEquals("a implies b", Constraints.autoQuote(c));
+		final IFeatureModelFactory factory = getFMFactory();
+		final IFeatureModel fm = factory.createFeatureModel();
+		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("a"), new Literal("b")));
+		Assert.assertEquals("a implies b", c.getNode().toString(NodeWriter.textualSymbols));
 	}
 	
 	@Test
 	public void testSplit1() {
 		final String constraint = "- (A  =>  \" A\"  |  - - (\"A \"  &  and  =>  \" and\"  &  \" and\"  |  \" and \"  &  \" and\"  &  - \" and\"))";
-		final String exptected = "not ( A implies \" A\" or not not ( \"A \" and \"and\" implies \" and\" and \" and\" or \" and \" and \" and\" and not \" and\" ))";
-		Assert.assertEquals(exptected, Constraints.autoQuote(constraint));
+		final String exptected = "not (A implies \" A\" or not not (\"A \" and \"and\" implies \" and\" and \" and\" or \" and \" and \" and\" and not \" and\"))";
+		final NodeReader nodeReader = new NodeReader();
+		nodeReader.activateShortSymbols();
+		Assert.assertEquals(exptected, nodeReader.stringToNode(constraint).toString(NodeWriter.textualSymbols));
 	}
 	
 	@Test
 	public void testSplit2() {
 		final String constraint = "- \"Permission Control\"  &  (\"Person Prio\"  |  Service)";
-		final String exptected = "not \"Permission Control\" and ( \"Person Prio\" or Service )";
-		Assert.assertEquals(exptected, Constraints.autoQuote(constraint));
+		final String exptected = "not \"Permission Control\" and (\"Person Prio\" or Service)";
+		final NodeReader nodeReader = new NodeReader();
+		nodeReader.activateShortSymbols();
+		Assert.assertEquals(exptected, nodeReader.stringToNode(constraint).toString(NodeWriter.textualSymbols));
 	}
 	
 	

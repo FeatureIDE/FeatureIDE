@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -31,7 +31,7 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * SatSolver wrapper for multi-thread usage.
@@ -90,7 +90,7 @@ public class MultiThreadSatSolver {
 				satisfiable = solvers[0].isSatisfiable();
 			} catch (TimeoutException e) {
 				satisfiable = false;
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 
 			synchronized (this) {
@@ -107,7 +107,7 @@ public class MultiThreadSatSolver {
 					try {
 						this.wait();
 					} catch (InterruptedException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 				}
 			}
@@ -226,7 +226,7 @@ public class MultiThreadSatSolver {
 						return (byte) Math.signum(x);
 					}
 				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
+					Logger.logError(e);
 					solver.backbone.pop();
 				} finally {
 					if (isContained) {

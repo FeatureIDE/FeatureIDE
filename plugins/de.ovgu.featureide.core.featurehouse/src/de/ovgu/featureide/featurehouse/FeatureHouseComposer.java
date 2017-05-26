@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -82,16 +82,18 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import fuji.CompilerWarningException;
-import fuji.Composition;
 import fuji.CompositionErrorException;
 import fuji.FeatureDirNotFoundException;
 import fuji.Main;
@@ -156,7 +158,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	private ICompositionErrorListener compositionErrorListener = createCompositionErrorListener();
-	private AStoppableJob fuji;
+	private IJob<?> fuji;
 
 	private ICompositionErrorListener createCompositionErrorListener() {
 		return new ICompositionErrorListener() {
@@ -367,7 +369,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
-		final String configPath = config.getRawLocation().toOSString();
+		final String configPath = createTemporaryConfigrationsFile(config).toString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
 
@@ -445,6 +447,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			} else {
 				final IFeatureModel featureModel = featureProject.getFeatureModel();
+				final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
 				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						IFeature featureRole1 = featureModel.getFeature(r.getFeature().getName());
@@ -452,7 +455,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 							final List<IFeature> currentFeatureList = new LinkedList<IFeature>();
 							final List<IFeature> originalList = new LinkedList<IFeature>();
 
-							currentFeatureList.add(FMFactoryManager.getFactory().createFeature(featureModel, r.getFeature().getName()));
+							currentFeatureList.add(factory.createFeature(featureModel, r.getFeature().getName()));
 
 							for (final String feat : featureModel.getFeatureOrderList()) {
 								if (feat.equals(r.getFeature().getName())) {
@@ -479,7 +482,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									if (checkForIllegitimateContract(m, mm)) {
 										List<IFeature> finalContractList = new LinkedList<IFeature>();
 										finalContractList.add(featureRole2);
-										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(FMFactoryManager.getFactory().createFeature(featureModel, r.getFeature().getName()), finalContractList))
+										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(factory.createFeature(featureModel, r.getFeature().getName()), finalContractList))
 											setContractErrorMarker(m, "keyword \"\\final_contract\" found but possibly later contract refinement.");
 									}
 
@@ -696,9 +699,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				FMCorePlugin.getDefault().logError(e);
 			}
 		}
-		fuji = new AStoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
+		final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 			@Override
-			protected boolean work() throws Exception {
+			public Boolean execute(IMonitor workMonitor) throws Exception {
 				try {
 					final Program ast = runFuji(featureProject);
 					signatureSetter.setFujiParameters(featureProject, ast);
@@ -709,7 +712,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 			}
 		};
-		fuji.addJobFinishedListener(signatureSetter);
+		fuji = LongRunningWrapper.getRunner(job, "Type checking " + featureProject.getProjectName() + " with fuji");
 		fuji.schedule();
 	}
 
@@ -726,14 +729,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				"-typechecker", "-basedir", sourcePath };
 		Program ast = null;
 		try {
-			IFeatureModel fm = featureProject.getFeatureModel();
+			final IFeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
-			@SuppressWarnings("deprecation")
-			Main fuji = new Main(fujiOptions, new de.ovgu.featureide.fm.core.FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
-			
-			Composition composition = fuji.getComposition(fuji);
-			ast = composition.composeAST();
+			final Main fuji = new Main(fujiOptions, fm, null);
+
+			ast = fuji.getComposition(fuji).composeAST();
+			ast.setCmd(fuji.getCmd());
 
 			// run type check
 			fuji.typecheckAST(ast);
@@ -856,7 +858,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
-		List<String> featureOrder = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
+		List<String> featureOrder = featureProject.getFeatureModel().getFeatureOrderList();
 		String[] features = new String[featureOrder.size()];
 		int i = 0;
 		for (String f : featureOrder) {
@@ -994,7 +996,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final String configPath;
 		IFile currentConfiguration = featureProject.getCurrentConfiguration();
 		if (currentConfiguration != null) {
-			configPath = currentConfiguration.getRawLocation().toOSString();
+			configPath = createTemporaryConfigrationsFile(currentConfiguration).toString();
 		} else {
 			configPath = featureProject.getProject().getFile(".project").getRawLocation().toOSString();
 		}
@@ -1007,7 +1009,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
 
-		List<String> featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
+		List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
 		String[] features = new String[featureOrderList.size()];
 		int i = 0;
 		for (String f : featureOrderList) {
@@ -1036,7 +1038,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
-		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
+		composer.run(getArguments(createTemporaryConfigrationsFile(configurationFile).toString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
 		if (errorPropagation != null && errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, because the

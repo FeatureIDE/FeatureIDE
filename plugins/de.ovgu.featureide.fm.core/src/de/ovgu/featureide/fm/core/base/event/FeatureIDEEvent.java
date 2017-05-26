@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -50,117 +50,145 @@ public class FeatureIDEEvent {
 	 */
 	public enum EventType {
 		/**
-		 * The constraint was moved
+		 * The constraint was moved.
 		 */
 		CONSTRAINT_MOVE,
 		/**
-		 * A constraint was modified
+		 * A constraint was modified.
 		 */
 		CONSTRAINT_MODIFY,
 		/**
-		 * A constraint was deleted
+		 * A constraint was deleted.
 		 */
 		CONSTRAINT_DELETE,
 		/**
-		 * A constraint was added
+		 * A constraint was added.
 		 */
 		CONSTRAINT_ADD,
 		/**
-		 * A constraint was selected
+		 * A constraint was selected.
 		 */
 		CONSTRAINT_SELECTED,
 		/**
-		 * A feature was modified
+		 * A feature was modified.
 		 */
 		FEATURE_MODIFY,
 		/**
-		 * A feature was deleted
+		 * A feature was deleted.
 		 */
 		FEATURE_DELETE,
 		/**
-		 * A feature was added above another feature
+		 * A feature was added above another feature.
 		 */
 		FEATURE_ADD_ABOVE,
 		/**
-		 * A feature was added
+		 * A feature was added.
 		 */
 		FEATURE_ADD,
 		/**
-		 * A feature's name was changed
+		 * A feature's name was changed.
 		 */
 		FEATURE_NAME_CHANGED,
 		/**
-		 * All features changed their name representation
+		 * All features changed their name representation.
 		 */
 		ALL_FEATURES_CHANGED_NAME_TYPE,
 		/**
-		 * A color was changed
+		 * A color was changed.
 		 */
 		COLOR_CHANGED,
 		/**
-		 * A hidden feature was changed
+		 * A hidden feature was changed.
 		 */
 		HIDDEN_CHANGED,
 		/**
-		 * The location of an object was
+		 * A collapsed feature was changed.
+		 */
+		COLLAPSED_CHANGED,
+		/**
+		 * A collapsed feature was changed.
+		 */
+		COLLAPSED_ALL_CHANGED,
+		/**
+		 * The location of an object was changed.
 		 */
 		LOCATION_CHANGED,
 		/**
-		 * A feature attributed (e.g., the "is dead" flag) changed 
+		 * A feature attributed (e.g., the "is dead" flag) changed.
 		 */
 		ATTRIBUTE_CHANGED,
 		/**
-		 * A group type changed (e.g., from "or" to "xor")
+		 * A group type changed (e.g., from "or" to "xor").
 		 */
 		GROUP_TYPE_CHANGED,
 		/**
-		 * A feature parent changed
+		 * A feature parent changed.
 		 */
 		PARENT_CHANGED,
 		/**
-		 * The mandatory state changed
+		 * The mandatory state changed.
 		 */
 		MANDATORY_CHANGED,
 		/**
-		 * The feature structure changed
+		 * The feature structure changed.
 		 */
 		STRUCTURE_CHANGED,
 		/**
-		 * The legend layout was changed
+		 * The legend layout was changed.
 		 */
 		LEGEND_LAYOUT_CHANGED,
 		/**
-		 * The model layout was changed (e.g., from vertical to horizontal)
+		 * The model layout was changed (e.g., from vertical to horizontal).
 		 */
 		MODEL_LAYOUT_CHANGED,
 		/**
-		 * The model data changed (i.e., the underlying model file was changed)
+		 * The model data changed (i.e., the underlying model file was changed).
 		 */
 		MODEL_DATA_CHANGED,
 		/**
-		 * The model data was saved to file
+		 * The model data was saved to file.
 		 */
 		MODEL_DATA_SAVED,
 		/**
-		 * The model data was loaded from file
+		 * The model data was loaded from file.
 		 */
 		MODEL_DATA_LOADED,
 		/**
-		 * The diagram was redrawn
+		 * The model data loaded from a file has overridden the internal model instance.
+		 */
+		MODEL_DATA_OVERRIDDEN,
+		/**
+		 * The diagram was redrawn.
 		 */
 		REDRAW_DIAGRAM,
 		/**
-		 * The refresh action command was triggered
+		 * The refresh action command was triggered.
 		 */
 		REFRESH_ACTIONS, 
 		/**
-		 * The children of a feature changed
+		 * The children of a feature changed.
 		 */
 		CHILDREN_CHANGED,
 		/**
-		 * The dependency for a subtree was calculated 
+		 * The dependency for a subtree was calculated.
 		 */
 		DEPENDENCY_CALCULATED,
+		/**
+		 * The active explanation changed.
+		 */
+		ACTIVE_EXPLANATION_CHANGED,
+		/**
+		 * The active reason changed.
+		 * Events of this type are fired for feature model elements when the active explanation has changed.
+		 * It would be possible to instead simply notify each affected feature model element of the new active explanation.
+		 * However, this would lead to a negative performance impact as each feature model would have to search the explanation for the relevant reason again.
+		 * As such, each event of this type carries the respective reason so the feature model element does not have to look for it itself.
+		 */
+		ACTIVE_REASON_CHANGED,
+		/**
+		 * Default. Do nothing.
+		 */
+		DEFAULT,
 	}
 	
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];

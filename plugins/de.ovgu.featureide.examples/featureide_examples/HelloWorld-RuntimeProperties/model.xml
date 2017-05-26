@@ -2,38 +2,23 @@
 	<featureModel>
 		<properties/>
 		<struct>
-			<and abstract="true" mandatory="true" name="Runtime">
-				<description>
-					
-				</description>
-				<feature name="Hello">
-					<description>
-						
-					</description>
-				</feature>
+			<and abstract="true" mandatory="true" name="HelloWorld">
+				<feature mandatory="true" name="Hello"/>
 				<alt abstract="true" name="Feature">
-					<description>
-						
-					</description>
-					<feature mandatory="true" name="Wonderful">
-						<description>
-							
-						</description>
-					</feature>
-					<feature mandatory="true" name="Beautiful">
-						<description>
-							
-						</description>
-					</feature>
+					<feature name="Beautiful"/>
+					<feature name="Wonderful"/>
 				</alt>
-				<feature name="World">
-					<description>
-						
-					</description>
-				</feature>
+				<feature name="World"/>
 			</and>
 		</struct>
-		<constraints/>
+		<constraints>
+			<rule>
+				<imp>
+					<var>Feature</var>
+					<var>World</var>
+				</imp>
+			</rule>
+		</constraints>
 		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -40,7 +40,7 @@ public class MandatoryAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public MandatoryAction(Object viewer, IFeatureModel featureModel) {
-		super("Mandatory (Double Click)", viewer);
+		super("Mandatory", viewer);
 		this.featureModel = featureModel;
 	}
 

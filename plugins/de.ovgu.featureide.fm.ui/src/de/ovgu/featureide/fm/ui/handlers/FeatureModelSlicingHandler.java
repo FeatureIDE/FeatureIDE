@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,10 +29,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
@@ -45,15 +43,14 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
-		final ProblemList problems = FileHandler.load(Paths.get(file.getLocationURI()), featureModel, new XmlFeatureModelFormat());
-		if (!problems.containsError()) {
+		final IFeatureModel featureModel = FeatureModelManager.readFromFile(Paths.get(file.getLocationURI()));
+		if (featureModel != null) {
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
 			if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
 				final JobArguments arguments = new SliceFeatureModelJob.Arguments(Paths.get(file.getLocationURI()), featureModel,
 						(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES), true);
-				arguments.createJob().schedule();
+				LongRunningWrapper.getRunner(arguments.createJob()).schedule();
 			}
 		}
 

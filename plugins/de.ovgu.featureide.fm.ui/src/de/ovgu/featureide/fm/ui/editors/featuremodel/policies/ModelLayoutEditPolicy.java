@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -92,12 +92,12 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			Object editPart = r.getEditParts().get(0);
 			if (editPart instanceof FeatureEditPart) {
 				FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
-				IGraphicalFeature feature = featureEditPart.getFeature();
+				IGraphicalFeature feature = featureEditPart.getModel();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
 			} else if (editPart instanceof ConstraintEditPart) {
-				IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
+				IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getModel();
 
 				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
 					Point point = r.getLocation().getCopy();

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -183,7 +183,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 			final String featureName;
 
 			if (element instanceof FeatureEditPart) {
-				featureName = ((FeatureEditPart) element).getFeature().getObject().getName();
+				featureName = ((FeatureEditPart) element).getModel().getObject().getName();
 			} else if (element instanceof IFeature) {
 				featureName = ((IFeature) element).getName();
 			} else {

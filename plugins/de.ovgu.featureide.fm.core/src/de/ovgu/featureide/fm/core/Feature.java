@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,6 +29,7 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.FeatureUtilsLegacy;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -119,7 +120,7 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	 * @since 2.7.5 
 	 */
 	public void setNewLocation(FMPoint newLocation) {
-		FeatureUtils.setNewLocation(feature, newLocation);
+		FeatureUtilsLegacy.setNewLocation(feature, newLocation);
 	}
 
 	/**
@@ -136,7 +137,7 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	 */
 	@Deprecated
 	public FMPoint getLocation() {
-		return FeatureUtils.getLocation(feature);
+		return FeatureUtilsLegacy.getLocation(feature);
 	}
 
 	/**
@@ -611,7 +612,7 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	 */
 	@Deprecated
 	public Feature getParent() {
-		return FeatureUtils.convert(FeatureUtils.getParent(feature));
+		return FeatureUtilsLegacy.convert(FeatureUtils.getParent(feature));
 	}
 
 	/**
@@ -645,7 +646,7 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	 */
 	@Deprecated
 	public LinkedList<Feature> getChildren() {
-		return new LinkedList<>(Functional.toList(Functional.map(FeatureUtils.getChildren(feature), FeatureUtils.IFEATURE_TO_FEATURE)));
+		return new LinkedList<>(Functional.toList(Functional.map(FeatureUtils.getChildren(feature), FeatureUtilsLegacy.IFEATURE_TO_FEATURE)));
 	}
 
 	/**
@@ -662,7 +663,7 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	 */
 	@Deprecated
 	public void setChildren(LinkedList<Feature> children) {
-		FeatureUtils.setChildren(feature, Functional.map(children, FeatureUtils.FEATURE_TO_IFEATURE));
+		FeatureUtils.setChildren(feature, Functional.map(children, FeatureUtilsLegacy.FEATURE_TO_IFEATURE));
 	}
 
 	/**
@@ -764,7 +765,7 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	 */
 	@Deprecated
 	public Feature removeLastChild() {
-		return FeatureUtils.convert(FeatureUtils.removeLastChild(feature));
+		return FeatureUtilsLegacy.convert(FeatureUtils.removeLastChild(feature));
 	}
 
 	/**
@@ -971,7 +972,7 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	 */
 	@Deprecated
 	public int getChildIndex(Feature child) {
-		return FeatureUtils.getChildIndex(feature, FeatureUtils.convert(child));
+		return FeatureUtils.getChildIndex(feature, FeatureUtilsLegacy.convert(child));
 	}
 
 	/**

@@ -56,6 +56,11 @@
             id="de.ovgu.featureide.fm.core.format.XmlFeatureModelFormat"
             name="XML">
       </fmFormat>
+      <fmFormat
+            class="de.ovgu.featureide.fm.core.io.fama.FAMAFormat"
+            id="de.ovgu.featureide.fm.core.format.FAMAFormat"
+            name="FAMA">
+      </fmFormat>
    </extension>
    <extension
          point="de.ovgu.featureide.fm.core.ConfigFormat">
@@ -63,6 +68,11 @@
             class="de.ovgu.featureide.fm.core.configuration.DefaultFormat"
             id="de.ovgu.featureide.fm.core.format.config.DefaultFormat"
             name="DefaultFormat">
+      </configFormat>
+      <configFormat
+            class="de.ovgu.featureide.fm.core.configuration.XMLConfFormat"
+            id="de.ovgu.featureide.fm.core.format.config.XMLFormat"
+            name="XMLFormat">
       </configFormat>
       <configFormat
             class="de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat"

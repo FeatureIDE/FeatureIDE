@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="GameOfLife">
 				<or abstract="true" hidden="true" name="Composed">
-					<feature mandatory="true" name="UndoRedoGenerator"/>
-					<feature mandatory="true" name="UndoRedoTest"/>
-					<feature mandatory="true" name="UndoRedoGuiBase"/>
+					<feature name="UndoRedoGenerator"/>
+					<feature name="UndoRedoTest"/>
+					<feature name="UndoRedoGuiBase"/>
 				</or>
 				<and abstract="true" name="Options">
 					<feature name="UndoRedo"/>
@@ -13,12 +14,12 @@
 					<and abstract="true" mandatory="true" name="Generator">
 						<feature name="GeneratorSelection"/>
 						<alt abstract="true" mandatory="true" name="DefaultGenerator">
-							<feature mandatory="true" name="RandomDefaultGenerator"/>
-							<feature mandatory="true" name="FormDefaultGenerator"/>
+							<feature name="RandomDefaultGenerator"/>
+							<feature name="FormDefaultGenerator"/>
 						</alt>
 						<or abstract="true" mandatory="true" name="ConcretGenerator">
-							<feature mandatory="true" name="RandomGenerator"/>
-							<feature mandatory="true" name="FormGenerator"/>
+							<feature name="RandomGenerator"/>
+							<feature name="FormGenerator"/>
 						</or>
 						<feature mandatory="true" name="AbstractGenerator"/>
 					</and>
@@ -26,10 +27,10 @@
 					<feature name="PopUpMenu"/>
 				</and>
 				<or abstract="true" mandatory="true" name="View">
-					<feature mandatory="true" name="GuiBase"/>
+					<feature name="GuiBase"/>
 				</or>
 				<or abstract="true" hidden="true" mandatory="true" name="Model">
-					<feature mandatory="true" name="ModelBase"/>
+					<feature name="ModelBase"/>
 				</or>
 			</and>
 		</struct>
@@ -111,23 +112,23 @@
 				</imp>
 			</rule>
 		</constraints>
-		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="true">
-			<feature name="ModelBase"/>
-			<feature name="GuiBase"/>
-			<feature name="PopUpMenu"/>
-			<feature name="IO"/>
-			<feature name="AbstractGenerator"/>
-			<feature name="FormGenerator"/>
-			<feature name="RandomGenerator"/>
-			<feature name="FormDefaultGenerator"/>
-			<feature name="GeneratorSelection"/>
-			<feature name="Test"/>
-			<feature name="UndoRedo"/>
-			<feature name="UndoRedoGuiBase"/>
-			<feature name="UndoRedoTest"/>
 			<feature name="UndoRedoGenerator"/>
+			<feature name="UndoRedoTest"/>
+			<feature name="UndoRedoGuiBase"/>
+			<feature name="UndoRedo"/>
+			<feature name="Test"/>
+			<feature name="GeneratorSelection"/>
 			<feature name="RandomDefaultGenerator"/>
+			<feature name="FormDefaultGenerator"/>
+			<feature name="RandomGenerator"/>
+			<feature name="FormGenerator"/>
+			<feature name="AbstractGenerator"/>
+			<feature name="IO"/>
+			<feature name="PopUpMenu"/>
+			<feature name="GuiBase"/>
+			<feature name="ModelBase"/>
 		</featureOrder>
 	</featureModel>

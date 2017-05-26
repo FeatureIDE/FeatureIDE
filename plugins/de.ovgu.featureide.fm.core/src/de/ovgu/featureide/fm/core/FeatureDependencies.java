@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,11 +34,9 @@ import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Calculates dependencies of features
@@ -103,7 +101,7 @@ public class FeatureDependencies {
 						    maybe.get(feature).add(current_feature);
 						}
 				    } catch (TimeoutException e) {
-				    	FMCorePlugin.getDefault().logError(e);
+				    	Logger.logError(e);
 				    }
 				}
 		    }
@@ -133,7 +131,7 @@ public class FeatureDependencies {
     			}
     		}
     	} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
     	return impliedFeatures;
     }
@@ -151,7 +149,7 @@ public class FeatureDependencies {
 		try {
 			return nodeImpliesFeature(nodeSel, B.getName(), true);
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return false;
 	}
@@ -194,30 +192,12 @@ public class FeatureDependencies {
     	return always.get(feature);
     }
     
-    /*
-     * Don't remove this method - it is called by Fuji
-     * 
-     */
-    @Deprecated
-    public Set<Feature> always(Feature feature) {
-    	return Functional.toSet(Functional.map(always.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
-    }
-
     /**
      * @param feature
      * @return
      */
     public Set<IFeature> never(IFeature feature) {
     	return never.get(feature);
-    }
-    
-    /*
-     * Don't remove this method - it is called by Fuji
-     * 
-     */
-    @Deprecated
-    public Set<Feature> never(Feature feature) {
-    	return Functional.toSet(Functional.map(never.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
     }
     
     /**
@@ -228,15 +208,6 @@ public class FeatureDependencies {
     	return maybe.get(feature);
     }
     
-    /*
-     * Don't remove this method - it is called by Fuji
-     * 
-     */
-    @Deprecated
-    public Set<Feature> maybe(Feature feature) {
-    	return Functional.toSet(Functional.map(maybe.get(FeatureUtils.convert(feature)), FeatureUtils.IFEATURE_TO_FEATURE));
-    }
-
     public String toString() {
     	StringBuilder builder = new StringBuilder();
 		for (IFeature feature : fm.getFeatures()) {

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.INTERFACES;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,18 +46,14 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
 import de.ovgu.featureide.core.mpl.builder.MSPLNature;
-import de.ovgu.featureide.core.mpl.io.writer.JavaProjectWriter;
 import de.ovgu.featureide.core.mpl.job.CreateInterfaceJob;
 import de.ovgu.featureide.core.mpl.job.PrintFeatureInterfacesJob;
-import de.ovgu.featureide.core.mpl.job.statistics.PrintComparedInterfacesJob;
-import de.ovgu.featureide.core.mpl.job.statistics.PrintExtendedSignaturesJob;
-import de.ovgu.featureide.core.mpl.job.statistics.PrintStatisticsJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.io.IOConstants;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /** 
  * Plug-in activator with miscellaneous function for an interface project.
@@ -247,11 +244,11 @@ public class MPLPlugin extends AbstractCorePlugin {
 				newProject.create(description, null);
 				newProject.open(null);
 				
-				newProject.getFile(new Path(IOConstants.FILENAME_MODEL)).create(featureProject.getModelFile().getContents(), true, null);
+				newProject.getFile(new Path("model.xml")).create(featureProject.getModelFile().getContents(), true, null);
 
 				InputStream stream = new ByteArrayInputStream("".getBytes());
-				newProject.getFile(new Path(IOConstants.FILENAME_CONFIG)).create(stream, true, null);
-				newProject.getFile(new Path(IOConstants.FILENAME_EXTCONFIG)).create(stream, true, null);
+				newProject.getFile(new Path("configuration.config")).create(stream, true, null);
+				newProject.getFile(new Path(".xconf")).create(stream, true, null);
 				stream.close();
 
 				InterfaceProject interfaceProject = new InterfaceProject(newProject, featureProject);
@@ -262,9 +259,9 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 	}
 	
-	public void buildJavaProject(IFile featureListFile, String name) {
-		new JavaProjectWriter(getInterfaceProject(featureListFile.getProject())).buildJavaProject(featureListFile, name);
-	}
+//	public void buildJavaProject(IFile featureListFile, String name) {
+//		new JavaProjectWriter(getInterfaceProject(featureListFile.getProject())).buildJavaProject(featureListFile, name);
+//	}
 	
 	public void setCurrentMapping(IProject project, String name) {
 		try {
@@ -312,28 +309,49 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void buildFeatureInterfaces(LinkedList<IProject> projects, String folder, String viewName, int viewLevel, int configLimit) {
-		FMCorePlugin.getDefault().startJobs(projects, new PrintFeatureInterfacesJob.Arguments(folder), true);
+		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+		for (IProject iProject : projects) {
+			arguments.add(new PrintFeatureInterfacesJob.Arguments(folder, iProject));
+		}
+		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 	
 	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-		FMCorePlugin.getDefault().startJobs(projects, new PrintComparedInterfacesJob.Arguments(), true);
+//		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+//		for (IProject iProject : projects) {
+//			arguments.add(new PrintComparedInterfacesJob.Arguments(iProject));
+//		}
+//		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 	
 	public void compareConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-		FMCorePlugin.getDefault().startJobs(projects, new PrintComparedInterfacesJob.Arguments(), true);
+//		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+//		for (IProject iProject : projects) {
+//			arguments.add(new PrintComparedInterfacesJob.Arguments(iProject));
+//		}
+//		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 	
 	public void buildExtendedModules(LinkedList<IProject> projects, String folder) {
-		FMCorePlugin.getDefault().startJobs(projects, new PrintExtendedSignaturesJob.Arguments(folder), true);
+//		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+//		for (IProject iProject : projects) {
+//			arguments.add(new PrintExtendedSignaturesJob.Arguments(folder, iProject));
+//		}
+//		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 	
 	public void printStatistics(LinkedList<IProject> projects, String folder) {
-		FMCorePlugin.getDefault().startJobs(projects, new PrintStatisticsJob.Arguments(folder), true);
+//		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+//		for (IProject iProject : projects) {
+//			arguments.add(new PrintStatisticsJob.Arguments(folder, iProject));
+//		}
+//		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 	
 	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {
-		final LinkedList<IProject> projectList = new LinkedList<>();
-		projectList.add(mplProject);
-		FMCorePlugin.getDefault().startJobs(projectList, new CreateInterfaceJob.Arguments(featureProject.getProjectName(), featureProject.getFeatureModel(), featureNames), true);
+		ArrayList<JobArguments> arguments = new ArrayList<>(1);
+		arguments.add(new CreateInterfaceJob.Arguments(featureProject.getProjectName(), featureProject.getFeatureModel(), featureNames));
+		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
+
 }

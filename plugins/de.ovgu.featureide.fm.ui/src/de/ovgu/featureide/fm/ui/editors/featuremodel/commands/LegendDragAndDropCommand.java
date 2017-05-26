@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -68,7 +68,7 @@ public class LegendDragAndDropCommand extends Command {
 		Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
 
 		// check if legend intersects with a feature
-		for (IGraphicalFeature f : model.getFeatures()) {
+		for (IGraphicalFeature f : model.getVisibleFeatures()) {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(f))) {
 				return false;
 			}

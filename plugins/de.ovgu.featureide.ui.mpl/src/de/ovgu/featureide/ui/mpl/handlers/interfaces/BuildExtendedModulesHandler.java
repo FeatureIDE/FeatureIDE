@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FOLDER_OF_EXTENDED_MODULES;
+
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;

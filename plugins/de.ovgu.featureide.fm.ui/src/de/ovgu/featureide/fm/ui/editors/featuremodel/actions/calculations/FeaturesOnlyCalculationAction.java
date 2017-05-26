@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -41,6 +41,7 @@ public class FeaturesOnlyCalculationAction extends Action {
 	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_FEATURES);
 		this.featureModel = featureModel;
+		setToolTipText("Test");
 		setChecked(featureModel.getAnalyser().calculateFeatures);
 	}
 
@@ -55,6 +56,8 @@ public class FeaturesOnlyCalculationAction extends Action {
 			featureModel.getAnalyser().calculateFOConstraints = false;
 		} else {
 			featureModel.getAnalyser().calculateFeatures = true;
+			featureModel.getAnalyser().calculateDeadConstraints = true;
+			featureModel.getAnalyser().calculateFOConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}

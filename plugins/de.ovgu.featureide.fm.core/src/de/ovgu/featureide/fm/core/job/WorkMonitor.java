@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,13 +20,19 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
+
 /**
  * Control object for {@link IJob}s.
  * Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
+ * @deprecated Use {@link NullMonitor}, {@link ProgressMonitor}, or {@link ConsoleProgressMonitor} instead.
+ * 
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public final class WorkMonitor extends AWorkMonitor {
 
 	/**

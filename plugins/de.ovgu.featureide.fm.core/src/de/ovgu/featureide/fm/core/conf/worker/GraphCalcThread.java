@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,7 +30,7 @@ import org.prop4j.SatSolver.ValueType;
 import de.ovgu.featureide.fm.core.conf.IConfigurationChanger;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * TODO description
@@ -90,7 +90,7 @@ public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
 	}
 
 	public GraphCalcThread(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode, int numberOfSolvers) {
-		super(new WorkMonitor());
+		super(new NullMonitor());
 		sharedObjects = new SharedObjects(featureArray, variableConfiguration, fmNode, numberOfSolvers);
 		this.id = sharedObjects.lastSolverID;
 	}

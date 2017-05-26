@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -125,6 +125,7 @@ public class SetColorAction extends AbstractColorAction {
 		IFeature feature = fm.getFeature(collName);
 		if (feature != null) {
 			FeatureColorManager.setColor(feature, FeatureColor.getColor(index));
+			FeatureColorManager.notifyColorChange(feature);
 			return true;
 		}
 		return false;

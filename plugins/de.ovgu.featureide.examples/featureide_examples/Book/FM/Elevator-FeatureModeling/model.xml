@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="Elevator">
+				<description>
+					The firmware and simulation of an elevator to transport humans from certain floors to other floors.
+				</description>
+				<and abstract="true" mandatory="true" name="Behavior">
+					<description>
+						The behavior of the elevator in terms handling, ignoring, and prioritizing requests.
+					</description>
+					<alt abstract="true" mandatory="true" name="Modes">
+						<description>
+							Modes indicate in which order incoming requests are handled.
+						</description>
+						<feature name="Sabbath">
+							<description>
+								The elevator from lowest to highest floor and vice versa. It opens the doors in every floor without any user input.
+							</description>
+						</feature>
+						<feature name="FIFO">
+							<description>
+								The elevator proceeds requests based on the first-in-first-out principle. That is, the floor being requested first is the next target floor.
+							</description>
+						</feature>
+						<feature name="ShortestPath">
+							<description>
+								The elevator always moves to the requested floor that is closest to the current floor.
+							</description>
+						</feature>
+					</alt>
+					<feature name="Service">
+						<description>
+							The service mode enables maintenance by heading towards the lowest floor and ignoring all requests unless the service mode is stopped from within the elevator.
+						</description>
+					</feature>
+					<or abstract="true" name="Priorities">
+						<description>
+							Priorities specify that certain requests are supposed to be processed faster than others.
+						</description>
+						<feature name="RushHour">
+							<description>
+								During rush hours the elevator moves to a particular floor if there are no requests. In the morning, it will move to the lowest floor and, in the afternoon, it will move to a floor in the center of the building.
+							</description>
+						</feature>
+						<feature name="FloorPriority">
+							<description>
+								Certain floors as specified during initialization will always be handled before all remaining floors.
+							</description>
+						</feature>
+						<feature name="PersonPriority">
+							<description>
+								With a special key, the request of certain persons are served first.
+							</description>
+						</feature>
+					</or>
+				</and>
+				<feature name="VoiceOutput"/>
+				<alt abstract="true" name="CallButtons">
+					<description>
+						Call buttons enable to choose the desired floor in the inside as well as to call the elevator to a certain floor.
+					</description>
+					<feature name="DirectedCall">
+						<description>
+							On each floor, there are separate buttons to go upwards and downwards. The elevator is supposed to only open the doors if it is moving into the same direction as the call.
+						</description>
+					</feature>
+					<feature name="UndirectedCall">
+						<description>
+							Each floor has just one button to request the elevator, but the direction cannot be indicated.
+						</description>
+					</feature>
+				</alt>
+				<and abstract="true" name="Security">
+					<description>
+						Variability of the elevator that directly influences security.
+					</description>
+					<or abstract="true" mandatory="true" name="Permission">
+						<description>
+							Permissions enable to specify which floors can be reached by everyone or only with privileges.
+						</description>
+						<feature name="FloorPermission">
+							<description>
+								During initialization, certain floors can be deactivated and cannot be reached by the elevator.
+							</description>
+						</feature>
+						<feature name="PermissionControl">
+							<description>
+								Permission control enables to reach non-public floors for those that are privileged.
+							</description>
+						</feature>
+					</or>
+				</and>
+				<and abstract="true" name="Safety">
+					<description>
+						Variability of the elevator that directly influences safety.
+					</description>
+					<feature name="Overloaded">
+						<description>
+							A sensor measures the load of the elevator and will not close the doors until the limit of the elevator is not reached.
+						</description>
+					</feature>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<var>CallButtons</var>
+					<var>Sabbath</var>
+				</disj>
+			</rule>
+			<rule>
+				<imp>
+					<var>DirectedCall</var>
+					<var>ShortestPath</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>UndirectedCall</var>
+					<disj>
+						<var>FIFO</var>
+						<var>ShortestPath</var>
+					</disj>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

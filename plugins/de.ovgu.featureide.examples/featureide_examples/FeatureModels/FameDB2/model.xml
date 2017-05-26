@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="DB">
 				<alt abstract="true" mandatory="true" name="OS">
-					<feature mandatory="true" name="NutOS"/>
-					<feature mandatory="true" name="Win"/>
+					<feature name="NutOS"/>
+					<feature name="Win"/>
 				</alt>
 				<alt abstract="true" mandatory="true" name="BufferMgr">
-					<and abstract="true" mandatory="true" name="Persistent">
+					<and abstract="true" name="Persistent">
 						<alt abstract="true" mandatory="true" name="MemAlloc">
-							<feature mandatory="true" name="Static"/>
-							<feature mandatory="true" name="Dynamic"/>
+							<feature name="Static"/>
+							<feature name="Dynamic"/>
 						</alt>
 						<alt abstract="true" mandatory="true" name="PageRepl">
-							<feature mandatory="true" name="LRU"/>
-							<feature mandatory="true" name="LFU"/>
+							<feature name="LRU"/>
+							<feature name="LFU"/>
 						</alt>
 					</and>
-					<feature mandatory="true" name="InMemory"/>
+					<feature name="InMemory"/>
 				</alt>
 				<feature name="DebugLogging"/>
 				<and abstract="true" mandatory="true" name="Storage">
 					<or abstract="true" mandatory="true" name="API">
-						<feature mandatory="true" name="get"/>
-						<feature mandatory="true" name="put"/>
-						<feature mandatory="true" name="delete"/>
+						<feature name="get"/>
+						<feature name="put"/>
+						<feature name="delete"/>
 					</or>
 					<feature name="BTree"/>
 					<feature name="Unindexed"/>
@@ -54,5 +55,7 @@
 				</conj>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

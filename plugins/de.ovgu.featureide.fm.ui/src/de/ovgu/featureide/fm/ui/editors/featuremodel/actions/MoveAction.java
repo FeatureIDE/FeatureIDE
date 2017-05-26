@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -160,7 +160,7 @@ public class MoveAction extends Action {
 	 */
 	private void moveFigure(Object element, boolean doStop) {
 		if ((element instanceof FeatureEditPart) || (element instanceof IFeature)) {
-			IGraphicalFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (IGraphicalFeature) element;
+			IGraphicalFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getModel() : (IGraphicalFeature) element;
 			final Point newPos = feature.getLocation().translate(deltaPos);
 
 			if (doStop) {
@@ -169,7 +169,7 @@ public class MoveAction extends Action {
 
 			feature.setLocation(newPos);
 		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
-			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (IGraphicalConstraint) element;
+			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getModel() : (IGraphicalConstraint) element;
 			final Point newPos = constraint.getLocation().translate(deltaPos);
 			constraint.setLocation(newPos);
 		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {

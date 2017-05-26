@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -19,6 +19,8 @@
  * See http://featureide.cs.ovgu.de/ for further information.
  */
 package de.ovgu.featureide.fm.core.io;
+
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Saves a warning with a line number where it occurred.
@@ -49,23 +51,51 @@ public class Problem {
 	public final String message;
 
 	public final int line;
+	
+	public final Throwable error;
 
 	public Problem(Throwable throwable) {
-		this(throwable.getMessage(), 0, Severity.ERROR);
+		this(throwable.getMessage(), 1, Severity.ERROR, throwable);
 	}
 
 	public Problem(Throwable throwable, int line) {
-		this(throwable.getMessage(), line, Severity.ERROR);
+		this(throwable.getMessage(), line, Severity.ERROR, throwable);
 	}
 
 	public Problem(String message, int line) {
-		this(message, line, Severity.WARNING);
+		this(message, line, Severity.WARNING, null);
+	}
+
+	public Problem(String message, int line, Throwable throwable) {
+		this(message, line, Severity.ERROR, throwable);
 	}
 
 	public Problem(String message, int line, Severity severity) {
+		this(message, line, severity, null);
+	}
+	
+	protected Problem(String message, int line, Severity severity, Throwable error) {
 		this.message = message;
 		this.line = line;
 		this.severity = severity;
+		this.error = error;
+		if (error != null) {
+			Logger.logError(message, error);
+		} else {
+			switch (severity) {
+			case ERROR:
+				Logger.logError(message);
+				break;
+			case INFO:
+				Logger.logInfo(message);
+				break;
+			case WARNING:
+				Logger.logWarning(message);
+				break;
+			default:
+				throw new RuntimeException();
+			}
+		}
 	}
 
 	@Override

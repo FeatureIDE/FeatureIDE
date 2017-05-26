@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.properties.language;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRAKT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IST_TAUTOLOGIE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EINGEKLAPPT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FALSCH_OPTIONALES_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GEERBT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GERMAN;
@@ -53,16 +54,17 @@ public class German implements ILanguage {
 	private static final String INTERFACED = VON_INTERFACE;
 	private static final String CONCRETE = KONKRET;
 	private static final String HIDDEN = VERSTECKT;
-	private static final String DEAD = "Unw�hlbar";
+	private static final String COLLAPSED = EINGEKLAPPT;
+	private static final String DEAD = "Unwählbar";
 	private static final String FALSE_OPTIONAL = FALSCH_OPTIONALES_FEATURE;
 	private static final String OR = ODER;
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = UNBESTIMMBAR_VERSTECKTES_FEATURE;
 	private static final String REDUNDANT = REDUNDANTES_CONSTRAINT;
 	private static final String IMPLICIT = "Implizites Constraint";
-	private static final String UNSATISFIABLE_CONST = "Unerf�llbares Constraint";
+	private static final String UNSATISFIABLE_CONST = "Unerfüllbares Constraint";
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IST_TAUTOLOGIE;
-	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerf�llbar";
+	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";
 
 	@Override
 	public String getRedundantConst() {
@@ -137,6 +139,11 @@ public class German implements ILanguage {
 	@Override
 	public String getHidden() {
 		return HIDDEN;
+	}
+	
+	@Override
+	public String getCollapsed() {
+		return COLLAPSED;
 	}
 
 	@Override

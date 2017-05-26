@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -106,7 +106,7 @@ public class DeleteAction extends Action {
 			Object editPart = iter.next();
 			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature))
 				continue;
-			IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature().getObject() : (IFeature) editPart;
+			IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : (IFeature) editPart;
 			if (feature == root) {
 				if (root.getStructure().getChildrenCount() != 1)
 					return false;

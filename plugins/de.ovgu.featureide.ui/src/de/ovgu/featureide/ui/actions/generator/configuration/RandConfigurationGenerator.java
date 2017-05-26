@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -40,9 +40,10 @@ public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
 	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
 	}
-	
+
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance solver, int solutionCount) {
-		return new RandomConfigurationGenerator(solver, solutionCount);
+	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
+		return new RandomConfigurationGenerator(satInstance, solutionCount);
 	}
+
 }

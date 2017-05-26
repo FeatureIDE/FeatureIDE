@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,7 +27,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 
 /**
@@ -37,7 +38,7 @@ import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
  */
 public class FeatureGraphFormat implements IFeatureGraphFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fg." + FeatureGraphFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + FeatureGraphFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureGraph object, CharSequence source) {
@@ -46,7 +47,6 @@ public class FeatureGraphFormat implements IFeatureGraphFormat {
 			final IFeatureGraph featureGraph = (IFeatureGraph) in.readObject();
 			object.copyValues(featureGraph);
 		} catch (IOException | ClassNotFoundException e) {
-			FMCorePlugin.getDefault().logError(e);
 			problems.add(new Problem(e));
 		}
 		return problems;
@@ -60,7 +60,7 @@ public class FeatureGraphFormat implements IFeatureGraphFormat {
 			out.writeObject(object);
 			ret = byteArrayOutputStream.toString("UTF-8");
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return ret;
 	}

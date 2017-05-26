@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -49,8 +49,8 @@ import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.ModelIterator;
 import org.sat4j.tools.SolutionCounter;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * A solver that computes if a given propositional node is satisfiable and
@@ -182,7 +182,7 @@ public class SatSolver {
 		try {
 			contradiction = contradiction || !solver.isSatisfiable();
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return false;
 		}
 		return !contradiction;
@@ -211,7 +211,7 @@ public class SatSolver {
 							backbone.pop().push(x);
 						}
 					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 						backbone.pop();
 					}
 				}
@@ -259,7 +259,7 @@ public class SatSolver {
 			try {
 				return !solver.isSatisfiable(backbone);
 			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 		}
 		return false;
@@ -418,7 +418,7 @@ public class SatSolver {
 		try {
 			return (solver.isSatisfiable(backbone, false));
 		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return false;
 		} finally {
 			backbone.pop();
@@ -718,7 +718,7 @@ public class SatSolver {
 					return resultList;
 				}
 			} catch (Exception e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			} finally {
 				s.setOrder(oldOrder);
 			}
@@ -737,7 +737,7 @@ public class SatSolver {
 	 * @param features The features that should be covered. 
 	 * @param selection true is the features should be selected, false otherwise.
 	 */
-	public List<String> coverFeatures(Collection<String> features, boolean selection, WorkMonitor monitor) throws TimeoutException {
+	public List<String> coverFeatures(Collection<String> features, boolean selection, IMonitor monitor) throws TimeoutException {
 		final VecInt vector = new VecInt();
 		List<String> coveredFeatures = new LinkedList<>();
 		for (final String feature : features) {

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,22 +32,22 @@ import java.util.NoSuchElementException;
  */
 public class RingList<T> implements Iterable<T> {
 	private final List<T> ring;
-	private int nextPointer;
+	private int firstPointer;
 	private int size;
 
 	public RingList(int size) {
-		this.ring = new ArrayList<T>(size);
+		this.ring = new ArrayList<>();
 		this.size = size > 0 ? size : 1;
-		this.nextPointer = 0;
+		this.firstPointer = 0;
 	}
 
 	public void add(T element) {
 		if (ring.size() < size) {
 			ring.add(element);
 		} else {
-			ring.set(nextPointer, element);
+			ring.set(firstPointer, element);
+			firstPointer = (firstPointer + 1) % size;
 		}
-		nextPointer = (nextPointer + 1) % size;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class RingList<T> implements Iterable<T> {
 			return ring.iterator();
 		}
 		return new Iterator<T>() {
-			int index = nextPointer;
+			int index = firstPointer;
 			int count = 0;
 
 			@Override
@@ -80,6 +80,22 @@ public class RingList<T> implements Iterable<T> {
 				throw new UnsupportedOperationException();
 			}
 		};
+	}
+
+	public int size() {
+		return ring.size();
+	}
+
+	public T get(int k) {
+		return ring.get((firstPointer + k) % size);
+	}
+
+	public T getLast() {
+		return ring.get((firstPointer + (ring.size() - 2)) % size);
+	}
+
+	public T getFirst() {
+		return ring.get(firstPointer);
 	}
 
 }

@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="Bali">
 				<alt abstract="true" mandatory="true" name="Tool">
-					<and abstract="true" mandatory="true" name="A">
+					<and abstract="true" name="A">
 						<feature name="requireBali2jak"/>
 						<feature mandatory="true" name="bali2jak"/>
 					</and>
-					<and abstract="true" mandatory="true" name="B">
+					<and abstract="true" name="B">
 						<feature name="requireBali2jcc"/>
 						<feature mandatory="true" name="bali2jcc"/>
 					</and>
-					<and abstract="true" mandatory="true" name="C">
+					<and abstract="true" name="C">
 						<feature name="requireComposer"/>
 						<feature mandatory="true" name="composer"/>
 					</and>
-					<and abstract="true" mandatory="true" name="D">
+					<and abstract="true" name="D">
 						<feature mandatory="true" name="bali2layerGUI"/>
 						<feature mandatory="true" name="bali2layer"/>
 						<feature mandatory="true" name="bali2layerOptions"/>
@@ -34,5 +35,7 @@
 			</and>
 		</struct>
 		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

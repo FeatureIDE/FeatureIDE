@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.LONG_NAMES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANUAL_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHORT_NAMES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LONG_NAMES;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -85,12 +85,12 @@ public class FeatureDiagramLayoutHelper {
 	 */
 	public static void initializeConstraintPosition(IGraphicalFeatureModel featureModel, int index) {
 		Point newLocation = new Point(0, 0);
-		IGraphicalConstraint constraint = featureModel.getConstraints().get(index);
+		IGraphicalConstraint constraint = featureModel.getVisibleConstraints().get(index);
 		int leftX = Integer.MAX_VALUE;
 		int rightX = Integer.MIN_VALUE;
-		final int constraintCount = featureModel.getConstraints().size();
+		final int constraintCount = featureModel.getVisibleConstraints().size();
 		if (constraintCount == 1) {
-			for (IGraphicalFeature feature : featureModel.getFeatures()) {
+			for (IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 				if (feature.getLocation().y > newLocation.y) {
 					newLocation.y = feature.getLocation().y;
 				}
@@ -104,7 +104,7 @@ public class FeatureDiagramLayoutHelper {
 			newLocation.x = (leftX + rightX) / 2;
 			newLocation.y += FMPropertyManager.getFeatureSpaceY();
 		} else {
-			IGraphicalConstraint lastConstraint = featureModel.getConstraints().get(constraintCount - 2);
+			IGraphicalConstraint lastConstraint = featureModel.getVisibleConstraints().get(constraintCount - 2);
 			newLocation = lastConstraint.getLocation().getCopy();
 			newLocation.y += FMPropertyManager.getConstraintSpace();
 		}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -30,7 +29,8 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
@@ -40,8 +40,8 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public abstract class FileManagerMap {
 
-	private static final Map<String, IFileManager> map = new HashMap<>();
-	
+	private static final Map<String, IFileManager<?>> map = new HashMap<>();
+
 	public static String constructExtraPath(String path, IPersistentFormat<?> format) throws IllegalArgumentException {
 		final Path mainPath = Paths.get(path).toAbsolutePath();
 		final Path mainFileNamePath = mainPath.getFileName();
@@ -50,13 +50,13 @@ public abstract class FileManagerMap {
 			final Path subpath = mainPath.subpath(0, mainPath.getNameCount() - 1);
 			final Path root = mainPath.getRoot();
 			if (subpath != null && root != null) {
-				final Path extraFolder = root.resolve(subpath.resolve("." + mainFileNameString));
+				final Path extraFolder = root.resolve(subpath.resolve(".featureide").resolve(mainFileNameString));
 
-				if (!Files.exists(extraFolder)) {
+				if (!FileSystem.exists(extraFolder)) {
 					try {
-						Files.createDirectory(extraFolder);
+						FileSystem.mkDir(extraFolder);
 					} catch (IOException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 				}
 
@@ -80,12 +80,13 @@ public abstract class FileManagerMap {
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
 	 */
 	@CheckForNull
-	public static IFileManager getFileManager(String path) {
+	public static IFileManager<?> getFileManager(String path) {
 		return map.get(constructAbsolutePath(path));
 	}
-	
+
 	/**
-	 * Checks whether there is already instance 
+	 * Checks whether there is already an instance.
+	 * 
 	 * @param path
 	 * @return
 	 */
@@ -110,7 +111,7 @@ public abstract class FileManagerMap {
 
 	public static <T, R extends AFileManager<T>> R getInstance(T object, String path, IPersistentFormat<T> format, Class<R> c, Class<T> t) {
 		final String absolutePath = constructAbsolutePath(path);
-		final IFileManager manager = map.get(absolutePath);
+		final IFileManager<?> manager = map.get(absolutePath);
 		if (manager != null) {
 			return c.cast(manager);
 		} else {
@@ -121,13 +122,13 @@ public abstract class FileManagerMap {
 				map.put(absolutePath, newInstance);
 				return newInstance;
 			} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 				return null;
 			}
 		}
 	}
-	
-	public static IFileManager remove(String path) {
+
+	public static IFileManager<?> remove(String path) {
 		return map.remove(constructAbsolutePath(path));
 	}
 

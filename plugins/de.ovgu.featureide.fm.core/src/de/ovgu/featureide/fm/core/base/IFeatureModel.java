@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,18 +21,19 @@
 package de.ovgu.featureide.fm.core.base;
  
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
-
-import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ModelFileIdMap;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -167,6 +168,19 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 */
 	long getId();
+	
+	/**
+	 * A feature model is created via a feature model {@link IFeatureModelFactory factory}.
+	 * This methods returns the identifier of the factory used to create this feature model.
+	 * The factory can be used to create more feature models, features, or constraint from the same type as this feature model.
+	 * 
+	 * @return the feature model factory ID.
+	 * 
+	 * @see FMFactoryManager#getFactoryById(String)
+	 * 
+	 * @since 3.1
+	 */
+	String getFactoryID();
 
 	/**
 	 * A constraint is an additional restriction on features in the feature model.
@@ -414,6 +428,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @return All constraints stored in this feature model.
 	 */
 	List<IConstraint> getConstraints();
+	
 
 	/**
 	 * Returns the feature with the given <code>name</code> stored in this feature model, or <code>null</code> if no features can be found. The given
@@ -495,21 +510,53 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @return
 	 */
 	Iterable<IFeature> getFeatures();
-
+	
 	/**
-	 * @since 3.0
+	 * Returns the a read-only iterable collection of features stored in this feature model, which are not hidden and not collapsed.
+	 * This method is intend to provide the iteration-concept directly. <br/>
+	 * <br/>
+	 * <b>Example</b>
+	 * <code>
+	 * <pre>
+	 * for (IFeature feature : featureModel.getVisibleFeatures()) {
+	 * 		// ...
+	 * }
+	 * </pre>
+	 * </code>
+	 * If a list interface is required rather than the iterable counterpart, the utility class
+	 * {@link Functional} provides a set of useful methods. To convert the iterator directly into a
+	 * list, use {@link Functional#toList(Iterable)}. By using methods from the {@link Functional} utility class
+	 * the advantages of a functional-like programming style can be directly used. For instance, to convert
+	 * the collection of features inside a feature model into a set of feature names, the following
+	 * code snippet can be used:
+	 * <code>
+	 * <pre>
+	 * import static de.ovgu.featureide.fm.core.functional.Functional.*;
 	 * 
-	 * @return Returns the instance of {@link IFMComposerExtension} of the underlying {@link FMComposerManager} of this feature model.
-	 */
-	IFMComposerExtension getFMComposerExtension();
-
-	/**
-	 * @since 3.0
+	 * Set<String> featureNames = new HashSet<>(toList(mapToString(fm.getVisibleFeatures())))
+	 * </pre>
+	 * </code>
+	 * If modification is required, use the related
+	 * constructor for collection implementations, e.g.,
+	 * <br/>
+	 * <code><pre>List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getVisibleFeatures()));</pre></code>
+	 * <br/>
+	 * <b>Note</b>: Many operations of features in feature models runs over iteration. This method returns
+	 * an iterator rather than a collection for <i>lazy evaluation</i> purposes.
+	 * <br/>
 	 * 
-	 * @param project
-	 * @return Returns the instance of the underlying {@link FMComposerManager} of this feature model.
+	 * @see Functional FeatureIDE functional helper class
+	 * @see #addFeature(IFeature)
+	 * @see #deleteFeature(IFeature)
+	 * @see #getFeature(CharSequence)
+	 * @see #getNumberOfFeatures()
+	 * @see #reset()
+	 * 
+	 * @since 3.3
+	 * 
+	 * @return A iterable of IFeatures, which are not hidden and not collapsed
 	 */
-	FMComposerManager getFMComposerManager(final IProject project);
+	Iterable<IFeature> getVisibleFeatures(boolean showHiddenFeatures);
 
 	/**
 	 * Returns the number of features stored in this feature model. This call must be constistent with {@link IFeatureModel#getFeatureTable()} size.
@@ -572,14 +619,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 */
 	void handleModelDataLoaded();
-
-	/**
-	 * @since 3.0
-	 * 
-	 * @param project
-	 * @return Returns {@link #getFMComposerManager(IProject)} with the parameter <code>project</code>
-	 */
-	IFMComposerExtension initFMComposerExtension(final IProject project);
 
 	/**
 	 * @since 3.0
@@ -850,7 +889,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @param file the source file of this model (might be <b>null</b>.
 	 */
-	void setSourceFile(File file);
+	void setSourceFile(Path file);
 
 	/**
 	 * @see #setSourceFile(File)
@@ -859,7 +898,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @return Returns the feature models current source file, or <b>null</b> if no source file is specified.
 	 */
-	File getSourceFile();
+	Path getSourceFile();
 
 	/**
 	 * Feature models are identified with their system-wide unique numeric

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="SvgMapApp">
 				<feature name="L2Build"/>
@@ -88,13 +89,15 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments>
-			<c> this turns panel a off</c>
-			<c> this turns panel a off</c>
+			<c>this turns panel a off</c>
+			<c>this turns panel a off</c>
 			<c>Layers { tab }</c>
 			<c>Legends { out="" }</c>
 			<c>Controls { tab }</c>
 			<c>Stats1 { tab }</c>
 			<c>Stats2 { tab }</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>

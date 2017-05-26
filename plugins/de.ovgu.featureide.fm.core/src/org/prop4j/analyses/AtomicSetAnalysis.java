@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,68 +24,67 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.prop4j.Literal;
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.base.util.RingList;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds atomic sets.
  * 
  * @author Sebastian Krieter
  */
-public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>> {
+public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
+
+	public AtomicSetAnalysis(ISatSolver solver) {
+		super(solver);
+	}
 
 	public AtomicSetAnalysis(SatInstance satInstance) {
 		super(satInstance);
 	}
 
 	@Override
-	public List<List<Literal>> analyze(WorkMonitor monitor) throws Exception {
-		final List<int[]> solutions = new ArrayList<>();
-		final List<List<Literal>> result = new ArrayList<>();
+	public List<int[]> analyze(IMonitor monitor) throws Exception {
+		final List<int[]> result = new ArrayList<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findModel();
-		solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-		int[] model2 = solver.findModel();
-		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 		if (model1 != null) {
+			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+			int[] model2 = solver.findModel();
+			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+
 			final byte[] done = new byte[model1.length];
 
-			ArrayList<Literal> setList = new ArrayList<>();
 			final int[] model1Copy = Arrays.copyOf(model1, model1.length);
-
-			solutions.add(model1);
-			solutions.add(model2);
 
 			SatInstance.updateModel(model1Copy, model2);
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
-					solver.getAssignment().push(-varX);
+					solver.assignmentPush(-varX);
 					switch (solver.isSatisfiable()) {
 					case FALSE:
 						done[i] = 2;
-						solver.getAssignment().pop().unsafePush(varX);
-						setList.add(solver.getSatInstance().getLiteral(varX));
+						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
-						solver.getAssignment().pop();
+						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.getAssignment().pop();
-						model2 = solver.getModel();
-						SatInstance.updateModel(model1Copy, model2);
-						solutions.add(model2);
+						solver.assignmentPop();
+						SatInstance.updateModel(model1Copy, solver.getModel());
 						solver.shuffleOrder();
 						break;
 					}
 				}
 			}
-			result.add(setList);
+			final int fixedSize = solver.getAssignment().size();
+			result.add(solver.getAssignmentArray(0, fixedSize));
 
 			for (int i = 0; i < model1.length; i++) {
 				if (done[i] == 0) {
@@ -95,11 +94,9 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 					int[] xModel0 = Arrays.copyOf(model1, model1.length);
 
 					final int mx0 = xModel0[i];
-					solver.getAssignment().push(mx0);
+					solver.assignmentPush(mx0);
+					final RingList<int[]> solutions = solver.getSolutionList();
 
-					setList = new ArrayList<>();
-					setList.add(solver.getSatInstance().getLiteral(mx0));
-					
 					inner: for (int j = i + 1; j < xModel0.length; j++) {
 						final int my0 = xModel0[j];
 						if (my0 != 0 && done[j] == 0) {
@@ -111,8 +108,8 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 									continue inner;
 								}
 							}
-							
-							solver.getAssignment().push(-my0);
+
+							solver.assignmentPush(-my0);
 
 							switch (solver.isSatisfiable()) {
 							case FALSE:
@@ -121,17 +118,16 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 							case TIMEOUT:
 								break;
 							case TRUE:
-								final int[] lastModel = solver.getModel();
-								SatInstance.updateModel(xModel0, lastModel);
-								solutions.add(lastModel);
+								SatInstance.updateModel(xModel0, solver.getModel());
 								updateSolver(c++);
 								break;
 							}
-							solver.getAssignment().pop();
+							solver.assignmentPop();
 						}
 					}
 
-					solver.getAssignment().pop().unsafePush(-mx0);
+					solver.assignmentPop();
+					solver.assignmentPush(-mx0);
 
 					switch (solver.isSatisfiable()) {
 					case FALSE:
@@ -150,37 +146,35 @@ public class AtomicSetAnalysis extends SingleThreadAnalysis<List<List<Literal>>>
 						if (done[j] == 1) {
 							final int my0 = xModel0[j];
 							if (my0 != 0) {
-								solver.getAssignment().push(-my0);
+								solver.assignmentPush(-my0);
 
 								switch (solver.isSatisfiable()) {
 								case FALSE:
 									done[j] = 2;
-									setList.add(solver.getSatInstance().getLiteral(-my0));
+									solver.assignmentReplaceLast(my0);
 									break;
 								case TIMEOUT:
 									done[j] = 0;
+									solver.assignmentPop();
 									break;
 								case TRUE:
 									done[j] = 0;
-									final int[] lastModel = solver.getModel();
-									SatInstance.updateModel(xModel0, lastModel);
-									solutions.add(lastModel);
+									SatInstance.updateModel(xModel0, solver.getModel());
 									updateSolver(c++);
+									solver.assignmentPop();
 									break;
 								}
-								solver.getAssignment().pop();
 							} else {
 								done[j] = 0;
 							}
 						}
 					}
 
-					solver.getAssignment().pop();
-					result.add(setList);
+					result.add(solver.getAssignmentArray(fixedSize, solver.getAssignment().size()));
+					solver.assignmentClear(fixedSize);
 				}
 			}
 		}
-		System.out.println(solutions.size());
 		return result;
 	}
 

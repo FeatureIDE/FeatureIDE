@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * This class is part of the outline. It provides the content that should be
@@ -45,6 +46,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 public class FmTreeContentProvider implements ITreeContentProvider {
 
 	private IFeatureModel fModel;
+	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	@Override
 	public void dispose() {
@@ -55,6 +57,18 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		if (newInput != null && newInput instanceof IFeatureModel)
 			fModel = ((IFeatureModel) newInput);
 
+	}
+	
+	public IFeatureModel getFeatureModel() {
+		return fModel;
+	}
+	
+	public IGraphicalFeatureModel getGraphicalFeatureModel() {
+		return graphicalFeatureModel;
+	}
+	
+	public void setGraphicalFeatureModel(IGraphicalFeatureModel gfm) {
+		graphicalFeatureModel = gfm;
 	}
 
 	@Override
@@ -88,6 +102,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		// we store the group stage into an extra object in order to be able to
 		// show an own element for GroupStages
 		if (parentElement instanceof FmOutlineGroupStateStorage) {
+			
 			return featureListToArray(FeatureUtils.convertToFeatureList(((FmOutlineGroupStateStorage) parentElement).getFeature().getStructure().getChildren()));
 		}
 

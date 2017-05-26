@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.base.impl;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,8 +62,8 @@ public class ModelFileIdMap {
 	 *            physical file
 	 * @return The identifier associated with <b>modelFile</b> if there is already such an association. </b>featureModel</b>'s identifier otherwise.
 	 */
-	public static synchronized long getModelId(IFeatureModel featureModel, File modelFile) {
-		String fileLocation = modelFile.toPath().toAbsolutePath().toString();
+	public static synchronized long getModelId(IFeatureModel featureModel, Path modelFile) {
+		String fileLocation = modelFile.toAbsolutePath().toString();
 		Long id = map.get(fileLocation);
 		if (id == null) {
 			id = featureModel.getId();

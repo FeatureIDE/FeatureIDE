@@ -1,108 +1,109 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<alt abstract="true" mandatory="true" name="Violet">
-				<and abstract="true" mandatory="true" name="VioletDef">
+				<and abstract="true" name="VioletDef">
 					<or abstract="true" name="Additional">
-						<feature mandatory="true" name="CommandLine"/>
-						<feature mandatory="true" name="VersionChecker"/>
-						<feature mandatory="true" name="VioletFilter"/>
-						<feature mandatory="true" name="ImageFilter"/>
-						<feature mandatory="true" name="SetTitle"/>
-						<feature mandatory="true" name="Preferences"/>
+						<feature name="CommandLine"/>
+						<feature name="VersionChecker"/>
+						<feature name="VioletFilter"/>
+						<feature name="ImageFilter"/>
+						<feature name="SetTitle"/>
+						<feature name="Preferences"/>
 					</or>
 					<or abstract="true" name="Help">
-						<feature mandatory="true" name="About"/>
-						<feature mandatory="true" name="License"/>
+						<feature name="About"/>
+						<feature name="License"/>
 					</or>
 					<feature hidden="true" name="HelpMenu"/>
 					<or abstract="true" name="Window">
-						<feature mandatory="true" name="CloseWindow"/>
-						<feature mandatory="true" name="RestoreWindow"/>
-						<feature mandatory="true" name="MaximizeWindow"/>
-						<feature mandatory="true" name="PreviousWindow"/>
-						<feature mandatory="true" name="NextWindow"/>
+						<feature name="CloseWindow"/>
+						<feature name="RestoreWindow"/>
+						<feature name="MaximizeWindow"/>
+						<feature name="PreviousWindow"/>
+						<feature name="NextWindow"/>
 					</or>
 					<feature hidden="true" name="WindowMenu"/>
 					<or abstract="true" name="View">
-						<feature mandatory="true" name="LookAndFeel"/>
-						<feature mandatory="true" name="ZoomOut"/>
-						<feature mandatory="true" name="ZoomIn"/>
-						<feature mandatory="true" name="GrowDrawingArea"/>
-						<feature mandatory="true" name="ClipDrawingArea"/>
-						<feature mandatory="true" name="SmallerGrid"/>
-						<feature mandatory="true" name="LargerGrid"/>
-						<feature mandatory="true" name="HideGrid"/>
+						<feature name="LookAndFeel"/>
+						<feature name="ZoomOut"/>
+						<feature name="ZoomIn"/>
+						<feature name="GrowDrawingArea"/>
+						<feature name="ClipDrawingArea"/>
+						<feature name="SmallerGrid"/>
+						<feature name="LargerGrid"/>
+						<feature name="HideGrid"/>
 					</or>
 					<feature hidden="true" name="ViewMenu"/>
 					<or abstract="true" name="Edit">
-						<feature mandatory="true" name="EditProperties"/>
-						<feature mandatory="true" name="DeleteItem"/>
-						<feature mandatory="true" name="SelectNext"/>
-						<feature mandatory="true" name="SelectPrevious"/>
+						<feature name="EditProperties"/>
+						<feature name="DeleteItem"/>
+						<feature name="SelectNext"/>
+						<feature name="SelectPrevious"/>
 					</or>
 					<feature hidden="true" name="EditMenu"/>
 					<or abstract="true" name="ClassDiagram">
-						<feature mandatory="true" name="ClassNode"/>
-						<feature mandatory="true" name="InterfaceNode"/>
-						<feature mandatory="true" name="PackageNode"/>
-						<feature mandatory="true" name="ClassNoteNode"/>
-						<feature mandatory="true" name="ClassDependencyEdge"/>
-						<feature mandatory="true" name="ClassInheritanceEdge"/>
-						<feature mandatory="true" name="ClassAggregationEdge"/>
-						<feature mandatory="true" name="ClassAssociationEdge"/>
-						<feature mandatory="true" name="ClassCompositionEdge"/>
-						<feature mandatory="true" name="ClassInterfaceEdge"/>
-						<feature mandatory="true" name="ClassNoteEdge"/>
+						<feature name="ClassNode"/>
+						<feature name="InterfaceNode"/>
+						<feature name="PackageNode"/>
+						<feature name="ClassNoteNode"/>
+						<feature name="ClassDependencyEdge"/>
+						<feature name="ClassInheritanceEdge"/>
+						<feature name="ClassAggregationEdge"/>
+						<feature name="ClassAssociationEdge"/>
+						<feature name="ClassCompositionEdge"/>
+						<feature name="ClassInterfaceEdge"/>
+						<feature name="ClassNoteEdge"/>
 					</or>
 					<feature hidden="true" name="ClassD"/>
 					<or abstract="true" name="SequenceDiagram">
-						<feature mandatory="true" name="SequenceParameterNode"/>
-						<feature mandatory="true" name="SequenceCallNode"/>
-						<feature mandatory="true" name="SequenceNoteNode"/>
-						<feature mandatory="true" name="SequenceCallEdge"/>
-						<feature mandatory="true" name="SequenceReturnEdge"/>
-						<feature mandatory="true" name="SequenceNoteEdge"/>
+						<feature name="SequenceParameterNode"/>
+						<feature name="SequenceCallNode"/>
+						<feature name="SequenceNoteNode"/>
+						<feature name="SequenceCallEdge"/>
+						<feature name="SequenceReturnEdge"/>
+						<feature name="SequenceNoteEdge"/>
 					</or>
 					<feature hidden="true" name="SequenceD"/>
 					<or abstract="true" name="StateDiagram">
-						<feature mandatory="true" name="StateNode"/>
-						<feature mandatory="true" name="InitialStateNode"/>
-						<feature mandatory="true" name="FinalStateNode"/>
-						<feature mandatory="true" name="StateNoteNode"/>
-						<feature mandatory="true" name="StateTransitionEdge"/>
-						<feature mandatory="true" name="StateNoteEdge"/>
+						<feature name="StateNode"/>
+						<feature name="InitialStateNode"/>
+						<feature name="FinalStateNode"/>
+						<feature name="StateNoteNode"/>
+						<feature name="StateTransitionEdge"/>
+						<feature name="StateNoteEdge"/>
 					</or>
 					<feature hidden="true" name="StateD"/>
 					<or abstract="true" name="ObjectDiagram">
-						<feature mandatory="true" name="ObjectNode"/>
-						<feature mandatory="true" name="ObjectFieldNode"/>
-						<feature mandatory="true" name="ObjectNoteNode"/>
-						<feature mandatory="true" name="ObjectReferenceEdge"/>
-						<feature mandatory="true" name="ObjectAssociationEdge"/>
-						<feature mandatory="true" name="ObjectNoteEdge"/>
+						<feature name="ObjectNode"/>
+						<feature name="ObjectFieldNode"/>
+						<feature name="ObjectNoteNode"/>
+						<feature name="ObjectReferenceEdge"/>
+						<feature name="ObjectAssociationEdge"/>
+						<feature name="ObjectNoteEdge"/>
 					</or>
 					<feature hidden="true" name="ObjectD"/>
 					<or abstract="true" name="UseCaseDiagram">
-						<feature mandatory="true" name="Actor"/>
-						<feature mandatory="true" name="UseCaseNode"/>
-						<feature mandatory="true" name="UseCaseNoteNode"/>
-						<feature mandatory="true" name="UseCaseAssociationEdge"/>
-						<feature mandatory="true" name="ExtendRelationshipEdge"/>
-						<feature mandatory="true" name="IncludeRelationshipEdge"/>
-						<feature mandatory="true" name="UseCaseGeneralizationEdge"/>
-						<feature mandatory="true" name="UseCaseNoteEdge"/>
+						<feature name="Actor"/>
+						<feature name="UseCaseNode"/>
+						<feature name="UseCaseNoteNode"/>
+						<feature name="UseCaseAssociationEdge"/>
+						<feature name="ExtendRelationshipEdge"/>
+						<feature name="IncludeRelationshipEdge"/>
+						<feature name="UseCaseGeneralizationEdge"/>
+						<feature name="UseCaseNoteEdge"/>
 					</or>
 					<feature hidden="true" name="UseCaseD"/>
 					<feature hidden="true" name="DiagramSupport"/>
 					<or abstract="true" name="File">
-						<feature mandatory="true" name="Exit"/>
-						<feature mandatory="true" name="Print"/>
-						<feature mandatory="true" name="ExportImage"/>
-						<feature mandatory="true" name="SaveFile"/>
-						<feature mandatory="true" name="SaveAs"/>
-						<feature mandatory="true" name="RecentFile"/>
-						<feature mandatory="true" name="OpenFile"/>
+						<feature name="Exit"/>
+						<feature name="Print"/>
+						<feature name="ExportImage"/>
+						<feature name="SaveFile"/>
+						<feature name="SaveAs"/>
+						<feature name="RecentFile"/>
+						<feature name="OpenFile"/>
 					</or>
 					<feature hidden="true" name="NewFile"/>
 					<feature hidden="true" name="FileMenu"/>
@@ -364,10 +365,11 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments>
-			<c>* Violet Model File */</c>
-			<c> constraints</c>
-			<c> formatting</c>
+			<c>* Violet Model File *</c>
+			<c>constraints</c>
+			<c>formatting</c>
 			<c>Exit {out="ExitV"}</c>
 			<c>ClassD {out="ClassDiagram"}</c>
 			<c>SequenceD {out="SequenceDiagram"}</c>
@@ -380,4 +382,5 @@
 			<c>ExtendRelationshipEdge {out="UseCaseExtendRelationEdge"}</c>
 			<c>IncludeRelationshipEdge {out="UseCaseIncludeRelationEdge"}</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>

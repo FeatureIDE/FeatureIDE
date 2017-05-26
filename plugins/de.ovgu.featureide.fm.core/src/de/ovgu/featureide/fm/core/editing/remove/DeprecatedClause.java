@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 public class DeprecatedClause extends Clause {
 
 	private int relevance;
-
+	
 	public static DeprecatedClause createClause(int[] newLiterals, int curFeature) {
 		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
 
@@ -47,6 +47,44 @@ public class DeprecatedClause extends Clause {
 		}
 
 		return getClauseFromSet(literalSet);
+	}
+	
+	public static DeprecatedClause createClause(int[] newLiterals, int curFeature, int[] helper) {
+		int uniqueVarCount = newLiterals.length;
+		for (int i = 0; i < newLiterals.length; i++) {
+			final int l = newLiterals[i];
+			final int index = Math.abs(l);
+			if (index == curFeature) {
+				newLiterals[i] = 0;
+				uniqueVarCount--;
+			} else {
+				final int h = helper[index];
+				if (h == 0) {
+					helper[index] = l;
+				} else {
+					if (h != l) {
+						for (int j = 0; j < i; j++) {
+							helper[Math.abs(newLiterals[j])] = 0;
+						}
+						return null;
+					} else {
+						newLiterals[i] = 0;
+						uniqueVarCount--;
+					}
+				}
+			}
+		}
+		int[] uniqueVarArray = new int[uniqueVarCount];
+		int k = 0;
+		for (int i = 0; i < newLiterals.length; i++) {
+			final int l = newLiterals[i];
+			helper[Math.abs(l)] = 0;
+			if (l != 0) {
+				uniqueVarArray[k++] = l;
+			}
+		}
+		
+		return new DeprecatedClause(uniqueVarArray);
 	}
 
 	public static DeprecatedClause createClause(int[] newLiterals) {
@@ -72,15 +110,6 @@ public class DeprecatedClause extends Clause {
 		return new DeprecatedClause(newLiterals);
 	}
 
-	public static DeprecatedClause createClause(DeprecatedFeature[] map, int newLiteral) {
-		final DeprecatedClause clause = new DeprecatedClause(new int[] { newLiteral });
-		final DeprecatedFeature df = map[Math.abs(newLiteral)];
-		if (df != null) {
-			clause.relevance++;
-		}
-		return clause;
-	}
-
 	private DeprecatedClause(int[] literals) {
 		super(literals);
 		this.relevance = 0;
@@ -102,7 +131,23 @@ public class DeprecatedClause extends Clause {
 	}
 
 	public boolean delete(DeprecatedFeature[] map) {
-		if (literals != null && literals.length > 1) {
+		if (literals.length > 1) {
+			final boolean mixed = (relevance > 0 && relevance < literals.length);
+			for (int literal : literals) {
+				final DeprecatedFeature df = map[Math.abs(literal)];
+				if (df != null) {
+					if (literal > 0) {
+						df.decPositive();
+					} else {
+						df.decNegative();
+					}
+					if (mixed) {
+						df.decMixed();
+					}
+				}
+			}
+			return mixed;
+		} else {
 			for (int literal : literals) {
 				final DeprecatedFeature df = map[Math.abs(literal)];
 				if (df != null) {
@@ -113,7 +158,6 @@ public class DeprecatedClause extends Clause {
 					}
 				}
 			}
-			return (relevance > 0 && relevance < literals.length);
 		}
 		return false;
 	}

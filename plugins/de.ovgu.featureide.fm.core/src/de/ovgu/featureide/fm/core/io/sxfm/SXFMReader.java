@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,9 +35,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNKNOWN_XML_TA
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,15 +59,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -77,37 +77,15 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class SXFMReader extends AbstractFeatureModelReader {
+public class SXFMReader {
 
 	private int line;
 
 	private Hashtable<String, IFeature> idTable;
 
-	/**
-	 * Creates a new reader and sets the feature model to store the data.
-	 * 
-	 * @param featureModel the structure to fill
-	 */
-	public SXFMReader(IFeatureModel featureModel) {
-		setFeatureModel(featureModel);
-	}
+	private IFeatureModel featureModel;
 
-	@Override
-	protected void parseInputStream(InputStream inputStream) throws UnsupportedModelException {
-		DocumentBuilder db = init();
-
-		Document doc = null;
-		try {
-			doc = db.parse(inputStream);
-		} catch (SAXException se) {
-			FMCorePlugin.getDefault().logError(se);
-		} catch (IOException ioe) {
-			FMCorePlugin.getDefault().logError(ioe);
-		}
-		// Create the Feature Model from the DOM-Document
-		buildFModelRec(doc);
-		featureModel.handleModelDataLoaded();
-	}
+	private ProblemList warnings = new ProblemList();
 
 	private DocumentBuilder init() {
 		warnings.clear();
@@ -127,7 +105,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 			db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
 			System.err.println(pce);
-			FMCorePlugin.getDefault().logError(pce);
+			Logger.logError(pce);
 		}
 		featureModel.reset();
 		line = 0;
@@ -135,16 +113,17 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		return db;
 	}
 
-	protected void parseInputStream(String source) throws UnsupportedModelException {
+	protected void parseInputStream(IFeatureModel featureModel, String source) throws UnsupportedModelException {
+		this.featureModel = featureModel;
 		DocumentBuilder db = init();
 
 		Document doc = null;
 		try {
 			doc = db.parse(new InputSource(new StringReader(source)));
 		} catch (SAXException se) {
-			FMCorePlugin.getDefault().logError(se);
+			Logger.logError(se);
 		} catch (IOException ioe) {
-			FMCorePlugin.getDefault().logError(ioe);
+			Logger.logError(ioe);
 		}
 		// Create the Feature Model from the DOM-Document
 		buildFModelRec(doc);
@@ -235,8 +214,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 	 */
 	private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
 		try {
-			IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
-			FeatureIndent lastFeat = new FeatureIndent(model, -1);
+			FeatureIndent lastFeat = new FeatureIndent(featureModel, -1);
 			// List of Features with arbitrary cardinalities
 			LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();
 			String lineText = reader.readLine();
@@ -363,7 +341,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 
 			handleArbitrayCardinality(arbCardGroupFeats);
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 
@@ -562,7 +540,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 				line++;
 			}
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 	}
 
@@ -689,6 +667,10 @@ public class SXFMReader extends AbstractFeatureModelReader {
 			this.end = end;
 		}
 
+	}
+
+	public Collection<? extends Problem> getWarnings() {
+		return warnings;
 	}
 
 }

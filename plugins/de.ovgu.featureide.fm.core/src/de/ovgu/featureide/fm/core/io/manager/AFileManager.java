@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,65 +20,48 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
- * Responsible to load and save all information from / to a file.</br>
+ * Responsible to load and save all information from / to a file.<br/>
  * To get an instance use the {@link FileManagerMap}.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFileManager<T> implements IFileManager, IResourceChangeListener {
+public abstract class AFileManager<T> implements IFileManager<T>, IEventManager {
+
+	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
 	private final IEventManager eventManager = new DefaultEventManager();
 
 	private final ProblemList lastProblems = new ProblemList();
 
-	private final Object syncObject = new Object();
-	private final Object saveSyncObject = new Object();
+	protected final Object syncObject = new Object();
 
 	protected final IPersistentFormat<T> format;
 
 	protected final String absolutePath;
 	protected final Path path;
 
-	private IPath eclipseFile;
-
 	protected T persistentObject;
 	protected T variableObject;
+	protected T emptyObject;
 
-	private boolean saveFlag = false;
-
-	public IPersistentFormat<T> getFormat() {
-		return format;
-	}
+	private boolean modifying = false;
 
 	protected AFileManager(T object, String absolutePath, IPersistentFormat<T> format) {
 		this.format = format;
@@ -86,113 +69,20 @@ public abstract class AFileManager<T> implements IFileManager, IResourceChangeLi
 		path = Paths.get(absolutePath);
 
 		variableObject = object;
-		persistentObject = copyObject(variableObject);
+		emptyObject = copyObject(object);
 
-		findEclipseFile();
-	}
-
-	private void findEclipseFile() {
-		IPath absolutePath2 = new org.eclipse.core.runtime.Path(absolutePath);
-		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		final IPath rootLocation = root.getLocation();
-		if (absolutePath2.matchingFirstSegments(rootLocation) != rootLocation.segmentCount()) {
+		if (FileSystem.exists(path)) {
 			try {
-				IFile[] filesOfLocation = root.findFilesForLocationURI(URI.create("file:/" + absolutePath2.toString().replace(" ", "%20")));
-				absolutePath2 = filesOfLocation[0].getFullPath().makeRelativeTo(rootLocation);
-			} catch (IndexOutOfBoundsException e) {
-				FMCorePlugin.getDefault().logError(e);
-				eclipseFile = null;
-				return;
-			}
-		}
-		synchronized (syncObject) {
-			if (eclipseFile == null) {
-				eclipseFile = absolutePath2.makeRelativeTo(rootLocation);
-				ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);				
-			}
-		}
-	}
-
-	public T getObject() {
-		synchronized (saveSyncObject) {
-			return persistentObject;
-		}
-	}
-
-	public T editObject() {
-		return variableObject;
-	}
-
-	public ProblemList getLastProblems() {
-		return lastProblems;
-	}
-
-	public synchronized boolean read() {
-		if (!Files.exists(path)) {
-			return false;
-		}
-		lastProblems.clear();
-		try {
-			final String content = new String(Files.readAllBytes(path), Charset.availableCharsets().get("UTF-8"));
-			synchronized (saveSyncObject) {
-				List<Problem> problemList = format.getInstance().read(variableObject, content);
-				if (problemList != null) {
-					lastProblems.addAll(problemList);
+				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+				final ProblemList problems = format.getInstance().read(variableObject, content);
+				if (problems != null) {
+					lastProblems.addAll(problems);
 				}
-				persist();
+			} catch (Exception e) {
+				handleException(e);
 			}
-			fireEvent(new FeatureIDEEvent(persistentObject, EventType.MODEL_DATA_LOADED));
-		} catch (Exception e) {
-			handleException(e);
 		}
-		return lastProblems.isEmpty();
-	}
-
-	/**
-	 * Copy on write.
-	 */
-	protected void persist() {
-		synchronized (syncObject) {
-			persistentObject = copyObject(variableObject);
-		}
-	}
-
-	protected abstract T copyObject(T oldObject);
-
-	public boolean save() {
-		lastProblems.clear();
-		try {
-			synchronized (syncObject) {
-				saveFlag = true;
-			}
-			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
-			if (eclipseFile != null) {
-				final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(eclipseFile);
-				synchronized (saveSyncObject) {
-					if (!file.exists()) {
-						file.create(new ByteArrayInputStream(content), true, null);
-					} else {
-						file.setContents(new ByteArrayInputStream(content), true, true, null);
-					}
-					persist();
-				}
-			} else {
-				synchronized (saveSyncObject) {
-					Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-					persist();
-				}
-				findEclipseFile();
-			}
-			fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
-		} catch (Exception e) {
-			handleException(e);
-		}
-		return lastProblems.isEmpty();
-	}
-
-	private void handleException(Exception e) {
-		lastProblems.add(new Problem(e));
-		FMCorePlugin.getDefault().logError(e);
+		persistentObject = copyObject(variableObject);
 	}
 
 	@Override
@@ -200,9 +90,84 @@ public abstract class AFileManager<T> implements IFileManager, IResourceChangeLi
 		eventManager.addListener(listener);
 	}
 
+	protected abstract T copyObject(T oldObject);
+
+	public T getObject() {
+		return persistentObject;
+	}
+
+	public T editObject() {
+		return variableObject;
+	}
+
+	public void setModifying(boolean modifying) {
+		synchronized (syncObject) {
+			this.modifying = modifying;
+		}
+	}
+
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
+	}
+
+	public IPersistentFormat<T> getFormat() {
+		return format;
+	}
+
+	public ProblemList getLastProblems() {
+		return lastProblems;
+	}
+
+	private void handleException(Exception e) {
+		lastProblems.add(new Problem(e));
+	}
+
+	public boolean read() {
+		if (!FileSystem.exists(path)) {
+			return false;
+		}
+		final boolean success, changed;
+		synchronized (syncObject) {
+			if (modifying) {
+				return true;
+			}
+			lastProblems.clear();
+			final T tempObject = copyObject(emptyObject);
+			try {
+				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+				final List<Problem> problemList = format.getInstance().read(tempObject, content);
+				if (problemList != null) {
+					lastProblems.addAll(problemList);
+				}
+				changed = !compareObjects(tempObject, persistentObject);
+			} catch (Exception e) {
+				handleException(e);
+				return false;
+			}
+			if (changed) {
+				persistentObject = tempObject;
+			}
+			success = lastProblems.isEmpty();
+		}
+		if (changed) {
+			ExternalChangeListener.update(this);
+		}
+		return success;
+	}
+
+	// TODO Quickfix for #501. Should be implemented by overriding the current instance pointer.
+	public void override() {
+		synchronized (syncObject) {
+			if (modifying) {
+				return;
+			}
+			final String write = format.getInstance().write(persistentObject);
+			format.getInstance().read(variableObject, write);
+			//			variableObject = copyObject(localObject);
+			//			persistentObject = copyObject(localObject);
+		}
+		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_OVERRIDDEN));
 	}
 
 	@Override
@@ -210,47 +175,85 @@ public abstract class AFileManager<T> implements IFileManager, IResourceChangeLi
 		eventManager.removeListener(listener);
 	}
 
-	@Override
-	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-			final IResourceDelta delta = event.getDelta();
-			if (delta != null) {
-				final IResourceDelta deltaMember = delta.findMember(eclipseFile);
-				if (deltaMember != null) {
-					final IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
-						public boolean visit(IResourceDelta delta) {
-							if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-								synchronized (syncObject) {
-									if (saveFlag) {
-										saveFlag = false;
-									} else {
-										read();
-									}
-								}
-							}
-							return true;
-						}
-					};
-					try {
-						deltaMember.accept(visitor);
-					} catch (CoreException e) {
-					}
-				}
-			}
-		}
+	/**
+	 * Compares two object for equality.<br/>
+	 * Subclasses should override (implement) this method.
+	 * 
+	 * @param o1 First object.
+	 * @param o2 Second object.
+	 * @return {@code true} if objects are considered equal, {@code false} otherwise.
+	 */
+	protected boolean compareObjects(T o1, T o2) {
+		final String s1 = format.getInstance().write(o1);
+		final String s2 = format.getInstance().write(o2);
+		return s1.equals(s2);
 	}
 
-	public void dispose() {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-		FileManagerMap.remove(absolutePath);
+	public boolean save() {
+		final boolean success;
+		synchronized (syncObject) {
+			lastProblems.clear();
+			try {
+				if (modifying) {
+					return true;
+				}
+				modifying = true;
+				final T tempObject = copyObject(variableObject);
+				final byte[] content = format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET);
+				FileSystem.write(path, content);
+				persistentObject = copyObject(tempObject);
+			} catch (Exception e) {
+				handleException(e);
+				return false;
+			} finally {
+				modifying = false;
+			}
+			success = lastProblems.isEmpty();
+		}
+		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
+		return success;
+	}
 
-		persistentObject = null;
-		variableObject = null;
+	public boolean externalSave(Runnable externalSaveMethod) {
+		final boolean success;
+		synchronized (syncObject) {
+			lastProblems.clear();
+			try {
+				if (modifying) {
+					return true;
+				}
+				modifying = true;
+				final T tempObject = copyObject(variableObject);
+				externalSaveMethod.run();
+				persistentObject = copyObject(tempObject);
+			} catch (Exception e) {
+				handleException(e);
+				return false;
+			} finally {
+				modifying = false;
+			}
+			success = lastProblems.isEmpty();
+		}
+		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
+		return success;
+	}
+
+	@Override
+	public void dispose() {
+		FileManagerMap.remove(absolutePath);
+		synchronized (syncObject) {
+			persistentObject = null;
+			variableObject = null;
+		}
 	}
 
 	@Override
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	public Path getPath() {
+		return path;
 	}
 
 	@Override

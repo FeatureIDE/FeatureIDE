@@ -7,6 +7,45 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.3.1 (May 2017)
+* Hotfix containing only stability improvements over v3.3.0
+* Improvements for configuration editor, feature-model editor, configuration map, random and t-wise configuration generation
+
+Release 3.3.0 (April 2017)
+* Feature subtrees in feature diagram can be folded manually and automatically
+* Visual explanations for feature-model defects (e.g., dead features)
+* New view Configuration Map added for an overview on all user-defined configurations
+* New visualizations on feature usage in configurations added (e.g., feature relations graph)
+* Added new XML format to store configurations (including selection states of abstract features)
+* New short cuts added for feature diagrams
+* Improved usability of collaboration diagram, statistics view and colors in all views
+* Improved performance for explanations on feature-diagram defects
+* Improved feature-model slicing
+* Improved FeatureIDE library and its build scripts
+
+Release 3.2.0 (December 2016)
+* Refactored main FeatureIDE functionality into Jar without dependencies to Eclipse
+* New visualizations on the selection of features across configurations
+* Improved performance for analysis of dead and false-optional features
+* Improved warnings for unused and false-optional features and quick fix to create configurations automatically
+* Content assist for annotations improved for preprocessor Antenna
+* Improvements for product generation (to create and build products in batch mode)
+
+Release 3.1.2 (October 2016)
+* (Release used for FeatureIDE tutorial at SPLC in Beijing, China)
+* Hotfix for product generation under Unix operating systems
+
+Release 3.1.1 (September 2016)
+* Several hotfixes regarding:
+  * Example wizard and example projects (#393, #399)
+  * Feature model editor and constraint dialog (#383, #389, #404, #406, #409, #420, #422)
+  * Source code editor (#397, #402, #410)
+  * Collaboration diagram (#395, #397)
+  * Product generation (#384, #385, #413, #416)
+* Added warnings in "New Source File" Dialog (#256)
+* Added Automotive examples (large-scale feature models)
+* Further stability improvements
+
 Release 3.1.0 (July 2016)
 * New extension point to exchange classes for features, constraints, and feature models with the factory pattern
 * Explanations for anomalies in feature models

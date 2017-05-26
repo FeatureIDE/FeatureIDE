@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_EXAMPLE_A
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,29 +47,32 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.examples.ExamplePlugin;
 
 /**
- * Handles metadata of a project that is represented in the ExmampleWizard
+ * Handles meta data of a project that is represented in the ExmampleWizard.
  * 
  * @author Reimar Schroeter
  */
-public class ProjectRecord implements Serializable {
+public class ProjectRecord {
 
-	private static final long serialVersionUID = 7680436510104564244L;
+	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
+	public static final String INDEX_FILENAME = "index.fileList";
 
 	private final String projectDescriptionRelativePath;
 	private final String projectName;
 
 	private Collection<ProjectRecord> subProjects;
 
-	private transient IProjectDescription projectDescription;
-	private transient CommentParser comment;
-	private transient String warning;
-	private transient String error;
-	private transient List<TreeItem> contentProviderItems;
-	private transient boolean hasWarnings = false;
-	private transient boolean hasErrors = false;
-	private transient boolean updated = false;
+	private IProjectDescription projectDescription;
+	private CommentParser comment;
+	private String warning;
+	private String error;
+	private List<TreeItem> contentProviderItems;
+	private boolean hasWarnings = false;
+	private boolean hasErrors = false;
+	private boolean updated = false;
+	private boolean needsComposer = true;
 
 	/**
 	 * Create a record for a project based on the info given in the file.
@@ -97,7 +99,9 @@ public class ProjectRecord implements Serializable {
 
 	private void initFields() {
 		warning = "";
+		hasWarnings = false;
 		error = "";
+		hasErrors = false;
 		contentProviderItems = new ArrayList<>();
 	}
 
@@ -106,13 +110,14 @@ public class ProjectRecord implements Serializable {
 	}
 
 	public class TreeItem {
-		private transient IContentProvider contProv;
+		private IContentProvider contProv;
 
 		public TreeItem(IContentProvider contProv) {
 			this.contProv = contProv;
 		}
 
 		public ProjectRecord getRecord() {
+			init();
 			return ProjectRecord.this;
 		}
 
@@ -138,25 +143,35 @@ public class ProjectRecord implements Serializable {
 		return ti;
 	}
 
-	public void init() {
+	public boolean init() {
 		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection()
 				.getInputStream()) {
 			projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
 		} catch (IOException | CoreException e) {
-			e.printStackTrace();
+			ExamplePlugin.getDefault().logError(e);
+			return false;
 		}
 
-		comment = new CommentParser(projectDescription.getComment());
+		if (projectDescription != null) {
+			comment = new CommentParser(projectDescription.getComment());
 
-		performAlreadyExistsCheck();
-		performRequirementCheck();
+			performAlreadyExistsCheck();
+			performRequirementCheck();
 
-		for (ProjectRecord projectRecord : getSubProjects()) {
-			projectRecord.init();
+			for (ProjectRecord projectRecord : getSubProjects()) {
+				if (!projectRecord.init()) {
+					return false;
+				}
+			}
+		} else {
+			return false;
 		}
+		return true;
 	}
 
 	private void performAlreadyExistsCheck() {
+		hasErrors = false;
+		error = "";
 		if (isProjectInWorkspace(getProjectName())) {
 			error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
 			hasErrors = true;
@@ -164,9 +179,16 @@ public class ProjectRecord implements Serializable {
 	}
 
 	private void performRequirementCheck() {
-		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
+		hasWarnings = false;
+		warning = "";
+		String[] natures = projectDescription.getNatureIds();
+		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(natures);
 
-		if (status.isOK()) {
+		if (natures.length == 1 && natures[0].equals("org.eclipse.jdt.core.javanature")) {
+			needsComposer = false;
+		}
+
+		if (status.isOK() && needsComposer) {
 			status = CorePlugin.getDefault().isComposable(projectDescription);
 		}
 
@@ -186,8 +208,11 @@ public class ProjectRecord implements Serializable {
 		}
 	}
 
-	public void setSubProjects(Collection<ProjectRecord> subProjects) {
-		this.subProjects = subProjects;
+	public void addSubProject(ProjectRecord subProject) {
+		if (subProjects == null) {
+			subProjects = new ArrayList<>();
+		}
+		subProjects.add(subProject);
 	}
 
 	public boolean hasSubProjects() {
@@ -231,6 +256,10 @@ public class ProjectRecord implements Serializable {
 
 	public String getErrorText() {
 		return error;
+	}
+
+	public boolean needsComposer() {
+		return needsComposer;
 	}
 
 	/**
@@ -301,11 +330,11 @@ public class ProjectRecord implements Serializable {
 	}
 
 	public String getIndexDocumentPath() {
-		return projectDescriptionRelativePath.replace(".project", CreateMetaInformation.INDEX_FILENAME);
+		return projectDescriptionRelativePath.replace(".project", INDEX_FILENAME);
 	}
 
 	public String getInformationDocumentPath() {
-		return projectDescriptionRelativePath.replace(".project", CreateMetaInformation.PROJECT_INFORMATION_XML);
+		return projectDescriptionRelativePath.replace(".project", PROJECT_INFORMATION_XML);
 	}
 
 	public IProjectDescription getProjectDescription() {
@@ -336,4 +365,9 @@ public class ProjectRecord implements Serializable {
 	public void setUpdated(boolean updated) {
 		this.updated = updated;
 	}
+
+	public String getProjectDescriptionRelativePath() {
+		return projectDescriptionRelativePath;
+	}
+
 }

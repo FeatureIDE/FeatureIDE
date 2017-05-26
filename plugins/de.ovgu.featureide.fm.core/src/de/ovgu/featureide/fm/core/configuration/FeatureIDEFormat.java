@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,7 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class FeatureIDEFormat implements IConfigurationFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + FeatureIDEFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + FeatureIDEFormat.class.getSimpleName();
 
 	public static final String EXTENSION = StringTable.FIDECONF;
 
@@ -98,7 +98,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 							break;
 						}
 					} catch (NumberFormatException e) {
-						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber));
+						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber, e));
 					}
 
 					final String name = renamingsManager.getNewName(line.substring(2));
@@ -111,7 +111,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 							configuration.setManual(feature, manual);
 							configuration.setAutomatic(feature, automatic);
 						} catch (SelectionNotPossibleException e) {
-							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber));
+							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber, e));
 						}
 					}
 				}

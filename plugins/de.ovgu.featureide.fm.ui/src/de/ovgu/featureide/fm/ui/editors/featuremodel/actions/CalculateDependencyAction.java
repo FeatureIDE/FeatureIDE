@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -58,7 +58,7 @@ public class CalculateDependencyAction extends Action {
 	public static final String ID = "de.ovgu.featureide.calculatedependency";
 
 	/**
-	 * The underlying feature model.
+	 * The complete feature model.
 	 */
 	private final IFeatureModel featureModel;
 
@@ -81,7 +81,7 @@ public class CalculateDependencyAction extends Action {
 	 * Constructor.
 	 * 
 	 * @param viewer
-	 * @param featureModel The feature model
+	 * @param featureModel The complete feature model
 	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {
 		super(CALCULATE_DEPENDENCY);
@@ -131,7 +131,7 @@ public class CalculateDependencyAction extends Action {
 			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart)
-				feature = ((FeatureEditPart) editPart).getFeature().getObject();
+				feature = ((FeatureEditPart) editPart).getModel().getObject();
 			else
 				feature = (IFeature) editPart;
 

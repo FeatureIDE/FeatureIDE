@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -50,18 +50,18 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
 		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
-		layout(yoffset, featureModel.getConstraints());
+		layout(yoffset, featureModel.getVisibleConstraints());
 	}
 
 	private int depthFirstLayout(IGraphicalFeature feature, int level, int x) {
-		if (isHidden(feature)) {
+		if (feature.getObject().getStructure().hasHiddenParent()) {
 			return 0;
 		}
-		feature.setLocation(new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
+		setLocation(feature, new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
 		int newX = x;
 		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
 			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();
-		for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
+		for (IGraphicalFeature child : getChildren(feature)) {
 			newX = depthFirstLayout(child, level + 1, newX);
 		}
 		return Math.max(newX, x + feature.getSize().width + FMPropertyManager.getFeatureSpaceX());

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,744 +20,429 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Stack;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.prop4j.Literal;
+import org.prop4j.Literal.FeatureAttribute;
 import org.prop4j.Node;
 
-import Jakarta.util.Util;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-
 /**
- * The class LTMS (logic truth maintenance system) uses BCP for managing logical implications. By recording proofs
- * for implications, explanations can be constructed. BCP expects two parameters: initial truth values (premises) and a CNF. 
+ * The class LTMS (logic truth maintenance system) records proofs for implications and constructs explanations.
+ * Uses BCP (boolean constraint propagation) for managing logical implications.
+ * BCP expects two parameters: initial truth values (premises) and a propositional formula in CNF (conjunctive normal form).
+ * The application in a feature model context is handled in {@link ExplanationCreator}.
  * 
- * @author "Ananieva Sofia"
+ * @author Sofia Ananieva
+ * @author Timo Guenther
  */
 public class LTMS {
-
 	/**
-	 * Differentiates between different modes to explain. A mode can either belong to Redundancy, Dead Features
-	 * or False-optional Features.
+	 * A feature model transformed into a propositional formula in conjunctive normal form for easier reasoning.
 	 */
-	public static enum ExplanationMode {
-		Redundancy, DeadFeature, FalseOptionalFeature
-	};
-
+	private final Node cnf;
 	/**
-	 * The model to explain the defect from.
+	 * Nodes mapped to the literals they contain.
+	 * Redundant map for the sake of performance.
 	 */
-	private IFeatureModel model;
+	private final Map<Node, Set<Literal>> clauseLiterals = new LinkedHashMap<>();
 	/**
-	 * The explanation of a defect.
+	 * Variables mapped to the clauses they are contained in.
+	 * Redundant map for the sake of performance.
 	 */
-	private List<String> reason = new ArrayList<String>();
+	private final Map<Object, Set<Node>> variableClauses = new LinkedHashMap<>();
+	/**
+	 * The truth value assignments that are initially set and not derived.
+	 */
+	private final Map<Object, Boolean> premises = new LinkedHashMap<>();
+	/**
+	 * The truth value assignments of the variables.
+	 * If the truth value is true, all positive literals containing the variable evaluate to true and negated ones to false.
+	 * If the truth value is false, all positive literals containing the variable evaluate to false and negated ones to true.
+	 * If the variable is not contained in this map, its truth value is considered unknown.
+	 */
+	private final Map<Object, Boolean> variableValues = new LinkedHashMap<>();
+	/**
+	 * The reason for a derived truth value, represented by a node (which is clause in CNF).
+	 * The literals of this clause are the antecedents of the variable.
+	 * The antecedents are the literals whose values were referenced when deriving a new truth value.
+	 */
+	private final Map<Object, Node> reasons = new LinkedHashMap<>();
 	/**
 	 * The stack to collect unit-open clauses.
 	 */
-	private Stack<Node> stackOpenClause = new Stack<Node>();
+	private final Deque<Node> unitOpenClauses = new LinkedList<>();
 	/**
-	 * The hashMap for bookkeeping of reasons and antecedents for literals. Key = literal.var, value = class Bookkeeping
-	 */
-	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>();
-	/**
-	 * The clause which is violated (the truth values of all literals are bound to false).
+	 * The clause that was violated during the most recent contradiction check.
 	 */
 	private Node violatedClause;
 	/**
-	 * The list which contains a literal of a respective feature from the redundant constraint.
+	 * The clause containing the derived literal.
 	 */
-	private ArrayList<Literal> featuresRedundantConstr = null; // the feature from the redundant constraint
-
+	private Node derivedClause;
 	/**
-	 * Weight strings which occur in every generated explanation for a defect while searching for the shortest explanation.
+	 * The literal whose truth value was derived during the most recent propagation.
 	 */
-	HashMap<String, Integer> weightedExplanations = new HashMap<String, Integer>();
-
+	private Literal derivedLiteral;
+	
 	/**
-	 * Constructor. Used to explain a redundant constraint. 
-	 * 
-	 * @param oldModel The model without the redundant constraint
-	 * @param map The valueMap which contains all literals from the conjunctive normal form and is which used
-	 *            for bookkeeping (stores the name, reason, antecedents, premise and truth value of a literal)
-	 * @param features The features from the redundant constraint
+	 * Constructs a new instance of this class.
+	 * @param cnf the conjunctive normal form of the feature model
 	 */
-	public LTMS(IFeatureModel oldModel, HashMap<Object, Bookkeeping> map, ArrayList<Literal> features) {
-		this(oldModel);
-		valueMap = map;
-		featuresRedundantConstr = features;
+	public LTMS(Node cnf) {
+		this.cnf = cnf;
+		setClauseLiterals();
+		setVariableClauses();
 	}
-
+	
 	/**
-	 * Constructor. Used to explain dead or false-optional features.
-	 * 
-	 * @param newModel The model with the constraint which leads to dead feature(s)
-	 * @param map The valueMap which is used for bookkeeping
+	 * Sets the map from CNF clauses to the literals they contain.
 	 */
-	public LTMS(IFeatureModel newModel) {
-		model = newModel;
-	}
-
-	/**
-	 * Adds explanation part to the complete explanation (reason) if it is unique and not empty.
-	 * 
-	 * @param s The string to add to a reason
-	 */
-	private void addToReasonListOptionally(String s) {
-		if (!s.isEmpty() && !reason.contains(s)) {
-			reason.add(s);
+	private void setClauseLiterals() {
+		for (final Node cnfClause : cnf.getChildren()) {
+			clauseLiterals.put(cnfClause, cnfClause.getLiterals());
 		}
 	}
-
+	
 	/**
-	 * Explains why a constraint is redundant. As soon as a clause gets violated, an explanation is generated.
-	 * 
-	 * @param clauses The clauses of the conjunctive normal form of the feature model
-	 * @return reason An explanation for the redundant constraint
-	 * @throws IOException
+	 * Sets the map from variables to the CNF clauses containing them.
 	 */
-	public List<String> explainRedundantConstraint(Node[] clauses, HashMap<Object, Integer> map) {
-		reason.clear();
-		// if initial truth values lead to a false clause, explain immediately
-		if (isViolated(clauses)) {
-			ArrayList<Literal> literalList = getLiterals(violatedClause);
-			for (Literal l : literalList) {
-				String tmpReason = explainVariable(l);
-				addToReasonListOptionally(tmpReason);
-			}
-			//weight explanation strings according their occurrences 
-			for (String tmp : reason) {
-				if (Redundancy.getWeighted().containsKey(tmp)) {
-					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
-				} else {
-					Redundancy.getWeighted().put(tmp, 1);
+	private void setVariableClauses() {
+		for (final Node cnfClause : cnf.getChildren()) {
+			for (final Literal literal : clauseLiterals.get(cnfClause)) {
+				Set<Node> clauses = variableClauses.get(literal.var);
+				if (clauses == null) {
+					clauses = new LinkedHashSet<>();
+					variableClauses.put(literal.var, clauses);
 				}
-				Redundancy.setCntExpl(); // increase counter of explanations by 1				
-			}
-
-			return reason;
-		}
-		// if we are here, propagated values via BCP lead to a false clause
-		findOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
-		BCP(clauses);// true, if violation occured during BCP	
-		return shortestExpl(clauses, map, null, ExplanationMode.Redundancy);
-	}
-
-	/**
-	 * Explains why a feature is false optional. Sets the truth value of false-optional feature to false and the
-	 * truth value of its parent to true. Propagates this value until a violation in any occurs.
-	 * 
-	 * @param clauses The clauses of the conjunctive normal form of the feature model
-	 * @param falseoptional The literal-feature which is false-optional
-	 * @param parent The literal-parent of the false optional feature
-	 * @return reason An explanation why the feature is false-optional
-	 */
-	public List<String> explainFalseOpsFeature(Node[] clauses, Literal falseoptional, Literal parent) {
-		ArrayList<Literal> falsopts = new ArrayList<Literal>();
-		falsopts.add(parent);
-		falsopts.add(falseoptional);
-		reason.clear();
-		setTruthValToUnknown(clauses);
-		valueMap.get(parent.var).value = 1; // set parent of false optional feature to true
-		valueMap.get(parent.var).premise = true;
-		valueMap.get(falseoptional.var).value = 0; // set false optional feature to false
-		valueMap.get(falseoptional.var).premise = true;
-
-		// if initial truth values lead to a false clause, explain immediately
-		if (isViolated(clauses)) {
-			ArrayList<Literal> literalList = getLiterals(violatedClause);
-			for (Literal l : literalList) {
-				String tmpReason = explainVariable(l);
-				addToReasonListOptionally(tmpReason);
-			}
-			// remember first explanation strings in order to weight them later according their occurrences 
-			for (String tmp : reason) {
-				weightedExplanations.put(tmp, 1);
-				weightExpl(reason, weightedExplanations, 1);
-			}
-			return reason;
-		}
-		// if we are here, propagated values via BCP lead to a false clause
-		findOpenClauses(falsopts, clauses); // find unit-open clauses depending on initial truth values 
-		BCP(clauses); // propagate values and find further unit-open clauses
-		return shortestExpl(clauses, null, falseoptional, ExplanationMode.FalseOptionalFeature);
-	}
-
-	/**
-	 * Explains why a feature is dead. As soon as a violation occurs in a clause after truth value propagation,
-	 * an explanation is generated.
-	 * 
-	 * @param clauses The clauses of the conjunctive normal form of the feature model
-	 * @param deadF The dead feature
-	 * @return reason An explanation why the feature is dead
-	 */
-	public List<String> explainDeadFeature(Node[] clauses, Literal deadF) {
-		ArrayList<Literal> deads = new ArrayList<Literal>();
-		deads.add(deadF);
-		reason.clear();
-		setTruthValToUnknown(clauses);
-		valueMap.get(deadF.var).value = 1;
-		valueMap.get(deadF.var).premise = true;
-
-		// if initial truth values lead to a false clause, explain immediately
-		if (isViolated(clauses)) {
-			ArrayList<Literal> literalList = getLiterals(violatedClause);
-			for (Literal l : literalList) {
-				String tmpReason = explainVariable(l);
-				addToReasonListOptionally(tmpReason);
-			}
-			// remember first explanation strings in order to weight them later according their occurrences 
-			for (String tmp : reason) {
-				weightedExplanations.put(tmp, 1);
-				weightExpl(reason, weightedExplanations, 1);
-			}
-			return reason;
-		}
-		findOpenClauses(deads, clauses);
-		BCP(clauses);
-		return shortestExpl(clauses, null, deadF, ExplanationMode.DeadFeature);
-	}
-
-	/**
-	 * Generate all possible explanations and choose the shortest one. The length of an explanation
-	 * is measured by the amount of lines (parts) it consists of. Every part represents a relationship within 
-	 * the feature model tree topology or a cross-tree constraint.
-	 * 
-	 * @param expl The first generated explanation
-	 * @param clauses The clauses of the conjunctive normal form
-	 * @param map The map which stores the initial values for features from the redundant constraint
-	 * @return shortestExpl The shortest possible explanation which we can find (they might be shorter ones)
-	 */
-	@SuppressWarnings ("unchecked")
-	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
-		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
-		int allExpl = 1;
-
-		// count number of explanations outside this class due to different truth values for features from redundant constraint
-		Redundancy.setCntExpl();
-
-		// remember first explanation parts in order to weight them later according their occurrences 
-		if (mode != ExplanationMode.Redundancy) {
-			for (String tmp : shortestExpl) {
-				weightedExplanations.put(tmp, 1);
-			}
-		} else {
-			// remember explanation parts for different truth values of feat. from redundant constraint
-			for (String tmp : shortestExpl) {
-				if (Redundancy.getWeighted().containsKey(tmp)) {
-					Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
-				} else {
-					Redundancy.getWeighted().put(tmp, 1);
-				}
-			}
-		}
-		while (!stackOpenClause.isEmpty()) { 
-
-			// restore preconditions to start BCP algorithm again
-			reason.clear();
-			violatedClause = null;
-			setTruthValToUnknown(clauses);
-
-			switch (mode) {
-			case Redundancy: // parameter map is expected not to be null
-				for (Literal l : featuresRedundantConstr) {
-					valueMap.get(l.var).value = map.get(l.var); // set value of feature from redundant constraint according to invalid redundant constraint
-					valueMap.get(l.var).premise = true;
-				}
-				break;
-
-			case DeadFeature: // explain dead feature, set its initial value to true
-				valueMap.get(explLit.var).value = 1;
-				valueMap.get(explLit.var).premise = true;
-				break;
-
-			case FalseOptionalFeature:// explain false-optional feature, set its initial value to false
-				valueMap.get(explLit.var).value = 0;
-				valueMap.get(explLit.var).premise = true;
-				break;
-
-			default:
-				shortestExpl.add("unknown explanation mode");
-				return shortestExpl;
-			}
-			BCP(clauses); // generate new explanation with remaining clauses in stack 
-			if (!reason.isEmpty()) {
-
-				allExpl++;
-				Redundancy.setCntExpl();
-
-				// remember how often a certain string occurred in several explanations for the same defect
-				if (mode != ExplanationMode.Redundancy) {
-					for (String tmp : reason) {
-						if (weightedExplanations.containsKey(tmp)) {
-							weightedExplanations.put(tmp, weightedExplanations.get(tmp) + 1);
-						} else {
-							weightedExplanations.put(tmp, 1);
-						}
-					}
-				} else { // remember explanation parts for different truth values of feat. from redundant constraint
-					for (String tmp : reason) {
-						if (Redundancy.getWeighted().containsKey(tmp)) {
-							Redundancy.getWeighted().put(tmp, Redundancy.getWeighted().get(tmp) + 1);
-						} else {
-							Redundancy.getWeighted().put(tmp, 1);
-						}
-					}
-				}
-				if (reason.size() < shortestExpl.size()) { //remember only shortest explanation
-					shortestExpl = (List<String>) ((ArrayList<String>) reason).clone();
-				}
-			}
-		}
-		// if we are here, shortest explanation has been found
-		if (mode != ExplanationMode.Redundancy) {
-			weightExpl(shortestExpl, weightedExplanations, allExpl); // weight explanations parts within final explanation
-		} 
-		// the shortest explanation for a redundant constraint is weighted within class Redundancy since a final explanation
-		// consists of explanation parts which arise from different truth values which lead to an invalid redundant constraint.
-		return shortestExpl;
-	}
-
-	/**
-	 * Processes the shortest explanation and weights every part of this explanation according to its occurrence.
-	 * Explanation parts which occur most often possess a high probability to cause the defect to explain.
-	 * 
-	 * @param shortestExpl The shortest explanation
-	 * @param weightedParts The explanation parts to weight
-	 * @param cnt The number of explanations
-	 * @return shortest The shortest explanation with weighted explanation parts that occur most often
-	 */
-	public static List<String> weightExpl(List<String> shortestExpl, HashMap<String, Integer> weightedParts, int cntAllExpl) {
-
-		// remove all explanation parts which are not part of the shortest explanation
-		/*	Iterator<String> it = weighted.keySet().iterator();
-			while (it.hasNext()) {
-				String expl = it.next();
-				if (!shortest.contains(expl)) {
-					it.remove();
-				}
-			}*/
-		
-		// get max number of occurrences
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		for (String key : weightedParts.keySet()) {
-			list.add(weightedParts.get(key));
-		}
-		// weight explanation parts which exist in weighted map and in shortest explanation
-		Iterator<String> it2 = weightedParts.keySet().iterator();
-		while (it2.hasNext()) {
-			String explMap = it2.next();
-			for (ListIterator<String> itr = shortestExpl.listIterator(); itr.hasNext();) {
-				String explShortest = (String) itr.next(); // A => B
-				if (explMap.equals(explShortest)) {
-					int cntOccur = weightedParts.get(explMap);
-					itr.set(explShortest + "$" + cntOccur + "/" + cntAllExpl);
-					break;
-				}
-			}
-		}
-		return shortestExpl;
-	}
-
-	/**
-	 * Finds unit-open clauses depending on the initial truth value assumptions of
-	 * the features from the redundant constraint and pushes them to stack.
-	 * 
-	 * @param literal The literal from the redundant constraint whose value is initially set
-	 * @param allClauses All clauses of the conjunctive normal form
-	 */
-	private void findOpenClauses(ArrayList<Literal> literals, Node[] allClauses) {
-		for (Literal l : literals) {
-			boolean negated = (valueMap.get(l.var).value == 0);
-			for (Node cnfclause : allClauses) {
-				if (!hasNegLiteral(!negated, l, cnfclause)) {
-					continue;
-				}
-				if (isUnitOpen(cnfclause) != null && !stackOpenClause.contains(cnfclause)) {
-					stackOpenClause.push(cnfclause);
-					continue;
-				}
+				clauses.add(cnfClause);
 			}
 		}
 	}
+	
+	/**
+	 * Sets the premises to the given ones.
+	 * @param premises premises to set
+	 */
+	public void setPremises(Map<Object, Boolean> premises) {
+		clearPremises();
+		addPremises(premises);
+	}
+	
+	/**
+	 * Removes all premises.
+	 */
+	public void clearPremises() {
+		premises.clear();
+	}
+	
+	/**
+	 * Adds the given variable as a premise with the given truth value.
+	 * This premise is used later to arrive at the contradiction.
+	 * @param variable variable to be added as a premise
+	 * @param value truth value of the variable
+	 */
+	public void addPremise(Object variable, boolean value) {
+		premises.put(variable, value);
+	}
 
 	/**
-	 * Sets the value of a literal depending on its negation in the unit-open clause. Finds new unit-open
-	 * clauses and pushes them to stack.
-	 * 
-	 * @param literal The literal whose value is set using boolean constraint propagation
-	 * @param negated True, if the literal is negated in the open clause. Else, false
-	 * @return true, if the value of a literal is set without violating a clause. Else, return false
+	 * Adds all the given premises.
+	 * @param premises premises to add
 	 */
-	private boolean setValue(Literal literal, boolean negated, Node[] allClauses) {
-
-		// propagate value of variable to be true or false
-		valueMap.get(literal.var).value = literal.positive ? 1 : 0;
-
-		// for each clause in all clauses of the cnf that contains not this-literal
-		for (Node cnfclause : allClauses) {
-			if (!hasNegLiteral(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
+	public void addPremises(Map<Object, Boolean> premises) {
+		this.premises.putAll(premises);
+	}
+	
+	/**
+	 * Returns an explanation why the premises lead to a contradiction in the conjunctive normal form.
+	 * Generates multiple explanations and returns the shortest one among them.
+	 * Note that this may not be the shortest one possible.
+	 * @return an explanation why the premises lead to a contradiction in the conjunctive normal form
+	 */
+	public Explanation getExplanation() {
+		final Explanation cumulatedExplanation = new Explanation();
+		cumulatedExplanation.setExplanationCount(0);
+		Explanation shortestExplanation = null;
+		for (final Explanation explanation : getExplanations()) {
+			cumulatedExplanation.addExplanation(explanation); //Remember that this explanation was generated.
+			if (shortestExplanation == null || explanation.getReasonCount() < shortestExplanation.getReasonCount()) {
+				shortestExplanation = explanation; //Remember the shortest explanation.
+			}
+		}
+		if (shortestExplanation == null) {
+			return null;
+		}
+		shortestExplanation.setCounts(cumulatedExplanation); //Remember the reason and explanations that were generated before.
+		return shortestExplanation;
+	}
+	
+	/**
+	 * Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form.
+	 * This is done by propagating the truth values until a contradiction is found.
+	 * Then, the proofs for the implications are recalled.
+	 * This is repeated several times to find multiple explanations, some of which might be shorter than others.
+	 * @return multiple explanations why the premises lead to a contradiction in the conjunctive normal form
+	 */
+	public List<Explanation> getExplanations() {
+		reset();
+		final List<Explanation> explanations = new LinkedList<>();
+		if (isContradicted()) { //If the initial truth values already lead to a contradiction...
+			explanations.add(getContradictionExplanation()); //... explain immediately.
+			return explanations;
+		}
+		unitOpenClauses.clear();
+		pushUnitOpenClauses(); //Start iterating over the first unit-open clauses using the initial truth value assumptions.
+		while (!unitOpenClauses.isEmpty()) {
+			derivedClause = unitOpenClauses.removeLast();
+			derivedLiteral = getUnboundLiteral(derivedClause);
+			if (derivedLiteral == null) { //not actually unit-open
 				continue;
 			}
-			// if we are here, we may have found a unit-open clause
-			if (isUnitOpen(cnfclause) != null) {
-				stackOpenClause.push(cnfclause);
-				continue;
+			propagate(); //Propagate the truth values by deriving a new truth value.
+			pushUnitOpenClauses();
+			if (isContradicted()) { //If the propagation lead to a contradiction...
+				explanations.add(getContradictionExplanation()); //... explain the reason for the contradiction.
+				/*
+				 * At this point, the found explanation could already be returned.
+				 * Instead, keep generating new explanations as there might be a shorter one among them.
+				 * To this end, reset the derived truth values (but not the premises) and keep iterating.
+				 */
+				reset();
 			}
-			if (!isViolated(cnfclause)) {
-				continue;
-			}
-			return false;
 		}
-		return true;
+		return explanations;
 	}
-
+	
 	/**
-	 * Checks if a clause is violated (all truth values of literals are false).
-	 * 
-	 * @param clause The clause to check
-	 * @return true, if the clause is violated. Else, return false
+	 * Clears the internal state for a new explanation.
+	 * Adds the premises to the variable values.
 	 */
-	private boolean isViolated(Node clause) {
-		// truth values of all literals must be false
-		ArrayList<Literal> literals = getLiterals(clause);
-		for (Literal lit : literals) {
-			if (evaluateValue(lit) == 0) {
-				if (valueMap.get(lit.var).reason == null && valueMap.get(lit.var).premise == false) { // features from red. constraint can't have antecedents
-					justify(lit, clause);// set reason and antecedent
+	private void reset() {
+		variableValues.clear();
+		reasons.clear();
+		derivedLiteral = null;
+		variableValues.putAll(premises);
+	}
+	
+	/**
+	 * Pushes the unit-open clauses to stack.
+	 */
+	private void pushUnitOpenClauses() {
+		unitOpenClauses.addAll(getUnitOpenClauses());
+	}
+	
+	/**
+	 * Returns the unit-open clauses.
+	 * @return the unit-open clauses
+	 */
+	private Set<Node> getUnitOpenClauses() {
+		final Collection<Node> dirtyClauses = derivedLiteral == null ? Arrays.asList(cnf.getChildren()) : variableClauses.get(derivedLiteral.var);
+		final Set<Node> unitOpenClauses = new LinkedHashSet<>();
+		for (final Node dirtyClause : dirtyClauses) {
+			if (isUnitOpenClause(dirtyClause)) {
+				unitOpenClauses.add(dirtyClause);
+			}
+		}
+		return unitOpenClauses;
+	}
+	
+	/**
+	 * Returns true iff the given clause is unit-open.
+	 * A CNF clause is unit-open iff one of the contained literals evaluates to unknown and all others to false.
+	 * @param cnfClause clause in conjunctive normal form
+	 * @return true iff the given clause is unit-open
+	 */
+	private boolean isUnitOpenClause(Node cnfClause) {
+		return getUnboundLiteral(cnfClause) != null;
+	}
+	
+	/**
+	 * Returns the unbound literal in the given clause or null if no such literal exists.
+	 * A literal is unbound iff it evaluates to unknown while all other literals in the same CNF clause evaluate to false.
+	 * Such a literal is critical for the satisfiability of the clause and as such the entire CNF.
+	 * @param cnfClause clause in conjunctive normal form
+	 * @return the unbound literal in the given clause or null if no such literal exists
+	 */
+	private Literal getUnboundLiteral(Node cnfClause) {
+		Literal unboundLiteral = null;
+		for (final Literal literal : clauseLiterals.get(cnfClause)) {
+			if (!variableValues.containsKey(literal.var)) { //unknown value
+				if (unboundLiteral == null) {
+					unboundLiteral = literal;
+				} else { //more than one unknown literal found, thus actually a non-unit-open clause 
+					return null;
 				}
-				continue;
+			} else if (literal.getValue(variableValues)) { //true value
+				return null;
+			} else { //false value
+				//irrelevant
 			}
-			return false;
 		}
-		violatedClause = clause; // remember violated clause for explanation
-		return true;
+		return unboundLiteral;
 	}
-
+	
 	/**
-	 * Checks if a single clause in the conjunctive normal form is violated.
-	 * 
-	 * @param n The clauses to check
-	 * @return true, if the clause is violated. Else, return false
+	 * Returns true iff the conjunctive normal form evaluates to false.
+	 * A CNF evaluates to false iff any of its clauses evaluates to false.
+	 * @return true iff the conjunctive normal form evaluates to false
 	 */
-	private boolean isViolated(Node[] n) {
-		for (Node cnfclause : n) {
-			if (!isViolated(cnfclause)) {
-				continue;
-			}
-			return true; // clause is violated, all literals are 0
-		}
-		return false; // clause is not violated
-	}
-
-	/**
-	 * Checks if a clause contains a not-literal.
-	 * 
-	 * @param neg A representation of the opposite sign of a literal
-	 * @param l The literal
-	 * @param node A clause which may contain a not-literal
-	 * @return true, if a clause contains not-literal. Else, return false.
-	 */
-	private boolean hasNegLiteral(boolean neg, Literal l, Node node) {
-		ArrayList<Literal> literals = getLiterals(node);
-		for (Literal lit : literals) {
-			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) {
+	private boolean isContradicted() {
+		final Collection<Node> dirtyClauses = derivedLiteral == null ? Arrays.asList(cnf.getChildren()) : variableClauses.get(derivedLiteral.var);
+		for (final Node dirtyClause : dirtyClauses) {
+			if (isViolatedClause(dirtyClause)) {
+				violatedClause = dirtyClause;
 				return true;
 			}
-			if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) {
-				continue;
-			}
-			return true;
 		}
 		return false;
 	}
-
+	
 	/**
-	 * Checks if a clause is unit-open. In a unit-open clause, the truth values of all literals 
-	 * are false except for one literal whose truth value is unknown.
-	 * 
-	 * @param clause The clause to check if it is unit-open
-	 * @return openLiteral The literal whose value is unknown
+	 * Returns true iff the given CNF clause evaluates to false.
+	 * A CNF clause evaluates to false iff all of its literals evaluate to false.
+	 * @param cnfClause clause in conjunctive normal form
+	 * @return true iff the given CNF clause evaluates to false
 	 */
-	private Literal isUnitOpen(Node clause) {
-		Literal openLiteral = null;
-		ArrayList<Literal> literals = getLiterals(clause);
-		for (Literal lit : literals) {
-			switch (evaluateValue(lit)) {
-			case 0: { // do nothing
-				break;
+	private boolean isViolatedClause(Node cnfClause) {
+		for (final Literal literal : clauseLiterals.get(cnfClause)) {
+			if (!variableValues.containsKey(literal.var)) { //unknown value
+				return false;
+			} else if (literal.getValue(variableValues)) { //true value
+				return false;
+			} else { //false value
+				//irrelevant
 			}
-			case 1: { //can't be open because truth value of literal is true and therefore the clause
-				return null;
-			}
-			case -1: { // -1: is unit-open
-				if (openLiteral == null) {
-					openLiteral = lit; //remember first open literal
-					break;
-				}
-				return null; // truth value of more than one literal is unknown - can't be unit-open
-			}
-			}
-		}
-		// if we get this far, this is a unit-open clause or a unsatisfied clause, else, null is returned
-		return openLiteral;
-	}
-
-	/**
-	 * Checks if the truth value of a literal is true, false or unknown.
-	 * 
-	 * @param l the literal to evaluate the truth value for.
-	 * @return value An int which represents the truth value of a literal
-	 */
-	private int evaluateValue(Literal l) {
-		if (!l.positive) {
-			return this.negate(valueMap.get(l.var).value);
-		}
-		return valueMap.get(l.var).value;
-	}
-
-	/**
-	 * Returns the truth value of a literal: true (1), false (0) or unknown (-1).
-	 * 
-	 * @param v the literal to evaluate the truth value for
-	 * @return an int which represents the truth value of a literal
-	 */
-	private int negate(int l) {
-		switch (l) {
-		case 1: {
-			return 0;
-		}
-		case 0: {
-			return 1;
-		}
-		case -1: {
-			return -1;
-		}
-		}
-		Util.fatalError((String) ("Unknown value: " + l));
-		return -3; // will never get here
-	}
-
-	/**
-	 * Sets the reason and antecedents for a literal's truth value.
-	 * 
-	 * @param l The literal to set its reason and antecedents
-	 * @param clause The clause of the literal
-	 */
-	private void justify(Literal l, Node clause) {
-		valueMap.get(l.var).reason = clause;
-		valueMap.get(l.var).antecedents = new ArrayList<Literal>();
-
-		ArrayList<Literal> literals = getLiterals(clause);
-		for (Literal lit : literals) {
-
-			if (lit.var.toString().equals(l.var.toString())) {
-				continue;
-			}
-			valueMap.get(l.var).antecedents.add(lit); // all variables from same clause added to antecedents which are not this variable
-		}
-	}
-
-	/**
-	 * Core of the logic truth maintenance system. The BCP algorithm maintains a stack of unit-open clauses.
-	 * Changes the unknown assignment of a literals truth value to true and sets its reason and antecedents. Finds
-	 * new unit-open clauses and pushes them to stack. Whenever it encounters a violated clause, it signals a
-	 * contradiction.
-	 * 
-	 * @param cnfclauses The clauses of the conjunctive normal form of a feature model
-	 * @return true, if all unit-open clauses have been processed and no violated clause have been encountered. Else, return false.
-	 */
-	private boolean BCP(Node[] cnfclauses) {
-		while (!stackOpenClause.empty()) {
-			Node openclause = stackOpenClause.pop();
-			Literal l = isUnitOpen(openclause);
-			if (l == null) {
-				continue;
-			}
-			justify(l, openclause); //set reason and antecedents explanation
-			if (setValue(l, !l.positive, cnfclauses)) { // set propagated value and push unit-open clauses to stack
-				continue;
-			}
-
-			// BCP is finished, all clauses are checked or a clause is violated
-			ArrayList<Literal> literalsFromViolatedClause = getLiterals(violatedClause);
-			ArrayList<Literal> literalsFromReason = getLiterals(valueMap.get(l.var).reason);
-
-			// first, explain the violated clause and then start explaining from the current reason-clause
-			if (!literalsFromViolatedClause.equals(literalsFromReason)) {
-				for (Literal lit : literalsFromViolatedClause) {
-					String varExpl = explainVariable(lit);
-					addToReasonListOptionally(varExpl);
-				}
-			}
-			explainValue(l);
-			return false;
 		}
 		return true;
 	}
-
+	
 	/**
-	 * Returns an explanation why a variable has its truth value by iterating its antecedents
-	 * and collecting their reasons. Only called to explain the BCP stack, not the violated clause.
-	 * 
-	 * @param l The literal to explain
+	 * Does one iteration of BCP.
+	 * Changes the assignment of a literal's variable from unknown to whatever makes it evaluate to true in the current clause.
+	 * Also sets its reason and antecedents.
 	 */
-	private void explainValue(Literal l) {
-		ArrayList<Literal> allAntencedents = new ArrayList<Literal>();
-		allAntencedents.add(l);
-		collectAntecedents(l, allAntencedents); //collect all variables together that contribute to this variable's value
-
-		// explain relationship of every antecedent with the literal in focus (needed to find correct feature attribute)
-		for (Literal v : allAntencedents) {
-			String tmp = explainVariable(v);
-			addToReasonListOptionally(tmp);
-
-			// explain every antecedent from its reason in map 
-			Node reasonFromMap = valueMap.get(v.var).reason;
-			if (reasonFromMap != null) {
-				Literal litFromMap = getLiteralFromMap(reasonFromMap, v);
-				String explFromMap = explainVariable(litFromMap);
-				addToReasonListOptionally(explFromMap);
+	private void propagate() {
+		deriveValue();
+		justify(derivedLiteral.var, derivedClause);
+	}
+	
+	/**
+	 * Satisfies the current unit-open clause by making its unbound literal true or negated false.
+	 */
+	private void deriveValue() {
+		variableValues.put(derivedLiteral.var, derivedLiteral.positive);
+	}
+	
+	/**
+	 * Sets a variable's reason and antecedents.
+	 * @param variable variable to set
+	 * @param cnfClause clause containing the literal
+	 */
+	private void justify(Object variable, Node cnfClause) {
+		reasons.put(variable, cnfClause);
+	}
+	
+	/**
+	 * Returns an explanation why the premises lead to a contradiction.
+	 * @return an explanation why the premises lead to a contradiction
+	 */
+	private Explanation getContradictionExplanation() {
+		final Explanation explanation = new Explanation();
+		
+		//Include literals from the violated clause so it shows up in the explanation.
+		Literal violatedLiteral = null;
+		for (final Literal literal : clauseLiterals.get(violatedClause)) {
+			if (literal.getSourceAttribute() == FeatureAttribute.CHILD) {
+				explanation.addUniqueReason(violatedClause, literal);
+			} else {
+				violatedLiteral = literal;
 			}
 		}
-	}
-
-	/**
-	 * Forms a union of all antecedents.
-	 * 
-	 * @param l The literal whose antecedents shall be collected
-	 * @param antecedents A list which is used to collect the antecedents.
-	 */
-	private void collectAntecedents(Literal l, ArrayList<Literal> antecedents) {
-		if (valueMap.get(l.var).antecedents == null) {
-			return;
+		if (explanation.getReasons().isEmpty()) {
+			explanation.addUniqueReason(violatedClause, violatedLiteral);
 		}
-		for (Literal antecendent : valueMap.get(l.var).antecedents) { // collect antecedents recursively
-			if (antecedents.contains(antecendent))
-				continue;
-			antecedents.add(antecendent);
-			collectAntecedents(antecendent, antecedents);
+
+		//Get all antecedents of the derived literal.
+		if (derivedLiteral == null) { //immediate contradiction, thus no propagations, thus no antecedents
+			return explanation;
 		}
-	}
-
-	/**
-	 * Explains a truth value of a literal. Uses an enumeration to choose between explaining a
-	 * relationship to parent or a cross-tree constraint.
-	 * 
-	 * @param l The literal to explain
-	 * @return s An explanation for the literal
-	 */
-	private String explainVariable(Literal l) {
-		String s = "";
-		IFeature f = FeatureUtils.getFeatureTable(model).get(l.var);
-
-		// if attribute is UP, explain relationship to parent
-		if (l.getSourceAttribute() == Literal.FeatureAttribute.Up) {
-			if (FeatureUtils.getParent(f) != null) {
-				IFeature parent = FeatureUtils.getParent(f);
-				String parentName = parent.getName();
-				String featureName = f.getName();
-
-				// if parent is alternative, explain alternative relationship between all children
-				if (parent.getStructure().isAlternative()) {
-					s += f.getName() + " is alternative child of " + parentName;
-				}
-				// if parent is or, explain or relationship between all children
-				else if (parent.getStructure().isOr()) {
-					s += f.getName() + " is or child of " + parentName;
-				} else { // if parent is not "alt" or "or", then feature is mandatory or optional child
-					s = featureName + (FeatureUtils.isMandatory(f) ? " is mandatory" : " is") + " child of " + parent;
-				}
+		final Map<Literal, Node> allAntecedents = new LinkedHashMap<>();
+		allAntecedents.put(derivedLiteral, derivedClause);
+		for (final Entry<Literal, Node> e : getAllAntecedents(derivedLiteral).entrySet()) {
+			final Node value = allAntecedents.get(e.getKey());
+			if (value == null) {
+				allAntecedents.put(e.getKey(), e.getValue());
 			}
 		}
-		//if attribute is root, print "ROOT" as explanation only
-		if (l.getSourceAttribute() == Literal.FeatureAttribute.Root) {
-			s = l.var.toString() + " is ROOT";
-		}
-		// if attribute is CONSTRAINT, print origin constraint as explanation only
-		if (l.getSourceAttribute() == Literal.FeatureAttribute.Constraint) {
-			s = (FeatureUtils.getConstraint(model, l.getSourceIndex())).toString() + " is Constraint";
-		}
-		return s;
-	}
-
-	/**
-	 * Sets the truth value of every literal in the conjunctive normal form to -1 (unknown)
-	 * 
-	 * @param clausesFromCNF The clauses of the conjunctive normal form
-	 */
-	private void setTruthValToUnknown(Node[] clausesFromCNF) {
-		for (int j = 0; j < clausesFromCNF.length; j++) { // for all clauses of the cnf 
-			Node clause = clausesFromCNF[j];
-			Node[] features = clause.getChildren();
-
-			if (features == null) {
-				final Literal literal = (Literal) clause;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
-				valueMap.put(literal.var, expl);
+		
+		//Explain every antecedent and its reason.
+		for (final Entry<Literal, Node> e : allAntecedents.entrySet()) {
+			final Literal antecedentLiteral = e.getKey();
+			final Node antecedentClause = e.getValue();
+			switch (antecedentLiteral.getSourceAttribute()) {
+				case CHILD:
+				case ROOT:
+				case CONSTRAINT:
+					explanation.addUniqueReason(antecedentClause, antecedentLiteral);
+					break;
+				default:
+					break;
+			}
+			final Node reason = reasons.get(antecedentLiteral.var);
+			if (reason == null) { //premise, thus no reason to explain
 				continue;
 			}
-			for (Node feature : features) {
-				final Literal literal = (Literal) feature;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
-				valueMap.put(literal.var, expl);
-			}
-		}
-	}
-
-	/**
-	 * Returns a list which contains the literals of a given node.
-	 * 
-	 * @param node The node which contains the literals
-	 * @return res A list which contains the literals
-	 */
-	private ArrayList<Literal> getLiterals(Node node) {
-		ArrayList<Literal> res = new ArrayList<Literal>();
-		if (node instanceof Literal) {
-			res.add((Literal) node);
-			return res;
-		}
-		Node[] childs = node.getChildren();
-		if (childs != null) {
-			for (Node child : childs) {
-				res.addAll(getLiterals(child));
-			}
-		}
-		return res;
-	}
-
-	/**
-	 * Returns a certain literal from a node.
-	 * 
-	 * @param node The node which contains the literal
-	 * @param l The literal with the same name as the literal to return
-	 * @return res The specified literal
-	 */
-	private Literal getLiteralFromMap(Node node, Literal l) {
-		Literal res = null;
-		if (node instanceof Literal) {
-			Literal lit = (Literal) node;
-			if (lit.var.toString().equals(l.var.toString()))
-				res = lit;
-			return res;
-		}
-		Node[] childs = node.getChildren();
-		if (childs != null) {
-			for (Node child : childs) {
-				res = getLiteralFromMap((child), l);
-				if (res != null) {
-					return res;
+			for (final Literal literal : clauseLiterals.get(reason)) {
+				if (literal.var.equals(antecedentLiteral.var)) {
+					switch (literal.getSourceAttribute()) {
+						case CHILD:
+						case ROOT:
+						case CONSTRAINT:
+							explanation.addUniqueReason(reason, literal);
+							break;
+						default:
+							break;
+					}
+					break;
 				}
 			}
 		}
-		return res;
+		return explanation;
+	}
+	
+	/**
+	 * Returns all antecedents of the given variable recursively.
+	 * @param literal literal with possible antecedents
+	 * @return all antecedents of the given variable recursively
+	 */
+	private Map<Literal, Node> getAllAntecedents(Literal literal) {
+		final Node reason = reasons.get(literal.var);
+		if (reason == null) {
+			return Collections.emptyMap();
+		}
+		final Map<Literal, Node> allAntecedents = new LinkedHashMap<>();
+		for (final Literal antecedent : clauseLiterals.get(reason)) {
+			if (antecedent.var.equals(literal.var) || allAntecedents.containsKey(antecedent)) {
+				continue;
+			}
+			allAntecedents.put(antecedent, reason);
+			for (final Entry<Literal, Node> e : getAllAntecedents(antecedent).entrySet()) {
+				final Node value = allAntecedents.get(e.getKey());
+				if (value == null) {
+					allAntecedents.put(e.getKey(), e.getValue());
+				}
+			}
+		}
+		return allAntecedents;
 	}
 }

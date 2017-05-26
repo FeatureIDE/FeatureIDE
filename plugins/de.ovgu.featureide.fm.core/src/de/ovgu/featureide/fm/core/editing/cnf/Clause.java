@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,18 +34,18 @@ public class Clause {
 	protected final int[] literals;
 
 	private final long hashValue;
+	private final int hashCode;
 
 	public Clause(int... literals) {
 		this.literals = literals;
 		Arrays.sort(this.literals);
 
-		//		final long smallestLiteral = literals[0];
 		int literalHash = 0;
 		for (int literal : literals) {
-			literalHash |= (1 << (literal % HASHSIZE));
+			literalHash |= (1 << (Math.abs(literal) % HASHSIZE));
 		}
-		//		hashValue = (smallestLiteral << HASHSIZE) | literalHash;
 		hashValue = literalHash;
+		hashCode = Arrays.hashCode(literals);
 	}
 
 	public int[] getLiterals() {
@@ -63,7 +63,7 @@ public class Clause {
 
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(literals);
+		return hashCode;
 	}
 
 	@Override
@@ -133,14 +133,15 @@ public class Clause {
 	 * @param clause1 first clause
 	 * @param clause2 second clause
 	 * 
-	 * @return the larger clause (can then be removed from formula)
+	 * @return The larger clause (can then be removed from formula). <br/>
+	 * 	If both clauses are equal, the first clause is returned.
 	 */
 	public static Clause contained(Clause clause1, Clause clause2) {
 		final int[] literals1 = clause1.literals;
 		final int[] literals2 = clause2.literals;
 
 		if (literals1.length == literals2.length) {
-			return (Arrays.equals(literals1, literals2)) ? clause1 : null;
+			return (clause1.hashValue == clause2.hashValue && Arrays.equals(literals1, literals2)) ? clause1 : null;
 		} else {
 			final long combinedHash = clause1.hashValue & clause2.hashValue;
 			if (literals1.length < literals2.length) {

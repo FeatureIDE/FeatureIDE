@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,9 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
-import java.io.StringReader;
-
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -37,15 +35,15 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class GuidslFormat implements IFeatureModelFormat {
 	
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + GuidslFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GuidslFormat.class.getSimpleName();
 	
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
-		final GuidslReader guidslReader = new GuidslReader(featureModel);
+		final GuidslReader guidslReader = new GuidslReader();
 		try {
-			guidslReader.parseInputStream(new StringReader(source.toString()));
+			guidslReader.parseInputStream(featureModel, source.toString());
 		} catch (UnsupportedModelException e) {
 			problemList.add(new Problem(e, e.lineNumber));
 		}
@@ -55,12 +53,12 @@ public class GuidslFormat implements IFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		return new GuidslWriter(featureModel).writeToString();
+		return new GuidslWriter().writeToString(featureModel);
 	}
 
 	@Override
 	public String getSuffix() {
-		return "guidsl";
+		return "m";
 	}
 
 	@Override

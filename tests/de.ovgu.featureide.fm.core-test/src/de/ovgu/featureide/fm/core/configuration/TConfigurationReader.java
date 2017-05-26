@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,20 +21,17 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Test class for the {@link ConfigurationReader}.
@@ -44,55 +41,47 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  */
 public class TConfigurationReader {
 
-protected static File MODEL_FILE_FOLDER = getFolder();
-	
+	private static final String FEATUREMODEL_PATH = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/";
+
+	protected static File MODEL_FILE_FOLDER = getFolder();
+
 	private static final FileFilter filter = new FileFilter() {
 		@Override
 		public boolean accept(File pathname) {
 			return pathname.getName().endsWith(".xml");
 		}
 	};
-	
 
-	
-	String text = ""; 
+	String text = "";
 	InputStream a; // = new InputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
-	
+
 	private IFeatureModel FM_test_1 = init("test_5.xml");
-	
-	
-	private static File getFolder() { 
-		File folder =  new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/"); 
-		if (!folder.canRead()) { 
-			folder =  new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath()); 
-		} 
-		return folder; 
+
+	private static File getFolder() {
+		File folder = new File(FEATUREMODEL_PATH);
+		if (!folder.canRead()) {
+			folder = new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
+		}
+		return folder;
 	}
-	
-	
+
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-		FeatureModelingFMExtension comp = new FeatureModelingFMExtension();
-		fm.getFMComposerManager(null).setComposerID("de.ovgu.featureide.core.FeatureModeling", comp);
-		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
+		IFeatureModel fm = null;
+		File[] listFiles = MODEL_FILE_FOLDER.listFiles(filter);
+		assertNotNull(listFiles);
+		for (File f : listFiles) {
 			if (f.getName().equals(name)) {
-				try {
-					new XmlFeatureModelReader(fm).readFromFile(f);
+				fm = FeatureModelManager.readFromFile(f.toPath());
+				if (fm != null) {
 					break;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (UnsupportedModelException e) {
-					e.printStackTrace();
 				}
 			}
 		}
 		return fm;
-	}	
-	
-	
+	}
+
 	@Test
-	public void isValidConfiguration() 
-	{
+	public void isValidConfiguration() {
 		final Configuration c = new Configuration(FM_test_1, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C#");
@@ -101,86 +90,75 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	}
 
 	@Test
-	public void isValidConfiguration2() 
-	{
-			Configuration c = new Configuration(FM_test_1, false);
-			c.setManual("C#", Selection.SELECTED);
-			c.setManual("Python Ruby", Selection.SELECTED);
-			c.setManual("Bash   script   ", Selection.UNSELECTED);
-			c.setManual("C++", Selection.SELECTED);
-			assertFalse(c.isValid());
+	public void isValidConfiguration2() {
+		Configuration c = new Configuration(FM_test_1, false);
+		c.setManual("C#", Selection.SELECTED);
+		c.setManual("Python Ruby", Selection.SELECTED);
+		c.setManual("Bash   script   ", Selection.UNSELECTED);
+		c.setManual("C++", Selection.SELECTED);
+		assertFalse(c.isValid());
 	}
-	
-	
+
 	@Test
-	public void isValidConfiguration3() 
-	{
-			Configuration c = new Configuration(FM_test_1, true);
-			c.setManual("C#", Selection.SELECTED);
-			c.setManual("Python Ruby", Selection.SELECTED);
-			c.setManual("Bash   script   ", Selection.SELECTED);
-			c.setManual("C++", Selection.SELECTED);
-			assertTrue(c.isValid());
+	public void isValidConfiguration3() {
+		Configuration c = new Configuration(FM_test_1, true);
+		c.setManual("C#", Selection.SELECTED);
+		c.setManual("Python Ruby", Selection.SELECTED);
+		c.setManual("Bash   script   ", Selection.SELECTED);
+		c.setManual("C++", Selection.SELECTED);
+		assertTrue(c.isValid());
 	}
-	
-	
+
 	@Test
-	public void isValidConfiguration4() 
-	{
+	public void isValidConfiguration4() {
 		Configuration c = new Configuration(FM_test_1, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \"");
 		assertFalse(c.isValid());
 	}
-	
+
 	@Test
-	public void isValidConfiguration5() 
-	{
+	public void isValidConfiguration5() {
 		Configuration c = new Configuration(FM_test_1, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" \"Python Ruby\"");
 		assertTrue(c.isValid());
 	}
-	
+
 	@Test
-	public void isValidConfiguration6() 
-	{
+	public void isValidConfiguration6() {
 		Configuration c = new Configuration(FM_test_1, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" \n\"Python Ruby\" \n\"C++\"");
 		assertTrue(c.isValid());
 	}
-	
+
 	@Test
-	public void isValidConfiguration7() 
-	{
+	public void isValidConfiguration7() {
 		Configuration c = new Configuration(FM_test_1, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script    \n\"Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
-	
+
 	@Test
-	public void isValidConfiguration8() 
-	{
+	public void isValidConfiguration8() {
 		Configuration c = new Configuration(FM_test_1, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \nj ute \n \"Bash   script    \"\n\"Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
-	
+
 	@Test
-	public void isValidConfiguration9() 
-	{
+	public void isValidConfiguration9() {
 		Configuration c = new Configuration(FM_test_1, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
-	
+
 	@Test
-	public void isValidConfiguration10() 
-	{
+	public void isValidConfiguration10() {
 		Configuration c = new Configuration(FM_test_1, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "jute \"Bash   script   \" \"Python C# Ruby\" \"C++\"");

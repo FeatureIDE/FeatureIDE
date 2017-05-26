@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -122,7 +122,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 */
 	private boolean removeConstraint(Object element) {
 		if (element instanceof ConstraintEditPart) {
-			IConstraint constraint = ((ConstraintEditPart) element).getConstraintModel().getObject();
+			IConstraint constraint = ((ConstraintEditPart) element).getModel().getObject();
 			operations.add(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
 		} else if (element instanceof IConstraint) {
@@ -145,7 +145,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 		if (element instanceof IFeature) {
 			feature = ((IFeature) element);
 		} else if (element instanceof FeatureEditPart) {
-			feature = ((FeatureEditPart) element).getFeature().getObject();
+			feature = ((FeatureEditPart) element).getModel().getObject();
 		}
 		if (feature != null) {
 			final IFeature parent = FeatureUtils.getParent(feature);

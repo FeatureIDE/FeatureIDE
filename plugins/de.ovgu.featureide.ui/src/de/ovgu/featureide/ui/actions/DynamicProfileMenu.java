@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.ui.actions;
 
 import org.eclipse.core.resources.IProject;
@@ -24,6 +44,7 @@ import org.eclipse.ui.internal.Workbench;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -41,12 +62,13 @@ public class DynamicProfileMenu extends ContributionItem {
 	private AddProfileColorSchemeAction addProfileSchemeAction;
 	private RenameProfileColorSchemeAction renameProfileSchemeAction;
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
-	private IFeatureProject myFeatureProject = getCurrentFeatureProject();
-	private IFeatureModel featureModel = myFeatureProject.getFeatureModel();
+	private final IFeatureModel featureModel; {
+		IFeatureProject curFeatureProject = getCurrentFeatureProject();
+		featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
+	}
 	private boolean multipleSelected = isMultipleSelection();
 
 	public DynamicProfileMenu() {
-
 	}
 
 	public DynamicProfileMenu(String id) {
@@ -58,10 +80,12 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 	@Override
 	public void fill(Menu menu, int index) {
-		MenuManager man = new MenuManager("Color Scheme", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
+		if (featureModel == null) {
+			return;
+		}
+		MenuManager man = new MenuManager("Color Scheme Menu", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
 		man.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager m) {
-
 				fillContextMenu(m);
 			}
 		});
@@ -72,7 +96,6 @@ public class DynamicProfileMenu extends ContributionItem {
 
 		man.setVisible(true);
 		createActions();
-
 	}
 
 	/**
@@ -113,7 +136,6 @@ public class DynamicProfileMenu extends ContributionItem {
 		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Color Scheme", featureModel);
 		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", featureModel);
 		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Color Scheme", featureModel);
-
 	}
 
 	/**
@@ -124,7 +146,6 @@ public class DynamicProfileMenu extends ContributionItem {
 
 		ISelection selection = selectionService.getSelection();
 		return (IStructuredSelection) selection;
-
 	}
 
 	/**
@@ -150,20 +171,23 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 	private static IFeatureProject getCurrentFeatureProject() {
 		final Object element = getIStructuredCurrentSelection().getFirstElement();
-		if (element instanceof IResource) {
-			return CorePlugin.getFeatureProject((IResource) element);
-		} else if (element instanceof PackageFragmentRootContainer) {
-			IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
-			return CorePlugin.getFeatureProject(jProject.getProject());
-		} else if (element instanceof IJavaElement) {
-			return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
-		} else if (element instanceof IAdaptable) {
-			final IProject project = (IProject)((IAdaptable) element).getAdapter(IProject.class);
-			if (project != null) {
-				return CorePlugin.getFeatureProject(project);
+		if (element != null) {
+			if (element instanceof IResource) {
+				return CorePlugin.getFeatureProject((IResource) element);
+			} else if (element instanceof PackageFragmentRootContainer) {
+				IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
+				return CorePlugin.getFeatureProject(jProject.getProject());
+			} else if (element instanceof IJavaElement) {
+				return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
+			} else if (element instanceof IAdaptable) {
+				final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+				if (project != null) {
+					return CorePlugin.getFeatureProject(project);
+				}
 			}
+			throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
 		}
-		throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
+		return null;
 	}
 
 }

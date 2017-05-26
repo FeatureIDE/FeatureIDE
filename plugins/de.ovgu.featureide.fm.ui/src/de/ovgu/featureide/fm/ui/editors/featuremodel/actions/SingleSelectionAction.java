@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -107,8 +107,8 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 		Object part = selection.getFirstElement();
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected)
-			return ((ConnectionEditPart) part).getConnectionModel().getTarget().getObject();
-		return ((FeatureEditPart) part).getFeature().getObject();
+			return ((ConnectionEditPart) part).getModel().getTarget().getObject();
+		return ((FeatureEditPart) part).getModel().getObject();
 	}
 
 	private void selectionChanged(boolean oneSelected) {
@@ -134,7 +134,7 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 	public void propertyChange(FeatureIDEEvent event) {
 		EventType prop = event.getEventType();
 		if (EventType.GROUP_TYPE_CHANGED.equals(prop) || EventType.MANDATORY_CHANGED.equals(prop) || EventType.PARENT_CHANGED.equals(prop) || EventType.HIDDEN_CHANGED.equals(prop)
-				|| EventType.COLOR_CHANGED.equals(prop)) {
+				|| EventType.COLOR_CHANGED.equals(prop) || EventType.COLLAPSED_CHANGED.equals(prop)) {
 			updateProperties();
 		}
 	}

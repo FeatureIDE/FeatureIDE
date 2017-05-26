@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,21 +20,23 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Abstract eclipse job with support for {@link JobFinishListener}.
  * This class offers convenience constructors and hides the {@link #run2(IProgressMonitor)}-method.
  * 
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead.
+ * 
  * @author Sebastian Krieter
  */
-public class AWorkerThreadJob extends AbstractJob {
-
-	private final AWorkerThread<?> worker;
-	private final int numberOfThreads;
+@Deprecated
+public class AWorkerThreadJob extends AbstractJob<Void> {
 
 	public static void startJob(String name, AWorkerThread<?> worker, int numberOfThreads) {
 		new AWorkerThreadJob(name, worker, numberOfThreads).schedule();
@@ -46,28 +48,15 @@ public class AWorkerThreadJob extends AbstractJob {
 
 	public AWorkerThreadJob(String name, AWorkerThread<?> worker, int numberOfThreads) {
 		super(name, Job.LONG);
-		this.worker = worker;
-		this.numberOfThreads = numberOfThreads;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.job.AbstractJob#work(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
+	 */
 	@Override
-	final boolean run2() throws Exception {
-		workMonitor.begin(getName());
-		try {
-			return work();
-		} finally {
-			workMonitor.done();
-		}
-	}
-
-	@Override
-	protected boolean work() throws Exception {
-		if (numberOfThreads > 0) {
-			worker.start(numberOfThreads);
-		} else {
-			worker.start();
-		}
-		return true;
+	protected Void work(IMonitor workMonitor) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

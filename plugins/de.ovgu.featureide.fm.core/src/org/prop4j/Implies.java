@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,7 @@
 package org.prop4j;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A constraint that is true iff the left child is false or the right child is
@@ -33,6 +34,16 @@ public class Implies extends Node implements Cloneable {
 	
 	public Implies(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);
+	}
+
+	@Override
+	public boolean isConjunctiveNormalForm() {
+		return false;
+	}
+
+	@Override
+	public boolean isClausalNormalForm() {
+		return false;
 	}
 
 	@Override
@@ -66,6 +77,11 @@ public class Implies extends Node implements Cloneable {
 	@Override
 	public Node clone() {
 		return new Implies(children[0].clone(), children[1].clone());
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		return !children[0].getValue(map) || children[1].getValue(map);
 	}
 
 }

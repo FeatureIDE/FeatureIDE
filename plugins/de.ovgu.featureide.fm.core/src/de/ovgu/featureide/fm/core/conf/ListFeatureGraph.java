@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,10 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
-import java.util.Collection;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import org.prop4j.solver.SatInstance;
 
 public class ListFeatureGraph extends AFeatureGraph {
 
@@ -31,8 +28,8 @@ public class ListFeatureGraph extends AFeatureGraph {
 
 	private final int[][] adjList;
 
-	public ListFeatureGraph(IFeatureModel featureModel, Collection<IFeature> variantfeatures, Collection<IFeature> coreFeatures, Collection<IFeature> deadFeatures) {
-		super(featureModel, variantfeatures, coreFeatures, deadFeatures);
+	public ListFeatureGraph(SatInstance satInstance, int[] index) {
+		super(satInstance, index);
 		adjList = new int[size][4];
 	}
 
@@ -42,9 +39,7 @@ public class ListFeatureGraph extends AFeatureGraph {
 		}
 
 		final int[] oldValues;
-		synchronized (featureArray[from]) {
-			oldValues = adjList[from];
-		}
+		oldValues = adjList[from];
 		
 		int index = -1;
 		for (int i = 4; i < oldValues.length; i++) {
@@ -77,6 +72,11 @@ public class ListFeatureGraph extends AFeatureGraph {
 	}
 
 	public int countNeighbors(String from, boolean selected, boolean subtractReal) {
+		return 0;
+	}
+
+	@Override
+	public byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected) {
 		return 0;
 	}
 

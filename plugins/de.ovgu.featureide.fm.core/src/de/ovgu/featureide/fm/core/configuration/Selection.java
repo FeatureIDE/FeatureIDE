@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -39,6 +39,11 @@ public enum Selection {
 
 	public int getValue() {
 		return value;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString();
 	}
 
 }

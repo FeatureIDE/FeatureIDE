@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,18 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.prop4j.solver.BasicSolver;
-import org.prop4j.solver.BasicSolver.SelectionStrategy;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.base.util.RingList;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
  * 
  * @author Sebastian Krieter
  */
-public class ImplicationAnalysis extends SingleThreadAnalysis<List<int[]>> {
+public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 
 	private List<int[]> pairs;
 
@@ -49,21 +50,25 @@ public class ImplicationAnalysis extends SingleThreadAnalysis<List<int[]>> {
 		this.pairs = pairs;
 	}
 
-	public List<int[]> analyze(WorkMonitor monitor) throws Exception {
+	public List<int[]> analyze(IMonitor monitor) throws Exception {
 		final List<int[]> resultList = new ArrayList<>();
 
 		if (pairs == null) {
 			return resultList;
 		}
 
-		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), MAX_SOLUTION_BUFFER));
+		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+
+		monitor.checkCancel();
 		int[] model1 = solver.findModel();
 
 		if (model1 != null) {
 			solutionList.add(model1);
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+
+			monitor.checkCancel();
 			int[] model2 = solver.findModel();
 			solutionList.add(model2);
 
@@ -73,6 +78,7 @@ public class ImplicationAnalysis extends SingleThreadAnalysis<List<int[]>> {
 			}
 
 			pairLoop: for (int[] pair : pairs) {
+				monitor.checkCancel();
 				solutionLoop: for (int[] is : solutionList) {
 					for (int i : pair) {
 						if (is[Math.abs(i) - 1] == i) {
@@ -82,7 +88,7 @@ public class ImplicationAnalysis extends SingleThreadAnalysis<List<int[]>> {
 					continue pairLoop;
 				}
 				for (int i : pair) {
-					solver.getAssignment().push(-i);
+					solver.assignmentPush(-i);
 				}
 				switch (solver.isSatisfiable()) {
 				case FALSE:
@@ -96,7 +102,7 @@ public class ImplicationAnalysis extends SingleThreadAnalysis<List<int[]>> {
 					break;
 				}
 				for (int i = 0; i < pair.length; i++) {
-					solver.getAssignment().pop();
+					solver.assignmentPop();
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAIN
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
@@ -40,9 +41,9 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint constraint;
 	private Node newNode;
 	private Node oldNode;
-
-	public EditConstraintOperation(IConstraint constraint, Node propNode) {
-		super(constraint.getFeatureModel(), EDIT_CONSTRAINT);
+	
+	public EditConstraintOperation(IFeatureModel featureModel, IConstraint constraint, Node propNode) {
+		super(featureModel, EDIT_CONSTRAINT);
 		this.newNode = propNode;
 		this.oldNode = constraint.getNode();
 		this.constraint = constraint;
@@ -51,6 +52,7 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		constraint.setNode(newNode);
+
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldNode, newNode);
 	}
 

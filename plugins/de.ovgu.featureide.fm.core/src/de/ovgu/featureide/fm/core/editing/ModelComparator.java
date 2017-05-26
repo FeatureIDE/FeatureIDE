@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,10 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.editing;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -34,7 +34,7 @@ import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -44,7 +44,6 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * classification of the edit that transforms one model into the second model.
  * 
  * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
  */
 public class ModelComparator {
 
@@ -103,9 +102,9 @@ public class ModelComparator {
 			addedFeatures = calculateAddedFeatures(oldModel, newModel);
 			deletedFeatures = calculateAddedFeatures(newModel, oldModel);
 			
-			HashMap<Object, Node> oldMap = NodeCreator
+			Map<Object, Node> oldMap = NodeCreator
 					.calculateReplacingMap(oldModel);
-			HashMap<Object, Node> newMap = NodeCreator
+			Map<Object, Node> newMap = NodeCreator
 					.calculateReplacingMap(newModel);
 			optimizeReplacingMaps(oldMap, newMap);
 
@@ -140,10 +139,7 @@ public class ModelComparator {
 		} catch (TimeoutException e) {
 			result = Comparison.TIMEOUT;
 		} catch (Exception e) {
-			if (FMCorePlugin.getDefault() != null)
-				FMCorePlugin.getDefault().logError(e);
-			else
-				e.printStackTrace();
+			Logger.logError(e);
 			result = Comparison.ERROR;
 		}
 		return result;
@@ -163,7 +159,7 @@ public class ModelComparator {
 		return addedFeatures;
 	}
 
-	private void optimizeReplacingMaps(HashMap<Object, Node> oldMap, HashMap<Object, Node> newMap) {
+	private void optimizeReplacingMaps(Map<Object, Node> oldMap, Map<Object, Node> newMap) {
 		List<Object> toBeRemoved = new LinkedList<Object>();
 		for (Entry<Object, Node> entry : oldMap.entrySet()) {
 			Object var = entry.getKey();
@@ -281,7 +277,7 @@ public class ModelComparator {
 
 	public boolean isImplied() {		
 		if (isImplied == null) {
-			FMCorePlugin.getDefault().reportBug(278);
+			Logger.reportBug(278);
 			return false;
 		}
 		return isImplied;

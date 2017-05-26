@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="APL">
 				<and abstract="true" mandatory="true" name="mainAPL">
@@ -12,8 +13,8 @@
 						</and>
 					</and>
 					<alt abstract="true" name="Xml">
-						<feature mandatory="true" name="xc"/>
-						<feature mandatory="true" name="xak"/>
+						<feature name="xc"/>
+						<feature name="xak"/>
 					</alt>
 					<feature name="cpp"/>
 					<and abstract="true" name="Gui">
@@ -48,5 +49,7 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

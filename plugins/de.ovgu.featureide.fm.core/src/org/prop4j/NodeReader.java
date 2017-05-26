@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,16 +24,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IFF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLIES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_NUMBER_OF_QUOTATION_MARKS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_POSITIONING_OF_PARENTHESES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_LEFT_SYMBOL_FOUND;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_OPERATOR_FOUND;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_RIGHT_SYMBOL_FOUND;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SYMBOLS_FOUND_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SYMBOL_FOUND;
-import static de.ovgu.featureide.fm.core.localization.StringTable.WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED;
 
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class can be used to parse propositional formulas.
@@ -47,24 +44,28 @@ import java.util.List;
  */
 public class NodeReader {
 
-	public final static String[] textualSymbols = new String[] { IFF,
-			IMPLIES, "or", "and", "not" };
+	public final static String[] textualSymbols = new String[] { IFF, IMPLIES, "or", "and", "not" };
+	public final static String[] shortSymbols = new String[] { "<=>", "=>", "|", "&", "-" };
+	public final static String[] logicalSymbols = new String[] { "\u21D4", "\u21D2", "\u2228", "\u2227", "\u00AC" };
 
-	public final static String[] shortSymbols = new String[] { "<=>", "=>",
-			"|", "&", "-" };
+	private static final String featureNameMarker = "#";
+	private static final String subExpressionMarker = "$";
+	private static final String replacedFeatureNameMarker = featureNameMarker + "_";
+	private static final String replacedSubExpressionMarker = subExpressionMarker + "_";
 
-	public final static String[] logicalSymbols = new String[] { "\u21D4",
-			"\u21D2", "\u2228", "\u2227", "\u00AC" };
+	private static final Pattern subExpressionPattern = Pattern.compile(Pattern.quote(subExpressionMarker) + "\\d+");
+	private static final Pattern featureNamePattern = Pattern.compile(Pattern.quote(featureNameMarker) + "\\d+");
+
+	private static final Pattern parenthesisPattern = Pattern.compile("\\(([^()]*)\\)");
+	private static final Pattern quotePattern = Pattern.compile("\\\"(.*?)\\\"");
 
 	private Collection<String> featureNames;
-	
-	private boolean ignoreMissingFeatures = false;
-
-	private String errorMessage = "";
 
 	private String[] symbols = textualSymbols;
 
-	private boolean error = false;
+	private ParseException errorMessage = null;
+
+	private boolean ignoreMissingFeatures = false;
 
 	public void activateShortSymbols() {
 		symbols = shortSymbols;
@@ -84,22 +85,14 @@ public class NodeReader {
 
 	public Node stringToNode(String constraint, Collection<String> featureNames) {
 		this.featureNames = featureNames;
-		errorMessage = "";
-		constraint = constraint.trim();
+		errorMessage = null;
 
-		if (!isWellFormed(constraint, featureNames))
+		try {
+			return parseNode(constraint);
+		} catch (ParseException e) {
+			errorMessage = e;
 			return null;
-		return getNode(constraint);
-	}
-
-	/**
-	 * if stringToNode or isWellFormed were called with not well-formed
-	 * constraint this method returns the error message otherwise empty String
-	 * 
-	 * @return
-	 */
-	public String getErrorMessage() {
-		return errorMessage;
+		}
 	}
 
 	/**
@@ -109,138 +102,7 @@ public class NodeReader {
 	 * @return
 	 */
 	public boolean isWellFormed(String constraint) {
-		return isWellFormed(constraint, null);
-	}
-
-	/**
-	 * Checking expression on correct syntax
-	 * 
-	 * @param string
-	 *            constraint (without brackets) to convert
-	 * @param symbols
-	 *            array containing strings for: iff, implies, or, and, not
-	 * @param list
-	 *            list of substituted bracket expressions
-	 * @return
-	 */
-	private Node checkExpression(String string, LinkedList<String> list) {
-		if (!error) {
-			errorMessage = " ";
-			string = " " + string.trim() + " ";
-			if ("  ".equals(string)) {
-				errorMessage = NO_SYMBOLS_FOUND_;
-				error = true;
-				return getInvalidLiteral();
-			}
-			// traverse all symbols
-			for (int i = 0; i < symbols.length; i++) {
-				while (string.contains(" " + symbols[i] + " ")) {
-					int index = string.indexOf(" " + symbols[i] + " ") + 1; // 1st
-																			// symbol
-																			// occurrence
-
-					if (index == -1) {
-						errorMessage = NO_OPERATOR_FOUND;
-						error = true;
-						return getInvalidLiteral();
-					}
-
-					// recursion for children nodes
-					Node node1 = null;
-					if (i != 4)
-						node1 = checkExpression(string.substring(0, index),
-								list);
-					Node node2 = checkExpression(string.substring(index
-							+ symbols[i].length(), string.length()), list);
-
-					if (i < 4) {
-						if (index == 0) {
-							errorMessage = NO_LEFT_SYMBOL_FOUND;
-							error = true;
-							return getInvalidLiteral();
-						}
-
-						if (string.length() - (index + symbols[i].length()) == 0) {
-							errorMessage = NO_RIGHT_SYMBOL_FOUND;
-							error = true;
-							return getInvalidLiteral();
-						}
-
-					} else if (i == 4) {
-						if (string.length() - (index + symbols[i].length()) == 0) {
-							errorMessage = NO_SYMBOL_FOUND;
-							error = true;
-							return getInvalidLiteral();
-						}
-					}
-
-					switch (i) {
-						case 0: {
-							return new Equals(node1, node2);
-						}
-						case 1: {
-							return new Implies(node1, node2);
-						}
-						case 2: {
-							return new Or(node1, node2);
-						}
-						case 3: {
-							return new And(node1, node2);
-						}
-						case 4: {
-							return new Not(node2); // Not - only one argument
-	
-						}
-					}
-				}
-			}
-			string = string.trim();
-			if (isIntNumber(string)) {
-				if (Integer.parseInt(string) >= 100000) {
-					if (featureNames != null) {
-
-						if (featureNames.contains(list.get(Integer
-								.parseInt(string) - 100000))) {
-							return new Literal(list.get(Integer.parseInt(string) - 100000));
-						} else {
-							errorMessage = list.get(Integer.parseInt(string) - 100000)
-									+ " is no valid Feature Name";
-							error = true;
-							return getInvalidLiteral();
-						}
-					} else {
-						return new Literal(list.get(Integer.parseInt(string) - 100000));
-					}
-				} else {
-					return checkExpression(list.get(Integer.parseInt(string)), list);
-				}
-			}
-
-			if (featureNames != null) {
-				if (!featureNames.contains(string)) {
-					errorMessage = string + " is no valid Feature Name";
-					error = true;
-					return getInvalidLiteral();
-				}
-			}
-			if (string.contains(" ")) {
-				errorMessage = string + " is no valid Feature Name";
-				error = true;
-				return getInvalidLiteral();
-			}
-
-			return new Literal(string);
-		}
-		return getInvalidLiteral();
-	}
-	
-	private Literal getInvalidLiteral() {
-		if (ignoreMissingFeatures) {
-			error = false;
-			return new Literal("FALSE");
-		} else {
-			return new Literal("");
-		}
+		return stringToNode(constraint, null) != null;
 	}
 
 	/**
@@ -253,153 +115,67 @@ public class NodeReader {
 	 * @return true if constraint is well formed
 	 */
 	public boolean isWellFormed(String constraint, final Collection<String> featureNames) {
-		this.featureNames = featureNames;
-
-		if (!constraint.trim().isEmpty()) {
-			// Check constraint if brackets set correctly
-			int bracketCounter = 0;
-			for (int i = 0; i < constraint.length(); i++) {
-				if (constraint.charAt(i) == '(') {
-					bracketCounter++;
-				} else if (constraint.charAt(i) == ')' && bracketCounter == 0) {
-					errorMessage = INVALID_POSITIONING_OF_PARENTHESES;
-					return false;
-				} else if (constraint.charAt(i) == ')') {
-					bracketCounter--;
-				} else {
-
-				}
-			}
-			if (bracketCounter < 0) {
-				errorMessage = "invalid number of parentheses: to many ')'";
-				return false;
-			}
-			if (bracketCounter > 0) {
-				errorMessage = "invalid number of parentheses: to many '('";
-				return false;
-			}
-
-			LinkedList<String> list = new LinkedList<String>();
-
-			int counter = 0;
-
-			// replacing all quotation-marked Featurenames with numbers
-			// Same procedure as with brackets -> see below
-			while (constraint.contains("\"")) {
-				int indStart = constraint.indexOf("\"");
-				int indEnd = constraint.indexOf("\"", indStart + 1);
-
-				if (indEnd == -1) {
-					errorMessage = INVALID_NUMBER_OF_QUOTATION_MARKS;
-					return false;
-				}
-				if (indStart - 1 > 0 && constraint.charAt(indStart - 1) != ' '
-						&& constraint.charAt(indStart - 1) != '('
-						|| indEnd + 1 < constraint.length()
-						&& constraint.charAt(indEnd + 1) != ' '
-						&& constraint.charAt(indEnd + 1) != ')') {
-					errorMessage = WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED;
-					return false;
-				}
-
-				// inner bracket found -> substitution to list
-				// Names are added inclusive quotation marks
-				list.add(constraint.substring(indStart + 1, indEnd));
-
-				constraint = constraint.substring(0, indStart)
-						+ (counter + 100000)
-						+ constraint.substring(indEnd + 1, constraint.length());
-				counter++;
-			}
-
-			// finding all bracket expressions
-			while (constraint.contains(")")) {
-				int indEnd = constraint.indexOf(")");
-				int indStart = constraint.substring(0, indEnd).lastIndexOf("(");
-
-				if (indStart - 1 > 0 && constraint.charAt(indStart - 1) != ' '
-						&& constraint.charAt(indStart - 1) != '('
-						|| indEnd + 1 < constraint.length()
-						&& constraint.charAt(indEnd + 1) != ' '
-						&& constraint.charAt(indEnd + 1) != ')') {
-					errorMessage = WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED;
-					return false;
-				}
-
-				// inner bracket found -> substitution to list
-				list.add(constraint.substring(indStart + 1, indEnd));
-				constraint = constraint.substring(0, indStart) + counter
-						+ constraint.substring(indEnd + 1, constraint.length());
-				counter++;
-			}
-
-			error = false;
-			checkExpression(constraint, list);
-			return !error;
-		}
-		return true;
-	}
-
-	private Node getNode(String string) {
-
-		LinkedList<String> list = new LinkedList<String>();
-		int counter = 0;
-
-		// replacing all quotation-marked Featurenames with numbers
-		// Same procedure as with brackets -> see below
-		while (string.contains("\"")) {
-
-			int indStart = string.indexOf('\"');
-			int indEnd = string.indexOf('\"', indStart + 1);
-
-			// inner bracket found -> substitution to list
-			// Names are added inclusive quotation marks
-			list.add(string.substring(indStart + 1, indEnd));
-
-			string = string.substring(0, indStart) + (counter + 100000)
-					+ string.substring(indEnd + 1, string.length());
-			counter++;
-		}
-
-		// finding all bracket expressions
-		while (string.contains(")")) {
-			int indEnd = string.indexOf(")");
-			int indStart = string.substring(0, indEnd).lastIndexOf("(");
-
-			// inner bracket found -> substitution to list
-			list.add(string.substring(indStart + 1, indEnd));
-			string = string.substring(0, indStart) + counter
-					+ string.substring(indEnd + 1, string.length());
-			counter++;
-		}
-		return stringToNodeRec(string, list);
+		return stringToNode(constraint, featureNames) != null;
 	}
 
 	/**
-	 * Creating nodes out of constraints
+	 * if stringToNode or isWellFormed were called with not well-formed
+	 * constraint this method returns the error message otherwise empty String
 	 * 
-	 * @param string
-	 *            constraint (without brackets) to convert
-	 * @param symbols
-	 *            array containing strings for: iff, implies, or, and, not
-	 * @param list
-	 *            list of substituted bracket expressions
 	 * @return
 	 */
-	private Node stringToNodeRec(String string, List<String> list) {
-		string = " " + string.trim() + " ";
+	public ParseException getErrorMessage() {
+		return errorMessage;
+	}
+
+	public boolean ignoresMissingFeatures() {
+		return ignoreMissingFeatures;
+	}
+
+	public void setIgnoreMissingFeatures(boolean ignoreMissingFeatures) {
+		this.ignoreMissingFeatures = ignoreMissingFeatures;
+	}
+
+	/**
+	 * Checking expression on correct syntax
+	 * 
+	 * @param constraint
+	 *            constraint (without parenthesis) to convert
+	 * @param symbols
+	 *            array containing strings for: iff, implies, or, and, not
+	 * @param quotedFeatureNames
+	 *            list of substituted feature names
+	 * @param subExpressions
+	 *            list of substituted parenthesis expressions
+	 * @return
+	 */
+	private Node checkExpression(String constraint, List<String> quotedFeatureNames, List<String> subExpressions) throws ParseException {
+		constraint = " " + constraint + " ";
+		if ("  ".equals(constraint)) {
+			return getInvalidLiteral("Sub expression is empty");
+		}
 		// traverse all symbols
 		for (int i = 0; i < symbols.length; i++) {
-			while (string.contains(" " + symbols[i] + " ")) {
-				int index = string.indexOf(" " + symbols[i] + " ") + 1; // 1st
-																		// symbol
-																		// occurrence
+			final Matcher matcher = Pattern.compile("\\s+(" + Pattern.quote(symbols[i]) + ")\\s+").matcher(constraint);
+			while (matcher.find()) {
+				// 1st symbol occurrence
+				final int index = matcher.start(1);
 
 				// recursion for children nodes
-				Node node1 = stringToNodeRec(string.substring(0, index), list);
-				Node node2 = stringToNodeRec(
-						string.substring(index + symbols[i].length(),
-								string.length()), list);
+				final String leftSide = constraint.substring(0, index).trim();
+				final String rightSide = constraint.substring(index + symbols[i].length(), constraint.length()).trim();
+
+				final Node node1, node2;
+				if (i == 4) {
+					node1 = null;
+					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression")
+							: checkExpression(rightSide, quotedFeatureNames, subExpressions);
+				} else {
+					node1 = (leftSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on left side")
+							: checkExpression(leftSide, quotedFeatureNames, subExpressions);
+					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on right side")
+							: checkExpression(rightSide, quotedFeatureNames, subExpressions);
+				}
 
 				switch (i) {
 				case 0: {
@@ -420,44 +196,119 @@ public class NodeReader {
 				}
 			}
 		}
-
-		string = string.trim();
-		if (isIntNumber(string)) {
-			if (Integer.parseInt(string) >= 100000) {
-
-				return new Literal(list.get(Integer.parseInt(string) - 100000)
-						.replace("\"", ""));
-
+		constraint = constraint.trim();
+		final Matcher subExpressionMatcher = subExpressionPattern.matcher(constraint);
+		if (subExpressionMatcher.find()) {
+			if (subExpressionMatcher.start() == 0 && subExpressionMatcher.end() == constraint.length()) {
+				return checkExpression(subExpressions.get(Integer.parseInt(constraint.substring(1))).trim(), quotedFeatureNames, subExpressions);
 			} else {
-				return stringToNodeRec(list.get(Integer.parseInt(string)), list);
+				return getInvalidLiteral("Missing operator");
+			}
+		} else {
+			String featureName;
+			final Matcher featureNameMatcher = featureNamePattern.matcher(constraint);
+			if (featureNameMatcher.find()) {
+				if (featureNameMatcher.start() == 0 && featureNameMatcher.end() == constraint.length()) {
+					featureName = quotedFeatureNames.get(Integer.parseInt(constraint.substring(1)));
+				} else {
+					return getInvalidLiteral("Missing operator");
+				}
+			} else {
+				if (constraint.contains(" ")) {
+					return getInvalidLiteral("'" + constraint + "' is no valid feature name");
+				}
+				featureName = constraint;
+			}
+			featureName = featureName.replace(replacedFeatureNameMarker, featureNameMarker).replace(replacedSubExpressionMarker, subExpressionMarker);
+			if (featureNames != null && !featureNames.contains(featureName)) {
+				return getInvalidLiteral("'" + featureName + "' is no valid feature name");
+			}
+			return new Literal(featureName);
+		}
+	}
+
+	private Node getInvalidLiteral(String message) throws ParseException {
+		if (ignoreMissingFeatures) {
+			return new Literal("FALSE");
+		} else {
+			throw new ParseException(message, 0);
+		}
+	}
+
+	private Node parseNode(String constraint) throws ParseException {
+		constraint = constraint.trim();
+		if (constraint.isEmpty()) {
+			throw new ParseException("Contraint is empty", 0);
+		}
+
+		int parenthesisCounter = 0;
+		boolean quoteSign = false;
+		for (int i = 0; i < constraint.length(); i++) {
+			final char curChar = constraint.charAt(i);
+			switch (curChar) {
+			case '(':
+				if (quoteSign) {
+					throw new ParseException(INVALID_POSITIONING_OF_PARENTHESES + ": parenthesis are not allowed in feature names", i);
+				}
+				parenthesisCounter++;
+				break;
+			case '\"':
+				quoteSign = !quoteSign;
+				break;
+			case ')':
+				if (quoteSign) {
+					throw new ParseException(INVALID_POSITIONING_OF_PARENTHESES + ": parenthesis are not allowed in feature names", i);
+				}
+				if (--parenthesisCounter < 0) {
+					throw new ParseException(INVALID_POSITIONING_OF_PARENTHESES + ": to many closing parentheses", i);
+				}
+				break;
+			default:
+				break;
 			}
 		}
-
-		return new Literal(string.replace("\"", ""));
-	}
-
-	/**
-	 * Checks, if num is an integer number
-	 * 
-	 * @param num
-	 *            number to check
-	 * @return true, if num is an integer number, false otherwise
-	 */
-	private static boolean isIntNumber(String num) {
-		try {
-			Integer.parseInt(num);
-		} catch (NumberFormatException nfe) {
-			return false;
+		if (quoteSign) {
+			throw new ParseException(INVALID_NUMBER_OF_QUOTATION_MARKS, 0);
 		}
-		return true;
+		if (parenthesisCounter > 0) {
+			throw new ParseException(INVALID_POSITIONING_OF_PARENTHESES + ": there are unclosed opening parentheses", 0);
+		}
+
+		constraint = constraint.replace(featureNameMarker, replacedFeatureNameMarker);
+		constraint = constraint.replace(subExpressionMarker, replacedSubExpressionMarker);
+
+		final ArrayList<String> quotedFeatureNames = new ArrayList<>();
+		final ArrayList<String> subExpressions = new ArrayList<>();
+		if (constraint.contains("\"")) {
+			constraint = replaceGroup(constraint, featureNameMarker, quotedFeatureNames, quotePattern);
+		}
+		while (constraint.contains("(")) {
+			constraint = replaceGroup(constraint, subExpressionMarker, subExpressions, parenthesisPattern);
+		}
+
+		return checkExpression(constraint, quotedFeatureNames, subExpressions);
 	}
-	
-	public boolean ignoresMissingFeatures() {
-		return ignoreMissingFeatures;
-	}
-	
-	public void setIgnoreMissingFeatures(boolean ignoreMissingFeatures) {
-		this.ignoreMissingFeatures = ignoreMissingFeatures;
+
+	private String replaceGroup(String constraint, String marker, final List<String> groupList, final Pattern pattern) {
+		int counter = groupList.size();
+
+		final ArrayList<Integer> positionList = new ArrayList<>();
+		final Matcher matcher = pattern.matcher(constraint);
+		positionList.add(0);
+		while (matcher.find()) {
+			groupList.add(matcher.group(1));
+			positionList.add(matcher.start());
+			positionList.add(matcher.end());
+		}
+		positionList.add(constraint.length());
+
+		final StringBuilder sb = new StringBuilder(constraint.substring(positionList.get(0), positionList.get(1)));
+		for (int i = 2; i < positionList.size(); i += 2) {
+			sb.append(marker);
+			sb.append(counter++);
+			sb.append(constraint.substring(positionList.get(i), positionList.get(i + 1)));
+		}
+		return sb.toString();
 	}
 
 }

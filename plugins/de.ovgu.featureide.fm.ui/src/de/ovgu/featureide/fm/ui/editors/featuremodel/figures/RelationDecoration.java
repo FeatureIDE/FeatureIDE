@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import java.util.List;
 
 import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.RotatableDecoration;
-import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
@@ -40,7 +38,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author Thomas Thuem
  */
-public class RelationDecoration extends Shape implements RotatableDecoration, GUIDefaults {
+public class RelationDecoration extends ConnectionDecoration implements GUIDefaults {
 
 	private final boolean fill;
 
@@ -52,8 +50,6 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	private IGraphicalFeatureModel featureModel;
 
 	public RelationDecoration(final boolean fill, final IGraphicalFeature lastChild) {
-		super();
-		
 		this.fill = fill;
 		this.lastChild = lastChild;
 		if (lastChild == null) {
@@ -61,9 +57,8 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		} else {
 			children = FeatureUIHelper.getGraphicalSiblings(lastChild);
 		}
-		final Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
-		setForegroundColor(decoratorForgroundColor);
-		setBackgroundColor(decoratorForgroundColor);
+		setForegroundColor(FMPropertyManager.getDecoratorForegroundColor());
+		setBackgroundColor(FMPropertyManager.getDecoratorForegroundColor());
 		setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
 		if (lastChild != null) {
 			featureModel = lastChild.getGraphicalModel();
@@ -74,7 +69,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	public void setLocation(final Point p) {
 		if (this instanceof LegendRelationDecoration) {
 			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
-		}else {
+		} else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
 			if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
 				super.setLocation(p.translate(0, (-getBounds().width >> 1)));
@@ -98,7 +93,14 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	}
 
 	private void drawShape(final Graphics graphics) {
-		boolean verticalLayout = false; 
+		if (getActiveReason() != null) {
+			final Color reasonColor = FMPropertyManager.getReasonColor(getActiveReason());
+			graphics.setForegroundColor(reasonColor);
+			graphics.setBackgroundColor(reasonColor);
+			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
+		}
+		
+		boolean verticalLayout = false;
 		if (featureModel != null) {
 			verticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
 		}
@@ -106,9 +108,9 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		double maxAngle = Double.MIN_VALUE;
 		final Rectangle r;
 		if (verticalLayout) {
-			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1,  1);
+			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1, 1);
 		} else {
-			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1,  1);
+			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1, 1);
 		}
 		final Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
 		
@@ -119,15 +121,13 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 			if (children != null && children.size() > 1) {
 				for (final IGraphicalFeature curChild : children) {
 					lastChild = curChild;
-					if (!(lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
-						final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
-						final double currentAngle = calculateAngle(center, featureLocation);
-						if (currentAngle < minAngle) {
-							minAngle = currentAngle;
-						}
-						if (currentAngle > maxAngle) {
-							maxAngle = currentAngle;
-						}
+					final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
+					final double currentAngle = calculateAngle(center, featureLocation);
+					if (currentAngle < minAngle) {
+						minAngle = currentAngle;
+					}
+					if (currentAngle > maxAngle) {
+						maxAngle = currentAngle;
 					}
 				}
 			} else {
@@ -135,7 +135,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 			}
 		}
 		if (fill) {
-			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int)(maxAngle - minAngle));
+			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int) (maxAngle - minAngle));
 		} else {
 			graphics.drawArc(r, (int) minAngle, (int) (maxAngle - minAngle));
 		}
@@ -149,11 +149,9 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		return TARGET_ANCHOR_DIAMETER;
 	}
 
-
 	private double calculateAngle(final Point point, final Point referencePoint) {
 		int dx = referencePoint.x - point.x;
 		int dy = referencePoint.y - point.y;
 		return 360 - Math.round(Math.atan2(dy, dx) / Math.PI * 180);
 	}
-
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.conf.worker.base;
 
 import java.util.Collection;
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 public abstract class AWorkerThread<T> implements Runnable {
 
@@ -38,7 +38,7 @@ public abstract class AWorkerThread<T> implements Runnable {
 		this.masterThread = oldWorker.masterThread;
 	}
 
-	public AWorkerThread(WorkMonitor workMonitor) {
+	public AWorkerThread(IMonitor workMonitor) {
 		this.masterThread = new MasterThread<T>(this, workMonitor);
 	}
 
@@ -52,13 +52,12 @@ public abstract class AWorkerThread<T> implements Runnable {
 
 	public void addObjects(Collection<T> objects) {
 		masterThread.objects.addAll(objects);
-		masterThread.workMonitor.setMaxAbsoluteWork(objects.size());
+		masterThread.workMonitor.setRemainingWork(objects.size());
 	}
 
 	@Override
 	public final void run() {
 		if (beforeWork()) {
-			masterThread.workMonitor.begin("");
 			for (T object = masterThread.objects.poll(); object != null; object = masterThread.objects.poll()) {
 				work(object);
 				masterThread.workMonitor.step();

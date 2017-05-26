@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="Elevator">
+				<and abstract="true" mandatory="true" name="Behavior">
+					<alt abstract="true" mandatory="true" name="Modes">
+						<feature name="Sabbath"/>
+						<feature name="FIFO"/>
+						<feature name="ShortestPath"/>
+					</alt>
+					<feature abstract="true" name="Service"/>
+					<or abstract="true" name="Priorities">
+						<feature name="RushHour"/>
+						<feature abstract="true" name="FloorPriority"/>
+						<feature abstract="true" name="PersonPriority"/>
+					</or>
+				</and>
+				<feature abstract="true" name="VoiceOutput"/>
+				<alt name="CallButtons">
+					<feature name="DirectedCall"/>
+					<feature name="UndirectedCall"/>
+				</alt>
+				<and abstract="true" name="Security">
+					<or abstract="true" mandatory="true" name="Permission">
+						<feature name="FloorPermission"/>
+						<feature abstract="true" name="PermissionControl"/>
+					</or>
+				</and>
+				<and abstract="true" name="Safety">
+					<feature abstract="true" name="Overloaded"/>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>DirectedCall</var>
+					<var>ShortestPath</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>UndirectedCall</var>
+					<disj>
+						<var>FIFO</var>
+						<var>ShortestPath</var>
+					</disj>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="true">
+			<feature name="Elevator"/>
+			<feature name="Sabbath"/>
+			<feature name="FIFO"/>
+			<feature name="ShortestPath"/>
+			<feature name="RushHour"/>
+			<feature name="CallButtons"/>
+			<feature name="DirectedCall"/>
+			<feature name="UndirectedCall"/>
+			<feature name="FloorPermission"/>
+		</featureOrder>
+	</featureModel>

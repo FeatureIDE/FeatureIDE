@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,20 +28,15 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAK
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.Panel;
-import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -55,7 +50,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class ConstraintFigure extends Figure implements GUIDefaults {
+public class ConstraintFigure extends ModelElementFigure implements GUIDefaults {
 
 	public final static String VOID_MODEL = CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
 	public final static String UNSATISFIABLE = CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
@@ -67,6 +62,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private static final IFigure VOID_LABEL = new Label(VOID_MODEL);
 	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);
 	private static final IFigure TAUTOLOGY_LABEL = new Label(TAUTOLOGY);
+	private static final IFigure REDUNDANCE_LABEL = new Label(REDUNDANCE);
 
 	private static final String[] symbols;
 	static {
@@ -123,11 +119,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		case NORMAL:
 			break;
 		case VOID_MODEL:
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(VOID_LABEL);
 			break;
 		case UNSATISFIABLE:
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(UNSATISFIABLE_LABEL);
 			break;
 		case TAUTOLOGY:
@@ -135,40 +129,14 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setToolTip(TAUTOLOGY_LABEL);
 			break;
 		case REDUNDANT:
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			List<String> explanationRedundant = constraint.getFeatureModel().getAnalyser().redundantConstrExpl
-					.get(FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint));
-			Panel panelRedundant = new Panel();
-			panelRedundant.setLayoutManager(new ToolbarLayout(false));
-			panelRedundant.add(new Label(REDUNDANCE));
-			setToolTip(panelRedundant, explanationRedundant != null ? explanationRedundant : Collections.<String> emptyList());
-			return;
 		case IMPLICIT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getImplicitConstraintBorder());
-			// set tooltip with explanation for redundant constraint
-			List<String> explanationImplicit = constraint.getFeatureModel().getAnalyser().redundantConstrExpl
-					.get(FeatureUtils.getConstraintIndex(constraint.getFeatureModel(), constraint));
-			explanationImplicit = explanationImplicit != null ? explanationImplicit : Collections.<String> emptyList();
-
-			// replace "redundant" with "transitive" in explanation if constraint represents an implicit dependency
-			for (int i = 0; i < explanationImplicit.size(); i++) {
-				if (explanationImplicit.get(i).contains("redundant")) {
-					String newStr = explanationImplicit.get(i).replace("redundant", "transitive");
-					explanationImplicit.set(i, newStr);
-					break;
-				}
-			}
-			Panel panelImplicit = new Panel();
-			panelImplicit.setLayoutManager(new ToolbarLayout(false));
-			panelImplicit.add(new Label(REDUNDANCE));
-			setToolTip(panelImplicit, explanationImplicit);
-			return;
+			setToolTip(REDUNDANCE_LABEL);
+			break;
 		case DEAD:
 		case FALSE_OPTIONAL:
 			final StringBuilder toolTip = new StringBuilder();
 			if (!constraint.getDeadFeatures().isEmpty()) {
-				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				toolTip.append(DEAD_FEATURE);
 				ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
 				for (IFeature dead : constraint.getDeadFeatures()) {
@@ -184,9 +152,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			}
 
 			if (!constraint.getFalseOptional().isEmpty()) {
-				if (constraint.getDeadFeatures().isEmpty()) {
-					setBackgroundColor(FMPropertyManager.getWarningColor());
-				} else {
+				if (!constraint.getDeadFeatures().isEmpty()) {
 					toolTip.append("\n\n");
 				}
 
@@ -207,63 +173,10 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		default:
 			break;
 		}
-	}
-
-	/**
-	 * Color explanation parts according to their occurrences in all explanations for a defect constraint.
-	 * If expl. part occured once, it is colored black. If it occurred in every explanation, it is colored red.
-	 * For all other cases, a color gradient is used.
-	 * 
-	 * @param panel the panel to pass for a tool tip
-	 * @param expl the explanation within a tool tip
-	 */
-	private void setToolTip(Panel panel, List<String> expl) {
-		for (String s : expl) {
-			if (s.contains("$")) {
-				int lastChar = s.lastIndexOf("$");
-				String text = s.substring(0, lastChar); // pure explanation without delimiter and count of explanation part
-				int occur = 1; //if non-negative, intersection, number of all occurences of expl. part
-				int allExpl = 1; // number of all explanations
-				if (lastChar < s.length() - 1) {
-					String suffix = s.substring(lastChar + 1, s.length()); // 2 (occur) /3 (allExpl)
-					String[] l = suffix.split("/");
-					if (l.length == 2) {
-						try {
-							occur = Integer.parseInt(l[0]);
-							allExpl = Integer.parseInt(l[1]);
-
-						} catch (NumberFormatException e) {
-							System.out.println(e);
-						}
-					}
-				}
-				//check validity
-				if (allExpl < 1 || occur < 1 || occur > allExpl) {
-					System.out.println("inconsistent suffix: " + occur + "/" + allExpl + ", use defaults 1/1");
-					occur = 1;
-					allExpl = 1;
-				}
-				//if we are here, occur and allExpl are both >=1 and occur <= allExpl - consistent!
-				Label tmp = new Label(text + " (" + occur + "/" + allExpl + ")");
-				if (allExpl == 1) {
-					tmp.setForegroundColor(GUIBasics.createColor(255, 0, 0));
-				} else { //allExp > 1, can divide through allExpl - 1 
-					if (occur == 1)
-						tmp.setForegroundColor(GUIBasics.createColor(0, 0, 0)); // black for explanation part which occurs once
-
-					// color gradient for remaining explanations
-					else {
-						int confidence = (int) (255.0 * (occur - 1.0) / (allExpl - 1.0) + 0.5);
-						tmp.setForegroundColor(GUIBasics.createColor(confidence, 0, 0));
-					}
-				}
-				panel.add(tmp);
-			} else {
-				Label tmp = new Label(s);
-				panel.add(tmp);
-			}
+		
+		if (getActiveReason() != null) {
+			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
-		setToolTip(panel);
 	}
 
 	private String getConstraintText(IConstraint constraint) {
@@ -295,5 +208,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
 	}
-
+	
+	@Override
+	public ModelFigure getParent() {
+		return (ModelFigure) super.getParent();
+	}
 }

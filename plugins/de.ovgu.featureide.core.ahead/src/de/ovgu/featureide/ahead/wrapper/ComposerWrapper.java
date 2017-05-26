@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_SKIPPED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FEATURE_FOLDER_FOUND_IN_THE_JAK_FILE_PATH_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_NOT_CONTAINED_IN_THE_JAK_FILE_PATH_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNEXPECTED_ERROR_WHILE_PARSING;
-import jampack.Jampack;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,8 +37,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.TreeMap;
-
-import mixin.Mixin;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -55,6 +52,8 @@ import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
 import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import jampack.Jampack;
+import mixin.Mixin;
 
 /**
  * 

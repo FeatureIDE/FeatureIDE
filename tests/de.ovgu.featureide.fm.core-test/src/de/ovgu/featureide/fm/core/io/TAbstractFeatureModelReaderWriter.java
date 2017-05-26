@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -35,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -43,7 +45,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Basic test super-class for IFeatureModelReader/IFeatureModelWriter
@@ -94,10 +96,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		
 		for (File f : MODEL_FILE_FOLDER.listFiles(fileFilter)) {
 			Object[] models = new Object[2];
-
-			IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-			XmlFeatureModelReader r = new XmlFeatureModelReader(fm);
-			r.readFromFile(f);
+			IFeatureModel fm = FeatureModelManager.readFromFile(f.toPath());
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);
@@ -255,10 +254,15 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	}
 
 	private final IFeatureModel writeAndReadModel() throws UnsupportedModelException {
-		IFeatureModel newFm = FMFactoryManager.getFactory().createFeatureModel();
-		IFeatureModelWriter writer = getWriter(origFm);
-		IFeatureModelReader reader = getReader(newFm);
-		reader.readFromString(writer.writeToString());
+		IFeatureModel newFm = null;
+		try {
+			newFm = FMFactoryManager.getDefaultFactoryForPath(origFm.getFactoryID()).createFeatureModel();
+		} catch (NoSuchExtensionException e) {
+			fail();
+		}
+		final IFeatureModelFormat format = getFormat();
+		final String write = format.getInstance().write(origFm);
+		format.getInstance().read(newFm, write);
 		return newFm;
 	}
 
@@ -272,8 +276,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		return filter;
 	}
 
-	protected abstract IFeatureModelWriter getWriter(IFeatureModel fm);
-
-	protected abstract IFeatureModelReader getReader(IFeatureModel fm);
+	protected abstract IFeatureModelFormat getFormat();
 
 }

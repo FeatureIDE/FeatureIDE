@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -38,15 +38,15 @@ public class GraphicalEditPartFactory implements EditPartFactory {
 
 	public EditPart createEditPart(EditPart context, Object model) {
 		if (model instanceof IGraphicalFeature) {
-			return new FeatureEditPart(model);
+			return new FeatureEditPart((IGraphicalFeature) model);
 		} else if (model instanceof IGraphicalFeatureModel) {
-			return new ModelEditPart(model);
+			return new ModelEditPart((IGraphicalFeatureModel) model);
 		} else if (model instanceof FeatureConnection) {
-			return new ConnectionEditPart(model); 
+			return new ConnectionEditPart((FeatureConnection) model); 
 		} else if (model instanceof IGraphicalConstraint) {
-			return new ConstraintEditPart(model);
+			return new ConstraintEditPart((IGraphicalConstraint) model);
 		} else if (model instanceof Legend) {
-			return new LegendEditPart(model);
+			return new LegendEditPart((Legend) model);
 		} else {
 			throw new UnsupportedOperationException("Not implememented for " + model.getClass());
 		}

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.ui;singleton:=true
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 3.3.1.qualifier
 Bundle-Activator: de.ovgu.featureide.fm.ui.FMUIPlugin
 Require-Bundle: 
  org.eclipse.ui,
@@ -30,9 +30,11 @@ Export-Package: de.ovgu.featureide.fm.ui,
    org.eclipse.ui.part,
    org.eclipse.swt.widgets",
  de.ovgu.featureide.fm.ui.editors.configuration,
+ de.ovgu.featureide.fm.ui.editors.elements,
  de.ovgu.featureide.fm.ui.editors.featuremodel,
  de.ovgu.featureide.fm.ui.editors.featuremodel.actions,
  de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations,
+ de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors,
  de.ovgu.featureide.fm.ui.editors.featuremodel.commands,
  de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming,
  de.ovgu.featureide.fm.ui.editors.featuremodel.editparts,
@@ -42,11 +44,13 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors.featuremodel.operations,
  de.ovgu.featureide.fm.ui.editors.featuremodel.policies,
  de.ovgu.featureide.fm.ui.editors.keyhandler,
+ de.ovgu.featureide.fm.ui.handlers,
  de.ovgu.featureide.fm.ui.handlers.base,
  de.ovgu.featureide.fm.ui.preferences,
  de.ovgu.featureide.fm.ui.properties,
  de.ovgu.featureide.fm.ui.properties.language,
  de.ovgu.featureide.fm.ui.properties.page,
+ de.ovgu.featureide.fm.ui.utils,
  de.ovgu.featureide.fm.ui.views,
  de.ovgu.featureide.fm.ui.views.featuremodeleditview,
  de.ovgu.featureide.fm.ui.views.outline,

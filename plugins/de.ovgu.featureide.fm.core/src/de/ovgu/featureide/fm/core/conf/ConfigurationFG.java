@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -41,7 +42,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Represents a configuration and provides operations for the configuration process.
@@ -67,6 +68,8 @@ public class ConfigurationFG extends Configuration {
 	final Hashtable<String, SelectableFeature> table = new Hashtable<String, SelectableFeature>();
 
 	private final SelectableFeature root;
+	private final String[] featureNames;
+	
 	private boolean propagate = true;
 
 	private IFeatureGraph featureGraph;
@@ -91,12 +94,14 @@ public class ConfigurationFG extends Configuration {
 		this.propagator = new ConfigurationChanger(featureGraph, featureModel, variableConfiguration, this);
 
 		this.root = initRoot();
+		
+		this.featureNames = FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
 
-		for (String featureName : featureGraph.getCoreFeatures()) {
+		for (String featureName : FeatureUtils.getCoreFeaturesFromFeatureGraph(featureGraph)) {
 			setAutomatic(featureName, Selection.SELECTED);
 		}
 
-		for (String featureName : featureGraph.getDeadFeatures()) {
+		for (String featureName : FeatureUtils.getDeadFeaturesFromFeatureGraph(featureGraph)) {
 			setAutomatic(featureName, Selection.UNSELECTED);
 		}
 
@@ -200,34 +205,36 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	private IFeature getFeature(int id) {
-		return featureModel.getFeature(featureGraph.getFeatureArray()[id]);
+		return featureModel.getFeature(featureNames[id]);
 	}
 
 	public List<IFeature> getSelectedFeatures() {
-		final List<IFeature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.getCoreFeatures().length);
+		final String[] coreFeatures = FeatureUtils.getCoreFeaturesFromFeatureGraph(featureGraph);
+		final List<IFeature> featureList = new ArrayList<>(variableConfiguration.size(true) + coreFeatures.length);
 		for (Variable var : variableConfiguration) {
 			if (var.getValue() == Variable.TRUE) {
 				featureList.add(getFeature(var.getId()));
 			}
 		}
-		for (String featureName : featureGraph.getCoreFeatures()) {
+		for (String featureName : coreFeatures) {
 			featureList.add(featureModel.getFeature(featureName));
 		}
 		return featureList;
 	}
 
-	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
+	public List<List<String>> getSolutions(int max) throws TimeoutException {
 		return LongRunningWrapper.runMethod(propagator.getSolutions(max));
 	}
 
 	public List<IFeature> getUnSelectedFeatures() {
-		final List<IFeature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.getDeadFeatures().length);
+		final String[] deadFeatures = FeatureUtils.getDeadFeaturesFromFeatureGraph(featureGraph);
+		final List<IFeature> featureList = new ArrayList<>(variableConfiguration.size(true) + deadFeatures.length);
 		for (Variable var : variableConfiguration) {
 			if (var.getValue() == Variable.FALSE) {
 				featureList.add(getFeature(var.getId()));
 			}
 		}
-		for (String featureName : featureGraph.getDeadFeatures()) {
+		for (String featureName : deadFeatures) {
 			featureList.add(featureModel.getFeature(featureName));
 		}
 		return featureList;
@@ -258,10 +265,10 @@ public class ConfigurationFG extends Configuration {
 		return LongRunningWrapper.runMethod(propagator.isValidNoHidden());
 	}
 
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, IMonitor workMonitor) {
 	}
 
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, IMonitor workMonitor) {
 	}
 
 	/**
@@ -342,13 +349,9 @@ public class ConfigurationFG extends Configuration {
 		return builder.toString();
 	}
 
-	public void update() {
-		update(false, null);
-	}
-
-	public void update(boolean redundantManual, String startFeatureName) {
+	public void update(boolean redundantManual, List<SelectableFeature> featureOrder) {
 		if (propagate) {
-			LongRunningWrapper.runMethod(propagator.update(redundantManual, startFeatureName));
+			LongRunningWrapper.runMethod(propagator.update(redundantManual, featureOrder));
 		}
 	}
 

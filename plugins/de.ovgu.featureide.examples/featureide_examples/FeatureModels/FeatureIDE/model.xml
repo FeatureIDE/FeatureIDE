@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and mandatory="true" name="Eclipse">
 				<feature name="JDT"/>
@@ -9,14 +10,14 @@
 					<feature name="CIDE"/>
 					<feature name="FAMILIAR"/>
 					<or name="FeatureIDE">
-						<feature mandatory="true" name="AHEAD"/>
-						<feature mandatory="true" name="FeatureHouse"/>
-						<feature mandatory="true" name="FeatureCpp"/>
-						<feature mandatory="true" name="DeltaJ"/>
-						<feature mandatory="true" name="AspectJ"/>
-						<feature mandatory="true" name="Munge"/>
-						<feature mandatory="true" name="Antenna"/>
-						<feature mandatory="true" name="DeltaMontiArc"/>
+						<feature name="AHEAD"/>
+						<feature name="FeatureHouse"/>
+						<feature name="FeatureCpp"/>
+						<feature name="DeltaJ"/>
+						<feature name="AspectJ"/>
+						<feature name="Munge"/>
+						<feature name="Antenna"/>
+						<feature name="DeltaMontiArc"/>
 					</or>
 					<feature name="ExtendedFM"/>
 					<feature name="MoSoPoLiTe"/>
@@ -59,6 +60,7 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

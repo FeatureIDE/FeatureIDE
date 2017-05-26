@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,8 +22,18 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel;
 
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomComboContributionItem;
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.actions.ActionFactory;
@@ -100,6 +110,45 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 	public void contributeToToolBar(IToolBarManager manager) {
 		super.contributeToToolBar(manager);
 		manager.add(new Separator());
+		
+		//Fix for Issue #363
+		if (org.eclipse.core.runtime.Platform.getOS().equals(org.eclipse.core.runtime.Platform.OS_WIN32)) {
+		manager.add(new ContributionItem() {
+							final Point size = new Point(0,30);
+							private ToolItem widget;
+
+							@Override
+							public void fill(ToolBar parent, int index) {
+								if (widget == null && parent != null) {
+									int flags = SWT.PUSH;
+									
+									ToolItem ti = null;
+									if (index >= 0) {
+										ti = new ToolItem(parent, flags, index);
+									} else {
+										ti = new ToolItem(parent, flags);
+									}
+									ti.setData(this);
+									
+									// create an image the height of the text field
+									final Image image = new Image(Display.getCurrent(),1,size.y);
+									GC gc = new GC(image);
+									gc.setBackground(parent.getBackground());
+									gc.fillRectangle(image.getBounds());
+									gc.dispose();
+									ti.addDisposeListener(new DisposeListener() {
+										public void widgetDisposed(DisposeEvent e) {
+											image.dispose();
+										}
+									});
+									ti.setImage(image);
+
+									widget = ti;
+								}
+							}
+						});
+		}
+		
 		manager.add(new ZoomComboContributionItem(getPage()));
 	}
 

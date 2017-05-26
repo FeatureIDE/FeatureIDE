@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,9 +32,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -113,15 +114,15 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_FEATURE_BORDER = null;
 	}
 
-	private static LinkedList<IFeatureModel> featureModels = new LinkedList<IFeatureModel>();
+	private static LinkedList<FeatureModelEditor> editors = new LinkedList<>();
 
 	/**
 	 * Register the model for property changes.
 	 * 
 	 * @param model
 	 */
-	public static void registerEditor(IFeatureModel model) {
-		featureModels.add(model);
+	public static void registerEditor(FeatureModelEditor model) {
+		editors.add(model);
 	}
 
 	/**
@@ -129,16 +130,16 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * 
 	 * @param model
 	 */
-	public static void unregisterEditor(IFeatureModel model) {
-		featureModels.remove(model);
+	public static void unregisterEditor(FeatureModelEditor model) {
+		editors.remove(model);
 	}
 
 	/**
 	 * Refreshes registered models.
 	 */
 	public static void updateEditors() {
-		for (IFeatureModel model : featureModels) {
-			model.fireEvent(new FeatureIDEEvent(model, EventType.MODEL_DATA_LOADED));
+		for (FeatureModelEditor model : editors) {
+			model.propertyChange(new FeatureIDEEvent(model, EventType.REDRAW_DIAGRAM));
 		}
 	}
 
@@ -320,12 +321,12 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		setColor(QN_CONSTRAINT, color);
 	}
 
-	public static void setConnectionForgroundColor(Color color) {
+	public static void setConnectionForegroundColor(Color color) {
 		CURRENT_CONNECTION_FOREGROUND = color;
 		setColor(QN_CONNECTION, color);
 	}
 
-	public static Color getConnectionForgroundColor() {
+	public static Color getConnectionForegroundColor() {
 		if (CURRENT_CONNECTION_FOREGROUND == null) {
 			CURRENT_CONNECTION_FOREGROUND = getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
 		}
@@ -567,15 +568,28 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return GUIBasics.createLineBorder(getDiagramBackgroundColor(), 1, SWT.LINE_DOT);
 	}
 
-	public static Color getDecoratorForgroundColor() {
+	public static Color getDecoratorForegroundColor() {
 		if (CURRENT_DECORATOR_FORGROUND_COLOR == null) {
-			CURRENT_DECORATOR_FORGROUND_COLOR = getConnectionForgroundColor();
+			CURRENT_DECORATOR_FORGROUND_COLOR = getConnectionForegroundColor();
 		}
 		return CURRENT_DECORATOR_FORGROUND_COLOR;
 	}
 
 	public static Color getDecoratorBackgroundColor() {
 		return getDiagramBackgroundColor();
+	}
+	
+	public static Border getReasonBorder(Explanation.Reason reason) {
+		return GUIBasics.createLineBorder(getReasonColor(reason), getReasonLineWidth(reason));
+	}
+	
+	public static Color getReasonColor(Explanation.Reason reason) {
+//		FMCorePlugin.getDefault().logInfo(reason.getSourceElement().getName() + " got color " + GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0));
+		return GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0);
+	}
+	
+	public static int getReasonLineWidth(Explanation.Reason reason) {
+		return 3;
 	}
 
 	/**

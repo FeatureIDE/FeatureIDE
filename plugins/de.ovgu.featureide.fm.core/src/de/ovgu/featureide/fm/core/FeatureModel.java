@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import static de.ovgu.featureide.fm.core.base.FeatureUtils.convert;
+import static de.ovgu.featureide.fm.core.base.FeatureUtilsLegacy.convert;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -38,6 +38,7 @@ import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.FeatureUtilsLegacy;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -93,15 +94,15 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 
 	@Override
 	public FMComposerManager getFMComposerManager(final IProject project) {
-		return model.getFMComposerManager(project);
+		return (FMComposerManager) FMComposerManager.getFMComposerExtension(null);
 	}
 
 	public IFMComposerExtension initFMComposerExtension(final IProject project) {
-		return model.initFMComposerExtension(project);
+		return FMComposerManager.getFMComposerExtension(null);
 	}
 
 	public IFMComposerExtension getFMComposerExtension() {
-		return model.getFMComposerExtension();
+		return FMComposerManager.getFMComposerExtension(null);
 	}
 
 	@Override
@@ -143,7 +144,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public Collection<Feature> getFeatures() {
-		return Functional.toList(Functional.map(FeatureUtils.getFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getFeatures(model), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
 	}
 
 	/**
@@ -151,7 +152,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	 */
 	@CheckForNull
 	public Feature getFeature(String name) {
-		return convert(FeatureUtils.getFeature(model, name));
+		return FeatureUtilsLegacy.convert(FeatureUtils.getFeature(model, name));
 	}
 
 	/**
@@ -160,7 +161,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	 */
 	@Nonnull
 	public Collection<Feature> getConcreteFeatures() {
-		return Functional.toList(Functional.map(FeatureUtils.getConcreteFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getConcreteFeatures(model), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
 	}
 
 	/**
@@ -173,7 +174,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public Collection<Feature> getFeaturesPreorder() {
-		return Functional.toList(Functional.map(FeatureUtils.getFeaturesPreorder(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getFeaturesPreorder(model), FeatureUtilsLegacy.IFEATURE_TO_FEATURE));
 	}
 
 	public List<String> getFeatureNamesPreorder() {
@@ -221,7 +222,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void setConstraints(final LinkedList<Constraint> constraints) {
-		FeatureUtils.setConstraints(model, Functional.map(Functional.toIterator(constraints), FeatureUtils.CONSTRAINT_TO_ICONSTRANT));
+		FeatureUtils.setConstraints(model, Functional.map(constraints, FeatureUtilsLegacy.CONSTRAINT_TO_ICONSTRANT));
 	}
 
 	public void addPropositionalNode(Node node) {
@@ -229,7 +230,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void addConstraint(Constraint constraint) {
-		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint));
+		FeatureUtils.addConstraint(model, convert(constraint));
 	}
 
 	public void addPropositionalNode(Node node, int index) {
@@ -237,7 +238,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 	
 	public void addConstraint(Constraint constraint, int index) {
-		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint), index);
+		FeatureUtils.addConstraint(model, convert(constraint), index);
 	}
 
 	public List<Node> getPropositionalNodes() {
@@ -249,11 +250,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public List<Constraint> getConstraints() {
-		return Functional.toList(Functional.map(FeatureUtils.getConstraints(model), FeatureUtils.ICONSTRAINT_TO_CONSTRANT));
+		return Functional.toList(Functional.map(FeatureUtils.getConstraints(model), FeatureUtilsLegacy.ICONSTRAINT_TO_CONSTRANT));
 	}
 
 	public int getConstraintIndex(Constraint constraint) {
-		return FeatureUtils.getConstraintIndex(model, FeatureUtils.convert(constraint));
+		return FeatureUtils.getConstraintIndex(model, convert(constraint));
 	}
 
 	public void removePropositionalNode(Node node) {
@@ -261,7 +262,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void removeConstraint(Constraint constraint) {
-		FeatureUtils.removeConstraint(model, FeatureUtils.convert(constraint));
+		FeatureUtils.removeConstraint(model, FeatureUtilsLegacy.convert(constraint));
 	}
 
 	public void removeConstraint(int index) {

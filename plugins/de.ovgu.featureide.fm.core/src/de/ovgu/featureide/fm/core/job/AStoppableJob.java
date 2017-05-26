@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,19 +22,22 @@ package de.ovgu.featureide.fm.core.job;
 
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Abstract eclipse job which can be stopped.
  * 
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br/>
+ * A {@link IRunner} from the wrapper can be made stoppable via {@link IRunner#setStoppable(boolean)}.
+ * 
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
+@SuppressWarnings("rawtypes")
+@Deprecated
 public abstract class AStoppableJob extends AbstractJob implements IStoppableJob {
 	
 	private class InnerThread extends Thread {
-		private boolean success = false;
-		
 		public InnerThread() {
 			super("Thread-" + AStoppableJob.this.getName());
 			
@@ -51,17 +54,16 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 		@Override
 		public void run() {
 			try {
-				success = AStoppableJob.this.work();
+				AStoppableJob.this.work();
 			} catch (Exception e) {
-				success = false;
-				FMCorePlugin.getDefault().logError(e);
+				Logger.logError(e);
 			}
 		}
 	}
 	
 	private int cancelingTimeout = 300;
 	
-	private InnerThread innerThread = null;
+	private InnerThread innerThread = new InnerThread();;
 	
 	protected AStoppableJob(String name, int priority) {
 		super(name, priority);
@@ -86,7 +88,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 					try {
 						Thread.sleep(cancelingTimeout);
 					} catch (InterruptedException e) {
-						FMCorePlugin.getDefault().logError(e);
+						Logger.logError(e);
 					}
 					stopInnerThread();
 				}
@@ -95,37 +97,12 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 			stopInnerThread();
 		}
 	}
-	
+
 	@Override
 	public final int getCancelingTimeout() {
 		return cancelingTimeout;
 	}
-	
-	@Override
-	public final boolean run2() {
-		workMonitor.begin(getName());
-		
-		synchronized (this) {
-			// in case job was started and canceled at the same time
-			if (workMonitor.checkCancel()) {
-				workMonitor.done();
-				return false;
-			}
-			innerThread = new InnerThread();
-			innerThread.start();
-		}
-		try {
-			innerThread.join();
-			workMonitor.done();
-			return innerThread.success;
-		} catch (InterruptedException e) {
-			FMCorePlugin.getDefault().logError(e);
-			stopInnerThread();
-			workMonitor.done();
-			return false;
-		}
-	}
-	
+
 	@Override
 	public final void setCancelingTimeout(int cancelingTimeout) {
 		this.cancelingTimeout = cancelingTimeout;
@@ -137,7 +114,6 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 	 */
 	protected abstract boolean work() throws Exception;
 
-	@SuppressWarnings("deprecation")
 	private void stopInnerThread() {
 		try {
 		if (innerThread.isAlive()) {

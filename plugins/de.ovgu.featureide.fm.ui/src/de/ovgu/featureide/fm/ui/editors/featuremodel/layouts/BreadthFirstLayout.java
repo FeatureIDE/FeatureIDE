@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,7 +24,6 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -52,12 +51,11 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		yoffset = 0;
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
-		layout(yoffset, featureModel.getConstraints());
+		layout(yoffset, featureModel.getVisibleConstraints());
 	}
 
 	private void layout(IGraphicalFeature root) {
-		final HiddenFilter hiddenFilter = new HiddenFilter();
-		if (root == null || !hiddenFilter.isValid(root)) {
+		if (root == null || root.getObject().getStructure().isHidden()) {
 			return;
 		}
 		LinkedList<IGraphicalFeature> list = new LinkedList<>();
@@ -81,11 +79,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 				setLocation(feature, new Point(xoffset, yoffset));
 				xoffset += feature.getSize().width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
-				if (showHidden) {
-					list.addAll(FeatureUIHelper.getGraphicalChildren(feature));
-				} else {
-					list.addAll(Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), hiddenFilter)));
-				}
+				list.addAll(getChildren(feature));
 			}
 			yoffset += FMPropertyManager.getFeatureSpaceY();
 		}

@@ -1,13 +1,8 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
-
-
-#ifdef Hello
 	printf("Hello");
-#endif
 #ifdef Beautiful
 	printf(" beautiful");
 #endif
@@ -15,9 +10,7 @@ int main(void) {
 	printf(" wonderful");
 #endif
 #ifdef World
-	printf(" world!");
+	printf(" world");
 #endif
-
-
 	return 0;
 }

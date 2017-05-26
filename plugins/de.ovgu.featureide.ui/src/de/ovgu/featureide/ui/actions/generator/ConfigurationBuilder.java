@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,6 +32,7 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -48,9 +49,10 @@ import org.eclipse.jdt.internal.core.JavaProject;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.configuration.AConfigurationGenerator;
@@ -116,7 +118,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	private int built;
 
-
 	/**
 	 * This flag indicates that all jobs should be aborted.
 	 */
@@ -143,12 +144,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	/**
 	 * This list contains all {@link Generator} jobs.
 	 */
-	List<Generator> generatorJobs = new ArrayList<>();
-	
+	final List<Generator> generatorJobs = new ArrayList<>();
+
 	public AbstractConfigurationSorter sorter;
-	
+
 	public final boolean runTests;
-	
+
 	TestResults testResults;
 
 	private AConfigurationGenerator configurationBuilder;
@@ -188,7 +189,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param createNewProjects
 	 *            <code>true</code> if the configurations should be built into
 	 *            separate projects
-	 * @param runTests 
+	 * @param runTests
 	 * @param max Maximal number of configurations to generate.
 	 * @param tOrder 
 	 * @see BuildAllCurrentConfigurationsAction
@@ -197,13 +198,13 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, int max, int tOrder) {
 		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, runTests, null, max, tOrder);
 	}
-	
+
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final String featureName) {
 		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, featureName, Integer.MAX_VALUE, 1);
 	}
+
 	static int id = 0;
 	IProgressMonitor globalMonitor;
-		
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, 
 			final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, final String featureName, final int maxConfigs, int tOrder) {
 		this.runTests = runTests;
@@ -271,10 +272,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			throw new RuntimeException(buildType + " not supported");
 		}
 		jobName += StringTable.FOR + featureProject.getProjectName();
+		RemoveBaseMarkerFromSourceFolderFiles();
 		Job job = new Job(jobName) {
-			
-			
-			private LongRunningJob<Void> configurationBuilderJob;
+
+			private IRunner<Void> configurationBuilderJob;
 
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -299,8 +300,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					} else {
 						newgeneratorJobs(1);
 					}
-					configurationBuilderJob = LongRunningWrapper.startJob("Create Configurations " + id++, configurationBuilder);
-
+					configurationBuilderJob = LongRunningWrapper.getRunner(configurationBuilder, "Create Configurations " + id++);
+					configurationBuilderJob.schedule();
 					showStatistics(monitor);
 					if (!createNewProjects) {
 						try {
@@ -322,67 +323,66 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 			private void showStatistics(IProgressMonitor monitor) {
 				try {
-					synchronized (this) {
-						while (configurationBuilderJob.getStatus() == JobStatus.NOT_STARTED) {
-							try {
-								Thread.sleep(150);
-							} catch (InterruptedException e) {
-								LOGGER.logError(e);
-							}
-						}
-						while (configurationBuilderJob.getStatus() == JobStatus.RUNNING) {
-							monitor.setTaskName(getTaskName());
-							if (monitor.isCanceled()) {
-								cancelGenerationJobs();
-								configurationBuilderJob.cancel();
-								return;
-							}
-							try {
-								Thread.sleep(150);
-							} catch (InterruptedException e) {
-								LOGGER.logError(e);
-							}
-						}
-						System.err.println(configurationBuilderJob.getStatus());
-						
-						if (!sorter.isSorted()) {
-							monitor.setTaskName(getTaskName());
-							final WorkMonitor workMonitor = new WorkMonitor();
-							workMonitor.setMonitor(monitor);
-							configurationNumber = Math.min(configurationNumber, sorter.sortConfigurations(workMonitor));
-						}
-						finish();
-						
-						((SubMonitor)monitor).setWorkRemaining((int)configurationNumber - built);
-						while (!generatorJobs.isEmpty()) {
-							try {
-								if (monitor.isCanceled()) {
-									cancelGenerationJobs();
-									break;
-								}
-								Generator generator = generatorJobs.get(0);
-								if (generator.getState() == Thread.State.TERMINATED) {
-									generatorJobs.remove(generator);
-									if (sorter.getBufferSize() != 0) {
-										createNewGenerator(generator.nr);
-									}
-								}
-								monitor.setTaskName(getTaskName());
-								Thread.sleep(150);
-							} catch (InterruptedException e) {
-								LOGGER.logError(e);
-							} catch (IndexOutOfBoundsException e) {
-								// nothing here
-							}
+					while (configurationBuilderJob.getStatus() == JobStatus.NOT_STARTED) {
+						try {
+							Thread.sleep(150);
+						} catch (InterruptedException e) {
+							LOGGER.logError(e);
 						}
 					}
-	
+					while (configurationBuilderJob.getStatus() == JobStatus.RUNNING) {
+						monitor.setTaskName(getTaskName());
+						if (monitor.isCanceled()) {
+							cancelGenerationJobs();
+							configurationBuilderJob.cancel();
+							return;
+						}
+						try {
+							Thread.sleep(150);
+						} catch (InterruptedException e) {
+							LOGGER.logError(e);
+						}
+					}
+					System.err.println(configurationBuilderJob.getStatus());
+
+					if (!sorter.isSorted()) {
+						final IMonitor workMonitor = new ProgressMonitor(getTaskName(), monitor);
+						configurationNumber = Math.min(configurationNumber, sorter.sortConfigurations(workMonitor));
+					}
+					finish();
+
+					((SubMonitor) monitor).setWorkRemaining((int) configurationNumber - built);
+					while (!generatorJobs.isEmpty()) {
+						try {
+							if (monitor.isCanceled()) {
+								cancelGenerationJobs();
+								break;
+							}
+								final Generator generator = generatorJobs.get(0);
+								if (generator == null) {
+									// generator can never be null, however see #416
+									generatorJobs.remove(0);
+								} else if (generator.getState() == Thread.State.TERMINATED) {
+								generatorJobs.remove(generator);
+								if (sorter.getBufferSize() != 0) {
+									createNewGenerator(generator.nr);
+								}
+							}
+							monitor.setTaskName(getTaskName());
+							Thread.sleep(150);
+						} catch (InterruptedException e) {
+							LOGGER.logError(e);
+						} catch (IndexOutOfBoundsException e) {
+							// nothing here
+						}
+					}
+
 					long duration = System.currentTimeMillis() - time;
 					long s = (duration / 1000) % 60;
 					long min = (duration / (60 * 1000)) % 60;
 					long h = duration / (60 * 60 * 1000);
 					String t = h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
-	
+
 					if (built > configurationNumber) {
 						built = (int) configurationNumber;
 					}
@@ -487,13 +487,15 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			IJavaElement[] elements = proj.getChildren();
 			for (IJavaElement e : elements) {
 				String path = e.getPath().toOSString();
-				if (path.contains(":")) {
+				if (e.getPath().isAbsolute()) {
 					classpath += sep + "\"" + path + "\"";
-					continue;
-				}
+				} else {
 				IResource resource = e.getResource();
 				if (resource != null && "jar".equals(resource.getFileExtension())) {
-					classpath += sep + "\"" + resource.getRawLocation().toOSString() + "\"";
+						classpath += sep + "\"" + resource.getLocation().toOSString() + "\"";
+					} else {
+						UIPlugin.getDefault().logWarning("ClassPath element " + e.toString() + " is missing.");
+					}
 				}
 			}
 		} catch (JavaModelException e) {
@@ -564,7 +566,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			t = " " + h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
 		}
 		long buffer = sorter.getBufferSize();
-		return "Built configurations: " + built + "/" + (configurationNumber == Integer.MAX_VALUE ? COUNTING___ : configurationNumber) + "(" + buffer + " buffered)" + " Expected time: " + t;
+		return "Built configurations: " + built + "/" + (configurationNumber == Integer.MAX_VALUE ? COUNTING___ : configurationNumber) + "(" + buffer
+				+ " buffered)" + " Expected time: " + t;
 	}
 
 	/**
@@ -572,9 +575,26 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	public synchronized void builtConfiguration() {
 		built++;
-		((SubMonitor)globalMonitor).setWorkRemaining((int)configurationNumber - built);
+		((SubMonitor) globalMonitor).setWorkRemaining((int) configurationNumber - built);
 		globalMonitor.setTaskName(getTaskName());
 		globalMonitor.worked(1);
 	}
-	
+
+
+
+	/**
+	 * Removes the base markers from every file in the source folder
+	 */
+	public void RemoveBaseMarkerFromSourceFolderFiles()
+	{
+		try {
+			IMarker[] baseMarker = featureProject.getSourceFolder().findMarkers(IMarker.MARKER, true, IResource.DEPTH_INFINITE);
+			for (IMarker iMarker : baseMarker) {
+				iMarker.delete();
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+	}
+
 }

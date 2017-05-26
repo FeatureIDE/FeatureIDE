@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -41,7 +41,6 @@ public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeature
 
 	public static GraphicalFeatureModelManager getInstance(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {
 		final GraphicalFeatureModelManager manager = FileManagerMap.getInstance(model, absolutePath, format, GraphicalFeatureModelManager.class, IGraphicalFeatureModel.class);
-		manager.read();
 		return manager;
 	}
 

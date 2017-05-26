@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -143,7 +143,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			}
 			initialize(configFeatureProject);
 		}
-		featureCpp.compose(config);
+		featureCpp.compose(createTemporaryConfigrationsFile(config));
 		buildFSTModel();
 	}
 
@@ -264,7 +264,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			InputStream source = new ByteArrayInputStream(stringBuilder.toString()
 					.getBytes(Charset.availableCharsets().get("UTF-8")));
 			
-			IFile file = parentFolder.getFile("." + getConfigurationExtension());
+			IFile file = parentFolder.getFile("temp." + getConfigurationExtension());
 			try {
 				if (file.exists()) {
 					file.setContents(source, false, true, null);	
@@ -274,7 +274,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			} catch (CoreException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
-			featureCppModelWrapper.compose(file);
+			featureCppModelWrapper.compose(createTemporaryConfigrationsFile(file));
 			try {
 				tempFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			} catch (CoreException e) {
@@ -291,7 +291,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		try {
 			for (IResource res : folder.members()) {
 				if (res instanceof IFile && getConfigurationExtension().equals(res.getFileExtension())) {
-					featureCpp.compose((IFile)res);
+					featureCpp.compose(createTemporaryConfigrationsFile((IFile)res));
 				}
 			}
 		} catch (CoreException e) {

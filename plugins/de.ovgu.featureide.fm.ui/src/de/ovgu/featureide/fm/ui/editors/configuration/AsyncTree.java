@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -106,9 +106,7 @@ public class AsyncTree extends Thread {
 			final TreeItem[] children = item.getItems();
 			for (int i = 0; i < children.length; i++) {
 				final TreeItem childNode = children[i];
-				if (childNode.getItemCount() > 0) {
-					runnableList.add(new Traverser(childNode, perNodeFunction));
-				}
+				runnableList.add(new Traverser(childNode, perNodeFunction));
 			}
 			dec();
 		}
@@ -145,7 +143,7 @@ public class AsyncTree extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				currentDisplay.asyncExec(runnableList.take());
+				currentDisplay.syncExec(runnableList.take());
 			}
 		} catch (InterruptedException e) {
 		}

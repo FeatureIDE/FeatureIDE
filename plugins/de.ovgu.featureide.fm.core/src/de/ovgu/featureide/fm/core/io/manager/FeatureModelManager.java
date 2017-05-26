@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,20 +20,21 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.CheckForNull;
 
-import org.eclipse.core.resources.IResource;
-
 import de.ovgu.featureide.fm.core.ExtensionManager;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.InternalFeatureModelFormat;
 
 /**
  * Responsible to load and save all information for a feature model instance.
@@ -42,22 +43,33 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
-	public static FeatureModelManager getInstance(IResource modelFile) {
-		final String path = modelFile.getLocation().toString();
-		FeatureModelManager featureModelManager = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(path);
+	/**
+	 * Returns a singleton instance of a feature model manager associated with the specified model file.
+	 * 
+	 * @param modelFile Path to the physical model file.
+	 * @return
+	 */
+	public static FeatureModelManager getInstance(Path modelFile) {
+		final String path = modelFile.toAbsolutePath().toString();
+		FeatureModelManager featureModelManager = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(path);
 		if (featureModelManager == null) {
 			IFeatureModelFactory factory;
 			final IFeatureModelFormat format = FeatureModelManager.getFormat(path);
 			// TODO throw exception
 			if (format == null) {
-				FMCorePlugin.getDefault().logError(new ExtensionManager.NoSuchExtensionException("No format found for " + path));
-				factory = FMFactoryManager.getFactory();
+				Logger.logError(new ExtensionManager.NoSuchExtensionException("No format found for " + path));
+				try {
+					factory = FMFactoryManager.getDefaultFactoryForPath(path);
+				} catch (Exception e) {
+					Logger.logError(e);
+					factory = FMFactoryManager.getDefaultFactory();
+				}
 			} else {
 				try {
-					factory = FMFactoryManager.getFactory(modelFile.getLocation().toString(), format);
+					factory = FMFactoryManager.getFactory(path, format);
 				} catch (Exception e) {
-					FMCorePlugin.getDefault().logError(e);
-					factory = FMFactoryManager.getFactory();
+					Logger.logError(e);
+					factory = FMFactoryManager.getDefaultFactory();
 				}
 			}
 			featureModelManager = FeatureModelManager.getInstance(factory.createFeatureModel(), path, format);
@@ -75,20 +87,74 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return (IFeatureModelFormat) super.getFormat();
 	}
 
+	/**
+	 * Returns a singleton instance of a feature model manager associated with the specified model file.
+	 * 
+	 * @param model
+	 * @param absolutePath
+	 * @param format
+	 * @return
+	 */
 	public static FeatureModelManager getInstance(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> format) {
 		final FeatureModelManager instance = FileManagerMap.getInstance(model, absolutePath, format, FeatureModelManager.class, IFeatureModel.class);
-		model.setSourceFile(new File(absolutePath));
-		instance.read();
 		return instance;
 	}
 
 	protected FeatureModelManager(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> modelHandler) {
-		super(model, absolutePath, modelHandler);
+		super(setSourcePath(model, absolutePath), absolutePath, modelHandler);
+	}
+
+	private static IFeatureModel setSourcePath(IFeatureModel model, String absolutePath) {
+		model.setSourceFile(Paths.get(absolutePath));
+		return model;
+	}
+
+	@Override
+	protected boolean compareObjects(IFeatureModel o1, IFeatureModel o2) {
+		final InternalFeatureModelFormat format = new InternalFeatureModelFormat();
+		final String s1 = format.getInstance().write(o1);
+		final String s2 = format.getInstance().write(o2);
+		return s1.equals(s2);
+	}
+
+	@Override
+	public void override() {
+		persistentObject.setUndoContext(variableObject.getUndoContext());
+		super.override();
 	}
 
 	@Override
 	protected IFeatureModel copyObject(IFeatureModel oldObject) {
-		return oldObject.clone();
+		final IFeatureModel clone = oldObject.clone();
+		clone.setUndoContext(oldObject.getUndoContext());
+		return clone;
+	}
+
+	public static IFeatureModel readFromFile(Path path) {
+		try {
+			final String pathString = path.toAbsolutePath().toString();
+			final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
+			final IFeatureModel featureModel = FMFactoryManager.getFactory(pathString, format).createFeatureModel();
+			FileHandler.load(path, featureModel, format);
+			return featureModel;
+		} catch (NoSuchExtensionException e) {
+			Logger.logError(e);
+		}
+		return null;
+	}
+
+	public static boolean writeToFile(IFeatureModel featureModel, Path path) {
+		final String pathString = path.toAbsolutePath().toString();
+		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
+		return !FileHandler.save(path, featureModel, format).containsError();
+	}
+	
+	public static boolean convert(Path inPath, Path outPath) {
+		IFeatureModel featureModel = readFromFile(inPath);
+		if (featureModel == null) {
+			return false;
+		}
+		return writeToFile(featureModel, outPath);
 	}
 
 }

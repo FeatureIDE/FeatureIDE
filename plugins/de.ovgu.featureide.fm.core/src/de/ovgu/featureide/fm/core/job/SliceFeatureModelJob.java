@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,18 +35,20 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
@@ -55,13 +57,13 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Arguments> implements LongRunningMethod<IFeatureModel> {
+public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Arguments, IFeatureModel> {
 
 	public static class Arguments extends JobArguments {
+		private final boolean considerConstraints;
 		private final IFeatureModel featuremodel;
 		private final Collection<String> featureNames;
 		private final Path modelFile;
-		private final boolean considerConstraints;
 
 		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
 			super(Arguments.class);
@@ -72,141 +74,27 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		}
 	}
 
+	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
+	private static final String MARK1 = "?", MARK2 = "??";
+	
+	private boolean changed = false;
+
 	private IFeatureModel newInterfaceModel = null;
 
 	public SliceFeatureModelJob(Arguments arguments) {
 		super("Slice Feature Model", arguments);
 	}
 
-	public IFeatureModel getInterfaceModel() {
-		return newInterfaceModel;
+	private static boolean checkLiteral(final SatSolver solver, Node clause) throws TimeoutException {
+		final Literal literal = (Literal) clause.clone();
+		literal.flip();
+		if (solver.isSatisfiable(new Literal[] { literal })) {
+			return true;
+		}
+		return false;
 	}
 
-	@Override
-	public IFeatureModel execute(WorkMonitor monitor) throws Exception {
-		return createInterface(arguments.featuremodel, arguments.featureNames);
-	}
-
-	@Override
-	protected boolean work() {
-		newInterfaceModel = createInterface(arguments.featuremodel, arguments.featureNames);
-
-		String fileName = arguments.modelFile.getFileName().toString();
-		final int extIndex = fileName.lastIndexOf('.');
-		if (extIndex > 0) {
-			fileName = fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml";
-		} else {
-			fileName = fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
-		}
-		final Path outputPathRoot = arguments.modelFile.getRoot();
-		final Path outputPath = arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1);
-
-		FileHandler.save(outputPathRoot.resolve(outputPath).resolve(fileName), newInterfaceModel, new XmlFeatureModelFormat());
-
-		return true;
-	}
-
-	public IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
-		// Calculate Constraints
-		IFeatureModel m = orgFeatureModel.clone();
-		for (IFeature feat : m.getFeatures()) {
-			feat.getStructure().setAbstract(!selectedFeatureNames.contains(feat.getName()));
-		}
-		workMonitor.setMaxAbsoluteWork(3);
-		ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(m));
-		removeFeatures.removeAll(selectedFeatureNames);
-		final AdvancedNodeCreator nc = new AdvancedNodeCreator(m, removeFeatures, CNFType.Regular, ModelType.All, false);
-		final Node cnf = nc.createNodes();
-		workMonitor.worked();
-
-		// mark features
-		for (IFeature feat : m.getFeatures()) {
-			if (!selectedFeatureNames.contains(feat.getName())) {
-				feat.setName(MARK1);
-			}
-		}
-
-		IFeature root = m.getStructure().getRoot().getFeature();
-
-		m.getStructure().setRoot(null);
-		m.reset();
-
-		// set new abstract root
-		IFeature nroot = FMFactoryManager.getFactory().createFeature(m, "__root__");
-		nroot.getStructure().setAbstract(true);
-		nroot.getStructure().setAnd();
-		nroot.getStructure().addChild(root.getStructure());
-		root.getStructure().setParent(nroot.getStructure());
-
-		// merge tree
-		cut(nroot);
-		do {
-			changed = false;
-			merge(nroot.getStructure(), GROUP_NO);
-		} while (changed);
-
-		int count = 0;
-		Hashtable<String, IFeature> featureTable = new Hashtable<String, IFeature>();
-		LinkedList<IFeature> featureStack = new LinkedList<IFeature>();
-		featureStack.push(nroot);
-		while (!featureStack.isEmpty()) {
-			IFeature curFeature = featureStack.pop();
-			for (IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
-				featureStack.push(feature);
-			}
-			if (curFeature.getName().startsWith(MARK1)) {
-				curFeature.setName("_Abstract_" + count++);
-				curFeature.getStructure().setAbstract(true);
-			}
-			featureTable.put(curFeature.getName(), curFeature);
-		}
-		m.setFeatureTable(featureTable);
-		m.getStructure().setRoot(nroot.getStructure());
-
-		if (arguments.considerConstraints) {
-			final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
-			for (IConstraint constaint : orgFeatureModel.getConstraints()) {
-				final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
-				boolean containsAllfeatures = !containedFeatures.isEmpty();
-				for (IFeature feature : containedFeatures) {
-					if (!selectedFeatureNames.contains(feature.getName())) {
-						containsAllfeatures = false;
-						break;
-					}
-				}
-				if (containsAllfeatures) {
-					innerConstraintList.add(constaint);
-				}
-			}
-			for (IConstraint constraint : innerConstraintList) {
-				m.addConstraint(constraint.clone(m));
-			}
-		}
-
-		if (cnf instanceof And) {
-			final Node[] children = cnf.getChildren();
-			workMonitor.setMaxAbsoluteWork(children.length + 2);
-
-			final SatSolver modelSatSolver = new SatSolver(AdvancedNodeCreator.createCNF(m), 1000, false);
-			workMonitor.worked();
-			for (int i = 0; i < children.length; i++) {
-				final Node child = children[i];
-
-				try {
-					if (checkOr(modelSatSolver, child)) {
-						m.addConstraint(FMFactoryManager.getFactory().createConstraint(m, child));
-					}
-				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
-				} finally {
-					workMonitor.worked();
-				}
-			}
-		}
-		return m;
-	}
-
-	private boolean checkOr(final SatSolver solver, Node clause) throws TimeoutException {
+	private static boolean checkOr(final SatSolver solver, Node clause) throws TimeoutException {
 		if (clause instanceof Or) {
 			Node[] clauseChildren = clause.getChildren();
 			Literal[] literals = new Literal[clauseChildren.length];
@@ -224,20 +112,84 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		return false;
 	}
 
-	private boolean checkLiteral(final SatSolver solver, Node clause) throws TimeoutException {
-		final Literal literal = (Literal) clause.clone();
-		literal.flip();
-		if (solver.isSatisfiable(new Literal[] { literal })) {
-			return true;
+	private static boolean cut(final IFeature curFeature) {
+		final IFeatureStructure structure = curFeature.getStructure();
+		boolean notSelected = curFeature.getName().equals(MARK1);
+
+		List<IFeature> list = FeatureUtils.convertToFeatureList(structure.getChildren());
+		if (list.isEmpty()) {
+			return notSelected;
+		} else {
+			boolean[] remove = new boolean[list.size()];
+			int removeCount = 0;
+
+			int i = 0;
+			for (IFeature child : list) {
+				remove[i++] = cut(child);
+			}
+
+			// remove children
+			Iterator<IFeature> it = list.iterator();
+			for (i = 0; i < remove.length; i++) {
+				IFeature feat = it.next();
+				if (remove[i]) {
+					it.remove();
+					feat.getStructure().getParent().removeChild(feat.getStructure());
+					feat.getStructure().setParent(null);
+					removeCount++;
+					//    				changed = true;
+				}
+			}
+			if (list.isEmpty()) {
+				structure.setAnd();
+				return notSelected;
+			} else {
+				switch (getGroup(structure)) {
+				case GROUP_OR:
+					if (removeCount > 0) {
+						structure.setAnd();
+						for (IFeature child : list) {
+							child.getStructure().setMandatory(false);
+						}
+					} else if (list.size() == 1) {
+						structure.setAnd();
+						for (IFeature child : list) {
+							child.getStructure().setMandatory(true);
+						}
+					}
+					break;
+				case GROUP_ALT:
+					if (removeCount > 0) {
+						if (list.size() == 1) {
+							structure.setAnd();
+							for (IFeature child : list) {
+								child.getStructure().setMandatory(false);
+							}
+						} else {
+							final IFeatureModel featureModel = curFeature.getFeatureModel();
+							IFeature pseudoAlternative = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, MARK2);
+							pseudoAlternative.getStructure().setMandatory(false);
+							pseudoAlternative.getStructure().setAlternative();
+							for (IFeature child : list) {
+								pseudoAlternative.getStructure().addChild(child.getStructure());
+								structure.removeChild(child.getStructure());
+							}
+							list.clear();
+							structure.setAnd();
+							structure.addChild(pseudoAlternative.getStructure());
+						}
+					} else if (list.size() == 1) {
+						structure.setAnd();
+						for (IFeature child : list) {
+							child.getStructure().setMandatory(true);
+						}
+					}
+					break;
+				}
+			}
 		}
 		return false;
 	}
-
-	private static final String MARK1 = "?", MARK2 = "??";
-
-	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
-
-	private boolean changed = false;
 
 	private static int getGroup(IFeatureStructure f) {
 		if (f == null) {
@@ -248,6 +200,71 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			return GROUP_OR;
 		} else {
 			return GROUP_ALT;
+		}
+	}
+
+	@Override
+	public IFeatureModel execute(IMonitor monitor) throws Exception {
+		newInterfaceModel = sliceModel(arguments.featuremodel, arguments.featureNames, monitor);
+		saveModel();
+		return newInterfaceModel;
+	}
+
+	public IFeatureModel getInterfaceModel() {
+		return newInterfaceModel;
+	}
+
+	// TODO Change to own job
+	public IFeatureModel sliceModel(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames, IMonitor monitor) {
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(orgFeatureModel);
+		monitor.setTaskName("Slicing Feature Model");
+		monitor.setRemainingWork(100);
+		
+		monitor.checkCancel();
+		final Node cnf = sliceFormula(selectedFeatureNames, orgFeatureModel, monitor.subTask(80));
+		monitor.checkCancel();
+		final IFeatureModel m = sliceTree(selectedFeatureNames, orgFeatureModel, factory, monitor.subTask(2));
+		monitor.checkCancel();
+		merge(factory, cnf, m, monitor.subTask(18));
+
+		return m;
+	}
+
+	private void deleteFeature(IFeatureStructure curFeature) {
+		IFeatureStructure parent = curFeature.getParent();
+		List<IFeatureStructure> children = curFeature.getChildren();
+		parent.removeChild(curFeature);
+		changed = true;
+		for (IFeatureStructure child : children) {
+			parent.addChild(child);
+		}
+		children.clear();// XXX code smell
+	}
+
+	private void merge(IFeatureModelFactory factory, Node cnf, IFeatureModel m, IMonitor monitor) {
+		monitor.setTaskName("Adding Constraints");
+		if (cnf instanceof And) {
+			final Node[] children = cnf.getChildren();
+			monitor.setRemainingWork(children.length + 1);
+
+			final SatSolver modelSatSolver = new SatSolver(AdvancedNodeCreator.createCNF(m), 1000, false);
+			monitor.step();
+			
+			for (int i = 0; i < children.length; i++) {
+				final Node child = children[i];
+				try {
+					if (checkOr(modelSatSolver, child)) {
+						m.addConstraint(factory.createConstraint(m, child));
+					}
+				} catch (TimeoutException e) {
+					Logger.logError(e);
+				} finally {
+					monitor.step();
+				}
+			}
+		} else {
+			monitor.setRemainingWork(1);
+			monitor.worked();
 		}
 	}
 
@@ -314,93 +331,100 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		}
 	}
 
-	private void deleteFeature(IFeatureStructure curFeature) {
-		IFeatureStructure parent = curFeature.getParent();
-		List<IFeatureStructure> children = curFeature.getChildren();
-		parent.removeChild(curFeature);
-		changed = true;
-		for (IFeatureStructure child : children) {
-			parent.addChild(child);
+	private void saveModel() {
+		final Path filePath = arguments.modelFile.getFileName();
+		final Path root = arguments.modelFile.getRoot();
+		if (filePath != null && root != null) {
+			String fileName = filePath.toString();
+			final int extIndex = fileName.lastIndexOf('.');
+			fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
+					: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
+			final Path outputPath = root.resolve(arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1)).resolve(fileName);
+
+			FileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
 		}
-		children.clear();// XXX code smell
 	}
 
-	private static boolean cut(final IFeature curFeature) {
-		final IFeatureStructure structure = curFeature.getStructure();
-		boolean notSelected = curFeature.getName().equals(MARK1);
+	private Node sliceFormula(Collection<String> selectedFeatureNames, IFeatureModel m, IMonitor monitor) {
+		monitor.setTaskName("Slicing Feature Model Formula");
+		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(m));
+		removeFeatures.removeAll(selectedFeatureNames);
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(m, removeFeatures, CNFType.Regular, ModelType.All, false);
+		final Node cnf = LongRunningWrapper.runMethod(nc, monitor);
+		return cnf;
+	}
 
-		List<IFeature> list = FeatureUtils.convertToFeatureList(structure.getChildren());
-		if (list.isEmpty()) {
-			return notSelected;
-		} else {
-			boolean[] remove = new boolean[list.size()];
-			int removeCount = 0;
-
-			int i = 0;
-			for (IFeature child : list) {
-				remove[i++] = cut(child);
-			}
-
-			// remove children
-			Iterator<IFeature> it = list.iterator();
-			for (i = 0; i < remove.length; i++) {
-				IFeature feat = it.next();
-				if (remove[i]) {
-					it.remove();
-					feat.getStructure().getParent().removeChild(feat.getStructure());
-					feat.getStructure().setParent(null);
-					removeCount++;
-					//    				changed = true;
-				}
-			}
-			if (list.isEmpty()) {
-				structure.setAnd();
-				return notSelected;
-			} else {
-				switch (getGroup(structure)) {
-				case GROUP_OR:
-					if (removeCount > 0) {
-						structure.setAnd();
-						for (IFeature child : list) {
-							child.getStructure().setMandatory(false);
-						}
-					} else if (list.size() == 1) {
-						structure.setAnd();
-						for (IFeature child : list) {
-							child.getStructure().setMandatory(true);
-						}
-					}
-					break;
-				case GROUP_ALT:
-					if (removeCount > 0) {
-						if (list.size() == 1) {
-							structure.setAnd();
-							for (IFeature child : list) {
-								child.getStructure().setMandatory(false);
-							}
-						} else {
-							IFeature pseudoAlternative = FMFactoryManager.getFactory().createFeature(curFeature.getFeatureModel(), MARK2);
-							pseudoAlternative.getStructure().setMandatory(false);
-							pseudoAlternative.getStructure().setAlternative();
-							for (IFeature child : list) {
-								pseudoAlternative.getStructure().addChild(child.getStructure());
-								structure.removeChild(child.getStructure());
-							}
-							list.clear();
-							structure.setAnd();
-							structure.addChild(pseudoAlternative.getStructure());
-						}
-					} else if (list.size() == 1) {
-						structure.setAnd();
-						for (IFeature child : list) {
-							child.getStructure().setMandatory(true);
-						}
-					}
-					break;
-				}
+	private IFeatureModel sliceTree(Collection<String> selectedFeatureNames, IFeatureModel orgFeatureModel, IFeatureModelFactory factory, IMonitor monitor) {
+		monitor.setTaskName("Slicing Feature Tree");
+		monitor.setRemainingWork(2);
+		final IFeatureModel m = orgFeatureModel.clone();
+		// mark features
+		for (IFeature feat : m.getFeatures()) {
+			if (!selectedFeatureNames.contains(feat.getName())) {
+				feat.setName(MARK1);
 			}
 		}
-		return false;
+
+		IFeature root = m.getStructure().getRoot().getFeature();
+
+		m.getStructure().setRoot(null);
+		m.reset();
+
+		// set new abstract root
+		IFeature nroot = factory.createFeature(m, "__root__");
+		nroot.getStructure().setAbstract(true);
+		nroot.getStructure().setAnd();
+		nroot.getStructure().addChild(root.getStructure());
+		root.getStructure().setParent(nroot.getStructure());
+
+		// merge tree
+		cut(nroot);
+		do {
+			changed = false;
+			merge(nroot.getStructure(), GROUP_NO);
+		} while (changed);
+		monitor.step();
+
+		int count = 0;
+		Hashtable<String, IFeature> featureTable = new Hashtable<String, IFeature>();
+		LinkedList<IFeature> featureStack = new LinkedList<IFeature>();
+		featureStack.push(nroot);
+		while (!featureStack.isEmpty()) {
+			IFeature curFeature = featureStack.pop();
+			for (IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
+				featureStack.push(feature);
+			}
+			if (curFeature.getName().startsWith(MARK1)) {
+				curFeature.setName("_Abstract_" + count++);
+				curFeature.getStructure().setAbstract(true);
+			}
+			featureTable.put(curFeature.getName(), curFeature);
+		}
+		m.setFeatureTable(featureTable);
+		m.getStructure().setRoot(nroot.getStructure());
+		
+		if (arguments.considerConstraints) {
+			final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
+			for (IConstraint constaint : orgFeatureModel.getConstraints()) {
+				final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
+				boolean containsAllfeatures = !containedFeatures.isEmpty();
+				for (IFeature feature : containedFeatures) {
+					if (!selectedFeatureNames.contains(feature.getName())) {
+						containsAllfeatures = false;
+						break;
+					}
+				}
+				if (containsAllfeatures) {
+					innerConstraintList.add(constaint);
+				}
+			}
+			for (IConstraint constraint : innerConstraintList) {
+				m.addConstraint(constraint.clone(m));
+			}
+		}
+		monitor.step();
+		
+		return m;
 	}
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -299,7 +300,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void performRenamings(IFile file) {
-		getRenamingsManager().performRenamings(file);
+		getRenamingsManager().performRenamings(Paths.get(file.getLocationURI()));
 	}
 
 	/**

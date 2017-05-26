@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,130 +21,62 @@
 package de.ovgu.featureide.fm.core.job.util;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
-import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Class for starting jobs. {@link IJob}s in a specific {@link JobSequence} are executed consecutively. {@link IJob}s in different {@link JobSequence}s are
+ * Class for starting jobs. {@link IRunner}s in a specific {@link JobSequence} are executed consecutively. {@link IRunner}s in different {@link JobSequence}s
+ * are
  * executed independent of each other.
  * </br>
  * It is possible to wait for a sequence to finish.
  * 
  * @author Sebastian Krieter
- * @author Marcus Pinnecke (Feature Interface)
  */
-public final class JobSequence implements IJob {
+public final class JobSequence implements LongRunningMethod<Boolean> {
 
-	private final class NextJobListener implements JobFinishListener {
-		@Override
-		public void jobFinished(IJob finishedJob, boolean success) {
-			JobSequence.this.startNextJob();
-		}
+	private static final ConcurrentHashMap<LongRunningMethod<?>, JobSequence> sequenceMap = new ConcurrentHashMap<>();
+
+	public static JobSequence getSequenceForJob(LongRunningMethod<?> method) {
+		return sequenceMap.get(method);
 	}
 
-	private static final ConcurrentHashMap<IJob, JobSequence> sequenceMap = new ConcurrentHashMap<>();
-
-	public static JobSequence getSequenceForJob(IJob currentJob) {
-		return sequenceMap.get(currentJob);
-	}
-
-	private final LinkedList<IJob> jobs = new LinkedList<IJob>();
-	private final LinkedList<JobFinishListener> jobFinishedListeners = new LinkedList<JobFinishListener>();
+	private final LinkedList<LongRunningMethod<?>> jobs = new LinkedList<>();
 
 	private boolean ignorePreviousJobFail = true;
-	private JobStatus status = JobStatus.NOT_STARTED;
 
 	/**
 	 * Adds a new job to the sequence if it has not already finished
 	 * 
 	 * @param newJob the job to add
-	 * @return {@code true} if job was added to the sequence, {@code false} otherwise
 	 */
-	public boolean addJob(IJob newJob) {
-		synchronized (this) {
-			if (status == JobStatus.NOT_STARTED || status == JobStatus.RUNNING) {
-				newJob.addJobFinishedListener(new NextJobListener());
-				jobs.add(newJob);
-				sequenceMap.put(newJob, this);
-				return true;
-			} else {
-				return false;
-			}
+	public void addJob(LongRunningMethod<?> newJob) {
+		synchronized (jobs) {
+			jobs.add(newJob);
+			sequenceMap.put(newJob, this);
 		}
 	}
 
-	public void addJobFinishedListener(JobFinishListener listener) {
-		jobFinishedListeners.add(listener);
-	}
-
-	public boolean cancel() {
-		synchronized (this) {
-			status = JobStatus.FAILED;
-			if (jobs.isEmpty()) {
-				return true;
-			}
-			final IJob curJob = jobs.getFirst();
-			jobs.clear();
-			for (Iterator<Entry<IJob, JobSequence>> it = sequenceMap.entrySet().iterator(); it.hasNext();) {
-				Entry<IJob, JobSequence> sequenceMapping = it.next();
-				if (sequenceMapping.getValue() == this) {
-					it.remove();
-				}
-			}
-			return curJob.cancel();
-		}
-	}
-
-	public JobStatus getStatus() {
-		return status;
-	}
-
-	/**
-	 * @return
-	 */
 	public boolean ignoresPreviousJobFail() {
 		return ignorePreviousJobFail;
 	}
 
-	public void insertJobs(IJob lastJob, Collection<IJob> newJobs) {
-		synchronized (this) {
-			for (ListIterator<IJob> it = jobs.listIterator(); it.hasNext();) {
+	public void insertJobs(LongRunningMethod<?> lastJob, Collection<LongRunningMethod<?>> newJobs) {
+		synchronized (jobs) {
+			for (ListIterator<LongRunningMethod<?>> it = jobs.listIterator(); it.hasNext();) {
 				if (it.next().equals(lastJob)) {
-					for (IJob newJob : newJobs) {
-						newJob.addJobFinishedListener(new JobFinishListener() {
-							@Override
-							public void jobFinished(IJob finishedJob, boolean success) {
-								JobSequence.this.startNextJob();
-							}
-						});
+					for (LongRunningMethod<?> newJob : newJobs) {
 						it.add(newJob);
 						sequenceMap.put(newJob, this);
 					}
 					break;
-				}
-			}
-		}
-	}
-
-	public void removeJobFinishedListener(JobFinishListener listener) {
-		jobFinishedListeners.remove(listener);
-	}
-
-	@Override
-	public void schedule() {
-		final IJob firstJob = jobs.peekFirst();
-		if (firstJob != null) {
-			synchronized (this) {
-				if (status == JobStatus.NOT_STARTED) {
-					status = JobStatus.RUNNING;
-					firstJob.schedule();
 				}
 			}
 		}
@@ -159,55 +91,10 @@ public final class JobSequence implements IJob {
 		this.ignorePreviousJobFail = ignorePreviousJobFail;
 	}
 
-	private void startNextJob() {
-		synchronized (this) {
-			final IJob lastJob = jobs.poll();
-			if (lastJob != null) {
-				JobStatus lastStatus = lastJob.getStatus();
-				IJob nextJob = null;
-				sequenceMap.remove(lastJob);
-
-				for (final Iterator<IJob> it = jobs.iterator(); it.hasNext();) {
-					nextJob = it.next();
-					if (nextJob.getStatus() == JobStatus.FAILED) {
-						lastStatus = JobStatus.FAILED;
-						it.remove();
-						sequenceMap.remove(nextJob);
-					} else if (lastStatus == JobStatus.FAILED && !ignoresPreviousJobFail()) {
-						it.remove();
-						sequenceMap.remove(nextJob);
-					} else {
-						break;
-					}
-				}
-				if (jobs.isEmpty()) {
-					for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
-						try {
-							it.next().jobFinished(this, lastStatus == IJob.JobStatus.OK);
-						} catch (RuntimeException e) {
-							FMCorePlugin.getDefault().logError(e);
-						}
-					}
-					status = JobStatus.OK;
-				} else {
-					nextJob.schedule();
-				}
-			}
-		}
-	}
-
-	@Override
-	public void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-	}
-
-	@Override
-	public void join() throws InterruptedException {
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("JobSequence:");
-		for (IJob job : jobs) {
+		for (LongRunningMethod<?> job : jobs) {
 			sb.append("\n\t");
 			sb.append(job.toString());
 		}
@@ -215,8 +102,28 @@ public final class JobSequence implements IJob {
 	}
 
 	@Override
-	public Class<?> getImplementationClass() {
-		return getClass();
+	public Boolean execute(IMonitor monitor) throws Exception {
+		monitor.setRemainingWork(jobs.size());
+		while (true) {
+			monitor.checkCancel();
+			final LongRunningMethod<?> curJob;
+			synchronized (jobs) {
+				if (jobs.isEmpty()) {
+					break;
+				}
+				curJob = jobs.poll();
+			}
+			final IRunner<?> thread = LongRunningWrapper.getThread(curJob, monitor.subTask(1));
+			thread.schedule();
+			thread.join();
+
+			sequenceMap.remove(curJob);
+
+			if (!ignorePreviousJobFail && thread.getStatus() != JobStatus.OK) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

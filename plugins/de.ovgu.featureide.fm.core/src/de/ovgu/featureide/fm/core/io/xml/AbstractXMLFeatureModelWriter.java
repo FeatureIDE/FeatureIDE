@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -41,17 +41,21 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.AbstractObjectWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Prints a feature model in XML format.
+ * 
+ * @deprecated Use {@link AXMLFormat} and {@link FileHandler} instead.
  * 
  * @author Fabian Wielgorz
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  * @author Jens Meinicke
  */
+@Deprecated
 public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWriter<T> implements XMLFeatureModelTags {
 
 	/**
@@ -110,7 +114,7 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 				line = reader.readLine();
 			}
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		return result.toString();
 	}
@@ -127,7 +131,7 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 		try {
 			db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
-			FMCorePlugin.getDefault().logError(pce);
+			Logger.logError(pce);
 		}
 		Document doc = db.newDocument();
 		//Create the Xml Representation
@@ -138,9 +142,9 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 		try {
 			transfo = TransformerFactory.newInstance().newTransformer();
 		} catch (TransformerConfigurationException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		} catch (TransformerFactoryConfigurationError e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -150,7 +154,7 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 		try {
 			transfo.transform(source, result);
 		} catch (TransformerException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 
 		return prettyPrint(result.getWriter().toString());

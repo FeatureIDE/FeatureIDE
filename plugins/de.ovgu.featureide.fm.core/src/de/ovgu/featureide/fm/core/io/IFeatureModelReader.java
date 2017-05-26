@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,13 +25,17 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Parses a feature model from a given file or string.
  * 
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead.
+ * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
+@Deprecated
 public interface IFeatureModelReader {
 	
 	/**
