@@ -508,20 +508,28 @@ public abstract class Node {
 			nodes[i] = new Not(nodes[i]);
 	}
 
+	/**
+	 * Returns all features contained in this node and its children.
+	 * @return all features contained in this node and its children; not null
+	 */
 	public List<String> getContainedFeatures() {
-		List<String> ret = new ArrayList<>();
-		getContainedFeatures(this, ret);
-		return ret;
+		if (children == null) {
+			return new ArrayList<>();
+		}
+		return new ArrayList<>(getContainedFeatures(new LinkedList<String>()));
 	}
 
-	private void getContainedFeatures(Node actNode, List<String> featureList) {
-		if (actNode instanceof Literal) {
-			featureList.add(((Literal) actNode).var.toString());
-		} else {
-			for (Node child : actNode.getChildren()) {
-				getContainedFeatures(child, featureList);
-			}
+	/**
+	 * Returns all features contained in this node and its children.
+	 * Uses the given list as out variable.
+	 * @param containedFeatures list of previously found features to add to; not null
+	 * @return all features contained in this node and its children; not null
+	 */
+	protected List<String> getContainedFeatures(List<String> containedFeatures) {
+		for (final Node child : children) {
+			child.getContainedFeatures(containedFeatures);
 		}
+		return containedFeatures;
 	}
 
 	/**

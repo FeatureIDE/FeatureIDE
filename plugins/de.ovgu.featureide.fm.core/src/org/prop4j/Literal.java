@@ -199,6 +199,12 @@ public class Literal extends Node implements Cloneable {
 	}
 	
 	@Override
+	protected List<String> getContainedFeatures(List<String> containedFeatures) {
+		containedFeatures.add(String.valueOf(this.var));
+		return containedFeatures;
+	}
+	
+	@Override
 	protected Set<Literal> getLiterals(Set<Literal> literals) {
 		literals.add(this);
 		return literals;
