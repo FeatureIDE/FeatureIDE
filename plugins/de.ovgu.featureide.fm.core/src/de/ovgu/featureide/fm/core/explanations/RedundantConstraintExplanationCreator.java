@@ -202,10 +202,7 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	 * @return all possible truth value assignments for the given clause
 	 */
 	private static Set<Map<Object, Boolean>> getAssignments(Node clause) {
-		final Set<Object> keys = new LinkedHashSet<>();
-		for (final Literal literal : clause.getLiterals()) {
-			keys.add(literal.var);
-		}
+		final Set<Object> keys = clause.getVariables();
 		final Set<Map<Object, Boolean>> assignments = new LinkedHashSet<>();
 		for (int assignment = 0; assignment < 1 << keys.size(); assignment++) { //2^n possible assignments
 			final Map<Object, Boolean> map = new LinkedHashMap<Object, Boolean>();
