@@ -205,8 +205,19 @@ public class Literal extends Node implements Cloneable {
 	}
 	
 	@Override
-	public Set<Literal> getLiterals(Set<Literal> literals) {
+	protected Set<Literal> getLiterals(Set<Literal> literals) {
 		literals.add(this);
 		return literals;
+	}
+	
+	@Override
+	public Set<Object> getVariables() {
+		return Collections.<Object>singleton(this);
+	}
+	
+	@Override
+	protected Set<Object> getVariables(Set<Object> variables) {
+		variables.add(this);
+		return variables;
 	}
 }

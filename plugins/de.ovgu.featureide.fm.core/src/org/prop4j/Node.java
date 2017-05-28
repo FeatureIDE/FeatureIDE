@@ -543,9 +543,33 @@ public abstract class Node {
 	 * @return all literals contained in this node and its children; not null
 	 */
 	protected Set<Literal> getLiterals(Set<Literal> literals) {
-		for (int i = 0; i <  children.length; i++) {
-			children[i].getLiterals(literals);
+		for (final Node child : children) {
+			child.getLiterals(literals);
 		}
 		return literals;
+	}
+	
+	/**
+	 * Returns all variables contained in this node and its children.
+	 * @return all variables contained in this node and its children; not null
+	 */
+	public Set<Object> getVariables() {
+		if (children == null) {
+			return Collections.emptySet();
+		}
+		return getVariables(new LinkedHashSet<Object>());
+	}
+	
+	/**
+	 * Returns all variables contained in this node and its children.
+	 * Uses the given set as out variable.
+	 * @param variables set of previously found variables to add to; not null
+	 * @return all variables contained in this node and its children; not null
+	 */
+	protected Set<Object> getVariables(Set<Object> variables) {
+		for (final Node child : children) {
+			child.getVariables(variables);
+		}
+		return variables;
 	}
 }
