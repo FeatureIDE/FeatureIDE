@@ -513,9 +513,6 @@ public abstract class Node {
 	 * @return all features contained in this node and its children; not null
 	 */
 	public List<String> getContainedFeatures() {
-		if (children == null) {
-			return new ArrayList<>();
-		}
 		return new ArrayList<>(getContainedFeatures(new LinkedList<String>()));
 	}
 
@@ -537,9 +534,6 @@ public abstract class Node {
 	 * @return all literals contained in this node and its children; not null
 	 */
 	public Set<Literal> getLiterals() {
-		if (children == null) {
-			return new LinkedHashSet<>();
-		}
 		return getLiterals(new LinkedHashSet<Literal>());
 	}
 
@@ -561,9 +555,6 @@ public abstract class Node {
 	 * @return all variables contained in this node and its children; not null
 	 */
 	public Set<Object> getVariables() {
-		if (children == null) {
-			return new LinkedHashSet<>();
-		}
 		return getVariables(new LinkedHashSet<Object>());
 	}
 	
