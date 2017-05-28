@@ -212,12 +212,12 @@ public class Literal extends Node implements Cloneable {
 	
 	@Override
 	public Set<Object> getVariables() {
-		return Collections.<Object>singleton(this);
+		return Collections.<Object>singleton(this.var);
 	}
 	
 	@Override
 	protected Set<Object> getVariables(Set<Object> variables) {
-		variables.add(this);
+		variables.add(this.var);
 		return variables;
 	}
 }
