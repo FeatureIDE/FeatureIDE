@@ -21,7 +21,6 @@
 package org.prop4j;
 
 import java.security.InvalidParameterException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -198,21 +197,11 @@ public class Literal extends Node implements Cloneable {
 	public boolean getValue(Map<Object, Boolean> map) {
 		return this.positive == map.get(this.var);
 	}
-
-	@Override
-	public Set<Literal> getLiterals() {
-		return Collections.singleton(this);
-	}
 	
 	@Override
 	protected Set<Literal> getLiterals(Set<Literal> literals) {
 		literals.add(this);
 		return literals;
-	}
-	
-	@Override
-	public Set<Object> getVariables() {
-		return Collections.<Object>singleton(this.var);
 	}
 	
 	@Override

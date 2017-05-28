@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORT
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -531,7 +530,7 @@ public abstract class Node {
 	 */
 	public Set<Literal> getLiterals() {
 		if (children == null) {
-			return Collections.emptySet();
+			return new LinkedHashSet<>();
 		}
 		return getLiterals(new LinkedHashSet<Literal>());
 	}
@@ -555,7 +554,7 @@ public abstract class Node {
 	 */
 	public Set<Object> getVariables() {
 		if (children == null) {
-			return Collections.emptySet();
+			return new LinkedHashSet<>();
 		}
 		return getVariables(new LinkedHashSet<Object>());
 	}
