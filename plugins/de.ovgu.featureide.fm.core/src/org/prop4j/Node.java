@@ -533,9 +533,18 @@ public abstract class Node {
 		if (children == null) {
 			return Collections.emptySet();
 		}
-		final Set<Literal> literals = new LinkedHashSet<>();
-		for (int i = 0; i < children.length; i++) {
-			literals.addAll(children[i].getLiterals());
+		return getLiterals(new LinkedHashSet<Literal>());
+	}
+
+	/**
+	 * Returns all literals contained in this node and its children.
+	 * Uses the given set as out variable.
+	 * @param literals set of previously found literals to add to; not null
+	 * @return all literals contained in this node and its children; not null
+	 */
+	protected Set<Literal> getLiterals(Set<Literal> literals) {
+		for (int i = 0; i <  children.length; i++) {
+			children[i].getLiterals(literals);
 		}
 		return literals;
 	}
