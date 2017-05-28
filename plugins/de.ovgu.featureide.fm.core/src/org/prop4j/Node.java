@@ -510,6 +510,7 @@ public abstract class Node {
 
 	/**
 	 * Returns all features contained in this node and its children.
+	 * Duplicates are kept.
 	 * @return all features contained in this node and its children; not null
 	 */
 	public List<String> getContainedFeatures() {
@@ -518,11 +519,20 @@ public abstract class Node {
 
 	/**
 	 * Returns all features contained in this node and its children.
-	 * Uses the given list as out variable.
-	 * @param containedFeatures list of previously found features to add to; not null
+	 * Duplicates are removed.
 	 * @return all features contained in this node and its children; not null
 	 */
-	protected List<String> getContainedFeatures(List<String> containedFeatures) {
+	public Set<String> getUniqueContainedFeatures() {
+		return (Set<String>) getContainedFeatures(new LinkedHashSet<String>());
+	}
+
+	/**
+	 * Returns all features contained in this node and its children.
+	 * Uses the given collection as out variable.
+	 * @param containedFeatures collection of previously found features to add to; not null
+	 * @return all features contained in this node and its children; not null
+	 */
+	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
 		for (final Node child : children) {
 			child.getContainedFeatures(containedFeatures);
 		}
@@ -531,40 +541,61 @@ public abstract class Node {
 
 	/**
 	 * Returns all literals contained in this node and its children.
+	 * Duplicates are kept.
 	 * @return all literals contained in this node and its children; not null
 	 */
-	public Set<Literal> getLiterals() {
-		return getLiterals(new LinkedHashSet<Literal>());
+	public List<Literal> getLiterals() {
+		return new ArrayList<>(getLiterals(new LinkedList<Literal>()));
 	}
 
 	/**
 	 * Returns all literals contained in this node and its children.
-	 * Uses the given set as out variable.
-	 * @param literals set of previously found literals to add to; not null
+	 * Duplicates are removed.
 	 * @return all literals contained in this node and its children; not null
 	 */
-	protected Set<Literal> getLiterals(Set<Literal> literals) {
+	public Set<Literal> getUniqueLiterals() {
+		return (Set<Literal>) getLiterals(new LinkedHashSet<Literal>());
+	}
+
+	/**
+	 * Returns all literals contained in this node and its children.
+	 * Duplicates are kept.
+	 * Uses the given collection as out variable.
+	 * @param literals collection of previously found literals to add to; not null
+	 * @return all literals contained in this node and its children; not null
+	 */
+	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
 		for (final Node child : children) {
 			child.getLiterals(literals);
 		}
 		return literals;
 	}
-	
+
 	/**
 	 * Returns all variables contained in this node and its children.
+	 * Duplicates are kept.
 	 * @return all variables contained in this node and its children; not null
 	 */
-	public Set<Object> getVariables() {
-		return getVariables(new LinkedHashSet<Object>());
+	public List<Object> getVariables() {
+		return new ArrayList<>(getVariables(new LinkedList<Object>()));
 	}
-	
+
 	/**
 	 * Returns all variables contained in this node and its children.
-	 * Uses the given set as out variable.
-	 * @param variables set of previously found variables to add to; not null
+	 * Duplicates are removed.
 	 * @return all variables contained in this node and its children; not null
 	 */
-	protected Set<Object> getVariables(Set<Object> variables) {
+	public Set<Object> getUniqueVariables() {
+		return (Set<Object>) getVariables(new LinkedHashSet<Object>());
+	}
+
+	/**
+	 * Returns all variables contained in this node and its children.
+	 * Uses the given collection as out variable.
+	 * @param variables collection of previously found variables to add to; not null
+	 * @return all variables contained in this node and its children; not null
+	 */
+	protected Collection<Object> getVariables(Collection<Object> variables) {
 		for (final Node child : children) {
 			child.getVariables(variables);
 		}
