@@ -477,7 +477,6 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	public void updateTree() {
 		tree.refresh();
-		tree.expandAll();
 	}
 
 	public void updateElements() {
@@ -533,6 +532,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		if (currentEditor == newEditor) {
 			return;
 		}
+		boolean isNew = false;
 
 		// update project
 		if (newEditor != null) {
@@ -544,11 +544,14 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 					final IFeatureProject newProject = CorePlugin.getFeatureProject(projectFile);
 					if (newProject != null && !newProject.equals(featureProject)) {
 						setFeatureProject(newProject);
+						isNew = true;
 					}
 				}
-
+				Object[] expandedElements = tree.getExpandedElements();
 				tree.setInput(newInput);
 				updateTree();
+				if (expandedElements.length > 0 && !isNew) tree.setExpandedElements(expandedElements);
+				else tree.expandAll();
 			}
 		}
 
