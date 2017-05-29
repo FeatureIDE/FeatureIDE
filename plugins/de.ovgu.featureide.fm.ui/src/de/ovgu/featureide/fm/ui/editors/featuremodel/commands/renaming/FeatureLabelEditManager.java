@@ -80,7 +80,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 					} else {
 						final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(null);
 						if ((!fmComposerExtension.isValidFeatureName(value))) {
-							createTooltip(fmComposerExtension.getErroMessage(), SWT.ICON_ERROR);
+							createTooltip(fmComposerExtension.getErrorMessage(), SWT.ICON_ERROR);
 						} else if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(value)) {
 							createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
 						}
