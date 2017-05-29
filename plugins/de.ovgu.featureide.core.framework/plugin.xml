@@ -11,5 +11,14 @@
             nature="de.ovgu.featureide.core.composer.framework">
       </composer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMComposer">
+      <fmComposer
+            class="de.ovgu.featureide.core.framework.FrameworkFMComposerExtension"
+            composer="de.ovgu.featureide.core.composer.framework"
+            id="de.ovgu.featureide.core.framework.fmComposer"
+            name="de.ovgu.featureide.core.framework.fmComposer">
+      </fmComposer>
+   </extension>
 
 </plugin>
