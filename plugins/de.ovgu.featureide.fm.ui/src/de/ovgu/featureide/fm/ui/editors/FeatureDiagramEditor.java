@@ -1208,6 +1208,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			reload();
 			refreshGraphics(null);
 			refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			analyzeFeatureModel();
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
