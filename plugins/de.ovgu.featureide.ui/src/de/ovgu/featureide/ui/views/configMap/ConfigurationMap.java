@@ -542,7 +542,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 				if (newInput instanceof FileEditorInput) {
 					final IFile projectFile = ((FileEditorInput) newInput).getFile();
 					final IFeatureProject newProject = CorePlugin.getFeatureProject(projectFile);
-					if (!newProject.equals(featureProject)) {
+					if (newProject != null && !newProject.equals(featureProject)) {
 						setFeatureProject(newProject);
 					}
 				}
