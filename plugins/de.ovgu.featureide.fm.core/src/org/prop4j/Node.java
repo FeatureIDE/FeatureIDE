@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORT
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -509,64 +508,94 @@ public abstract class Node {
 			nodes[i] = new Not(nodes[i]);
 	}
 
+	/**
+	 * Returns all features contained in this node and its children.
+	 * Duplicates are kept.
+	 * @return all features contained in this node and its children; not null
+	 */
 	public List<String> getContainedFeatures() {
-		List<String> ret = new ArrayList<>();
-		getContainedFeatures(this, ret);
-		return ret;
+		return new ArrayList<>(getContainedFeatures(new LinkedList<String>()));
 	}
 
-	private void getContainedFeatures(Node actNode, List<String> featureList) {
-		if (actNode instanceof Literal) {
-			featureList.add(((Literal) actNode).var.toString());
-		} else {
-			for (Node child : actNode.getChildren()) {
-				getContainedFeatures(child, featureList);
-			}
+	/**
+	 * Returns all features contained in this node and its children.
+	 * Duplicates are removed.
+	 * @return all features contained in this node and its children; not null
+	 */
+	public Set<String> getUniqueContainedFeatures() {
+		return (Set<String>) getContainedFeatures(new LinkedHashSet<String>());
+	}
+
+	/**
+	 * Returns all features contained in this node and its children.
+	 * Uses the given collection as out variable.
+	 * @param containedFeatures collection of previously found features to add to; not null
+	 * @return all features contained in this node and its children; not null
+	 */
+	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
+		for (final Node child : children) {
+			child.getContainedFeatures(containedFeatures);
 		}
+		return containedFeatures;
 	}
 
 	/**
 	 * Returns all literals contained in this node and its children.
+	 * Duplicates are kept.
 	 * @return all literals contained in this node and its children; not null
 	 */
-	public Set<Literal> getLiterals() {
-		if (children == null) {
-			return Collections.emptySet();
-		}
-		return getLiterals(new LinkedHashSet<Literal>());
+	public List<Literal> getLiterals() {
+		return new ArrayList<>(getLiterals(new LinkedList<Literal>()));
 	}
 
 	/**
 	 * Returns all literals contained in this node and its children.
-	 * Uses the given set as out variable.
-	 * @param literals set of previously found literals to add to; not null
+	 * Duplicates are removed.
 	 * @return all literals contained in this node and its children; not null
 	 */
-	protected Set<Literal> getLiterals(Set<Literal> literals) {
+	public Set<Literal> getUniqueLiterals() {
+		return (Set<Literal>) getLiterals(new LinkedHashSet<Literal>());
+	}
+
+	/**
+	 * Returns all literals contained in this node and its children.
+	 * Duplicates are kept.
+	 * Uses the given collection as out variable.
+	 * @param literals collection of previously found literals to add to; not null
+	 * @return all literals contained in this node and its children; not null
+	 */
+	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
 		for (final Node child : children) {
 			child.getLiterals(literals);
 		}
 		return literals;
 	}
-	
+
 	/**
 	 * Returns all variables contained in this node and its children.
+	 * Duplicates are kept.
 	 * @return all variables contained in this node and its children; not null
 	 */
-	public Set<Object> getVariables() {
-		if (children == null) {
-			return Collections.emptySet();
-		}
-		return getVariables(new LinkedHashSet<Object>());
+	public List<Object> getVariables() {
+		return new ArrayList<>(getVariables(new LinkedList<Object>()));
 	}
-	
+
 	/**
 	 * Returns all variables contained in this node and its children.
-	 * Uses the given set as out variable.
-	 * @param variables set of previously found variables to add to; not null
+	 * Duplicates are removed.
 	 * @return all variables contained in this node and its children; not null
 	 */
-	protected Set<Object> getVariables(Set<Object> variables) {
+	public Set<Object> getUniqueVariables() {
+		return (Set<Object>) getVariables(new LinkedHashSet<Object>());
+	}
+
+	/**
+	 * Returns all variables contained in this node and its children.
+	 * Uses the given collection as out variable.
+	 * @param variables collection of previously found variables to add to; not null
+	 * @return all variables contained in this node and its children; not null
+	 */
+	protected Collection<Object> getVariables(Collection<Object> variables) {
 		for (final Node child : children) {
 			child.getVariables(variables);
 		}

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="ExpressionProductLine">
 				<and abstract="true" mandatory="true" name="Operations">
@@ -97,6 +98,7 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments>
 			<c>Ops { eqn }</c>
 			<c>Structs { eqn }</c>

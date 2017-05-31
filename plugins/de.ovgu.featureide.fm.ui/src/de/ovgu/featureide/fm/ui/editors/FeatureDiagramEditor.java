@@ -763,9 +763,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				orAction.setText(OR);
 				alternativeAction.setText(ALTERNATIVE);
 			}
-			menu.add(andAction);
-			menu.add(orAction);
-			menu.add(alternativeAction);
+			if (andAction.isEnabled() || andAction.isChecked()) {
+				menu.add(andAction);
+			}
+			if (orAction.isEnabled() || orAction.isChecked()) {
+				menu.add(orAction);
+			}
+			if (alternativeAction.isEnabled() || alternativeAction.isChecked()) {
+				menu.add(alternativeAction);
+			}
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		}
 	}
@@ -985,17 +991,26 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		final EventType prop = event.getEventType();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
-			IFeature oldParent = (IFeature) event.getOldValue();
-			if (oldParent != null) {
-				final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
-				parent.update(FeatureIDEEvent.getDefault(EventType.FEATURE_ADD_ABOVE));
-			} else {
-				reload();
-				IGraphicalFeature child = FeatureUIHelper.getGraphicalChildren(((IFeature) event.getNewValue()), graphicalFeatureModel).get(0);
-				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
-				reload();
-				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+			IFeature newCompound = null;
+			if (event.getNewValue() != null && event.getNewValue() instanceof IFeature) {
+				newCompound = (IFeature) event.getNewValue();
+				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound).getGraphicalChildren()) {
+					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+				}
+				IFeature oldParent = (IFeature) event.getOldValue();
+				if (oldParent != null) {
+					final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
+					parent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+					//new Feature is not root so update all childs from old Parent, which include the new feature and his children
+					refreshChildAll(oldParent);
+				} else {
+					//new Feature is root so update all childs from root
+					refreshChildAll(newCompound);
+				}
 			}
+			internRefresh(true);
+			featureModelEditor.setPageModified(true);
+			analyzeFeatureModel();
 		case FEATURE_ADD:
 			((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			featureModelEditor.setPageModified(true);
@@ -1131,7 +1146,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					if (extraPath != null) {
 						FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
 					}
-					
+
 					setContents(graphicalFeatureModel);
 					refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 					reload();
@@ -1159,15 +1174,24 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case FEATURE_DELETE:
 			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 			deletedFeature.update(event);
-			oldParent = (IFeature) event.getOldValue();
-			graphicalFeatureModel.init();
-			setContents(graphicalFeatureModel);
-			internRefresh(true);
-			if (oldParent == null) {
-				FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel).update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
-			} else {
+			IFeature oldParent = (IFeature) event.getOldValue();
+			//Update the parent from 
+			if (oldParent != null) {
 				graphicalFeatureModel.getGraphicalFeature(oldParent).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+				//and update the children that their parent changed
+				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(oldParent).getGraphicalChildren()) {
+					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+				}
+				refreshChildAll(oldParent);
+			} else {
+				//No old parent so the new feature was the root
+				//Now update roots parent
+				IGraphicalFeature root = graphicalFeatureModel
+						.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+				root.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+				refreshChildAll(root.getObject());
 			}
+			internRefresh(true);
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
@@ -1184,6 +1208,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			reload();
 			refreshGraphics(null);
 			refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			analyzeFeatureModel();
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
@@ -1304,8 +1329,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						elementNewActiveReasons.get(element)));
 			}
 			LegendFigure legend = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
-			if (legend != null && legend.isVisible())
-			{
+			if (legend != null && legend.isVisible()) {
 				legend.recreateLegend();
 			}
 			break;

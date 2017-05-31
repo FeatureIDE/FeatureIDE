@@ -68,8 +68,8 @@ public class DimacsWriter {
 		}
 		this.clauses = cnf instanceof And ? Arrays.asList(cnf.getChildren()) : Collections.singletonList(cnf);
 		this.variableIndexes = new LinkedHashMap<>();
-		for (final Literal l : cnf.getLiterals()) {
-			addVariable(l.var);
+		for (final Object variable : cnf.getUniqueVariables()) {
+			addVariable(variable);
 		}
 	}
 	
@@ -173,7 +173,7 @@ public class DimacsWriter {
 	 */
 	private String writeClause(Node clause) {
 		String s = "";
-		for (final Literal l : clause.getLiterals()) {
+		for (final Literal l : clause.getUniqueLiterals()) {
 			s += writeLiteral(l) + " ";
 		}
 		s += CLAUSE_END;

@@ -610,7 +610,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			final FeatureModelAnalyzer analyzer = configurationEditor.getConfiguration().getFeatureModel().getAnalyser();
 			try {
 				if (!analyzer.isValid()) {
-					displayError(THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
+					displayError(
+							THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
 					return false;
 				}
 			} catch (TimeoutException e) {
@@ -932,11 +933,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		}
 
-		
 		final LongRunningMethod<List<Node>> jobs = configurationEditor.getConfiguration().getPropagator().findOpenClauses(manualFeatureList);
-		LongRunningJob<List<Node>> job = new LongRunningJob<List<Node>>("FindClauses", jobs); 
+		LongRunningJob<List<Node>> job = new LongRunningJob<List<Node>>("FindClauses", jobs);
 		job.schedule();
-		
+
 		job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
 			@Override
 			public void jobFinished(IJob<List<Node>> finishedJob) {
@@ -1040,8 +1040,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
-		final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator()
-				.update(redundantManual, Arrays.asList(feature));
+		final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator().update(redundantManual, Arrays.asList(feature));
 		final LongRunningJob<Void> job = new LongRunningJob<>("", update);
 		job.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
@@ -1057,6 +1056,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						public void run() {
 							updateFeatures.remove(feature);
 							refreshItem(item);
+							setDirty();
 						}
 					});
 				}
@@ -1188,8 +1188,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			if (sb.length() > 0) {
 				tipItem = item;
 				final Rectangle bounds = item.getBounds();
-				final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12,bounds.y));
-				newToolTip(tree.getShell(), sb, false, displayPoint.x,displayPoint.y);
+				final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12, bounds.y));
+				newToolTip(tree.getShell(), sb, false, displayPoint.x, displayPoint.y);
 			}
 		}
 	}

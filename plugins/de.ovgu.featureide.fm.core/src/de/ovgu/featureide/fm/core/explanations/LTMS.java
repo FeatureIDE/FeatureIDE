@@ -109,7 +109,7 @@ public class LTMS {
 	 */
 	private void setClauseLiterals() {
 		for (final Node cnfClause : cnf.getChildren()) {
-			clauseLiterals.put(cnfClause, cnfClause.getLiterals());
+			clauseLiterals.put(cnfClause, cnfClause.getUniqueLiterals());
 		}
 	}
 	

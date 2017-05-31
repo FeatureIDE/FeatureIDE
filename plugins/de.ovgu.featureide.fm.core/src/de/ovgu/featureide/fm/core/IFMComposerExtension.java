@@ -65,5 +65,5 @@ public interface IFMComposerExtension {
 	/**
 	 * @return An error message displayed for invalid feature names.
 	 */
-	String getErroMessage();
+	String getErrorMessage();
 }

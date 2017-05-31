@@ -23,40 +23,33 @@ package de.ovgu.featureide.fm.ui.wizards;
 import org.eclipse.jface.wizard.Wizard;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * A simple wizard for selecting a color scheme and applying it.
- * If necessary, new color schemes can be created.
+ * Wizard for managing color schemes for a given feature model.
+ * Can select, rename, delete, and create color schemes.
  * 
- * @author Niklas Lehnfeld
- * @author Paul Maximilian Bittner
+ * @author Sebastian Krieter
  */
-public class SelectColorSchemeWizard extends Wizard {
+public class ColorSchemeWizard extends Wizard {
 
-	private SelectColorSchemePage page;
-	private IFeatureModel featureModel;
-	
-	public SelectColorSchemeWizard(IFeatureModel featureModel) {
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizards.ManageColorSchemesWizard";
+
+	private final IFeatureModel featureModel;
+
+	public ColorSchemeWizard(IFeatureModel featureModel) {
 		super();
-		setWindowTitle(StringTable.SELECT_COLOR_SCHEME);
+		setWindowTitle("Color-Scheme Manager");
 		this.featureModel = featureModel;
 	}
 
 	public void addPages() {
-		page = new SelectColorSchemePage(featureModel);
-		addPage(page);
+		addPage(new ColorSchemePage(featureModel));
 	}
 
 	@Override
 	public boolean performFinish() {
-		final String csName = page.getColorSchemeName();
-		if (csName != null && !csName.isEmpty() && FeatureColorManager.hasColorScheme(featureModel, csName)) {
-			FeatureColorManager.setActive(featureModel, csName);
-			return true;
-		}
-		
-		return false;
+		return true;
 	}
+
 }

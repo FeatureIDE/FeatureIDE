@@ -72,6 +72,7 @@ public class ProjectRecord {
 	private boolean hasWarnings = false;
 	private boolean hasErrors = false;
 	private boolean updated = false;
+	private boolean needsComposer = true;
 
 	/**
 	 * Create a record for a project based on the info given in the file.
@@ -98,7 +99,9 @@ public class ProjectRecord {
 
 	private void initFields() {
 		warning = "";
+		hasWarnings = false;
 		error = "";
+		hasErrors = false;
 		contentProviderItems = new ArrayList<>();
 	}
 
@@ -114,6 +117,7 @@ public class ProjectRecord {
 		}
 
 		public ProjectRecord getRecord() {
+			init();
 			return ProjectRecord.this;
 		}
 
@@ -166,6 +170,8 @@ public class ProjectRecord {
 	}
 
 	private void performAlreadyExistsCheck() {
+		hasErrors = false;
+		error = "";
 		if (isProjectInWorkspace(getProjectName())) {
 			error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
 			hasErrors = true;
@@ -173,9 +179,16 @@ public class ProjectRecord {
 	}
 
 	private void performRequirementCheck() {
-		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
+		hasWarnings = false;
+		warning = "";
+		String[] natures = projectDescription.getNatureIds();
+		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(natures);
 
-		if (status.isOK()) {
+		if (natures.length == 1 && natures[0].equals("org.eclipse.jdt.core.javanature")) {
+			needsComposer = false;
+		}
+
+		if (status.isOK() && needsComposer) {
 			status = CorePlugin.getDefault().isComposable(projectDescription);
 		}
 
@@ -243,6 +256,10 @@ public class ProjectRecord {
 
 	public String getErrorText() {
 		return error;
+	}
+
+	public boolean needsComposer() {
+		return needsComposer;
 	}
 
 	/**
@@ -352,5 +369,5 @@ public class ProjectRecord {
 	public String getProjectDescriptionRelativePath() {
 		return projectDescriptionRelativePath;
 	}
-	
+
 }

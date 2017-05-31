@@ -21,10 +21,9 @@
 package org.prop4j;
 
 import java.security.InvalidParameterException;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 
@@ -198,25 +197,21 @@ public class Literal extends Node implements Cloneable {
 	public boolean getValue(Map<Object, Boolean> map) {
 		return this.positive == map.get(this.var);
 	}
-
+	
 	@Override
-	public Set<Literal> getLiterals() {
-		return Collections.singleton(this);
+	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
+		containedFeatures.add(String.valueOf(this.var));
+		return containedFeatures;
 	}
 	
 	@Override
-	protected Set<Literal> getLiterals(Set<Literal> literals) {
+	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
 		literals.add(this);
 		return literals;
 	}
 	
 	@Override
-	public Set<Object> getVariables() {
-		return Collections.<Object>singleton(this.var);
-	}
-	
-	@Override
-	protected Set<Object> getVariables(Set<Object> variables) {
+	protected Collection<Object> getVariables(Collection<Object> variables) {
 		variables.add(this.var);
 		return variables;
 	}

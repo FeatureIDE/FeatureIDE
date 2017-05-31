@@ -37,6 +37,7 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -462,7 +463,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		final List<int[]> possibleFOFeatures = new ArrayList<>();
 		for (IFeature feature : features) {
 			final IFeature parent = FeatureUtils.getParent(feature);
-			if (parent != null && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
+			if (parent != null && (!feature.getStructure().isMandatorySet() && parent.getStructure().isAnd())) {
 				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
 			}
 		}
@@ -486,7 +487,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		final SatInstance si = solver.getSatInstance();
 		for (IFeature feature : foList) {
 			final IFeature parent = FeatureUtils.getParent(feature);
-			if (parent != null && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
+			if (parent != null && (!feature.getStructure().isMandatorySet() && parent.getStructure().isAnd())) {
 				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
 			}
 		}
