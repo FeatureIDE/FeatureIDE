@@ -1,91 +1,92 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<alt abstract="true" mandatory="true" name="Gpl">
-				<and abstract="true" mandatory="true" name="MainGpl">
+				<and abstract="true" name="MainGpl">
 					<alt abstract="true" mandatory="true" name="Test">
-						<and abstract="true" mandatory="true" name="StartHere">
+						<and abstract="true" name="StartHere">
 							<feature mandatory="true" name="Base"/>
 							<feature hidden="true" name="Benchmark"/>
 							<feature name="Prog"/>
 						</and>
 					</alt>
 					<alt abstract="true" name="Implementation">
-						<feature abstract="true" mandatory="true" name="NoEdges"/>
-						<feature abstract="true" mandatory="true" name="OnlyNeighbors"/>
-						<feature abstract="true" mandatory="true" name="Edges"/>
+						<feature abstract="true" name="NoEdges"/>
+						<feature abstract="true" name="OnlyNeighbors"/>
+						<feature abstract="true" name="Edges"/>
 					</alt>
 					<alt abstract="true" name="GraphType">
-						<feature abstract="true" mandatory="true" name="Directed"/>
-						<feature abstract="true" mandatory="true" name="Undirected"/>
+						<feature abstract="true" name="Directed"/>
+						<feature abstract="true" name="Undirected"/>
 					</alt>
 					<alt abstract="true" hidden="true" name="GraphTypeReal">
-						<and abstract="true" mandatory="true" name="DirType">
+						<and abstract="true" name="DirType">
 							<feature mandatory="true" name="DirectedCommon"/>
 							<alt abstract="true" mandatory="true" name="Dir">
-								<feature mandatory="true" name="DirectedGR"/>
-								<feature mandatory="true" name="DirectedGnR"/>
-								<feature mandatory="true" name="DirectedGenR"/>
+								<feature name="DirectedGR"/>
+								<feature name="DirectedGnR"/>
+								<feature name="DirectedGenR"/>
 							</alt>
 						</and>
-						<and abstract="true" mandatory="true" name="UndirType">
+						<and abstract="true" name="UndirType">
 							<feature mandatory="true" name="UndirectedCommon"/>
 							<alt abstract="true" mandatory="true" name="Undir">
-								<feature mandatory="true" name="UndirectedGR"/>
-								<feature mandatory="true" name="UndirectedGnR"/>
-								<feature mandatory="true" name="UndirectedGenR"/>
+								<feature name="UndirectedGR"/>
+								<feature name="UndirectedGnR"/>
+								<feature name="UndirectedGenR"/>
 							</alt>
 						</and>
 					</alt>
 					<alt abstract="true" name="Weight">
-						<and abstract="true" mandatory="true" name="Wgt">
+						<and abstract="true" name="Wgt">
 							<feature abstract="true" mandatory="true" name="Weighted"/>
 							<feature hidden="true" name="WeightedCommon"/>
 							<feature hidden="true" name="dProgdWeightedCommon"/>
 						</and>
-						<feature abstract="true" mandatory="true" name="UnWeighted"/>
+						<feature abstract="true" name="UnWeighted"/>
 					</alt>
 					<alt abstract="true" hidden="true" name="WeightReal">
-						<feature mandatory="true" name="WeightedGR"/>
-						<feature mandatory="true" name="WeightedGnR"/>
-						<feature mandatory="true" name="WeightedGenR"/>
+						<feature name="WeightedGR"/>
+						<feature name="WeightedGnR"/>
+						<feature name="WeightedGenR"/>
 					</alt>
 					<feature hidden="true" name="SearchCommon"/>
 					<alt abstract="true" name="Search">
-						<feature mandatory="true" name="DFS"/>
-						<feature mandatory="true" name="BFS"/>
+						<feature name="DFS"/>
+						<feature name="BFS"/>
 					</alt>
 					<or abstract="true" name="Alg">
-						<and abstract="true" mandatory="true" name="Num">
+						<and abstract="true" name="Num">
 							<feature mandatory="true" name="Number"/>
 							<feature hidden="true" name="dProgdNumber"/>
 						</and>
-						<and abstract="true" mandatory="true" name="Conn">
+						<and abstract="true" name="Conn">
 							<feature mandatory="true" name="Connected"/>
 							<feature hidden="true" name="dProgdConnected"/>
 						</and>
-						<and abstract="true" mandatory="true" name="StrongC">
+						<and abstract="true" name="StrongC">
 							<feature hidden="true" name="Transpose"/>
 							<feature mandatory="true" name="StronglyConnected"/>
 							<feature hidden="true" name="dProgdStronglyConnected"/>
 						</and>
-						<and abstract="true" mandatory="true" name="Cyc">
+						<and abstract="true" name="Cyc">
 							<feature mandatory="true" name="Cycle"/>
 							<feature hidden="true" name="dProgdCycle"/>
 						</and>
-						<and abstract="true" mandatory="true" name="MPrim">
+						<and abstract="true" name="MPrim">
 							<feature hidden="true" name="MSTPrimPrepGnR"/>
 							<feature hidden="true" name="MSTPrimPrepGR"/>
 							<feature mandatory="true" name="MSTPrim"/>
 							<feature hidden="true" name="dProgdMSTPrim"/>
 						</and>
-						<and abstract="true" mandatory="true" name="MKrus">
+						<and abstract="true" name="MKrus">
 							<feature hidden="true" name="MSTKruskalPrepGnR"/>
 							<feature hidden="true" name="MSTKruskalPrepGR"/>
 							<feature mandatory="true" name="MSTKruskal"/>
 							<feature hidden="true" name="dProgdMSTKruskal"/>
 						</and>
-						<feature abstract="true" mandatory="true" name="Shortest"/>
+						<feature abstract="true" name="Shortest"/>
 					</or>
 				</and>
 			</alt>
@@ -379,6 +380,7 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments>
 			<c>Directed { out="" }</c>
 			<c>Weighted { out="" }</c>

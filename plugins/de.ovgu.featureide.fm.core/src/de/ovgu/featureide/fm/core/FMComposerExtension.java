@@ -70,7 +70,7 @@ public class FMComposerExtension implements IFMComposerExtension {
 	}
 
 	@Override
-	public String getErroMessage() {
+	public String getErrorMessage() {
 		return hasComposer ? ERROR_MESSAGE_COMPOSER : ERROR_MESSAGE_NO_COMPOSER;
 	}
 }

@@ -5,26 +5,26 @@
 			<and mandatory="true" name="Elevator">
 				<and abstract="true" mandatory="true" name="Behavior">
 					<alt abstract="true" mandatory="true" name="Modes">
-						<feature mandatory="true" name="Sabbath"/>
-						<feature mandatory="true" name="FIFO"/>
-						<feature mandatory="true" name="ShortestPath"/>
+						<feature name="Sabbath"/>
+						<feature name="FIFO"/>
+						<feature name="ShortestPath"/>
 					</alt>
 					<feature abstract="true" name="Service"/>
 					<or abstract="true" name="Priorities">
-						<feature mandatory="true" name="RushHour"/>
-						<feature abstract="true" mandatory="true" name="FloorPriority"/>
-						<feature abstract="true" mandatory="true" name="PersonPriority"/>
+						<feature name="RushHour"/>
+						<feature abstract="true" name="FloorPriority"/>
+						<feature abstract="true" name="PersonPriority"/>
 					</or>
 				</and>
 				<feature abstract="true" name="VoiceOutput"/>
 				<alt name="CallButtons">
-					<feature mandatory="true" name="DirectedCall"/>
-					<feature mandatory="true" name="UndirectedCall"/>
+					<feature name="DirectedCall"/>
+					<feature name="UndirectedCall"/>
 				</alt>
 				<and abstract="true" name="Security">
 					<or abstract="true" mandatory="true" name="Permission">
-						<feature mandatory="true" name="FloorPermission"/>
-						<feature abstract="true" mandatory="true" name="PermissionControl"/>
+						<feature name="FloorPermission"/>
+						<feature abstract="true" name="PermissionControl"/>
 					</or>
 				</and>
 				<and abstract="true" name="Safety">
@@ -53,13 +53,13 @@
 		<comments/>
 		<featureOrder userDefined="true">
 			<feature name="Elevator"/>
-			<feature name="CallButtons"/>
-			<feature name="UndirectedCall"/>
-			<feature name="Service"/>
 			<feature name="Sabbath"/>
 			<feature name="FIFO"/>
 			<feature name="ShortestPath"/>
+			<feature name="RushHour"/>
+			<feature name="CallButtons"/>
 			<feature name="DirectedCall"/>
+			<feature name="UndirectedCall"/>
 			<feature name="FloorPermission"/>
 		</featureOrder>
 	</featureModel>

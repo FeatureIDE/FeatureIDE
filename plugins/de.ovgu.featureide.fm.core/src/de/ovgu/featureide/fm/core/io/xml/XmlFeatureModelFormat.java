@@ -582,7 +582,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod.setAttribute(HIDDEN, TRUE);
 		}
 		if (feat.getStructure().isMandatory()) {
-			fnod.setAttribute(MANDATORY, TRUE);
+			if(feat.getStructure().getParent() != null && feat.getStructure().getParent().isAnd()){
+				fnod.setAttribute(MANDATORY, TRUE);
+			} else if (feat.getStructure().getParent() == null){
+				fnod.setAttribute(MANDATORY, TRUE);
+			}
 		}
 		if (feat.getStructure().isAbstract()) {
 			fnod.setAttribute(ABSTRACT, TRUE);
