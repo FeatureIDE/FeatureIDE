@@ -67,7 +67,7 @@ public class Sat4jSatSolver extends BasicSatSolver {
 	
 	@Override
 	public void addClause(Node clause) {
-		addVariables(clause.getVariables());
+		addVariables(clause.getUniqueVariables());
 		try {
 			final IConstr constraint = getOracle().addClause(getVectorFromClause(clause));
 			constraints.add(constraint);
