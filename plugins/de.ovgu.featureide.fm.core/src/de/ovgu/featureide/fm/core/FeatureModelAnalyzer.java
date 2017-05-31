@@ -61,6 +61,9 @@ import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.impl.ltms.LtmsDeadFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.impl.ltms.LtmsFalseOptionalFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.impl.ltms.LtmsRedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -93,17 +96,17 @@ public class FeatureModelAnalyzer {
 	 * Creates explanations for dead features.
 	 * Stored for performance so the underlying CNF is not recreated for every explanation.
 	 */
-	private final DeadFeatureExplanationCreator deadFeatureExplanationCreator = new DeadFeatureExplanationCreator();
+	private final DeadFeatureExplanationCreator deadFeatureExplanationCreator = new LtmsDeadFeatureExplanationCreator();
 	/**
 	 * Creates explanations for false-optional features.
 	 * Stored for performance so the underlying CNF is not recreated for every explanation.
 	 */
-	private final FalseOptionalFeatureExplanationCreator falseOptionalFeatureExplanationCreator = new FalseOptionalFeatureExplanationCreator();
+	private final FalseOptionalFeatureExplanationCreator falseOptionalFeatureExplanationCreator = new LtmsFalseOptionalFeatureExplanationCreator();
 	/**
 	 * Creates explanations for redundant constraints.
 	 * Stored for performance so the underlying CNF is not recreated for every explanation.
 	 */
-	private final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = new RedundantConstraintExplanationCreator();
+	private final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = new LtmsRedundantConstraintExplanationCreator();
 
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
@@ -905,7 +908,7 @@ public class FeatureModelAnalyzer {
 	public void addDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
 		final DeadFeatureExplanationCreator creator = fm == this.fm
 				? deadFeatureExplanationCreator
-				: new DeadFeatureExplanationCreator(fm);
+				: new LtmsDeadFeatureExplanationCreator(fm);
 		creator.setDeadFeature(feature);
 		deadFeatureExplanations.put(feature, creator.getExplanation());
 	}
@@ -937,7 +940,7 @@ public class FeatureModelAnalyzer {
 	public void addFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
 		final FalseOptionalFeatureExplanationCreator creator = fm == this.fm
 				? falseOptionalFeatureExplanationCreator
-				: new FalseOptionalFeatureExplanationCreator(fm);
+				: new LtmsFalseOptionalFeatureExplanationCreator(fm);
 		creator.setFalseOptionalFeature(feature);
 		falseOptionalFeatureExplanations.put(feature, creator.getExplanation());
 	}
@@ -970,7 +973,7 @@ public class FeatureModelAnalyzer {
 	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
 		final RedundantConstraintExplanationCreator creator = fm == this.fm
 				? redundantConstraintExplanationCreator
-				: new RedundantConstraintExplanationCreator(fm);
+				: new LtmsRedundantConstraintExplanationCreator(fm);
 		creator.setRedundantConstraint(constraint);
 		redundantConstraintExplanations.put(constraint, creator.getExplanation());
 	}

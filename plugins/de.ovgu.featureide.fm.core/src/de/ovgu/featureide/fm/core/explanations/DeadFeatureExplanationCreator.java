@@ -21,76 +21,30 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * Generates explanations for dead features and void feature models using {@link LTMS}.
+ * Generates explanations for dead features in feature models.
+ * Also supports explanations for void feature models by explaining why the root feature is dead.
  * 
- * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class DeadFeatureExplanationCreator extends ExplanationCreator {
-	/** the dead feature in the feature model */
-	private IFeature deadFeature;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public DeadFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public DeadFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param deadFeature the dead feature in the feature model
-	 */
-	public DeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
-		super(fm);
-		setDeadFeature(deadFeature);
-	}
-	
+public interface DeadFeatureExplanationCreator extends FeatureModelExplanationCreator {
 	/**
 	 * Returns the dead feature in the feature model.
 	 * @return the dead feature in the feature model
 	 */
-	public IFeature getDeadFeature() {
-		return deadFeature;
-	}
+	public IFeature getDeadFeature();
 	
 	/**
 	 * Sets the dead feature in the feature model.
 	 * @param deadFeature the dead feature in the feature model
 	 */
-	public void setDeadFeature(IFeature deadFeature) {
-		this.deadFeature = deadFeature;
-	}
+	public void setDeadFeature(IFeature deadFeature);
 	
 	/**
 	 * Returns an explanation why the specified feature of the specified feature model is dead.
 	 * A dead root feature also means a void feature model.
-	 * Sets initial truth value assumptions of the dead feature to true.
-	 * Then propagates the values until a violation in a clause occurs.
-	 * @return an explanation why the specified feature of the specified feature model is dead
 	 */
 	@Override
-	public Explanation getExplanation() {
-		final LTMS ltms = getLTMS();
-		ltms.clearPremises();
-		ltms.addPremise(getDeadFeature().getName(), true);
-		final Explanation explanation = ltms.getExplanation();
-		if (explanation == null) {
-			return null;
-		}
-		explanation.setDefectDeadFeature(getDeadFeature());
-		return explanation;
-	}
+	public Explanation getExplanation() throws IllegalStateException;
 }

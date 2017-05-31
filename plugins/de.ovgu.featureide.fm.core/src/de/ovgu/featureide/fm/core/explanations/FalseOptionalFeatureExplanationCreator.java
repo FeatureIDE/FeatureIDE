@@ -20,78 +20,29 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * Generates explanations for false-optional features using {@link LTMS}.
+ * Generates explanations for false-optional features in feature models.
  * 
- * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class FalseOptionalFeatureExplanationCreator extends ExplanationCreator {
-	/** the false-optional feature in the feature model */
-	private IFeature falseOptionalFeature;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public FalseOptionalFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public FalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param falseOptionalFeature the false-optional feature in the feature model
-	 */
-	public FalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
-		super(fm);
-		setFalseOptionalFeature(falseOptionalFeature);
-	}
-	
+public interface FalseOptionalFeatureExplanationCreator extends FeatureModelExplanationCreator {
 	/**
 	 * Returns the false-optional feature in the feature model.
 	 * @return the false-optional feature in the feature model
 	 */
-	public IFeature getFalseOptionalFeature() {
-		return falseOptionalFeature;
-	}
+	public IFeature getFalseOptionalFeature();
 	
 	/**
 	 * Sets the false-optional feature in the feature model.
 	 * @param falseOptionalFeature the false-optional feature in the feature model
 	 */
-	public void setFalseOptionalFeature(IFeature falseOptionalFeature) {
-		this.falseOptionalFeature = falseOptionalFeature;
-	}
+	public void setFalseOptionalFeature(IFeature falseOptionalFeature);
 	
 	/**
 	 * Returns an explanation why the specified feature of the specified feature model is false-optional.
-	 * Sets initial truth value assumptions of the false-optional feature to false and its parent to true.
-	 * Then propagates the values until a violation in a clause occurs.
-	 * @return an explanation why the specified feature of the specified feature model is false-optional
 	 */
 	@Override
-	public Explanation getExplanation() {
-		final LTMS ltms = getLTMS();
-		ltms.clearPremises();
-		ltms.addPremise(getFalseOptionalFeature().getName(), false);
-		ltms.addPremise(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);
-		final Explanation explanation = ltms.getExplanation();
-		if (explanation == null) {
-			return null;
-		}
-		explanation.setDefectFalseOptionalFeature(getFalseOptionalFeature());
-		return explanation;
-	}
+	public Explanation getExplanation() throws IllegalStateException;
 }

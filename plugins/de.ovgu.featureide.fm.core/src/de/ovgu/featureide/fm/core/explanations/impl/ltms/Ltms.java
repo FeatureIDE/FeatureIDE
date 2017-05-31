@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.impl.ltms;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,16 +36,21 @@ import org.prop4j.Literal;
 import org.prop4j.Literal.FeatureAttribute;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
+
 /**
+ * <p>
  * The class LTMS (logic truth maintenance system) records proofs for implications and constructs explanations.
  * Uses BCP (boolean constraint propagation) for managing logical implications.
  * BCP expects two parameters: initial truth values (premises) and a propositional formula in CNF (conjunctive normal form).
- * The application in a feature model context is handled in {@link ExplanationCreator}.
+ * </p>
  * 
  * @author Sofia Ananieva
  * @author Timo Guenther
+ * @see {@link FeatureModelExplanationCreator} for using the LTMS with feature models
  */
-public class LTMS {
+public class Ltms {
 	/**
 	 * A feature model transformed into a propositional formula in conjunctive normal form for easier reasoning.
 	 */
@@ -98,7 +103,7 @@ public class LTMS {
 	 * Constructs a new instance of this class.
 	 * @param cnf the conjunctive normal form of the feature model
 	 */
-	public LTMS(Node cnf) {
+	public Ltms(Node cnf) {
 		this.cnf = cnf;
 		setClauseLiterals();
 		setVariableClauses();
