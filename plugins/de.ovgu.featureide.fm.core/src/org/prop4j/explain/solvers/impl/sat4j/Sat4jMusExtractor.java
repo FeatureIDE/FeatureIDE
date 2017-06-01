@@ -32,7 +32,7 @@ import org.sat4j.tools.xplain.Xplain;
 /**
  * A MUS extractor using a Sat4J oracle.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtractor {
 	/**

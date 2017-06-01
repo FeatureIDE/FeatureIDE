@@ -31,7 +31,7 @@ import org.prop4j.explain.solvers.SatProblem;
 /**
  * Basic implementation of {@link SatProblem}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class BasicSatProblem implements SatProblem {
 	/** The clauses added to this problem. */

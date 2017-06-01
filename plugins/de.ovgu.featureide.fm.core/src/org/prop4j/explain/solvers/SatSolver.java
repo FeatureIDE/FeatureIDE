@@ -28,7 +28,7 @@ import org.prop4j.Node;
  * A solver for the satisfiability problem for propositional formulas.
  * Uses a SAT oracle to do the actual work and only provides a common access point.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  * @see {@link MutableSatSolver} for a solver that supports the removal of clauses
  */
 public interface SatSolver extends SatProblem {

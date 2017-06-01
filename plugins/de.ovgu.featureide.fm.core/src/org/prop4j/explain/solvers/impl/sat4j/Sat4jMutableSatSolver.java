@@ -32,7 +32,7 @@ import org.sat4j.specs.IConstr;
 /**
  * A mutable SAT solver using a Sat4J oracle.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatSolver {
 	/** The amount of clauses that were added in each scope beyond the default one. */

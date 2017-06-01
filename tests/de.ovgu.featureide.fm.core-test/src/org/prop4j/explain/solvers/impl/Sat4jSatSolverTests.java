@@ -26,7 +26,7 @@ import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolver;
 /**
  * Tests for {@link Sat4jSatSolver}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class Sat4jSatSolverTests extends SatSolverTests {
 	@Override

@@ -25,7 +25,7 @@ import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolverFactory;
 /**
  * Provides instances of {@link SatSolver}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class SatSolverFactory {
 	/**

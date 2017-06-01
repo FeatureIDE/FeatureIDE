@@ -39,7 +39,7 @@ import org.prop4j.Or;
 /**
  * Tests for {@link MutableSatSolver}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class MutableSatSolverTests extends SatSolverTests {
 	@Test

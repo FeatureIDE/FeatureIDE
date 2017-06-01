@@ -38,7 +38,7 @@ import org.prop4j.Or;
 /**
  * Tests for {@link SatSolver}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class SatSolverTests extends SatProblemTests {
 	@Test

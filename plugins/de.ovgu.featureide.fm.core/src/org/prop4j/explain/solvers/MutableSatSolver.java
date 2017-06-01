@@ -42,7 +42,7 @@ import org.prop4j.Node;
  * On the other hand, the evaluation must take all scopes into account.
  * </p>
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public interface MutableSatSolver extends SatSolver {
 	/**

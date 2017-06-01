@@ -25,7 +25,7 @@ import org.prop4j.explain.solvers.SatSolver;
 /**
  * Basic implementation of {@link SatSolver}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class BasicSatSolver extends BasicSatProblem implements SatSolver {
 	/** The SAT oracle used for the actual solving. */

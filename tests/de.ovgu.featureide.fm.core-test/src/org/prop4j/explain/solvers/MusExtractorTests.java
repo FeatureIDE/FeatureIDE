@@ -35,7 +35,7 @@ import org.prop4j.Or;
 /**
  * Tests for {@link MusExtractor}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class MusExtractorTests extends MutableSatSolverTests {
 	@Test

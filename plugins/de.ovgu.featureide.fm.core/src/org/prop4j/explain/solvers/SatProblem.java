@@ -35,7 +35,7 @@ import org.prop4j.Node;
  * In particular, clauses may only be {@link #addFormula(Node) added} but never removed.
  * </p>
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  * @see {@link SatSolver} for solving the problem
  */
 public interface SatProblem {

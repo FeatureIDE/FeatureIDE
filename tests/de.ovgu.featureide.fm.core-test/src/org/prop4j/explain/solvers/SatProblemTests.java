@@ -45,7 +45,7 @@ import org.prop4j.Or;
 /**
  * Tests for {@link SatProblem}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class SatProblemTests {
 	@Rule

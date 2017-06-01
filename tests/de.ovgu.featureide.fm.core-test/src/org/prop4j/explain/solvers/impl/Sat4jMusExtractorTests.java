@@ -26,7 +26,7 @@ import org.prop4j.explain.solvers.impl.sat4j.Sat4jMusExtractor;
 /**
  * Tests for {@link Sat4jMusExtractor}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class Sat4jMusExtractorTests extends MusExtractorTests {
 	@Override

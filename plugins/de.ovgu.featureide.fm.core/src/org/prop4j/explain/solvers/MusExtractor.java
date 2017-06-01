@@ -27,7 +27,7 @@ import org.prop4j.Node;
 /**
  * A solver capable of extracting a {@link #getMinimalUnsatisfiableSubset() minimal unsatisfiable subset (MUS)} from a propositional formula.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public interface MusExtractor extends MutableSatSolver {
 	/**

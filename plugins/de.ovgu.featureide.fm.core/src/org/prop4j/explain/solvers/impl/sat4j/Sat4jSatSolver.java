@@ -42,7 +42,7 @@ import org.sat4j.specs.TimeoutException;
 /**
  * SAT solver using a Sat4J oracle.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class Sat4jSatSolver extends BasicSatSolver {
 	/** The handles to the clauses in the oracle. */

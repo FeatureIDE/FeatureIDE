@@ -28,7 +28,7 @@ import org.prop4j.explain.solvers.SatSolverFactory;
 /**
  * Provides instances of {@link SatSolver} using a Sat4J oracle.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class Sat4jSatSolverFactory extends SatSolverFactory {
 	@Override
