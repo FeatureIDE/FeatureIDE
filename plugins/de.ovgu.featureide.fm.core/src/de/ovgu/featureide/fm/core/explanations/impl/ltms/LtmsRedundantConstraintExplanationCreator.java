@@ -110,7 +110,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	 */
 	protected void setCNFWithoutRedundantConstraintClauses(Node cnfWithoutRedundantConstraintClauses) {
 		this.cnfWithoutRedundantConstraintClauses = cnfWithoutRedundantConstraintClauses;
-		setLTMS(null);
+		setLtms(null);
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	 * @return a copy of the CNF without the clauses of the redundant constraint; not null
 	 */
 	protected Node createCNFWithoutRedundantConstraintClauses() {
-		return removeRedundantConstraintClauses(getCNF());
+		return removeRedundantConstraintClauses(getCnf());
 	}
 	
 	/**
@@ -145,7 +145,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	}
 	
 	@Override
-	protected Ltms createLTMS() {
+	protected Ltms createLtms() {
 		return new Ltms(getCNFWithoutRedundantConstraintClauses());
 	}
 	
@@ -165,7 +165,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	public Explanation getExplanation() throws IllegalStateException {
 		final Explanation cumulatedExplanation = new Explanation();
 		cumulatedExplanation.setExplanationCount(0);
-		final Ltms ltms = getLTMS();
+		final Ltms ltms = getLtms();
 		for (final Map<Object, Boolean> assignment : getContradictingAssignments(getRedundantConstraint().getNode())) {
 			ltms.setPremises(assignment);
 			final Explanation explanation = ltms.getExplanation();

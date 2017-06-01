@@ -80,7 +80,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsExplanationCreator im
 	 */
 	@Override
 	public Explanation getExplanation() throws IllegalStateException {
-		final Ltms ltms = getLTMS();
+		final Ltms ltms = getLtms();
 		ltms.clearPremises();
 		ltms.addPremise(getDeadFeature().getName(), true);
 		final Explanation explanation = ltms.getExplanation();

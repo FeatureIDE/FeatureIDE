@@ -81,7 +81,7 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationC
 	 */
 	@Override
 	public Explanation getExplanation() throws IllegalStateException {
-		final Ltms ltms = getLTMS();
+		final Ltms ltms = getLtms();
 		ltms.clearPremises();
 		ltms.addPremise(getFalseOptionalFeature().getName(), false);
 		ltms.addPremise(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);

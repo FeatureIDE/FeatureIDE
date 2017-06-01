@@ -69,7 +69,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	@Override
 	public void setFeatureModel(IFeatureModel fm) {
 		this.fm = fm;
-		setCNF(null);
+		setCnf(null);
 	}
 	
 	/**
@@ -78,10 +78,10 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return a formula representation of the feature model in CNF; not null
 	 * @throws IllegalStateException if the CNF could not be created
 	 */
-	protected Node getCNF() throws IllegalStateException {
+	protected Node getCnf() throws IllegalStateException {
 		if (cnf == null) {
 			try {
-				setCNF(createCNF());
+				setCnf(createCnf());
 			} catch (IllegalArgumentException e) {
 				throw new IllegalStateException(e);
 			}
@@ -95,7 +95,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @param cnf formula representation of the feature model in CNF
 	 * @throws IllegalArgumentException if the given formula is not in CNF
 	 */
-	protected void setCNF(Node cnf) throws IllegalArgumentException {
+	protected void setCnf(Node cnf) throws IllegalArgumentException {
 		if (cnf != null && (!(cnf instanceof And) || !cnf.isConjunctiveNormalForm())) {
 			throw new IllegalArgumentException("Formula is not in CNF");
 		}
@@ -107,8 +107,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the formula representation of the feature model in CNF; not null
 	 * @throws IllegalStateException if the feature model is null
 	 */
-	protected Node createCNF() throws IllegalStateException {
-		return createCNF(NodeCreator.createNodes(fm));
+	protected Node createCnf() throws IllegalStateException {
+		return createCnf(NodeCreator.createNodes(fm));
 	}
 	
 	/**
@@ -116,7 +116,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @param node node to transform
 	 * @return a copy of the given node in CNF; not null
 	 */
-	protected Node createCNF(Node node) {
+	protected Node createCnf(Node node) {
 		return removeTautologies(node.toCNF());
 	}
 	
