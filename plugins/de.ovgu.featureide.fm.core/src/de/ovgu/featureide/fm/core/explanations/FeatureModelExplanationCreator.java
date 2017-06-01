@@ -20,16 +20,26 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
- * Generates {@link Explanation explanations}.
+ * Generates explanations for defects in feature models.
  * 
  * @author Timo Guenther
+ * @see {@link DeadFeatureExplanationCreator} for explaining dead features and void feature models
+ * @see {@link FalseOptionalFeatureExplanationCreator} for explaining false-optional features
+ * @see {@link RedundantConstraintExplanationCreator} for explaining redundant constraints
  */
-public interface ExplanationCreator {
+public interface FeatureModelExplanationCreator extends ExplanationCreator {
 	/**
-	 * Returns an explanation for the specified defect.
-	 * @return an explanation; null if none could be generated
-	 * @throws IllegalStateException if no defect is specified
+	 * Returns the feature model context.
+	 * @return the feature model context
 	 */
-	public Explanation getExplanation() throws IllegalStateException;
+	public IFeatureModel getFeatureModel();
+	
+	/**
+	 * Sets the feature model context.
+	 * @param fm the feature model context
+	 */
+	public void setFeatureModel(IFeatureModel fm);
 }
