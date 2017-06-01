@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCr
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationCreator implements FalseOptionalFeatureExplanationCreator {
+public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
 	/** The false-optional feature in the feature model. */
 	private IFeature falseOptionalFeature;
 	

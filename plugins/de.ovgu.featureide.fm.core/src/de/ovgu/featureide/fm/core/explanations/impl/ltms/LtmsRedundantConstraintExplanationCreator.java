@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCre
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCreator implements RedundantConstraintExplanationCreator {
+public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
 	/** The redundant constraint in the feature model. */
 	private IConstraint redundantConstraint;
 	/**

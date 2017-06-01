@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.impl.AbstractFeatureModelExplanat
  * @author Timo Guenther
  * @author Sofia Ananieva
  */
-public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplanationCreator {
+public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {
 	/**
 	 * The LTMS with the CNF as input.
 	 * The LTMS is created lazily when needed and reset when the CNF changes.
@@ -42,7 +42,7 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	protected LtmsExplanationCreator() {
+	protected LtmsFeatureModelExplanationCreator() {
 		super();
 	}
 	
@@ -50,7 +50,7 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	protected LtmsExplanationCreator(IFeatureModel fm) {
+	protected LtmsFeatureModelExplanationCreator(IFeatureModel fm) {
 		super();
 	}
 	

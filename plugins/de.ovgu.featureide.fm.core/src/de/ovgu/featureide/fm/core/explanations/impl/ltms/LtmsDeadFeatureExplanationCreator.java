@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class LtmsDeadFeatureExplanationCreator extends LtmsExplanationCreator implements DeadFeatureExplanationCreator {
+public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
 	/** The dead feature in the feature model. */
 	private IFeature deadFeature;
 	
