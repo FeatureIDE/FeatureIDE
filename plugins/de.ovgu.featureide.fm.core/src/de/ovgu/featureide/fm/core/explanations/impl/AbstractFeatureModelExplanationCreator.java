@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
 /**
  * Abstract implementation of {@link FeatureModelExlanationCreator}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class AbstractFeatureModelExplanationCreator implements FeatureModelExplanationCreator {
 	/** The feature model context. */

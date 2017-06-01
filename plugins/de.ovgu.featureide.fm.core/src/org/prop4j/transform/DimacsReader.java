@@ -37,7 +37,7 @@ import org.prop4j.Or;
 /**
  * Transforms DIMACS CNF files into instances of {@link Node}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class DimacsReader {
 	/** Token leading a (single-line) comment. */

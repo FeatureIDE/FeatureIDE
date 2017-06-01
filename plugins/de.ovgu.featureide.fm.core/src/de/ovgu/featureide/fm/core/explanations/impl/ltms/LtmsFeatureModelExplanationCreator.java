@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.explanations.impl.AbstractFeatureModelExplanat
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator} using an {@link Ltms LTMS}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */
 public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {

@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * Generates explanations for dead features in feature models.
  * Also supports explanations for void feature models by explaining why the root feature is dead.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public interface DeadFeatureExplanationCreator extends FeatureModelExplanationCreator {
 	/**

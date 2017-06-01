@@ -35,7 +35,7 @@ import org.prop4j.Or;
 /**
  * Tests for {@link DimacsReader}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class DimacsReaderTests {
 	@Rule

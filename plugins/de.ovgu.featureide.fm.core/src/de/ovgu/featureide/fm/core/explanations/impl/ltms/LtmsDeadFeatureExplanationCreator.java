@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
  * Implementation of {@link DeadFeatureExplanationCreator} using an {@link Ltms LTMS}.
  * 
  * @author Sofia Ananieva
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
 	/** The dead feature in the feature model. */

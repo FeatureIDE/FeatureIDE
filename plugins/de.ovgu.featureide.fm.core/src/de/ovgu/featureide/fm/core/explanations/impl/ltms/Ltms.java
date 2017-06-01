@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
  * </p>
  * 
  * @author Sofia Ananieva
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  * @see {@link FeatureModelExplanationCreator} for using the LTMS with feature models
  */
 public class Ltms {

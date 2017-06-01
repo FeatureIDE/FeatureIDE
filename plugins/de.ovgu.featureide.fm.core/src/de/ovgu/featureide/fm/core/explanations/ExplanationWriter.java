@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 /**
  * Transforms instances of {@link Explanation} into user-friendly strings in natural language.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */
 public class ExplanationWriter {

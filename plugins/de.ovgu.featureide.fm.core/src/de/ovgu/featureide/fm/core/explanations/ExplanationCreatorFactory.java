@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.LtmsExplanationCreatorF
 /**
  * Provides instances of {@link ExplanationCreator}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class ExplanationCreatorFactory {
 	/**

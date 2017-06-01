@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
  * A decoration for a connection figure.
  * Can be either {@link CircleDecoration} or {@link RelationDecoration}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class ConnectionDecoration extends Shape implements RotatableDecoration {
 	/** the currently active reason */

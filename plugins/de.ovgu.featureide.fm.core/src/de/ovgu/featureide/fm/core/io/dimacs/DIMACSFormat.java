@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * Reads and writes feature models in the DIMACS CNF format.
  * 
  * @author Sebastian Krieter
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class DIMACSFormat implements IFeatureModelFormat {
 

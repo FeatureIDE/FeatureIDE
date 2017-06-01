@@ -28,7 +28,7 @@ import org.prop4j.NodeWriter.Notation;
 /**
  * Tests for {@link NodeWriter}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class NodeWriterTests {
 	@Test

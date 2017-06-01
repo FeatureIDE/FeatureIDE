@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllButEx
 /**
  * Action for collapsing all features but those affected by the active explanation.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class CollapseAllButExplanationAction extends Action {
 	/** The ID of this action. */

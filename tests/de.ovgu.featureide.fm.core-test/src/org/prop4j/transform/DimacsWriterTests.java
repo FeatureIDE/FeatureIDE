@@ -35,7 +35,7 @@ import org.prop4j.Or;
 /**
  * Tests for {@link DimacsWriter}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class DimacsWriterTests {
 	private static final String LN = System.lineSeparator();
