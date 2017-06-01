@@ -42,6 +42,11 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	/** How often to pop until the scope containing the contradiction is reached. */
 	private int scopeContradictionDistance = 0;
 	
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	protected Sat4jMutableSatSolver() {}
+	
 	@Override
 	public void addClause(Node clause) {
 		super.addClause(clause);

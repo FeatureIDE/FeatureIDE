@@ -56,6 +56,11 @@ public class Sat4jSatSolver extends BasicSatSolver {
 	/** Whether an immediate contradiction occurred while adding the clauses. */
 	private boolean contradiction = false;
 	
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	protected Sat4jSatSolver() {}
+	
 	@Override
 	protected ISolver createOracle() {
 		return SolverFactory.newDefault();

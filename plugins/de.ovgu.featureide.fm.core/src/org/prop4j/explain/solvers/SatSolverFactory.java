@@ -18,11 +18,9 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.explain.solvers.factory;
+package org.prop4j.explain.solvers;
 
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.MutableSatSolver;
-import org.prop4j.explain.solvers.SatSolver;
+import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolverFactory;
 
 /**
  * Provides instances of {@link SatSolver}.
