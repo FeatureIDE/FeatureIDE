@@ -21,6 +21,7 @@
 package org.prop4j.explain.solvers.impl;
 
 import org.prop4j.explain.solvers.MusExtractorTests;
+import org.prop4j.explain.solvers.impl.sat4j.Sat4jMusExtractor;
 
 /**
  * Tests for {@link Sat4jMusExtractor}.

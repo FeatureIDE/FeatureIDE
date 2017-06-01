@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.explain.solvers.impl;
+package org.prop4j.explain.solvers.impl.sat4j;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.explain.solvers.impl.BasicSatSolver;
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;

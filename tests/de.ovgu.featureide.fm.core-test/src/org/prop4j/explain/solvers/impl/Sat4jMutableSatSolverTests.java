@@ -21,6 +21,7 @@
 package org.prop4j.explain.solvers.impl;
 
 import org.prop4j.explain.solvers.MutableSatSolverTests;
+import org.prop4j.explain.solvers.impl.sat4j.Sat4jMutableSatSolver;
 
 
 /**

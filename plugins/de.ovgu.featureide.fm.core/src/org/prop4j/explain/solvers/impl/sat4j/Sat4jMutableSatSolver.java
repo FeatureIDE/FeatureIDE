@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.explain.solvers.impl;
+package org.prop4j.explain.solvers.impl.sat4j;
 
 import java.util.Deque;
 import java.util.LinkedList;
