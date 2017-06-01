@@ -32,14 +32,14 @@ import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCr
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationCreator implements FalseOptionalFeatureExplanationCreator {
+public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
 	/** The false-optional feature in the feature model. */
 	private IFeature falseOptionalFeature;
 	
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public LtmsFalseOptionalFeatureExplanationCreator() {
+	protected LtmsFalseOptionalFeatureExplanationCreator() {
 		this(null);
 	}
 	
@@ -47,7 +47,7 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationC
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
+	protected LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -56,7 +56,7 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationC
 	 * @param fm the feature model context
 	 * @param falseOptionalFeature the false-optional feature in the feature model
 	 */
-	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
+	protected LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
 		super(fm);
 		setFalseOptionalFeature(falseOptionalFeature);
 	}
@@ -81,7 +81,7 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationC
 	 */
 	@Override
 	public Explanation getExplanation() throws IllegalStateException {
-		final Ltms ltms = getLTMS();
+		final Ltms ltms = getLtms();
 		ltms.clearPremises();
 		ltms.addPremise(getFalseOptionalFeature().getName(), false);
 		ltms.addPremise(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);

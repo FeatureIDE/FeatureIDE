@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.impl.AbstractFeatureModelExplanat
  * @author Timo Guenther
  * @author Sofia Ananieva
  */
-public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplanationCreator {
+public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {
 	/**
 	 * The LTMS with the CNF as input.
 	 * The LTMS is created lazily when needed and reset when the CNF changes.
@@ -42,7 +42,7 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public LtmsExplanationCreator() {
+	protected LtmsFeatureModelExplanationCreator() {
 		super();
 	}
 	
@@ -50,7 +50,7 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public LtmsExplanationCreator(IFeatureModel fm) {
+	protected LtmsFeatureModelExplanationCreator(IFeatureModel fm) {
 		super();
 	}
 	
@@ -59,9 +59,9 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	 * Creates it first if necessary.
 	 * @return the LTMS; not null
 	 */
-	protected Ltms getLTMS() {
+	protected Ltms getLtms() {
 		if (ltms == null) {
-			setLTMS(createLTMS());
+			setLtms(createLtms());
 		}
 		return ltms;
 	}
@@ -70,7 +70,7 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	 * Sets the LTMS.
 	 * @param ltms the LTMS
 	 */
-	protected void setLTMS(Ltms ltms) {
+	protected void setLtms(Ltms ltms) {
 		this.ltms = ltms;
 	}
 	
@@ -78,13 +78,13 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	 * Returns a new LTMS with the CNF.
 	 * @return a new LTMS with the CNF; not null
 	 */
-	protected Ltms createLTMS() {
-		return new Ltms(getCNF());
+	protected Ltms createLtms() {
+		return new Ltms(getCnf());
 	}
 	
 	@Override
-	protected void setCNF(Node cnf) throws IllegalArgumentException {
-		super.setCNF(cnf);
-		setLTMS(null);
+	protected void setCnf(Node cnf) throws IllegalArgumentException {
+		super.setCnf(cnf);
+		setLtms(null);
 	}
 }

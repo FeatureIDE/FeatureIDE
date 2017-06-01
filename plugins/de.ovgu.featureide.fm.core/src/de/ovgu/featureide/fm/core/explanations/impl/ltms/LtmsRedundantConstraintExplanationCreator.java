@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCre
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCreator implements RedundantConstraintExplanationCreator {
+public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
 	/** The redundant constraint in the feature model. */
 	private IConstraint redundantConstraint;
 	/**
@@ -59,7 +59,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public LtmsRedundantConstraintExplanationCreator() {
+	protected LtmsRedundantConstraintExplanationCreator() {
 		this(null);
 	}
 	
@@ -67,7 +67,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public LtmsRedundantConstraintExplanationCreator(IFeatureModel fm) {
+	protected LtmsRedundantConstraintExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -76,7 +76,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	 * @param fm the feature model context
 	 * @param redundantConstraint the redundant constraint in the feature model
 	 */
-	public LtmsRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
+	protected LtmsRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
 		super(fm);
 		setRedundantConstraint(redundantConstraint);
 	}
@@ -110,7 +110,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	 */
 	protected void setCNFWithoutRedundantConstraintClauses(Node cnfWithoutRedundantConstraintClauses) {
 		this.cnfWithoutRedundantConstraintClauses = cnfWithoutRedundantConstraintClauses;
-		setLTMS(null);
+		setLtms(null);
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	 * @return a copy of the CNF without the clauses of the redundant constraint; not null
 	 */
 	protected Node createCNFWithoutRedundantConstraintClauses() {
-		return removeRedundantConstraintClauses(getCNF());
+		return removeRedundantConstraintClauses(getCnf());
 	}
 	
 	/**
@@ -145,7 +145,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	}
 	
 	@Override
-	protected Ltms createLTMS() {
+	protected Ltms createLtms() {
 		return new Ltms(getCNFWithoutRedundantConstraintClauses());
 	}
 	
@@ -165,7 +165,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	public Explanation getExplanation() throws IllegalStateException {
 		final Explanation cumulatedExplanation = new Explanation();
 		cumulatedExplanation.setExplanationCount(0);
-		final Ltms ltms = getLTMS();
+		final Ltms ltms = getLtms();
 		for (final Map<Object, Boolean> assignment : getContradictingAssignments(getRedundantConstraint().getNode())) {
 			ltms.setPremises(assignment);
 			final Explanation explanation = ltms.getExplanation();
