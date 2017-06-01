@@ -42,7 +42,7 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public LtmsExplanationCreator() {
+	protected LtmsExplanationCreator() {
 		super();
 	}
 	
@@ -50,7 +50,7 @@ public abstract class LtmsExplanationCreator extends AbstractFeatureModelExplana
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public LtmsExplanationCreator(IFeatureModel fm) {
+	protected LtmsExplanationCreator(IFeatureModel fm) {
 		super();
 	}
 	

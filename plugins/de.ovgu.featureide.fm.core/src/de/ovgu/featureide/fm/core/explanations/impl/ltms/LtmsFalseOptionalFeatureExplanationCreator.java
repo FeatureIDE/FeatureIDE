@@ -39,7 +39,7 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationC
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public LtmsFalseOptionalFeatureExplanationCreator() {
+	protected LtmsFalseOptionalFeatureExplanationCreator() {
 		this(null);
 	}
 	
@@ -47,7 +47,7 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationC
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
+	protected LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -56,7 +56,7 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsExplanationC
 	 * @param fm the feature model context
 	 * @param falseOptionalFeature the false-optional feature in the feature model
 	 */
-	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
+	protected LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
 		super(fm);
 		setFalseOptionalFeature(falseOptionalFeature);
 	}

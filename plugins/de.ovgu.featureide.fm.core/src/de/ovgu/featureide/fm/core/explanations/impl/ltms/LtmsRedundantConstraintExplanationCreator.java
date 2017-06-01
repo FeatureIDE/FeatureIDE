@@ -59,7 +59,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public LtmsRedundantConstraintExplanationCreator() {
+	protected LtmsRedundantConstraintExplanationCreator() {
 		this(null);
 	}
 	
@@ -67,7 +67,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public LtmsRedundantConstraintExplanationCreator(IFeatureModel fm) {
+	protected LtmsRedundantConstraintExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -76,7 +76,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsExplanationCr
 	 * @param fm the feature model context
 	 * @param redundantConstraint the redundant constraint in the feature model
 	 */
-	public LtmsRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
+	protected LtmsRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
 		super(fm);
 		setRedundantConstraint(redundantConstraint);
 	}

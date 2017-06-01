@@ -38,7 +38,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsExplanationCreator im
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public LtmsDeadFeatureExplanationCreator() {
+	protected LtmsDeadFeatureExplanationCreator() {
 		this(null);
 	}
 	
@@ -46,7 +46,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsExplanationCreator im
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	public LtmsDeadFeatureExplanationCreator(IFeatureModel fm) {
+	protected LtmsDeadFeatureExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -55,7 +55,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsExplanationCreator im
 	 * @param fm the feature model context
 	 * @param deadFeature the dead feature in the feature model
 	 */
-	public LtmsDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
+	protected LtmsDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
 		super(fm);
 		setDeadFeature(deadFeature);
 	}

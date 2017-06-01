@@ -59,11 +59,9 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.LtmsDeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.LtmsFalseOptionalFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.LtmsRedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -93,20 +91,24 @@ public class FeatureModelAnalyzer {
 	 */
 	private final Map<IConstraint, Explanation> redundantConstraintExplanations = new HashMap<>();
 	/**
+	 * Used for creating explanation creators.
+	 */
+	private final ExplanationCreatorFactory explanationCreatorFactory = ExplanationCreatorFactory.getDefault();
+	/**
 	 * Creates explanations for dead features.
 	 * Stored for performance so the underlying CNF is not recreated for every explanation.
 	 */
-	private final DeadFeatureExplanationCreator deadFeatureExplanationCreator = new LtmsDeadFeatureExplanationCreator();
+	private final DeadFeatureExplanationCreator deadFeatureExplanationCreator = explanationCreatorFactory.getDeadFeatureExplanationCreator();
 	/**
 	 * Creates explanations for false-optional features.
 	 * Stored for performance so the underlying CNF is not recreated for every explanation.
 	 */
-	private final FalseOptionalFeatureExplanationCreator falseOptionalFeatureExplanationCreator = new LtmsFalseOptionalFeatureExplanationCreator();
+	private final FalseOptionalFeatureExplanationCreator falseOptionalFeatureExplanationCreator = explanationCreatorFactory.getFalseOptionalFeatureExplanationCreator();
 	/**
 	 * Creates explanations for redundant constraints.
 	 * Stored for performance so the underlying CNF is not recreated for every explanation.
 	 */
-	private final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = new LtmsRedundantConstraintExplanationCreator();
+	private final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = explanationCreatorFactory.getRedundantConstraintExplanationCreator();
 
 	public static enum Attribute {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
@@ -908,7 +910,7 @@ public class FeatureModelAnalyzer {
 	public void addDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
 		final DeadFeatureExplanationCreator creator = fm == this.fm
 				? deadFeatureExplanationCreator
-				: new LtmsDeadFeatureExplanationCreator(fm);
+				: explanationCreatorFactory.getDeadFeatureExplanationCreator(fm);
 		creator.setDeadFeature(feature);
 		deadFeatureExplanations.put(feature, creator.getExplanation());
 	}
@@ -940,7 +942,7 @@ public class FeatureModelAnalyzer {
 	public void addFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
 		final FalseOptionalFeatureExplanationCreator creator = fm == this.fm
 				? falseOptionalFeatureExplanationCreator
-				: new LtmsFalseOptionalFeatureExplanationCreator(fm);
+				: explanationCreatorFactory.getFalseOptionalFeatureExplanationCreator(fm);
 		creator.setFalseOptionalFeature(feature);
 		falseOptionalFeatureExplanations.put(feature, creator.getExplanation());
 	}
@@ -973,7 +975,7 @@ public class FeatureModelAnalyzer {
 	public void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
 		final RedundantConstraintExplanationCreator creator = fm == this.fm
 				? redundantConstraintExplanationCreator
-				: new LtmsRedundantConstraintExplanationCreator(fm);
+				: explanationCreatorFactory.getRedundantConstraintExplanationCreator(fm);
 		creator.setRedundantConstraint(constraint);
 		redundantConstraintExplanations.put(constraint, creator.getExplanation());
 	}
