@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 /**
  * Operation for collapsing all features but those affected by the active explanation.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class CollapseAllButExplanationOperation extends AbstractFeatureModelOperation {
 	/** The graphical feature model context. */

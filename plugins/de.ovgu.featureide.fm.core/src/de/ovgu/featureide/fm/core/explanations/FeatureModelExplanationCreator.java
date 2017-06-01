@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 /**
  * Generates explanations for defects in feature models.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  * @see {@link DeadFeatureExplanationCreator} for explaining dead features and void feature models
  * @see {@link FalseOptionalFeatureExplanationCreator} for explaining false-optional features
  * @see {@link RedundantConstraintExplanationCreator} for explaining redundant constraints

@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 /**
  * Generates explanations for redundant constraints in feature models.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public interface RedundantConstraintExplanationCreator extends FeatureModelExplanationCreator {
 	/**

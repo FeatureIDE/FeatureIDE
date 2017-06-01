@@ -27,7 +27,7 @@ import org.eclipse.draw2d.MarginBorder;
 /**
  * A figure representing the feature model.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class ModelFigure extends FreeformLayer {
 	/**

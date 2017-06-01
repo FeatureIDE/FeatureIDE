@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.explanations;
 /**
  * Generates {@link Explanation explanations}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public interface ExplanationCreator {
 	/**

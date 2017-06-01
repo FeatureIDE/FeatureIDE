@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCre
 /**
  * Provides instances of {@link ExplanationCreatorFactory} using an {@link Ltms LTMS}.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class LtmsExplanationCreatorFactory extends ExplanationCreatorFactory {
 	@Override

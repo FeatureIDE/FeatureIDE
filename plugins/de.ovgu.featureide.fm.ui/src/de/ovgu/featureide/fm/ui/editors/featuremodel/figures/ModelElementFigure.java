@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 /**
  * A figure for feature model elements, meaning features and constraints.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class ModelElementFigure extends Figure {
 	/** the currently active reason */

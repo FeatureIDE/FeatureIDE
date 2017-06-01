@@ -24,13 +24,13 @@ package org.prop4j;
  * Converts a propositional node to a String object.
  * 
  * @author Thomas Thuem
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class NodeWriter {
 	/**
 	 * The type of notation of the formula.
 	 * 
-	 * @author Timo Guenther
+	 * @author Timo G&uuml;nther
 	 */
 	public enum Notation {
 		/**

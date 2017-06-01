@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 /**
  * Generates explanations for false-optional features in feature models.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public interface FalseOptionalFeatureExplanationCreator extends FeatureModelExplanationCreator {
 	/**
