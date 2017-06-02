@@ -138,8 +138,8 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		instance.push();
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
-		instance.addFormula(new And(new Or("D", "A"), new Or("B", "D")));
-		expected.add(new Or("D", "A"));
+		instance.addFormula(new And(new Or("D"), new Or("B", "D")));
+		expected.add(new Or("D"));
 		expected.add(new Or("B", "D"));
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());

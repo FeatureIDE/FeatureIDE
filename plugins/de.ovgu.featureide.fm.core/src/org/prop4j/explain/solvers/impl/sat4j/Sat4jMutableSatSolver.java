@@ -89,7 +89,9 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		scopeClauseCount--;
 		final Node clause = getClauses().remove(getClauseCount() - 1);
 		final IConstr constraint = constraints.remove(constraints.size() - 1);
-		getOracle().removeConstr(constraint);
+		if (constraint != null) {
+			getOracle().removeConstr(constraint);
+		}
 		return clause;
 	}
 }
