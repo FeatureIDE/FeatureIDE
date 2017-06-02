@@ -21,7 +21,6 @@
 package org.prop4j.explain.solvers.impl.sat4j;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,8 +44,8 @@ import org.sat4j.specs.TimeoutException;
  * @author Timo G&uuml;nther
  */
 public class Sat4jSatSolver extends BasicSatSolver {
-	/** The handles to the clauses in the oracle. */
-	protected final List<IConstr> constraints = new LinkedList<>();
+	/** Maps clauses to constraints (handles to the clauses in the oracle). */
+	protected final Map<Node, IConstr> clauseConstraints = new LinkedHashMap<>();
 	
 	/** Maps variables to Sat4J indexes. */
 	private final Map<Object, Integer> variableIndexes = new LinkedHashMap<>();
@@ -76,11 +75,14 @@ public class Sat4jSatSolver extends BasicSatSolver {
 		addVariables(clause.getUniqueVariables());
 		try {
 			final IConstr constraint = getOracle().addClause(getVectorFromClause(clause));
-			constraints.add(constraint);
+			if (constraint != null) {
+				clauseConstraints.put(clause, constraint);
+			}
 		} catch (ContradictionException e) {
 			setContradiction(true);
 		}
 		super.addClause(clause);
+		
 	}
 	
 	/**

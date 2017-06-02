@@ -20,6 +20,7 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +36,7 @@ import org.sat4j.specs.IConstr;
  * @author Timo G&uuml;nther
  */
 public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatSolver {
-	/** The amount of clauses that were added in each scope beyond the default one. */
+	/** The amount of clauses that were added in each scope except the current one. */
 	private final Deque<Integer> scopeClauseCounts = new LinkedList<>();
 	/** The amount of clauses in the current scope. */
 	private int scopeClauseCount = 0;
@@ -87,11 +88,78 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	 */
 	protected Node removeClause() {
 		scopeClauseCount--;
-		final Node clause = getClauses().remove(getClauseCount() - 1);
-		final IConstr constraint = constraints.remove(constraints.size() - 1);
+		
+		/*
+		 * When a constraint is removed from a Sat4J oracle, its index is not freed up.
+		 * To still be able to keep track of the constraint indexes, do not remove the corresponding clause from the local list but just set it to null.
+		 */
+		final List<Node> clauses = super.getClauses();
+		Node clause = null;
+		for (int i = clauses.size() - 1; i >= 0; i--) {
+			clause = clauses.get(i);
+			if (clause != null) {
+				clauses.set(i, null);
+				break;
+			}
+		}
+		
+		final IConstr constraint = clauseConstraints.remove(clause);
 		if (constraint != null) {
 			getOracle().removeConstr(constraint);
 		}
 		return clause;
+	}
+	
+	@Override
+	public List<Node> getClauses() {
+		/*
+		 * Sat4J does not free up a constraint's index when it is removed.
+		 * In the local clause list, the resulting gaps in the index range are modeled using null values.
+		 * As such, return a copy without these null values to fulfill the interface's contract.
+		 */
+		final List<Node> clauses = super.getClauses();
+		final List<Node> clausesWithoutNull = new ArrayList<>(getClauseCount());
+		for (final Node clause : clauses) {
+			if (clause != null) {
+				clausesWithoutNull.add(clause);
+			}
+		}
+		return clausesWithoutNull;
+	}
+	
+	@Override
+	public Node getClause(int index) throws IndexOutOfBoundsException {
+		/*
+		 * For performance reasons, do not generate the entire null-free list of clauses.
+		 */
+		int i = 0;
+		for (final Node clause : super.getClauses()) {
+			if (clause != null && i++ == index) {
+				return clause;
+			}
+		}
+		throw new IndexOutOfBoundsException();
+	}
+	
+	@Override
+	public int getClauseCount() {
+		/*
+		 * For performance reasons, do not generate the entire null-free list of clauses.
+		 */
+		int total = scopeClauseCount;
+		for (final int scopeClauseCount : scopeClauseCounts) {
+			total += scopeClauseCount;
+		}
+		return total;
+	}
+	
+	@Override
+	public Node getClauseFromIndex(int index) {
+		/*
+		 * Sat4J does not free up a constraint's index when it is removed.
+		 * In the local clause list, the resulting gaps in the index range are modeled using null values.
+		 * As such, do not skip these null values when accessing the clause list using a Sat4J clause index.
+		 */
+		return super.getClause(index - 1);
 	}
 }

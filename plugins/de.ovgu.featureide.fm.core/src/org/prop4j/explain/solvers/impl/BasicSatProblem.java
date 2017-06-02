@@ -20,9 +20,9 @@
  */
 package org.prop4j.explain.solvers.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.Node;
@@ -35,7 +35,7 @@ import org.prop4j.explain.solvers.SatProblem;
  */
 public class BasicSatProblem implements SatProblem {
 	/** The clauses added to this problem. */
-	private final List<Node> clauses = new LinkedList<>();
+	private final List<Node> clauses = new ArrayList<>();
 	
 	@Override
 	public void addFormulas(Node... formulas) {
@@ -87,11 +87,11 @@ public class BasicSatProblem implements SatProblem {
 	
 	@Override
 	public Node getClause(int index) throws IndexOutOfBoundsException {
-		return getClauses().get(index);
+		return clauses.get(index);
 	}
 	
 	@Override
 	public int getClauseCount() {
-		return getClauses().size();
+		return clauses.size();
 	}
 }
