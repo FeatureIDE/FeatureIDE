@@ -18,11 +18,9 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.explain.solvers.impl;
+package org.prop4j.explain.solvers.impl.sat4j;
 
 import org.prop4j.explain.solvers.MusExtractorTests;
-import org.prop4j.explain.solvers.impl.sat4j.Sat4jMusExtractor;
-import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolverFactory;
 
 /**
  * Tests for {@link Sat4jMusExtractor}.

@@ -18,11 +18,9 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.explain.solvers.impl;
+package org.prop4j.explain.solvers.impl.sat4j;
 
 import org.prop4j.explain.solvers.MutableSatSolverTests;
-import org.prop4j.explain.solvers.impl.sat4j.Sat4jMutableSatSolver;
-import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolverFactory;
 
 /**
  * Tests for {@link Sat4jMutableSatSolver}.
