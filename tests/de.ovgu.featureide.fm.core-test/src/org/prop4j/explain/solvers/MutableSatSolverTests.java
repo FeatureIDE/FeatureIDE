@@ -164,6 +164,29 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		expected.removeLast();
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
+		exception.expect(NoSuchElementException.class);
+		instance.pop();
+	}
+	
+	@Test
+	public void testPopUnit() {
+		final MutableSatSolver instance = getInstance();
+		final Deque<Node> expected = new LinkedList<>();
+		instance.addFormula(new Or("A"));
+		expected.add(new Or("A"));
+		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.isSatisfiable());
+		instance.push();
+		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.isSatisfiable());
+		instance.addFormula(new Literal("B", true));
+		expected.add(new Or("B"));
+		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.isSatisfiable());
+		instance.pop();
+		expected.removeLast();
+		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.isSatisfiable());
 	}
 	
 	protected abstract MutableSatSolver getInstance();
