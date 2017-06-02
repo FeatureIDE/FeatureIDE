@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +70,22 @@ public abstract class Node {
 	}
 
 	/**
+	 * <p>
+	 * Returns true iff this node evaluates to true under the given truth value assignment.
+	 * The result of the evaluation is the same as if each positive literal in the expression were replaced by the corresponding boolean value in the given map.
+	 * </p>
+	 * 
+	 * <p>
+	 * For example, for the {@link And conjunction} operation, this operations returns true iff the following formula is satisfied:
+	 * <pre><i>c<sub>1</sub></i> &and; &hellip; &and; <i>c<sub>n</sub></i></pre>
+	 * Where <i>c<sub>i</sub></i> is the <i>i</i>-th of the <i>n</i> children of the node.
+	 * </p>
+	 * @param assignment truth value assignment from variable to true or false
+	 * @return the result of evaluation of this node
+	 */
+	public abstract boolean getValue(Map<Object, Boolean> assignment);
+
+	/**
 	 * Returns true iff this is in conjunctive normal form.
 	 * This is the case iff this is a conjunction of disjunctions of literals.
 	 * Note that redundant nodes may be omitted.
@@ -110,10 +127,6 @@ public abstract class Node {
 			regularCNFNode = new And(new Or(regularCNFNode));
 		}
 		return regularCNFNode;
-	}
-
-	public boolean getValue(Map<Object, Boolean> map) {
-		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
 	public static Node buildCNF(Node node) {
@@ -600,5 +613,60 @@ public abstract class Node {
 			child.getVariables(variables);
 		}
 		return variables;
+	}
+
+	/**
+	 * <p>
+	 * Returns all possible truth value assignments for {@link #getVariables() all variables} in this node.
+	 * </p>
+	 * 
+	 * <p>
+	 * Let <i>n</i> denote the amount of literals in this node.
+	 * Then this method will return exactly <i>2<sup>n</sup></i> assignments.
+	 * Each assignment in turn contains exactly <i>n</i> entries (1 for each variable).
+	 * </p>
+	 * @return all possible truth value assignments; not null
+	 */
+	public Set<Map<Object, Boolean>> getAssignments() {
+		return getAssignments(null);
+	}
+
+	/**
+	 * Returns all truth value assignments for which this node {@link #getValue(Map) evaluates} to true.
+	 * @return all satisfying truth value assignments; not null
+	 */
+	public Set<Map<Object, Boolean>> getSatisfyingAssignments() {
+		return getAssignments(true);
+	}
+
+	/**
+	 * Returns all truth value assignments for which this node {@link #getValue(Map) evaluates} to false.
+	 * @return all contradicting truth value assignments; not null
+	 */
+	public Set<Map<Object, Boolean>> getContradictingAssignments() {
+		return getAssignments(false);
+	}
+
+	/**
+	 * Returns all truth value assignments for which this node {@link #getValue(Map) evaluates} to the given boolean value.
+	 * Accepts all assignments if the given boolean value is null.
+	 * @param result the expected evaluation result; null to accept every assignment
+	 * @return all accepted truth value assignments; not null
+	 */
+	private Set<Map<Object, Boolean>> getAssignments(Boolean result) {
+		final Set<Object> keys = getUniqueVariables();
+		final Set<Map<Object, Boolean>> assignments = new LinkedHashSet<>();
+		for (int assignment = 0; assignment < 1 << keys.size(); assignment++) {
+			final Map<Object, Boolean> map = new LinkedHashMap<Object, Boolean>();
+			int i = 0;
+			for (final Object key : keys) {
+				map.put(key, (assignment & (1 << i)) != 0);
+				i++;
+			}
+			if (result == null || getValue(map) == result) {
+				assignments.add(map);
+			}
+		}
+		return assignments;
 	}
 }

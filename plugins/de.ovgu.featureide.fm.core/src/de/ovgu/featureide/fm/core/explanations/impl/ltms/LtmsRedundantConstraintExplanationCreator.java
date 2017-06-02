@@ -20,13 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations.impl.ltms;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -166,7 +162,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		final Explanation cumulatedExplanation = new Explanation();
 		cumulatedExplanation.setExplanationCount(0);
 		final Ltms ltms = getLtms();
-		for (final Map<Object, Boolean> assignment : getContradictingAssignments(getRedundantConstraint().getNode())) {
+		for (final Map<Object, Boolean> assignment : getRedundantConstraint().getNode().getContradictingAssignments()) {
 			ltms.setPremises(assignment);
 			final Explanation explanation = ltms.getExplanation();
 			if (explanation == null) {
@@ -176,41 +172,5 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		}
 		cumulatedExplanation.setDefectRedundantConstraint(getRedundantConstraint());
 		return cumulatedExplanation;
-	}
-	
-	/**
-	 * Returns all value assumptions for which the conjunctive normal form of a redundant constraint is false.
-	 * @param clause any clause (not necessarily in conjunctive normal form)
-	 * @return A list which contains a mapping between a variable and its truth value
-	 */
-	private static Set<Map<Object, Boolean>> getContradictingAssignments(Node clause) {
-		final Set<Map<Object, Boolean>> assignments = getAssignments(clause);
-		for (final Iterator<Map<Object, Boolean>> it = assignments.iterator(); it.hasNext();) {
-			final Map<Object, Boolean> assignment = it.next();
-			if (clause.getValue(assignment)) { //not a contradiction
-				it.remove();
-			}
-		}
-		return assignments;
-	}
-	
-	/**
-	 * Returns all possible truth value assignments for the given clause.
-	 * @param clause any clause (not necessarily in conjunctive normal form)
-	 * @return all possible truth value assignments for the given clause
-	 */
-	private static Set<Map<Object, Boolean>> getAssignments(Node clause) {
-		final Set<Object> keys = clause.getUniqueVariables();
-		final Set<Map<Object, Boolean>> assignments = new LinkedHashSet<>();
-		for (int assignment = 0; assignment < 1 << keys.size(); assignment++) { //2^n possible assignments
-			final Map<Object, Boolean> map = new LinkedHashMap<Object, Boolean>();
-			int i = 0;
-			for (final Object key : keys) {
-				map.put(key, (assignment & (1 << i)) != 0);
-				i++;
-			}
-			assignments.add(map);
-		}
-		return assignments;
 	}
 }
