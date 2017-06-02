@@ -22,6 +22,7 @@ package org.prop4j.explain.solvers.impl;
 
 import org.prop4j.explain.solvers.MusExtractorTests;
 import org.prop4j.explain.solvers.impl.sat4j.Sat4jMusExtractor;
+import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolverFactory;
 
 /**
  * Tests for {@link Sat4jMusExtractor}.
@@ -31,6 +32,6 @@ import org.prop4j.explain.solvers.impl.sat4j.Sat4jMusExtractor;
 public class Sat4jMusExtractorTests extends MusExtractorTests {
 	@Override
 	protected Sat4jMusExtractor getInstance() {
-		return new Sat4jMusExtractor();
+		return new Sat4jSatSolverFactory().getMusExtractor();
 	}
 }

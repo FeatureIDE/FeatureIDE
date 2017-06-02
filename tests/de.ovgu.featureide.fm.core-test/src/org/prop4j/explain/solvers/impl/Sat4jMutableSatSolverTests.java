@@ -22,7 +22,7 @@ package org.prop4j.explain.solvers.impl;
 
 import org.prop4j.explain.solvers.MutableSatSolverTests;
 import org.prop4j.explain.solvers.impl.sat4j.Sat4jMutableSatSolver;
-
+import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolverFactory;
 
 /**
  * Tests for {@link Sat4jMutableSatSolver}.
@@ -32,6 +32,6 @@ import org.prop4j.explain.solvers.impl.sat4j.Sat4jMutableSatSolver;
 public class Sat4jMutableSatSolverTests extends MutableSatSolverTests {
 	@Override
 	protected Sat4jMutableSatSolver getInstance() {
-		return new Sat4jMutableSatSolver();
+		return new Sat4jSatSolverFactory().getMutableSatSolver();
 	}
 }

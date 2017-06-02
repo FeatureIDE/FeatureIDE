@@ -20,8 +20,6 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.MutableSatSolver;
 import org.prop4j.explain.solvers.SatSolver;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
@@ -32,17 +30,17 @@ import org.prop4j.explain.solvers.SatSolverFactory;
  */
 public class Sat4jSatSolverFactory extends SatSolverFactory {
 	@Override
-	public SatSolver getSatSolver() {
+	public Sat4jSatSolver getSatSolver() {
 		return new Sat4jSatSolver();
 	}
 	
 	@Override
-	public MutableSatSolver getMutableSatSolver() {
+	public Sat4jMutableSatSolver getMutableSatSolver() {
 		return new Sat4jMutableSatSolver();
 	}
 	
 	@Override
-	public MusExtractor getMusExtractor() {
+	public Sat4jMusExtractor getMusExtractor() {
 		return new Sat4jMusExtractor();
 	}
 }
