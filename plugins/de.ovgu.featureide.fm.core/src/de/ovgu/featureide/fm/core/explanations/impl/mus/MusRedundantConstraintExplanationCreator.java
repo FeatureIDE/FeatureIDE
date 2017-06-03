@@ -20,20 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.explanations.impl.mus;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.prop4j.And;
-import org.prop4j.Literal;
-import org.prop4j.Literal.FeatureAttribute;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
 
@@ -45,14 +41,6 @@ import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCre
 public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
 	/** The redundant constraint in the feature model. */
 	private IConstraint redundantConstraint;
-	/**
-	 * The CNF without the clauses of the redundant constraint.
-	 * It is later used as the input for the LTMS.
-	 * It is stored separately from the CNF so the CNF does not have to be overridden and can continue to be reused.
-	 * It is created lazily when needed and reset when any of the variables it depends on is changed:
-	 * the feature model, the feature model's CNF representation or the redundant constraint.
-	 */
-	private Node cnfWithoutRedundantConstraintClauses;
 	
 	/**
 	 * Constructs a new instance of this class.
@@ -87,66 +75,24 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	@Override
 	public void setRedundantConstraint(IConstraint redundantConstraint) {
 		this.redundantConstraint = redundantConstraint;
-		setCNFWithoutRedundantConstraintClauses(null);
 	}
 	
 	/**
-	 * Returns the CNF without the clauses of the redundant constraint.
-	 * Creates it first if necessary.
-	 * @return the CNF without the clauses of the redundant constraint; not null
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Does not contain any of the constraints.
+	 * The constraints are only added later during explaining.
+	 * This is faster than creating the complete CNF and repeatedly removing the redundant constraints from it.
+	 * </p>
 	 */
-	protected Node getCNFWithoutRedundantConstraintClauses() {
-		if (cnfWithoutRedundantConstraintClauses == null) {
-			setCNFWithoutRedundantConstraintClauses(createCNFWithoutRedundantConstraintClauses());
-		}
-		return cnfWithoutRedundantConstraintClauses;
-	}
-	
-	/**
-	 * Sets the CNF without the clauses of the redundant constraint.
-	 * @param cnfWithoutRedundantConstraintClauses the CNF without the clauses of the redundant constraint
-	 */
-	protected void setCNFWithoutRedundantConstraintClauses(Node cnfWithoutRedundantConstraintClauses) {
-		this.cnfWithoutRedundantConstraintClauses = cnfWithoutRedundantConstraintClauses;
-		setOracle(null);
-	}
-	
-	/**
-	 * Creates a copy of the CNF without the clauses of the redundant constraint.
-	 * @return a copy of the CNF without the clauses of the redundant constraint; not null
-	 */
-	protected Node createCNFWithoutRedundantConstraintClauses() {
-		return removeRedundantConstraintClauses(getCnf());
-	}
-	
-	/**
-	 * Returns a copy of the given CNF without clauses of the redundant constraint.
-	 * @param cnf CNF to check
-	 * @return a copy of the given CNF without clauses of the redundant constraint
-	 * @throws IllegalStateException if the redundant constraint is not set
-	 */
-	private Node removeRedundantConstraintClauses(Node cnf) throws IllegalStateException {
-		if (getRedundantConstraint() == null) {
-			throw new IllegalStateException("Missing redundant constraint");
-		}
-		final List<Node> clauses = new LinkedList<>();
-		clause: for (final Node clause : cnf.getChildren()) {
-			for (final Literal literal : clause.getLiterals()) {
-				if (literal.getSourceAttribute() == FeatureAttribute.CONSTRAINT
-						&& getFeatureModel().getConstraints().get(literal.getSourceIndex()) == redundantConstraint) {
-					continue clause;
-				}
-			}
-			clauses.add(clause);
-		}
-		return new And(clauses.toArray());
-	}
-	
 	@Override
-	protected MusExtractor createOracle() {
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
-		oracle.addFormula(getCNFWithoutRedundantConstraintClauses());
-		return oracle;
+	protected Node createCnf() throws IllegalStateException {
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
+		nc.setCnfType(CNFType.Regular);
+		nc.setModelType(ModelType.OnlyStructure);
+		nc.setIncludeBooleanValues(false);
+		return nc.createNodes();
 	}
 	
 	@Override
@@ -154,15 +100,28 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 		final Explanation cumulatedExplanation = new Explanation();
 		cumulatedExplanation.setExplanationCount(0);
 		final MusExtractor oracle = getOracle();
-		for (final Map<Object, Boolean> assignment : getRedundantConstraint().getNode().getContradictingAssignments()) {
-			oracle.push();
-			try {
-				oracle.addAssumptions(assignment);
-				final Explanation explanation = getExplanation(oracle.getMinimalUnsatisfiableSubset());
-				cumulatedExplanation.addExplanation(explanation);
-			} finally {
-				oracle.pop();
+		oracle.push();
+		try {
+			//Add each constraint but the redundant one.
+			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
+				if (constraint != redundantConstraint) {
+					oracle.addFormula(constraint.getNode());
+				}
 			}
+			
+			//Explain each contradicting assignment of the redundant constraint.
+			for (final Map<Object, Boolean> assignment : getRedundantConstraint().getNode().getContradictingAssignments()) {
+				oracle.push();
+				try {
+					oracle.addAssumptions(assignment);
+					final Explanation explanation = getExplanation(oracle.getMinimalUnsatisfiableSubset());
+					cumulatedExplanation.addExplanation(explanation);
+				} finally {
+					oracle.pop();
+				}
+			}
+		} finally {
+			oracle.pop();
 		}
 		cumulatedExplanation.setDefectRedundantConstraint(getRedundantConstraint());
 		return cumulatedExplanation;
