@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 
 /**
- * TODO description
+ * Implementation of {@link DeadFeatureExplanationCreator} using a {@link MusExtractor MUS extractor}.
  * 
  * @author Timo G&uuml;nther
  */
