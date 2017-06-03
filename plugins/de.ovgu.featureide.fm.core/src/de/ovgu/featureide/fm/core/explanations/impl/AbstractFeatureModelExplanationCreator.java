@@ -20,15 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.explanations.impl;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.prop4j.And;
-import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
 
 /**
@@ -108,36 +104,6 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @throws IllegalStateException if the feature model is null
 	 */
 	protected Node createCnf() throws IllegalStateException {
-		return createCnf(NodeCreator.createNodes(fm));
-	}
-	
-	/**
-	 * Returns a copy of the given node in CNF.
-	 * @param node node to transform
-	 * @return a copy of the given node in CNF; not null
-	 */
-	protected Node createCnf(Node node) {
-		return removeTautologies(node.toCNF());
-	}
-	
-	/**
-	 * Returns a copy of the given CNF without tautologies.
-	 * {@link NodeCreator} creates closed literals (true and false) during elimination of abstract variables.
-	 * Clauses containing such literals can be removed as they do not change the semantics of the formula.
-	 * @param cnf formula in CNF; not null
-	 * @return a copy of the given CNF without tautologies; not null
-	 */
-	private static Node removeTautologies(Node cnf) {
-		final List<Node> cnfClauses = new LinkedList<>();
-		cnfClause: for (final Node cnfClause : cnf.getChildren()) {
-			for (final Literal literal : cnfClause.getLiterals()) {
-				if (literal.var == NodeCreator.varTrue && literal.positive
-						|| literal.var == NodeCreator.varFalse && !literal.positive) {
-					continue cnfClause;
-				}
-			}
-			cnfClauses.add(cnfClause);
-		}
-		return new And(cnfClauses.toArray());
+		return AdvancedNodeCreator.createRegularCNF(getFeatureModel());
 	}
 }
