@@ -245,6 +245,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
 			getFigure().setProperties();
+			break;
 		case COLLAPSED_ALL_CHANGED:
 		case COLLAPSED_CHANGED:
 			getFigure().setProperties();
@@ -293,6 +294,11 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	 * @param activeReason the new active reason
 	 */
 	protected void setActiveReason(Explanation.Reason activeReason) {
+		System.out.println("SET FEATURE " + this);
+		System.out.println("  " + activeReason);
+		if (activeReason == null) {
+			Thread.dumpStack();
+		}
 		getFigure().setActiveReason(activeReason);
 		getFigure().setProperties();
 		final FeatureConnection sourceConnection = getModel().getSourceConnection();
