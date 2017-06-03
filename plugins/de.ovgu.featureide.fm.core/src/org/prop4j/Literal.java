@@ -51,17 +51,15 @@ public class Literal extends Node implements Cloneable {
 
 	public int origin; // attribute encodes relevant information for generating explanations
 
+	public Literal(Object var) {
+		this(var, true);
+	}
 
 	public Literal(Object var, boolean positive) {
 		this.var = var;
 		this.positive = positive;
 	}
 
-	public Literal(Object var) {
-		this.var = var;
-		positive = true;
-	}
-	
 	/**
 	 * Encodes a literal from the tree topology.
 	 * FeatureAttribute must not have the value Constraint.
@@ -70,12 +68,8 @@ public class Literal extends Node implements Cloneable {
 	 * @param FeatureAttribute The Enumeration element  
 	 */
 	public Literal(Object var, FeatureAttribute a) {
-		this(var);
-		if (a == FeatureAttribute.CONSTRAINT) {
-			throw new InvalidParameterException("Parameter Constraint is not allowed");
-		}
-		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();  
-	}																	   
+		this(var, true, a);
+	}
 
 	/**
 	 * Encodes a literal from a constraint.
@@ -83,9 +77,21 @@ public class Literal extends Node implements Cloneable {
 	 * @param constraintIndex The index of a constraint  
 	 */
 	public Literal(Object var, int constraintIndex) {
-		this(var);
-		setOriginConstraint(constraintIndex);  
-	}										  
+		this(var, true, constraintIndex);
+	}
+
+	public Literal(Object var, boolean positive, FeatureAttribute a) {
+		this(var, positive);
+		if (a == FeatureAttribute.CONSTRAINT) {
+			throw new InvalidParameterException("Parameter Constraint is not allowed");
+		}
+		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();
+	}
+
+	public Literal(Object var, boolean positive, int constraintIndex) {
+		this(var, positive);
+		setOriginConstraint(constraintIndex);
+	}
 
 	/**
 	 * Decodes a constraint index.    

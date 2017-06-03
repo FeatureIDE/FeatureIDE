@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.editing;
 
+import static org.prop4j.Literal.FeatureAttribute.CHILD;
+import static org.prop4j.Literal.FeatureAttribute.PARENT;
+import static org.prop4j.Literal.FeatureAttribute.ROOT;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +31,7 @@ import java.util.ListIterator;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
+import org.prop4j.Literal.FeatureAttribute;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.SatInstance;
@@ -107,9 +112,12 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
 	}
 
-	private Literal getVariable(IFeature feature, boolean positive) {
-		final String oldName = useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
-		return new Literal(oldName, positive);
+	private Literal getLiteral(IFeature feature, boolean positive, FeatureAttribute featureAttribute) {
+		return new Literal(getVariable(feature), positive, featureAttribute);
+	}
+
+	private Object getVariable(IFeature feature) {
+		return useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
 	}
 
 	private CNFType cnfType = CNFType.None;
@@ -284,12 +292,12 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			if (!optionalRoot) {
 				switch (cnfType) {
 				case Regular:
-					clauses.add(new Or(getVariable(root, true)));
+					clauses.add(new Or(getLiteral(root, true, ROOT)));
 					break;
 				case None:
 				case Compact:
 				default:
-					clauses.add(getVariable(root, true));
+					clauses.add(getLiteral(root, true, ROOT));
 					break;
 				}
 			}
@@ -297,37 +305,37 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			final Iterable<IFeature> features = featureModel.getFeatures();
 			for (IFeature feature : features) {
 				for (IFeatureStructure child : feature.getStructure().getChildren()) {
-					clauses.add(new Or(getVariable(feature, true), getVariable(child.getFeature(), false)));
+					clauses.add(new Or(getLiteral(feature, true, PARENT), getLiteral(child.getFeature(), false, CHILD)));
 				}
 
 				if (feature.getStructure().hasChildren()) {
 					if (feature.getStructure().isAnd()) {
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
 							if (child.isMandatory()) {
-								clauses.add(new Or(getVariable(child.getFeature(), true), getVariable(feature, false)));
+								clauses.add(new Or(getLiteral(child.getFeature(), true, CHILD), getLiteral(feature, false, PARENT)));
 							}
 						}
 					} else if (feature.getStructure().isOr()) {
 						final Literal[] orLiterals = new Literal[feature.getStructure().getChildren().size() + 1];
 						int i = 0;
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
-							orLiterals[i++] = getVariable(child.getFeature(), true);
+							orLiterals[i++] = getLiteral(child.getFeature(), true, CHILD);
 						}
-						orLiterals[i] = getVariable(feature, false);
+						orLiterals[i] = getLiteral(feature, false, PARENT);
 						clauses.add(new Or(orLiterals));
 					} else if (feature.getStructure().isAlternative()) {
 						final Literal[] alternativeLiterals = new Literal[feature.getStructure().getChildrenCount() + 1];
 						int i = 0;
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
-							alternativeLiterals[i++] = getVariable(child.getFeature(), true);
+							alternativeLiterals[i++] = getLiteral(child.getFeature(), true, CHILD);
 						}
-						alternativeLiterals[i] = getVariable(feature, false);
+						alternativeLiterals[i] = getLiteral(feature, false, PARENT);
 						clauses.add(new Or(alternativeLiterals));
 
 						for (ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
 							final IFeatureStructure fs = it1.next();
 							for (ListIterator<IFeatureStructure> it2 = feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
-								clauses.add(new Or(getVariable(fs.getFeature(), false), getVariable(((IFeatureStructure) it2.next()).getFeature(), false)));
+								clauses.add(new Or(getLiteral(fs.getFeature(), false, CHILD), getLiteral(((IFeatureStructure) it2.next()).getFeature(), false, CHILD)));
 							}
 						}
 					}
