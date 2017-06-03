@@ -175,7 +175,11 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		switch (cnfType) {
 		case None:
 			for (IConstraint constraint : featureModel.getConstraints()) {
-				clauses.add(constraint.getNode().clone());
+				final Node constraintNode = constraint.getNode();
+				for (final Literal l : constraintNode.getLiterals()) {
+					l.setOriginConstraint(featureModel.getConstraintIndex(constraint));
+				}
+				clauses.add(constraintNode.clone());
 			}
 			break;
 		case Regular:
@@ -183,8 +187,11 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		case Compact:
 		default:
 			for (IConstraint constraint : featureModel.getConstraints()) {
-				final Node cnfNode = Node.buildCNF(constraint.getNode());
-				//				final Node cnfNode = constraint.getNode().toCNF();
+				final Node constraintNode = constraint.getNode();
+				for (final Literal l : constraintNode.getLiterals()) {
+					l.setOriginConstraint(featureModel.getConstraintIndex(constraint));
+				}
+				final Node cnfNode = Node.buildCNF(constraintNode);
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
 						clauses.add((compact || (andChild instanceof Or)) ? andChild : new Or(andChild));
