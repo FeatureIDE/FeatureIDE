@@ -157,9 +157,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 		for (final Map<Object, Boolean> assignment : getRedundantConstraint().getNode().getContradictingAssignments()) {
 			oracle.push();
 			try {
-				for (final Entry<Object, Boolean> e : assignment.entrySet()) {
-					oracle.addFormula(new Literal(e.getKey(), e.getValue()));
-				}
+				oracle.addAssumptions(assignment);
 				final Explanation explanation = getExplanation(oracle.getMinimalUnsatisfiableSubset());
 				cumulatedExplanation.addExplanation(explanation);
 			} finally {

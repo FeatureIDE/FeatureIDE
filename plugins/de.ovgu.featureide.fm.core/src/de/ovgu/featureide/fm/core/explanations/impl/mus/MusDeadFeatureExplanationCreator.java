@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations.impl.mus;
 
-import org.prop4j.Literal;
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -78,7 +77,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		final Explanation explanation;
 		oracle.push();
 		try {
-			oracle.addFormula(new Literal(getDeadFeature().getName(), true));
+			oracle.addAssumption(getDeadFeature().getName(), true);
 			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubset());
 		} finally {
 			oracle.pop();
