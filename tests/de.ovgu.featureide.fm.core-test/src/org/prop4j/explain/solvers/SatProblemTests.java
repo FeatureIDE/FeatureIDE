@@ -21,12 +21,17 @@
 package org.prop4j.explain.solvers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -356,6 +361,47 @@ public abstract class SatProblemTests {
 		final int expected = 4;
 		final int actual = instance.getClauseCount();
 		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testAddAssumptions() {
+		final SatProblem instance = getInstance();
+		final Map<Object, Boolean> expected = new LinkedHashMap<>();
+		final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
+		assumptions.put("A", true);
+		assumptions.put("B", false);
+		expected.putAll(assumptions);
+		instance.addAssumptions(assumptions);
+		assertEquals(expected, instance.getAssumptions());
+		assertTrue(instance.getAssumption("A"));
+		assertFalse(instance.getAssumption("B"));
+		assertNull(instance.getAssumption("C"));
+		assumptions.clear();
+		assumptions.put("C", false);
+		expected.putAll(assumptions);
+		instance.addAssumptions(assumptions);
+		assertEquals(expected, instance.getAssumptions());
+		assertTrue(instance.getAssumption("A"));
+		assertFalse(instance.getAssumption("B"));
+		assertFalse(instance.getAssumption("C"));
+		assumptions.clear();
+		assumptions.put("A", false);
+		expected.putAll(assumptions);
+		instance.addAssumptions(assumptions);
+		assertEquals(expected, instance.getAssumptions());
+		assertFalse(instance.getAssumption("A"));
+		assertFalse(instance.getAssumption("B"));
+		assertFalse(instance.getAssumption("C"));
+	}
+	
+	@Test
+	public void testAddAssumption() {
+		final SatProblem instance = getInstance();
+		final Map<Object, Boolean> expected = new LinkedHashMap<>();
+		instance.addAssumption("A", false);
+		expected.put("A", false);
+		assertEquals(expected, instance.getAssumptions());
+		assertFalse(instance.getAssumption("A"));
 	}
 	
 	protected abstract SatProblem getInstance();

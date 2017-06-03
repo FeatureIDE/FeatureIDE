@@ -22,8 +22,11 @@ package org.prop4j.explain.solvers.impl.sat4j;
 
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.prop4j.Node;
@@ -36,8 +39,10 @@ import org.sat4j.specs.IConstr;
  * @author Timo G&uuml;nther
  */
 public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatSolver {
+	/** The variables that were assumed in each scope except the current one. */
+	private final Deque<Map<Object, Boolean>> previousScopeAssumptions = new LinkedList<>();
 	/** The amount of clauses that were added in each scope except the current one. */
-	private final Deque<Integer> scopeClauseCounts = new LinkedList<>();
+	private final Deque<Integer> previousScopeClauseCounts = new LinkedList<>();
 	/** The amount of clauses in the current scope. */
 	private int scopeClauseCount = 0;
 	/** How often to pop until the scope containing the contradiction is reached. */
@@ -56,21 +61,31 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	
 	@Override
 	public void push() {
-		scopeClauseCounts.push(scopeClauseCount);
+		//Push the clauses.
+		previousScopeClauseCounts.push(scopeClauseCount);
 		scopeClauseCount = 0;
+		
+		//Push the contradiction distance.
 		if (isContradiction()) {
 			scopeContradictionDistance++;
 		}
+		
+		//Push the assumptions.
+		final Map<Object, Boolean> assumptions = super.getAssumptions();
+		previousScopeAssumptions.push(new LinkedHashMap<>(assumptions));
+		assumptions.clear();
 	}
 
 	@Override
 	public List<Node> pop() throws NoSuchElementException {
+		//Pop the clauses.
 		final List<Node> removedClauses = new LinkedList<>();
 		while (scopeClauseCount > 0) {
 			removedClauses.add(removeClause());
 		}
-		scopeClauseCount = scopeClauseCounts.pop();
+		scopeClauseCount = previousScopeClauseCounts.pop();
 		
+		//Pop the contradiction distance.
 		if (isContradiction()) {
 			if (scopeContradictionDistance == 0) {
 				setContradiction(false);
@@ -78,6 +93,11 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 				scopeContradictionDistance--;
 			}
 		}
+		
+		//Pop the assumptions.
+		final Map<Object, Boolean> assumptions = super.getAssumptions();
+		assumptions.clear();
+		assumptions.putAll(previousScopeAssumptions.pop());
 		
 		return removedClauses;
 	}
@@ -147,8 +167,8 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		 * For performance reasons, do not generate the entire null-free list of clauses.
 		 */
 		int total = scopeClauseCount;
-		for (final int scopeClauseCount : scopeClauseCounts) {
-			total += scopeClauseCount;
+		for (final int previousScopeClauseCount : previousScopeClauseCounts) {
+			total += previousScopeClauseCount;
 		}
 		return total;
 	}
@@ -161,5 +181,37 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		 * As such, do not skip these null values when accessing the clause list using a Sat4J clause index.
 		 */
 		return super.getClause(index - 1);
+	}
+	
+	@Override
+	public Map<Object, Boolean> getAssumptions() {
+		/*
+		 * Merge the assumptions of all scopes.
+		 * Add the newer assumptions later to override the older ones.
+		 */
+		final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
+		for (final Iterator<Map<Object, Boolean>> it = previousScopeAssumptions.descendingIterator(); it.hasNext();) {
+			assumptions.putAll(it.next());
+		}
+		assumptions.putAll(super.getAssumptions());
+		return assumptions;
+	}
+	
+	@Override
+	public Boolean getAssumption(Object variable) {
+		/*
+		 * For performance reasons, do not merge all assumptions.
+		 */
+		Boolean value = super.getAssumptions().get(variable);
+		if (value != null) {
+			return value;
+		}
+		for (final Map<Object, Boolean> prev : previousScopeAssumptions) {
+			value = prev.get(variable);
+			if (value != null) {
+				return value;
+			}
+		}
+		return null;
 	}
 }

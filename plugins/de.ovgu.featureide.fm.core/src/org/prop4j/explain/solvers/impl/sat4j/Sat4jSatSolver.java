@@ -23,6 +23,7 @@ package org.prop4j.explain.solvers.impl.sat4j;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.prop4j.Literal;
@@ -82,7 +83,6 @@ public class Sat4jSatSolver extends BasicSatSolver {
 			setContradiction(true);
 		}
 		super.addClause(clause);
-		
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class Sat4jSatSolver extends BasicSatSolver {
 			return false;
 		}
 		try {
-			return getOracle().isSatisfiable();
+			return getOracle().isSatisfiable(getVectorFromAssumptions());
 		} catch (TimeoutException e) {
 			return false;
 		}
@@ -176,8 +176,19 @@ public class Sat4jSatSolver extends BasicSatSolver {
 	 * @return a Sat4J index; 0 in case of an unknown variable
 	 */
 	public int getIndexFromLiteral(Literal l) {
-		int index = getIndexFromVariable(l.var);
-		if (!l.positive) {
+		return getIndexFromLiteral(l.var, l.positive);
+	}
+	
+	/**
+	 * Returns the Sat4J index corresponding to the given literal.
+	 * Does not add any variables or clauses.
+	 * @param variable variable of the literal; not null
+	 * @param positive whether the literal is positive
+	 * @return a Sat4J index; 0 in case of an unknown variable
+	 */
+	public int getIndexFromLiteral(Object variable, boolean positive) {
+		int index = getIndexFromVariable(variable);
+		if (!positive) {
 			index = -index;
 		}
 		return index;
@@ -252,5 +263,18 @@ public class Sat4jSatSolver extends BasicSatSolver {
 	 */
 	public int getVariableCount() {
 		return indexVariables.size();
+	}
+	
+	/**
+	 * Returns a vector encompassing the assumptions.
+	 * Does not add any clauses or variables.
+	 * @return a Sat4J vector; contains 0 in case of an unknown variable; not null
+	 */
+	public IVecInt getVectorFromAssumptions() {
+		final IVecInt vector = new VecInt();
+		for (final Entry<Object, Boolean> assumption : getAssumptions().entrySet()) {
+			vector.push(getIndexFromLiteral(assumption.getKey(), assumption.getValue()));
+		}
+		return vector;
 	}
 }

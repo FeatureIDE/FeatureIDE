@@ -21,6 +21,7 @@
 package org.prop4j.explain.solvers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -185,6 +186,26 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		assertTrue(instance.isSatisfiable());
 		instance.pop();
 		expected.removeLast();
+		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.isSatisfiable());
+	}
+	
+	@Test
+	public void testPopAssumptions() {
+		final MutableSatSolver instance = getInstance();
+		final Deque<Node> expected = new LinkedList<>();
+		instance.addFormula(new And("A", "B"));
+		expected.add(new Or("A"));
+		expected.add(new Or("B"));
+		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.isSatisfiable());
+		instance.push();
+		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.isSatisfiable());
+		instance.addAssumption("A", false);
+		assertEquals(expected, instance.getClauses());
+		assertFalse(instance.isSatisfiable());
+		instance.pop();
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 	}

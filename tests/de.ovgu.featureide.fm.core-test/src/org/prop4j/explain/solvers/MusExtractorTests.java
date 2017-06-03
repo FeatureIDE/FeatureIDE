@@ -76,6 +76,17 @@ public abstract class MusExtractorTests extends MutableSatSolverTests {
 		solver.getMinimalUnsatisfiableSubset();
 	}
 	
+	@Test
+	public void testMusAssumptions() {
+		final MusExtractor solver = getInstance();
+		solver.addFormula(new And("A", "B"));
+		solver.addAssumption("A", false);
+		final Set<Node> expected = new LinkedHashSet<>();
+		expected.add(new Or("A"));
+		final Set<Node> actual = solver.getMinimalUnsatisfiableSubset();
+		assertEquals(expected, actual);
+	}
+	
 	@Override
 	protected abstract MusExtractor getInstance();
 }

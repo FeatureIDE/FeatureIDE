@@ -22,6 +22,7 @@ package org.prop4j.explain.solvers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.prop4j.Node;
 
@@ -109,4 +110,29 @@ public interface SatProblem {
 	 * @return the amount of clauses in this problem
 	 */
 	public int getClauseCount();
+	/**
+	 * Adds all given assumptions to the problem.
+	 * @param assumptions assumptions to add; not null
+	 */
+	public void addAssumptions(Map<Object, Boolean> assumptions);
+	
+	/**
+	 * Adds the given assumption to the problem.
+	 * @param variable variable of which to assume the truth value; not null
+	 * @param value truth value to assume
+	 */
+	public void addAssumption(Object variable, boolean value);
+	
+	/**
+	 * Returns the truth value assumption for all variables.
+	 * @return all assumptions; not null
+	 */
+	public Map<Object, Boolean> getAssumptions();
+	
+	/**
+	 * Returns the truth value assumption for the given variable.
+	 * @param variable variable of which to check the truth value
+	 * @return the assumption; null if no assumption is made for the given variable
+	 */
+	public Boolean getAssumption(Object variable);
 }

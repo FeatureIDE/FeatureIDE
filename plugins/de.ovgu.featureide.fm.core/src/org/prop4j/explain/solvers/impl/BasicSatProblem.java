@@ -23,7 +23,10 @@ package org.prop4j.explain.solvers.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.SatProblem;
@@ -33,9 +36,11 @@ import org.prop4j.explain.solvers.SatProblem;
  * 
  * @author Timo G&uuml;nther
  */
-public class BasicSatProblem implements SatProblem {
+public abstract class BasicSatProblem implements SatProblem {
 	/** The clauses added to this problem. */
 	private final List<Node> clauses = new ArrayList<>();
+	/** The assumptions added to this problem. */
+	private final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
 	
 	@Override
 	public void addFormulas(Node... formulas) {
@@ -93,5 +98,27 @@ public class BasicSatProblem implements SatProblem {
 	@Override
 	public int getClauseCount() {
 		return clauses.size();
+	}
+	
+	@Override
+	public void addAssumptions(Map<Object, Boolean> assumptions) {
+		for (final Entry<Object, Boolean> assumption : assumptions.entrySet()) {
+			addAssumption(assumption.getKey(), assumption.getValue());
+		}
+	}
+	
+	@Override
+	public void addAssumption(Object variable, boolean value) {
+		assumptions.put(variable, value);
+	}
+	
+	@Override
+	public Map<Object, Boolean> getAssumptions() {
+		return assumptions;
+	}
+	
+	@Override
+	public Boolean getAssumption(Object variable) {
+		return assumptions.get(variable);
 	}
 }
