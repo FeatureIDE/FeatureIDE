@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.LtmsExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.impl.mus.MusExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link ExplanationCreator}.
@@ -34,7 +34,7 @@ public abstract class ExplanationCreatorFactory {
 	 * @return a default instance of this class
 	 */
 	public static ExplanationCreatorFactory getDefault() {
-		return new LtmsExplanationCreatorFactory();
+		return new MusExplanationCreatorFactory();
 	}
 	
 	/**

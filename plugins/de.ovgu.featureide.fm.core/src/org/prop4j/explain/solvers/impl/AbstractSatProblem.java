@@ -32,11 +32,11 @@ import org.prop4j.Node;
 import org.prop4j.explain.solvers.SatProblem;
 
 /**
- * Basic implementation of {@link SatProblem}.
+ * Abstract implementation of {@link SatProblem}.
  * 
  * @author Timo G&uuml;nther
  */
-public abstract class BasicSatProblem implements SatProblem {
+public abstract class AbstractSatProblem implements SatProblem {
 	/** The clauses added to this problem. */
 	private final List<Node> clauses = new ArrayList<>();
 	/** The assumptions added to this problem. */

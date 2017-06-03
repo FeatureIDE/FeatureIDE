@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.explain.solvers.impl.BasicSatSolver;
+import org.prop4j.explain.solvers.impl.AbstractSatSolver;
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
@@ -44,7 +44,7 @@ import org.sat4j.specs.TimeoutException;
  * 
  * @author Timo G&uuml;nther
  */
-public class Sat4jSatSolver extends BasicSatSolver {
+public class Sat4jSatSolver extends AbstractSatSolver {
 	/** Maps clauses to constraints (handles to the clauses in the oracle). */
 	protected final Map<Node, IConstr> clauseConstraints = new LinkedHashMap<>();
 	
