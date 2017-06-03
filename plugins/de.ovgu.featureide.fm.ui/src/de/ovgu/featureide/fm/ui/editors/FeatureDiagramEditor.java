@@ -435,10 +435,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		final IFeatureModelElement primaryModel = primary.getModel().getObject();
 		final Explanation activeExplanation;
 		if (getFeatureModel().getAnalyser().valid()) {
-			getFeatureModel().getAnalyser().addExplanation(primaryModel);
 			activeExplanation = getFeatureModel().getAnalyser().getExplanation(primaryModel);
 		} else {
-			getFeatureModel().getAnalyser().addVoidFeatureModelExplanation();
 			activeExplanation = getFeatureModel().getAnalyser().getVoidFeatureModelExplanation();
 		}
 		setActiveExplanation(activeExplanation);
