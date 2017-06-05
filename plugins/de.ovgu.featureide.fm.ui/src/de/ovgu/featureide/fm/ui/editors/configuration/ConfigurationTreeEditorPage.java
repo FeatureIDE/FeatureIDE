@@ -310,7 +310,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.horizontalAlignment = SWT.LEFT;
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalAlignment = SWT.CENTER;
-		gridData.minimumWidth = 200;
+		gridData.minimumWidth = 250;
+		gridData.widthHint = 300;
 		infoLabel = new Label(compositeTop, SWT.NONE);
 		infoLabel.setLayoutData(gridData);
 		if (configurationEditor.hasValidFeatureModel()) {
