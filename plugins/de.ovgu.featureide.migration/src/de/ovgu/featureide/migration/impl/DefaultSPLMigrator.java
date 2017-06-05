@@ -290,6 +290,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 	private IFeatureModel generateFeatureModelOfVariants() {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(newProject);
+		if (featureProject == null) return null;
 		final IFeatureModel featureModel = featureProject.getFeatureModel();
 
 		featureModel.reset();
