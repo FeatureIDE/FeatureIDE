@@ -195,6 +195,14 @@ public class ColorSchemePage extends WizardPage {
 				FeatureColorManager.setActive(featureModel, colorSchemeName);
 				selectedColorSchemeText.setText(colorSchemeName);
 			}
+		} else if (selectedColorSchemeText.getText().equals("")){
+			if(colorSchemeList.getItemCount() > 0){
+				final String first = colorSchemeList.getItem(0);
+				if (FeatureColorManager.hasColorScheme(featureModel, first)) {
+					FeatureColorManager.setActive(featureModel, first);
+					selectedColorSchemeText.setText(first);
+				}
+			}
 		}
 	}
 
@@ -253,6 +261,9 @@ public class ColorSchemePage extends WizardPage {
 			colorSchemeNames.add(newSchemeName);
 			updateColorSchemeList();
 			selectColorScheme(newSchemeName);
+			if(colorSchemeList.getItemCount() == 1){
+				selectColorScheme();
+			}
 		}
 	}
 
