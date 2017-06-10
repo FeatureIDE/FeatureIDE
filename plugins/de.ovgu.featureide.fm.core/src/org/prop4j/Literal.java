@@ -45,6 +45,7 @@ public class Literal extends Node implements Cloneable {
 	 * Annotates each literal of a formula with an attribute for explanation.
 	 * 
 	 * @author Sofia Ananieva
+	 * @author Timo G&uuml;nther
 	 */
 	public enum Origin {
 		/** Denotes an unknown origin. */
