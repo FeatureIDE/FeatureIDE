@@ -294,8 +294,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	 * @param activeReason the new active reason
 	 */
 	protected void setActiveReason(Explanation.Reason activeReason) {
-		System.out.println("SET FEATURE " + this);
-		System.out.println("  " + activeReason);
 		if (activeReason == null) {
 			Thread.dumpStack();
 		}
