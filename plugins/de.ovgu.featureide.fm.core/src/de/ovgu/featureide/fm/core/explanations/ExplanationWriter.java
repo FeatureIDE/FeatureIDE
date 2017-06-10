@@ -20,7 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import org.prop4j.Node;
+import java.util.Iterator;
+import java.util.List;
+
+import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -44,6 +47,21 @@ public class ExplanationWriter {
 	 */
 	public ExplanationWriter(Explanation explanation) {
 		this.explanation = explanation;
+	}
+	
+	/**
+	 * Returns a string describing the explanation.
+	 * @return a string describing the explanation
+	 */
+	public String getString() {
+		String s = getHeaderString();
+		if (explanation == null || explanation.getReasons() == null || explanation.getReasons().isEmpty()) {
+			return s;
+		}
+		for (final Reason reason : explanation.getReasons()) {
+			s += String.format("%n\u2022 %s", getReasonString(reason));
+		}
+		return s;
 	}
 	
 	/**
@@ -134,18 +152,44 @@ public class ExplanationWriter {
 			throw new IllegalArgumentException("Reason is not part of the explanation");
 		}
 		String s = null;
+		final IFeature feature;
+		final IFeature parent;
 		switch (reason.getLiteral().getOrigin()) {
-			case CHILD:
-				final IFeature feature = FeatureUtils.getFeatureTable(explanation.getDefectElement().getFeatureModel()).get(reason.getLiteral().var);
-				final IFeature parent = FeatureUtils.getParent(feature);
+			case CHILD_UP:
+				feature = (IFeature) reason.getSourceElement();
+				parent = FeatureUtils.getParent(feature);
 				if (parent == null) {
-					throw new IllegalStateException("Missing parent despite child source attribute");
+					throw new IllegalStateException("Missing parent despite up child source attribute");
+				}
+				s = String.format("%s is parent of %s.", parent.getName(), feature.getName());
+				break;
+			case CHILD_DOWN:
+				feature = (IFeature) reason.getSourceElement();
+				parent = FeatureUtils.getParent(feature);
+				if (parent == null) {
+					throw new IllegalStateException("Missing parent despite down child source attribute");
 				}
 				s = String.format("%s is %s of %s.", feature.getName(), getChildString(feature, parent), parent.getName());
 				break;
+			case CHILD_HORIZONTAL:
+				String alternatives = "";
+				final List<Literal> literals = reason.getClause().getLiterals();
+				literals.remove(reason.getLiteral());
+				boolean first = true;
+				for (final Iterator<Literal> it = literals.iterator(); it.hasNext();) {
+					final Literal l = it.next();
+					if (first) {
+						first = false;
+					} else {
+						alternatives += it.hasNext() ? ", " : " and ";
+					}
+					alternatives += l.var;
+				}
+				s = String.format("%s is alternative to %s.", reason.getLiteral().var, alternatives);
+				break;
 			case CONSTRAINT:
-				final Node constraint = FeatureUtils.getConstraint(explanation.getDefectElement().getFeatureModel(), reason.getLiteral().getOriginConstraintIndex());
-				s = String.format("%s is a constraint.", constraint.toString(NodeWriter.logicalSymbols));
+				final IConstraint constraint = (IConstraint) reason.getSourceElement();
+				s = String.format("%s is a constraint.", constraint.getNode().toString(NodeWriter.logicalSymbols));
 				break;
 			case ROOT:
 				s = String.format("%s is the root.", reason.getLiteral().var.toString());

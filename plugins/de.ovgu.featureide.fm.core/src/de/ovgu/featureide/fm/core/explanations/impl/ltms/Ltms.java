@@ -33,7 +33,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.prop4j.Literal;
-import org.prop4j.Literal.Origin;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.explanations.Explanation;
@@ -367,10 +366,15 @@ public class Ltms {
 		//Include literals from the violated clause so it shows up in the explanation.
 		Literal violatedLiteral = null;
 		for (final Literal literal : clauseLiterals.get(violatedClause)) {
-			if (literal.getOrigin() == Origin.CHILD) {
-				explanation.addUniqueReason(violatedClause, literal);
-			} else {
-				violatedLiteral = literal;
+			switch (literal.getOrigin()) {
+				case CHILD_UP:
+				case CHILD_DOWN:
+				case CHILD_HORIZONTAL:
+					explanation.addUniqueReason(violatedClause, literal);
+					break;
+				default:
+					violatedLiteral = literal;
+					break;
 			}
 		}
 		if (explanation.getReasons().isEmpty()) {
@@ -395,7 +399,9 @@ public class Ltms {
 			final Literal antecedentLiteral = e.getKey();
 			final Node antecedentClause = e.getValue();
 			switch (antecedentLiteral.getOrigin()) {
-				case CHILD:
+				case CHILD_UP:
+				case CHILD_DOWN:
+				case CHILD_HORIZONTAL:
 				case ROOT:
 				case CONSTRAINT:
 					explanation.addUniqueReason(antecedentClause, antecedentLiteral);
@@ -410,7 +416,9 @@ public class Ltms {
 			for (final Literal literal : clauseLiterals.get(reason)) {
 				if (literal.var.equals(antecedentLiteral.var)) {
 					switch (literal.getOrigin()) {
-						case CHILD:
+						case CHILD_UP:
+						case CHILD_DOWN:
+						case CHILD_HORIZONTAL:
 						case ROOT:
 						case CONSTRAINT:
 							explanation.addUniqueReason(reason, literal);

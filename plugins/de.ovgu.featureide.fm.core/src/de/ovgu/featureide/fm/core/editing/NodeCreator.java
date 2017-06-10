@@ -420,13 +420,13 @@ public class NodeCreator {
 
 		String s = getVariable(rootFeature.getName(), featureModel);
 
-		Node[] children = new Node[rootFeature.getStructure().getChildrenCount()];
+		final Literal[] children = new Literal[rootFeature.getStructure().getChildrenCount()];
 		int i = 0;
 		for (IFeatureStructure rootChild : rootFeature.getStructure().getChildren()) {
 			String var = getVariable(rootChild.getFeature().getName(), featureModel);
-			children[i++] = new Literal(var, Literal.Origin.CHILD);
+			children[i++] = new Literal(var, Literal.Origin.CHILD_UP);
 		}
-		Node definition = children.length == 1 ? children[0] : new Or(children);
+		final Node definition = children.length == 1 ? children[0] : new Or(children);
 
 		if (rootFeature.getStructure().isAnd()) {// &&
 			// (!replacings.containsKey(featureModel.getOldName(rootFeature.getName()))
@@ -435,7 +435,7 @@ public class NodeCreator {
 			for (IFeatureStructure feature : rootFeature.getStructure().getChildren())
 				if (feature.isMandatory()) {
 					String var = getVariable(feature.getFeature().getName(), featureModel);
-					manChildren.add(new Literal(var, Literal.Origin.CHILD));
+					manChildren.add(new Literal(var, Literal.Origin.CHILD_DOWN));
 				}
 
 			// add constraints for all mandatory children S => (A & B)
@@ -448,13 +448,25 @@ public class NodeCreator {
 			nodes.add(new Implies(definition, new Literal(s, Literal.Origin.PARENT)));
 		} else {
 			// add constraint S <=> (A | B | C)
-			if (replacings.get(featureModel.getRenamingsManager().getOldName(rootFeature.getName())) == null)
-				nodes.add(new Equals(new Literal(s), definition));
+			if (replacings.get(featureModel.getRenamingsManager().getOldName(rootFeature.getName())) == null) {
+				final Literal[] childrenDown = new Literal[children.length];
+				for (int j = 0; j < childrenDown.length; j++) {
+					childrenDown[j] = new Literal(children[j].var, Literal.Origin.CHILD_DOWN);
+				}
+				final Node definitionDown = childrenDown.length == 1 ? childrenDown[0] : new Or(childrenDown);
+				nodes.add(new Implies(new Literal(s), definitionDown));
+				nodes.add(new Implies(definition, new Literal(s)));
+			}
 
 			if (rootFeature.getStructure().isAlternative()) {
 				// add constraint atmost1(A, B, C)
-				if (children.length > 1)
-					nodes.add(new AtMost(1, Node.clone(children)));
+				if (children.length > 1) {
+					final Literal[] childrenHorizontal = new Literal[children.length];
+					for (int j = 0; j < childrenHorizontal.length; j++) {
+						childrenHorizontal[j] = new Literal(children[j].var, Literal.Origin.CHILD_HORIZONTAL);
+					}
+					nodes.add(new AtMost(1, childrenHorizontal));
+				}
 			}
 		}
 

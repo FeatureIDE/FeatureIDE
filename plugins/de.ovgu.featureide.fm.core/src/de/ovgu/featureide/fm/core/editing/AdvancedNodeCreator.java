@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.editing;
 
-import static org.prop4j.Literal.Origin.CHILD;
+import static org.prop4j.Literal.Origin.CHILD_DOWN;
+import static org.prop4j.Literal.Origin.CHILD_HORIZONTAL;
+import static org.prop4j.Literal.Origin.CHILD_UP;
 import static org.prop4j.Literal.Origin.PARENT;
 import static org.prop4j.Literal.Origin.ROOT;
 
@@ -312,21 +314,21 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			final Iterable<IFeature> features = featureModel.getFeatures();
 			for (IFeature feature : features) {
 				for (IFeatureStructure child : feature.getStructure().getChildren()) {
-					clauses.add(new Or(getLiteral(feature, true, PARENT), getLiteral(child.getFeature(), false, CHILD)));
+					clauses.add(new Or(getLiteral(feature, true, PARENT), getLiteral(child.getFeature(), false, CHILD_UP)));
 				}
 
 				if (feature.getStructure().hasChildren()) {
 					if (feature.getStructure().isAnd()) {
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
 							if (child.isMandatory()) {
-								clauses.add(new Or(getLiteral(child.getFeature(), true, CHILD), getLiteral(feature, false, PARENT)));
+								clauses.add(new Or(getLiteral(child.getFeature(), true, CHILD_DOWN), getLiteral(feature, false, PARENT)));
 							}
 						}
 					} else if (feature.getStructure().isOr()) {
 						final Literal[] orLiterals = new Literal[feature.getStructure().getChildren().size() + 1];
 						int i = 0;
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
-							orLiterals[i++] = getLiteral(child.getFeature(), true, CHILD);
+							orLiterals[i++] = getLiteral(child.getFeature(), true, CHILD_DOWN);
 						}
 						orLiterals[i] = getLiteral(feature, false, PARENT);
 						clauses.add(new Or(orLiterals));
@@ -334,7 +336,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 						final Literal[] alternativeLiterals = new Literal[feature.getStructure().getChildrenCount() + 1];
 						int i = 0;
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
-							alternativeLiterals[i++] = getLiteral(child.getFeature(), true, CHILD);
+							alternativeLiterals[i++] = getLiteral(child.getFeature(), true, CHILD_DOWN);
 						}
 						alternativeLiterals[i] = getLiteral(feature, false, PARENT);
 						clauses.add(new Or(alternativeLiterals));
@@ -342,7 +344,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 						for (ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
 							final IFeatureStructure fs = it1.next();
 							for (ListIterator<IFeatureStructure> it2 = feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
-								clauses.add(new Or(getLiteral(fs.getFeature(), false, CHILD), getLiteral(((IFeatureStructure) it2.next()).getFeature(), false, CHILD)));
+								clauses.add(new Or(getLiteral(fs.getFeature(), false, CHILD_HORIZONTAL), getLiteral(((IFeatureStructure) it2.next()).getFeature(), false, CHILD_HORIZONTAL)));
 							}
 						}
 					}
