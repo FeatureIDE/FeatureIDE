@@ -294,9 +294,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	 * @param activeReason the new active reason
 	 */
 	protected void setActiveReason(Explanation.Reason activeReason) {
-		if (activeReason == null) {
-			Thread.dumpStack();
-		}
 		getFigure().setActiveReason(activeReason);
 		getFigure().setProperties();
 		final FeatureConnection sourceConnection = getModel().getSourceConnection();
