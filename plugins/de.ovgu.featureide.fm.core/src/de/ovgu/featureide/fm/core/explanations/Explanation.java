@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.prop4j.Literal;
-import org.prop4j.Literal.FeatureAttribute;
+import org.prop4j.Literal.Origin;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -105,8 +105,8 @@ public class Explanation implements Cloneable {
 		 */
 		protected void setSourceElement() {
 			final IFeatureModel fm = getDefectElement().getFeatureModel();
-			if (getLiteral().getSourceAttribute() == FeatureAttribute.CONSTRAINT) {
-				sourceElement = fm.getConstraints().get(getLiteral().getSourceIndex());
+			if (getLiteral().getOrigin() == Origin.CONSTRAINT) {
+				sourceElement = fm.getConstraints().get(getLiteral().getOriginConstraintIndex());
 			} else {
 				sourceElement = fm.getFeature((String) getLiteral().var);
 			}
@@ -139,7 +139,7 @@ public class Explanation implements Cloneable {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			if (literal != null && literal.getSourceAttribute() != FeatureAttribute.CONSTRAINT)
+			if (literal != null && literal.getOrigin() != Origin.CONSTRAINT)
 				result = prime * result + (literal.var == null ? 0 : literal.var.hashCode());
 			result = prime * result + (literal == null ? 0 : literal.origin);
 			return result;
@@ -159,7 +159,7 @@ public class Explanation implements Cloneable {
 					return false;
 			} else if (literal.origin != other.literal.origin) {
 				return false;
-			} else if (literal.getSourceAttribute() != FeatureAttribute.CONSTRAINT //any literal of the same constraint denotes the same reason
+			} else if (literal.getOrigin() != Origin.CONSTRAINT //any literal of the same constraint denotes the same reason
 					&& !literal.var.equals(other.literal.var))
 				return false;
 			return true;

@@ -104,7 +104,7 @@ public abstract class MusFeatureModelExplanationCreator extends AbstractFeatureM
 		final Explanation explanation = new Explanation();
 		for (final Node clause : mus) {
 			for (final Literal literal : clause.getLiterals()) {
-				switch (literal.getSourceAttribute()) {
+				switch (literal.getOrigin()) {
 					case CHILD:
 					case CONSTRAINT:
 						explanation.addUniqueReason(clause, literal);

@@ -134,7 +134,7 @@ public class ExplanationWriter {
 			throw new IllegalArgumentException("Reason is not part of the explanation");
 		}
 		String s = null;
-		switch (reason.getLiteral().getSourceAttribute()) {
+		switch (reason.getLiteral().getOrigin()) {
 			case CHILD:
 				final IFeature feature = FeatureUtils.getFeatureTable(explanation.getDefectElement().getFeatureModel()).get(reason.getLiteral().var);
 				final IFeature parent = FeatureUtils.getParent(feature);
@@ -144,7 +144,7 @@ public class ExplanationWriter {
 				s = String.format("%s is %s of %s.", feature.getName(), getChildString(feature, parent), parent.getName());
 				break;
 			case CONSTRAINT:
-				final Node constraint = FeatureUtils.getConstraint(explanation.getDefectElement().getFeatureModel(), reason.getLiteral().getSourceIndex());
+				final Node constraint = FeatureUtils.getConstraint(explanation.getDefectElement().getFeatureModel(), reason.getLiteral().getOriginConstraintIndex());
 				s = String.format("%s is a constraint.", constraint.toString(NodeWriter.logicalSymbols));
 				break;
 			case ROOT:

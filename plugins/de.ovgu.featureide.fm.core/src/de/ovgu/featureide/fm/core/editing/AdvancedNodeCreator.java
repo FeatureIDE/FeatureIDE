@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.editing;
 
-import static org.prop4j.Literal.FeatureAttribute.CHILD;
-import static org.prop4j.Literal.FeatureAttribute.PARENT;
-import static org.prop4j.Literal.FeatureAttribute.ROOT;
+import static org.prop4j.Literal.Origin.CHILD;
+import static org.prop4j.Literal.Origin.PARENT;
+import static org.prop4j.Literal.Origin.ROOT;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +31,7 @@ import java.util.ListIterator;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
-import org.prop4j.Literal.FeatureAttribute;
+import org.prop4j.Literal.Origin;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.SatInstance;
@@ -112,8 +112,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
 	}
 
-	private Literal getLiteral(IFeature feature, boolean positive, FeatureAttribute featureAttribute) {
-		return new Literal(getVariable(feature), positive, featureAttribute);
+	private Literal getLiteral(IFeature feature, boolean positive, Origin origin) {
+		return new Literal(getVariable(feature), positive, origin);
 	}
 
 	private Object getVariable(IFeature feature) {
@@ -177,7 +177,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			for (IConstraint constraint : featureModel.getConstraints()) {
 				final Node constraintNode = constraint.getNode();
 				for (final Literal l : constraintNode.getLiterals()) {
-					l.setOriginConstraint(featureModel.getConstraintIndex(constraint));
+					l.setOriginConstraintIndex(featureModel.getConstraintIndex(constraint));
 				}
 				clauses.add(constraintNode.clone());
 			}
@@ -189,7 +189,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			for (IConstraint constraint : featureModel.getConstraints()) {
 				final Node constraintNode = constraint.getNode();
 				for (final Literal l : constraintNode.getLiterals()) {
-					l.setOriginConstraint(featureModel.getConstraintIndex(constraint));
+					l.setOriginConstraintIndex(featureModel.getConstraintIndex(constraint));
 				}
 				final Node cnfNode = Node.buildCNF(constraintNode);
 				if (cnfNode instanceof And) {

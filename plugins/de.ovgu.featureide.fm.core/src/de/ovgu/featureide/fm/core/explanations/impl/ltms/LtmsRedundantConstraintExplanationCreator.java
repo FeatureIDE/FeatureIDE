@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
-import org.prop4j.Literal.FeatureAttribute;
+import org.prop4j.Literal.Origin;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -130,8 +130,8 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		final List<Node> clauses = new LinkedList<>();
 		clause: for (final Node clause : cnf.getChildren()) {
 			for (final Literal literal : clause.getLiterals()) {
-				if (literal.getSourceAttribute() == FeatureAttribute.CONSTRAINT
-						&& getFeatureModel().getConstraints().get(literal.getSourceIndex()) == redundantConstraint) {
+				if (literal.getOrigin() == Origin.CONSTRAINT
+						&& getFeatureModel().getConstraints().get(literal.getOriginConstraintIndex()) == redundantConstraint) {
 					continue clause;
 				}
 			}

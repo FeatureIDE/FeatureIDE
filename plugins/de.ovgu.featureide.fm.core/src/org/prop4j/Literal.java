@@ -20,12 +20,14 @@
  */
 package org.prop4j;
 
-import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.FeatureStructure;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 
 /**
  * A variable or negated variable.
@@ -39,95 +41,142 @@ public class Literal extends Node implements Cloneable {
 
 	public boolean positive;
 
-	//annotate each literal of a formula with an attribute for explanation. If "Up", explain child relationship
-	// to parent from feature-tree. If "Constraint", explain using cross-tree constraint.
-	public enum FeatureAttribute {
+	/**
+	 * Annotates each literal of a formula with an attribute for explanation.
+	 * 
+	 * @author Sofia Ananieva
+	 */
+	public enum Origin {
+		/** Denotes an unknown origin. */
 		UNDEFINED,
+		/** Denotes that the literal's origin is a {@link FeatureStructure#getChildren() child feature}. */
 		CHILD,
+		/** Denotes that the literal's origin is the {@link FeatureStructure#getParent() parent feature}. */
 		PARENT,
+		/** Denotes that the literal's origin is the {@link FeatureStructure#isRoot() root feature}. */
 		ROOT,
+		/** Denotes that the literal's origin is a {@link IConstraint constraint}. */
 		CONSTRAINT
 	};
 
-	public int origin; // attribute encodes relevant information for generating explanations
+	/**
+	 * <p>
+	 * Encodes the origin.
+	 * Stores which {@link Origin type of origin} the literal has.
+	 * Additionally, if the type is a {@link Origin#CONSTRAINT constraint}, its index in the feature model is stored.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is necessary for generating {@link Explanation explanations}.
+	 * </p>
+	 */
+	public int origin;
 
+	/**
+	 * Creates a new positive literal.
+	 * @param var contained variable
+	 */
 	public Literal(Object var) {
 		this(var, true);
 	}
 
+	/**
+	 * Creates a new literal.
+	 * @param var contained variable
+	 * @param positive whether the variable is positive or negated
+	 */
 	public Literal(Object var, boolean positive) {
 		this.var = var;
 		this.positive = positive;
 	}
 
 	/**
-	 * Encodes a literal from the tree topology.
-	 * FeatureAttribute must not have the value Constraint.
-	 * Example with root as FeatureAttribute: origin = -1 * 5 + 3 = -2 
-	 * @param var The variable 
-	 * @param FeatureAttribute The Enumeration element  
+	 * Creates a new positive literal.
+	 * @param var contained variable
+	 * @param origin origin of the literal
+	 * @throws IllegalArgumentException if the origin is a {@link Origin#CONSTRAINT constraint},
+	 * in which case {@link #Literal(Object,int)} should be used
 	 */
-	public Literal(Object var, FeatureAttribute a) {
-		this(var, true, a);
+	public Literal(Object var, Origin origin) throws IllegalArgumentException {
+		this(var, true, origin);
 	}
 
 	/**
-	 * Encodes a literal from a constraint.
-	 * @param var The variable
-	 * @param constraintIndex The index of a constraint  
+	 * Creates a new positive literal.
+	 * @param var contained variable
+	 * @param constraintIndex the index of the origin constraint in the feature model
 	 */
 	public Literal(Object var, int constraintIndex) {
 		this(var, true, constraintIndex);
 	}
 
-	public Literal(Object var, boolean positive, FeatureAttribute a) {
+	/**
+	 * Creates a new literal.
+	 * @param var contained variable
+	 * @param positive whether the variable is positive or negated
+	 * @param origin origin of the literal
+	 * @throws IllegalArgumentException if the origin is a {@link Origin#CONSTRAINT constraint},
+	 * in which case {@link #Literal(Object,boolean,int)} should be used
+	 */
+	public Literal(Object var, boolean positive, Origin origin) throws IllegalArgumentException {
 		this(var, positive);
-		if (a == FeatureAttribute.CONSTRAINT) {
-			throw new InvalidParameterException("Parameter Constraint is not allowed");
-		}
-		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();
-	}
-
-	public Literal(Object var, boolean positive, int constraintIndex) {
-		this(var, positive);
-		setOriginConstraint(constraintIndex);
+		setOrigin(origin);
 	}
 
 	/**
-	 * Decodes a constraint index.    
-	 * Example with origin = 4: origin = 4 / 5 = 0. Returns a constraint with index 0.
-	 * 
-	 * @return The constraint-index
+	 * Creates a new literal.
+	 * @param var contained variable
+	 * @param positive whether the variable is positive or negated
+	 * @param originConstraintIndex the index of the origin constraint in the feature model
 	 */
-	public int getSourceIndex() {
-		if (getSourceAttribute() != FeatureAttribute.CONSTRAINT) {
-			throw new IllegalStateException("origin is not Constraint");
-		}
-		return origin / FeatureAttribute.values().length;
+	public Literal(Object var, boolean positive, int originConstraintIndex) {
+		this(var, positive);
+		setOriginConstraintIndex(originConstraintIndex);
 	}
 
 	/**
-	 * Decodes a FeatureAttribute. 
-	 * Example with FeatureAttribute root and origin of -2: -2 % 5 + 5 = 3. 
-	 * Returns a FeatureAttribute with value 3 (ordinal).   
-	 * 
-	 * @return FeatureAttribute The Enumeration element  
+	 * Returns the origin of the literal.
+	 * @return the origin of the literal
 	 */
-	public FeatureAttribute getSourceAttribute() {
-		int index = origin % FeatureAttribute.values().length;
+	public Origin getOrigin() {
+		int index = origin % Origin.values().length;
 		if (index < 0) {
-			index += FeatureAttribute.values().length;
+			index += Origin.values().length;
 		}
-		return FeatureAttribute.values()[index];
+		return Origin.values()[index];
+	}
+	
+	/**
+	 * Sets the origin.
+	 * @param origin origin of the literal
+	 * @throws IllegalArgumentException if the given feature attribute denotes a {@link Origin#CONSTRAINT constraint},
+	 * in which case {@link #setOriginConstraintIndex(int)} should be used
+	 */
+	public void setOrigin(Origin origin) throws IllegalArgumentException {
+		if (origin == Origin.CONSTRAINT) {
+			throw new IllegalArgumentException("Origin must not be a constraint");
+		}
+		this.origin = -1 * Origin.values().length + origin.ordinal();
 	}
 
 	/**
-	 * Encodes a constraint-index.  
-	 * Example with constraintIndex = 0: origin = 0 * 5 + 4 = 4
-	 * @param constrIndex The index of a constraint
+	 * Returns the origin constraint's index in the feature model.
+	 * @return the origin constraint's index in the feature model
+	 * @throws IllegalStateException if the origin is not a {@link Origin#CONSTRAINT constraint}
 	 */
-	public void setOriginConstraint(int constrIndex) {
-		this.origin = constrIndex * FeatureAttribute.values().length + FeatureAttribute.CONSTRAINT.ordinal();
+	public int getOriginConstraintIndex() throws IllegalStateException {
+		if (getOrigin() != Origin.CONSTRAINT) {
+			throw new IllegalStateException("Origin is not a constraint");
+		}
+		return origin / Origin.values().length;
+	}
+
+	/**
+	 * Sets the origin by encoding the given origin constraint index.
+	 * @param originConstraintIndex index of the origin constraint in the feature model
+	 */
+	public void setOriginConstraintIndex(int originConstraintIndex) {
+		this.origin = originConstraintIndex * Origin.values().length + Origin.CONSTRAINT.ordinal();
 	}
 
 	public void flip() {
