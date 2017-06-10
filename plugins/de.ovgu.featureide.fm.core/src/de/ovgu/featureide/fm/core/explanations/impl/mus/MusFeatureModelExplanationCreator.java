@@ -109,6 +109,7 @@ public abstract class MusFeatureModelExplanationCreator extends AbstractFeatureM
 					case CONSTRAINT:
 						explanation.addUniqueReason(clause, literal);
 						break;
+					case ROOT:
 					case PARENT:
 					case UNDEFINED:
 					default:
