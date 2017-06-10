@@ -62,12 +62,12 @@ public class Literal extends Node implements Cloneable {
 	/**
 	 * <p>
 	 * Encodes the origin.
-	 * Stores which {@link Origin type of origin} the literal has.
-	 * Additionally, if the type is a {@link Origin#CONSTRAINT constraint}, its index in the feature model is stored.
+	 * Stores which {@link Origin type of origin} the literal has (using its {@link Origin#ordinal() ordinal}).
+	 * Additionally, if the type is a {@link Origin#CONSTRAINT constraint}, its index in the feature model is stored (using its bitwise complement).
 	 * </p>
 	 * 
 	 * <p>
-	 * This is necessary for generating {@link Explanation explanations}.
+	 * This information is necessary for generating {@link Explanation explanations}.
 	 * </p>
 	 */
 	public int origin;
@@ -139,24 +139,23 @@ public class Literal extends Node implements Cloneable {
 	 * @return the origin of the literal
 	 */
 	public Origin getOrigin() {
-		int index = origin % Origin.values().length;
-		if (index < 0) {
-			index += Origin.values().length;
+		if (origin < 0) {
+			return Origin.CONSTRAINT;
 		}
-		return Origin.values()[index];
+		return Origin.values()[origin];
 	}
 	
 	/**
 	 * Sets the origin.
 	 * @param origin origin of the literal
-	 * @throws IllegalArgumentException if the given feature attribute denotes a {@link Origin#CONSTRAINT constraint},
+	 * @throws IllegalArgumentException if the origin is a {@link Origin#CONSTRAINT constraint},
 	 * in which case {@link #setOriginConstraintIndex(int)} should be used
 	 */
 	public void setOrigin(Origin origin) throws IllegalArgumentException {
 		if (origin == Origin.CONSTRAINT) {
 			throw new IllegalArgumentException("Origin must not be a constraint");
 		}
-		this.origin = -1 * Origin.values().length + origin.ordinal();
+		this.origin = origin.ordinal();
 	}
 
 	/**
@@ -168,7 +167,7 @@ public class Literal extends Node implements Cloneable {
 		if (getOrigin() != Origin.CONSTRAINT) {
 			throw new IllegalStateException("Origin is not a constraint");
 		}
-		return origin / Origin.values().length;
+		return ~origin;
 	}
 
 	/**
@@ -176,7 +175,7 @@ public class Literal extends Node implements Cloneable {
 	 * @param originConstraintIndex index of the origin constraint in the feature model
 	 */
 	public void setOriginConstraintIndex(int originConstraintIndex) {
-		this.origin = originConstraintIndex * Origin.values().length + Origin.CONSTRAINT.ordinal();
+		this.origin = ~originConstraintIndex;
 	}
 
 	public void flip() {
