@@ -33,6 +33,7 @@ import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
+import org.prop4j.Literal.Origin;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -248,12 +249,11 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case COLLAPSED_ALL_CHANGED:
 		case COLLAPSED_CHANGED:
-			getFigure().setProperties();
 			/*
 			 * Reset the active reason in case we missed that it was set to null while this was collapsed.
 			 * In case it should not be null, the active reason will be set to the correct value in the upcoming feature model analysis anyway.
 			 */
-			setActiveReason(null);
+			setActiveReason(null); //reset includes a refresh (getFigure().setProperties())
 			break;
 		case MANDATORY_CHANGED:
 			sourceConnection = getModel().getSourceConnection();
@@ -278,6 +278,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			connectionEditPart.refreshSourceDecoration();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
+			setActiveReason(null); //reset
 			break;
 		case ACTIVE_REASON_CHANGED:
 			setActiveReason((Explanation.Reason) event.getNewValue());
@@ -289,20 +290,36 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	}
 
 	/**
+	 * <p>
 	 * Sets the currently active reason.
+	 * </p>
+	 * 
+	 * <p>
+	 * Propagates into the figure and the source connection.
 	 * Refreshes accordingly.
-	 * @param activeReason the new active reason
+	 * </p>
+	 * @param activeReason the new active reason; null to reset
 	 */
 	protected void setActiveReason(Explanation.Reason activeReason) {
-		getFigure().setActiveReason(activeReason);
-		getFigure().setProperties();
-		final FeatureConnection sourceConnection = getModel().getSourceConnection();
-		if (sourceConnection == null || getViewer() == null) {
-			return;
+		//Update the figure.
+		if (activeReason == null //reset
+				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_UP) {
+			getFigure().setActiveReason(activeReason);
+			getFigure().setProperties();
 		}
-		final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
-		connectionEditPart.setActiveReason(activeReason);
-		connectionEditPart.refreshVisuals();
+		
+		//Update the source connection.
+		if (activeReason == null //reset
+				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_DOWN
+				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_HORIZONTAL) {
+			final FeatureConnection sourceConnection = getModel().getSourceConnection();
+			if (sourceConnection == null || getViewer() == null) {
+				return;
+			}
+			final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
+			connectionEditPart.setActiveReason(activeReason);
+			connectionEditPart.refreshVisuals();
+		}
 	}
 
 	private static boolean equals(final IGraphicalFeature newTarget, final IGraphicalFeature target) {

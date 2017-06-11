@@ -340,10 +340,35 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 	
 	/**
+	 * <p>
 	 * Sets the currently active reason.
-	 * @param activeReason new active reason
+	 * </p>
+	 * 
+	 * <p>
+	 * Only does so in any of the following cases:
+	 * <ul>
+	 * <li>
+	 * The new active reason is null.
+	 * This makes it possible to reset the active reason.
+	 * </li>
+	 * <li>
+	 * The old active reason is null.
+	 * After resetting, any new active reason is accepted.
+	 * </li>
+	 * <li>
+	 * The new active reason has a greater {@link Reason#getConfidence() confidence} than the old one.
+	 * This means that, in case of graphically overlapping reasons, the greatest confidence is displayed.
+	 * </li>
+	 * </ul>
+	 * </p>
+	 * @param activeReason the new active reason; null to reset
 	 */
 	public void setActiveReason(Reason activeReason) {
+		if (activeReason != null
+				&& this.activeReason != null
+				&& activeReason.getConfidence() <= this.activeReason.getConfidence()) {
+			return;
+		}
 		this.activeReason = activeReason;
 	}
 	

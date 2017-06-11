@@ -35,7 +35,7 @@ public abstract class ModelElementFigure extends Figure {
 	
 	/**
 	 * Sets the currently active reason.
-	 * @param activeReason new active reason
+	 * @param activeReason new active reason; null to reset
 	 */
 	public void setActiveReason(Reason activeReason) {
 		this.activeReason = activeReason;

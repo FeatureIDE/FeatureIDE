@@ -36,7 +36,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATU
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1303,29 +1302,37 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			//Deactivate the old active explanation.
 			final Explanation oldActiveExplanation = (Explanation) event.getOldValue();
 			if (oldActiveExplanation != null) {
+				//Notify the defect element.
 				final IGraphicalElement defectElement = FeatureUIHelper.getGraphicalElement(oldActiveExplanation.getDefectElement(),
 						getGraphicalFeatureModel());
 				defectElement.update(event);
+
+				//Reset each element affected by the old active explanation.
+				final Set<IGraphicalElement> updatedElements = new HashSet<>();
+				for (final Explanation.Reason reason : oldActiveExplanation.getReasons()) {
+					final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(reason.getSourceElement(), getGraphicalFeatureModel());
+					if (updatedElements.add(element)) {
+						element.update(event);
+					}
+				}
 			}
 
 			//Activate the new active explanation.
 			final Explanation newActiveExplanation = (Explanation) event.getNewValue();
 			if (newActiveExplanation != null) {
+				//Notify the defect element.
 				final IGraphicalElement defectElement = FeatureUIHelper.getGraphicalElement(newActiveExplanation.getDefectElement(),
 						getGraphicalFeatureModel());
 				defectElement.update(event);
+
+				//Notify each element affected by the new active explanation of its new active reasons.
+				for (final Explanation.Reason reason : newActiveExplanation.getReasons()) {
+					final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(reason.getSourceElement(), getGraphicalFeatureModel());
+					element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+				}
 			}
 
-			//Notify each affected element of its new active reason.
-			final Map<IGraphicalElement, Explanation.Reason> elementOldActiveReasons = getGraphicalElementReasons(oldActiveExplanation);
-			final Map<IGraphicalElement, Explanation.Reason> elementNewActiveReasons = getGraphicalElementReasons(newActiveExplanation);
-			final Set<IGraphicalElement> elements = new HashSet<>();
-			elements.addAll(elementOldActiveReasons.keySet());
-			elements.addAll(elementNewActiveReasons.keySet());
-			for (final IGraphicalElement element : elements) {
-				element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, elementOldActiveReasons.get(element),
-						elementNewActiveReasons.get(element)));
-			}
+			//Refresh the legend.
 			LegendFigure legend = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
 			if (legend != null && legend.isVisible()) {
 				legend.recreateLegend();
@@ -1355,23 +1362,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		for (IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
 			registry.remove(f);
 		}
-	}
-
-	/**
-	 * Returns each reason mapped to the graphical feature model element it affects.
-	 * 
-	 * @param explanation explanation containing reasons
-	 * @return each reason mapped to the graphical feature model element it affects; never null
-	 */
-	private Map<IGraphicalElement, Explanation.Reason> getGraphicalElementReasons(Explanation explanation) {
-		if (explanation == null) {
-			return Collections.emptyMap();
-		}
-		final Map<IGraphicalElement, Explanation.Reason> elementReasons = new HashMap<>();
-		for (final Explanation.Reason reason : explanation.getReasons()) {
-			elementReasons.put(FeatureUIHelper.getGraphicalElement(reason.getSourceElement(), getGraphicalFeatureModel()), reason);
-		}
-		return elementReasons;
 	}
 
 	/**

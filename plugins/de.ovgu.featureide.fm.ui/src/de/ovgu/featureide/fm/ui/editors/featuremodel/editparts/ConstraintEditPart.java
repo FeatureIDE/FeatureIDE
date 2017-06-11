@@ -120,6 +120,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			getFigure().setConstraintProperties();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
+			setActiveReason(null); //reset
 			break;
 		case ACTIVE_REASON_CHANGED:
 			setActiveReason((Explanation.Reason) event.getNewValue());
@@ -131,9 +132,15 @@ public class ConstraintEditPart extends ModelElementEditPart {
 	}
 
 	/**
+	 * <p>
 	 * Sets the currently active reason.
+	 * </p>
+	 * 
+	 * <p>
+	 * Propagates into the figure.
 	 * Refreshes accordingly.
-	 * @param activeReason the new active reason
+	 * </p>
+	 * @param activeReason the new active reason; null to reset
 	 */
 	protected void setActiveReason(Explanation.Reason activeReason) {
 		getFigure().setActiveReason(activeReason);
