@@ -136,6 +136,17 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 		}
 	}
+	
+	/**
+	 * Returns the source connection.
+	 * @return the source connection; null if none exists
+	 */
+	protected ConnectionEditPart getSourceConnection() {
+		if (getSourceConnections().isEmpty()) {
+			return null;
+		}
+		return (ConnectionEditPart) getSourceConnections().get(0);
+	}
 
 	@Override
 	protected List<FeatureConnection> getModelSourceConnections() {
@@ -304,21 +315,18 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		//Update the figure.
 		if (activeReason == null //reset
 				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_UP) {
-			getFigure().setActiveReason(activeReason);
-			getFigure().setProperties();
+			final FeatureFigure figure = getFigure();
+			figure.setActiveReason(activeReason);
+			figure.setProperties();
 		}
 		
 		//Update the source connection.
 		if (activeReason == null //reset
 				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_DOWN
 				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_HORIZONTAL) {
-			final FeatureConnection sourceConnection = getModel().getSourceConnection();
-			if (sourceConnection == null || getViewer() == null) {
-				return;
-			}
-			final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
-			connectionEditPart.setActiveReason(activeReason);
-			connectionEditPart.refreshVisuals();
+			final ConnectionEditPart sourceConnection = getSourceConnection();
+			sourceConnection.setActiveReason(activeReason);
+			sourceConnection.refreshVisuals();
 		}
 	}
 
