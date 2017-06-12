@@ -48,13 +48,12 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -218,9 +217,15 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
 		if (!contraints.isEmpty()) {
-			String c = "\n\nConstraints:\n";
-			toolTip.append(c);
-			toolTip.append(contraints + "\n");
+			toolTip.append("\n\nConstraints:\n");
+			toolTip.append(contraints);
+		}
+
+		if (getActiveReason() != null) {
+			final ExplanationWriter w = new ExplanationWriter(getActiveReason().getExplanation());
+			toolTip.append("\n\nThis feature is involved in the selected defect:");
+			toolTip.append("\n\u2022 ");
+			toolTip.append(w.getReasonString(getActiveReason()));
 		}
 
 		Figure toolTipContent = new Figure();

@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -46,6 +47,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
@@ -80,7 +82,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		}
 	};
 	
-	/** the currently active reason */
+	/** All active reasons. */
+	private final List<Reason> activeReasons = new LinkedList<>();
+	/** The currently active reason. */
 	private Reason activeReason;
 
 	private Figure toolTipContent = new Figure();
@@ -300,7 +304,16 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IFeature target = graphicalTarget.getObject();
 		toolTipContent.removeAll();
 		toolTipContent.setLayoutManager(new GridLayout());
-		toolTipContent.add(new Label(" Connection type: \n" + (target.getStructure().isAnd() ? " And" : (target.getStructure().isMultiple() ? " Or" : " Alternative"))));
+		toolTipContent.add(new Label("Connection type:\n" + (target.getStructure().isAnd() ? "And" : (target.getStructure().isMultiple() ? "Or" : "Alternative"))));
+
+		if (getActiveReason() != null) {
+			String explanation = "This connection is involved in the selected defect:";
+			final ExplanationWriter w = new ExplanationWriter(activeReason.getExplanation());
+			for (final Reason reason : activeReasons) {
+				explanation += "\n\u2022 " + w.getReasonString(reason);
+			}
+			toolTipContent.add(new Label(explanation));
+		}
 
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
@@ -364,12 +377,15 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	 * @param activeReason the new active reason; null to reset
 	 */
 	public void setActiveReason(Reason activeReason) {
-		if (activeReason != null
-				&& this.activeReason != null
-				&& activeReason.getConfidence() <= this.activeReason.getConfidence()) {
-			return;
+		if (activeReason == null) {
+			activeReasons.clear();
+			this.activeReason = activeReason;
+		} else {
+			if (this.activeReason == null || activeReason.getConfidence() >= this.activeReason.getConfidence()) {
+				this.activeReason = activeReason;
+			}
+			activeReasons.add(activeReason);
 		}
-		this.activeReason = activeReason;
 	}
 	
 	/**

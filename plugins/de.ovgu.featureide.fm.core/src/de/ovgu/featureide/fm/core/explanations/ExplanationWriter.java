@@ -161,7 +161,7 @@ public class ExplanationWriter {
 				if (parent == null) {
 					throw new IllegalStateException("Missing parent despite up child source attribute");
 				}
-				s = String.format("%s is parent of %s.", parent.getName(), feature.getName());
+				s = String.format("%s is child of %s.", feature.getName(), parent.getName());
 				break;
 			case CHILD_DOWN:
 				feature = (IFeature) reason.getSourceElement();

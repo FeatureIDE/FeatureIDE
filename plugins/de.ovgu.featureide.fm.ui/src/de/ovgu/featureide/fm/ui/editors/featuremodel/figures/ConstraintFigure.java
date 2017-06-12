@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
+import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
@@ -39,6 +41,7 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -115,23 +118,26 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 		IConstraint constraint = this.graphicalConstraint.getObject();
 
+		final IFigure toolTipContent = new Figure();
+		toolTipContent.setLayoutManager(new GridLayout());
+
 		switch (constraint.getConstraintAttribute()) {
 		case NORMAL:
 			break;
 		case VOID_MODEL:
-			setToolTip(VOID_LABEL);
+			toolTipContent.add(VOID_LABEL);
 			break;
 		case UNSATISFIABLE:
-			setToolTip(UNSATISFIABLE_LABEL);
+			toolTipContent.add(UNSATISFIABLE_LABEL);
 			break;
 		case TAUTOLOGY:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(TAUTOLOGY_LABEL);
+			toolTipContent.add(TAUTOLOGY_LABEL);
 			break;
 		case REDUNDANT:
 		case IMPLICIT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(REDUNDANCE_LABEL);
+			toolTipContent.add(REDUNDANCE_LABEL);
 			break;
 		case DEAD:
 		case FALSE_OPTIONAL:
@@ -145,10 +151,10 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
 
 				for (String dead : deadFeatures) {
-					toolTip.append("\n   ");
+					toolTip.append("\n\u2022 ");
 					toolTip.append(dead);
 				}
-				setToolTip(new Label(toolTip.toString()));
+				toolTipContent.add(new Label(toolTip.toString()));
 			}
 
 			if (!constraint.getFalseOptional().isEmpty()) {
@@ -164,19 +170,23 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 				toolTip.append(FALSE_OPTIONAL);
 				for (String feature : falseOptionalFeatures) {
-					toolTip.append("\n   ");
+					toolTip.append("\n\u2022 ");
 					toolTip.append(feature);
 				}
-				setToolTip(new Label(toolTip.toString()));
+				toolTipContent.add(new Label(toolTip.toString()));
 			}
 			break;
 		default:
 			break;
 		}
-		
+
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
+			final ExplanationWriter w = new ExplanationWriter(getActiveReason().getExplanation());
+			toolTipContent.add(new Label("This constraint is involved in the selected defect:\n\u2022 " + w.getReasonString(getActiveReason())));
 		}
+
+		setToolTip(toolTipContent);
 	}
 
 	private String getConstraintText(IConstraint constraint) {
