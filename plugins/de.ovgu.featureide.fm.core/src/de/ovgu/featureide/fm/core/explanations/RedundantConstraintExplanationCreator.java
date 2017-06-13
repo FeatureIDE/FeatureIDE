@@ -127,7 +127,7 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 	
 	/**
 	 * Returns a copy of the given CNF without clauses of the redundant constraint.
-	 * @param cnf CNF to check
+	 * @param newCNF CNF to check
 	 * @return a copy of the given CNF without clauses of the redundant constraint
 	 * @throws IllegalStateException if the redundant constraint is not set
 	 */

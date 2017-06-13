@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
-import static de.ovgu.featureide.fm.core.functional.Functional.toList;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
@@ -54,6 +53,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -224,7 +224,7 @@ public class SetFeatureColorDialog extends Dialog {
 			}
 			
 			private List<IGraphicalFeature> findChildren(IGraphicalFeature parent) {
-				return toList(FeatureUIHelper.getGraphicalChildren(parent));
+				return Functional.toList(FeatureUIHelper.getGraphicalChildren(parent));
 			}
 
 			private void findDirectChildren() {

@@ -20,12 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import static de.ovgu.featureide.fm.core.functional.Functional.filter;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +38,6 @@ import javax.annotation.Nonnull;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.prop4j.SatSolver;
-import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
@@ -50,10 +48,14 @@ import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.IFeatureModelLayout;
 import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.Operator;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 
@@ -76,6 +78,8 @@ public final class FeatureUtils {
 	};
 
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
+
+	public static final HiddenFeatureFilter HIDDEN_FEATURE_FILTER = new HiddenFeatureFilter();
 
 	public static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE = new IFunction<IConstraint, Node>() {
 
@@ -102,6 +106,13 @@ public final class FeatureUtils {
 		@Override
 		public String invoke(IFeature t) {
 			return t.getName();
+		}
+	};
+
+	public static final IFunction<IFeature, String> GET_OLD_FEATURE_NAME = new IFunction<IFeature, String>() {
+		@Override
+		public String invoke(IFeature t) {
+			return t.getFeatureModel().getRenamingsManager().getOldName(t.getName());
 		}
 	};
 
@@ -247,7 +258,7 @@ public final class FeatureUtils {
 	public static final FeatureModelAnalyzer createAnalyser(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getAnalyser();
+		return ProjectManager.getAnalyzer(featureModel);
 	}
 
 	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {
@@ -299,6 +310,12 @@ public final class FeatureUtils {
 		return extractConcreteFeatures(model.getFeatures());
 	}
 
+	public static Iterable<IFeature> extractHiddenFeatures(final IFeatureModel model) {
+		requireNonNull(model);
+
+		return extractHiddenFeatures(model.getFeatures());
+	}
+
 	/**
 	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable
 	 * object that
@@ -308,7 +325,7 @@ public final class FeatureUtils {
 	 * 
 	 * <br/>
 	 * <br/>
-	 * The extraction is done via {@link de.ovgu.featureide.fm.core.functional.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
+	 * The extraction is done via {@link de.ovgu.featureide.fm.core.base.util.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
 	 * 
 	 * @since 3.0
 	 * @param features An iterable object providing features
@@ -318,12 +335,18 @@ public final class FeatureUtils {
 	public static Iterable<IFeature> extractConcreteFeatures(final Iterable<IFeature> features) {
 		requireNonNull(features);
 
-		return filter(features, CONCRETE_FEATURE_FILTER);
+		return Functional.filter(features, CONCRETE_FEATURE_FILTER);
+	}
+
+	public static Iterable<IFeature> extractHiddenFeatures(final Iterable<IFeature> features) {
+		requireNonNull(features);
+
+		return Functional.filter(features, HIDDEN_FEATURE_FILTER);
 	}
 
 	/**
 	 * Extracts all concrete features from a feature model as a list of strings by calling
-	 * {@link de.ovgu.featureide.fm.core.functional.Functional#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)} using
+	 * {@link de.ovgu.featureide.fm.core.base.util.Functional#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)} using
 	 * <code>model.getFeatures()</code>.
 	 * 
 	 * @since 3.0
@@ -337,16 +360,16 @@ public final class FeatureUtils {
 		return new ArrayList<String>(Functional.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures())));
 	}
 
-	public static Iterable<String> extractFeatureNames(Collection<IFeature> features) {
+	public static Iterable<String> extractFeatureNames(Iterable<IFeature> features) {
 		requireNonNull(features);
 
 		return Functional.map(features, GET_FEATURE_NAME);
 	}
 
-	public static Iterable<String> extractFeatureNames(Iterable<IFeature> features) {
+	public static Iterable<String> extractOldFeatureNames(Iterable<IFeature> features) {
 		requireNonNull(features);
 
-		return Functional.map(features, GET_FEATURE_NAME);
+		return Functional.map(features, GET_OLD_FEATURE_NAME);
 	}
 
 	public static final void fire(IConstraint constraint, PropertyChangeEvent event) {
@@ -363,7 +386,7 @@ public final class FeatureUtils {
 	public static final FeatureModelAnalyzer getAnalyser(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getAnalyser();
+		return ProjectManager.getAnalyzer(featureModel);
 	}
 
 	public static final List<String> getAnnotations(IFeatureModel featureModel) {
@@ -421,16 +444,24 @@ public final class FeatureUtils {
 		return Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel));
 	}
 
+	@Nonnull
+	public static final Collection<IFeature> getHiddenFeatures(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return Functional.toList(FeatureUtils.extractHiddenFeatures(featureModel));
+	}
+
 	public static final Node getConstraint(IFeatureModel featureModel, int index) {
 		requireNonNull(featureModel);
 
 		return Functional.toList(getPropositionalNodes(featureModel)).get(index);
 	}
 
+	@Deprecated
 	public static final ConstraintAttribute getConstraintAttribute(IConstraint constraint) {
 		requireNonNull(constraint);
 
-		return constraint.getConstraintAttribute();
+		return ConstraintAttribute.NORMAL;
 	}
 
 	public static final int getConstraintCount(IFeatureModel featureModel) {
@@ -465,7 +496,7 @@ public final class FeatureUtils {
 	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint) {
 		requireNonNull(constraint);
 
-		return constraint.getDeadFeatures();
+		return getConstraintProperties(constraint).getDeadFeatures();
 	}
 
 	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
@@ -476,7 +507,7 @@ public final class FeatureUtils {
 		final Node propNode = constraint.getNode();
 		if (propNode != null) {
 			fm.removeConstraint(constraint);
-			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures();
+			deadFeaturesBefore = ProjectManager.getAnalyzer(fm).getDeadFeatures();
 			fm.addConstraint(new Constraint(fm, propNode));
 			fm.handleModelDataChanged();
 		}
@@ -492,11 +523,12 @@ public final class FeatureUtils {
 		return deadFeaturesAfter;
 	}
 
+	@Deprecated
 	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
 		requireNonNull(constraint);
 		requireNonNull(fmDeadFeatures);
 
-		return Functional.toList(constraint.getDeadFeatures(solver, fm, fmDeadFeatures));
+		return Collections.emptyList();
 	}
 
 	public static final String getDescription(IFeature feature) {
@@ -512,10 +544,10 @@ public final class FeatureUtils {
 		return feature.getProperty().getDisplayName();
 	}
 
-	public static final Iterable<IFeature> getFalseOptional(IConstraint constraint) {
+	public static final Collection<IFeature> getFalseOptional(IConstraint constraint) {
 		requireNonNull(constraint);
 
-		return constraint.getFalseOptional();
+		return getConstraintProperties(constraint).getFalseOptionalFeatures();
 	}
 
 	public static final IFeature getFeature(IFeatureModel featureModel, CharSequence name) {
@@ -547,6 +579,18 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 
 		return Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()));
+	}
+
+	public static final Set<String> getOldFeatureNames(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return Functional.toSet(FeatureUtils.extractOldFeatureNames(featureModel.getFeatures()));
+	}
+
+	public static final List<String> getOldFeatureNamesList(IFeatureModel featureModel) {
+		requireNonNull(featureModel);
+
+		return Functional.toList(FeatureUtils.extractOldFeatureNames(featureModel.getFeatures()));
 	}
 
 	public static final List<String> getFeatureNamesPreorder(IFeatureModel featureModel) {
@@ -765,13 +809,13 @@ public final class FeatureUtils {
 	public static final boolean hasDeadConst(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getStructure().hasDeadConstraints();
+		return getFeatureModelProperties(featureModel).hasDeadConstraints();
 	}
 
 	public static final boolean hasFalseOptionalFeatures(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getStructure().hasFalseOptionalFeatures();
+		return getFeatureModelProperties(featureModel).hasFalseOptionalFeatures();
 	}
 
 	public static final int hashCode(IConstraint constraint) {
@@ -843,25 +887,25 @@ public final class FeatureUtils {
 	public static final boolean hasRedundantConst(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getStructure().hasRedundantConstraints();
+		return getFeatureModelProperties(featureModel).hasRedundantConstraints();
 	}
 
 	public static final boolean hasTautologyConst(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getStructure().hasTautologyConstraints();
+		return getFeatureModelProperties(featureModel).hasTautologyConstraints();
 	}
 
 	public static final boolean hasUnsatisfiableConst(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getStructure().hasUnsatisfiableConstraints();
+		return getFeatureModelProperties(featureModel).hasUnsatisfiableConstraints();
 	}
 
 	public static final boolean hasVoidModelConst(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getStructure().hasVoidModelConstraints();
+		return getFeatureModelProperties(featureModel).hasVoidModelConstraints();
 	}
 
 	public static final boolean isAbstract(IFeature feature) {
@@ -1161,11 +1205,11 @@ public final class FeatureUtils {
 	//		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
 	//	}
 
+	@Deprecated
 	public static final void setConstraintAttribute(IConstraint constraint, ConstraintAttribute attri, boolean fire) {
 		requireNonNull(constraint);
 		requireNonNull(attri);
-
-		constraint.setConstraintAttribute(attri, fire);
+		// ...
 	}
 
 	public static final void setConstraints(IFeatureModel featureModel, final Iterable<IConstraint> constraints) {
@@ -1183,15 +1227,13 @@ public final class FeatureUtils {
 
 	public static final void setContainedFeatures(IConstraint constraint) {
 		requireNonNull(constraint);
-
-		constraint.setContainedFeatures();
 	}
 
 	public static final void setDeadFeatures(IConstraint constraint, Collection<IFeature> deadFeatures) {
 		requireNonNull(constraint);
 		requireNonNull(deadFeatures);
 
-		constraint.setDeadFeatures(deadFeatures);
+		getConstraintProperties(constraint).setDeadFeatures(deadFeatures);
 	}
 
 	public static final void setDescription(IFeature feature, CharSequence description) {
@@ -1210,8 +1252,8 @@ public final class FeatureUtils {
 		final IFeatureModel featureModel = constraint.getFeatureModel();
 		final IFeatureModel clonedModel = FeatureUtils.clone(constraint.getFeatureModel());
 		clonedModel.removeConstraint(constraint);
-		final Collection<IFeature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
-		for (IFeature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
+		final Collection<IFeature> foFeatures = ProjectManager.getAnalyzer(clonedModel).getFalseOptionalFeatures();
+		for (IFeature feature : ProjectManager.getAnalyzer(featureModel).getFalseOptionalFeatures()) {
 			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
 				falseOptionalFeatures.add(feature);
 				found = true;
@@ -1220,11 +1262,13 @@ public final class FeatureUtils {
 		return found;
 	}
 
+	@Deprecated
 	public static final boolean setFalseOptionalFeatures(IConstraint constraint, IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
 		requireNonNull(constraint);
 		requireNonNull(fmFalseOptionals);
 
-		return constraint.setFalseOptionalFeatures(clone, fmFalseOptionals);
+		getConstraintProperties(constraint).setFalseOptionalFeatures(fmFalseOptionals);
+		return true;
 	}
 
 	public static final void setFeatureOrderList(IFeatureModel featureModel, final List<String> featureOrderList) {
@@ -1393,35 +1437,16 @@ public final class FeatureUtils {
 		return stringBuilder.toString();
 	}
 
-	public static String[] getFeaturesFromFeatureGraph(IFeatureGraph featureGraph) {
-		final SatInstance satInstance = featureGraph.getSatInstance();
-		String[] featureNames = new String[satInstance.getNumberOfVariables()];
-
-		for (int i = 0; i < featureNames.length; i++) {
-			featureNames[i] = (String) satInstance.getVariableObject(i + 1);
-		}
-		return featureNames;
+	public static ConstraintProperties getConstraintProperties(IConstraint constraint) {
+		return ProjectManager.getAnalyzer(constraint.getFeatureModel()).getConstraintProperties(constraint);
 	}
 
-	public static String[] getCoreFeaturesFromFeatureGraph(IFeatureGraph featureGraph) {
-		return getNonCommonFeaturesFromFeatureGraph(featureGraph, -1);
+	public static FeatureProperties getFeatureProperties(IFeature feature) {
+		return ProjectManager.getAnalyzer(feature.getFeatureModel()).getFeatureProperties(feature);
 	}
 
-	public static String[] getDeadFeaturesFromFeatureGraph(IFeatureGraph featureGraph) {
-		return getNonCommonFeaturesFromFeatureGraph(featureGraph, -2);
-	}
-
-	private static String[] getNonCommonFeaturesFromFeatureGraph(IFeatureGraph featureGraph, int mode) {
-		final SatInstance satInstance = featureGraph.getSatInstance();
-		final ArrayList<String> featureNames = new ArrayList<>(satInstance.getNumberOfVariables());
-
-		final int[] index = featureGraph.getIndex();
-		for (int i = 0; i < index.length; i++) {
-			if (index[i] == mode) {
-				featureNames.add((String) satInstance.getVariableObject(i + 1));
-			}
-		}
-		return featureNames.toArray(new String[0]);
+	public static FeatureModelProperties getFeatureModelProperties(IFeatureModel featureModel) {
+		return ProjectManager.getAnalyzer(featureModel).getFeatureModelProperties();
 	}
 
 }

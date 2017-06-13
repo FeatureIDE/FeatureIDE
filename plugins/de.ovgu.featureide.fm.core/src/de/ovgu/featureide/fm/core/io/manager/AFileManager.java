@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFileManager<T> implements IFileManager, IEventManager {
+public abstract class AFileManager<T> implements IFileManager<T>, IEventManager {
 
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
@@ -76,6 +76,13 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 	public T getObject() {
 		synchronized (syncObject) {
 			return persistentObject;
+		}
+	}
+
+	public void setObject(T object) {
+		synchronized (syncObject) {
+			variableObject = object;
+			persist();
 		}
 	}
 
@@ -167,6 +174,10 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager {
 	@Override
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	public Path getPath() {
+		return path;
 	}
 
 	@Override

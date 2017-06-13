@@ -29,16 +29,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_CORRUPT__NO
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.RenamingsManager;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -59,12 +52,7 @@ public class DefaultFormat implements IConfigurationFormat {
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
-
-		final boolean orgPropagate = configuration.isPropagate();
-		configuration.setPropagate(false);
-		configuration.resetValues();
 
 		String line = null;
 		int lineNumber = 1;
@@ -76,7 +64,6 @@ public class DefaultFormat implements IConfigurationFormat {
 				// the string tokenizer is used to also support the expression
 				// format used by FeatureHouse
 				final StringTokenizer tokenizer = new StringTokenizer(line);
-				final LinkedList<String> hiddenFeatures = new LinkedList<>();
 				while (tokenizer.hasMoreTokens()) {
 					String name = tokenizer.nextToken(" ");
 					if (name.startsWith("\"")) {
@@ -90,23 +77,8 @@ public class DefaultFormat implements IConfigurationFormat {
 							warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 						}
 					}
-					name = renamingsManager.getNewName(name);
-					IFeature feature = configuration.getFeatureModel().getFeature(name);
-					if (feature != null && feature.getStructure().hasHiddenParent()) {
-						hiddenFeatures.add(name);
-					} else {
-						try {
-							configuration.setManual(name, Selection.SELECTED);
-						} catch (FeatureNotFoundException e) {
-							warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
-						} catch (SelectionNotPossibleException e) {
-							warnings.add(new Problem(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
-						}
-					}
-				}
-				for (String name : hiddenFeatures) {
 					try {
-						configuration.setAutomatic(name, Selection.SELECTED);
+						configuration.setManual(name, Selection.SELECTED);
 					} catch (FeatureNotFoundException e) {
 						warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} catch (SelectionNotPossibleException e) {
@@ -118,11 +90,8 @@ public class DefaultFormat implements IConfigurationFormat {
 		} catch (IOException e) {
 			warnings.clear();
 			warnings.add(new Problem(e));
-			configuration.setPropagate(orgPropagate);
 			return warnings;
 		}
-		configuration.setPropagate(orgPropagate);
-		configuration.update();
 		return warnings;
 	}
 
@@ -133,22 +102,6 @@ public class DefaultFormat implements IConfigurationFormat {
 	@Override
 	public String write(Configuration configuration) {
 		final StringBuilder buffer = new StringBuilder();
-		final IFeatureModel featureModel = configuration.getFeatureModel();
-		if (featureModel.isFeatureOrderUserDefined()) {
-			final List<String> list = Functional.toList(featureModel.getFeatureOrderList());
-			final Set<String> featureSet = configuration.getSelectedFeatureNames();
-			for (String s : list) {
-				if (featureSet.contains(s)) {
-					if (s.contains(" ")) {
-						buffer.append("\"" + s + "\"" + NEWLINE);
-					} else {
-						buffer.append(s + NEWLINE);
-					}
-				}
-			}
-			return buffer.toString();
-		}
-
 		writeSelectedFeatures(configuration.getRoot(), buffer);
 		return buffer.toString();
 	}

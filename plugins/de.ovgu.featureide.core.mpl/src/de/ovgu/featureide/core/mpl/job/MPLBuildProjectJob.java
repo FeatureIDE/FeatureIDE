@@ -27,8 +27,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NO_MAPPING_FIL
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -36,7 +34,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -49,12 +46,13 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
@@ -65,7 +63,7 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
  */
 public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments, Boolean> {
 
-	public static class Arguments extends JobArguments {
+	public static class Arguments implements JobArguments<Boolean> {
 
 		private final IFeatureProject externalFeatureProject;
 		private final IFeatureProject rootFeatureProject;
@@ -75,12 +73,16 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 
 		public Arguments(IFeatureProject rootFeatureProject, IFeatureProject externalFeatureProject, IFolder buildFolder, Configuration configuration,
 				String varName) {
-			super(Arguments.class);
 			this.rootFeatureProject = rootFeatureProject;
 			this.externalFeatureProject = externalFeatureProject;
 			this.buildF = buildFolder;
 			this.configuration = configuration;
 			this.varName = varName;
+		}
+
+		@Override
+		public MPLBuildProjectJob createJob() {
+			return new MPLBuildProjectJob(this);
 		}
 	}
 
@@ -137,7 +139,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 
 	}
 
-	private LongRunningMethod<?> createJob(JobArguments arg) {
+	private LongRunningMethod<?> createJob(JobArguments<Boolean> arg) {
 		return arg.createJob();
 	}
 
@@ -269,32 +271,17 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 					+ ".";
 
 				final Configuration newConfiguration = new Configuration(arguments.externalFeatureProject.getFeatureModel());
+				final ConfigurationPropagator propagator = arguments.externalFeatureProject.getStatus().getPropagator(newConfiguration);
 
 				for (SelectableFeature feature : arguments.configuration.getFeatures()) {
 					if (feature.getName().startsWith(prefix)) {
 						String featureName = feature.getName().substring(prefix.length());
-						try {
-							newConfiguration.setManual(featureName, feature.getSelection());
-						} catch (Exception e) {}
+						newConfiguration.setManual(featureName, feature.getSelection());
 					}
 				}
 
 				// Find Random Solution
-				try {
-					LinkedList<List<String>> solutions = newConfiguration.getSolutions(1);
-					if (!solutions.isEmpty()) {
-						newConfiguration.resetValues();
-						List<String> solution = solutions.getFirst();
-						for (String solutionFeatureName : solution) {
-							try {
-								newConfiguration.setManual(solutionFeatureName, Selection.SELECTED);
-							} catch (Exception e) {}
-						}
-					}
-				} catch (TimeoutException e) {
-					MPLPlugin.getDefault().logError(e);
-					return false;
-				}
+				LongRunningWrapper.runMethod(propagator.completeRandomly());
 
 				// Build project
 				composerExtension.buildConfiguration(buildFolder, newConfiguration, varName);

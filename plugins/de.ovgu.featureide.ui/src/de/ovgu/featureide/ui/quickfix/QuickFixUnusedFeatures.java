@@ -31,13 +31,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
@@ -80,25 +82,24 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
-		Configuration configuration = new Configuration(featureModel, false);
-		try {
-			List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, true);
-			for (List<String> solution : solutions) {
-				configuration = new Configuration(featureModel, false);
-				for (String feature : solution) {
-					if (!"True".equals(feature)) {
-						configuration.setManual(feature, Selection.SELECTED);
-					}
-				}
-				if (collect) {
-					confs.add(configuration);
-				} else {
-					final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
-					writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
-				}
+		final ConfigurationPropagator propagator;
+		if (project != null) {
+			propagator = project.getStatus().getPropagator();
+		} else {
+			propagator = ProjectManager.getProject(featureModel).getStatus().getPropagator();
+		}
+		List<List<String>> solutions = LongRunningWrapper.runMethod(propagator.coverFeatures(unusedFeatures, true), monitor);
+		for (List<String> solution : solutions) {
+			Configuration configuration = new Configuration(featureModel);
+			for (String feature : solution) {
+				configuration.setManual(feature, Selection.SELECTED);
 			}
-		} catch (TimeoutException e1) {
-			e1.printStackTrace();
+			if (collect) {
+				confs.add(configuration);
+			} else {
+				final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
+				writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
+			}
 		}
 
 		return confs;

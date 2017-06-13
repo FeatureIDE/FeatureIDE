@@ -49,6 +49,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -139,11 +140,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		root.appendChild(calculations);
-		calculations.setAttribute(CALCULATE_AUTO, "" + object.getAnalyser().runCalculationAutomatically);
-		calculations.setAttribute(CALCULATE_FEATURES, "" + object.getAnalyser().calculateFeatures);
-		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + object.getAnalyser().calculateConstraints);
-		calculations.setAttribute(CALCULATE_REDUNDANT, "" + object.getAnalyser().calculateRedundantConstraints);
-		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + object.getAnalyser().calculateTautologyConstraints);
+		calculations.setAttribute(CALCULATE_AUTO, "" + ProjectManager.getAnalyzer(object).runCalculationAutomatically);
+		calculations.setAttribute(CALCULATE_FEATURES, "" + ProjectManager.getAnalyzer(object).calculateFeatures);
+		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + ProjectManager.getAnalyzer(object).calculateConstraints);
+		calculations.setAttribute(CALCULATE_REDUNDANT, "" + ProjectManager.getAnalyzer(object).calculateRedundantConstraints);
+		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + ProjectManager.getAnalyzer(object).calculateTautologyConstraints);
 
 		root.appendChild(comments);
 		for (final String comment : object.getProperty().getComments()) {
@@ -351,15 +352,15 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					final String nodeName = node.getNodeName();
 					final boolean value = node.getNodeValue().equals(TRUE);
 					if (nodeName.equals(CALCULATE_AUTO)) {
-						object.getAnalyser().runCalculationAutomatically = value;
+						ProjectManager.getAnalyzer(object).runCalculationAutomatically = value;
 					} else if (nodeName.equals(CALCULATE_CONSTRAINTS)) {
-						object.getAnalyser().calculateConstraints = value;
+						ProjectManager.getAnalyzer(object).calculateConstraints = value;
 					} else if (nodeName.equals(CALCULATE_REDUNDANT)) {
-						object.getAnalyser().calculateRedundantConstraints = value;
+						ProjectManager.getAnalyzer(object).calculateRedundantConstraints = value;
 					} else if (nodeName.equals(CALCULATE_FEATURES)) {
-						object.getAnalyser().calculateFeatures = value;
+						ProjectManager.getAnalyzer(object).calculateFeatures = value;
 					} else if (nodeName.equals(CALCULATE_TAUTOLOGY)) {
-						object.getAnalyser().calculateTautologyConstraints = value;
+						ProjectManager.getAnalyzer(object).calculateTautologyConstraints = value;
 					} else {
 						throwError("Unknown calculations attribute: " + nodeName, e);
 					}

@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -108,9 +109,9 @@ public class QuickFixUnusedFeaturesTest {
 	@Test
 	public void createConfigurationsTest() {
 		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
-		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
-		final Collection<IFeature> dead = fm.getAnalyser().getDeadFeatures();
-		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
+		final Collection<IFeature> core = ProjectManager.getAnalyzer(fm).getCoreFeatures();
+		final Collection<IFeature> dead = ProjectManager.getAnalyzer(fm).getDeadFeatures();
+		final Collection<String> falseOptionalFeatures = new LinkedList<>();
 
 		for (IFeature feature : concrete) {
 			if (!core.contains(feature) && !dead.contains(feature)) {

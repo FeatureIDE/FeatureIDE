@@ -24,8 +24,9 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -46,7 +47,7 @@ public class CNFFormat implements IFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
+		final Node nodes = Nodes.convert(CNFCreator.createNodes(featureModel));		
 		final StringBuilder cnf = new StringBuilder();
 		cnf.append("Logical Symbols:\r\n");
 		cnf.append(nodes.toString(NodeWriter.logicalSymbols));

@@ -79,6 +79,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IBuilderMarkerHandler;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
@@ -90,7 +91,9 @@ import de.ovgu.featureide.core.job.ModelScheduleRule;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -100,6 +103,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -122,7 +126,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Tom Brosch
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class FeatureProject extends BuilderMarkerHandler implements IFeatureProject, IResourceChangeListener {
+public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject implements IFeatureProject, IResourceChangeListener, IBuilderMarkerHandler {
 
 	private static final CorePlugin LOGGER = CorePlugin.getDefault();
 
@@ -281,14 +285,20 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							break;
 						}
 					}
-					if(addedFeatures < 10 && addedFeatures > 0)
-					{
-						message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ")+2);						
+					if (addedFeatures < 10 && addedFeatures > 0) {
+						message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ") + 2);
 					}
 
 					return message.toString();
 				}
 			});
+	
+	private static FeatureModelManager getFeatureModelManager(IProject project) {
+		ModelMarkerHandler<IFile> modelFile = (project.getFile("mpl.velvet").exists()) ? new ModelMarkerHandler<>(project.getFile("mpl.velvet"))
+				: new ModelMarkerHandler<>(project.getFile("model.xml"));
+
+		return FeatureModelManager.getInstance(Paths.get(modelFile.getModelFile().getLocationURI()));
+	}
 
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,
@@ -298,7 +308,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 *            the FeatureIDE project
 	 */
 	public FeatureProject(IProject aProject) {
-		super(aProject);
+		super(getFeatureModelManager(aProject));
 		project = aProject;
 
 		try {
@@ -540,7 +550,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					configurationUpdate = true;
 					configFolder.accept(new IResourceVisitor() {
 						private final String suffix = "." + composer.getConfigurationExtension();
-						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
+						private final Configuration config = new Configuration(model);
 						private final FileHandler<Configuration> handler = new FileHandler<>(config);
 
 						@Override
@@ -860,8 +870,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		try {
 			List<IFile> configs = getAllConfigurations();
 			IResourceDelta configurationDelta = event.getDelta().findMember(configFolder.getFullPath());
-			if(configurationDelta != null)
-			{
+			if (configurationDelta != null) {
 				for (IResourceDelta delta : configurationDelta.getAffectedChildren(IResourceDelta.REMOVED)) {
 					CorePlugin.getDefault().logInfo(delta.toString() + " was removed.");
 					//if configuration was removed update warnings
@@ -1039,7 +1048,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
 				workMonitor.setRemainingWork(2);
-				final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
+				final Configuration config = new Configuration(featureModelManager.getObject());
 				final FileHandler<Configuration> reader = new FileHandler<>(config);
 				try {
 					IMonitor subTask = workMonitor.subTask(1);
@@ -1056,7 +1065,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					for (IFile file : files) {
 						subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
 						reader.read(Paths.get(file.getLocationURI()), ConfigurationManager.getFormat(file.getName()));
-						if (!config.isValid()) {
+						final ConfigurationPropagator propagator = de.ovgu.featureide.fm.core.FeatureProject.getPropagator(config, true);
+						if (!LongRunningWrapper.runMethod(propagator.isValid())) {
 							String name = file.getName();
 							name = name.substring(0, name.lastIndexOf('.'));
 							String message = CONFIGURATION_ + name + IS_INVALID;
@@ -1135,7 +1145,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final List<IFile> configurations = getAllConfigurations();
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
-		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT);
+		final Configuration configuration = new Configuration(featureModelManager.getObject());
 		final FileHandler<Configuration> reader = new FileHandler<>(configuration);
 
 		int row = 0;
@@ -1149,7 +1159,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			int column = 0;
 			for (String feature : concreteFeatures) {
-				final SelectableFeature selectablefeature = configuration.getSelectablefeature(feature);
+				final SelectableFeature selectablefeature = configuration.getSelectableFeature(feature);
 				if (selectablefeature != null) {
 					currentRow[column] = selectablefeature.getSelection() == Selection.SELECTED;
 				}
@@ -1162,11 +1172,13 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private Collection<String> getOptionalConcreteFeatures() {
 		final IFeatureModel featureModel = featureModelManager.getObject();
 		final Collection<String> concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
-		List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		for (final IFeature feature : deadCoreList.get(0)) {
+		final FeatureModelAnalyzer analyzer = ProjectManager.getAnalyzer(featureModel);
+		final List<IFeature> coreList = analyzer.getCoreFeatures();
+		final List<IFeature> deadList = analyzer.getDeadFeatures();
+		for (final IFeature feature : coreList) {
 			concreteFeatures.remove(feature.getName());
 		}
-		for (final IFeature feature : deadCoreList.get(1)) {
+		for (final IFeature feature : deadList) {
 			concreteFeatures.remove(feature.getName());
 		}
 		return concreteFeatures;
@@ -1482,4 +1494,21 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	public FeatureModelManager getFeatureModelManager() {
 		return featureModelManager;
 	}
+
+	public void createBuilderMarker(IResource resource, String message, int lineNumber, int severity) {
+		EclipseMarkerHandler.createBuilderMarker((resource != null) ? resource : project, message, lineNumber, severity);
+	}
+
+	public void deleteBuilderMarkers(IResource resource, int depth) {
+		EclipseMarkerHandler.deleteBuilderMarkers(resource, depth);
+	}
+
+	public void createConfigurationMarker(IResource resource, String message, int lineNumber, int severity) {
+		EclipseMarkerHandler.createConfigurationMarker(resource, message, lineNumber, severity);
+	}
+
+	public void deleteConfigurationMarkers(IResource resource, int depth) {
+		EclipseMarkerHandler.deleteConfigurationMarkers(resource, depth);
+	}
+
 }

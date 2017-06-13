@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.Logger;
  * 
  * @author Sebastian Krieter
  */
+@Deprecated
 public class SimpleSatSolver extends SatSolver {
 
 	final byte[] b;

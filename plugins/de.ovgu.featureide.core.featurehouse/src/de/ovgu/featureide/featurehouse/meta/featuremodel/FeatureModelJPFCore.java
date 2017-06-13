@@ -34,6 +34,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -86,9 +87,8 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 		}
 
 		final ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
-		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		coreFeatures = deadCoreList.get(0);
-		deadFeatures = deadCoreList.get(1);
+		coreFeatures = ProjectManager.getAnalyzer(featureModel).getCoreFeatures();
+		deadFeatures = ProjectManager.getAnalyzer(featureModel).getDeadFeatures();
 		fields.append(NEWLINE + "\t/**" + NEWLINE 
 				+ "\t * Core features are set 'selected' and dead features 'unselected'." + NEWLINE 
 				+ "\t * All other features have unknown selection states." + NEWLINE 

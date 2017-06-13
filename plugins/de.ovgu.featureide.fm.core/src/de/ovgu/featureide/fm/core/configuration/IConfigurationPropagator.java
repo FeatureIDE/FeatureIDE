@@ -20,12 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import java.util.LinkedList;
 import java.util.List;
 
-import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
@@ -35,7 +34,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
  */
 public interface IConfigurationPropagator {
 
-	LongRunningMethod<LinkedList<List<String>>> getSolutions(int max) throws TimeoutException;
+	LongRunningMethod<List<List<String>>> getSolutions(int max) throws TimeoutException;
 
 	/**
 	 * Checks that all manual and automatic selections are valid.<br>
@@ -44,10 +43,6 @@ public interface IConfigurationPropagator {
 	 * @return {@code true} if the current selection is a valid configuration
 	 */
 	LongRunningMethod<Boolean> isValid();
-	
-	boolean isLoaded();
-	
-	LongRunningMethod<Void> resolve();
 
 	/**
 	 * Ignores hidden features.
@@ -57,22 +52,28 @@ public interface IConfigurationPropagator {
 
 	LongRunningMethod<Boolean> canBeValid();
 
-	LongRunningMethod<Void> load();
-
-	LongRunningMethod<Void> leadToValidConfiguration(List<SelectableFeature> featureList);
-
-	LongRunningMethod<Void> leadToValidConfiguration(List<SelectableFeature> featureList, int mode);
-
 	/**
 	 * Counts the number of possible solutions.
 	 * 
 	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br>
 	 *         or a negative value (if a timeout occurred) that indicates that there are more solutions than the absolute value
 	 */
-	LongRunningMethod<Long> number(long timeout);
+	LongRunningMethod<Long> number(int timeout);
 
-	LongRunningMethod<List<String>> update(boolean redundantManual, String startFeatureName);
-	
-	LongRunningMethod<List<Node>> findOpenClauses(List<SelectableFeature> featureList);
+	LongRunningMethod<Boolean> update(boolean redundantManual, List<SelectableFeature> featureOrder);
+
+	LongRunningMethod<Boolean> update(boolean redundantManual);
+
+	LongRunningMethod<Boolean> update();
+
+	LongRunningMethod<Boolean> completeRandomly();
+
+	LongRunningMethod<Boolean> completeMin();
+
+	LongRunningMethod<Boolean> completeMax();
+
+	LongRunningMethod<Void> resolve();
+
+	LongRunningMethod<List<LiteralSet>> findOpenClauses(List<SelectableFeature> featureList);
 
 }

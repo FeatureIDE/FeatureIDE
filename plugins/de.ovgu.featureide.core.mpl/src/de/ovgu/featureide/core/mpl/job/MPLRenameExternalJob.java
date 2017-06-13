@@ -67,16 +67,20 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
 @SuppressWarnings(RESTRICTION)
 public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments, Boolean> {
 
-	public static class Arguments extends JobArguments {
+	public static class Arguments implements JobArguments<Boolean> {
 		private final IProject externalProject;
 		private final String prefix;
 		private final IPath srcPath;
 
 		public Arguments(IProject externalProject, String prefix, IPath srcPath) {
-			super(Arguments.class);
 			this.externalProject = externalProject;
 			this.prefix = prefix;
 			this.srcPath = srcPath;
+		}
+
+		@Override
+		public MPLRenameExternalJob createJob() {
+			return new MPLRenameExternalJob(this);
 		}
 	}
 

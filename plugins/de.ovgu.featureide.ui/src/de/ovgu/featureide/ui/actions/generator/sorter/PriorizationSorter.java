@@ -76,7 +76,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	}
 	
 	private BuilderConfiguration createConfiguration(final List<String> solution, int i) {
-		final Configuration configuration = new Configuration(featureModel, false);
+		final Configuration configuration = new Configuration(featureModel);
 		for (final String selection : solution) {
 			configuration.setManual(selection, Selection.SELECTED);
 		}

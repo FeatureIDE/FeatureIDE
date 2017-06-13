@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.Logger;
  * 
  * @author Sebastian Krieter
  */
+@Deprecated
 public class MultiThreadSatSolver {
 
 	private static final class Solver {
@@ -50,7 +51,7 @@ public class MultiThreadSatSolver {
 			solver.newVar(numberOfVars);
 		}
 
-		public boolean isSatisfiable() throws TimeoutException {
+		public boolean hasSolution() throws TimeoutException {
 			return solver.isSatisfiable(backbone);
 		}
 	}
@@ -87,7 +88,7 @@ public class MultiThreadSatSolver {
 
 		if (id == 0) {
 			try {
-				satisfiable = solvers[0].isSatisfiable();
+				satisfiable = solvers[0].hasSolution();
 			} catch (TimeoutException e) {
 				satisfiable = false;
 				Logger.logError(e);
@@ -215,7 +216,7 @@ public class MultiThreadSatSolver {
 
 				solver.backbone.push(-x);
 				try {
-					if (solver.isSatisfiable()) {
+					if (solver.hasSolution()) {
 						solver.backbone.pop();
 						updateModel(solver.solver.model(), varIndex);
 					} else {

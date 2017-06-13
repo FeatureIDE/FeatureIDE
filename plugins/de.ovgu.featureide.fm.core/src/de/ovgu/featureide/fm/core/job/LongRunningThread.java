@@ -34,7 +34,6 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * 
  * @author Sebastian Krieter
  */
-// TODO Change to Runnable so it can be started more than once
 // TODO Implement prioritization
 public class LongRunningThread<T> extends Thread implements IRunner<T> {
 	protected final List<JobFinishListener<T>> listenerList = new LinkedList<>();

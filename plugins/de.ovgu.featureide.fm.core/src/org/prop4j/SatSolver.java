@@ -58,6 +58,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * 
  * @author Thomas Thuem
  */
+@Deprecated
 public class SatSolver {
 
 	public static enum ValueType {
@@ -442,7 +443,7 @@ public class SatSolver {
 	 * @return true if the formula is satisfiable
 	 * @throws TimeoutException
 	 */
-	public boolean isSatisfiable() throws TimeoutException {
+	public boolean hasSolution() throws TimeoutException {
 		return !contradiction && solver.isSatisfiable();
 	}
 

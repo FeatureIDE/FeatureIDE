@@ -51,7 +51,7 @@ public class BFeatureModelAnalyzer {
 	 * Analyzes the model completely.
 	 */
 	private static void analyze(final int i) {
-		getFM(i).getAnalyser().analyzeFeatureModel(null);
+		ProjectManager.getAnalyzer(getFM(i)).analyzeFeatureModel(null);
 	}
 
 	@Test (timeout=6000) // 0.749s @ i5(3,3GHz)
@@ -113,7 +113,7 @@ public class BFeatureModelAnalyzer {
 	 * Analyzes constraints only
 	 */
 	private void BUpdateConstraints(final int i) {
-		getFM(i).getAnalyser().updateConstraints();
+		ProjectManager.getAnalyzer(getFM(i)).updateConstraints();
 	}
 	
 	@Test (timeout=2500) // 0.509 @ i5(3,3GHz)
@@ -175,7 +175,7 @@ public class BFeatureModelAnalyzer {
 	 * Analyzes features only
 	 */
 	private void BUpdateFeatures(final int i) {
-		getFM(i).getAnalyser().updateFeatures();
+		ProjectManager.getAnalyzer(getFM(i)).updateFeatures();
 	}
 	
 	@Test (timeout=1000) // 0.053s @ i5(3,3GHz)

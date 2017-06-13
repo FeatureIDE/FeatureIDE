@@ -23,13 +23,13 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
@@ -59,72 +59,21 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 	 * @param featureName The feature to build
 	 */
 	private void buildModule(IFeatureProject featureProject, IMonitor monitor, String featureName) {
+		final Configuration configuration = new Configuration(featureModel);
+		final ConfigurationPropagator c = FeatureProject.getPropagator(configuration, true);
+		
 		// create a configuration where the feature is selected
-		Configuration configuration = new Configuration(featureModel, true);
-		boolean success = createValidConfiguration(configuration, featureName, Selection.SELECTED);
-		if (success) {
+		configuration.setManual(featureName, Selection.SELECTED);
+		if (LongRunningWrapper.runMethod(c.completeRandomly())) {
 			builder.addConfiguration(new BuilderConfiguration(configuration, featureName));
 		}
-		
 
-		for (IFeature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
-			if (coreFeature.getName().equals(featureName)) {
-				builder.configurationNumber = 1;
-				return;
-			}
-		}
-		// create a configuration without the feature
-		configuration = new Configuration(featureModel, true);
-		if (configuration.getSelectablefeature(featureName).getAutomatic() != Selection.UNDEFINED) {
-			return;
-		}
-		createValidConfiguration(configuration, featureName, Selection.UNSELECTED);
-		if (success) {
+		// create a configuration where the feature is unselected
+		configuration.resetValues();
+		configuration.setManual(featureName, Selection.UNSELECTED);
+		if (LongRunningWrapper.runMethod(c.completeRandomly())) {
 			builder.addConfiguration(new BuilderConfiguration(configuration, NOT_ + featureName));
 		}
 	}
 	
-	/**
-	 * Selects features to create a valid configuration.
-	 * @param featureName 
-	 * @param selection 
-	 */
-	private boolean createValidConfiguration(Configuration configuration, String featureName, Selection selection) {
-		configuration.setManual(featureName, selection);
-		for (SelectableFeature feature : configuration.getFeatures()) {
-			if (feature.getName().equals(featureName)) {
-				continue;
-			}
-			if (configuration.isValid()) {
-				break;
-			}
-			SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
-			if (selectableFeature.getSelection() == Selection.UNDEFINED) {
-				configuration.setManual(selectableFeature, Selection.SELECTED);
-			}
-		}
-		boolean canDeselect = true;
-		while (canDeselect) {
-			canDeselect = false;
-			for (IFeature feature : configuration.getSelectedFeatures()) {
-				if (feature.getName().equals(featureName)) {
-					continue;
-				}
-				SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
-				try {
-					if (selectableFeature.getAutomatic() == Selection.UNDEFINED && selectableFeature.getManual() == Selection.SELECTED) {
-						configuration.setManual(selectableFeature, Selection.UNDEFINED);
-						if (!configuration.isValid()) {
-							configuration.setManual(selectableFeature, Selection.SELECTED);
-						} else {
-							canDeselect = true;
-						}
-					}
-				} catch (Exception e) {
-					UIPlugin.getDefault().logError(e);
-				}
-			}
-		}
-		return configuration.isValid();
-	}
 }

@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONS
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -38,22 +39,22 @@ public class ConstrainsCalculationsAction extends Action {
 	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_CONSTRAINT_ERRORS);
 		this.featureModel = featureModel;
-		setChecked(featureModel.getAnalyser().calculateConstraints);
+		setChecked(ProjectManager.getAnalyzer(featureModel).calculateConstraints);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.getAnalyser().calculateConstraints) {
-			featureModel.getAnalyser().calculateConstraints = false;
-			featureModel.getAnalyser().calculateRedundantConstraints = false;
-			featureModel.getAnalyser().calculateTautologyConstraints = false;
+		if (ProjectManager.getAnalyzer(featureModel).calculateConstraints) {
+			ProjectManager.getAnalyzer(featureModel).calculateConstraints = false;
+			ProjectManager.getAnalyzer(featureModel).calculateRedundantConstraints = false;
+			ProjectManager.getAnalyzer(featureModel).calculateTautologyConstraints = false;
 		} else {
-			featureModel.getAnalyser().calculateConstraints = true;
-			featureModel.getAnalyser().calculateFeatures = true;
-			featureModel.getAnalyser().calculateRedundantConstraints = true;
-			featureModel.getAnalyser().calculateTautologyConstraints = true;
-			featureModel.getAnalyser().calculateDeadConstraints = true;
-			featureModel.getAnalyser().calculateFOConstraints = true;
+			ProjectManager.getAnalyzer(featureModel).calculateConstraints = true;
+			ProjectManager.getAnalyzer(featureModel).calculateFeatures = true;
+			ProjectManager.getAnalyzer(featureModel).calculateRedundantConstraints = true;
+			ProjectManager.getAnalyzer(featureModel).calculateTautologyConstraints = true;
+			ProjectManager.getAnalyzer(featureModel).calculateDeadConstraints = true;
+			ProjectManager.getAnalyzer(featureModel).calculateFOConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}

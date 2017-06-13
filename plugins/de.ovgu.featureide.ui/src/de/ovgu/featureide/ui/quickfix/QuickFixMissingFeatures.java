@@ -32,10 +32,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 
 /**
@@ -64,7 +65,7 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 		};
 		job.schedule();
 	}
-	
+
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IProgressMonitor monitor) {
 		monitor.beginTask(CREATE_CONFIGURATIONS_FOR, unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
@@ -73,54 +74,21 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 			if (monitor.isCanceled()) {
 				break;
 			}
-			final Configuration configuration = new Configuration(featureModel, true);
+			final Configuration configuration = new Configuration(featureModel);
+			final ConfigurationPropagator c = FeatureProject.getPropagator(configuration, true);
 			for (final String feature : unusedFeatures) {
-				if (configuration.getSelectablefeature(feature).getSelection() == Selection.UNDEFINED) {
+				if (configuration.getSelectableFeature(feature).getSelection() == Selection.UNDEFINED) {
 					configuration.setManual(feature, Selection.SELECTED);
-					
+					LongRunningWrapper.runMethod(c.update());
 				}
+				monitor.worked(1);
 			}
+
 			if (monitor.isCanceled()) {
 				break;
 			}
-			for (final IFeature feature : configuration.getSelectedFeatures()) {
-				if (unusedFeatures.remove(feature.getName())) {
-					monitor.worked(1);	
-				}
-			}
-			
-			// select further features to get a valid configuration
-			final List<SelectableFeature> features = new LinkedList<SelectableFeature>();
-			for (final SelectableFeature feature : configuration.getFeatures()) {
-				if (configuration.isValid()) {
-					break;
-				}
-				if (feature.getSelection() == Selection.UNDEFINED) {
-					configuration.setManual(feature, Selection.SELECTED);
-					features.add(feature);
-				}
-			}
-			
-			// deselect unneccessary features
-			boolean unselected = true;
-			final List<SelectableFeature> unselectedFeatures = new LinkedList<SelectableFeature>(); 
-			while (unselected) {
-				unselected = false;
-				unselectedFeatures.clear();
-				for (final SelectableFeature feature : features) {
-					if (feature.getAutomatic() == Selection.UNDEFINED) {
-						configuration.setManual(feature, Selection.UNSELECTED);
-						if (!configuration.isValid()) {
-							configuration.setManual(feature, Selection.SELECTED);
-							break;
-						}
-						unselectedFeatures.add(feature);
-						unselected = true;
-					}
-				}
-				features.removeAll(unselectedFeatures);
-			}
-			
+			LongRunningWrapper.runMethod(c.completeMin());
+
 			confs.add(configuration);
 		}
 		return confs;

@@ -7,6 +7,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR_A
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
 
 import java.io.File;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,7 +15,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -233,11 +233,11 @@ public class CPPComposer extends PPComposerExtensionClass {
 	}
 
 	synchronized private void processLinesOfFile(Vector<String> lines, IFile res) {
-		expressionStack = new Stack<Node>();
+		expressionStack = new ArrayDeque<>();
 
 		// count of if, ifelse and else to remove after processing of else from
 		// stack
-		ifelseCountStack = new Stack<Integer>();
+		ifelseCountStack = new ArrayDeque<>();
 
 		// go line for line
 		for (int j = 0; j < lines.size(); ++j) {
@@ -268,14 +268,14 @@ public class CPPComposer extends PPComposerExtensionClass {
 						ifelseCountStack.push(0);
 					}
 
-					if (!ifelseCountStack.empty() && !line.contains("#else"))
+					if (!ifelseCountStack.isEmpty() && !line.contains("#else"))
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 
 					setMarkersContradictionalFeatures(line, res, j + 1);
 
 					setMarkersNotConcreteFeatures(line, res, j + 1);
 				} else if (line.contains("#endif")) {
-					while (!ifelseCountStack.empty()) {
+					while (!ifelseCountStack.isEmpty()) {
 						if (ifelseCountStack.peek() == 0)
 							break;
 
@@ -285,7 +285,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 						ifelseCountStack.push(ifelseCountStack.pop() - 1);
 					}
 
-					if (!ifelseCountStack.empty())
+					if (!ifelseCountStack.isEmpty())
 						ifelseCountStack.pop();
 				}
 			}

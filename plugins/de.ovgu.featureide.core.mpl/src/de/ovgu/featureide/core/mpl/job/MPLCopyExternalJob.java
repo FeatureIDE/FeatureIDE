@@ -39,14 +39,18 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  */
 public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments, Boolean> {
 	
-	public static class Arguments extends JobArguments {
+	public static class Arguments implements JobArguments<Boolean> {
 		private final IFolder srcFolder;
 		private final IFolder destFolder;
 		
 		public Arguments(IFolder srcFolder, IFolder destFolder) {
-			super(Arguments.class);
 			this.srcFolder = srcFolder;
 			this.destFolder = destFolder;
+		}
+
+		@Override
+		public MPLCopyExternalJob createJob() {
+			return new MPLCopyExternalJob(this);
 		}
 	}
 	

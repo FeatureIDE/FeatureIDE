@@ -66,9 +66,8 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.fm.core.annotation.LogService;
-import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Assigns color annotations to the editor.
@@ -367,7 +366,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			try {
 				lines.add(document.get(document.getLineOffset(i), document.getLineLength(i)));
 			} catch (BadLocationException e) {
-				LogService.getInstance().log(LogLevel.DEBUG, e.getMessage());
+				UIPlugin.getDefault().logError(e);
 			}
 		}
 
@@ -592,7 +591,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 					overViewLength = 0;
 				}
 			} catch (BadLocationException e) {
-				LogService.getInstance().log(LogLevel.DEBUG, e.getMessage());
+				UIPlugin.getDefault().logError(e);
 			}
 		}
 

@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public abstract class AProjectJob<T extends JobArguments, R> implements LongRunningMethod<R> {
+public abstract class AProjectJob<T extends JobArguments<?>, R> implements LongRunningMethod<R> {
 
 	protected final T arguments;
 	

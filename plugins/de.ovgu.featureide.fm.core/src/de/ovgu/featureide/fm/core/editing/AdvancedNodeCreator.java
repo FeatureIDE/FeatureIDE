@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.editing;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -29,18 +28,13 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
-import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
@@ -72,51 +66,14 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return nodeCreator.createNodes();
 	}
 
-	public static SatInstance createSatInstance(IFeatureModel featureModel) {
-		return createSatInstance(new AdvancedNodeCreator(featureModel));
-	}
-
-	public static SatInstance createSatInstance(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
-		return createSatInstance(new AdvancedNodeCreator(featureModel, featureFilter));
-	}
-
-	public static SatInstance createSatInstance(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
-		return createSatInstance(new AdvancedNodeCreator(featureModel, excludedFeatureNames));
-	}
-
-	private static SatInstance createSatInstance(AdvancedNodeCreator nodeCreator) {
-		nodeCreator.setCnfType(CNFType.Regular);
-		nodeCreator.setIncludeBooleanValues(false);
-		return new SatInstance(nodeCreator.createNodes());
-	}
-
 	public static Node createNodes(IFeatureModel featureModel) {
 		return new AdvancedNodeCreator(featureModel).createNodes();
-	}
-
-	public static Node createNodes(IFeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
-			boolean includeBooleanValues) {
-		return new AdvancedNodeCreator(featureModel, excludedFeatureNames, cnfType, modelType, includeBooleanValues).createNodes();
-	}
-
-	public static Node createNodes(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType,
-			boolean includeBooleanValues) {
-		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
-	}
-
-	private Literal getVariable(IFeature feature, boolean positive) {
-		final String oldName = useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
-		return new Literal(oldName, positive);
 	}
 
 	private CNFType cnfType = CNFType.None;
 
 	private ModelType modelType = ModelType.All;
 
-	/**
-	 * Specifies whether the literals <b>True</b> and <b>False</b> should be included in the created formula.</br>
-	 * Default values is {@code true} (values will be included).
-	 */
 	private boolean includeBooleanValues = true;
 
 	private boolean useOldNames = true;
@@ -125,8 +82,6 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	private IFeatureModel featureModel = null;
 
-	private Collection<String> excludedFeatureNames = null;
-
 	public AdvancedNodeCreator() {
 	}
 
@@ -134,28 +89,16 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		setFeatureModel(featureModel);
 	}
 
-	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
-		setFeatureModel(featureModel, featureFilter);
-	}
-
-	public AdvancedNodeCreator(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
-		setFeatureModel(featureModel, excludedFeatureNames);
-	}
-
-	public AdvancedNodeCreator(IFeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
-			boolean includeBooleanValues) {
+	public AdvancedNodeCreator(IFeatureModel featureModel, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
 		this.cnfType = cnfType;
 		this.modelType = modelType;
 		this.includeBooleanValues = includeBooleanValues;
-		setFeatureModel(featureModel, excludedFeatureNames);
+		setFeatureModel(featureModel);
 	}
 
-	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType,
-			boolean includeBooleanValues) {
-		this.cnfType = cnfType;
-		this.modelType = modelType;
-		this.includeBooleanValues = includeBooleanValues;
-		setFeatureModel(featureModel, featureFilter);
+	private Literal getVariable(IFeature feature, boolean positive) {
+		final String oldName = useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
+		return new Literal(oldName, positive);
 	}
 
 	private And createConstraintNodes() {
@@ -205,10 +148,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		}
 
 		monitor.setRemainingWork(10);
-		final Node[] basicFormula = createFormula(monitor.subTask(1));
-		final Node newFormula = removeFeatures(basicFormula, monitor.subTask(9));
-
-		return newFormula;
+		return new And(createFormula(monitor.subTask(1)));
 	}
 
 	private Node[] createFormula(IMonitor monitor) {
@@ -262,15 +202,6 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		monitor.step();
 
 		return nodeArray;
-	}
-
-	private Node removeFeatures(final Node[] nodeArray, IMonitor monitor) {
-		if (excludedFeatureNames != null && !excludedFeatureNames.isEmpty()) {
-			final FeatureRemover remover = new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular);
-			return remover.createNewClauseList(LongRunningWrapper.runMethod(remover, monitor));
-		} else {
-			return new And(nodeArray);
-		}
 	}
 
 	private And createStructuralNodes() {
@@ -345,10 +276,6 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return cnfType;
 	}
 
-	public Collection<String> getExcludedFeatureNames() {
-		return excludedFeatureNames;
-	}
-
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
@@ -376,17 +303,6 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public void setFeatureModel(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
-		this.excludedFeatureNames = null;
-	}
-
-	public void setFeatureModel(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
-		this.featureModel = featureModel;
-		this.excludedFeatureNames = Functional.mapToStringList(Functional.filter(featureModel.getFeatures(), featureFilter));
-	}
-
-	public void setFeatureModel(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
-		this.featureModel = featureModel;
-		this.excludedFeatureNames = excludedFeatureNames;
 	}
 
 	/**

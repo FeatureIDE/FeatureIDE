@@ -107,7 +107,7 @@ public abstract class ExplanationCreator {
 	/**
 	 * Sets the formula representation of the feature model in CNF (conjunctive normal form).
 	 * Also removes all clauses containing closed literals (true and false) 
-	 * @param cnf formula representation of the feature model in CNF
+	 * @param newCNF formula representation of the feature model in CNF
 	 * @throws IllegalArgumentException if the given formula is not in CNF
 	 */
 	protected void setCNF(Node cnf) throws IllegalArgumentException {
@@ -140,7 +140,7 @@ public abstract class ExplanationCreator {
 	 * Returns a copy of the given CNF without tautologies.
 	 * {@link NodeCreator} creates closed literals (true and false) during elimination of abstract variables.
 	 * Clauses containing such literals can be removed as they do not change the semantics of the formula.
-	 * @param cnf formula in CNF; not null
+	 * @param newCNF formula in CNF; not null
 	 * @return a copy of the given CNF without tautologies; not null
 	 */
 	private static Node removeTautologies(Node cnf) {

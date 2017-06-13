@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -50,7 +51,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.sat4j.specs.TimeoutException;
 
@@ -82,12 +82,15 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.ProjectManager;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -475,27 +478,27 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									if (checkForIllegitimateMethodRefinement(m, mm)) {
 										List<IFeature> finalMethodList = new LinkedList<IFeature>();
 										finalMethodList.add(featureRole2);
-										if (!featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(featureRole1, finalMethodList))
+										if (!ProjectManager.getAnalyzer(featureModel).checkIfFeatureCombinationNotPossible(featureRole1, finalMethodList))
 											setContractErrorMarker(m, "keyword \"\\final_method\" found but possibly later refinement.");
 									}
 
 									if (checkForIllegitimateContract(m, mm)) {
 										List<IFeature> finalContractList = new LinkedList<IFeature>();
 										finalContractList.add(featureRole2);
-										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(factory.createFeature(featureModel, r.getFeature().getName()), finalContractList))
+										if (mm.getCompKey().contains(FINAL_CONTRACT) && !ProjectManager.getAnalyzer(featureModel).checkIfFeatureCombinationNotPossible(factory.createFeature(featureModel, r.getFeature().getName()), finalContractList))
 											setContractErrorMarker(m, "keyword \"\\final_contract\" found but possibly later contract refinement.");
 									}
 
 									if (checkForIllegitimaterefinement(m, mm)) {
 										LinkedList<IFeature> treeDependencyList = new LinkedList<IFeature>();
 										treeDependencyList.add(featureRole2);
-										if (!featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(featureRole1, treeDependencyList))
+										if (!ProjectManager.getAnalyzer(featureModel).checkIfFeatureCombinationNotPossible(featureRole1, treeDependencyList))
 											setContractErrorMarker(m, "Contract with composition keyword " + mm.getCompKey() + " possibily illegitimately redefined with keyword " + m.getCompKey() + ".");
 									}
 
 								}
 							}
-							if (m.getContract().contains(ORIGINAL) && !(!originalList.isEmpty() ? featureModel.getAnalyser().checkImplies(currentFeatureList, originalList) : false))
+							if (m.getContract().contains(ORIGINAL) && !(!originalList.isEmpty() ? ProjectManager.getAnalyzer(featureModel).checkImplies(currentFeatureList, originalList) : false))
 								setContractErrorMarker(m, "keyword \"\\original\" found but no mandatory previous introduction.");
 						}
 					}
@@ -593,7 +596,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		Collection<String> featureOrderList = featureModel.getFeatureOrderList();
 		// dead features should not be composed
 		LinkedList<String> deadFeatures = new LinkedList<String>();
-		for (IFeature deadFeature : featureModel.getAnalyser().getDeadFeatures()) {
+		for (IFeature deadFeature : ProjectManager.getAnalyzer(featureModel).getDeadFeatures()) {
 			deadFeatures.add(deadFeature.getName());
 		}
 
@@ -630,19 +633,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = new FSTGenComposerExtension();
 		composer.addCompositionErrorListener(compositionErrorListener);
 		try {
+			String input = NodeWriter.nodeToString(Nodes.convert(CNFCreator.createNodes(featureProject.getFeatureModel())), NodeWriter.javaSymbols);
+			input = input.replace("!", "! ");
+			
 			IFile cnfFile = featureProject.getSourceFolder().getFile("model.cnf");
-			Node nodes = AdvancedNodeCreator.createCNF(featureProject.getFeatureModel());
-			String input = nodes.toString(NodeWriter.javaSymbols);
-			input = input.replaceAll("!", "! ");
-			InputStream cnfSource = new ByteArrayInputStream(input.getBytes(Charset.availableCharsets().get("UTF-8")));
 			try {
-				if (cnfFile.exists()) {
-					cnfFile.setContents(cnfSource, false, true, null);
-				} else {
-					cnfFile.create(cnfSource, true, null);
-				}
-				cnfFile.setDerived(true);
-			} catch (CoreException e) {
+				FileSystem.write(Paths.get(cnfFile.getLocationURI()), input);
+				cnfFile.setDerived(true, null);
+			} catch (IOException e) {
 				LOGGER.logError(e);
 			}
 
@@ -730,7 +728,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		Program ast = null;
 		try {
 			final IFeatureModel fm = featureProject.getFeatureModel();
-			fm.getAnalyser().setDependencies();
+//			fm.getAnalyser().setDependencies();
 
 			final Main fuji = new Main(fujiOptions, fm, null);
 

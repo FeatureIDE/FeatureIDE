@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -102,11 +103,11 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		boolean isCoreFeature = false;
 		// feature model slicing 
 		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, completeFm, subtreeFeatures, true);
-		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
-		IFeatureModel slicedModel = slice.sliceModel(completeFm, subtreeFeatures, new NullMonitor()).clone(); // returns new feature model
+		SliceFeatureModelJob slice = arguments.createJob();
+		IFeatureModel slicedModel = slice.sliceModel(new NullMonitor()).clone(); // returns new feature model
 		
 		// only replace root with selected feature if feature is core-feature
-		List<IFeature> coreFeatures = completeFm.getAnalyser().getCoreFeatures();
+		List<IFeature> coreFeatures = ProjectManager.getAnalyzer(completeFm).getCoreFeatures();
 		if (coreFeatures.contains(subtreeRoot)) {
 			isCoreFeature = true;
 		}
@@ -119,7 +120,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		TrayDialog.setDialogHelpAvailable(false);
 		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		dialog.open();
-		completeFm.getAnalyser().clearExplanations();
+		ProjectManager.getAnalyzer(completeFm).clearExplanations();
 		return new FeatureIDEEvent(completeFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);
 	}
 

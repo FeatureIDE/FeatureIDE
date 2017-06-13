@@ -32,9 +32,9 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -96,15 +96,11 @@ public abstract class Generator {
 		fm.getRenamingsManager().performRenamings();
 		return fm;
 	}
-	
+
 	public static void generateConstraints(IFeatureModel fm, Random random, int numberOfConstraints) {
-		boolean valid = true;
-		try {
-			valid = fm.getAnalyser().isValid();
-			if (!valid)
-				Logger.logInfo("Feature model not valid!");
-		} catch (TimeoutException e) {
-			Logger.logError(e);
+		boolean valid = ProjectManager.getAnalyzer(fm).isValid();
+		if (!valid) {
+			Logger.logInfo("Feature model not valid!");
 		}
 		Object[] names = fm.getRenamingsManager().getOldFeatureNames().toArray();
 		int k = 0;
@@ -127,20 +123,14 @@ public abstract class Generator {
 					node = new Not(node);
 			}
 			fm.addConstraint(new Constraint(fm, node));
-			try {
-				if (!valid || fm.getAnalyser().isValid()) {
-					i++;
-					System.out.println("E\t" + i + "\t" + node);
-				}
-				else {
-					fm.getConstraints().remove(new Constraint(fm, node));
-					Logger.logInfo("F\t" + ++k + "\t" + node);
-				}
-			} catch (TimeoutException e) {
-				Logger.logError(e);
-				fm.addConstraint(new Constraint(fm, node));
+			if (!valid || ProjectManager.getAnalyzer(fm).isValid()) {
+				i++;
+				System.out.println("E\t" + i + "\t" + node);
+			} else {
+				fm.getConstraints().remove(new Constraint(fm, node));
+				Logger.logInfo("F\t" + ++k + "\t" + node);
 			}
-		}		
+		}
 	}
 
 	public static IFeatureModel refactoring(IFeatureModel originalFM, long id, int numberOfEdits) {
@@ -317,12 +307,7 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel arbitraryEdits(IFeatureModel originalFM, long id, int numberOfEdits) {
-		boolean valid = false;
-		try {
-			valid = originalFM.getAnalyser().isValid();
-		} catch (TimeoutException e) {
-			Logger.logError(e);
-		}
+		boolean valid = ProjectManager.getAnalyzer(originalFM).isValid();
 		IFeatureModel fm = originalFM.clone(null);
 		IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
 		final Random random = new Random(id);
@@ -404,25 +389,20 @@ public abstract class Generator {
 						break;
 					}
 				}
-			}
-			else {
+			} else {
 				//delete or add constraint
 				if (fm.getConstraints().size() > 0 && random.nextBoolean()) {
 					int index = random.nextInt(fm.getConstraints().size());
 					fm.removeConstraint(index);
-				}
-				else
+				} else {
 					generateConstraints(fm, random, 1);
-			}
-			
-			try {
-				if (valid && !fm.getAnalyser().isValid()) {
-					System.out.println("Void feature model by arbitrary edit	" + r);
-					fm = backup;
-					i--;
 				}
-			} catch (TimeoutException e) {
-				Logger.logError(e);
+			}
+
+			if (valid && !ProjectManager.getAnalyzer(fm).isValid()) {
+				System.out.println("Void feature model by arbitrary edit	" + r);
+				fm = backup;
+				i--;
 			}
 		}
 		return fm;

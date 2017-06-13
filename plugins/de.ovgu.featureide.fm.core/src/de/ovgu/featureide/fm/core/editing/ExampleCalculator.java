@@ -109,7 +109,7 @@ public class ExampleCalculator {
 			exampleSolver = null;
 			return nextExample();
 		}
-		final Configuration configuration = new Configuration(fm, false);
+		final Configuration configuration = new Configuration(fm);
 		final DefaultFormat format = new DefaultFormat();
 
 		format.read(configuration, solution);

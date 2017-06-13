@@ -23,10 +23,13 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -63,17 +66,18 @@ public class ConfigParentNode extends LazyParent {
 		 * @param priority
 		 *            for the job.
 		 */
-		public void calculate(final long timeout, final int priority) {
+		public void calculate(final int timeout, final int priority) {
 			LongRunningMethod<Boolean> job = new TreeJob(this) {
 				private String calculateConfigs() {
-					boolean ignoreAbstract = description.equals(DESC_CONFIGS);
-					if (!ignoreAbstract && innerModel.getAnalyser().countConcreteFeatures() == 0) {
+					boolean includeAbstract = description.equals(DESC_CONFIGS);
+					if (!includeAbstract && ProjectManager.getAnalyzer(innerModel).countConcreteFeatures() == 0) {
 						// case: there is no concrete feature so there is only one program variant,
 						// without this the calculation least much to long
 						return "1";
 					}
 
-					final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout);
+					final ConfigurationPropagator configurationPropagator = new ConfigurationPropagator(new Configuration(innerModel), includeAbstract);
+					final long number = LongRunningWrapper.runMethod(configurationPropagator.number(timeout));
 					
 					return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
 				}

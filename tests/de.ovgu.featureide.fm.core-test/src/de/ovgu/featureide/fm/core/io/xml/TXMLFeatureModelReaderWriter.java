@@ -21,15 +21,12 @@
 package de.ovgu.featureide.fm.core.io.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
 import de.ovgu.featureide.common.Commons;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;

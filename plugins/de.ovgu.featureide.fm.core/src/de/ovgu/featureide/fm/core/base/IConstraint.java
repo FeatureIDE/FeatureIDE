@@ -23,13 +23,11 @@ package de.ovgu.featureide.fm.core.base;
 import java.util.Collection;
 
 import org.prop4j.Node;
-import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.impl.AConstraint;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
-import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * The <code>IConstraint</code> interface represents any class which acts in the sense of a <i>Constraint</i> in FeatureIDE.
@@ -166,7 +164,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * 
 	 * @return A value which indicates how the constraints affects the feature model
 	 */
-	ConstraintAttribute getConstraintAttribute();
+//	ConstraintAttribute getConstraintAttribute();
 
 	/**
 	 * Returns the collection of features contained in the underlying formula of this constraint.
@@ -222,7 +220,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * 
 	 * @return A collection of features which are marked as dead features.
 	 */
-	Collection<IFeature> getDeadFeatures();
+//	Collection<IFeature> getDeadFeatures();
 
 	/**
 	 * Calculates and returns a iterable collection of features which are marked as <i>dead</i> due to the affect of this
@@ -256,7 +254,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @return An iterable over <i>dead</i> features in <code>featureModel</code> caused by this constraint, which are not included in the
 	 *         <code>excludeFeatures</code> collection.
 	 */
-	Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers);
+//	Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers);
 
 	/**
 	 * Returns the parameter of the last {@link #setFalseOptionalFeatures(IFeatureModel, Collection)} call, or <code>null</code> if
@@ -282,7 +280,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * 
 	 * @return A collection of features which are marked as dead features.
 	 */
-	Collection<IFeature> getFalseOptional();
+//	Collection<IFeature> getFalseOptional();
 
 	/**
 	 * @since 3.0
@@ -361,7 +359,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @param attribute The affect caused by this constraint
 	 * @param notifyListeners A flag indicating if listeners should be notified about this change
 	 */
-	void setConstraintAttribute(ConstraintAttribute attribute, boolean notifyListeners);
+//	void setConstraintAttribute(ConstraintAttribute attribute, boolean notifyListeners);
 
 	/**
 	 * Calculates and caches the collection of contained features in this constraint.
@@ -377,7 +375,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * 
 	 * @since 3.0
 	 */
-	void setContainedFeatures();
+//	void setContainedFeatures();
 
 	/**
 	 * Sets the collection of <i>dead</i> features caused by this constraint to the values stored
@@ -397,7 +395,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * 
 	 * @param deadFeatures iterable of features which are claimed to be dead
 	 */
-	void setDeadFeatures(Iterable<IFeature> deadFeatures);
+//	void setDeadFeatures(Iterable<IFeature> deadFeatures);
 
 	/**
 	 * Calculates and sets the collections of <i>false optional</i> features in <code>featureModel</code> caused by this constraint.
@@ -427,7 +425,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @param collection A set containing features. Elements in <code>collection</code> are removed, if they are marked as <i>false optional</i> during this method call.
 	 * @return <b>true</b> if this constraint affects a least one feature to be <i>false optional</i>, <b>false</b> otherwise.
 	 */
-	boolean setFalseOptionalFeatures(IFeatureModel featureModel, Collection<IFeature> collection);
+//	boolean setFalseOptionalFeatures(IFeatureModel featureModel, Collection<IFeature> collection);
 
 	/**
 	 * String representation of the constraint's propositional formula.
@@ -461,6 +459,6 @@ public interface IConstraint extends IFeatureModelElement {
 	 * 
 	 * @param foFeatures iterable of features which are claimed to be falseOptional
 	 */
-	void setFalseOptionalFeatures(Iterable<IFeature> foFeatures);
+//	void setFalseOptionalFeatures(Iterable<IFeature> foFeatures);
 
 }

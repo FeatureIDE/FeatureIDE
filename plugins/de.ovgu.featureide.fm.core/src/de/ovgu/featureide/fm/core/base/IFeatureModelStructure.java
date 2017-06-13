@@ -64,19 +64,19 @@ public interface IFeatureModelStructure {
 
 	void setRoot(IFeatureStructure root);
 
-	boolean hasFalseOptionalFeatures();
-
-	boolean hasUnsatisfiableConstraints();
-
-	boolean hasTautologyConstraints();
-
-	boolean hasDeadConstraints();
-
-	boolean hasVoidModelConstraints();
-
-	boolean hasRedundantConstraints();
-
-	boolean hasDeadFeatures();
+//	boolean hasFalseOptionalFeatures();
+//
+//	boolean hasUnsatisfiableConstraints();
+//
+//	boolean hasTautologyConstraints();
+//
+//	boolean hasDeadConstraints();
+//
+//	boolean hasVoidModelConstraints();
+//
+//	boolean hasRedundantConstraints();
+//
+//	boolean hasDeadFeatures();
 
 	void setShowHiddenFeatures(boolean showHiddenFeatures);
 

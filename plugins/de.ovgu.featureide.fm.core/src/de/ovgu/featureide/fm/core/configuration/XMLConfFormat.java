@@ -27,7 +27,6 @@ import org.w3c.dom.Element;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -49,7 +48,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	public static final String EXTENSION = StringTable.CONF;
 
 	@Override
-	public IPersistentFormat<Configuration> getInstance() {
+	public XMLConfFormat getInstance() {
 		return this;
 	}
 
@@ -75,7 +74,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature = object.getSelectablefeature(featureName);
+					selectablefeature = object.getSelectableFeature(featureName);
 					if (selectablefeature == null) {
 						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;

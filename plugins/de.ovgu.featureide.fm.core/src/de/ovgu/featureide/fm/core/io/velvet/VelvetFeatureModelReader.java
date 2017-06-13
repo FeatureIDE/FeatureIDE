@@ -918,7 +918,6 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			updateConstraintNode(constraintNode, connectorName, instanceRoot.getFeature().getName());
 			ExtendedConstraint newConstraint = factory.createConstraint(extFeatureModel, constraintNode);
 			newConstraint.setType(type);
-			newConstraint.setContainedFeatures();
 			extFeatureModel.addConstraint(newConstraint);
 		}
 	}

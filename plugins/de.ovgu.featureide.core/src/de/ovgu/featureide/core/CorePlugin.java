@@ -45,7 +45,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import javax.annotation.CheckForNull;
 
@@ -71,7 +70,6 @@ import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
-import org.prop4j.Node;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
@@ -101,13 +99,11 @@ import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMComposerManager;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -133,7 +129,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	private HashMap<IProject, IFeatureProject> featureProjectMap;
 
-	private LinkedList<IProjectListener> projectListeners = new LinkedList<IProjectListener>();
+	private LinkedList<IProjectListener> projectListeners = new LinkedList<>();
 
 	private LinkedList<ICurrentConfigurationListener> currentConfigurationListeners = new LinkedList<>();
 
@@ -166,7 +162,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		featureProjectMap = new HashMap<IProject, IFeatureProject>();
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-			try { 
+			try {
 				if (project.isOpen()) {
 					// conversion for old projects
 					IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
@@ -197,8 +193,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @throws CoreException
 	 */
 	private static void changeOldNature(IProject project, String composerID) throws CoreException {
-		CorePlugin.getDefault().logInfo(
-				CHANGE_OLD_NATURE_TO_ + FeatureProjectNature.NATURE_ID + AND_COMPOSER_TO_ + composerID + IN_PROJECT_ + project.getName() + "'");
+		CorePlugin.getDefault()
+				.logInfo(CHANGE_OLD_NATURE_TO_ + FeatureProjectNature.NATURE_ID + AND_COMPOSER_TO_ + composerID + IN_PROJECT_ + project.getName() + "'");
 		IProjectDescription description = project.getDescription();
 		String[] natures = description.getNatureIds();
 		for (int i = 0; i < natures.length; i++)
@@ -289,7 +285,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		IFeatureProject featureProject = featureProjectMap.remove(project);
 		// Quick fix #402 
 		featureProject.dispose();
-		
+
 		logInfo(project.getName() + REMOVED);
 
 		for (IProjectListener listener : projectListeners)
@@ -362,7 +358,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * Starts composer specific changes of the project structure,
 	 * after adding the FeatureIDE nature to a project.
 	 */
-	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath) {
+	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
+			final String buildPath) {
 		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false);
 
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
@@ -701,7 +698,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		if (signatures != null) {
 			SignatureIterator it = signatures.iterator();
 			int featureID = signatures.getFeatureID(featureName);
-			if(featureID == -1){
+			if (featureID == -1) {
 				return Collections.emptyList();
 			}
 			it.addFilter(new ContextFilter(featureName, signatures));
@@ -791,43 +788,36 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void buildContextDocumentation(List<IProject> pl, String options, String featureName) {
-		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
+		final ArrayList<JobArguments<?>> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
-			arguments.add(new PrintDocumentationJob.Arguments("Docu_Context_" + featureName, options.split("\\s+"),
-					new ContextMerger(), featureName, iProject));
+			arguments.add(new PrintDocumentationJob.Arguments("Docu_Context_" + featureName, options.split("\\s+"), new ContextMerger(), featureName, iProject));
 		}
-		FMCorePlugin.getDefault().startJobs(arguments, true);
+		ProjectManager.startJobs(arguments, true);
 	}
 
 	public void buildVariantDocumentation(List<IProject> pl, String options) {
-		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
+		final ArrayList<JobArguments<?>> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
 			arguments.add(new PrintDocumentationJob.Arguments("Docu_Variant", options.split("\\s+"), new VariantMerger(), null, iProject));
 		}
-		FMCorePlugin.getDefault().startJobs(arguments, true);
+		ProjectManager.startJobs(arguments, true);
 	}
 
 	public void buildFeatureDocumentation(List<IProject> pl, String options, String featureName) {
-		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
+		final ArrayList<JobArguments<?>> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
-			arguments.add(new PrintDocumentationJob.Arguments("Docu_Feature_" + featureName, options.split("\\s+"),
-					new FeatureModuleMerger(), featureName, iProject));
+			arguments.add(new PrintDocumentationJob.Arguments("Docu_Feature_" + featureName, options.split("\\s+"), new FeatureModuleMerger(), featureName,
+					iProject));
 		}
-		FMCorePlugin.getDefault().startJobs(arguments, true);
+		ProjectManager.startJobs(arguments, true);
 	}
 
 	public void buildSPLDocumentation(List<IProject> pl, String options) {
-		final ArrayList<JobArguments> arguments = new ArrayList<>(pl.size());
+		final ArrayList<JobArguments<?>> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
 			arguments.add(new PrintDocumentationJob.Arguments("Docu_SPL", options.split("\\s+"), new SPLMerger(), null, iProject));
 		}
-		FMCorePlugin.getDefault().startJobs(arguments, true);
-	}
-	
-	public static Node removeFeatures(IFeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
-		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, removeFeatures);
-		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
-		return nodeCreator.createNodes();
+		ProjectManager.startJobs(arguments, true);
 	}
 
 }

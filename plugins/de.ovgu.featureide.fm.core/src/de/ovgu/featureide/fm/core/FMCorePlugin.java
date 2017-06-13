@@ -26,8 +26,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -51,14 +51,9 @@ import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
-import de.ovgu.featureide.fm.core.job.IProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
-import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -77,17 +72,20 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		
+
 		FileSystem.INSTANCE = new EclipseFileSystem();
 		LongRunningWrapper.INSTANCE = new LongRunningEclipse();
-		
-		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID, IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
-		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID, IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
-		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID, IConfigurationFormat.extensionID, IConfigurationFormat.class));
 
-//		ConfigFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
-//		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));
-//		FMFactoryManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
+		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID,
+				IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
+		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID,
+				IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
+		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID,
+				IConfigurationFormat.extensionID, IConfigurationFormat.class));
+
+		//		ConfigFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
+		//		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));
+		//		FMFactoryManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
 
 		Logger.logger = new EclipseLogger();
 		FMFactoryManager.factoryWorkspaceProvider = new EclipseFactoryWorkspaceProvider();
@@ -107,39 +105,6 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		return plugin;
 	}
 
-	/**
-	 * Creates a {@link IProjectJob} for every project with the given arguments.
-	 * 
-	 * @param projects the list of projects
-	 * @param arguments the arguments for the job
-	 * @param autostart if {@code true} the jobs is started automatically.
-	 * @return the created job or a {@link JobSequence} if more than one project is given.
-	 *         Returns {@code null} if {@code projects} is empty.
-	 */
-	public LongRunningMethod<?> startJobs(List<JobArguments> projects, boolean autostart) {
-		LongRunningMethod<?> ret;
-		switch (projects.size()) {
-		case 0:
-			return null;
-		case 1:
-			LongRunningMethod<?> newJob = projects.get(0).createJob();
-			ret = newJob;
-			break;
-		default:
-			final JobSequence jobSequence = new JobSequence();
-			jobSequence.setIgnorePreviousJobFail(true);
-			for (JobArguments p : projects) {
-				LongRunningMethod<?> newSequenceJob = p.createJob();
-				jobSequence.addJob(newSequenceJob);
-			}
-			ret = jobSequence;
-		}
-		if (autostart) {
-			LongRunningWrapper.getRunner(ret).schedule();
-		}
-		return ret;
-	}
-
 	public void analyzeModel(IFile file) {
 		logInfo(READING_MODEL_FILE___);
 		final IContainer outputDir = file.getParent();
@@ -152,84 +117,78 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			return;
 		}
 
-		final String path = file.getLocation().toString();
-		if (FileManagerMap.hasInstance(path)) {
-			final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(path);
-			if (instance != null) {
-				final IFeatureModel fm = instance.getObject();
-				try {
-					FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
-					fma.analyzeFeatureModel(null);
+		FeatureProject featureProject = ProjectManager.getProject(Paths.get(file.getProject().getLocationURI()));
 
-					final StringBuilder sb = new StringBuilder();
-					sb.append("Number Features: ");
-					sb.append(fm.getNumberOfFeatures());
-					sb.append(" (");
-					sb.append(fma.countConcreteFeatures());
-					sb.append(")\n");
+		final IFeatureModel fm = featureProject.getStatus().getFeatureModel();
+		try {
+			FeatureModelAnalyzer fma = featureProject.getStatus().getAnalyzer();
+			fma.analyzeFeatureModel(null);
 
-					if (fm instanceof ExtendedFeatureModel) {
-						ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
-						int countInherited = 0;
-						int countInstances = 0;
-						for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
-							switch (usedModel.getType()) {
-							case ExtendedFeature.TYPE_INHERITED:
-								countInherited++;
-								break;
-							case ExtendedFeature.TYPE_INSTANCE:
-								countInstances++;
-								break;
-							}
-						}
-						sb.append("Number Instances: ");
-						sb.append(countInstances);
-						sb.append("\n");
-						sb.append("Number Inherited: ");
-						sb.append(countInherited);
-						sb.append("\n");
-					}
+			final StringBuilder sb = new StringBuilder();
+			sb.append("Number Features: ");
+			sb.append(fm.getNumberOfFeatures());
+			sb.append(" (");
+			sb.append(fma.countConcreteFeatures());
+			sb.append(")\n");
 
-					final List<List<IFeature>> unnomralFeature = fma.analyzeFeatures();
-
-					Collection<IFeature> analyzedFeatures = unnomralFeature.get(0);
-					sb.append("Core Features (");
-					sb.append(analyzedFeatures.size());
-					sb.append("): ");
-					for (IFeature coreFeature : analyzedFeatures) {
-						sb.append(coreFeature.getName());
-						sb.append(", ");
+			if (fm instanceof ExtendedFeatureModel) {
+				ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
+				int countInherited = 0;
+				int countInstances = 0;
+				for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
+					switch (usedModel.getType()) {
+					case ExtendedFeature.TYPE_INHERITED:
+						countInherited++;
+						break;
+					case ExtendedFeature.TYPE_INSTANCE:
+						countInstances++;
+						break;
 					}
-					analyzedFeatures = unnomralFeature.get(1);
-					sb.append("\nDead Features (");
-					sb.append(analyzedFeatures.size());
-					sb.append("): ");
-					for (IFeature deadFeature : analyzedFeatures) {
-						sb.append(deadFeature.getName());
-						sb.append(", ");
-					}
-					analyzedFeatures = fma.getFalseOptionalFeatures();
-					sb.append("\nFO Features (");
-					sb.append(analyzedFeatures.size());
-					sb.append("): ");
-					for (IFeature foFeature : analyzedFeatures) {
-						sb.append(foFeature.getName());
-						sb.append(", ");
-					}
-					sb.append("\n");
-
-					final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
-					final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
-					if (outputFile.isAccessible()) {
-						outputFile.setContents(inputStream, false, true, null);
-					} else {
-						outputFile.create(inputStream, true, null);
-					}
-					logInfo(PRINTED_OUTPUT_FILE_);
-				} catch (Exception e) {
-					logError(e);
 				}
+				sb.append("Number Instances: ");
+				sb.append(countInstances);
+				sb.append("\n");
+				sb.append("Number Inherited: ");
+				sb.append(countInherited);
+				sb.append("\n");
 			}
+
+			Collection<IFeature> analyzedFeatures = fma.getCoreFeatures();
+			sb.append("Core Features (");
+			sb.append(analyzedFeatures.size());
+			sb.append("): ");
+			for (IFeature coreFeature : analyzedFeatures) {
+				sb.append(coreFeature.getName());
+				sb.append(", ");
+			}
+			analyzedFeatures = fma.getDeadFeatures();
+			sb.append("\nDead Features (");
+			sb.append(analyzedFeatures.size());
+			sb.append("): ");
+			for (IFeature deadFeature : analyzedFeatures) {
+				sb.append(deadFeature.getName());
+				sb.append(", ");
+			}
+			analyzedFeatures = fma.getFalseOptionalFeatures();
+			sb.append("\nFO Features (");
+			sb.append(analyzedFeatures.size());
+			sb.append("): ");
+			for (IFeature foFeature : analyzedFeatures) {
+				sb.append(foFeature.getName());
+				sb.append(", ");
+			}
+			sb.append("\n");
+
+			final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
+			final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
+			if (outputFile.isAccessible()) {
+				outputFile.setContents(inputStream, false, true, null);
+			} else {
+				outputFile.create(inputStream, true, null);
+			}
+			logInfo(PRINTED_OUTPUT_FILE_);
+		} catch (Exception e) {
+			logError(e);
 		}
 	}
 

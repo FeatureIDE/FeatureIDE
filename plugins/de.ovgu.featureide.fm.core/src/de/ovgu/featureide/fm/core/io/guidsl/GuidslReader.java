@@ -334,9 +334,9 @@ public class GuidslReader {
 			line = 1;
 			Node node = exprToNode(((EStmt) astListNode.arg[0]).getExpr());
 			try {
-				if (!new SatSolver(new Not(node.clone()), 250).isSatisfiable())
+				if (!new SatSolver(new Not(node.clone()), 250).hasSolution())
 					warnings.add(new Problem(CONSTRAINT_IS_A_TAUTOLOGY_, line));
-				if (!new SatSolver(node.clone(), 250).isSatisfiable())
+				if (!new SatSolver(node.clone(), 250).hasSolution())
 					warnings.add(new Problem(CONSTRAINT_IS_NOT_SATISFIABLE_, line));
 			} catch (Exception e) {
 			}

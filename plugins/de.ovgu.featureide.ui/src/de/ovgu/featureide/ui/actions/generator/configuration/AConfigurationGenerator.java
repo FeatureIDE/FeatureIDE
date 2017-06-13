@@ -20,10 +20,20 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
+import java.util.List;
+
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
@@ -49,12 +59,19 @@ public abstract class AConfigurationGenerator implements LongRunningMethod<Void>
 	protected long confs = 0;
 
 	protected final IFeatureProject featureProject;
+	protected final ConfigurationPropagator configurationPropagator;
 	
 	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		this.builder = builder;
 		this.featureModel = featureModel;
 		this.featureProject = featureProject;
-		configuration = new Configuration(featureModel, false, false);
+		configuration = new Configuration(featureModel);
+		configurationPropagator = featureProject.getStatus().getPropagator(configuration);
+	}
+	
+	protected final CNF getSatInstance(IFeatureModel fm) {
+		final List<String> abstractFeatures = Functional.mapToList(fm.getFeatures(), new AbstractFeatureFilter(), FeatureUtils.GET_FEATURE_NAME);
+		return LongRunningWrapper.runMethod(new CNFSlicer(CNFCreator.createNodes(fm), abstractFeatures));
 	}
 	
 	protected void cancelGenerationJobs() {

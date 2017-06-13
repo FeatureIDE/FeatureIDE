@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -34,12 +33,13 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -125,10 +125,14 @@ public class DIMACSFormat implements IFeatureModelFormat {
 			clauses.add(propNode);
 		}
 		Node cnf = new And(clauses.toArray(new Or[0]));
-
-		//		final FeatureRemover remover = new FeatureRemover(cnf, abstractNames, false);
-		//		cnf = remover.createNewClauseList(LongRunningWrapper.runMethod(remover, new ConsoleMonitor()));
-
+//		final IMonitor workMonitor = new ConsoleMonitor();
+//
+//		final CNFCreator clauseCreator = new CNFCreator(featureModel);
+//		CNF satInstance = clauseCreator.createNodes();
+//		final CNFSilcer slicer = new CNFSilcer(satInstance, abstractNames);
+//		final CNF slicedSatInstance = LongRunningWrapper.runMethod(slicer, workMonitor);
+//
+//		cnf = Nodes.convert(slicedSatInstance);
 		for (Node clause : cnf.getChildren()) {
 			featureModel.addConstraint(factory.createConstraint(featureModel, clause));
 		}
@@ -137,63 +141,35 @@ public class DIMACSFormat implements IFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
-
 		final StringBuilder stringBuilder = new StringBuilder();
-		Map<String, Integer> featureMap = new HashMap<>();
-		int i = 1;
-		for (CharSequence name : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
-			featureMap.put(name.toString(), i);
+
+		final CNF nodes = CNFCreator.createNodes(featureModel);
+		final List<LiteralSet> clauses = nodes.getClauses();
+		final String[] names = nodes.getVariables().getNames();
+
+		for (int i = 0; i < names.length; i++) {
 			stringBuilder.append("c ");
 			stringBuilder.append(i);
 			stringBuilder.append(' ');
-			stringBuilder.append(name.toString());
+			stringBuilder.append(names[i]);
 			stringBuilder.append(System.lineSeparator());
-			i++;
-		}
-
-		int clauseCount = 0;
-		final StringBuilder clauseStringBuilder = new StringBuilder();
-		CHILDREN: for (Node and : nodes.getChildren()) {
-			if (and instanceof Literal) {
-				if (and.toString().equals("True") || and.toString().equals("-False")) {
-					continue;
-				}
-				if (((Literal) and).positive) {
-					clauseStringBuilder.append(featureMap.get(and.toString()));
-				} else {
-					clauseStringBuilder.append('-');
-					clauseStringBuilder.append(featureMap.get(((Literal) and).var.toString()));
-				}
-				clauseStringBuilder.append(' ');
-			} else {
-				for (Node literal : and.getChildren()) {
-					if (literal.toString().equals("True") || literal.toString().equals("-False")) {
-						continue CHILDREN;
-					}
-				}
-
-				for (Node literal : and.getChildren()) {
-					if (((Literal) literal).positive) {
-						clauseStringBuilder.append(featureMap.get(literal.toString()));
-					} else {
-						clauseStringBuilder.append('-');
-						clauseStringBuilder.append(featureMap.get(((Literal) literal).var.toString()));
-					}
-					clauseStringBuilder.append(' ');
-				}
-			}
-			clauseStringBuilder.append('0');
-			clauseStringBuilder.append(System.lineSeparator());
-			clauseCount++;
 		}
 
 		stringBuilder.append("p cnf ");
 		stringBuilder.append(featureModel.getNumberOfFeatures());
 		stringBuilder.append(' ');
-		stringBuilder.append(clauseCount);
+		stringBuilder.append(clauses.size());
 		stringBuilder.append(System.lineSeparator());
-		stringBuilder.append(clauseStringBuilder);
+
+		for (LiteralSet clause : clauses) {
+			final int[] literals = clause.getLiterals();
+			for (int i = 0; i < literals.length; i++) {
+				stringBuilder.append(literals[i]);
+				stringBuilder.append(' ');
+			}
+			stringBuilder.append('0');
+			stringBuilder.append(System.lineSeparator());
+		}
 
 		return stringBuilder.toString();
 	}

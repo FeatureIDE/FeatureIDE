@@ -26,6 +26,7 @@ import java.util.List;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.cnf.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 
 /**
@@ -43,10 +44,10 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 	private UniqueId idGen;
 	private RestrictionFactory<DeRestriction> deFactory;
 
-	public ExtendedFeatureModelAnalyzer(ExtendedFeatureModel fm) {
-		super(fm);
+	public ExtendedFeatureModelAnalyzer(FeatureModelFormula formula, ExtendedFeatureModel featureModel) {
+		super(formula, featureModel);
 
-		this.efm = fm;
+		this.efm = featureModel;
 		this.idGen = new UniqueId();
 		this.map = Translator.buildFeatureNameMap(efm, idGen);
 		this.deFactory = new DeRestrictionFactory();

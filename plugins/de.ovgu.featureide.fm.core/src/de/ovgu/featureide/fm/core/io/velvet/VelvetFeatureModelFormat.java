@@ -1209,7 +1209,6 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			updateConstraintNode(constraintNode, connectorName, instanceRoot.getFeature().getName(), extFeatureModel);
 			ExtendedConstraint newConstraint = factory.createConstraint(extFeatureModel, constraintNode);
 			newConstraint.setType(type);
-			newConstraint.setContainedFeatures();
 			extFeatureModel.addConstraint(newConstraint);
 		}
 	}

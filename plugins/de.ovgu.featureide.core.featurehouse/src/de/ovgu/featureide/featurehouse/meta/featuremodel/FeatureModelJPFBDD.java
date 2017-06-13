@@ -23,13 +23,13 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -84,8 +84,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);//.eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
-		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
+		String formula = NodeWriter.nodeToString(Nodes.convert(CNFCreator.createNodes(featureModel)), NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 		if (formula.contains("  &&  true  &&  ! false")) {
 			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));
 		}

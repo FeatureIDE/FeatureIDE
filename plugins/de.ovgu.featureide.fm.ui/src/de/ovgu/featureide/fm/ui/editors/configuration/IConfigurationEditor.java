@@ -25,6 +25,7 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 
 public interface IConfigurationEditor {
 
@@ -49,5 +50,7 @@ public interface IConfigurationEditor {
 	EXPAND_ALGORITHM getExpandAlgorithm();
 
 	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
+
+	ConfigurationPropagator getPropagator();
 
 }

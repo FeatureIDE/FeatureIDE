@@ -56,8 +56,6 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
 
-		final boolean orgPropagate = configuration.isPropagate();
-		configuration.setPropagate(false);
 		configuration.resetValues();
 
 		String line = null;
@@ -103,7 +101,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 
 					final String name = renamingsManager.getNewName(line.substring(2));
 
-					final SelectableFeature feature = configuration.getSelectablefeature(name);
+					final SelectableFeature feature = configuration.getSelectableFeature(name);
 					if (feature == null) {
 						warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} else {
@@ -120,7 +118,6 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 		} catch (IOException e) {
 			warnings.add(new Problem(e));
 		} finally {
-			configuration.setPropagate(orgPropagate);
 		}
 		return warnings;
 	}
@@ -164,7 +161,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 	}
 
 	@Override
-	public IPersistentFormat<Configuration> getInstance() {
+	public FeatureIDEFormat getInstance() {
 		return this;
 	}
 

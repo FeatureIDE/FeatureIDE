@@ -170,7 +170,7 @@ public class Prop4JTest {
 	}
 
 	protected boolean isTautology(Node node) throws TimeoutException {
-		return !new SatSolver(new Not(node), TIMEOUT).isSatisfiable();
+		return !new SatSolver(new Not(node), TIMEOUT).hasSolution();
 	}
 
 	@Test

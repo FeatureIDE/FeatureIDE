@@ -25,9 +25,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
@@ -118,7 +116,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public IFeatureStructure getRoot() {
 		return rootFeature;
 	}
-	
+
 	@Override
 	public void setShowHiddenFeatures(boolean showHiddenFeatures) {
 		this.showHiddenFeatures = showHiddenFeatures;
@@ -147,7 +145,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasAndGroup() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
-			if ( (f.getStructure().getChildrenCount() > 1) && f.getStructure().isAnd()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAnd()) {
 				return true;
 			}
 		}
@@ -183,7 +181,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasMandatoryFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
@@ -198,7 +196,8 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOptionalFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(this.showHiddenFeatures)) {
-			if (!f.equals(rootFeature.getFeature()) && f.getStructure().getParent() != null && f.getStructure().getParent().isAnd() && !f.getStructure().isMandatory()) {
+			if (!f.equals(rootFeature.getFeature()) && f.getStructure().getParent() != null && f.getStructure().getParent().isAnd()
+					&& !f.getStructure().isMandatory()) {
 				return true;
 			}
 		}
@@ -249,65 +248,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public void setRoot(IFeatureStructure root) {
 		rootFeature = root;
-	}
-
-	private boolean existsFeatureWithStatus(FeatureStatus status) {
-		for (final IFeature f : correspondingFeatureModel.getFeatureTable().values()) {
-			if ((!f.getStructure().hasHiddenParent() || showHiddenFeatures))
-				if (f.getProperty().getFeatureStatus() == status) {
-					return true;
-				}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean hasFalseOptionalFeatures() {
-		return existsFeatureWithStatus(FeatureStatus.FALSE_OPTIONAL);
-	}
-
-	@Override
-	public boolean hasDeadFeatures() {
-		return existsFeatureWithStatus(FeatureStatus.DEAD);
-	}
-
-	@Override
-	public boolean hasUnsatisfiableConstraints() {
-		return existsConstraintWithAttribute(ConstraintAttribute.UNSATISFIABLE);
-	}
-
-	@Override
-	public boolean hasTautologyConstraints() {
-		return existsConstraintWithAttribute(ConstraintAttribute.TAUTOLOGY);
-	}
-
-	@Override
-	public boolean hasDeadConstraints() {
-		for (IConstraint c : getFeatureModel().getConstraints()) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD || !c.getDeadFeatures().isEmpty()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean hasVoidModelConstraints() {
-		return existsConstraintWithAttribute(ConstraintAttribute.VOID_MODEL);
-	}
-
-	private boolean existsConstraintWithAttribute(ConstraintAttribute attribute) {
-		for (IConstraint c : getFeatureModel().getConstraints()) {
-			if (c.getConstraintAttribute() == attribute) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean hasRedundantConstraints() {
-		return existsConstraintWithAttribute(ConstraintAttribute.REDUNDANT);
 	}
 
 }

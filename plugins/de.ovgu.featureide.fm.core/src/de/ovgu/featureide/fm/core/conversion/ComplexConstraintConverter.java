@@ -29,8 +29,9 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.ProjectManager;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintRedundancyStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -218,7 +219,7 @@ public class ComplexConstraintConverter {
 	 * If the feature model is a void model or unsatisfiable then a simple contradicting feature model will be created.
 	 */
 	protected boolean prepare() {
-		FeatureModelAnalyzer analyzer = fm.getAnalyser();
+		FeatureModelAnalyzer analyzer = ProjectManager.getAnalyzer(fm);
 		
 		analyzer.calculateFeatures = true;
 		analyzer.calculateConstraints = true;
@@ -229,9 +230,8 @@ public class ComplexConstraintConverter {
 		List<IConstraint> toRemove = new LinkedList<IConstraint>();
 		
 		for (IConstraint c : fm.getConstraints()) {
-			ConstraintAttribute attribute = c.getConstraintAttribute();
-			
-			if (attribute == ConstraintAttribute.REDUNDANT || attribute == ConstraintAttribute.TAUTOLOGY) {
+			final ConstraintRedundancyStatus redundancyStatus = analyzer.getConstraintProperties(c).getConstraintRedundancyStatus();
+			if (redundancyStatus == ConstraintRedundancyStatus.REDUNDANT || redundancyStatus == ConstraintRedundancyStatus.TAUTOLOGY) {
 				toRemove.add(c);
 			} 
 		}

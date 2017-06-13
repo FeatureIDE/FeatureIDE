@@ -38,6 +38,7 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -213,7 +214,7 @@ public class NodeCreator {
 					and = new And(children);
 				}
 			}
-		Node[] concreteFeatures = new Node[featureModel.getAnalyser().countConcreteFeatures() + 1];
+		Node[] concreteFeatures = new Node[ProjectManager.getAnalyzer(featureModel).countConcreteFeatures() + 1];
 		int i = 0;
 		for (IFeature feature : featureModel.getFeatures())
 			if (feature.getStructure().isConcrete())

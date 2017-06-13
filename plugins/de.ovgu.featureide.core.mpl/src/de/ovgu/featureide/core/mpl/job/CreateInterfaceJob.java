@@ -51,12 +51,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -68,16 +68,20 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  */
 public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments, IFeatureModel> {
 
-	public static class Arguments extends JobArguments {
+	public static class Arguments implements JobArguments<IFeatureModel> {
 		private final IFeatureModel featuremodel;
 		private final Collection<String> featureNames;
 		private final String projectName;
 
 		public Arguments(String projectName, IFeatureModel featuremodel, Collection<String> featureNames) {
-			super(Arguments.class);
 			this.projectName = projectName;
 			this.featuremodel = featuremodel;
 			this.featureNames = featureNames;
+		}
+
+		@Override
+		public CreateInterfaceJob createJob() {
+			return new CreateInterfaceJob(this);
 		}
 	}
 
@@ -130,8 +134,6 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 			cnf = (selectedFeatureNames.size() > 1) ? CorePlugin.removeFeatures(m, removeFeatures) : new Literal(m.getStructure().getRoot().getFeature()
 					.getName());
 		} catch (java.util.concurrent.TimeoutException e1) {
-			e1.printStackTrace();
-		} catch (UnkownLiteralException e1) {
 			e1.printStackTrace();
 		}
 		workMonitor.worked();

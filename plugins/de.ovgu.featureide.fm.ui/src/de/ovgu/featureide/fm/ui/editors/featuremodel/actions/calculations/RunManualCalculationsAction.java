@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RUN_MANUAL_CAL
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -45,10 +46,10 @@ public class RunManualCalculationsAction extends Action {
 
 	@Override
 	public void run() {
-		boolean oldValue = featureModel.getAnalyser().runCalculationAutomatically;
-		featureModel.getAnalyser().runCalculationAutomatically = true;
+		boolean oldValue = ProjectManager.getAnalyzer(featureModel).runCalculationAutomatically;
+		ProjectManager.getAnalyzer(featureModel).runCalculationAutomatically = true;
 		featureModel.handleModelDataLoaded();
-		featureModel.getAnalyser().runCalculationAutomatically = oldValue;
+		ProjectManager.getAnalyzer(featureModel).runCalculationAutomatically = oldValue;
 	}
 
 }

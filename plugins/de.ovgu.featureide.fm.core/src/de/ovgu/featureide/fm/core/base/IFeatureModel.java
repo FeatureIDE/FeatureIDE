@@ -22,11 +22,11 @@ package de.ovgu.featureide.fm.core.base;
  
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
@@ -353,16 +353,16 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 */
 	void deleteFeatureFromTable(IFeature feature);
 
-	/**
-	 * Returns an instance of {@link FeatureModelAnalyzer} which is bound to this feature model. Since analysis of feature models are computational expensive in
-	 * general, results for analysis are cached in the instance of a analyzer. When calling methods on the return value of this method, changes are indirectly
-	 * automatically stored in this feature model by object references.
-	 * 
-	 * @return The instance of {@link FeatureModelAnalyzer} bound to this feature model.
-	 * 
-	 * @since 3.0
-	 */
-	FeatureModelAnalyzer getAnalyser();
+//	/**
+//	 * Returns an instance of {@link FeatureModelAnalyzer} which is bound to this feature model. Since analysis of feature models are computational expensive in
+//	 * general, results for analysis are cached in the instance of a analyzer. When calling methods on the return value of this method, changes are indirectly
+//	 * automatically stored in this feature model by object references.
+//	 * 
+//	 * @return The instance of {@link FeatureModelAnalyzer} bound to this feature model.
+//	 * 
+//	 * @since 3.0
+//	 */
+//	FeatureModelAnalyzer getAnalyser();
 
 	/**
 	 * @return Returns the number of constraints contained in this feature model.
@@ -509,7 +509,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @return
 	 */
-	Iterable<IFeature> getFeatures();
+	Collection<IFeature> getFeatures();
 	
 	/**
 	 * Returns the a read-only iterable collection of features stored in this feature model, which are not hidden and not collapsed.

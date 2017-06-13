@@ -31,14 +31,17 @@ import org.prop4j.NodeWriter;
 import composer.rules.meta.FeatureModelInfo;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Representation of the feature model. 
@@ -49,8 +52,9 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
  */
 public class FeatureIDEModelInfo implements FeatureModelInfo {
 	
-	private IFeatureModel featureModel;
-	private Configuration currentConfig;
+	private final IFeatureModel featureModel;
+	private final Configuration currentConfig;
+	private final ConfigurationPropagator propagator;
 	private List<String> coreFeatureNames;
 	private boolean validSelect = true;
 	private boolean validReject = true;
@@ -69,6 +73,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		this.featureModel = featureModel;
 		this.useValidMethod = useValidMethod;
 		currentConfig = new Configuration(featureModel);
+		propagator = ProjectManager.getProject(featureModel).getStatus().getPropagator(currentConfig);
 		validClause = createdValidClause();
 	}
 	
@@ -129,7 +134,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			if (!rootFeature.getName().equals(featureName)){
 				Configuration config = new Configuration(featureModel);
 				config.setManual(rootFeature.getName(), Selection.SELECTED);
-				if (config.getSelectablefeature(featureName).getAutomatic() != Selection.SELECTED)
+				if (config.getSelectableFeature(featureName).getAutomatic() != Selection.SELECTED)
 					return false;
 			} 
 		}
@@ -159,7 +164,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 				for (IFeature feat : currentConfig.getUnSelectedFeatures())
 					config.setManual(feat.getName(),Selection.UNSELECTED);
 				config.setManual(rootFeature.getName(), Selection.SELECTED);
-				if (config.getSelectablefeature(featureName).getAutomatic() != Selection.SELECTED)
+				if (config.getSelectableFeature(featureName).getAutomatic() != Selection.SELECTED)
 					return false;
 			} 
 		}
@@ -221,14 +226,14 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	public boolean isValidSelection() {
 		if (!fm)
 			return true;
-		return validSelect && validReject && currentConfig.number() > 0;
+		return validSelect && validReject && LongRunningWrapper.runMethod(propagator.canBeValid());
 	}
 
 	@Override
 	public boolean canBeSelected(String featureName) {
 		if (!fm)
 			return true;
-		SelectableFeature feature = currentConfig.getSelectablefeature(featureName);
+		SelectableFeature feature = currentConfig.getSelectableFeature(featureName);
 		Selection oldManual = feature.getManual();
 		try{
 			currentConfig.setManual(feature, Selection.SELECTED);
@@ -243,7 +248,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	public boolean canBeEliminated(String featureName) {
 		if (!fm)
 			return true;
-		SelectableFeature feature = currentConfig.getSelectablefeature(featureName);
+		SelectableFeature feature = currentConfig.getSelectableFeature(featureName);
 		Selection oldManual = feature.getManual();
 		try{
 			currentConfig.setManual(feature, Selection.UNSELECTED);
@@ -258,14 +263,14 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	public boolean isAlwaysSelected(String featureName) {
 		if (!fm)
 			return false;
-		return currentConfig.getSelectablefeature(featureName).getSelection() == Selection.SELECTED;
+		return currentConfig.getSelectableFeature(featureName).getSelection() == Selection.SELECTED;
 	}
 
 	@Override
 	public boolean isAlwaysEliminated(String featureName) {
 		if (!fm)
 			return false;
-		return currentConfig.getSelectablefeature(featureName).getSelection() == Selection.UNSELECTED;
+		return currentConfig.getSelectableFeature(featureName).getSelection() == Selection.UNSELECTED;
 	}
 
 	@Override

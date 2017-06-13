@@ -21,72 +21,74 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Tests about feature selection.
  * 
  * @author Fabian Benduhn
  */
-public class TConfigurationSelection extends AbstractConfigurationTest{
-	
+public class TConfigurationSelection extends AbstractConfigurationTest {
+
 	@Override
-	IFeatureModel loadModel() 
-	{
+	IFeatureModel loadModel() {
 		return loadGUIDSL("S : [A] [B] C :: _S; %% not B;");
 	}
 
-	
+	private void testConfigurationValid(Configuration c, final long expectedValue) {
+		final ConfigurationPropagator propagator = FeatureProject.getPropagator(c, true);
+		LongRunningWrapper.runMethod(propagator.update());
+		assertTrue(LongRunningWrapper.runMethod(propagator.isValid()));
+		assertEquals(expectedValue, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
+	}
+
+	private void testConfigurationInvalid(Configuration c) {
+		final ConfigurationPropagator propagator = FeatureProject.getPropagator(c, true);
+		LongRunningWrapper.runMethod(propagator.update());
+		assertFalse(LongRunningWrapper.runMethod(propagator.isValid()));
+		assertEquals(0L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
+	}
+
 	@Test
-	public void testSelection1() 
-	{
-		Configuration c = new Configuration(fm, true);
+	public void testSelection1() {
+		Configuration c = new Configuration(fm);
 		c.setManual("C", Selection.SELECTED);
-		assertTrue(c.isValid());
-		assertEquals(2, c.number());
+		testConfigurationValid(c, 2L);
 	}
 
 	@Test
-	public void testSelection2() 
-	{
-		Configuration c = new Configuration(fm, true);
-		assertTrue(c.isValid());
-		assertEquals(2, c.number());
+	public void testSelection2() {
+		Configuration c = new Configuration(fm);
+		testConfigurationValid(c, 2L);
 	}
 
 	@Test
-	public void testSelection3() 
-	{
-		Configuration c = new Configuration(fm, true);
+	public void testSelection3() {
+		Configuration c = new Configuration(fm);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
-		assertTrue(c.isValid());
-		assertEquals(1, c.number());
+		testConfigurationValid(c, 1L);
 	}
 
 	@Test
-	public void testSelection4() 
-	{
-		Configuration c = new Configuration(fm, true);
+	public void testSelection4() {
+		Configuration c = new Configuration(fm);
 		c.setManual("A", Selection.SELECTED);
-		assertTrue(c.isValid());
-		assertEquals(1, c.number());
+		testConfigurationValid(c, 1L);
 	}
 
 	@Test
 	public void testSelection5() {
-		Configuration c = new Configuration(fm, true);
-		boolean exception = false;
-		try {
-			c.setManual("B", Selection.SELECTED);
-		} catch (SelectionNotPossibleException e) {
-			exception = true;
-		}
-		assertTrue(exception);
+		Configuration c = new Configuration(fm);
+		c.setManual("B", Selection.SELECTED);
+		testConfigurationInvalid(c);
 	}
 
 }

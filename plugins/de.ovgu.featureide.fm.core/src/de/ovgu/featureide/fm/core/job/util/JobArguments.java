@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job.util;
 
-import java.lang.reflect.Constructor;
-
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
@@ -32,32 +29,8 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
  * 
  * @author Sebastian Krieter
  */
-public abstract class JobArguments {
+public interface JobArguments<T> {
 
-	private final Constructor<? extends LongRunningMethod<?>> constructor;
+	LongRunningMethod<T> createJob();
 
-	@SuppressWarnings("unchecked")
-	protected JobArguments(Class<? extends JobArguments> cl) {
-		Constructor<? extends LongRunningMethod<?>> tempConstructor;
-		try {
-			tempConstructor = (Constructor<? extends LongRunningMethod<?>>) cl.getEnclosingClass().getDeclaredConstructor(cl);
-			tempConstructor.setAccessible(true);
-		} catch (Exception e) {
-			Logger.logError(e);
-			tempConstructor = null;
-		}
-		constructor = tempConstructor;
-	}
-
-	public LongRunningMethod<?> createJob() {
-		if (constructor == null) {
-			return null;
-		}
-		try {
-			return constructor.newInstance(this);
-		} catch (Exception e) {
-			Logger.logError(e);
-			return null;
-		}
-	}
 }

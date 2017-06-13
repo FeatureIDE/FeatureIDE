@@ -44,6 +44,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -108,11 +109,11 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
     	}
 
 		root.appendChild(calculations);
-		calculations.setAttribute(CALCULATE_AUTO, "" + object.getAnalyser().runCalculationAutomatically);
-		calculations.setAttribute(CALCULATE_FEATURES, "" + object.getAnalyser().calculateFeatures);
-		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + object.getAnalyser().calculateConstraints);
-		calculations.setAttribute(CALCULATE_REDUNDANT, "" + object.getAnalyser().calculateRedundantConstraints);
-		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + object.getAnalyser().calculateTautologyConstraints);
+		calculations.setAttribute(CALCULATE_AUTO, "" + ProjectManager.getAnalyzer(object).runCalculationAutomatically);
+		calculations.setAttribute(CALCULATE_FEATURES, "" + ProjectManager.getAnalyzer(object).calculateFeatures);
+		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + ProjectManager.getAnalyzer(object).calculateConstraints);
+		calculations.setAttribute(CALCULATE_REDUNDANT, "" + ProjectManager.getAnalyzer(object).calculateRedundantConstraints);
+		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + ProjectManager.getAnalyzer(object).calculateTautologyConstraints);
 
     	root.appendChild(comments);
     	for(String comment : object.getProperty().getComments()){

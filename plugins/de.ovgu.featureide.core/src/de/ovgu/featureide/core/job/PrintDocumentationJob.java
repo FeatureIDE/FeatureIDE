@@ -74,7 +74,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  */
 public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments, Boolean> {
 	
-	public static class Arguments extends JobArguments {
+	public static class Arguments implements JobArguments<Boolean> {
 		private final String foldername, featureName;
 		private final String[] options;
 		private final IProject project;
@@ -82,12 +82,16 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		private final ADocumentationCommentMerger merger;
 		
 		public Arguments(String foldername, String[] options, ADocumentationCommentMerger merger, String featureName, IProject project) {
-			super(Arguments.class);
 			this.foldername = foldername;
 			this.options = options;
 			this.merger = merger;
 			this.featureName = featureName;
 			this.project = project;			
+		}
+
+		@Override
+		public PrintDocumentationJob createJob() {
+			return new PrintDocumentationJob(this);
 		}
 	}
 	
@@ -118,8 +122,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (arguments.merger instanceof VariantMerger) {
-			final Configuration conf = new Configuration(featureProject.getFeatureModel(),
-					Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
+			// TODO !!! ignore abstract features (below)
+			final Configuration conf = new Configuration(featureProject.getFeatureModel());
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
 				FileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigurationManager.getFormat(file.getName()));

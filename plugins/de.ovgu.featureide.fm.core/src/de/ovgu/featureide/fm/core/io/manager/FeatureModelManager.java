@@ -123,4 +123,9 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return writeToFile(featureModel, outPath);
 	}
 
+	@Override
+	public boolean externalSave(Runnable externalSaveMethod) {
+		return true;
+	}
+
 }

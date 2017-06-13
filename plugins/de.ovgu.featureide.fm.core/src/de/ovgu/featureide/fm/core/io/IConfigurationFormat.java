@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * Format for {@link Configuration configurations}.

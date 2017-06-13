@@ -65,7 +65,7 @@ public class ConfigDialog extends TitleAreaDialog {
 	private static final String MINUTE = "60";
 	
 	private int priority;
-	private long timeout;
+	private int timeout;
 	
 	private Combo timeOutComboBox;
 	private Combo priorityComboBox;
@@ -77,7 +77,7 @@ public class ConfigDialog extends TitleAreaDialog {
 		return priority;
 	}
 
-	public long getTimeout() {
+	public int getTimeout() {
 		return timeout;
 	}
 	
@@ -216,7 +216,7 @@ public class ConfigDialog extends TitleAreaDialog {
 		
 		String t = timeOutComboBox.getText();
 		try {
-			timeout = 1000 * Long.parseLong(t);
+			timeout = 1000 * Integer.parseInt(t);
 		} catch (NumberFormatException ex) {
 			MessageDialog.openError(Display.getDefault().getActiveShell(), "Error", "That was not a valid number!\n(integer only)");
 			return;

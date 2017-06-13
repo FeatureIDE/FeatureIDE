@@ -25,13 +25,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureComparator;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.ProjectManager;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -68,10 +70,12 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
-		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
+		final FeatureModelAnalyzer analyzer = ProjectManager.getAnalyzer(featureModel);
+		final List<IFeature> coreList = analyzer.getCoreFeatures();
+		final List<IFeature> deadList = analyzer.getDeadFeatures();
 		for (IFeature feature : features) {
-			final boolean isCoreFeature = deadCoreList.get(0).contains(feature);
-			final boolean isDeadFeature = deadCoreList.get(1).contains(feature);
+			final boolean isCoreFeature = coreList.contains(feature);
+			final boolean isDeadFeature = deadList.contains(feature);
 			if (!isCoreFeature && !isDeadFeature) {
 				fields.append(ANNOTATION);
 			}
@@ -86,15 +90,9 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 		return fields.toString();
 	}
 	
-	private final static String TRUE_FALSE = "  &&  True  &&  !False";
-
 	@Override
 	public String getFormula() {
-		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
-		String formula = nodes.toString(NodeWriter.javaSymbols);
-		if (formula.contains(TRUE_FALSE)) {
-			formula = formula.substring(0, formula.indexOf(TRUE_FALSE));
-		}
+		String formula = NodeWriter.nodeToString(Nodes.convert(CNFCreator.createNodes(featureModel)), NodeWriter.javaSymbols);
 		return VALID + "return " + formula.toLowerCase(Locale.ENGLISH) + ";\r\n\t}\r\n\r\n";
 	}
 

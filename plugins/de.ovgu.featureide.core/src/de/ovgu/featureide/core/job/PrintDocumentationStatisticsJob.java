@@ -50,14 +50,18 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  */
 public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentationStatisticsJob.Arguments, Boolean> {
 	
-	public static class Arguments extends JobArguments {
+	public static class Arguments implements JobArguments<Boolean> {
 		private final String foldername;
 		private final IProject project;
 		
 		public Arguments(String foldername, IProject project) {
-			super(Arguments.class);
 			this.foldername = foldername;
 			this.project = project;			
+		}
+
+		@Override
+		public PrintDocumentationStatisticsJob createJob() {
+			return new PrintDocumentationStatisticsJob(this);
 		}
 	}
 	

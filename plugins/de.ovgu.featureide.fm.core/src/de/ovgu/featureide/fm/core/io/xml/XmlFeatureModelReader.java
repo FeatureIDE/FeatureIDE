@@ -52,6 +52,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -406,15 +407,15 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					String nodeName = node.getNodeName();
 					boolean value = node.getNodeValue().equals(TRUE);
 					if (nodeName.equals(CALCULATE_AUTO)) {
-						featureModel.getAnalyser().runCalculationAutomatically = value;
+						ProjectManager.getAnalyzer(featureModel).runCalculationAutomatically = value;
 					} else if (nodeName.equals(CALCULATE_CONSTRAINTS)) {
-						featureModel.getAnalyser().calculateConstraints = value;
+						ProjectManager.getAnalyzer(featureModel).calculateConstraints = value;
 					} else if (nodeName.equals(CALCULATE_REDUNDANT)) {
-						featureModel.getAnalyser().calculateRedundantConstraints = value;
+						ProjectManager.getAnalyzer(featureModel).calculateRedundantConstraints = value;
 					} else if (nodeName.equals(CALCULATE_FEATURES)) {
-						featureModel.getAnalyser().calculateFeatures = value;
+						ProjectManager.getAnalyzer(featureModel).calculateFeatures = value;
 					} else if (nodeName.equals(CALCULATE_TAUTOLOGY)) {
-						featureModel.getAnalyser().calculateTautologyConstraints = value;
+						ProjectManager.getAnalyzer(featureModel).calculateTautologyConstraints = value;
 					} else {
 						throwError("Unknown calculations attribute: " + nodeName, e);
 					}

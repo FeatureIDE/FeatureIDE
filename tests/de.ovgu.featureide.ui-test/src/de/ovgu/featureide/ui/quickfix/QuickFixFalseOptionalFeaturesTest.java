@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -108,7 +109,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
 			final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
-			final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
+			final Collection<IFeature> core = ProjectManager.getAnalyzer(fm).getCoreFeatures();
 			final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 			
 			for (IFeature feature : concrete) {

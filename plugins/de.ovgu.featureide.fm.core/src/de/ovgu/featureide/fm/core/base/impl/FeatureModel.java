@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -76,7 +75,7 @@ public class FeatureModel implements IFeatureModel {
 
 	protected final String factoryID;
 
-	protected final FeatureModelAnalyzer analyser;
+//	protected final FeatureModelAnalyzer analyser;
 	protected final List<IConstraint> constraints = new ArrayList<>();
 
 	/**
@@ -105,13 +104,13 @@ public class FeatureModel implements IFeatureModel {
 		this.factoryID = factoryID;
 
 		id = getNextId();
-		featureOrderList = new LinkedList<String>();
+		featureOrderList = new LinkedList<>();
 		featureOrderUserDefined = false;
 
 		property = createProperty();
 		structure = createStructure();
 
-		analyser = createAnalyser();
+//		analyser = createAnalyser();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
@@ -141,7 +140,7 @@ public class FeatureModel implements IFeatureModel {
 				}
 			}
 		}
-		analyser = createAnalyser();
+//		analyser = createAnalyser();
 	}
 
 	protected IFeatureModelProperty createProperty() {
@@ -184,9 +183,10 @@ public class FeatureModel implements IFeatureModel {
 		return new FeatureModel(this, newRoot);
 	}
 
-	protected FeatureModelAnalyzer createAnalyser() {
-		return new FeatureModelAnalyzer(this);
-	}
+//	protected FeatureModelAnalyzer createAnalyser() {
+//		// TODO !!!
+//		return new FeatureModelAnalyzer(new FeatureProject(featureModelManager, configurationManagerList));
+//	}
 
 	@Override
 	public void createDefaultValues(CharSequence projectName) {
@@ -265,10 +265,10 @@ public class FeatureModel implements IFeatureModel {
 		fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
-	@Override
-	public FeatureModelAnalyzer getAnalyser() {
-		return analyser;
-	}
+//	@Override
+//	public FeatureModelAnalyzer getAnalyser() {
+//		return analyser;
+//	}
 
 	@Override
 	public int getConstraintCount() {

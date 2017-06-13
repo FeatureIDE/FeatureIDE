@@ -26,10 +26,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -123,13 +125,13 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * Stack for preprocessor directives (for nested expressions). Have to be
 	 * initialized in subclass.
 	 */
-	protected Stack<Node> expressionStack;
+	protected Deque<Node> expressionStack;
 
 	/**
 	 * Stack for count of "if" and "else" instructions for each level. Have to
 	 * be initialized in subclass.
 	 */
-	protected Stack<Integer> ifelseCountStack;
+	protected Deque<Integer> ifelseCountStack;
 
 	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
 	private static final String FEATURE_MODULE_MARKER = CorePlugin.PLUGIN_ID + ".featureModuleMarker";
@@ -217,9 +219,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		SatSolver solverTautology = new SatSolver(tautologyNode, 1000);
 
 		try {
-			if (!solverContradiction.isSatisfiable()) {
+			if (!solverContradiction.hasSolution()) {
 				return SAT_CONTRADICTION;
-			} else if (!solverTautology.isSatisfiable()) {
+			} else if (!solverTautology.hasSolution()) {
 				return SAT_TAUTOLOGY;
 			}
 		} catch (TimeoutException e) {
@@ -288,10 +290,67 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param res
 	 *            file containing the given expression
 	 */
+	protected void checkExpressions2(Node ppExpression, int lineNumber, IFile res) {
+		if (ppExpression == null) {
+			return;
+		}
+
+		/** collect all used features **/
+		findLiterals(ppExpression);
+
+		int result = isContradictionOrTautology(ppExpression.clone(), false, lineNumber, res);
+
+		if (result == SAT_NONE) {
+			result = isContradictionOrTautology(ppExpression.clone(), true, lineNumber, res);
+
+			if (result == SAT_NONE && !expressionStack.isEmpty()) {
+				Node[] nestedExpressions = new Node[expressionStack.size()];
+				nestedExpressions = expressionStack.toArray(nestedExpressions);
+
+				And nestedExpressionsAnd = new And(nestedExpressions);
+
+				result = isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+				if (result == SAT_NONE && expressionStack.size() > 1) {
+					nestedExpressions = new Node[expressionStack.size() - 1];
+					int index = 0;
+					for (Node expression : expressionStack) {
+						if (index == expressionStack.size() - 1) {
+							break;
+						}
+						nestedExpressions[index++] = expression;
+					}
+					nestedExpressionsAnd = new And(nestedExpressions);
+					checkRedundancy(ppExpression, nestedExpressionsAnd, lineNumber, res);
+				}
+			}
+		}
+	}
+
+	private class LocalExpression {
+		private final int lineNumber;
+		private final IFile file;
+		private final Node[] nestedExpressions;
+
+		public LocalExpression(int lineNumber, IFile res, Node[] nestedExpressions) {
+			this.lineNumber = lineNumber;
+			this.file = res;
+			this.nestedExpressions = nestedExpressions;
+		}
+	}
+	protected HashMap<Node, List<LocalExpression>> map = new HashMap<>();
+
 	protected void checkExpressions(Node ppExpression, int lineNumber, IFile res) {
 		if (ppExpression == null) {
 			return;
 		}
+		
+		// TODO
+		List<LocalExpression> list = map.get(ppExpression);
+		if (list == null) {
+			list = new ArrayList<>();
+			map.put(ppExpression, list);
+		}
+		list.add(new LocalExpression(lineNumber, res, expressionStack.toArray(new Node[0])));
 
 		/** collect all used features **/
 		findLiterals(ppExpression);
@@ -332,7 +391,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		Node node = new And(new And(featureModel.clone(), expression.clone()), new Not(nestedExpression.clone()));
 		SatSolver solver = new SatSolver(node, 1000);
 		try {
-			if (!solver.isSatisfiable()) {
+			if (!solver.hasSolution()) {
 				setMarkersOnContradictionOrTautology(SAT_TAUTOLOGY, lineNumber, res);
 			}
 		} catch (TimeoutException e) {
@@ -434,7 +493,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 */
 	private boolean isPreprocessorAnotationMarker(IMarker marker) throws CoreException {
 		String message = marker.getAttribute(IMarker.MESSAGE, "");
-		if (message.contains(MESSAGE_ABSTRACT) || message.contains(MESSAGE_ALWAYS_TRUE) || message.contains(MESSAGE_DEAD_CODE) || message.contains(MESSAGE_NOT_DEFINED)) {
+		if (message.contains(MESSAGE_ABSTRACT) || message.contains(MESSAGE_ALWAYS_TRUE) || message.contains(MESSAGE_DEAD_CODE)
+				|| message.contains(MESSAGE_NOT_DEFINED)) {
 			return true;
 		}
 		return false;
@@ -511,10 +571,12 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Further processing after the files are preprocessed. 
+	 * Further processing after the files are preprocessed.
+	 * 
 	 * @param folder The folder containing the preprocessed files
 	 */
-	public void postProcess(IFolder folder) {}
+	public void postProcess(IFolder folder) {
+	}
 }

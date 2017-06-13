@@ -45,6 +45,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
@@ -137,7 +138,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		IFeature feature = this.feature.getObject();
-		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
+		final FeatureModelAnalyzer analyser = ProjectManager.getAnalyzer(feature.getFeatureModel());
 		
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
 			// only color if the active profile is not the default profile
@@ -153,7 +154,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 				}
 			}
 		} else {
-			if (feature.getStructure().isRoot() && !analyser.valid()) {
+			if (feature.getStructure().isRoot() && !analyser.isValid()) {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 				toolTip.append(VOID);

@@ -36,6 +36,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
@@ -167,7 +168,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	public LegendFigure(IGraphicalFeatureModel graphicalFeatureModel, Point pos) {
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModel();
-		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
+		final FeatureModelAnalyzer analyser = ProjectManager.getAnalyzer(featureModel);
 
 		final IFeatureModelStructure fmStructure = featureModel.getStructure();
 		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
@@ -182,12 +183,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		hidden = fmStructure.hasHidden();
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getAllFeatures().size();
-		if (analyser.calculateDeadConstraints) {
-			dead = fmStructure.hasDeadFeatures();
-		}
-		if (analyser.calculateFOConstraints) {
-			falseoptional = fmStructure.hasFalseOptionalFeatures();
-		}
+		dead = analyser.calculateDeadConstraints && analyser.getFeatureModelProperties().hasDeadFeatures();
+		falseoptional = analyser.calculateFOConstraints && analyser.getFeatureModelProperties().hasFalseOptionalFeatures();
 		indetHidden = fmStructure.hasIndetHidden();
 
 		unsatisfiableConst = analyser.calculateConstraints && FeatureUtils.hasUnsatisfiableConst(featureModel);

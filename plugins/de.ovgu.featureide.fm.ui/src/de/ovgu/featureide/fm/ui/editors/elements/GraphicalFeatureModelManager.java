@@ -54,4 +54,9 @@ public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeature
 		return graphicalItem.clone();
 	}
 
+	@Override
+	public boolean externalSave(Runnable externalSaveMethod) {
+		return true;
+	}
+
 }

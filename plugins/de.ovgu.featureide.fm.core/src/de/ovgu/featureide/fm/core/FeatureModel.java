@@ -70,7 +70,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	protected FeatureModelAnalyzer createAnalyser() {
-		return model.getAnalyser();
+		return ProjectManager.getAnalyzer(model);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	 * on the {@link FeatureModel}.
 	 */
 	public FeatureModelAnalyzer getAnalyser() {
-		return model.getAnalyser();
+		return ProjectManager.getAnalyzer(model);
 	}
 
 	@Override

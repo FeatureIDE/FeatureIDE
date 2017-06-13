@@ -28,8 +28,8 @@ import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
 
-import org.prop4j.Node;
-
+import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -48,7 +48,8 @@ public class SelectableFeature extends TreeElement {
 	private final IFeature feature;
 
 	private int recommendationValue = -1;
-	private Map<Integer, Node> openClauses = null;
+	private Map<Integer, LiteralSet> openClauses = null;
+	private IVariables variables = null;
 
 	private String name;
 
@@ -120,14 +121,14 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	@Nonnull
-	public Collection<Node> getOpenClauses() {
+	public Collection<LiteralSet> getOpenClauses() {
 		if (openClauses == null) {
 			return Collections.emptyList();
 		}
 		return openClauses.values();
 	}
 
-	public void addOpenClause(int index, Node openClause) {
+	public void addOpenClause(int index, LiteralSet openClause) {
 		if (openClauses == null) {
 			openClauses = new TreeMap<>();
 		}
@@ -144,6 +145,14 @@ public class SelectableFeature extends TreeElement {
 			return openClauses.keySet();
 		}
 		return Collections.emptySet();
+	}
+
+	public IVariables getVariables() {
+		return variables;
+	}
+
+	public void setVariables(IVariables variables) {
+		this.variables = variables;
 	}
 
 }

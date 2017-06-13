@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_FEAT
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -42,22 +43,22 @@ public class FeaturesOnlyCalculationAction extends Action {
 		super(CALCULATE_FEATURES);
 		this.featureModel = featureModel;
 		setToolTipText("Test");
-		setChecked(featureModel.getAnalyser().calculateFeatures);
+		setChecked(ProjectManager.getAnalyzer(featureModel).calculateFeatures);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.getAnalyser().calculateFeatures) {
-			featureModel.getAnalyser().calculateFeatures = false;
-			featureModel.getAnalyser().calculateConstraints = false;
-			featureModel.getAnalyser().calculateRedundantConstraints = false;
-			featureModel.getAnalyser().calculateTautologyConstraints = false;
-			featureModel.getAnalyser().calculateDeadConstraints = false;
-			featureModel.getAnalyser().calculateFOConstraints = false;
+		if (ProjectManager.getAnalyzer(featureModel).calculateFeatures) {
+			ProjectManager.getAnalyzer(featureModel).calculateFeatures = false;
+			ProjectManager.getAnalyzer(featureModel).calculateConstraints = false;
+			ProjectManager.getAnalyzer(featureModel).calculateRedundantConstraints = false;
+			ProjectManager.getAnalyzer(featureModel).calculateTautologyConstraints = false;
+			ProjectManager.getAnalyzer(featureModel).calculateDeadConstraints = false;
+			ProjectManager.getAnalyzer(featureModel).calculateFOConstraints = false;
 		} else {
-			featureModel.getAnalyser().calculateFeatures = true;
-			featureModel.getAnalyser().calculateDeadConstraints = true;
-			featureModel.getAnalyser().calculateFOConstraints = true;
+			ProjectManager.getAnalyzer(featureModel).calculateFeatures = true;
+			ProjectManager.getAnalyzer(featureModel).calculateDeadConstraints = true;
+			ProjectManager.getAnalyzer(featureModel).calculateFOConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}

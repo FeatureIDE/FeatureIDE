@@ -31,10 +31,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -246,11 +246,11 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	 *            file
 	 */
 	synchronized private void processLinesOfFile(Vector<String> lines, IFile res) {
-		expressionStack = new Stack<Node>();
+		expressionStack = new ArrayDeque<>();
 
 		// count of if, ifelse and else to remove after processing of else from
 		// stack
-		ifelseCountStack = new Stack<Integer>();
+		ifelseCountStack = new ArrayDeque<>();
 		ifelseCountStack.push(0);
 
 		commentSection = false;

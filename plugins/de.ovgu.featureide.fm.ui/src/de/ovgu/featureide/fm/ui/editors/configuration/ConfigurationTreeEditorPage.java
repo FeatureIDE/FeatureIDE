@@ -80,9 +80,11 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.ProjectManager;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -92,6 +94,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
@@ -103,6 +106,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.EXPAND_ALGORITHM;
@@ -151,6 +155,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
 
 	protected IConfigurationEditor configurationEditor = null;
+
+	protected ConfigurationPropagator propagator;
 
 	protected boolean dirty = false;
 
@@ -247,6 +253,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	@Override
 	protected void setInput(IEditorInput input) {
 		super.setInput(input);
+		propagator = configurationEditor.getPropagator();
 	}
 
 	@Override
@@ -522,11 +529,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			infoLabel.setForeground(null);
 			return;
 		}
-		final boolean valid = configurationEditor.getConfiguration().isValid();
-		if (configurationEditor.getConfiguration().getPropagator() == null) {
+		final boolean valid = LongRunningWrapper.runMethod(propagator.isValid());
+		if (configurationEditor.getPropagator() == null) {
 			return;
 		}
-		final LongRunningJob<Long> job = new LongRunningJob<>("", configurationEditor.getConfiguration().getPropagator().number(250));
+		final LongRunningJob<Long> job = new LongRunningJob<>("", propagator.number(250));
 		job.addJobFinishedListener(new JobFinishListener<Long>() {
 			@Override
 			public void jobFinished(IJob<Long> finishedJob) {
@@ -584,14 +591,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 			return false;
 		} else {
-			final FeatureModelAnalyzer analyzer = configurationEditor.getConfiguration().getFeatureModel().getAnalyser();
-			try {
-				if (!analyzer.isValid()) {
-					displayError(THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
-					return false;
-				}
-			} catch (TimeoutException e) {
-				FMUIPlugin.getDefault().logError(e);
+			final FeatureModelAnalyzer analyzer = ProjectManager.getAnalyzer(configurationEditor.getConfiguration().getFeatureModel());
+			if (!analyzer.isValid()) {
+				displayError(
+						THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
+				return false;
 			}
 		}
 		return true;
@@ -653,7 +657,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				item.setForeground(null);
 				item.setFont(treeItemStandardFont);
 				refreshItem(item, feature);
-				if (configurationEditor.getConfiguration().canBeValid()) {
+				if (LongRunningWrapper.runMethod(propagator.canBeValid())) {
 					invalidFeatures.clear();
 				} else {
 					invalidFeatures.add(feature);
@@ -853,8 +857,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * Colors all features if they lead to a valid configuration if current
 	 * configuration is invalid. deselect:blue, select:green
 	 */
-	protected LongRunningJob<List<Node>> computeColoring(final Display currentDisplay) {
-		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValid()) {
+	protected LongRunningJob<List<LiteralSet>> computeColoring(final Display currentDisplay) {
+		if (!configurationEditor.isAutoSelectFeatures() || LongRunningWrapper.runMethod(propagator.isValid())) {
 			for (SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
 				selectableFeature.setRecommendationValue(-1);
 				selectableFeature.clearOpenClauses();
@@ -905,11 +909,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		}
 
-		
-		final LongRunningMethod<List<Node>> jobs = configurationEditor.getConfiguration().getPropagator().findOpenClauses(manualFeatureList);
-		LongRunningJob<List<Node>> job = new LongRunningJob<List<Node>>("FindClauses", jobs); 
+		final LongRunningMethod<List<LiteralSet>> jobs = propagator.findOpenClauses(manualFeatureList);
+		LongRunningJob<List<LiteralSet>> job = new LongRunningJob<>("FindClauses", jobs);
 		job.schedule();
-		
+
 		job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
 			@Override
 			public void jobFinished(IJob<List<Node>> finishedJob) {
@@ -944,7 +947,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 									return "";
 								}
 								// TODO @Sebastian: might not work anymore
-								final Node groupAbs = feature.getOpenClauses().iterator().next();
+								final LiteralSet groupAbs = feature.getOpenClauses().iterator().next();
 								final int groupRel = feature.getOpenClauseIndexes().iterator().next();
 								final StringBuilder sb = new StringBuilder();
 
@@ -1007,15 +1010,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return job;
 	}
 
-	protected LongRunningJob<List<String>> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
+	protected LongRunningJob<Boolean> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures()) {
 			return null;
 		}
-		final TreeItem topItem = tree.getTopItem();
-		SelectableFeature feature = (SelectableFeature) (topItem.getData());
-		final LongRunningMethod<List<String>> update = configurationEditor.getConfiguration().getPropagator()
-				.update(redundantManual, feature.getFeature().getName());
-		final LongRunningJob<List<String>> job = new LongRunningJob<>("", update);
+		final LongRunningMethod<Boolean> update = propagator.update(redundantManual);
+		final LongRunningJob<Boolean> job = new LongRunningJob<>("", update);
 		job.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
 			public void invoke(Object t) {
@@ -1052,7 +1052,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		updateInfoLabel(null);
 
-		final LongRunningJob<List<String>> updateJob = computeFeatures(redundantManual, currentDisplay);
+		final LongRunningJob<Boolean> updateJob = computeFeatures(redundantManual, currentDisplay);
 		if (updateJob != null) {
 			updateJob.addJobFinishedListener(new JobFinishListener<List<String>>() {
 				@Override
@@ -1147,22 +1147,22 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				sb.append("Constraints:\n");
 				sb.append(relConst);
 			}
-			final Collection<Node> openClauses = feature.getOpenClauses();
+			final Collection<LiteralSet> openClauses = feature.getOpenClauses();
 			if (!openClauses.isEmpty()) {
 				if (sb.length() > 0) {
 					sb.append("\n\n");
 				}
 				sb.append("Open Clauses:\n");
-				for (Node clause : openClauses) {
-					sb.append(NodeWriter.nodeToString(clause, NodeWriter.logicalSymbols)).append('\n');
+				for (LiteralSet clause : openClauses) {
+					sb.append(NodeWriter.nodeToString(Nodes.convert(feature.getVariables(), clause), NodeWriter.logicalSymbols)).append('\n');
 				}
 			}
 
 			if (sb.length() > 0) {
 				tipItem = item;
 				final Rectangle bounds = item.getBounds();
-				final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12,bounds.y));
-				newToolTip(tree.getShell(), sb, false, displayPoint.x,displayPoint.y);
+				final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12, bounds.y));
+				newToolTip(tree.getShell(), sb, false, displayPoint.x, displayPoint.y);
 			}
 		}
 	}

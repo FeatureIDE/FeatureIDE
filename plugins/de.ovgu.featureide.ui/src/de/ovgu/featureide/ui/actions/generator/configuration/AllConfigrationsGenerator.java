@@ -29,17 +29,14 @@ import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
-import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -55,7 +52,7 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics;
  */
 public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
-	private LongRunningJob<Boolean> number;
+	private LongRunningJob<Boolean> numberJob;
 
 	/**
 	 * @param builder
@@ -63,10 +60,11 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	 */
 	public AllConfigrationsGenerator(final ConfigurationBuilder builder, final IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
-		number = new LongRunningJob<>(IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS, new LongRunningMethod<Boolean>() {
+		numberJob = new LongRunningJob<>(IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS, new LongRunningMethod<Boolean>() {
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
-				builder.configurationNumber = Math.min(new Configuration(featureModel, false, false).number(1000000), builder.configurationNumber);
+				final Long number = LongRunningWrapper.runMethod(configurationPropagator.number(1_000_000));
+				builder.configurationNumber = Math.min(number, builder.configurationNumber);
 				if (builder.configurationNumber < 0) {
 					UIPlugin.getDefault().logWarning(StringTable.SATSOLVER_COMPUTATION_TIMEOUT);
 					builder.configurationNumber = Math.min(Integer.MAX_VALUE, builder.configurationNumber);
@@ -74,8 +72,8 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 				return true;
 			}
 		});
-		number.setPriority(Job.LONG);
-		number.schedule();
+		numberJob.setPriority(Job.LONG);
+		numberJob.schedule();
 	}
 		
 	private Node rootNode;
@@ -92,7 +90,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		try {
 			buildAll(featureModel.getStructure().getRoot().getFeature(), monitor);
 		} finally {
-			number.cancel();
+			numberJob.cancel();
 		}
 		return null;
 	}
@@ -110,10 +108,11 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	 * @param monitor
 	 */
 	private void buildAll(IFeature root, IMonitor monitor) {
-		LinkedList<IFeature> selectedFeatures2 = new LinkedList<IFeature>();
+		LinkedList<IFeature> selectedFeatures2 = new LinkedList<>();
 		selectedFeatures2.add(root);
-		rootNode = AdvancedNodeCreator.createNodes(featureModel, new AbstractFeatureFilter(), CNFType.Compact, ModelType.All, true);
-		children = new LinkedList<Node>();
+
+		CNF satInstance = getSatInstance(featureModel);
+		children = new LinkedList<>();
 		build(root, "", selectedFeatures2, monitor);
 	}
 
@@ -121,7 +120,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		try {
 			monitor.checkCancel();
 		} catch (MethodCancelException e) {
-			number.cancel();
+			numberJob.cancel();
 			cancelGenerationJobs();
 			return;
 		}
@@ -135,7 +134,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 				children.add(new Literal(feature, true));
 			}
 			try {
-				if (!(new SatSolver(new And(rootNode.clone(), new And(children)), 1000)).isSatisfiable()) {
+				if (!(new SatSolver(new And(rootNode.clone(), new And(children)), 1000)).hasSolution()) {
 					return;
 				}
 			} catch (org.sat4j.specs.TimeoutException e) {
@@ -152,7 +151,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 				}
 
 			}
-			if (configuration.isValid()) {
+			if (LongRunningWrapper.runMethod(configurationPropagator.update())) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
 				for (String f : selected.split("\\s+")) {
 					if (!"".equals(f)) {
@@ -167,7 +166,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 					}
 				}
 				for (String f : selectedFeatures3) {
-					if (configuration.getSelectablefeature(f).getSelection() != Selection.SELECTED) {
+					if (configuration.getSelectableFeature(f).getSelection() != Selection.SELECTED) {
 						return;
 					}
 				}
@@ -180,7 +179,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 							try {
 								monitor.checkCancel();
 							} catch (MethodCancelException e) {
-								number.cancel();
+								numberJob.cancel();
 								return;
 							}
 							try {

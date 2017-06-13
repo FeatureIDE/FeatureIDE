@@ -21,9 +21,11 @@
 package de.ovgu.featureide.fm.core;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -31,8 +33,11 @@ import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Contains all deprecated functionality of {@link IFeatureModel}.
@@ -53,7 +58,7 @@ abstract class DeprecatedFeatureModel {
      * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
      */
 	@Deprecated
-	public HashMap<Object, Object> analyzeFeatureModel() {
+	public Map<IFeatureModelElement, Object> analyzeFeatureModel() {
 	    return getAnalyser().analyzeFeatureModel(null);
 	}
 	
@@ -144,9 +149,11 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#commonFeatures(long, Object...)} instead.
 	 */
 	@Deprecated
-	public LinkedList<String> commonFeatures(long timeout,
-			Object... selectedFeatures) {
-	    	return new LinkedList<String>(getAnalyser().commonFeatures(timeout, selectedFeatures));
+	public List<String> commonFeatures(long timeout,
+			IFeature... selectedFeatures) {
+	    	final List<IFeature> commonFeatures = getAnalyser().getCommonFeatures();
+	    	commonFeatures.retainAll(Arrays.asList(selectedFeatures));
+			return Functional.mapToList(commonFeatures, FeatureUtils.GET_FEATURE_NAME);
 	}
 
 	/**
@@ -324,7 +331,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public LinkedList<IFeature> getCalculatedDeadFeatures() {
-		return new LinkedList<IFeature>(getAnalyser().getCachedDeadFeatures());
+		return new LinkedList<IFeature>(getAnalyser().getDeadFeatures());
 	}
 
 	/**
@@ -332,7 +339,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean valid() {
-		return getAnalyser().valid();
+		return getAnalyser().isValid();
 	}
 
 
@@ -343,6 +350,6 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public LinkedList<IFeature> getFalseOptionalFeatures() {
-		return new LinkedList<IFeature>(getAnalyser().getCachedFalseOptionalFeatures());
+		return new LinkedList<IFeature>(getAnalyser().getFalseOptionalFeatures());
 	}
 }
