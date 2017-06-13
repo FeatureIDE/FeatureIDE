@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -46,15 +46,12 @@ public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 
 	@Override
 	public Void execute(IMonitor monitor) throws Exception {
-		final CNF satInstance = getSatInstance(featureModel);
-
-		PairWiseConfigurationGenerator gen = getGenerator(satInstance, (int) builder.configurationNumber);
-		exec(satInstance, gen, monitor);
+		exec(cnf, getGenerator(), monitor);
 		return null;
 	}
-
-	protected PairWiseConfigurationGenerator getGenerator(CNF solver, int solutionCount) {
-		return new PairWiseConfigurationGenerator(solver, solutionCount);
+	
+	protected PairWiseConfigurationGenerator getGenerator() {
+		return new PairWiseConfigurationGenerator(cnf, (int) builder.configurationNumber);
 	}
 
 	protected void exec(final CNF satInstance, final PairWiseConfigurationGenerator as, IMonitor monitor) {

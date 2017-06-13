@@ -1,0 +1,6 @@
+.project
+configs/Enterprise.config
+configs/HomeBasic.config
+configs/HomePremium.config
+configs/Ultimate.config
+model.xml

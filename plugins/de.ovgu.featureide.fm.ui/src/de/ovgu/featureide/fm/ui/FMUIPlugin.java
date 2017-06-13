@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,8 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui;
 
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
+
+import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
+import de.ovgu.featureide.fm.ui.editors.EclipseExternalChangeListener;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -35,30 +40,26 @@ public class FMUIPlugin extends AbstractUIPlugin {
 
 	private static FMUIPlugin plugin;
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.plugin.AbstractUIPlugin#getID()
-	 */
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		final EclipseExternalChangeListener eclipseExternalChangeListener = new EclipseExternalChangeListener();
+		ExternalChangeListener.listener = eclipseExternalChangeListener;
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(eclipseExternalChangeListener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
+		final ExternalChangeListener listener = ExternalChangeListener.listener;
+		if (listener instanceof IResourceChangeListener) {
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener((IResourceChangeListener) listener);
+		}
 	}
 
 	public static FMUIPlugin getDefault() {

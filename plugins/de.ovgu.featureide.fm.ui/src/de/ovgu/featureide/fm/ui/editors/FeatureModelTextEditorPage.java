@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -75,7 +75,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(featureModelEditor.featureModel);
+		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(featureModelEditor.getFeatureModel());
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);
@@ -149,7 +149,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	private void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
-			final IFeatureModel fm = featureModelEditor.featureModel;
+			final IFeatureModel fm = featureModelEditor.getFeatureModel();
 			
 			//TODO _interfaces replace text with DocumentEvent (delta)
 			SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);

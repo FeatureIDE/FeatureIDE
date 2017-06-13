@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -69,10 +69,10 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.runtime.activator.RuntimeCorePlugin;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -437,7 +437,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	private Configuration readConfig() {
 		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
 		final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
-		FileHandler.load(configPath, featureProjectConfig, ConfigurationManager.getFormat(configPath.getFileName().toString()));
+		FileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 
 		return featureProjectConfig;
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -153,6 +153,10 @@ public class FeatureIDEEvent {
 		 * The model data was loaded from file.
 		 */
 		MODEL_DATA_LOADED,
+		/**
+		 * The model data loaded from a file has overridden the internal model instance.
+		 */
+		MODEL_DATA_OVERRIDDEN,
 		/**
 		 * The diagram was redrawn.
 		 */

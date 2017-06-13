@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,16 +27,17 @@ package de.ovgu.featureide.fm.core.color;
  */
 public enum FeatureColor {
 	NO_COLOR(-1), Red(0), Orange(1), Yellow(2), Dark_Green(3), Light_Green(4), Cyan(5), Light_Gray(6), Blue(7), Magenta(8), Pink(9);
-	
+
 	final int value;
+
 	FeatureColor(int i) {
 		this.value = i;
 	}
-	
+
 	public String getColorName() {
 		return name().replace('_', ' ');
 	}
-	
+
 	public int getValue() {
 		return value;
 	}

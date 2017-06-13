@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -36,12 +37,22 @@ public class ExtendedConstraint extends Constraint {
 		super(featureModel, propNode);
 	}
 
+	public ExtendedConstraint(ExtendedConstraint extendedConstraint, IFeatureModel newFeatureModel) {
+		super(extendedConstraint, newFeatureModel);
+		this.type = extendedConstraint.type;
+	}
+
 	public int getType() {
 		return type;
 	}
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	@Override
+	public IConstraint clone(IFeatureModel newFeatureModel) {
+		return new ExtendedConstraint(this, newFeatureModel);
 	}
 
 }

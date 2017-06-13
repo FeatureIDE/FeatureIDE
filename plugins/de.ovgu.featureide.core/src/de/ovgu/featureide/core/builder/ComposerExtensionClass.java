@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,6 +23,9 @@ package de.ovgu.featureide.core.builder;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -59,8 +62,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.JavaFileSystem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
@@ -325,7 +328,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public String getConfigurationExtension() {
-		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
+		return ConfigFormatManager.getInstance().getExtensions().get(0).getSuffix();
 	}
 
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
@@ -347,6 +350,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public boolean hasSourceFolder() {
+		return true;
+	}
+
+	public boolean hasSource() {
 		return true;
 	}
 
@@ -419,52 +426,32 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 * @param config The configuration file to read from.
 	 * @return The temporary configuration file.
 	 */
-	public IFile createTemporaryConfigrationsFile(IFile config) {
+	public java.nio.file.Path createTemporaryConfigrationsFile(IFile config) {
 		String configName = config.getName();
-		final String orgExtension;
 		final int extIndex = configName.lastIndexOf('.');
 		if (extIndex > 0) {
-			orgExtension = configName.substring(extIndex + 1);
 			configName = configName.substring(0, extIndex);
-		} else {
-			orgExtension = "";
 		}
-		configName = configName + '.' + getConfigurationExtension();
 		CorePlugin.getDefault().logInfo("create config " + configName);
-		final IFolder folder = config.getProject().getFolder(".tempconf");
-		try {
-			if (!folder.exists()) {
-				folder.create(true, true, null);
-			} else {
-				for (IResource member : folder.members()) {
-					if (!member.getName().equals(configName)) {
-						member.delete(true, null);
-					}
-				}
-			}
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-
-		final IFile tempConfigurationFile = folder.getFile(new Path(configName));
 
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
 
-		final IConfigurationFormat inFormat = ConfigFormatManager.getInstance().getFormatByExtension(orgExtension);
-		if (inFormat == null) {
-			CorePlugin.getDefault().logWarning("failed to read " + config);
-			return null;
-		}
-
-		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, inFormat);
+		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		if (problems.containsError()) {
 			CorePlugin.getDefault().logWarning("failed to read " + config);
 			return null;
 		}
 
-		FileHandler.save(Paths.get(tempConfigurationFile.getLocationURI()), configuration, new DefaultFormat());
+		try {
+			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + getConfigurationExtension());
+			new JavaFileSystem().write(tempFile, new DefaultFormat().write(configuration).getBytes(Charset.defaultCharset()));
+			tempFile.toFile().deleteOnExit();
+			return tempFile;
+		} catch (IOException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 
-		return tempConfigurationFile;
+		return null;
 	}
 
 	@Override

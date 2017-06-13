@@ -94,12 +94,21 @@ public class FeatureProject {
 		}
 
 		public ConfigurationPropagator getPropagator() {
-			return getPropagator(new Configuration(featureModel));
+			return new ConfigurationPropagator(formula, new Configuration(featureModel));
 		}
 
 		public ConfigurationPropagator getPropagator(Configuration configuration) {
 			return new ConfigurationPropagator(formula, configuration);
 		}
+
+		public ConfigurationPropagator getPropagator(Configuration configuration, boolean includeAbstract) {
+			return new ConfigurationPropagator(formula, configuration, includeAbstract);
+		}
+
+		public ConfigurationPropagator getPropagator(boolean includeAbstract) {
+			return new ConfigurationPropagator(formula, new Configuration(featureModel), includeAbstract);
+		}
+
 	}
 
 	private final HashSet<IFileManager<Configuration>> configurationManagerList = new HashSet<>();
@@ -155,8 +164,8 @@ public class FeatureProject {
 		}
 	}
 
-	public IFileManager<Configuration> getConfigurationManager(String path) {
-		IFileManager<Configuration> fileManager = ConfigurationManager.getInstance(new Configuration(featureModelManager.getObject()), path);
+	public IFileManager<Configuration> getConfigurationManager(Path path) {
+		IFileManager<Configuration> fileManager = ConfigurationManager.getInstance(path, new Configuration(featureModelManager.getObject()));
 		if (fileManager != null && !configurationManagerList.contains(fileManager)) {
 			configurationManagerList.add(fileManager);
 		}

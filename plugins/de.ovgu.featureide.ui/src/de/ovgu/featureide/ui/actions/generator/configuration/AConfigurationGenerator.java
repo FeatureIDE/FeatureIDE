@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,20 +20,13 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import java.util.List;
-
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FeatureProject.FeatureProjectStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
-import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
-import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
@@ -60,18 +53,16 @@ public abstract class AConfigurationGenerator implements LongRunningMethod<Void>
 
 	protected final IFeatureProject featureProject;
 	protected final ConfigurationPropagator configurationPropagator;
+	protected final CNF cnf;
 	
 	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		this.builder = builder;
 		this.featureModel = featureModel;
 		this.featureProject = featureProject;
 		configuration = new Configuration(featureModel);
-		configurationPropagator = featureProject.getStatus().getPropagator(configuration);
-	}
-	
-	protected final CNF getSatInstance(IFeatureModel fm) {
-		final List<String> abstractFeatures = Functional.mapToList(fm.getFeatures(), new AbstractFeatureFilter(), FeatureUtils.GET_FEATURE_NAME);
-		return LongRunningWrapper.runMethod(new CNFSlicer(CNFCreator.createNodes(fm), abstractFeatures));
+		final FeatureProjectStatus status = featureProject.getStatus();
+		configurationPropagator = status.getPropagator(configuration);
+		cnf = status.getFormula().getCNFWithoutAbstract();
 	}
 	
 	protected void cancelGenerationJobs() {

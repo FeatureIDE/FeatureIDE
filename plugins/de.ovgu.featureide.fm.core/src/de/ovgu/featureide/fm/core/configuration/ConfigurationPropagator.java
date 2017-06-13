@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -38,9 +38,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.OneWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.SolutionGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -328,8 +328,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	public class UpdateMethod implements LongRunningMethod<Boolean> {
-		private final boolean redundantManual;
-		private final List<SelectableFeature> featureOrder;
+		protected final boolean redundantManual;
+		protected final List<SelectableFeature> featureOrder;
 
 		public UpdateMethod(boolean redundantManual) {
 			this(redundantManual, null);
@@ -433,15 +433,26 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	// TODO fix monitor values
-	private final FeatureModelFormula formula;
-	private final Configuration configuration;
+	protected final FeatureModelFormula formula;
+	protected final Configuration configuration;
 
-	private boolean includeAbstractFeatures;
+	protected boolean includeAbstractFeatures;
 
 	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration, boolean includeAbstractFeatures) {
 		this.formula = formula;
 		this.configuration = configuration;
 		this.includeAbstractFeatures = includeAbstractFeatures;
+	}
+
+	/**
+	 * This method creates a clone of the given {@link ConfigurationPropagator}
+	 * 
+	 * @param configuration The new configuration object
+	 */
+	protected ConfigurationPropagator(ConfigurationPropagator oldPropagator, Configuration configuration) {
+		this.formula = oldPropagator.formula;
+		this.configuration = configuration;
+		this.includeAbstractFeatures = oldPropagator.includeAbstractFeatures;
 	}
 
 	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
@@ -476,7 +487,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		this.includeAbstractFeatures = includeAbstractFeatures;
 	}
 
-	private AdvancedSatSolver getSolverForCurrentConfiguration(boolean deselectUndefinedFeatures, boolean includeHiddenFeatures) {
+	protected AdvancedSatSolver getSolverForCurrentConfiguration(boolean deselectUndefinedFeatures, boolean includeHiddenFeatures) {
 		final AdvancedSatSolver solver = getSolver(includeHiddenFeatures);
 		if (solver == null) {
 			return null;
@@ -492,7 +503,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		return solver;
 	}
 
-	private AdvancedSatSolver getSolver(boolean includeHiddenFeatures) {
+	protected AdvancedSatSolver getSolver(boolean includeHiddenFeatures) {
 		final CNF satInstance;
 		if (includeAbstractFeatures) {
 			if (includeHiddenFeatures) {
@@ -502,7 +513,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			}
 		} else {
 			if (includeHiddenFeatures) {
-				satInstance = formula.getClausesWithoutAbstract();
+				satInstance = formula.getCNFWithoutAbstract();
 			} else {
 				satInstance = formula.getClausesWithoutAbstractAndHidden();
 			}
@@ -545,7 +556,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	@Override
-	public LongRunningMethod<Boolean> isValid() {
+	public IsValidMethod isValid() {
 		return new IsValidMethod(true, true);
 	}
 
@@ -582,6 +593,10 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	@Override
 	public UpdateMethod update() {
 		return update(false, null);
+	}
+
+	protected ConfigurationPropagator clone(Configuration configuration) {
+		return new ConfigurationPropagator(this, configuration);
 	}
 
 	@Override

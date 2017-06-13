@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,10 +23,8 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -60,18 +58,17 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 	 */
 	private void buildModule(IFeatureProject featureProject, IMonitor monitor, String featureName) {
 		final Configuration configuration = new Configuration(featureModel);
-		final ConfigurationPropagator c = FeatureProject.getPropagator(configuration, true);
 		
 		// create a configuration where the feature is selected
 		configuration.setManual(featureName, Selection.SELECTED);
-		if (LongRunningWrapper.runMethod(c.completeRandomly())) {
+		if (LongRunningWrapper.runMethod(configurationPropagator.completeRandomly())) {
 			builder.addConfiguration(new BuilderConfiguration(configuration, featureName));
 		}
 
 		// create a configuration where the feature is unselected
 		configuration.resetValues();
 		configuration.setManual(featureName, Selection.UNSELECTED);
-		if (LongRunningWrapper.runMethod(c.completeRandomly())) {
+		if (LongRunningWrapper.runMethod(configurationPropagator.completeRandomly())) {
 			builder.addConfiguration(new BuilderConfiguration(configuration, NOT_ + featureName));
 		}
 	}

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <exampleWizard>
 	<contentProvider name="Composer">
-		<path>Munge</path>
-		<path>Munge-Android</path>
+		<path>Munge for Android</path>
 	</contentProvider>
 	<contentProvider name="Concepts">
 		<path>Preprocessor/Munge</path>
-		<path>Combined Approaches/Munge with Android</path>
+		<path>Combined Approaches/Munge for Android</path>
 	</contentProvider>
 	<contentProvider name="Languages">
 		<path>Java/Android</path>

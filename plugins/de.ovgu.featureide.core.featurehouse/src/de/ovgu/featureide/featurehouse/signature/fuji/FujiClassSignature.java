@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -56,7 +56,6 @@ public class FujiClassSignature extends AbstractClassSignature {
 			if (!classDecl.name().equals("Object")) {
 				addExtend(classDecl.superclass().name());
 			}
-			@SuppressWarnings("unchecked")
 			Iterator<TypeDecl> implementInterfaceIt = classDecl.interfacesIterator();
 			while (implementInterfaceIt.hasNext()) {
 				TypeDecl implementType = implementInterfaceIt.next();
@@ -64,7 +63,6 @@ public class FujiClassSignature extends AbstractClassSignature {
 				addImplement(implementType.name());
 			}
 		} else if (typeDecl instanceof InterfaceDecl) {
-			@SuppressWarnings("unchecked")
 			Iterator<TypeDecl> superInterfaceIt = ((InterfaceDecl)typeDecl).superinterfacesIterator();
 			while (superInterfaceIt.hasNext()) {
 				TypeDecl superInterface = superInterfaceIt.next();

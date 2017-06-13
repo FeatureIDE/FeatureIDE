@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -39,8 +39,8 @@ import org.eclipse.core.runtime.IStatus;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -179,7 +179,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 		Configuration c = new Configuration(featureModel);
-		FileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigurationManager.getFormat(configFile.getName()));
+		FileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigFormatManager.getInstance());
 		composerExtension.copyNotComposedFiles(c, null);
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);

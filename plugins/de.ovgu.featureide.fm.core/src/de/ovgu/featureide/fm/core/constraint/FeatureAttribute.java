@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,37 +26,24 @@ package de.ovgu.featureide.fm.core.constraint;
  * @author Sebastian Krieter
  */
 public class FeatureAttribute<T> {
+
 	private final String attributeName, featureName;
 	private final T value;
-	
-	/**
-	 * @param attributeName
-	 * @param featureName
-	 * @param value
-	 */
+
 	public FeatureAttribute(String attributeName, String featureName, T value) {
 		this.attributeName = attributeName;
 		this.featureName = featureName;
 		this.value = value;
 	}
-	
-	/**
-	 * @return the attributeName
-	 */
+
 	public String getAttributeName() {
 		return attributeName;
 	}
 
-	/**
-	 * @return the featureName
-	 */
 	public String getFeatureName() {
 		return featureName;
 	}
 
-	/**
-	 * @return the value
-	 */
 	public T getValue() {
 		return value;
 	}

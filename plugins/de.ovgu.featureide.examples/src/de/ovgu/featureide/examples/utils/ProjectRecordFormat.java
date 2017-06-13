@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 /**
  * Reads / Writes the XML structure that holds the paths for all example projects.
  * 
- * @author skrieter
+ * @author Sebastian Krieter
  */
 public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
@@ -48,7 +48,7 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
 	@Override
 	public String getId() {
-		return null;
+		return ID;
 	}
 
 	@Override
@@ -114,6 +114,11 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 				addProjectRecords(doc, projectElement, projectRecord.getSubProjects());
 			}
 		}
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
 	}
 
 }

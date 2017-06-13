@@ -39,7 +39,6 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.io.manager.VirtualFileManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -131,17 +130,17 @@ public class ProjectManager {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 					final Configuration c = new Configuration(featureModel);
-					ConfigurationManager configurationManager = FileManagerMap.<Configuration, ConfigurationManager> getInstance(file.toString());
+					ConfigurationManager configurationManager = ConfigurationManager.getInstance(file);
 					if (configurationManager != null) {
 						configurationManager.setObject(c);
 						configurationManager.read();
 					} else {
-						configurationManager = ConfigurationManager.getInstance(c, file.toString());
+						configurationManager = ConfigurationManager.getInstance(file, c);
 					}
 
 					final ProblemList lastProblems = configurationManager.getLastProblems();
 					if (lastProblems.containsError()) {
-						FileManagerMap.remove(file.toString());
+						ConfigurationManager.removeInstance(file);
 					} else {
 						configurationManagerList.add(configurationManager);
 					}

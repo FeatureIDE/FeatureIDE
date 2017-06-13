@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -102,7 +102,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		label.setFont(DEFAULT_FONT);
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
-		
+
 		String displayName = feature.getObject().getName();
 		if (featureModel.getLayout().showShortNames()) {
 			int lastIndexOf = displayName.lastIndexOf(".");
@@ -146,54 +146,54 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			if (color != FeatureColor.NO_COLOR) {
 				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 			} else {
-				if (feature.getStructure().isConcrete()) {
-					toolTip.append(CONCRETE);
-				} else {
-					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					toolTip.append(ABSTRACT);
-				}
-			}
-		} else {
-			if (feature.getStructure().isRoot() && !analyser.isValid()) {
-				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-				toolTip.append(VOID);
-			} else {
-				if (feature.getStructure().isConcrete()) {
-					toolTip.append(CONCRETE);
-				} else {
-					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					toolTip.append(ABSTRACT);
-				}
-
-				if (feature.getStructure().hasHiddenParent()) {
-					setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
-					label.setForegroundColor(HIDDEN_FOREGROUND);
-					toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
-				}
-
-				toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
-
-				switch (feature.getProperty().getFeatureStatus()) {
-				case DEAD:
+				if (feature.getStructure().isRoot() && !analyser.isValid()) {
 					setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 					setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-					toolTip.append(DEAD);
-					break;
-				case FALSE_OPTIONAL:
-					setBackgroundColor(FMPropertyManager.getWarningColor());
-					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-					toolTip.append(FALSE_OPTIONAL);
-					break;
-				case INDETERMINATE_HIDDEN:
-					setBackgroundColor(FMPropertyManager.getWarningColor());
-					setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
-					toolTip.append(INDETERMINATE_HIDDEN);
-					break;
-				default:
-					break;
+					toolTip.append(VOID);
+				}
+				if (feature.getStructure().isConcrete()) {
+					toolTip.append(CONCRETE);
+				} else {
+					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
+					toolTip.append(ABSTRACT);
 				}
 			}
+		}
+
+		if (feature.getStructure().hasHiddenParent()) {
+			setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
+			label.setForegroundColor(HIDDEN_FOREGROUND);
+			toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
+		}
+
+		toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
+
+		switch (feature.getProperty().getFeatureStatus()) {
+		case DEAD:
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+			toolTip.append(DEAD);
+			break;
+		case FALSE_OPTIONAL:
+			setBackgroundColor(FMPropertyManager.getWarningColor());
+			setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
+			toolTip.append(FALSE_OPTIONAL);
+			break;
+		case INDETERMINATE_HIDDEN:
+			setBackgroundColor(FMPropertyManager.getWarningColor());
+			setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
+			toolTip.append(INDETERMINATE_HIDDEN);
+			break;
+		default:
+			break;
+		}
+
+		if (!analyser.isValid()) {
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+			toolTip.setLength(0);
+			toolTip.trimToSize();
+			toolTip.append(VOID);
 		}
 
 		if (feature instanceof ExtendedFeature) {
@@ -211,7 +211,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 				setBorder(FMPropertyManager.getInterfacedFeatureBorder());
 			}
 		}
-		
+
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
@@ -315,7 +315,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
 	}
-	
+
 	@Override
 	public ModelFigure getParent() {
 		return (ModelFigure) super.getParent();

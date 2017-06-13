@@ -17,7 +17,6 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Configurations Analysis utils
@@ -50,7 +49,7 @@ public class ConfigAnalysisUtils {
 		int iconf = 0;
 		for (IFile config : configs) {
 			final Configuration configuration = new Configuration(featureProject.getFeatureModel());
-			FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigurationManager.getFormat(config.getName()));
+			ConfigurationManager.load(Paths.get(config.getLocationURI()), configuration);
 			Set<String> configFeatures = configuration.getSelectedFeatureNames();
 			int ifeat = 0;
 			for (String f : featureList) {

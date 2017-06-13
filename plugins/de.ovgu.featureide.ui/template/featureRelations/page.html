@@ -1,0 +1,273 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+    <body>
+
+    <canvas id="myCanvas" width="800" height="700"></canvas>
+    <script>
+
+      var NODE_RADIUS = 10;
+      var NODE_DIAMETER = NODE_RADIUS * 2;
+
+var EXCLUDES_ZONE = 250;
+var REQUIRES_ZONE = 60;
+var DISCOURAGES_ZONE = EXCLUDES_ZONE - 20;
+var MIDDLE_ZONE = DISCOURAGES_ZONE - EXCLUDES_ZONE/4;
+var ENCOURAGES_ZONE = REQUIRES_ZONE + EXCLUDES_ZONE/4;
+var CENTER_ZONE = REQUIRES_ZONE - NODE_DIAMETER;
+
+var EXCLUDES_COLOR = "rgb(255, 0, 0)";
+var REQUIRES_COLOR = "rgb(19, 166, 50)";
+var ENCOURAGES_COLOR = "rgb(179, 202, 157)";
+var DISCOURAGES_COLOR = "rgb(242, 178, 103)";
+var MIDDLE_COLOR = "rgb(255, 255, 255)";
+
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+      var centerX = canvas.width / 2;
+      var centerY = canvas.height / 2;
+
+var CENTRAL_FEATURE = "FeatureC";
+var FEATURE_NAMES = ["Feature1", "Feature2", "Feature3", "Feature4", "Feature5", "Feature6"];
+var GIVEN = [1, 0.99, 0.66, 0.5, 0.01, 0];
+var FORMALIZED_REQUIRES = ["Feature1"];
+var FORMALIZED_EXCLUDES = [];
+// Override values
+// DATA_HERE
+
+var NUMBER_OF_FEATURES = FEATURE_NAMES.length;
+
+context.save();
+      context.translate(canvas.width / 2, canvas.height / 2);
+      context.strokeStyle = '#000000';
+
+      // Excludes zone
+      context.beginPath();
+      context.arc(0, 0, EXCLUDES_ZONE, 0, 2 * Math.PI, false);
+      context.fillStyle = EXCLUDES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+
+      // Discourages zone
+      context.beginPath();
+      context.arc(0, 0, DISCOURAGES_ZONE, 0, 2 * Math.PI, false);
+      context.fillStyle = DISCOURAGES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+
+      // Fade from middle to discourage
+      context.beginPath();
+      context.arc(0, 0, MIDDLE_ZONE + NODE_RADIUS, 0, 2 * Math.PI, false);
+      var grd2 = context.createRadialGradient(0, 0, MIDDLE_ZONE, 0, 0, MIDDLE_ZONE + NODE_RADIUS);
+      grd2.addColorStop(0, MIDDLE_COLOR);
+      grd2.addColorStop(1, DISCOURAGES_COLOR);
+      context.fillStyle = grd2;
+      context.fill();
+      context.lineWidth = 1;
+
+      // Middle zone
+      context.beginPath();
+      context.arc(0, 0, MIDDLE_ZONE, 0, 2 * Math.PI, false);
+      context.fillStyle = MIDDLE_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+
+      // Encourages zone
+      context.beginPath();
+      context.arc(0, 0, ENCOURAGES_ZONE, 0, 2 * Math.PI, false);
+      var grd = context.createRadialGradient(0, 0, ENCOURAGES_ZONE - NODE_RADIUS, 0, 0, ENCOURAGES_ZONE);
+      grd.addColorStop(0, ENCOURAGES_COLOR);
+      grd.addColorStop(1, 'white');
+      context.fillStyle = grd;
+      context.fill();
+      context.lineWidth = 1;
+
+
+      // Requires zone
+      context.beginPath();
+      context.arc(0, 0, REQUIRES_ZONE, 0, 2 * Math.PI, false);
+      context.fillStyle = REQUIRES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+
+      // Central
+      context.beginPath();
+      context.arc(0, 0, CENTER_ZONE, 0, 2 * Math.PI, false);
+      context.fillStyle = 'white';
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+      
+      // Text of central features
+      var centralName = CENTRAL_FEATURE;
+      context.font = '11pt Calibri';
+      var metrics = context.measureText(centralName);
+      var width = metrics.width;
+
+      context.fillStyle = 'black';
+      context.fillText(centralName, -width/2, 0);
+
+      var rotateRadio = Math.PI * 2 /(NUMBER_OF_FEATURES);
+      var currentRotation = 0;
+
+      for (var i = 0; i < NUMBER_OF_FEATURES; i++) {
+      var fiPosition = 100;
+      if(GIVEN[i]==0){
+         fiPosition = EXCLUDES_ZONE - NODE_RADIUS;
+      } else if (GIVEN[i]==1){
+         fiPosition = REQUIRES_ZONE - NODE_RADIUS;
+      } else {
+         var totalSpace = (EXCLUDES_ZONE - NODE_RADIUS*3) - (REQUIRES_ZONE + NODE_RADIUS);
+         fiPosition = REQUIRES_ZONE + NODE_RADIUS + ((1-GIVEN[i]) * totalSpace);
+      }
+      context.beginPath();
+      context.arc(fiPosition, 0, NODE_RADIUS, 0, 2 * Math.PI, false);
+      context.fillStyle = 'white';
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+      
+            if(FORMALIZED_REQUIRES.indexOf(FEATURE_NAMES[i]) > -1){
+context.beginPath();
+              context.arc(fiPosition, 0, NODE_RADIUS - 4, 0, 2 * Math.PI, false);
+context.fillStyle = REQUIRES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+      }
+
+
+      if(FORMALIZED_EXCLUDES.indexOf(FEATURE_NAMES[i]) > -1){
+context.beginPath();
+              context.arc(fiPosition, 0, NODE_RADIUS - 4, 0, 2 * Math.PI, false);
+context.fillStyle = EXCLUDES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+      }
+
+      // line
+      context.beginPath();
+      context.moveTo(CENTER_ZONE, 0);
+      context.lineTo(fiPosition - NODE_RADIUS, 0);
+      context.stroke();      
+
+      // feature name
+context.fillStyle = 'black';
+     if (currentRotation>Math.PI/2 && currentRotation<Math.PI/2*3) {
+      context.save();
+//context.translate(fiPosition, 0);
+var metrics = context.measureText(FEATURE_NAMES[i]);
+      var width = metrics.width;
+
+      context.rotate(Math.PI);
+      context.fillText(FEATURE_NAMES[i], -(fiPosition + width + NODE_DIAMETER), 0);
+      context.restore();
+      } else {
+
+        context.fillText(FEATURE_NAMES[i], fiPosition + NODE_DIAMETER, 0);
+      }
+      currentRotation += rotateRadio;
+      context.rotate(rotateRadio);
+      }
+
+context.restore();
+
+// Legend
+context.translate(canvas.width - 100, canvas.height - 180);
+var LEGEND_ITEM = 15;
+var y = 5;
+context.fillStyle = 'black';
+context.font = '11pt Calibri';
+context.fillText("Relation types", 0, 0);
+y += LEGEND_ITEM + 5;
+context.fillText("Formalized", NODE_RADIUS * 2 + 5, y);
+
+
+	context.beginPath();
+      context.arc(NODE_RADIUS, y -NODE_RADIUS/2 , NODE_RADIUS, 0, 2 * Math.PI, false);
+      context.fillStyle = 'white';
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+      
+      context.beginPath();
+      context.arc(NODE_RADIUS, y - NODE_RADIUS/2, NODE_RADIUS - 4, 0, 2 * Math.PI, false);
+context.fillStyle = 'grey';
+      context.fill();
+      context.lineWidth = 1;
+      context.stroke();
+
+y += LEGEND_ITEM + 15;
+
+
+context.fillStyle = 'black';
+context.fillText("Zones", 0, y);
+ 	y += LEGEND_ITEM;
+      context.beginPath();
+      context.rect(0, y, LEGEND_ITEM, LEGEND_ITEM);
+      context.fillStyle = REQUIRES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.strokeStyle = 'black';
+      context.stroke();
+      context.fillStyle = 'black';
+      context.fillText("Requires", LEGEND_ITEM + 5, LEGEND_ITEM + y);
+
+      y += LEGEND_ITEM + 5;
+      context.beginPath();
+      context.rect(0, y, LEGEND_ITEM, LEGEND_ITEM);
+      context.fillStyle = ENCOURAGES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.strokeStyle = 'black';
+      context.stroke();
+      context.fillStyle = 'black';
+      context.fillText("Encourages", LEGEND_ITEM + 5, LEGEND_ITEM + y);
+
+      y += LEGEND_ITEM + 5;
+      context.beginPath();
+      context.rect(0, y, LEGEND_ITEM, LEGEND_ITEM);
+      context.fillStyle = MIDDLE_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.strokeStyle = 'black';
+      context.stroke();
+      context.fillStyle = 'black';
+      context.fillText("Independent", LEGEND_ITEM + 5, LEGEND_ITEM + y);
+
+      y += LEGEND_ITEM + 5;
+      context.beginPath();
+      context.rect(0, y, LEGEND_ITEM, LEGEND_ITEM);
+      context.fillStyle = DISCOURAGES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.strokeStyle = 'black';
+      context.stroke();
+      context.fillStyle = 'black';
+      context.fillText("Discourages", LEGEND_ITEM + 5, LEGEND_ITEM + y);
+
+      y += LEGEND_ITEM + 5;
+      context.beginPath();
+      context.rect(0, y, LEGEND_ITEM, LEGEND_ITEM);
+      context.fillStyle = EXCLUDES_COLOR;
+      context.fill();
+      context.lineWidth = 1;
+      context.strokeStyle = 'black';
+      context.stroke();
+      context.fillStyle = 'black';
+      context.fillText("Excludes", LEGEND_ITEM + 5, LEGEND_ITEM + y);
+
+    </script>
+  </body>
+</html>

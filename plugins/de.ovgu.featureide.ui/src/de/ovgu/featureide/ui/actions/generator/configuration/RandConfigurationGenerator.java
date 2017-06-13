@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,7 +21,6 @@
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.PairWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.RandomConfigurationGenerator;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -41,8 +40,8 @@ public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
 	}
 
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(CNF satInstance, int solutionCount) {
-		return new RandomConfigurationGenerator(satInstance, solutionCount);
+	protected PairWiseConfigurationGenerator getGenerator() {
+		return new RandomConfigurationGenerator(cnf, (int) builder.configurationNumber);
 	}
 
 }

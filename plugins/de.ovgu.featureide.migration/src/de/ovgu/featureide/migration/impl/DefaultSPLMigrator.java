@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -130,7 +130,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	}
 
 	private void convertToFeatureProject(MigrationConfigurationData configurationData) {
-		CorePlugin.setupFeatureProject(newProject, configurationData.composer.getId(), configurationData.sourcePath, configurationData.configPath, configurationData.buildPath, false);
+		CorePlugin.setupFeatureProject(newProject, configurationData.composer.getId(), configurationData.sourcePath, configurationData.configPath, configurationData.buildPath, false, false);
 
 		CorePlugin.getDefault().addProject(newProject);
 	}

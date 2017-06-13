@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,7 +29,6 @@ import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -111,7 +110,6 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		LinkedList<IFeature> selectedFeatures2 = new LinkedList<>();
 		selectedFeatures2.add(root);
 
-		CNF satInstance = getSatInstance(featureModel);
 		children = new LinkedList<>();
 		build(root, "", selectedFeatures2, monitor);
 	}
@@ -130,7 +128,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 		if (featureModel.getConstraintCount() > 0) {
 			children.clear();
-			for (String feature : selected.split("\\s+")) {
+			for (String feature : selected.split("\"")) {
 				children.add(new Literal(feature, true));
 			}
 			try {
@@ -146,14 +144,14 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			configuration.resetValues();
 
 			if (!selected.isEmpty()) {
-				for (final String feature : selected.split("\\s+")) {
+				for (final String feature : selected.split("\"")) {
 					configuration.setManual((feature), Selection.SELECTED);
 				}
 
 			}
 			if (LongRunningWrapper.runMethod(configurationPropagator.update())) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
-				for (String f : selected.split("\\s+")) {
+				for (String f : selected.split("\"")) {
 					if (!"".equals(f)) {
 						selectedFeatures3.add(f);
 					}
@@ -211,7 +209,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {
@@ -240,7 +238,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {
@@ -275,7 +273,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
-				selected += " " + currentFeature.getName();
+				selected += "\"" + currentFeature.getName();
 			}
 		}
 		if (!currentFeature.getStructure().hasChildren()) {

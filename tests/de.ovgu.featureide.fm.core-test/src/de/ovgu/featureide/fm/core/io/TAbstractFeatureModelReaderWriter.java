@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -96,7 +96,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		
 		for (File f : MODEL_FILE_FOLDER.listFiles(fileFilter)) {
 			Object[] models = new Object[2];
-			IFeatureModel fm = FeatureModelManager.readFromFile(f.toPath());
+			IFeatureModel fm = FeatureModelManager.load(f.toPath()).getObject();
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);

@@ -142,7 +142,7 @@ public class FeatureModelFormula {
 	//		}
 	//	}
 
-	public CNF getClausesWithoutAbstract() {
+	public CNF getCNFWithoutAbstract() {
 		return getSlicedCNF(0);
 	}
 

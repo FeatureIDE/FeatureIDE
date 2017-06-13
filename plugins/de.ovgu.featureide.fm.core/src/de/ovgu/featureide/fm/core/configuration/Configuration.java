@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -138,7 +137,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public List<SelectableFeature> getManualFeatures() {
-		final List<SelectableFeature> featureList = new LinkedList<>();
+		final List<SelectableFeature> featureList = new ArrayList<>();
 		for (SelectableFeature selectableFeature : features) {
 			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 				featureList.add(selectableFeature);
@@ -151,7 +150,6 @@ public class Configuration implements Cloneable {
 		return root;
 	}
 
-	// TODO Rename to getSelectableFeature
 	public SelectableFeature getSelectableFeature(String name) {
 		return table.get(name);
 	}

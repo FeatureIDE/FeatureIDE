@@ -5,6 +5,23 @@
 		<project name="ATM-DeltaJ" path="featureide_examples/ATM-DeltaJ/.project"/>
 		<project name="BankAccount-FH-JML" path="featureide_examples/BankAccount-FH-JML/.project"/>
 		<project name="BerkeleyDB-FH-Java" path="featureide_examples/BerkeleyDB-FH-Java/.project"/>
+		<project name="Elevator-FeatureModeling" path="featureide_examples/Book/FM/Elevator-FeatureModeling/.project"/>
+		<project name="Elevator-FeatureModeling-Colored" path="featureide_examples/Book/FM/Elevator-FeatureModeling-Colored/.project"/>
+		<project name="Elevator-FeatureModeling-Configuration" path="featureide_examples/Book/FM/Elevator-FeatureModeling-Configuration/.project"/>
+		<project name="Elevator-FeatureHouse-v0.0" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.0/.project"/>
+		<project name="Elevator-FeatureHouse-v0.1" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.1/.project"/>
+		<project name="Elevator-FeatureHouse-v0.2" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.2/.project"/>
+		<project name="Elevator-FeatureHouse-v1.0" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v1.0/.project"/>
+		<project name="Elevator-FeatureHouse-v1.1" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v1.1/.project"/>
+		<project name="Elevator" path="featureide_examples/Book/OOP/Elevator/.project"/>
+		<project name="Elevator-Antenna-v0.0" path="featureide_examples/Book/PP/Elevator-Antenna-v0.0/.project"/>
+		<project name="Elevator-Antenna-v0.1" path="featureide_examples/Book/PP/Elevator-Antenna-v0.1/.project"/>
+		<project name="Elevator-Antenna-v0.2" path="featureide_examples/Book/PP/Elevator-Antenna-v0.2/.project"/>
+		<project name="Elevator-Antenna-v1.0" path="featureide_examples/Book/PP/Elevator-Antenna-v1.0/.project"/>
+		<project name="Elevator-Antenna-v1.1" path="featureide_examples/Book/PP/Elevator-Antenna-v1.1/.project"/>
+		<project name="Elevator-Antenna-v1.2" path="featureide_examples/Book/PP/Elevator-Antenna-v1.2/.project"/>
+		<project name="Elevator-Antenna-v1.3" path="featureide_examples/Book/PP/Elevator-Antenna-v1.3/.project"/>
+		<project name="Elevator-Antenna-v1.4" path="featureide_examples/Book/PP/Elevator-Antenna-v1.4/.project"/>
 		<project name="Clock-FH-AsmetaL" path="featureide_examples/Clock-FH-AsmetaL/.project"/>
 		<project name="DesktopSearcher-AHEAD" path="featureide_examples/DesktopSearcher-AHEAD/.project"/>
 		<project name="DiGraph-FH-JML" path="featureide_examples/DiGraph-FH-JML/.project"/>
@@ -54,6 +71,7 @@
 		<project name="HelloWorld-FC++" path="featureide_examples/HelloWorld-FC++/.project"/>
 		<project name="HelloWorld-FH-AspectJ" path="featureide_examples/HelloWorld-FH-AspectJ/.project"/>
 		<project name="HelloWorld-FH-Java" path="featureide_examples/HelloWorld-FH-Java/.project"/>
+		<project name="HelloWorld-FH-JML" path="featureide_examples/HelloWorld-FH-JML/.project"/>
 		<project name="HelloWorld-FH-JUnit" path="featureide_examples/HelloWorld-FH-JUnit/.project"/>
 		<project name="HelloWorld-Framework" path="featureide_examples/HelloWorld-Framework/.project">
 			<project name="World" path="featureide_examples/HelloWorld-Framework/features/World/.project"/>
@@ -62,12 +80,11 @@
 			<project name="Beautiful" path="featureide_examples/HelloWorld-Framework/features/Beautiful/.project"/>
 		</project>
 		<project name="HelloWorld-Munge" path="featureide_examples/HelloWorld-Munge/.project"/>
+		<project name="HelloWorld-RuntimeParameters" path="featureide_examples/HelloWorld-RuntimeParameters/.project"/>
 		<project name="HelloWorld-RuntimeProperties" path="featureide_examples/HelloWorld-RuntimeProperties/.project"/>
-		<project name="HelloWorld-RuntimeRunConfig" path="featureide_examples/HelloWorld-RuntimeRunConfig/.project"/>
 		<project name="HelloWorldMPL-FH-Java" path="featureide_examples/HelloWorldMPL-FH-Java/.project">
 			<project name="HelloWorld-FH-Java-MPLDependency" path="featureide_examples/HelloWorldMPL-FH-Java/projects/HelloWorld-FH-Java-MPLDependency/.project"/>
 		</project>
-		<project name="Images_Example" path="featureide_examples/Images_Example/.project"/>
 		<project name="IntegerSet-FH-JML" path="featureide_examples/IntegerSet-FH-JML/.project"/>
 		<project name="IntList-FH-JML" path="featureide_examples/IntList-FH-JML/.project"/>
 		<project name="LandingGear-FH-AsmetaL" path="featureide_examples/LandingGear-FH-AsmetaL/.project"/>
@@ -89,4 +106,5 @@
 		<project name="Telecom Example-AspectJ" path="featureide_examples/Telecom Example-AspectJ/.project"/>
 		<project name="Tracing Example-AspectJ" path="featureide_examples/Tracing Example-AspectJ/.project"/>
 		<project name="UnionFind-FH-JML" path="featureide_examples/UnionFind-FH-JML/.project"/>
+		<project name="VariableCharacters-ImageComposer" path="featureide_examples/VariableCharacters-ImageComposer/.project"/>
 	</projectRecords>

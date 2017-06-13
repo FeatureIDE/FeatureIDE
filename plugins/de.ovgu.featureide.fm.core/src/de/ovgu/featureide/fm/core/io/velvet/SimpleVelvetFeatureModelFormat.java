@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -301,9 +301,6 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 			unsupportedModelException.addSuppressed(e);
 			throw unsupportedModelException;
 		}
-
-		// Update the FeatureModel in Editor
-		extFeatureModel.handleModelDataLoaded();
 	}
 
 	private ExtendedFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,
@@ -778,6 +775,11 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
 	}
 
 }

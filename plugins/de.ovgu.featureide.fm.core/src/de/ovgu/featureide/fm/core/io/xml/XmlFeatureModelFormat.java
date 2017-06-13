@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.prop4j.And;
 import org.prop4j.AtMost;
@@ -74,6 +75,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + XmlFeatureModelFormat.class.getSimpleName();
 
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
+
 	private IFeatureModelFactory factory;
 
 	@Override
@@ -109,8 +112,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		importCustomProperties(customProperties, object);
-
-		object.handleModelDataLoaded();
 	}
 
 	@Override
@@ -614,6 +615,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }

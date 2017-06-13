@@ -2,6 +2,7 @@
 .project
 .settings/org.eclipse.cdt.managedbuilder.core.prefs
 configs/BeautifulWorld.equation
+configs/Hello.equation
 configs/HelloWorld.equation
 configs/WonderfulWorld.equation
 features/Beautiful/Main.h

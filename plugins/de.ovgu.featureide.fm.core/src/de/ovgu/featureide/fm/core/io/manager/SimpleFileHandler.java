@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -51,7 +52,7 @@ public class SimpleFileHandler<T> {
 
 	private IPersistentFormat<T> format;
 
-	private final ProblemList lastProblems = new ProblemList();
+	private final ProblemList problemList = new ProblemList();
 
 	private T object;
 
@@ -69,12 +70,30 @@ public class SimpleFileHandler<T> {
 		return fileHandler.getLastProblems();
 	}
 
+	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
+		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, null);
+		final String content = fileHandler.getContent();
+
+		if (content != null) {
+			final String fileName = path.getFileName().toString();
+			final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
+			if (format == null) {
+				fileHandler.getLastProblems()
+						.add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));
+			} else {
+				fileHandler.setFormat(format);
+				fileHandler.parse(content);
+			}
+		}
+		return fileHandler.getLastProblems();
+	}
+
 	public static <T> ProblemList save(Path path, T object, IPersistentFormat<T> format) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
 		fileHandler.write();
 		return fileHandler.getLastProblems();
 	}
-	
+
 	public static <T> ProblemList convert(Path inPath, Path outPath, T object, IPersistentFormat<T> inFormat, IPersistentFormat<T> outFormat) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(inPath, object, inFormat);
 		ProblemList pl = new ProblemList();
@@ -86,11 +105,11 @@ public class SimpleFileHandler<T> {
 		pl.addAll(fileHandler.getLastProblems());
 		return pl;
 	}
-	
+
 	public static <T> String saveToString(T object, IPersistentFormat<T> format) {
 		return format.write(object);
 	}
-	
+
 	public static <T> ProblemList loadFromString(String source, T object, IPersistentFormat<T> format) {
 		return format.read(object, source);
 	}
@@ -106,7 +125,7 @@ public class SimpleFileHandler<T> {
 	}
 
 	public ProblemList getLastProblems() {
-		return lastProblems;
+		return problemList;
 	}
 
 	public T getObject() {
@@ -130,62 +149,70 @@ public class SimpleFileHandler<T> {
 	}
 
 	public boolean read() {
-		lastProblems.clear();
-		if (!Files.exists(path)) {
-			lastProblems.add(new Problem(new FileNotFoundException(path.toString())));
-			return false;
-		}
-		try {
-			final T newObject = object;
-
-			final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
-			final List<Problem> problemList = format.getInstance().read(newObject, content);
-			if (problemList != null) {
-				lastProblems.addAll(problemList);
-			}
-		} catch (final Exception e) {
-			handleException(e);
-		}
-		return !lastProblems.containsError();
+		problemList.clear();
+		return parse(getContent());
 	}
 
 	public boolean read(InputStream inputStream) {
-		lastProblems.clear();
-		try {
-			final T newObject = object;
+		problemList.clear();
+		return parse(getContent(inputStream));
+	}
 
+	String getContent() {
+		if (!Files.exists(path)) {
+			problemList.add(new Problem(new FileNotFoundException(path.toString())));
+			return null;
+		}
+
+		try {
+			return new String(FileSystem.read(path), DEFAULT_CHARSET);
+		} catch (final Exception e) {
+			problemList.add(new Problem(e));
+			return null;
+		}
+	}
+
+	private String getContent(InputStream inputStream) {
+		try {
 			final StringBuilder sb = new StringBuilder();
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, DEFAULT_CHARSET))) {
-				String line;
-				while ((line = br.readLine()) != null) {
+				for (String line; (line = br.readLine()) != null;) {
 					sb.append(line);
 					sb.append(System.lineSeparator());
 				}
 			}
-
-			final List<Problem> problemList = format.getInstance().read(newObject, sb.toString());
-			if (problemList != null) {
-				lastProblems.addAll(problemList);
-			}
+			return sb.toString();
 		} catch (final Exception e) {
-			handleException(e);
+			problemList.add(new Problem(e));
+			return null;
 		}
-		return lastProblems.containsError();
+	}
+
+	boolean parse(String content) {
+		if (content != null) {
+			try {
+				final List<Problem> parsingProblemList = format.getInstance().read(object, content);
+				if (problemList != null) {
+					problemList.addAll(parsingProblemList);
+				}
+			} catch (final Exception e) {
+				problemList.add(new Problem(e));
+			}
+		}
+
+		return !problemList.containsError();
 	}
 
 	public boolean write() {
-		lastProblems.clear();
+		problemList.clear();
 		try {
 			final byte[] content = format.getInstance().write(object).getBytes(DEFAULT_CHARSET);
 			FileSystem.write(path, content);
 		} catch (final Exception e) {
-			handleException(e);
+			problemList.add(new Problem(e));
 		}
-		return !lastProblems.containsError();
-	}
 
-	private void handleException(Exception e) {
-		lastProblems.add(new Problem(e));
+		return !problemList.containsError();
 	}
 
 }

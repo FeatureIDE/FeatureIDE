@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -72,7 +72,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public String toString() {
 		return "Name: " + name + "; ID: " + id;
 	}
-	
+
 	@Override
 	public String getDescription() {
 		return description;
@@ -105,6 +105,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	}
 
 	@Override
+	public boolean hasSource() {
+		return defaultComposerExtensionClass.hasSource();
+	}
+
+	@Override
 	public boolean hasContractComposition() {
 		return defaultComposerExtensionClass.hasContractComposition();
 	}
@@ -128,17 +133,17 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public boolean supportsAndroid() {
 		return defaultComposerExtensionClass.supportsAndroid();
 	}
-	
+
 	@Override
 	public boolean supportsMigration() {
 		return defaultComposerExtensionClass.supportsMigration();
 	}
-	
+
 	@Override
 	public IStatus isComposable() {
 		return defaultComposerExtensionClass.isComposable();
 	}
-	
+
 	@Override
 	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c) {
 		return defaultComposerExtensionClass.getComposerObjectInstance(c);

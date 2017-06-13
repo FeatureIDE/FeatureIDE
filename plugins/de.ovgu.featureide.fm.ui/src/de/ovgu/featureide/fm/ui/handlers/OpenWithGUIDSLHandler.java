@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -64,7 +64,7 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 			String command = "java -cp \"" + jakarta + "\"";
 			command += " -jar \"" + guidsl + "\"";
 
-			IFeatureModel fm = FeatureModelManager.readFromFile(Paths.get(modelfile.getLocationURI()));
+			IFeatureModel fm = FeatureModelManager.load(Paths.get(modelfile.getLocationURI())).getObject();
 
 			// Parse XML to GUIDSL and save file as model.m
 			String loc = modelfile.getLocation().toOSString();

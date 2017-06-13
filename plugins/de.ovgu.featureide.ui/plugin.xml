@@ -110,6 +110,14 @@
 				name="FeatureIDE Statistics"
 				restorable="true">
 		</view>
+  <view
+        category="FeatureIDE"
+        class="de.ovgu.featureide.ui.views.configMap.ConfigurationMap"
+        icon="icons/FeatureIconSmall.ico"
+        id="de.ovgu.featureide.ui.views.configMap"
+        name="Configuration Map"
+        restorable="true">
+  </view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.perspectives">
@@ -1171,6 +1179,12 @@
          label="Enable Editor Highlighting"
          style="toggle">
 			</command>
+   <command
+         commandId="de.ovgu.featureide.fm.ui.colorscheme"
+         icon="icons/FeatureColorIcon.gif"
+         label="Feature Color"
+         style="push">
+   </command>
 		</menuContribution>
   <menuContribution
         allPopups="false"
@@ -1251,6 +1265,7 @@
 				name="Create documentation statistics">
 		</command>
   <command
+        defaultHandler="de.ovgu.featureide.ui.handlers.ColorSchemeHandler"
         id="de.ovgu.featureide.fm.ui.colorscheme"
         name="Colorscheme">
   </command>
@@ -1420,5 +1435,36 @@
     </navigatorContent>
  </extension>
 	
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
+         <menu
+               icon="icons/FeatureIconSmall.ico"
+               id="popup:de.ovgu.featureide.fm.ui.menus.popupMenu.visualizations"
+               label="Visualization">
+               				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+					</reference>
+				</visibleWhen>
+            <command
+                  commandId="de.ovgu.featureide.ui.visualization.command.featurerelations"
+                  label="Feature Relations Graph"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="de.ovgu.featureide.ui.visualization.ShowFeatureRelationsGraphCommandHandler"
+            id="de.ovgu.featureide.ui.visualization.command.featurerelations"
+            name="Feature Relations Graph">
+      </command>
+   </extension>
 	
 </plugin>

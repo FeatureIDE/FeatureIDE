@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -50,7 +50,7 @@ public abstract class AbstractExportHandler extends AFileHandler {
 		}
 
 		final Path path = Paths.get(modelFile.getLocationURI());
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByExtension(modelFile.getFileExtension());
+		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(modelFile.getName());
 		IFeatureModelFactory factory;
 		try {
 			factory = FMFactoryManager.getFactory(path.toString(), format);

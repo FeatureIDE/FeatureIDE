@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -38,8 +38,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -88,7 +88,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 
 	private final HashMap<String, Boolean> buildMap = new HashMap<String, Boolean>();
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
 		final IProject project = getProject();
@@ -116,7 +116,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				final Configuration config = new Configuration(featureProject.getFeatureModel());
 
 				final IFile configFile = featureProject.getCurrentConfiguration();
-				FileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigurationManager.getFormat(configFile.getName()));
+				FileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigFormatManager.getInstance());
 
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();

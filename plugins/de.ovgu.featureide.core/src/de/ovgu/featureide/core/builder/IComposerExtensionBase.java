@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -50,6 +50,11 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @return <code>false</code> if a source folder should not be created. Default: <code>true</code>
 	 */
 	boolean hasSourceFolder();
+
+	/**
+	 * @return <code>false</code> if the project has no source code. Default: <code>true</code>
+	 */
+	boolean hasSource();
 
 	/**
 	 * @return <code>true</code> if the composition tool supports contract composition.

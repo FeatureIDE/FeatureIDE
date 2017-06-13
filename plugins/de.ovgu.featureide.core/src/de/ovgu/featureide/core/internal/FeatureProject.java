@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -84,7 +84,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
-import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.job.ModelScheduleRule;
@@ -100,6 +99,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -108,8 +108,8 @@ import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -126,7 +126,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Tom Brosch
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject implements IFeatureProject, IResourceChangeListener, IBuilderMarkerHandler {
+public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject implements IFeatureProject, IResourceChangeListener, IBuilderMarkerHandler, IEventListener {
 
 	private static final CorePlugin LOGGER = CorePlugin.getDefault();
 
@@ -325,6 +325,7 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 
 		featureModelManager = FeatureModelManager.getInstance(Paths.get(modelFile.getModelFile().getLocationURI()));
 		featureModelManager.addListener(new FeatureModelChangeListner());
+		featureModelManager.read();
 
 		// initialize project structure
 		try {
@@ -336,22 +337,11 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 
 		String projectBuildPath = getProjectBuildPath();
 
-		try {
-
-			// just create the bin folder if project hat only the FeatureIDE
-			// Nature
-			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if (!(projectBuildPath.isEmpty() && getProjectSourcePath().isEmpty())) {
-					binFolder = CorePlugin.createFolder(project, "bin");
-				}
-			}
-		} catch (CoreException e) {
-			LOGGER.logError(e);
-		}
 		libFolder = project.getFolder("lib");
-		buildFolder = CorePlugin.createFolder(project, projectBuildPath);
-		configFolder = CorePlugin.createFolder(project, getProjectConfigurationPath());
-		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
+		binFolder = CorePlugin.getFolder(project, "bin");
+		buildFolder = CorePlugin.getFolder(project, projectBuildPath);
+		configFolder = CorePlugin.getFolder(project, getProjectConfigurationPath());
+		sourceFolder = CorePlugin.getFolder(project, getProjectSourcePath());
 		fstModel = null;
 		// loading model data and listen to changes in the model file
 		addModelListener();
@@ -437,7 +427,7 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 			// write feature order to model
 			// XmlFeatureModelWriter modelWriter = new
 			// XmlFeatureModelWriter(featureModel);
-			FeatureModelManager.writeToFile(featureModel, Paths.get(modelFile.getModelFile().getLocationURI()));
+			FeatureModelManager.save(featureModel, Paths.get(modelFile.getModelFile().getLocationURI()));
 		}
 		/*
 		 * TODO delete .order file in 2013 delete
@@ -486,16 +476,18 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 			}
 		}
 		// delete all empty folders which do not anymore belong to layers
-		for (IResource res : sourceFolder.members())
-			if (res instanceof IFolder && res.exists()) {
-				IFolder folder = (IFolder) res;
-				IFeature feature = featureModel.getFeature(folder.getName());
+		for (IResource res : sourceFolder.members()) {
+			if (res instanceof IFolder && res.isAccessible()) {
+				final IFeature feature = featureModel.getFeature(res.getName());
 				if (feature == null || !feature.getStructure().isConcrete()) {
+					final IFolder folder = (IFolder) res;
 					folder.refreshLocal(IResource.DEPTH_ONE, null);
-					if (folder.members().length == 0)
+					if (folder.members().length == 0) {
 						folder.delete(false, null);
+					}
 				}
 			}
+		}
 	}
 
 	private void addModelListener() {
@@ -550,19 +542,14 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 					configurationUpdate = true;
 					configFolder.accept(new IResourceVisitor() {
 						private final String suffix = "." + composer.getConfigurationExtension();
+
 						private final Configuration config = new Configuration(model);
-						private final FileHandler<Configuration> handler = new FileHandler<>(config);
 
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
 							final String name = resource.getName();
 							if (resource instanceof IFile && name.endsWith(suffix)) {
-								final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(resource.getName());
-								final java.nio.file.Path path = Paths.get(resource.getLocationURI());
-								handler.setFormat(format);
-								handler.setPath(path);
-								handler.read();
-								handler.write();
+								ConfigurationManager.load(Paths.get(resource.getLocationURI()), config).write();
 							}
 							return true;
 						}
@@ -856,16 +843,16 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 	public void resourceChanged(IResourceChangeEvent event) {
 		// if something in source folder changed
 		if (sourceFolder != null && event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
-
 			// set markers, only if event is not fired from changes to markers
 			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0 && composerExtension != null && composerExtension.createFolderForFeatures()) {
 				setAllFeatureModuleMarkers();
 			}
 		}
-
+		
 		IPath modelPath = modelFile.getModelFile().getFullPath();
-		if (checkModelChange(event.getDelta().findMember(modelPath)))
+		if (checkModelChange(event.getDelta().findMember(modelPath))) {
 			return;
+		}
 
 		try {
 			List<IFile> configs = getAllConfigurations();
@@ -1003,10 +990,9 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 			return configs;
 		try {
 			for (IResource res : configFolder.members()) {
-				if (!(res instanceof IFile))
-					continue;
-				if (LOGGER.getConfigurationExtensions().contains(res.getFileExtension()))
+				if (res instanceof IFile && ConfigFormatManager.getInstance().hasFormat(res.getName())) {
 					configs.add((IFile) res);
+				}
 			}
 		} catch (CoreException e) {
 			LOGGER.logError(e);
@@ -1015,28 +1001,7 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 	}
 
 	private boolean checkModelChange(IResourceDelta delta) {
-		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
-			return false;
-
-		Job job = new Job(LOAD_MODEL) {
-			protected IStatus run(IProgressMonitor monitor) {
-				if (loadModel()) {
-					final IComposerExtensionClass composerExtension = getComposer();
-					if (composerExtension.isInitialized()) {
-						composerExtension.postModelChanged();
-						if (!configurationUpdate) {
-							checkConfigurations(getAllConfigurations());
-						}
-						checkFeatureCoverage();
-						return Status.OK_STATUS;
-					}
-				}
-				return Status.CANCEL_STATUS;
-			}
-		};
-		job.setPriority(Job.INTERACTIVE);
-		job.schedule();
-		return true;
+		return delta != null && (delta.getFlags() & IResourceDelta.CONTENT) != 0;
 	}
 
 	private void checkConfigurations(final List<IFile> files) {
@@ -1048,8 +1013,8 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
 				workMonitor.setRemainingWork(2);
+
 				final Configuration config = new Configuration(featureModelManager.getObject());
-				final FileHandler<Configuration> reader = new FileHandler<>(config);
 				try {
 					IMonitor subTask = workMonitor.subTask(1);
 					subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
@@ -1064,7 +1029,7 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 					// check validity
 					for (IFile file : files) {
 						subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
-						reader.read(Paths.get(file.getLocationURI()), ConfigurationManager.getFormat(file.getName()));
+						final ProblemList lastProblems = FileHandler.load(Paths.get(file.getLocationURI()), config, ConfigFormatManager.getInstance());
 						final ConfigurationPropagator propagator = de.ovgu.featureide.fm.core.FeatureProject.getPropagator(config, true);
 						if (!LongRunningWrapper.runMethod(propagator.isValid())) {
 							String name = file.getName();
@@ -1074,7 +1039,7 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 
 						}
 						// create warnings (e.g., for features that are not available anymore)
-						for (Problem warning : reader.getLastProblems()) {
+						for (Problem warning : lastProblems) {
 							createConfigurationMarker(file, warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
 						}
 						subTask.step();
@@ -1146,13 +1111,12 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
 		final Configuration configuration = new Configuration(featureModelManager.getObject());
-		final FileHandler<Configuration> reader = new FileHandler<>(configuration);
 
 		int row = 0;
 		for (IFile file : configurations) {
 			final boolean[] currentRow = selections[row++];
 			try {
-				reader.read(Paths.get(file.getLocationURI()), ConfigurationManager.getFormat(file.getName()));
+				FileHandler.load(Paths.get(file.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 			} catch (Exception e) {
 				FMCorePlugin.getDefault().logError(e);
 			}
@@ -1509,6 +1473,34 @@ public class FeatureProject extends de.ovgu.featureide.fm.core.FeatureProject im
 
 	public void deleteConfigurationMarkers(IResource resource, int depth) {
 		EclipseMarkerHandler.deleteConfigurationMarkers(resource, depth);
+	}
+
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		switch (event.getEventType()) {
+		case MODEL_DATA_OVERRIDDEN:
+			Job job = new Job(LOAD_MODEL) {
+				protected IStatus run(IProgressMonitor monitor) {
+					if (loadModel()) {
+						final IComposerExtensionClass composerExtension = getComposer();
+						if (composerExtension.isInitialized()) {
+							composerExtension.postModelChanged();
+							if (!configurationUpdate) {
+								checkConfigurations(getAllConfigurations());
+							}
+							checkFeatureCoverage();
+							return Status.OK_STATUS;
+						}
+					}
+					return Status.CANCEL_STATUS;
+				}
+			};
+			job.setPriority(Job.INTERACTIVE);
+			job.schedule();
+			break;
+		default:
+			break;
+		}
 	}
 
 }

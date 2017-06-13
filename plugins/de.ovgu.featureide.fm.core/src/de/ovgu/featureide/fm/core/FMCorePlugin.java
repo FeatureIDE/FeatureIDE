@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.fm.core.FeatureProject.FeatureProjectStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -49,7 +50,6 @@ import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
@@ -112,16 +112,15 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			return;
 		}
 
-		final IPersistentFormat<IFeatureModel> format = FeatureModelManager.getFormat(file.getName());
+		final IFeatureModelFormat format = FeatureModelManager.getFormat(file.getName());
 		if (format == null) {
 			return;
 		}
 
-		FeatureProject featureProject = ProjectManager.getProject(Paths.get(file.getProject().getLocationURI()));
-
-		final IFeatureModel fm = featureProject.getStatus().getFeatureModel();
+		final FeatureProjectStatus status = ProjectManager.getProject(Paths.get(file.getProject().getLocationURI())).getStatus();
+		final IFeatureModel fm = status.getFeatureModel();
 		try {
-			FeatureModelAnalyzer fma = featureProject.getStatus().getAnalyzer();
+			FeatureModelAnalyzer fma = status.getAnalyzer();
 			fma.analyzeFeatureModel(null);
 
 			final StringBuilder sb = new StringBuilder();

@@ -2,7 +2,8 @@
 .project
 .settings/org.eclipse.jdt.core.prefs
 configs/BeautifulWorld.config
+configs/Hello.config
 configs/HelloWorld.config
 configs/WonderfulWorld.config
 model.xml
-src/Main.java
+src/HelloWorld.java

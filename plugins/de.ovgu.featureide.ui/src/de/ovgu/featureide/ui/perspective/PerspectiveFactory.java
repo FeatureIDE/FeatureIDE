@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -34,6 +34,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
+import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard;
@@ -65,6 +66,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		IFolderLayout right = layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
 
 		down.addView(CollaborationView.ID);
+		down.addView(ConfigurationMap.ID);
 		down.addView(FeatureModelEditView.ID);
 		down.addView(FeatureStatisticsView.ID);
 
@@ -79,10 +81,12 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
 		layout.addShowViewShortcut(FeatureStatisticsView.ID);
 		layout.addShowViewShortcut(FeatureModelEditView.ID);
+		layout.addShowViewShortcut(ConfigurationMap.ID);
 		layout.addShowViewShortcut(CollaborationView.ID);
 		layout.addShowViewShortcut(Outline.ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
+		
 	}
 }
