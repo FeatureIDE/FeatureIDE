@@ -38,8 +38,13 @@ import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
  * @author Sofia Ananieva
  */
 public class ExplanationWriter {
-	/** explanation to be transformed */
+	/** The explanation to be transformed. */
 	protected final Explanation explanation;
+	/**
+	 * Whether to include the reason count versus explanation count when writing a reason.
+	 * This acts as an explanation for the reason's confidence.
+	 */
+	private boolean writingReasonCounts = false;
 	
 	/**
 	 * Constructs a new instance of this class.
@@ -47,6 +52,24 @@ public class ExplanationWriter {
 	 */
 	public ExplanationWriter(Explanation explanation) {
 		this.explanation = explanation;
+	}
+	
+	/**
+	 * Sets the writing reason counts flag.
+	 * @param writingReasonCounts new writing reason counts flag
+	 */
+	public void setWritingReasonCounts(boolean writingReasonCounts) {
+		this.writingReasonCounts = writingReasonCounts;
+	}
+	
+	/**
+	 * Returns the writing reason counts flag.
+	 * It denotes whether to include the reason count versus explanation count when writing a reason.
+	 * This acts as an explanation for the reason's confidence.
+	 * @return the writing reason counts flag
+	 */
+	public boolean isWritingReasonCounts() {
+		return writingReasonCounts;
 	}
 	
 	/**
@@ -199,7 +222,9 @@ public class ExplanationWriter {
 			default:
 				throw new IllegalStateException("Reason has unexpected source attribute");
 		}
-		s = String.format("%s (%d/%d)", s, explanation.getReasonCounts().get(reason), explanation.getExplanationCount());
+		if (isWritingReasonCounts()) {
+			s = String.format("%s (%d/%d)", s, explanation.getReasonCounts().get(reason), explanation.getExplanationCount());
+		}
 		return s;
 	}
 	
