@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -99,8 +100,6 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return superImage;
-			}
-			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 			}
 			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return superImage;
@@ -383,16 +382,6 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		return false;
 	}
 
-	private boolean isFileOrFolderInSrc(IResource res) {
-		if (res instanceof IFile) {
-			return true;
-		}
-		if (res instanceof IFolder) {
-			return true;
-		}
-		return false;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider#getStyledText(java.lang.Object)
 	 */
@@ -461,9 +450,20 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 					return null;
 				}
+
 				IResource res = (IResource) element;
 
-				if ((isInBuildFolder(res) || isInSourceFolder(res)) && res instanceof IFile) {
+				if (isInSourceFolder(res) && res instanceof IFile) {
+					if (isInSourceFolder(res) && composer.getName().equals("AHEAD")) {
+						return res.getName();
+					}
+					FSTModel model = featureProject.getFSTModel();
+					getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					SPACE_STRING = "";
+					for (int i = 0; i < elementColors.size(); i++)
+						SPACE_STRING += " ";
+					return SPACE_STRING + res.getName();
+				} else if (isInBuildFolder(res) && res instanceof IFile) {
 					FSTModel model = featureProject.getFSTModel();
 					getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 					SPACE_STRING = "";
