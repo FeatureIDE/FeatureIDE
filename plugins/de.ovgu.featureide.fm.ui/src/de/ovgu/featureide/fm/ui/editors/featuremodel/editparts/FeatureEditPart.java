@@ -33,12 +33,12 @@ import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
-import org.prop4j.Literal.Origin;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
@@ -314,7 +314,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	protected void setActiveReason(Explanation.Reason activeReason) {
 		//Update the figure.
 		if (activeReason == null //reset
-				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_UP) {
+				|| activeReason.getTrace().getOrigin() == Origin.CHILD_UP) {
 			final FeatureFigure figure = getFigure();
 			figure.setActiveReason(activeReason);
 			figure.setProperties();
@@ -322,8 +322,8 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		
 		//Update the source connection.
 		if (activeReason == null //reset
-				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_DOWN
-				|| activeReason.getLiteral().getOrigin() == Origin.CHILD_HORIZONTAL) {
+				|| activeReason.getTrace().getOrigin() == Origin.CHILD_DOWN
+				|| activeReason.getTrace().getOrigin() == Origin.CHILD_HORIZONTAL) {
 			final ConnectionEditPart sourceConnection = getSourceConnection();
 			sourceConnection.setActiveReason(activeReason);
 			sourceConnection.refreshVisuals();

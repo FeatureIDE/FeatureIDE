@@ -20,20 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.editing;
 
-import static org.prop4j.Literal.Origin.CHILD_DOWN;
-import static org.prop4j.Literal.Origin.CHILD_HORIZONTAL;
-import static org.prop4j.Literal.Origin.CHILD_UP;
-import static org.prop4j.Literal.Origin.PARENT;
-import static org.prop4j.Literal.Origin.ROOT;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
-import org.prop4j.Literal.Origin;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.SatInstance;
@@ -114,14 +110,6 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
 	}
 
-	private Literal getLiteral(IFeature feature, boolean positive, Origin origin) {
-		return new Literal(getVariable(feature), positive, origin);
-	}
-
-	private Object getVariable(IFeature feature) {
-		return useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
-	}
-
 	private CNFType cnfType = CNFType.None;
 
 	private ModelType modelType = ModelType.All;
@@ -139,6 +127,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	private IFeatureModel featureModel = null;
 
 	private Collection<String> excludedFeatureNames = null;
+
+	/** The trace model. */
+	private FeatureModelToNodeTraceModel traceModel;
 
 	public AdvancedNodeCreator() {
 	}
@@ -171,40 +162,66 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		setFeatureModel(featureModel, featureFilter);
 	}
 
+	/**
+	 * Creates the nodes for all constraints of the feature model.
+	 * @return the transformed nodes
+	 */
 	private And createConstraintNodes() {
-		final List<Node> clauses = new ArrayList<>(featureModel.getConstraints().size());
+		final List<Node> clauses = new LinkedList<>();
+		for (final IConstraint constraint : featureModel.getConstraints()) {
+			createConstraintNodes(constraint, clauses);
+		}
+		return new And(clauses.toArray(new Node[clauses.size()]));
+	}
+
+	/**
+	 * Creates the node for a single constraint of the feature model.
+	 * @param constraint constraint to transform
+	 * @return the transformed node
+	 */
+	public Node createConstraintNode(IConstraint constraint) {
+		final List<Node> clauses = createConstraintNodes(constraint, new LinkedList<Node>());
+		if (cnfType != CNFType.Regular && clauses.size() == 1) {
+			return clauses.get(0);
+		}
+		return new And(clauses.toArray(new Node[clauses.size()]));
+	}
+
+	/**
+	 * Creates the clauses for the given constraint.
+	 * Adds them to the given list of clauses.
+	 * @param constraint constraint to transform
+	 * @param clauses clauses to add to; out variable
+	 * @return given clauses plus new clauses
+	 */
+	private List<Node> createConstraintNodes(IConstraint constraint, List<Node> clauses) {
+		Node clause;
 		boolean compact = true;
 		switch (cnfType) {
 		case None:
-			for (IConstraint constraint : featureModel.getConstraints()) {
-				final Node constraintNode = constraint.getNode();
-				for (final Literal l : constraintNode.getLiterals()) {
-					l.setOriginConstraintIndex(featureModel.getConstraintIndex(constraint));
-				}
-				clauses.add(constraintNode.clone());
-			}
+			clause = constraint.getNode().clone();
+			clauses.add(clause);
+			traceModel.addTraceConstraint(constraint);
 			break;
 		case Regular:
 			compact = false;
 		case Compact:
 		default:
-			for (IConstraint constraint : featureModel.getConstraints()) {
-				final Node constraintNode = constraint.getNode();
-				for (final Literal l : constraintNode.getLiterals()) {
-					l.setOriginConstraintIndex(featureModel.getConstraintIndex(constraint));
+			final Node cnfNode = Node.buildCNF(constraint.getNode());
+			if (cnfNode instanceof And) {
+				for (Node andChild : cnfNode.getChildren()) {
+					clause = compact || andChild instanceof Or ? andChild : new Or(andChild);
+					clauses.add(clause);
+					traceModel.addTraceConstraint(constraint);
 				}
-				final Node cnfNode = Node.buildCNF(constraintNode);
-				if (cnfNode instanceof And) {
-					for (Node andChild : cnfNode.getChildren()) {
-						clauses.add((compact || (andChild instanceof Or)) ? andChild : new Or(andChild));
-					}
-				} else {
-					clauses.add((compact || (cnfNode instanceof Or)) ? cnfNode : new Or(cnfNode));
-				}
+			} else {
+				clause = compact || cnfNode instanceof Or ? cnfNode : new Or(cnfNode);
+				clauses.add(clause);
+				traceModel.addTraceConstraint(constraint);
 			}
 			break;
 		}
-		return new And(clauses.toArray(new Node[0]));
+		return clauses;
 	}
 
 	public Node createNodes() {
@@ -297,54 +314,77 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		final IFeature root = FeatureUtils.getRoot(featureModel);
 		if (root != null) {
 			final List<Node> clauses = new ArrayList<>(featureModel.getNumberOfFeatures());
+			Node clause;
 
 			if (!optionalRoot) {
+				clause = getLiteral(root, true);
 				switch (cnfType) {
 				case Regular:
-					clauses.add(new Or(getLiteral(root, true, ROOT)));
+					clause = new Or(clause);
 					break;
 				case None:
 				case Compact:
 				default:
-					clauses.add(getLiteral(root, true, ROOT));
 					break;
 				}
+				clauses.add(clause);
+				traceModel.addTraceRoot(root);
 			}
 
 			final Iterable<IFeature> features = featureModel.getFeatures();
 			for (IFeature feature : features) {
 				for (IFeatureStructure child : feature.getStructure().getChildren()) {
-					clauses.add(new Or(getLiteral(feature, true, PARENT), getLiteral(child.getFeature(), false, CHILD_UP)));
+					final IFeature childFeature = child.getFeature();
+					clause = new Or(getLiteral(feature, true), getLiteral(childFeature, false));
+					clauses.add(clause);
+					traceModel.addTraceChildUp(feature, Collections.singleton(childFeature));
 				}
 
 				if (feature.getStructure().hasChildren()) {
 					if (feature.getStructure().isAnd()) {
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
 							if (child.isMandatory()) {
-								clauses.add(new Or(getLiteral(child.getFeature(), true, CHILD_DOWN), getLiteral(feature, false, PARENT)));
+								final IFeature childFeature = child.getFeature();
+								clause = new Or(getLiteral(childFeature, true), getLiteral(feature, false));
+								clauses.add(clause);
+								traceModel.addTraceChildDown(feature, Collections.singleton(childFeature));
 							}
 						}
 					} else if (feature.getStructure().isOr()) {
+						final List<IFeature> children = new LinkedList<>();
 						final Literal[] orLiterals = new Literal[feature.getStructure().getChildren().size() + 1];
 						int i = 0;
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
-							orLiterals[i++] = getLiteral(child.getFeature(), true, CHILD_DOWN);
+							final IFeature childFeature = child.getFeature();
+							orLiterals[i++] = getLiteral(childFeature, true);
+							children.add(childFeature);
 						}
-						orLiterals[i] = getLiteral(feature, false, PARENT);
-						clauses.add(new Or(orLiterals));
+						orLiterals[i] = getLiteral(feature, false);
+						clause = new Or(orLiterals);
+						clauses.add(clause);
+						traceModel.addTraceChildDown(feature, children);
 					} else if (feature.getStructure().isAlternative()) {
+						final List<IFeature> children = new LinkedList<>();
 						final Literal[] alternativeLiterals = new Literal[feature.getStructure().getChildrenCount() + 1];
 						int i = 0;
 						for (IFeatureStructure child : feature.getStructure().getChildren()) {
-							alternativeLiterals[i++] = getLiteral(child.getFeature(), true, CHILD_DOWN);
+							final IFeature childFeature = child.getFeature();
+							alternativeLiterals[i++] = getLiteral(childFeature, true);
+							children.add(childFeature);
 						}
-						alternativeLiterals[i] = getLiteral(feature, false, PARENT);
-						clauses.add(new Or(alternativeLiterals));
+						alternativeLiterals[i] = getLiteral(feature, false);
+						clause = new Or(alternativeLiterals);
+						clauses.add(clause);
+						traceModel.addTraceChildDown(feature, children);
 
 						for (ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
 							final IFeatureStructure fs = it1.next();
+							final IFeature sibling1 = fs.getFeature();
 							for (ListIterator<IFeatureStructure> it2 = feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
-								clauses.add(new Or(getLiteral(fs.getFeature(), false, CHILD_HORIZONTAL), getLiteral(((IFeatureStructure) it2.next()).getFeature(), false, CHILD_HORIZONTAL)));
+								final IFeature sibling2 = it2.next().getFeature();
+								clause = new Or(getLiteral(sibling1, false), getLiteral(sibling2, false));
+								clauses.add(clause);
+								traceModel.addTraceChildHorizontal(Arrays.asList(sibling1, sibling2));
 							}
 						}
 					}
@@ -354,6 +394,14 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			return new And(clauses.toArray(new Node[0]));
 		}
 		return new And(new Node[0]);
+	}
+
+	private Literal getLiteral(IFeature feature, boolean positive) {
+		return new Literal(getVariable(feature), positive);
+	}
+
+	private Object getVariable(IFeature feature) {
+		return useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
 	}
 
 	@Override
@@ -395,18 +443,17 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {
-		this.featureModel = featureModel;
-		this.excludedFeatureNames = null;
+		setFeatureModel(featureModel, (Collection<String>) null);
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
-		this.featureModel = featureModel;
-		this.excludedFeatureNames = Functional.mapToStringList(Functional.filter(featureModel.getFeatures(), featureFilter));
+		setFeatureModel(featureModel, Functional.mapToStringList(Functional.filter(featureModel.getFeatures(), featureFilter)));
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
 		this.featureModel = featureModel;
 		this.excludedFeatureNames = excludedFeatureNames;
+		this.traceModel = new FeatureModelToNodeTraceModel();
 	}
 
 	/**
@@ -430,4 +477,12 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		this.optionalRoot = optionalRoot;
 	}
 
+	/**
+	 * Returns the trace model.
+	 * The trace model keeps track of the origin of transformed elements.
+	 * @return the trace model
+	 */
+	public FeatureModelToNodeTraceModel getTraceModel() {
+		return traceModel;
+	}
 }

@@ -20,17 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.explanations.impl.ltms;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.prop4j.And;
-import org.prop4j.Literal;
-import org.prop4j.Literal.Origin;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
 
@@ -43,14 +44,10 @@ import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCre
 public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
 	/** The redundant constraint in the feature model. */
 	private IConstraint redundantConstraint;
-	/**
-	 * The CNF without the clauses of the redundant constraint.
-	 * It is later used as the input for the LTMS.
-	 * It is stored separately from the CNF so the CNF does not have to be overridden and can continue to be reused.
-	 * It is created lazily when needed and reset when any of the variables it depends on is changed:
-	 * the feature model, the feature model's CNF representation or the redundant constraint.
-	 */
-	private Node cnfWithoutRedundantConstraintClauses;
+	/** The CNF with all constraints but the redundant one. */
+	private Node cnfWithoutRedundantConstraint;
+	/** The amount of clauses added to the CNF that originate from a constraint. */
+	private int constraintClauseCount = 0;
 	
 	/**
 	 * Constructs a new instance of this class.
@@ -85,64 +82,73 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	@Override
 	public void setRedundantConstraint(IConstraint redundantConstraint) {
 		this.redundantConstraint = redundantConstraint;
-		setCNFWithoutRedundantConstraintClauses(null);
+		setCnfWithoutRedundantConstraint();
 	}
 	
 	/**
-	 * Returns the CNF without the clauses of the redundant constraint.
-	 * Creates it first if necessary.
-	 * @return the CNF without the clauses of the redundant constraint; not null
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Does not include any of the constraints.
+	 * The constraints are only added later during explaining.
+	 * This is faster than creating the complete CNF and repeatedly removing the redundant constraints from it.
+	 * </p>
 	 */
-	protected Node getCNFWithoutRedundantConstraintClauses() {
-		if (cnfWithoutRedundantConstraintClauses == null) {
-			setCNFWithoutRedundantConstraintClauses(createCNFWithoutRedundantConstraintClauses());
+	@Override
+	protected AdvancedNodeCreator createNodeCreator() {
+		final AdvancedNodeCreator nc = super.createNodeCreator();
+		nc.setModelType(ModelType.OnlyStructure);
+		return nc;
+	}
+
+	@Override
+	protected Node setCnf() {
+		final Node cnf = super.setCnf();
+		constraintClauseCount = 0;
+		if (cnf != null) {
+			setCnfWithoutRedundantConstraint();
 		}
-		return cnfWithoutRedundantConstraintClauses;
+		return cnf;
 	}
 	
-	/**
-	 * Sets the CNF without the clauses of the redundant constraint.
-	 * @param cnfWithoutRedundantConstraintClauses the CNF without the clauses of the redundant constraint
-	 */
-	protected void setCNFWithoutRedundantConstraintClauses(Node cnfWithoutRedundantConstraintClauses) {
-		this.cnfWithoutRedundantConstraintClauses = cnfWithoutRedundantConstraintClauses;
-		setLtms(null);
-	}
-	
-	/**
-	 * Creates a copy of the CNF without the clauses of the redundant constraint.
-	 * @return a copy of the CNF without the clauses of the redundant constraint; not null
-	 */
-	protected Node createCNFWithoutRedundantConstraintClauses() {
-		return removeRedundantConstraintClauses(getCnf());
-	}
-	
-	/**
-	 * Returns a copy of the given CNF without clauses of the redundant constraint.
-	 * @param cnf CNF to check
-	 * @return a copy of the given CNF without clauses of the redundant constraint
-	 * @throws IllegalStateException if the redundant constraint is not set
-	 */
-	private Node removeRedundantConstraintClauses(Node cnf) throws IllegalStateException {
-		if (getRedundantConstraint() == null) {
-			throw new IllegalStateException("Missing redundant constraint");
+	protected Node getCnfWithoutRedundantConstraint() {
+		if (cnfWithoutRedundantConstraint == null) {
+			setCnfWithoutRedundantConstraint();
 		}
+		return cnfWithoutRedundantConstraint;
+	}
+	
+	protected void setCnfWithoutRedundantConstraint() {
+		final Node cnf;
+		if (redundantConstraint == null || (cnf = getCnf()) == null) {
+			this.cnfWithoutRedundantConstraint = null;
+			setLtms(null);
+			return;
+		}
+		
+		getTraceModel().removeTraces(constraintClauseCount);
+		this.constraintClauseCount = 0;
+		
 		final List<Node> clauses = new LinkedList<>();
-		clause: for (final Node clause : cnf.getChildren()) {
-			for (final Literal literal : clause.getLiterals()) {
-				if (literal.getOrigin() == Origin.CONSTRAINT
-						&& getFeatureModel().getConstraints().get(literal.getOriginConstraintIndex()) == redundantConstraint) {
-					continue clause;
-				}
+		Collections.addAll(clauses, cnf.getChildren());
+		final AdvancedNodeCreator nc = getNodeCreator();
+		for (final IConstraint constraint : getFeatureModel().getConstraints()) {
+			if (constraint == redundantConstraint) {
+				continue;
 			}
-			clauses.add(clause);
+			final Node constraintNode = nc.createConstraintNode(constraint);
+			final Node[] constraintClauses = constraintNode.getChildren();
+			constraintClauseCount += constraintClauses.length;
+			Collections.addAll(clauses, constraintClauses);
 		}
-		return new And(clauses.toArray());
+		this.cnfWithoutRedundantConstraint = new And(clauses.toArray(new Node[clauses.size()]));
+		
+		setLtms(null);
 	}
 	
 	@Override
 	protected Ltms createLtms() {
-		return new Ltms(getCNFWithoutRedundantConstraintClauses());
+		return new Ltms(getCnfWithoutRedundantConstraint());
 	}
 	
 	/**
@@ -164,7 +170,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		final Ltms ltms = getLtms();
 		for (final Map<Object, Boolean> assignment : getRedundantConstraint().getNode().getContradictingAssignments()) {
 			ltms.setPremises(assignment);
-			final Explanation explanation = ltms.getExplanation();
+			final Explanation explanation = getExplanation(ltms.getExplanations());
 			if (explanation == null) {
 				continue;
 			}

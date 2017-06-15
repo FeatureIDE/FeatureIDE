@@ -1302,17 +1302,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			//Deactivate the old active explanation.
 			final Explanation oldActiveExplanation = (Explanation) event.getOldValue();
 			if (oldActiveExplanation != null) {
-				//Notify the defect element.
-				final IGraphicalElement defectElement = FeatureUIHelper.getGraphicalElement(oldActiveExplanation.getDefectElement(),
-						getGraphicalFeatureModel());
-				defectElement.update(event);
-
 				//Reset each element affected by the old active explanation.
 				final Set<IGraphicalElement> updatedElements = new HashSet<>();
 				for (final Explanation.Reason reason : oldActiveExplanation.getReasons()) {
-					final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(reason.getSourceElement(), getGraphicalFeatureModel());
-					if (updatedElements.add(element)) {
-						element.update(event);
+					for (final IFeatureModelElement sourceElement : reason.getTrace().getElements()) {
+						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
+						if (updatedElements.add(element)) {
+							element.update(event);
+						}
 					}
 				}
 			}
@@ -1320,15 +1317,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			//Activate the new active explanation.
 			final Explanation newActiveExplanation = (Explanation) event.getNewValue();
 			if (newActiveExplanation != null) {
-				//Notify the defect element.
-				final IGraphicalElement defectElement = FeatureUIHelper.getGraphicalElement(newActiveExplanation.getDefectElement(),
-						getGraphicalFeatureModel());
-				defectElement.update(event);
-
 				//Notify each element affected by the new active explanation of its new active reasons.
 				for (final Explanation.Reason reason : newActiveExplanation.getReasons()) {
-					final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(reason.getSourceElement(), getGraphicalFeatureModel());
-					element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+					for (final IFeatureModelElement sourceElement : reason.getTrace().getElements()) {
+						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
+						element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+					}
 				}
 			}
 

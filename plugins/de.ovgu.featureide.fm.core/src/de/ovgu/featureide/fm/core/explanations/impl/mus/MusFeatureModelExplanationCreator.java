@@ -20,15 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.explanations.impl.mus;
 
-import java.util.Set;
-
-import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.AbstractFeatureModelExplanationCreator;
 
@@ -66,59 +62,31 @@ public abstract class MusFeatureModelExplanationCreator extends AbstractFeatureM
 	 */
 	protected MusExtractor getOracle() {
 		if (oracle == null) {
-			setOracle(createOracle());
+			setOracle();
 		}
 		return oracle;
 	}
 	
 	/**
 	 * Sets the oracle.
-	 * @param oracle the oracle
 	 */
-	protected void setOracle(MusExtractor oracle) {
+	protected void setOracle() {
+		final Node cnf = getCnf();
+		if (cnf == null) {
+			this.oracle = null;
+			return;
+		}
+		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
+		oracle.addFormula(cnf);
 		this.oracle = oracle;
 	}
 	
-	/**
-	 * Returns a new oracle with the CNF.
-	 * @return a new oracle with the CNF; not null
-	 */
-	protected MusExtractor createOracle() {
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
-		oracle.addFormula(getCnf());
-		return oracle;
-	}
-	
 	@Override
-	protected void setCnf(Node cnf) throws IllegalArgumentException {
-		super.setCnf(cnf);
-		setOracle(null);
-	}
-	
-	/**
-	 * Returns an explanation for the given MUS.
-	 * @param mus minimal unsatisfiable subset of the CNF
-	 * @return an explanation for the given MUS
-	 */
-	protected Explanation getExplanation(Set<Node> mus) {
-		final Explanation explanation = new Explanation();
-		for (final Node clause : mus) {
-			for (final Literal literal : clause.getLiterals()) {
-				switch (literal.getOrigin()) {
-					case ROOT:
-					case CHILD_UP:
-					case CHILD_DOWN:
-					case CHILD_HORIZONTAL:
-					case CONSTRAINT:
-						explanation.addUniqueReason(clause, literal);
-						break;
-					case PARENT:
-					case UNDEFINED:
-					default:
-						break;
-				}
-			}
+	protected Node setCnf() {
+		final Node cnf = super.setCnf();
+		if (cnf != null) {
+			setOracle();
 		}
-		return explanation;
+		return cnf;
 	}
 }

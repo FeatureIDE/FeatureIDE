@@ -83,7 +83,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 		final Ltms ltms = getLtms();
 		ltms.clearPremises();
 		ltms.addPremise(getDeadFeature().getName(), true);
-		final Explanation explanation = ltms.getExplanation();
+		final Explanation explanation = getExplanation(ltms.getExplanations());
 		if (explanation == null) {
 			return null;
 		}

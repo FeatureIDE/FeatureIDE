@@ -53,6 +53,16 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 	
 	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
+		final Set<Integer> indexes = getMinimalUnsatisfiableSubsetIndexes();
+		final Set<Node> mus = new LinkedHashSet<>(indexes.size());
+		for (final int index : indexes) {
+			mus.add(getClause(index));
+		}
+		return mus;
+	}
+	
+	@Override
+	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
 		if (isSatisfiable()) {
 			throw new IllegalStateException("Problem is satisfiable");
 		}
@@ -62,10 +72,10 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 		} catch (TimeoutException e) {
 			throw new IllegalStateException(e);
 		}
-		final Set<Node> mus = new LinkedHashSet<>(indexes.length);
+		final Set<Integer> set = new LinkedHashSet<>(indexes.length);
 		for (final int index : indexes) {
-			mus.add(getClauseFromIndex(index));
+			set.add(index - 1); //Sat4J clause indexes start at 1.
 		}
-		return mus;
+		return set;
 	}
 }

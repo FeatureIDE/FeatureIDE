@@ -221,15 +221,6 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	}
 	
 	/**
-	 * Returns a clause corresponding to the given Sat4J clause index.
-	 * @param index of the clause starting at 1
-	 * @return a clause; not null
-	 */
-	public Node getClauseFromIndex(int index) {
-		return getClause(index - 1);
-	}
-	
-	/**
 	 * Returns a literal corresponding to the given Sat4J index.
 	 * Does not add any variables or clauses.
 	 * @param index Sat4J index to transform; not 0

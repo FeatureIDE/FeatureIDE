@@ -28,7 +28,6 @@ import org.prop4j.explain.solvers.MusExtractor;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
@@ -81,18 +80,16 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 * {@inheritDoc}
 	 * 
 	 * <p>
-	 * Does not contain any of the constraints.
+	 * Does not include any of the constraints.
 	 * The constraints are only added later during explaining.
 	 * This is faster than creating the complete CNF and repeatedly removing the redundant constraints from it.
 	 * </p>
 	 */
 	@Override
-	protected Node createCnf() throws IllegalStateException {
-		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
-		nc.setCnfType(CNFType.Regular);
+	protected AdvancedNodeCreator createNodeCreator() {
+		final AdvancedNodeCreator nc = super.createNodeCreator();
 		nc.setModelType(ModelType.OnlyStructure);
-		nc.setIncludeBooleanValues(false);
-		return nc.createNodes();
+		return nc;
 	}
 	
 	@Override
@@ -101,12 +98,17 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 		cumulatedExplanation.setExplanationCount(0);
 		final MusExtractor oracle = getOracle();
 		oracle.push();
+		int constraintClauseCount = 0;
 		try {
 			//Add each constraint but the redundant one.
+			final AdvancedNodeCreator nc = getNodeCreator();
 			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
-				if (constraint != redundantConstraint) {
-					oracle.addFormula(constraint.getNode());
+				if (constraint == redundantConstraint) {
+					continue;
 				}
+				final Node constraintNode = nc.createConstraintNode(constraint);
+				constraintClauseCount += constraintNode.getChildren().length;
+				oracle.addFormula(constraintNode);
 			}
 			
 			//Explain each contradicting assignment of the redundant constraint.
@@ -114,7 +116,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 				oracle.push();
 				try {
 					oracle.addAssumptions(assignment);
-					final Explanation explanation = getExplanation(oracle.getMinimalUnsatisfiableSubset());
+					final Explanation explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 					cumulatedExplanation.addExplanation(explanation);
 				} finally {
 					oracle.pop();
@@ -122,6 +124,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			}
 		} finally {
 			oracle.pop();
+			getTraceModel().removeTraces(constraintClauseCount);
 		}
 		cumulatedExplanation.setDefectRedundantConstraint(getRedundantConstraint());
 		return cumulatedExplanation;

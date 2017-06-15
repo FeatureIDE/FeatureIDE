@@ -44,4 +44,12 @@ public interface MusExtractor extends MutableSatSolver {
 	 * @throws IllegalStateException if the formula in this solver is satisfiable
 	 */
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException;
+	
+	/**
+	 * Returns any minimal unsatisfiable subset (MUS) of the problem.
+	 * Each clause is referenced by its index instead of object.
+	 * @return any minimal unsatisfiable subset; not null
+	 * @throws IllegalStateException
+	 */
+	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException;
 }

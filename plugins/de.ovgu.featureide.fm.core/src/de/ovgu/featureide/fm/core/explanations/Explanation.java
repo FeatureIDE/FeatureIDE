@@ -27,14 +27,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.prop4j.Literal;
-import org.prop4j.Literal.Origin;
-import org.prop4j.Node;
-
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
 
 /**
  * Data class holding the explanation for a defect in a feature model.
@@ -51,21 +47,15 @@ public class Explanation implements Cloneable {
 	 * @author Sofia Ananieva
 	 */
 	public class Reason implements Cloneable {
-		/** clause containing the literal */
-		private final Node clause;
-		/** the literal of this reason */
-		private final Literal literal;
-		/** the source feature model element of the literal; stored to circumvent brittle string identifiers */
-		private IFeatureModelElement sourceElement;
+		/** The trace of this reason. */
+		private final FeatureModelElementTrace trace;
 		
 		/**
 		 * Constructs a new instance of this class.
-		 * @param clause clause containing the literal
-		 * @param literal the literal of this reason
+		 * @param trace the trace of this reason; not null
 		 */
-		public Reason(Node clause, Literal literal) {
-			this.clause = clause;
-			this.literal = literal;
+		private Reason(FeatureModelElementTrace trace) {
+			this.trace = trace;
 		}
 		
 		/**
@@ -77,39 +67,11 @@ public class Explanation implements Cloneable {
 		}
 		
 		/**
-		 * Returns the clause containing the literal.
-		 * @return the clause containing the literal
+		 * Returns the trace of this reason.
+		 * @return the trace of this reason; not null
 		 */
-		public Node getClause() {
-			return clause;
-		}
-		
-		/**
-		 * Returns the literal of this reason.
-		 * @return the literal of this reason
-		 */
-		public Literal getLiteral() {
-			return literal;
-		}
-		
-		/**
-		 * Returns the source feature model element of the literal.
-		 * @return the source feature model element of the literal
-		 */
-		public IFeatureModelElement getSourceElement() {
-			return sourceElement;
-		}
-		
-		/**
-		 * Sets the stored source feature model element to denote the source of the literal.
-		 */
-		protected void setSourceElement() {
-			final IFeatureModel fm = getDefectElement().getFeatureModel();
-			if (getLiteral().getOrigin() == Origin.CONSTRAINT) {
-				sourceElement = fm.getConstraints().get(getLiteral().getOriginConstraintIndex());
-			} else {
-				sourceElement = fm.getFeature((String) getLiteral().var);
-			}
+		public FeatureModelElementTrace getTrace() {
+			return trace;
 		}
 		
 		/**
@@ -132,16 +94,14 @@ public class Explanation implements Cloneable {
 		
 		@Override
 		public Reason clone() {
-			return new Reason(clause, literal);
+			return new Reason(trace);
 		}
 		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			if (literal != null && literal.getOrigin() != Origin.CONSTRAINT)
-				result = prime * result + (literal.var == null ? 0 : literal.var.hashCode());
-			result = prime * result + (literal == null ? 0 : literal.origin);
+			result = prime * result + ((trace == null) ? 0 : trace.hashCode());
 			return result;
 		}
 		
@@ -154,24 +114,18 @@ public class Explanation implements Cloneable {
 			if (getClass() != obj.getClass())
 				return false;
 			Reason other = (Reason) obj;
-			if (literal == null) {
-				if (other.literal != null)
+			if (trace == null) {
+				if (other.trace != null)
 					return false;
-			} else if (literal.origin != other.literal.origin) {
-				return false;
-			} else if (literal.getOrigin() != Origin.CONSTRAINT //any literal of the same constraint denotes the same reason
-					&& !literal.var.equals(other.literal.var))
+			} else if (!trace.equals(other.trace))
 				return false;
 			return true;
 		}
 		
 		@Override
 		public String toString() {
-			return "Reason["
-					+ "clause=" + clause + ", "
-					+ "literal=" + literal + ", "
-					+ "source=" + sourceElement
-					+ "]";
+			return getClass().getSimpleName() + " ["
+					+ "trace=" + trace + "]";
 		}
 	}
 	
@@ -184,16 +138,16 @@ public class Explanation implements Cloneable {
 		FALSE_OPTIONAL_FEATURE
 	}
 	
-	/** the reasons this explanation is composed of mapped to how often the respective reason has been generated */
-	private final Map<Reason, Integer> reasonCounts = new LinkedHashMap<>();
-	
-	/** the explanation mode */
+	/** The explanation mode. */
 	private Mode mode;
-	/** the defect feature model element */
+	/** The defect feature model element. */
 	private IFeatureModelElement defectElement;
-	/** true if this explanation is for an implicit constraint */
+	/** True if this explanation is for an implicit constraint. */
 	private boolean implicit;
-	/** how many explanations have been generated and rolled into one for this explanation */
+	
+	/** The reasons this explanation is composed of mapped to how often the respective reason has been generated. */
+	private final Map<Reason, Integer> reasonCounts = new LinkedHashMap<>();
+	/** How many explanations have been generated and rolled into one for this explanation. */
 	private int explanationCount = 1;
 	
 	/**
@@ -220,7 +174,6 @@ public class Explanation implements Cloneable {
 	public void setDefectDeadFeature(IFeature defectElement) {
 		this.mode = Explanation.Mode.DEAD_FEATURE;
 		this.defectElement = defectElement;
-		setReasonSourceElements();
 	}
 	
 	/**
@@ -231,7 +184,6 @@ public class Explanation implements Cloneable {
 	public void setDefectFalseOptionalFeature(IFeature defectElement) {
 		this.mode = Explanation.Mode.FALSE_OPTIONAL_FEATURE;
 		this.defectElement = defectElement;
-		setReasonSourceElements();
 	}
 	
 	/**
@@ -242,16 +194,6 @@ public class Explanation implements Cloneable {
 	public void setDefectRedundantConstraint(IConstraint defectElement) {
 		this.mode = Explanation.Mode.REDUNDANT_CONSTRAINT;
 		this.defectElement = defectElement;
-		setReasonSourceElements();
-	}
-	
-	/**
-	 * Sets each reason's source.
-	 */
-	protected void setReasonSourceElements() {
-		for (final Reason reason : getReasons()) {
-			reason.setSourceElement();
-		}
 	}
 	
 	/**
@@ -310,7 +252,7 @@ public class Explanation implements Cloneable {
 	 * @param count how often to add the given reason
 	 */
 	protected void addReason(Reason reason, int count) {
-		reason = new Reason(reason.getClause(), reason.getLiteral());
+		reason = new Reason(reason.getTrace());
 		final Integer reasonCount = reasonCounts.get(reason);
 		reasonCounts.put(reason, (reasonCount == null ? 0 : reasonCount) + count);
 	}
@@ -326,12 +268,11 @@ public class Explanation implements Cloneable {
 	}
 	
 	/**
-	 * Adds a reason with the given literal to this explanation.
-	 * @param clause clause containing the literal
-	 * @param literal literal of the reason to add
+	 * Adds a new reason to this explanation.
+	 * @param trace trace of the reason to add
 	 */
-	public void addReason(Node clause, Literal literal) {
-		addReason(new Reason(clause, literal));
+	public void addReason(FeatureModelElementTrace trace) {
+		addReason(new Reason(trace));
 	}
 	
 	/**
@@ -339,7 +280,7 @@ public class Explanation implements Cloneable {
 	 * @param reason reason to add
 	 */
 	public void addUniqueReason(Reason reason) {
-		reason = new Reason(reason.getClause(), reason.getLiteral());
+		reason = new Reason(reason.getTrace());
 		final Integer value = reasonCounts.get(reason);
 		if (value == null) {
 			reasonCounts.put(reason, 1);
@@ -357,12 +298,11 @@ public class Explanation implements Cloneable {
 	}
 	
 	/**
-	 * Adds a reason with the given literal to this explanation if it is not already contained.
-	 * @param clause clause containing the literal
-	 * @param literal literal of the reason to add
+	 * Adds a new reason to this explanation if it is not already contained.
+	 * @param trace trace of the reason to add
 	 */
-	public void addUniqueReason(Node clause, Literal literal) {
-		addUniqueReason(new Reason(clause, literal));
+	public void addUniqueReason(FeatureModelElementTrace trace) {
+		addUniqueReason(new Reason(trace));
 	}
 	
 	/**
@@ -413,7 +353,7 @@ public class Explanation implements Cloneable {
 	public Set<IFeatureModelElement> getAffectedElements() {
 		final Set<IFeatureModelElement> affectedElements = new LinkedHashSet<>();
 		for (final Reason reason : getReasons()) {
-			affectedElements.add(reason.getSourceElement());
+			affectedElements.addAll(reason.getTrace().getElements());
 		}
 		affectedElements.add(getDefectElement());
 		final Set<IFeatureModelElement> constraintElements = new LinkedHashSet<>();
@@ -508,12 +448,11 @@ public class Explanation implements Cloneable {
 	
 	@Override
 	public String toString() {
-		return "Explanation["
-				+ "reasonCounts=" + reasonCounts + ", "
+		return getClass().getSimpleName() + " ["
 				+ "mode=" + mode + ", "
 				+ "defectElement=" + defectElement + ", "
 				+ "implicit=" + implicit + ", "
-				+ "explanationCount=" + explanationCount
-				+ "]";
+				+ "reasonCounts=" + reasonCounts + ", "
+				+ "explanationCount=" + explanationCount + "]";
 	}
 }

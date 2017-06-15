@@ -31,11 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
 
 /**
@@ -168,38 +168,15 @@ public class Ltms {
 	}
 	
 	/**
-	 * Returns an explanation why the premises lead to a contradiction in the conjunctive normal form.
-	 * Generates multiple explanations and returns the shortest one among them.
-	 * Note that this may not be the shortest one possible.
-	 * @return an explanation why the premises lead to a contradiction in the conjunctive normal form
-	 */
-	public Explanation getExplanation() {
-		final Explanation cumulatedExplanation = new Explanation();
-		cumulatedExplanation.setExplanationCount(0);
-		Explanation shortestExplanation = null;
-		for (final Explanation explanation : getExplanations()) {
-			cumulatedExplanation.addExplanation(explanation); //Remember that this explanation was generated.
-			if (shortestExplanation == null || explanation.getReasonCount() < shortestExplanation.getReasonCount()) {
-				shortestExplanation = explanation; //Remember the shortest explanation.
-			}
-		}
-		if (shortestExplanation == null) {
-			return null;
-		}
-		shortestExplanation.setCounts(cumulatedExplanation); //Remember the reason and explanations that were generated before.
-		return shortestExplanation;
-	}
-	
-	/**
 	 * Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form.
 	 * This is done by propagating the truth values until a contradiction is found.
 	 * Then, the proofs for the implications are recalled.
 	 * This is repeated several times to find multiple explanations, some of which might be shorter than others.
 	 * @return multiple explanations why the premises lead to a contradiction in the conjunctive normal form
 	 */
-	public List<Explanation> getExplanations() {
+	public List<Set<Integer>> getExplanations() {
 		reset();
-		final List<Explanation> explanations = new LinkedList<>();
+		final List<Set<Integer>> explanations = new LinkedList<>();
 		if (isContradicted()) { //If the initial truth values already lead to a contradiction...
 			explanations.add(getContradictionExplanation()); //... explain immediately.
 			return explanations;
@@ -358,28 +335,13 @@ public class Ltms {
 	
 	/**
 	 * Returns an explanation why the premises lead to a contradiction.
-	 * @return an explanation why the premises lead to a contradiction
+	 * @return indexes of clauses that serve as an explanation
 	 */
-	private Explanation getContradictionExplanation() {
-		final Explanation explanation = new Explanation();
+	private Set<Integer> getContradictionExplanation() {
+		final Set<Integer> explanation = new TreeSet<>();
 		
 		//Include literals from the violated clause so it shows up in the explanation.
-		Literal violatedLiteral = null;
-		for (final Literal literal : clauseLiterals.get(violatedClause)) {
-			switch (literal.getOrigin()) {
-				case CHILD_UP:
-				case CHILD_DOWN:
-				case CHILD_HORIZONTAL:
-					explanation.addUniqueReason(violatedClause, literal);
-					break;
-				default:
-					violatedLiteral = literal;
-					break;
-			}
-		}
-		if (explanation.getReasons().isEmpty()) {
-			explanation.addUniqueReason(violatedClause, violatedLiteral);
-		}
+		explanation.add(getClauseIndex(violatedClause));
 
 		//Get all antecedents of the derived literal.
 		if (derivedLiteral == null) { //immediate contradiction, thus no propagations, thus no antecedents
@@ -398,37 +360,12 @@ public class Ltms {
 		for (final Entry<Literal, Node> e : allAntecedents.entrySet()) {
 			final Literal antecedentLiteral = e.getKey();
 			final Node antecedentClause = e.getValue();
-			switch (antecedentLiteral.getOrigin()) {
-				case CHILD_UP:
-				case CHILD_DOWN:
-				case CHILD_HORIZONTAL:
-				case ROOT:
-				case CONSTRAINT:
-					explanation.addUniqueReason(antecedentClause, antecedentLiteral);
-					break;
-				default:
-					break;
-			}
+			explanation.add(getClauseIndex(antecedentClause));
 			final Node reason = reasons.get(antecedentLiteral.var);
 			if (reason == null) { //premise, thus no reason to explain
 				continue;
 			}
-			for (final Literal literal : clauseLiterals.get(reason)) {
-				if (literal.var.equals(antecedentLiteral.var)) {
-					switch (literal.getOrigin()) {
-						case CHILD_UP:
-						case CHILD_DOWN:
-						case CHILD_HORIZONTAL:
-						case ROOT:
-						case CONSTRAINT:
-							explanation.addUniqueReason(reason, literal);
-							break;
-						default:
-							break;
-					}
-					break;
-				}
-			}
+			explanation.add(getClauseIndex(reason));
 		}
 		return explanation;
 	}
@@ -457,5 +394,21 @@ public class Ltms {
 			}
 		}
 		return allAntecedents;
+	}
+	
+	/**
+	 * Returns the index of the given CNF clause.
+	 * @param cnfClause CNF clause to look up
+	 * @return the index of the given CNF clause
+	 * @throws IllegalStateException if the CNF clause is not contained in the CNF
+	 */
+	private int getClauseIndex(Node cnfClause) throws IllegalStateException {
+		final Node[] cnfClauses = cnf.getChildren();
+		for (int i = 0; i < cnfClauses.length; i++) {
+			if (cnfClause == cnfClauses[i]) {
+				return i;
+			}
+		}
+		throw new IllegalStateException("CNF clause not contained in CNF");
 	}
 }

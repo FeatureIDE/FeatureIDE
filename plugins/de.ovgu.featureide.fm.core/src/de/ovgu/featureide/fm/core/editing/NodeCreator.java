@@ -64,43 +64,17 @@ public class NodeCreator {
 	public static Node createNodes(IFeatureModel featureModel, Collection<String> removeFeatures) {
 		return createNodes(featureModel, calculateReplacingMap(featureModel, removeFeatures), removeFeatures);
 	}
-
-	/**
-	 * Adds an encoded constraint index to literals of this constraint. If a cross-tree-constraint
-	 * is needed for an explanation, the constrained index is decoded. 
-	 * 
-	 * @param node the constraint to set its index
-	 * @param constraintIndex the index of a cross-tree constraint
-	 */
-	static void addConstraintIndexRec(Node node, int constraintIndex) {
-		if (node == null)
-			return;
-
-		if (node instanceof Literal) {
-			((Literal) node).setOriginConstraintIndex(constraintIndex);
-
-			return;
-		}
-
-		if (node.getChildren() != null) {
-			for (Node child : node.getChildren()) {
-				addConstraintIndexRec(child, constraintIndex);
-			}
-		}
-	}
 	
 	public static Node createNodes(IFeatureModel featureModel, Map<Object, Node> replacingMap) {
 		IFeature root = FeatureUtils.getRoot(featureModel);
 		List<Node> nodes = new LinkedList<>();
 		if (root != null) {
-			nodes.add(new Literal(getVariable(root.getName(), featureModel), Literal.Origin.ROOT));
+			nodes.add(new Literal(getVariable(root.getName(), featureModel)));
 			// convert grammar rules into propositional formulas
 			createNodes(nodes, root, featureModel, true, replacingMap);
 			// add extra constraints
 			for (IConstraint constraint : new ArrayList<>(featureModel.getConstraints())) {
-				Node node = constraint.getNode();
-				addConstraintIndexRec(node, FeatureUtils.getConstraintIndex(featureModel, constraint));
-				nodes.add(node.clone());
+				nodes.add(constraint.getNode().clone());
 			}
 		}
 		And and = new And(nodes);
@@ -424,7 +398,7 @@ public class NodeCreator {
 		int i = 0;
 		for (IFeatureStructure rootChild : rootFeature.getStructure().getChildren()) {
 			String var = getVariable(rootChild.getFeature().getName(), featureModel);
-			children[i++] = new Literal(var, Literal.Origin.CHILD_UP);
+			children[i++] = new Literal(var);
 		}
 		final Node definition = children.length == 1 ? children[0] : new Or(children);
 
@@ -435,23 +409,23 @@ public class NodeCreator {
 			for (IFeatureStructure feature : rootFeature.getStructure().getChildren())
 				if (feature.isMandatory()) {
 					String var = getVariable(feature.getFeature().getName(), featureModel);
-					manChildren.add(new Literal(var, Literal.Origin.CHILD_DOWN));
+					manChildren.add(new Literal(var));
 				}
 
 			// add constraints for all mandatory children S => (A & B)
 			if (manChildren.size() == 1)
-				nodes.add(new Implies(new Literal(s, Literal.Origin.PARENT), manChildren.get(0)));
+				nodes.add(new Implies(new Literal(s), manChildren.get(0)));
 			else if (manChildren.size() > 1)
-				nodes.add(new Implies(new Literal(s, Literal.Origin.PARENT), new And(manChildren)));
+				nodes.add(new Implies(new Literal(s), new And(manChildren)));
 
 			// add contraint (A | B | C) => S
-			nodes.add(new Implies(definition, new Literal(s, Literal.Origin.PARENT)));
+			nodes.add(new Implies(definition, new Literal(s)));
 		} else {
 			// add constraint S <=> (A | B | C)
 			if (replacings.get(featureModel.getRenamingsManager().getOldName(rootFeature.getName())) == null) {
 				final Literal[] childrenDown = new Literal[children.length];
 				for (int j = 0; j < childrenDown.length; j++) {
-					childrenDown[j] = new Literal(children[j].var, Literal.Origin.CHILD_DOWN);
+					childrenDown[j] = new Literal(children[j].var);
 				}
 				final Node definitionDown = childrenDown.length == 1 ? childrenDown[0] : new Or(childrenDown);
 				nodes.add(new Implies(new Literal(s), definitionDown));
@@ -463,7 +437,7 @@ public class NodeCreator {
 				if (children.length > 1) {
 					final Literal[] childrenHorizontal = new Literal[children.length];
 					for (int j = 0; j < childrenHorizontal.length; j++) {
-						childrenHorizontal[j] = new Literal(children[j].var, Literal.Origin.CHILD_HORIZONTAL);
+						childrenHorizontal[j] = new Literal(children[j].var);
 					}
 					nodes.add(new AtMost(1, childrenHorizontal));
 				}

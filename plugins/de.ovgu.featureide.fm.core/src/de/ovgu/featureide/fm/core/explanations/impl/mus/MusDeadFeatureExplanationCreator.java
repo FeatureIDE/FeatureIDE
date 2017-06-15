@@ -78,7 +78,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		oracle.push();
 		try {
 			oracle.addAssumption(getDeadFeature().getName(), true);
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubset());
+			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}

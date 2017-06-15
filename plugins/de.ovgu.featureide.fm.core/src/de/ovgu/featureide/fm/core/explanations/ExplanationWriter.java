@@ -21,14 +21,14 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
-import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 
 /**
@@ -45,6 +45,8 @@ public class ExplanationWriter {
 	 * This acts as an explanation for the reason's confidence.
 	 */
 	private boolean writingReasonCounts = true;
+	/** Symbols to use with {@link NodeWriter}. */
+	private String[] symbols = NodeWriter.logicalSymbols;
 	
 	/**
 	 * Constructs a new instance of this class.
@@ -70,6 +72,28 @@ public class ExplanationWriter {
 	 */
 	public boolean isWritingReasonCounts() {
 		return writingReasonCounts;
+	}
+	
+	/**
+	 * <p>
+	 * Returns the symbols to use with {@link NodeWriter}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Defaults to {@link NodeWriter#logicalSymbols logical symbols}.
+	 * </p>
+	 * @return the symbols to use with {@link NodeWriter}
+	 */
+	public String[] getSymbols() {
+		return symbols;
+	}
+	
+	/**
+	 * Sets the symbols to use with {@link NodeWriter}.
+	 * @param symbols symbols to use with {@link NodeWriter}
+	 */
+	public void setSymbols(String[] symbols) {
+		this.symbols = symbols;
 	}
 	
 	/**
@@ -167,62 +191,42 @@ public class ExplanationWriter {
 	 * Returns a user-friendly representation of the given reason.
 	 * @param reason reason to transform
 	 * @return a user-friendly representation of the given reason
-	 * @throws IllegalArgumentException if the given reason is not part of the explanation
-	 * @throws IllegalStateException if there is no parent despite up relationship; if the reason's source attribute is unknown or denotes parent relationship
+	 * @throws IllegalStateException if the reason's source attribute is unknown
 	 */
 	public String getReasonString(Reason reason) throws IllegalArgumentException {
-		if (explanation == null || explanation.getReasons() == null || !explanation.getReasons().contains(reason)) {
-			throw new IllegalArgumentException("Reason is not part of the explanation");
-		}
 		String s = null;
-		final IFeature feature;
+		final Set<IFeatureModelElement> sourceElements = reason.getTrace().getElements();
+		final String joinedSourceElements = join(sourceElements);
 		final IFeature parent;
-		switch (reason.getLiteral().getOrigin()) {
+		switch (reason.getTrace().getOrigin()) {
 			case CHILD_UP:
-				feature = (IFeature) reason.getSourceElement();
-				parent = FeatureUtils.getParent(feature);
-				if (parent == null) {
-					throw new IllegalStateException("Missing parent despite up child source attribute");
-				}
-				s = String.format("%s is child of %s.", feature.getName(), parent.getName());
+				parent = (IFeature) reason.getTrace().getElement();
+				s = String.format("%s is a child of %s.", joinedSourceElements, parent.getName());
 				break;
 			case CHILD_DOWN:
-				feature = (IFeature) reason.getSourceElement();
-				parent = FeatureUtils.getParent(feature);
-				if (parent == null) {
-					throw new IllegalStateException("Missing parent despite down child source attribute");
+				parent = (IFeature) reason.getTrace().getElement();
+				if (parent.getStructure().isAlternative()) {
+					s = String.format("%s are alternative children of %s.", joinedSourceElements, parent.getName());
+				} else if (parent.getStructure().isOr()) {
+					s = String.format("%s are or-children of %s.", joinedSourceElements, parent.getName());
+				} else {
+					s = String.format("%s is a mandatory child of %s.", joinedSourceElements, parent.getName());
 				}
-				s = String.format("%s is %s of %s.", feature.getName(), getChildString(feature, parent), parent.getName());
 				break;
 			case CHILD_HORIZONTAL:
-				String alternatives = "";
-				final List<Literal> literals = reason.getClause().getLiterals();
-				literals.remove(reason.getLiteral());
-				boolean first = true;
-				for (final Iterator<Literal> it = literals.iterator(); it.hasNext();) {
-					final Literal l = it.next();
-					if (first) {
-						first = false;
-					} else {
-						alternatives += it.hasNext() ? ", " : " and ";
-					}
-					alternatives += l.var;
-				}
-				s = String.format("%s is alternative to %s.", reason.getLiteral().var, alternatives);
+				s = String.format("%s are alternatives.", joinedSourceElements);
 				break;
 			case CONSTRAINT:
-				final IConstraint constraint = (IConstraint) reason.getSourceElement();
-				s = String.format("%s is a constraint.", constraint.getNode().toString(NodeWriter.logicalSymbols));
+				s = String.format("%s is a constraint.", joinedSourceElements);
 				break;
 			case ROOT:
-				s = String.format("%s is the root.", reason.getLiteral().var.toString());
+				s = String.format("%s is the root.", joinedSourceElements);
 				break;
-			case PARENT:
-				throw new IllegalStateException("Reason denotes parent relationship");
 			default:
 				throw new IllegalStateException("Reason has unexpected source attribute");
 		}
-		final int reasonCount = explanation.getReasonCount();
+		final Explanation explanation = reason.getExplanation();
+		final int reasonCount = explanation.getReasonCounts().get(reason);
 		final int explanationCount = explanation.getExplanationCount();
 		if (isWritingReasonCounts() && reasonCount > 1 && explanationCount > 1) {
 			s = String.format("%s (%d/%d)", s, reasonCount, explanationCount);
@@ -231,21 +235,28 @@ public class ExplanationWriter {
 	}
 	
 	/**
-	 * Returns a string describing what kind of child the given child is.
-	 * @param child child of the parent
-	 * @param parent parent of the child
-	 * @return a string describing what kind of child the given child is
+	 * Joins the given elements.
+	 * @param elements elements to join
+	 * @return joined elements
 	 */
-	protected String getChildString(IFeature child, IFeature parent) {
+	private String join(Set<IFeatureModelElement> elements) {
 		String s = "";
-		if (parent.getStructure().isAlternative()) {
-			s += "alternative ";
-		} else if (parent.getStructure().isOr()) {
-			s += "or-";
-		} else if (FeatureUtils.isMandatory(child)) {
-			s += "mandatory ";
+		boolean first = true;
+		for (final Iterator<IFeatureModelElement> it = elements.iterator(); it.hasNext();) {
+			final IFeatureModelElement element = it.next();
+			if (first) {
+				first = false;
+			} else {
+				s += it.hasNext() ? ", " : " and ";
+			}
+			if (element instanceof IConstraint) {
+				final NodeWriter w = new NodeWriter(((IConstraint) element).getNode());
+				w.setSymbols(getSymbols());
+				s += w.nodeToString();
+			} else {
+				s += element.getName();
+			}
 		}
-		s += "child";
 		return s;
 	}
 }

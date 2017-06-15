@@ -174,16 +174,6 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	}
 	
 	@Override
-	public Node getClauseFromIndex(int index) {
-		/*
-		 * Sat4J does not free up a constraint's index when it is removed.
-		 * In the local clause list, the resulting gaps in the index range are modeled using null values.
-		 * As such, do not skip these null values when accessing the clause list using a Sat4J clause index.
-		 */
-		return super.getClause(index - 1);
-	}
-	
-	@Override
 	public Map<Object, Boolean> getAssumptions() {
 		/*
 		 * Merge the assumptions of all scopes.
