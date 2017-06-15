@@ -44,7 +44,7 @@ public class ExplanationWriter {
 	 * Whether to include the reason count versus explanation count when writing a reason.
 	 * This acts as an explanation for the reason's confidence.
 	 */
-	private boolean writingReasonCounts = false;
+	private boolean writingReasonCounts = true;
 	
 	/**
 	 * Constructs a new instance of this class.
@@ -222,8 +222,10 @@ public class ExplanationWriter {
 			default:
 				throw new IllegalStateException("Reason has unexpected source attribute");
 		}
-		if (isWritingReasonCounts()) {
-			s = String.format("%s (%d/%d)", s, explanation.getReasonCounts().get(reason), explanation.getExplanationCount());
+		final int reasonCount = explanation.getReasonCount();
+		final int explanationCount = explanation.getExplanationCount();
+		if (isWritingReasonCounts() && reasonCount > 1 && explanationCount > 1) {
+			s = String.format("%s (%d/%d)", s, reasonCount, explanationCount);
 		}
 		return s;
 	}
