@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
 import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 
 /**
@@ -195,26 +196,28 @@ public class ExplanationWriter {
 	 */
 	public String getReasonString(Reason reason) throws IllegalArgumentException {
 		String s = null;
-		final Set<IFeatureModelElement> sourceElements = reason.getTrace().getElements();
+		
+		final FeatureModelElementTrace trace = reason.getTrace();
+		final Set<IFeatureModelElement> sourceElements = trace.getElements();
 		final String joinedSourceElements = join(sourceElements);
 		final IFeature parent;
-		switch (reason.getTrace().getOrigin()) {
+		switch (trace.getOrigin()) {
 			case CHILD_UP:
-				parent = (IFeature) reason.getTrace().getElement();
-				s = String.format("%s is a child of %s.", joinedSourceElements, parent.getName());
+				parent = (IFeature) trace.getElement();
+				s = String.format("%s is a child of %s: %s", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 				break;
 			case CHILD_DOWN:
-				parent = (IFeature) reason.getTrace().getElement();
+				parent = (IFeature) trace.getElement();
 				if (parent.getStructure().isAlternative()) {
-					s = String.format("%s are alternative children of %s.", joinedSourceElements, parent.getName());
+					s = String.format("%s are alternative children of %s: %s", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 				} else if (parent.getStructure().isOr()) {
-					s = String.format("%s are or-children of %s.", joinedSourceElements, parent.getName());
+					s = String.format("%s are or-children of %s: %s", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 				} else {
-					s = String.format("%s is a mandatory child of %s.", joinedSourceElements, parent.getName());
+					s = String.format("%s is a mandatory child of %s: %s", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 				}
 				break;
 			case CHILD_HORIZONTAL:
-				s = String.format("%s are alternatives.", joinedSourceElements);
+				s = String.format("%s are alternatives: %s", joinedSourceElements, trace.toString(getSymbols()));
 				break;
 			case CONSTRAINT:
 				s = String.format("%s is a constraint.", joinedSourceElements);
@@ -225,12 +228,14 @@ public class ExplanationWriter {
 			default:
 				throw new IllegalStateException("Reason has unexpected source attribute");
 		}
+		
 		final Explanation explanation = reason.getExplanation();
 		final int reasonCount = explanation.getReasonCounts().get(reason);
 		final int explanationCount = explanation.getExplanationCount();
 		if (isWritingReasonCounts() && reasonCount > 1 && explanationCount > 1) {
 			s = String.format("%s (%d/%d)", s, reasonCount, explanationCount);
 		}
+		
 		return s;
 	}
 	
