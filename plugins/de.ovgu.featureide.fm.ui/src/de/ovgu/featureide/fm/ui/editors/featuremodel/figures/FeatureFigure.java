@@ -30,7 +30,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
@@ -53,6 +55,7 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -88,6 +91,8 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private static String FALSE_OPTIONAL = IS_FALSE_OPTIONAL;
 	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
 	private static String VOID = FEATURE_MODEL_IS_VOID;
+	
+	private final Set<Reason> activeReasons = new LinkedHashSet<>();
 
 	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
 		super();
@@ -224,8 +229,10 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		if (getActiveReason() != null) {
 			final ExplanationWriter w = new ExplanationWriter(getActiveReason().getExplanation());
 			toolTip.append("\n\nThis feature is involved in the selected defect:");
-			toolTip.append("\n\u2022 ");
-			toolTip.append(w.getReasonString(getActiveReason()));
+			for (final Reason activeReason : activeReasons) {
+				toolTip.append("\n\u2022 ");
+				toolTip.append(w.getReasonString(activeReason));
+			}
 		}
 
 		Figure toolTipContent = new Figure();
@@ -330,5 +337,39 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	@Override
 	public void setLocation(Point p) {
 		super.setLocation(p);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Only does so in any of the following cases:
+	 * <ul>
+	 * <li>
+	 * The new active reason is null.
+	 * This makes it possible to reset the active reason.
+	 * </li>
+	 * <li>
+	 * The old active reason is null.
+	 * After resetting, any new active reason is accepted.
+	 * </li>
+	 * <li>
+	 * The new active reason has a greater {@link Reason#getConfidence() confidence} than the old one.
+	 * This means that, in case of graphically overlapping reasons, the greatest confidence is displayed.
+	 * </li>
+	 * </ul>
+	 * </p>
+	 * @param activeReason the new active reason; null to reset
+	 */
+	public void setActiveReason(Reason activeReason) {
+		if (activeReason == null) {
+			activeReasons.clear();
+			super.setActiveReason(activeReason);
+		} else {
+			if (getActiveReason() == null || activeReason.getConfidence() >= getActiveReason().getConfidence()) {
+				super.setActiveReason(activeReason);
+			}
+			activeReasons.add(activeReason);
+		}
 	}
 }

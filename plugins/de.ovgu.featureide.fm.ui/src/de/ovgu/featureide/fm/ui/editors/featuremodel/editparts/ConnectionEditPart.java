@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -46,6 +45,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
 import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -82,10 +82,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		}
 	};
 	
-	/** All active reasons. */
-	private final List<Reason> activeReasons = new LinkedList<>();
-	/** The currently active reason. */
-	private Reason activeReason;
+	/** The currently active reason directed {@link Origin#CHILD_UP upward}. */
+	private Reason activeReasonUp;
+	/** The currently active reason directed {@link Origin#CHILD_DOWN downward}. */
+	private Reason activeReasonDown;
 
 	private Figure toolTipContent = new Figure();
 
@@ -210,9 +210,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		setTarget(newEditPart);
 		getFigure().setVisible(getTarget() != null);
 		
-		if (activeReason != null) {
-			getFigure().setForegroundColor(FMPropertyManager.getReasonColor(activeReason));
-			getFigure().setLineWidth(FMPropertyManager.getReasonLineWidth(activeReason));
+		if (activeReasonUp != null) {
+			getFigure().setForegroundColor(FMPropertyManager.getReasonColor(activeReasonUp));
+			getFigure().setLineWidth(FMPropertyManager.getReasonLineWidth(activeReasonUp));
 		} else {
 			getFigure().setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 			getFigure().setLineWidth(1);
@@ -248,8 +248,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		}
 		getFigure().setSourceDecoration(sourceDecoration);
 		
-		if (sourceDecoration != null && getActiveReason() != null) {
-			sourceDecoration.setActiveReason(getActiveReason());
+		if (sourceDecoration != null && activeReasonDown != null) {
+			sourceDecoration.setActiveReason(activeReasonDown);
 		}
 	}
 
@@ -306,11 +306,15 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		toolTipContent.setLayoutManager(new GridLayout());
 		toolTipContent.add(new Label("Connection type:\n" + (target.getStructure().isAnd() ? "And" : (target.getStructure().isMultiple() ? "Or" : "Alternative"))));
 
-		if (getActiveReason() != null) {
+		final Reason activeReason = activeReasonUp != null ? activeReasonUp : activeReasonDown;
+		if (activeReason != null) {
 			String explanation = "This connection is involved in the selected defect:";
 			final ExplanationWriter w = new ExplanationWriter(activeReason.getExplanation());
-			for (final Reason reason : activeReasons) {
-				explanation += "\n\u2022 " + w.getReasonString(reason);
+			if (activeReasonUp != null) {
+				explanation += "\n\u2022 " + w.getReasonString(activeReasonUp);
+			}
+			if (activeReasonDown != null) {
+				explanation += "\n\u2022 " + w.getReasonString(activeReasonDown);
 			}
 			toolTipContent.add(new Label(explanation));
 		}
@@ -345,46 +349,25 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 	
 	/**
-	 * Returns the currently active reason.
-	 * @return the currently active reason
-	 */
-	public Reason getActiveReason() {
-		return activeReason;
-	}
-	
-	/**
-	 * <p>
-	 * Sets the currently active reason.
-	 * </p>
-	 * 
-	 * <p>
-	 * Only does so in any of the following cases:
-	 * <ul>
-	 * <li>
-	 * The new active reason is null.
-	 * This makes it possible to reset the active reason.
-	 * </li>
-	 * <li>
-	 * The old active reason is null.
-	 * After resetting, any new active reason is accepted.
-	 * </li>
-	 * <li>
-	 * The new active reason has a greater {@link Reason#getConfidence() confidence} than the old one.
-	 * This means that, in case of graphically overlapping reasons, the greatest confidence is displayed.
-	 * </li>
-	 * </ul>
-	 * </p>
+	 * Sets the active reason.
 	 * @param activeReason the new active reason; null to reset
+	 * @throws IllegalArgumentException if the reason's origin is not a vertical child relationship
 	 */
-	public void setActiveReason(Reason activeReason) {
+	public void setActiveReason(Reason activeReason) throws IllegalArgumentException {
 		if (activeReason == null) {
-			activeReasons.clear();
-			this.activeReason = activeReason;
-		} else {
-			if (this.activeReason == null || activeReason.getConfidence() >= this.activeReason.getConfidence()) {
-				this.activeReason = activeReason;
-			}
-			activeReasons.add(activeReason);
+			this.activeReasonUp = null;
+			this.activeReasonDown = null;
+			return;
+		}
+		switch (activeReason.getTrace().getOrigin()) {
+			case CHILD_UP:
+				this.activeReasonUp = activeReason;
+				break;
+			case CHILD_DOWN:
+				this.activeReasonDown = activeReason;
+				break;
+			default:
+				throw new IllegalArgumentException("Reason does not denote a vertical child relationship");
 		}
 	}
 	
@@ -422,7 +405,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			if (siblingConnectionEditPart == null) {
 				continue;
 			}
-			final Reason activeReason = siblingConnectionEditPart.getActiveReason();
+			final Reason activeReason = siblingConnectionEditPart.activeReasonDown;
 			if (activeReason != null
 					&& (mainActiveReason == null
 					|| mainActiveReason.getConfidence() < activeReason.getConfidence())) { //maximum confidence of all siblings
