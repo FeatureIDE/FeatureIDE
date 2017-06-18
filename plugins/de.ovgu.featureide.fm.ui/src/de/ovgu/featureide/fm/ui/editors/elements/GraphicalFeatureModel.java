@@ -134,7 +134,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public Collection<IGraphicalFeature> getAllFeatures() {
 		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (IFeature f : correspondingFeatureModel.getVisibleFeatures(true)) {
+		for (IFeature f : correspondingFeatureModel.getFeatures()) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);

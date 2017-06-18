@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
@@ -227,7 +228,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		boolean parentHidden = false;
 
-		CircleDecoration sourceDecoration = null;
+		ConnectionDecoration sourceDecoration = null;
 		while (!sourceParent.getStructure().isRoot()) {
 			sourceParent = sourceParent.getStructure().getParent().getFeature();
 			if (sourceParent.getStructure().isHidden())
@@ -235,8 +236,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		}
 		if (graphicalSource == graphicalTarget && graphicalSource.isCollapsed()) {
-			getFigure().setSourceDecoration(new CollapsedDecoration(graphicalTarget));
-			return;
+			sourceDecoration = new CollapsedDecoration(graphicalTarget);
 		} else if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());

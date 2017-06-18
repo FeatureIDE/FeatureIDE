@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Christopher Sontag
  * @author Maximilian Kühl
  */
-public class CollapsedDecoration extends Shape implements RotatableDecoration, GUIDefaults {
+public class CollapsedDecoration extends ConnectionDecoration implements GUIDefaults {
 	private final Label childrenCount = new Label();
 	//	private static GridLayout gl = new GridLayout();
 	private static final FreeformLayout layout = new FreeformLayout();

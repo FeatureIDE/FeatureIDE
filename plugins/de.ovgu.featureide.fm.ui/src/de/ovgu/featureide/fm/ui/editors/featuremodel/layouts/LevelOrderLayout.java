@@ -80,7 +80,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void layoutLevelInX(LinkedList<IGraphicalFeature> level) {
 		for (IGraphicalFeature feature : level)
-			if (!feature.isCollapsed() && feature.getGraphicalChildren().size() > 0) {
+			if (!feature.isCollapsed() && getChildren(feature).size() > 0) {
 				centerAboveChildren(feature);
 			}
 
@@ -96,7 +96,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
 		
-		if (feature.getGraphicalChildren().size() == 0)
+		if (getChildren(feature).size() == 0)
 			nextToLeftSibling(feature, lastFeature);
 		else {
 			if (lastFeature != null)
@@ -108,7 +108,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				firstCompound = false;
 				boolean compoundSibling = false;
 				for (int k = j - 1; k >= 0; k--)
-					if (level.get(k).getGraphicalChildren().size() > 0)
+					if (getChildren(level.get(k)).size() > 0)
 						compoundSibling = true;
 				if (!compoundSibling)
 					for (int k = j - 1; k >= 0; k--)
@@ -129,7 +129,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				l = k + 1;
 				break;
 			}
-			if (sibling.getGraphicalChildren().size() > 0) {
+			if (getChildren(sibling).size() > 0) {
 				l = k + 1;
 				right = false;
 				space = getBounds(feature).x - getBounds(sibling).right() - width;

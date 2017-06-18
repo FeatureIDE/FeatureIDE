@@ -255,6 +255,6 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
-		return Functional.toList(feature.getGraphicalChildren());
+		return Functional.toList(feature.getGraphicalChildren(showHidden));
 	}
 }
