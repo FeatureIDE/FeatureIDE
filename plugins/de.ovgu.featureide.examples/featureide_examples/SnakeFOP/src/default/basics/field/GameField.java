@@ -222,7 +222,7 @@ public   class  GameField  extends JPanel  implements IPanelListener {
 	/**{@feature 0}
 	 * Tötet das Teilstück des Gegners und den Gegner.
 	 */
-	 private void  killEntityPart__wrappee__Entities  (IKIEntity enemy, IEntityPart iEntityPart) {
+	 private void  killEntityPart__wrappee__SnakeFOP  (IKIEntity enemy, IEntityPart iEntityPart) {
 		if (enemy.isAlive()) {
 			enemy.kill();
 		}
@@ -236,7 +236,7 @@ public   class  GameField  extends JPanel  implements IPanelListener {
 	 * Addiert die Punkte für das Essen des Gegners.
 	 */
 	private void killEntityPart(IKIEntity enemy, IEntityPart iEntityPart) {
-		killEntityPart__wrappee__Entities(enemy, iEntityPart);
+		killEntityPart__wrappee__SnakeFOP(enemy, iEntityPart);
 		main.addPoints(enemy.getPoints());
 	}
 
@@ -249,26 +249,25 @@ public   class  GameField  extends JPanel  implements IPanelListener {
 	/**{@feature 0}
 	 * @return Anzahl der übrigen Leben.
 	 */
-	 private String  getGameStatusString__wrappee__Entities  () {
+	 private String  getGameStatusString__wrappee__SnakeFOP  () {
 		return "Leben: " + main.getLives();
 	}
 
 	
 	
 	/**{@feature 0}
-	 * @return Aktuelle Punktzahl.
+	 * @return Aktuelle Punktzahl als String.
 	 */
 	private String getGameStatusString() {
-		return getGameStatusString__wrappee__Entities() + "   Punkte: " + main.getPoints();
+		return getGameStatusString__wrappee__SnakeFOP() + "   Punkte: " + main.getPoints();
 	}
 
 	
 
 	/**
-	 * Malt die Einzelnen Frames mit allen Infoelementen.
+	 * Malt die Einzelnen Frames mit allen Info-Elementen.
 	 * 
-	 * @param g
-	 *            Graphics auf der gemalt wird
+	 * @param g Graphics-Objekt, auf dem gemalt wird
 	 */
 	public void paint(Graphics g) {
 		if (main.hasFocus()) {
@@ -442,7 +441,7 @@ public   class  GameField  extends JPanel  implements IPanelListener {
 	/**{@feature 0}
 	 * Hook method.
 	 */
-	 private static void  addEntityType__wrappee__Manual  () {}
+	 private static void  addEntityType__wrappee__Enemies  () {}
 
 	
 	
@@ -451,7 +450,7 @@ public   class  GameField  extends JPanel  implements IPanelListener {
 	 */
 	private static void addEntityType() {
 		entityTypeList.add(IEntity.CENTIPEDE);
-		addEntityType__wrappee__Manual();
+		addEntityType__wrappee__Enemies();
 	}
 
 	
@@ -493,7 +492,7 @@ public   class  GameField  extends JPanel  implements IPanelListener {
 	/**{@feature 0}
 	 * Hook method.
 	 */
-	 private IKIEntity  newEntity__wrappee__Manual  (int type, int route) {
+	 private IKIEntity  newEntity__wrappee__Enemies  (int type, int route) {
 		return null;
 	}
 
@@ -503,7 +502,7 @@ public   class  GameField  extends JPanel  implements IPanelListener {
 	 * Tausendfüßler
 	 */
 	private IKIEntity newEntity(int type, int route) {
-		IKIEntity enemy = newEntity__wrappee__Manual(type, route);
+		IKIEntity enemy = newEntity__wrappee__Enemies(type, route);
 		if (enemy != null) {
 			return enemy;
 		} else if (type == IEntity.CENTIPEDE) {

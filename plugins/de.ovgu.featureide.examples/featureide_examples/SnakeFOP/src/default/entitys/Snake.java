@@ -29,14 +29,14 @@ public  class  Snake  extends AEntity {
 	/**
 	 * Konstruktor einer neuen Snake.
 	 * 
-	 * Es wird eine neue instance der Klasse Snake erstellt.
+	 * Es wird eine neue Instanz der Klasse Snake erstellt.
 	 * 
 	 * @param xPosbeiStart
 	 *            die X -Position der Snake beim Start
 	 * @param yPosbeiStart
 	 *            die Y -Position der Snake beim Start
 	 * @param AnzahlderMittelteilebeimStart
-	 *            die Anzahl der Elemente einer Snake zwischen Head und Tale
+	 *            die Anzahl der Elemente einer Snake zwischen Head und Tail
 	 * 
 	 */
 	public Snake(int xPosbeiStart, int yPosbeiStart, int AnzahlderMittelteilebeimStart) {
@@ -54,7 +54,6 @@ public  class  Snake  extends AEntity {
 	}
 
 	
-
 	
 	private void setStatus(EntityPart first, EntityPart second) {
 		if (first.getStatus() < 24) {
@@ -103,9 +102,7 @@ public  class  Snake  extends AEntity {
 
 	
 	/**
-	 * 
 	 * Verlängert die Schlange um ein Element.
-	 * 
 	 */
 	public void eat() {
 		EntityPart neu = new EntityPart(tail.getXPos(), tail.getYPos(), tail.getRoute());
@@ -157,10 +154,9 @@ public  class  Snake  extends AEntity {
 	
 
 	/**
-	 * 
 	 * Gibt zurück ob sich die Schlange schon bewegt hat.
 	 * 
-	 * @return moved?
+	 * @return {@code true}, wenn die Schlange sich schon bewegt hat.
 	 */
 	public boolean alreadyMoved() {
 		return alreadyMoved;
@@ -169,10 +165,9 @@ public  class  Snake  extends AEntity {
 	
 
 	/**
+	 * Gibt zurück, ob die Schlange schon vollkommen im Loch ist.
 	 * 
-	 * Gibt zurück ob die Schlange schon vollkommen im Loch ist.
-	 * 
-	 * @return imLoch?
+	 * @return {@code true}, wenn die Schlange komplett im Loch ist.
 	 */
 	public boolean getInHole() {
 		return inHole;
@@ -182,9 +177,9 @@ public  class  Snake  extends AEntity {
 
 	/**
 	 * 
-	 * Gibt zurück ob die Schlange das Loch erreicht hat.
+	 * Gibt zurück, ob die Schlange das Loch erreicht hat.
 	 * 
-	 * @return loch erreicht?
+	 * @return {@code true}, wenn die Schlange das Loch erreicht ist.
 	 */
 	public boolean getHoleArrived() {
 		return holearrived;

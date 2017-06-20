@@ -62,11 +62,12 @@ public   class  EntityPainter {
 	// -------------------------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Hier werden alle übergebenen Entitys auf ein Image gezeichnet.
+	 * Hier werden alle übergebenen Entitys auf das Hintergrundbild gezeichnet.
 	 * 
 	 * @param backround
+	 * 		das Hintergrundbild
 	 * @param entities
-	 *            das Array der zu zeichnenden Entitys
+	 * 		das Array der zu zeichnenden Entitys
 	 * 
 	 */
 	public Image paintEntitys(Image backround, IEntity[] entities) {
@@ -108,7 +109,7 @@ public   class  EntityPainter {
 	/**{@feature 0}
 	 * Zeichnet alle eingliedrigen Gegner.
 	 */
-	 private void  paintEnemy__wrappee__Manual  (IEntity enemy) {
+	 private void  paintEnemy__wrappee__SnakeFOP  (IEntity enemy) {
 		paintEntity(enemy);
 	}
 
@@ -121,7 +122,7 @@ public   class  EntityPainter {
 		if (enemy.getType() == IEntity.CENTIPEDE) {
 			paintTausend((Centipede) enemy);
 		} else {
-			paintEnemy__wrappee__Manual(enemy);
+			paintEnemy__wrappee__SnakeFOP(enemy);
 		}
 	}
 
@@ -149,7 +150,7 @@ public   class  EntityPainter {
 	/**{@feature 0}
 	 * Hook method.
 	 */
-	 private int[]  getGraphics__wrappee__Manual  (IEntity entity) {
+	 private int[]  getGraphics__wrappee__SnakeFOP  (IEntity entity) {
 		return null;
 	}
 
@@ -162,7 +163,7 @@ public   class  EntityPainter {
 		if (entity.getType() == IEntity.CENTIPEDE) {
 			return centiParts;
 		} else {
-			return getGraphics__wrappee__Manual(entity);
+			return getGraphics__wrappee__SnakeFOP(entity);
 		}
 	}
 

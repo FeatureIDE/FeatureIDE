@@ -39,7 +39,7 @@ public  class  LevelPainter {
 	
 
 	/**
-	 * Malt das Übergebene Field.
+	 * Malt das übergebene Field.
 	 * 
 	 * @param width Breite des zu malenenden Hintergrunds
 	 * @param height Länge des zu malenenden Hintergrunds
