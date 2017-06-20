@@ -364,7 +364,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					return;
 				int difX = newLoc.x - oldLoc.x;
 
-				if (!FMPropertyManager.isLegendHidden()) {
+				if (!graphicalFeatureModel.isLegendHidden()) {
 					moveLegend(graphicalFeatureModel, difX);
 				}
 				setLayout();
@@ -517,7 +517,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		exportFeatureModelAction = new ExportFeatureModelAction(featureModelEditor);
 		legendLayoutAction = new LegendLayoutAction(this, graphicalFeatureModel);
-		legendAction = new LegendAction(this, featureModel);
+		legendAction = new LegendAction(this, graphicalFeatureModel);
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this, graphicalFeatureModel);
 		showCollapsedConstraintsAction = new ShowCollapsedConstraintsAction(this, graphicalFeatureModel);
 
@@ -1216,6 +1216,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			legendLayoutAction.refresh();
 			break;
 		case LEGEND_LAYOUT_CHANGED:
+			if(event.getSource() instanceof Boolean && ((Boolean)event.getSource())){
+				//Layout hidden property changed. Needs to be saved to the graphical model
+				featureModelEditor.setPageModified(true);
+			}
 			legendLayoutAction.refresh();
 			internRefresh(false);
 			break;

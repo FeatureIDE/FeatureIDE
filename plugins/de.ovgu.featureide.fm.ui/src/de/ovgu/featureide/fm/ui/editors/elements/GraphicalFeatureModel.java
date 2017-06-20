@@ -56,11 +56,13 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	protected Map<IFeature, IGraphicalFeature> features;
 	protected Map<IConstraint, IGraphicalConstraint> constraints;
 
+	protected boolean hiddenLegend;
+
 	/**
 	 * The currently active explanation that is shown in the FeatureDiagrammEditor if any defect element is selected.
 	 */
 	public Explanation currentlyActiveExplanation = null;
-	
+
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 		layout = new FeatureModelLayout();
@@ -105,6 +107,22 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public void handleLegendLayoutChanged() {
 		fireEvent(EventType.LEGEND_LAYOUT_CHANGED);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getLegendHidden()
+	 */
+	@Override
+	public boolean isLegendHidden() {
+		return hiddenLegend;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setLegendHidden(boolean)
+	 */
+	@Override
+	public void setLegendHidden(boolean hidden) {
+		hiddenLegend = hidden;
 	}
 
 	@Override
@@ -253,7 +271,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public void setActiveExplanation(Explanation exp) {
 		currentlyActiveExplanation = exp;
-		
+
 	}
 
 	/* (non-Javadoc)

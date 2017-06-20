@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -30,22 +31,26 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Joshua Sprey
  */
 public class HideLegendOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Show/Hide Legend";
 
+	IGraphicalFeatureModel model;
+
 	/**
 	 * @param label
 	 */
-	public HideLegendOperation(IFeatureModel featureModel) {
-		super(featureModel, LABEL);
+	public HideLegendOperation(IGraphicalFeatureModel featureModel) {
+		super(featureModel.getFeatureModel(), LABEL);
+		model = featureModel;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		FMPropertyManager.setHideLegend(!FMPropertyManager.isLegendHidden());
-		return FeatureIDEEvent.getDefault(EventType.LEGEND_LAYOUT_CHANGED);
+		model.setLegendHidden(!model.isLegendHidden());
+		return new FeatureIDEEvent(true, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override

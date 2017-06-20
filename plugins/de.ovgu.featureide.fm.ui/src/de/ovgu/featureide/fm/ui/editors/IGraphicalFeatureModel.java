@@ -42,6 +42,9 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	FeatureModelLayout getLayout();
 
+	boolean isLegendHidden();
+	void setLegendHidden(boolean hidden);
+
 	void handleLegendLayoutChanged();
 
 	void handleModelLayoutChanged();

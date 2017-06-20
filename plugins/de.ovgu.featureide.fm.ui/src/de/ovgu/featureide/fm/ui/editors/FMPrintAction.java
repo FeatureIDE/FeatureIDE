@@ -96,7 +96,7 @@ public class FMPrintAction extends PrintAction {
 		Point legendPos = layout.getLegendPos();
 		Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
 		
-		if (!FMPropertyManager.isLegendHidden()) {
+		if (!featureModel.isLegendHidden()) {
 			FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLegendPos);
 		}
 		layout.setLegendPos(newLegendPos.x, newLegendPos.y);
