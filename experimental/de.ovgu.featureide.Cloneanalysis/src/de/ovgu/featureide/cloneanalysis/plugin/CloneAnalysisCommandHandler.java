@@ -56,6 +56,9 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 
 	private static final boolean UPDATE_MARKERS = true;
 	private static final boolean UPDATE_GRAPHS = false;
+	
+	protected HashMap<String,String> fileLocations = new HashMap<String,String>();
+	private String trimFileName=null;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
@@ -153,10 +156,14 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 												.makeRelativeTo(
 														CloneAnalysisUtils.getWorkspaceRoot()
 																.getLocation()).toString() : ""));
-					else
+					else{
+						trimFileName = file.getLocation().toString();
+						int tempIndex = trimFileName.lastIndexOf("/");
+						trimFileName = trimFileName.substring(tempIndex+1);
+						fileLocations.put(trimFileName, file.getLocation().toString());
 						System.out.println("creating marker in file "
 								+ file.getLocation().toString());
-					
+					}
 					
 					
 					final IDocument document = getDocumentForFile(file, documents);
@@ -172,8 +179,8 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 				}
 			}
 		}
-
-		cloneAnalysisView.showResults(formattedResults);
+		cloneAnalysisView.showResults(formattedResults,fileLocations);
+//		cloneAnalysisView.showResults(formattedResults);
 		// cloneAnalysisView.updateMatches(cpdResults);
 		time = System.currentTimeMillis() - time;
 		double timeD = ((double) time) / 1000.0;
