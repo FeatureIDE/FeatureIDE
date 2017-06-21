@@ -3,7 +3,7 @@ package de.ovgu.featureide.cloneanalysis.views;
 public enum CloneAnalysisTreeColumn
 {
 	CLONE_OR_OCCURENCE("Clone / Occurence"),
-	SIZE("size"),
+	SIZE("Size"),
 	LENGTH("Lines"),
 	TOKEN_COUNT("Tokens"),
 	FILES_AFFECTED_COUNT("Files"),

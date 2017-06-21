@@ -6,31 +6,31 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.results.Clone;
 
-final class LinesComparator extends ViewerComparator
-{
+public class TokenComparator extends ViewerComparator {
+	
 	boolean sortDescending;
-	public LinesComparator(boolean sortDescending){
+	public TokenComparator(boolean sortDescending){
 		this.sortDescending = sortDescending;
 	}
+	
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2)
 	{
-		int l1 = 0, l2 = 0,result=0;
+		int t1 = 0, t2 = 0,result = 0;
 		if(e1 instanceof Clone)
-			l1 = ((Clone)e1).getLineCount();
+			t1 = ((Clone)e1).getTokenCount();
 		else if(e1 instanceof CloneOccurence)
-			l1 = ((CloneOccurence)e1).getClone().getLineCount();
+			t1 = ((CloneOccurence)e1).getClone().getTokenCount();
 		if(e2 instanceof Clone)
-			l2 = ((Clone)e2).getLineCount();
+			t2 = ((Clone)e2).getTokenCount();
 		else if(e2 instanceof CloneOccurence)
-			l2 = ((CloneOccurence)e2).getClone().getLineCount();
+			t2 = ((CloneOccurence)e2).getClone().getTokenCount();
 		
 		if(sortDescending == true){
-			result = l2-l1;
+			result = t2-t1;
 		}else{
-			result = l1-l2;
+			result = t1-t2;
 		}
-		
 		
 		return result;
 	}

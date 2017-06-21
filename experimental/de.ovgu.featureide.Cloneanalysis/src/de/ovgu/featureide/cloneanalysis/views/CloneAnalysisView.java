@@ -1,7 +1,14 @@
 package de.ovgu.featureide.cloneanalysis.views;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -16,14 +23,22 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.cloneanalysis.results.CloneAnalysisResults;
@@ -39,9 +54,17 @@ public class CloneAnalysisView extends ViewPart
 	public static final String ID = "de.ovgu.featureide.code.cloneanalysis.views.CloneAnalysisView";
 
 	public static int hiddenEntries = 0, totalEntries = 0; 
-	
+
 	private Tree cloneTree;
 	private TreeViewer cloneViewer;
+
+	private Text text;
+	private String fileName;
+	IPath path;
+	IFile ifile;
+	Path filePath;
+	File file;
+	private HashMap<String,String> fileLocations;
 
 	CloneAnalysisResults<VariantAwareClone> results = null;
 
@@ -58,7 +81,8 @@ public class CloneAnalysisView extends ViewPart
 	 * The constructor.
 	 */
 	public CloneAnalysisView()
-	{}
+	{
+	}
 
 	public void updateAnalysis(IStructuredSelection selection)
 	{}
@@ -77,11 +101,10 @@ public class CloneAnalysisView extends ViewPart
 		cloneViewer.setInput(getViewSite());
 		cloneViewer.setComparator(new SizeComparator());
 
-		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem()
-				.setHelp(cloneViewer.getControl(), "de.ovgu.featureide.code.Cloneanalysis.viewer");
-		addColumns();
+		.setHelp(cloneViewer.getControl(), "de.ovgu.featureide.code.Cloneanalysis.viewer");
 
+		addColumns();
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
@@ -103,24 +126,26 @@ public class CloneAnalysisView extends ViewPart
 		column15.setText(CloneAnalysisTreeColumn.SIZE.toString());
 		column15.setWidth(50);
 		cloneTree.setSortColumn(column15);
-		cloneTree.setSortDirection(SWT.DOWN);
+		cloneTree.setSortDirection(SWT.UP);
+		column15.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column2 = new TreeColumn(cloneTree, SWT.RIGHT);
 		column2.setAlignment(SWT.LEFT);
 		column2.setText(CloneAnalysisTreeColumn.LENGTH.toString());
 		column2.setWidth(50);
-		// cloneTree.setSortColumn(column2);
-		// cloneTree.setSortDirection(SWT.DOWN);
+		column2.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column3 = new TreeColumn(cloneTree, SWT.RIGHT);
 		column3.setAlignment(SWT.LEFT);
 		column3.setText(CloneAnalysisTreeColumn.TOKEN_COUNT.toString());
 		column3.setWidth(50);
+		column3.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column4 = new TreeColumn(cloneTree, SWT.RIGHT);
 		column4.setAlignment(SWT.LEFT);
 		column4.setText(CloneAnalysisTreeColumn.FILES_AFFECTED_COUNT.toString());
 		column4.setWidth(50);
+		column4.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column5 = new TreeColumn(cloneTree, SWT.RIGHT);
 		column5.setAlignment(SWT.LEFT);
@@ -203,16 +228,17 @@ public class CloneAnalysisView extends ViewPart
 		action2.setToolTipText("Action 2 tooltip");
 		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		doubleClickAction = new Action()
-		{
-			public void run()
-			{
-				// TreeItem<VariantAwareClone> selectedItem =
-				// matchViewer.getSelectionModel().getSelectedItem();
-				// showMessage("Double-click detected on " +
-				// selectedItem.toString());
-			}
-		};
+		
+//		doubleClickAction = new Action()
+//		{
+//			public void run()
+//			{
+//				// TreeItem<VariantAwareClone> selectedItem =
+//				// matchViewer.getSelectionModel().getSelectedItem();
+//				// showMessage("Double-click detected on " +
+//				// selectedItem.toString());
+//			}
+//	};
 	}
 
 	private void hookDoubleClickAction()
@@ -221,7 +247,31 @@ public class CloneAnalysisView extends ViewPart
 		{
 			public void doubleClick(DoubleClickEvent event)
 			{
-				doubleClickAction.run();
+//				doubleClickAction.run();
+				String selectedItem = null,selected = null;
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				selectedItem = selection.toString();
+				selectedItem = selectedItem.replaceAll("[\\[\\]]", "");
+				selected = selectedItem.substring(selectedItem.lastIndexOf(":"));
+				selectedItem = selectedItem.replaceAll(selected,"");
+				System.out.println(selectedItem);
+				fileName = selectedItem;
+				if(fileLocations.containsKey(fileName)){
+					String mapValue = fileLocations.get(fileName);
+					File fileToOpen = new File(mapValue);
+					if (fileToOpen.exists() && fileToOpen.isFile()) {
+						IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
+						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+						try {
+							IDE.openEditorOnFileStore( page, fileStore );
+						} catch ( PartInitException exception ) {
+						}
+					} else {
+						showMessage("File does not exist");
+					}
+				}
+				
 			}
 		});
 	}
@@ -238,9 +288,11 @@ public class CloneAnalysisView extends ViewPart
 	{
 		cloneViewer.getControl().setFocus();
 	}
-
-	public void showResults(CloneAnalysisResults<VariantAwareClone> formattedResults)
+	//	public void showResults(CloneAnalysisResults<VariantAwareClone> formattedResults)
+	public void showResults(CloneAnalysisResults<VariantAwareClone> formattedResults, HashMap<String,String> fileLocations)
 	{
+		this.fileLocations = fileLocations;
+		
 		results = formattedResults;
 		createFilterActions();
 		cloneViewer.setInput(results);
@@ -268,10 +320,10 @@ public class CloneAnalysisView extends ViewPart
 		{
 			if(filter instanceof FeatureFilter)
 			{
-					cloneViewer.removeFilter(filter);
+				cloneViewer.removeFilter(filter);
 			}
 		}
-		
+
 		if(filterActions!= null && !filterActions.isEmpty())
 		{
 			IActionBars bars = getViewSite().getActionBars();
@@ -323,7 +375,7 @@ public class CloneAnalysisView extends ViewPart
 				}
 			}
 		}
-		
+
 		applyFeatureFilter(feature);
 		return true;
 	}
