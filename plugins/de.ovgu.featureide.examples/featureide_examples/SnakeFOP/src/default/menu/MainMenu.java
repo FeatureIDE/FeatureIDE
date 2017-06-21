@@ -41,7 +41,7 @@ public   class  MainMenu  extends JPanel  implements IPanelListener {
 	 * Impressum.</br>
 	 * Ende.
 	 */
-	 private static void  addMenuElements__wrappee__L3  () {
+	 private static void  addMenuElements__wrappee__SnakeFOP  () {
 		menuElements.add("Spiel starten");
 		menuElements.add("Einstellungen");
 		menuElements.add("Anleitung");
@@ -55,7 +55,7 @@ public   class  MainMenu  extends JPanel  implements IPanelListener {
 	 * Highscore.
 	 */
 	private static void addMenuElements() {
-		addMenuElements__wrappee__L3();
+		addMenuElements__wrappee__SnakeFOP();
 		menuElements.add("Highscore");
 		highscoreIndex = menuElements.size() - 1;
 	}
@@ -122,7 +122,7 @@ public   class  MainMenu  extends JPanel  implements IPanelListener {
 	/**{@feature 0}
 	 * Hook method.
 	 */
-	 private void  testOtherMenuPoints__wrappee__L3  () {}
+	 private void  testOtherMenuPoints__wrappee__SnakeFOP  () {}
 
 	
 	
@@ -133,7 +133,7 @@ public   class  MainMenu  extends JPanel  implements IPanelListener {
 		if (selected == highscoreIndex) {
 			main.startHighscore();
 		} else {
-			testOtherMenuPoints__wrappee__L3();
+			testOtherMenuPoints__wrappee__SnakeFOP();
 		}
 	}
 

@@ -1,8 +1,13 @@
 package de.ovgu.featureide.cloneanalysis.markers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaModelMarker;
 
 public class CloneAnalysisMarkers
 {
@@ -51,6 +56,7 @@ public class CloneAnalysisMarkers
 	
 	public static void addProblemMarker(IFile file, String message, int lineIndex, int startChar, int endChar)
 	{
+		
 		try
 		{
 			IMarker marker = file.createMarker(IMarker.PROBLEM);
@@ -59,6 +65,7 @@ public class CloneAnalysisMarkers
 			marker.setAttribute(IMarker.LINE_NUMBER, lineIndex);
 			marker.setAttribute(IMarker.CHAR_START, startChar);
 			marker.setAttribute(IMarker.CHAR_END, endChar);
+			marker.setAttribute(IJavaModelMarker.ID, 1244);
 		} catch (CoreException e)
 		{
 			System.out.println("Marker creation failed");

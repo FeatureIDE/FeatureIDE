@@ -42,7 +42,6 @@ public  class  Tile {
 	 * Kopiert die Instanz der Kachel.
 	 * 
 	 * @return eine neue Instanz mit den sleben Attributen
-	 * 
 	 */
 	public Tile copy() {
 		Tile tmp = new Tile(xpos, ypos,imgNr, viewNr);
@@ -57,7 +56,6 @@ public  class  Tile {
 	 * Gibt die Image Nummer zurück (legt Bild fest).
 	 * 
 	 * @return Image-Nummer
-	 * 
 	 */
 	public int getImgNr() {
 		return imgNr;
@@ -66,11 +64,10 @@ public  class  Tile {
 	
 
 	/**
-	 * Gibt an welche Ansicht das Image haben soll(mehrere Varianten bei zb
+	 * Gibt an, welche Ansicht das Image haben soll (mehrere Varianten bei z.B.
 	 * Stein).
 	 * 
 	 * @return gibt das genaue Image an
-	 * 
 	 */
 	public int getViewNr() {
 		return viewNr;
@@ -79,7 +76,7 @@ public  class  Tile {
 	
 
 	/**
-	 * Gibt die X-Position des Tile zurück.
+	 * Gibt die x-Position des Tile zurück.
 	 * 
 	 * @return x-Position
 	 * 
@@ -103,7 +100,7 @@ public  class  Tile {
 	
 
 	/**
-	 * Gibt true zurück wenn das Tile begehbar ist.
+	 * Gibt {@code true} zurück wenn das Tile begehbar ist.
 	 * 
 	 * @return Begehbarkeit
 	 * 
@@ -129,7 +126,7 @@ public  class  Tile {
 	 * Setzt die Begehbarkeit eines Tile.
 	 * 
 	 * @param walk
-	 *            bei Begehbarkeit - True
+	 * 		bei Begehbarkeit - {@code true}
 	 * 
 	 */
 	public void setWalkable(boolean walk) {
