@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
@@ -57,6 +58,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	protected Map<IConstraint, IGraphicalConstraint> constraints;
 
 	protected boolean hiddenLegend;
+	protected Legend legend;
 
 	/**
 	 * The currently active explanation that is shown in the FeatureDiagrammEditor if any defect element is selected.
@@ -125,6 +127,21 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		hiddenLegend = hidden;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getLegend()
+	 */
+	@Override
+	public Legend getLegend() {
+		return legend;
+	}
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setLegend(de.ovgu.featureide.fm.ui.editors.featuremodel.Legend)
+	 */
+	@Override
+	public void setLegend(Legend legend) {
+		this.legend = legend;
+	}
+	
 	@Override
 	public void handleModelLayoutChanged() {
 		fireEvent(EventType.MODEL_LAYOUT_CHANGED);

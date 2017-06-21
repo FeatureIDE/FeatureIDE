@@ -177,8 +177,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		createRows();
 		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
 		setBackgroundColor(FMPropertyManager.getLegendBackgroundColor());
-		FeatureUIHelper.setLegendSize(graphicalFeatureModel, this.getSize());
-		FeatureUIHelper.setLegendFigure(graphicalFeatureModel, this);
 		this.setOpaque(true);
 	}
 	
@@ -666,6 +664,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	public void recreateLegend() {
 		this.removeAll();
+		this.setLocation(graphicalFeatureModel.getLayout().getLegendPos());
 		refreshProperties(graphicalFeatureModel.getFeatureModel());
 		setLegendSize();
 		createRows();

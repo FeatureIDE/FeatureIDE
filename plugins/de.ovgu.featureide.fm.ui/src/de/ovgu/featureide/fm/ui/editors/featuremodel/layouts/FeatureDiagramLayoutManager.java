@@ -30,10 +30,15 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -47,8 +52,10 @@ abstract public class FeatureDiagramLayoutManager {
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden, showCollapsedConstraints;
+	protected FeatureDiagramEditor editor;
 
-	public final void layout(IGraphicalFeatureModel featureModel) {
+	public final void layout(IGraphicalFeatureModel featureModel, FeatureDiagramEditor editor) {
+		this.editor = editor;
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		showCollapsedConstraints = featureModel.getLayout().showCollapsedConstraints();
@@ -119,7 +126,7 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * sets the position of the legend
 	 */
-	private static void layoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
+	private void layoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
 		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
@@ -155,17 +162,24 @@ abstract public class FeatureDiagramLayoutManager {
 			if (position.y + position.height > max.y)
 				max.y = position.bottom();
 		}
-
-		final Dimension legendSize = FeatureUIHelper.getLegendSize(featureModel);
-		if (legendSize == null) {
+		if (editor == null)
 			return;
+		Dimension legendSize = null;
+		LegendFigure legendFigure = null;
+		//Find Legend Figure
+		for (Object obj : editor.getEditPartRegistry().values()) {
+			if (obj instanceof LegendEditPart) {
+				legendFigure = ((LegendEditPart) obj).getFigure();
+				legendSize = legendFigure.getSize();
+			}
 		}
+		if (legendSize == null && legendFigure == null)
+			return;
 
 		boolean topRight = true;
 		boolean topLeft = true;
 		boolean botLeft = true;
 		boolean botRight = true;
-
 		/*
 		 * check if features would intersect with the legend on the edges
 		 */

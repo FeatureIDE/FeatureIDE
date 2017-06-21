@@ -108,6 +108,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 			if (legend == null)
 				legend = new Legend(fm);
 			list.add(legend);
+			fm.setLegend(legend);
 		}
 
 		return list;
