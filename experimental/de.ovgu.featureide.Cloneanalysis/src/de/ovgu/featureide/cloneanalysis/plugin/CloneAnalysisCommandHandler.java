@@ -2,9 +2,12 @@ package de.ovgu.featureide.cloneanalysis.plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import net.sourceforge.pmd.cpd.Match;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -38,7 +41,6 @@ import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
 import de.ovgu.featureide.cloneanalysis.views.CloneAnalysisView;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import net.sourceforge.pmd.cpd.Match;
 
 /**
  * Command that is used by UI-elements and starts a CC analysis on the selected
@@ -53,43 +55,38 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 	private static final boolean UPDATE_MARKERS = true;
 	private static final boolean UPDATE_GRAPHS = false;
 
-	protected HashMap<String,String> fileLocations = new HashMap<String,String>();
-	private String trimFileName=null;
-
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		IStructuredSelection currentSelection = null;
 		if (HandlerUtil.getCurrentSelection(event) instanceof IStructuredSelection)
 			currentSelection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-
 		long time = System.currentTimeMillis();
 		CPDCloneAnalysis analysis = new CPDCloneAnalysis();
-
+		
 		CloneAnalysisView cloneAnalysisView = (CloneAnalysisView) PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getActivePage().findView(CloneAnalysisView.ID);
 
 		final Iterator<Match> cpdResults = analysis.analyze(currentSelection);
-
 		final CloneAnalysisResults<VariantAwareClone> formattedResults = CPDResultConverter
 				.convertMatchesToReadableResults(cpdResults);
 		final IClonePercentageData percentageData = formattedResults.getPercentageData();
 
-		//		if (formattedResults.getRelevantFeatures() == null)
-		//			System.out.println("relevant features null, q.q");
-		//		else
-		//		{
-		System.out.println(formattedResults.getRelevantFeatures().size()
-				+ " relevant features ");
-		System.out.println(formattedResults.getRelevantFeatures().toString());
-		for (FeatureRootLocation feature : formattedResults.getRelevantFeatures())
-		{
-			System.out.println(feature.getLocation().lastSegment() + " total: "
-					+ percentageData.getTotalLineCount(feature) + " cloned: "
-					+ percentageData.getTotalCloneLength(feature) + " lines: "
-					+ percentageData.getClonedLineCount(feature));
-		}
-		//		}
+//		if (formattedResults.getRelevantFeatures() == null)
+//			System.out.println("relevant features null, q.q");
+//		else
+//		{
+			System.out.println(formattedResults.getRelevantFeatures().size()
+					+ " relevant features ");
+			System.out.println(formattedResults.getRelevantFeatures().toString());
+			for (FeatureRootLocation feature : formattedResults.getRelevantFeatures())
+			{
+				System.out.println(feature.getLocation().lastSegment() + " total: "
+						+ percentageData.getTotalLineCount(feature) + " cloned: "
+						+ percentageData.getTotalCloneLength(feature) + " lines: "
+						+ percentageData.getClonedLineCount(feature));
+			}
+//		}
 
 		if (UPDATE_GRAPHS)
 			CloneAnalysisGraphResults.createGraphsForResults(formattedResults,
@@ -100,17 +97,16 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 			deleteAllMarkersForCodeClones();
 
 			final Map<IFile, IDocument> documents = new HashMap<IFile, IDocument>();
-
+			
 			final IPath location = ResourcesPlugin.getWorkspace().getRoot().getLocation();
-
 			for (VariantAwareClone clone : formattedResults.getClones())
 			{
 				String message = "Detected a code clone(" + clone.getLineCount() + " lines) starting at this line: ";
-
+				
 				int count = 0;
 				for (CloneOccurence occ : clone.getOccurences())
 				{
-
+					
 					String file = occ.getFile().makeRelativeTo(location).uptoSegment(1).toString()
 							+ "/" +  occ.toString();
 					message += (" Occurrence " + count++ + " in file " + file);
@@ -118,89 +114,79 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 
 				final List<IPath> distinctFiles = clone.getDistinctFiles();
 				final Map<String, List<IPath>> allPathsForFileName = new HashMap<String, List<IPath>>();
-
 				for (IPath iPath : distinctFiles) {
 					String fileName = iPath.removeFirstSegments(iPath.segmentCount()-1).toString();
-
-					System.out.println(fileName);
-
+					
 					List<IPath> allFiles;
-					if (allPathsForFileName.containsKey(fileName))
-						allFiles = allPathsForFileName.get(fileName);
-					else
-					{
-						allFiles = new ArrayList<IPath>();
-						allPathsForFileName.put(fileName, allFiles);
-					}
-
-					allFiles.add(iPath);
-				}
+ 					if (allPathsForFileName.containsKey(fileName))
+ 						allFiles = allPathsForFileName.get(fileName);
+ 					else
+ 					{
+ 						allFiles = new ArrayList<IPath>();
+ 						allPathsForFileName.put(fileName, allFiles);
+ 					}
+						
+ 					allFiles.add(iPath);
+ 				}
 				for (CloneOccurence occ : clone.getOccurences())
 				{
 					final IFile file = CloneAnalysisUtils.getFileFromPath(occ.getFile());
-
+					
+					if (allPathsForFileName.get(file.getName()).size() == 1) continue;
+					
 					if (file == null || file.getLocation() == null)
 						System.out
-						.println("trying to create marker in null file "
-								+ (occ.getFile() != null ? occ
-										.getFile()
-										.makeRelativeTo(
-												CloneAnalysisUtils.getWorkspaceRoot()
-												.getLocation()).toString() : ""));
-					else{
-						
-						//fileLocations.add(file.getLocation().toString());
-						trimFileName = file.getLocation().toString();
-						int index = trimFileName.lastIndexOf("/");
-						trimFileName = trimFileName.substring(index+1);
-						fileLocations.put(trimFileName, file.getLocation().toString());
-
+								.println("trying to create marker in null file "
+										+ (occ.getFile() != null ? occ
+												.getFile()
+												.makeRelativeTo(
+														CloneAnalysisUtils.getWorkspaceRoot()
+																.getLocation()).toString() : ""));
+					else
 						System.out.println("creating marker in file "
 								+ file.getLocation().toString());
-					}
-
-
+					
+					
+					
 					final IDocument document = getDocumentForFile(file, documents);
 					final int[] markerPositions = getMarkerPositions(document, occ);
 					CloneAnalysisMarkers.addProblemMarker(file, message, occ.getStartIndex(), markerPositions[0], markerPositions[1]);
-
+					
 				}
 			}
 		}
-		
-		//		cloneAnalysisView.showResults(formattedResults);
-		cloneAnalysisView.showResults(formattedResults,fileLocations);
 
+		cloneAnalysisView.showResults(formattedResults);
 		// cloneAnalysisView.updateMatches(cpdResults);
 		time = System.currentTimeMillis() - time;
 		double timeD = ((double) time) / 1000.0;
 		System.out.println("Overall clone analysis execution time: " + timeD + "s");
 		return null;
 	}
-
-
+	
+	
 	private int[] getMarkerPositions(final IDocument document, final CloneOccurence occ) {
-
+		
 		int[] result = new int[2];
 		try {
 			int startLine = occ.getStartIndex() - 1;
 			int endLine = startLine + occ.getClone().getLineCount() - 1;
 			result[0] = document.getLineOffset(startLine);
 			result[1] = document.getLineOffset(endLine) + document.getLineLength(endLine) -1;
-
+			
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
-
+		
 		return result;
 	}
-
+	
 	private IDocument getDocumentForFile(final IFile file, final Map<IFile, IDocument> documents)
 	{
 		if (documents.containsKey(file))
 			return documents.get(file);
-
-
+		
+		
 		IDocumentProvider provider = new TextFileDocumentProvider();
 		try {
 			provider.connect(file);
@@ -210,10 +196,10 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-
+		
 		return null;
 	}
-
+	
 	private void deleteAllMarkersForCodeClones() {
 
 		try {
@@ -224,13 +210,13 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 		} catch (CoreException e) {
 		}
 	}
-
+	
 	protected IFeatureProject getFeatureProject()
 	{
 		IEditorInput fileEditorInput = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
 		final IFile file = ResourceUtil.getFile(fileEditorInput);
 		if (file == null) return null;
-
+		
 		return CorePlugin.getFeatureProject(file);
 	}
 
