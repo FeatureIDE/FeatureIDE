@@ -97,17 +97,13 @@ public class FrameworkComposer extends ComposerExtensionClass {
 					if (!FrameworkValidator.validate(infoFile)) {
 						return false;
 					}
-					final IFolder jarFeatureFolder = jarFolder.getFolder(res.getName());
-					if (!jarFeatureFolder.exists()) {
-						jarFeatureFolder.create(true, true, null);
-					}
-					final IFile oldJar = jarFeatureFolder.getFile(jarName);
+					final IFile oldJar = jarFolder.getFile(jarName);
 					if (oldJar.exists()) {
 						oldJar.delete(false, null);
 					}
 					/** build jar **/
 					final IFolder bin = ((IFolder) res).getFolder("bin");
-					final String path = jarFolder.getLocation().append(res.getName() + FileSystems.getDefault().getSeparator() + jarName).toString();
+					final String path = jarFolder.getLocation().append(FileSystems.getDefault().getSeparator() + jarName).toString();
 					try (FileOutputStream fileStream = new FileOutputStream(path); JarOutputStream jarStream = new JarOutputStream(fileStream)) {
 						FrameworkJarCreator.addToJar(jarStream, bin);
 						FrameworkJarCreator.addFileToJar(jarStream, infoFile, "");
@@ -223,7 +219,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	 * @return Folder with jars
 	 */
 	private IFolder getJarFolder() {
-		return featureProject.getProject().getFolder("jars");
+		return featureProject.getProject().getFolder("lib");
 	}
 
 	/**
@@ -252,13 +248,10 @@ public class FrameworkComposer extends ComposerExtensionClass {
 			/** add selected features **/
 			try {
 				for (final IResource res : getJarFolder().members()) {
-					final String featureName = res.getName();
+					final String featureName = res.getName().substring(0, res.getName().indexOf("."));
 					if (selectedFeatures.contains(featureName)) {
-						final List<IPath> newEntries = createNewIPath(res);
-						for (final IPath entry : newEntries) {
-							final IClasspathEntry newLibraryEntry = JavaCore.newLibraryEntry(entry, null, null);
-							entries.add(newLibraryEntry);
-						}
+						final IClasspathEntry newLibraryEntry = JavaCore.newLibraryEntry(res.getFullPath(), null, null);
+						entries.add(newLibraryEntry);
 					}
 				}
 			} catch (final CoreException e) {
@@ -349,7 +342,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 			}
 		}
 		/** Create jar folder **/
-		final IFolder jarFolder = project.getProject().getFolder("jars");
+		final IFolder jarFolder = project.getProject().getFolder("lib");
 		if (!jarFolder.exists()) {
 			try {
 				jarFolder.create(true, true, null);
