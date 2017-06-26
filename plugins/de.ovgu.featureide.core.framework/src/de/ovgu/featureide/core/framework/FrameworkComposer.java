@@ -159,7 +159,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		} catch (final CoreException e) {
 			FrameworkCorePlugin.getDefault().logError(e);
 		}
-		createSubprojects();
+		createSubprojects(featureProject.getProjectName());
 		if (!createJARs(project)) {
 			FrameworkCorePlugin.getDefault().logWarning("JARs not build");
 		}
@@ -179,21 +179,21 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	/**
 	 * Creates sub-projects inside feature folder depending on selected features
 	 */
-	private void createSubprojects() {
+	private void createSubprojects(String parentProjectName) {
 
 		for (final String featureName : selectedFeatures) {
 			final IFolder features = featureProject.getSourceFolder();
 			final IFolder subproject = features.getFolder(featureName);
 			if (!subproject.exists()) {
 				try {
-					FrameworkProjectCreator.createSubprojectFolder(featureName, subproject);
+					FrameworkProjectCreator.createSubprojectFolder(parentProjectName+"-"+featureName, subproject);
 				} catch (final CoreException e) {
 					FrameworkCorePlugin.getDefault().logError(e);
 				}
 			} else {
 				if (!subproject.getFile(".project").exists()) {
 					try {
-						FrameworkProjectCreator.createSubprojectFolder(featureName, subproject);
+						FrameworkProjectCreator.createSubprojectFolder(parentProjectName+"-"+featureName, subproject);
 					} catch (final CoreException e) {
 						FrameworkCorePlugin.getDefault().logError(e);
 					}
