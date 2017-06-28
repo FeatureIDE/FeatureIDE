@@ -79,7 +79,8 @@ public class SearchField<T> {
 		gridData.horizontalAlignment = SWT.RIGHT;
 		gridData.verticalAlignment = SWT.CENTER;
 		gridData.grabExcessHorizontalSpace = true;
-		gridData.minimumWidth = 200;
+		gridData.widthHint = 300;
+		gridData.minimumWidth = 150;
 
 		searchField.setLayoutData(gridData);
 		searchField.addModifyListener(searchModifyListener);

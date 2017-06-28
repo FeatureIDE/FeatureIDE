@@ -63,6 +63,7 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.BuildType;
 
@@ -88,7 +89,6 @@ public class TestRunner {
 		this.builder = builder;
 
 	}
-
 
 	@SuppressWarnings(RESOURCE)
 	public void runTests(final BuilderConfiguration configuration) {
@@ -127,7 +127,9 @@ public class TestRunner {
 							return;
 						}
 						time = System.currentTimeMillis() - time;
-						testResults.addTest(file, (builder.buildType == BuildType.ALL_CURRENT ? "" : ConfigurationBuilder.FOLDER_NAME + "\\") + configuration.getName(), new Test(description.toString(), time, file));
+						testResults.addTest(file,
+								(builder.buildType == BuildType.ALL_CURRENT ? "" : ConfigurationBuilder.FOLDER_NAME + "\\") + configuration.getName(),
+								new Test(description.toString(), time, file));
 					}
 
 					@Override
@@ -137,7 +139,9 @@ public class TestRunner {
 							return;
 						}
 						time = System.currentTimeMillis() - time;
-						testResults.addTest(file, (builder.buildType == BuildType.ALL_CURRENT ? "" : ConfigurationBuilder.FOLDER_NAME + "\\") + configuration.getName(), new Test(failure.getTestHeader(), time, file, failure));
+						testResults.addTest(file,
+								(builder.buildType == BuildType.ALL_CURRENT ? "" : ConfigurationBuilder.FOLDER_NAME + "\\") + configuration.getName(),
+								new Test(failure.getTestHeader(), time, file, failure));
 						time = -1;
 					}
 
@@ -159,8 +163,11 @@ public class TestRunner {
 			}
 		}
 
-		IFile iResultsXML = CorePlugin.getFeatureProject(tmp).getProject().getFile("test.xml");
-		saveResults(iResultsXML, testResults);
+		IFeatureProject project = CorePlugin.getFeatureProject(tmp);
+		if (project != null) {
+			IFile iResultsXML = project.getProject().getFile("test.xml");
+			saveResults(iResultsXML, testResults);
+		}
 
 	}
 
@@ -170,7 +177,7 @@ public class TestRunner {
 			URL url = tmp.getLocationURI().toURL();
 			url = new URL(url.toString() + "/");
 			urls.add(url);
-			
+
 			JavaProject proj = new JavaProject(tmp.getProject(), null);
 			IJavaElement[] elements = proj.getChildren();
 			for (IJavaElement e : elements) {

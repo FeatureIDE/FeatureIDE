@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="Root">
+				<and mandatory="true" name="And">
+					<feature name="AndFalseOptional"/>
+					<feature name="OtherAnd"/>
+				</and>
+				<or mandatory="true" name="Or">
+					<feature mandatory="true" name="OrFalseOptional"/>
+					<feature mandatory="true" name="OtherOr"/>
+				</or>
+				<alt mandatory="true" name="Alternative">
+					<feature mandatory="true" name="AlternativeFalseOptional"/>
+					<feature mandatory="true" name="OtherAlternative"/>
+				</alt>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>And</var>
+					<var>AndFalseOptional</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Or</var>
+					<var>OrFalseOptional</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Alternative</var>
+					<var>AlternativeFalseOptional</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

@@ -56,21 +56,21 @@ import jak2java.Jak2JavaWrapper;
 public class AheadWrapper {
 
 	private Jak2JavaWrapper jak2java;
-	
+
 	private ComposerWrapper composer;
 
 	private Vector<IFile> files;
 
 	private boolean createJob = true;
-	
+
 	private static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
-	
+
 	// Java 1.4 exclusions
 	private static final String RAW_TYPE = "raw type";
 	private static final String GENERIC_TYPE = "generic type";
 	private static final String TYPE_SAFETY = "Type safety";
 	private static final String TASK = "org.eclipse.jdt.core.task";
-	
+
 	public AheadWrapper(IFeatureProject featureProject) {
 		jak2java = new Jak2JavaWrapper();
 		composer = new ComposerWrapper(featureProject);
@@ -97,13 +97,13 @@ public class AheadWrapper {
 	public void build() {
 		reduceJak2Java(composer.compose());
 	}
-	
+
 	public void setCompositionFolder(IFolder folder) {
 		composer.setCompositionFolder(folder);
 	}
 
 	private IFile[] reduceJak2Java(IFile[] jakFiles) {
-		
+
 		IFile[] javaFiles = new IFile[jakFiles.length];
 		String filename = null;
 		for (int i = 0; i < jakFiles.length; i++) {
@@ -113,22 +113,21 @@ public class AheadWrapper {
 
 				filename = jakFile.getName();
 				filename = filename.substring(0, filename.lastIndexOf('.'));
-				javaFiles[i] = ((IFolder)jakFile.getParent()).getFile(filename
-						+ ".java");
+				javaFiles[i] = ((IFolder) jakFile.getParent()).getFile(filename + ".java");
 			}
 		}
 		return javaFiles;
 	}
-	
+
 	public void addBuildErrorListener(AheadBuildErrorListener listener) {
 		composer.addBuildErrorListener(listener);
 	}
 
 	public void postCompile(IFile file) {
-		final IFile jakFile = ((IFolder)file.getParent()).getFile(file.getName().replace(".java",".jak"));
+		final IFile jakFile = ((IFolder) file.getParent()).getFile(file.getName().replace(".java", ".jak"));
 		if (!jakFile.exists())
 			return;
-		
+
 		if (files == null) {
 			files = new Vector<IFile>();
 		}
@@ -139,7 +138,7 @@ public class AheadWrapper {
 			return;
 		}
 		createJob = false;
-		Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) {
+		Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file) != null ? CorePlugin.getFeatureProject(file).toString() : "") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -151,11 +150,12 @@ public class AheadWrapper {
 								for (IMarker marker : markers) {
 									if (marker.exists() && !TASK.equals(marker.getType())) {
 										String content = marker.getAttribute(IMarker.MESSAGE, null);
-										if (content != null && (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || 
-												content.contains(TYPE_SAFETY))) {
+										if (content != null
+												&& (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || content.contains(TYPE_SAFETY))) {
 											marker.delete();
 										} else {
-											AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
+											AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(),
+													AheadBuildErrorType.JAVAC_ERROR, (Integer) marker.getAttribute(IMarker.LINE_NUMBER));
 											if (!hasMarker(buildError)) {
 												IResource res = buildError.getResource();
 												if (res.exists()) {

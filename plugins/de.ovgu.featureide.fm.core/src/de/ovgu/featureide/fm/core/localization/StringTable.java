@@ -1037,6 +1037,8 @@ public class StringTable {
 	public static final String CALCULATE_VOID_FEATURES = "Calculate Void Features";
 	public static final String CALCULATE_FALSE_OPTIONAL_FEATURES = "Calculate False Optional Features";
 	public static final String CALCULATE_DEAD_FEATURES = "Calculate Dead Features";
+	public static final String CURRENTLY_NO_COLOR_SCHEME_SELECTED = "No color scheme is selected";
+	public static final String CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG = "There is currently no color scheme selected. To color features please use the color scheme wizard and select a color scheme.";
 	
 	public static final String PUBLIC_CLASS = "public class";
 	public static final String PUBLIC_INTERFACE = "public interface";

@@ -18,36 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.examples.elevator.core.controller;
+package de.ovgu.featureide.fm.core.base;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.Assert;
+import org.junit.Test;
 
-import de.ovgu.featureide.examples.elevator.core.model.Elevator;
-import de.ovgu.featureide.examples.elevator.core.model.ElevatorState;
+import de.ovgu.featureide.common.Commons;
 
 /**
+ * Test case to verify that the analyzer recognizes false optional feature in 'and', 'or' and 'alternative' groups.
  * 
- * This class controls the elevator.
- * 
- * @author FeatureIDE Team
+ * @author Joshua Sprey
  */
-public class ControlUnit implements Runnable {
+public class FalseOptionalAndOrAlternativeAnalyserTest {
 
-	private ElevatorState calculateNextState() {
-		final int currentFloor = elevator.getCurrentFloor();
-		switch (elevator.getCurrentState()) {
-		case FLOORING:
-			switch (elevator.getDirection()) {
-			case MOVING_DOWN:
-				return (currentFloor <= elevator.getMinFloor()) ? ElevatorState.MOVING_UP : ElevatorState.MOVING_DOWN;
-			case MOVING_UP:
-				return (currentFloor >= elevator.getMaxFloor()) ? ElevatorState.MOVING_DOWN : ElevatorState.MOVING_UP;
-			default:
-				return ElevatorState.MOVING_UP;
-			}
-		default:
-			return null;
-		}
+	@Test
+	public void checkFalseOptionals() {		
+		final IFeatureModel model = Commons.loadFeatureModelFromFile("false_optional_test.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE, Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		model.getAnalyser().analyzeFeatureModel(null);				
+		Assert.assertEquals(model.getAnalyser().getCachedFalseOptionalFeatures().size(), 3);
 	}
 }

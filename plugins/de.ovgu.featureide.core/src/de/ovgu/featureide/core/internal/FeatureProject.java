@@ -133,11 +133,21 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		 * listens to changed feature names
 		 */
 		public void propertyChange(FeatureIDEEvent evt) {
-
-			if (EventType.FEATURE_NAME_CHANGED == evt.getEventType()) {
+			switch(evt.getEventType()){
+			case FEATURE_NAME_CHANGED:
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
 				FeatureProject.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
+				break;
+			case MODEL_DATA_SAVED:
+				try {
+					createAndDeleteFeatureFolders();
+				} catch (CoreException e) {
+					CorePlugin.getDefault().logError(e);
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}

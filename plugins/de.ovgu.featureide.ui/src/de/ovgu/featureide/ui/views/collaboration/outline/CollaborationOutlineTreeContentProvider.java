@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLABORATION_MODEL_NOT_FOUND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -153,7 +154,11 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 
-			List<String> featureOrder = Functional.toList(CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList());
+			IFeatureProject project = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile());
+			List<String> featureOrder = new ArrayList<>();
+			if (project != null) {
+				featureOrder = Functional.toList(project.getFeatureModel().getFeatureOrderList());
+			}
 
 			obj = new FSTRole[roleList.size()];
 			int index = 0;
