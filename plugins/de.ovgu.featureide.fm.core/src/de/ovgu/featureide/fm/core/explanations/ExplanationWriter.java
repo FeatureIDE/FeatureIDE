@@ -204,20 +204,20 @@ public class ExplanationWriter {
 		switch (trace.getOrigin()) {
 			case CHILD_UP:
 				parent = (IFeature) trace.getElement();
-				s = String.format("%s is a child of %s: %s", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+				s = String.format("%s is a child of %s (i.e, %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 				break;
 			case CHILD_DOWN:
 				parent = (IFeature) trace.getElement();
 				if (parent.getStructure().isAlternative()) {
-					s = String.format("%s are alternative children of %s: %s", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+					s = String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 				} else if (parent.getStructure().isOr()) {
-					s = String.format("%s are or-children of %s: %s", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+					s = String.format("%s are or-children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 				} else {
-					s = String.format("%s is a mandatory child of %s: %s", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+					s = String.format("%s is a mandatory child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 				}
 				break;
 			case CHILD_HORIZONTAL:
-				s = String.format("%s are alternatives: %s", joinedSourceElements, trace.toString(getSymbols()));
+				s = String.format("%s are alternatives (i.e., %s).", joinedSourceElements, trace.toString(getSymbols()));
 				break;
 			case CONSTRAINT:
 				s = String.format("%s is a constraint.", joinedSourceElements);
@@ -246,13 +246,11 @@ public class ExplanationWriter {
 	 */
 	private String join(Set<IFeatureModelElement> elements) {
 		String s = "";
-		boolean first = true;
+		int i = 0;
 		for (final Iterator<IFeatureModelElement> it = elements.iterator(); it.hasNext();) {
 			final IFeatureModelElement element = it.next();
-			if (first) {
-				first = false;
-			} else {
-				s += it.hasNext() ? ", " : " and ";
+			if (i++ > 0) {
+				s += it.hasNext() ? ", " : i > 2 ? ", and " : " and ";
 			}
 			if (element instanceof IConstraint) {
 				final NodeWriter w = new NodeWriter(((IConstraint) element).getNode());
