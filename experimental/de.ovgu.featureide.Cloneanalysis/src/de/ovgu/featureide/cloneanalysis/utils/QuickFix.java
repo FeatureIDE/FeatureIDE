@@ -28,7 +28,7 @@ public class QuickFix implements IMarkerResolution {
      
     	String[] problems = null;
 		try {
-			problems = marker.getAttribute(IMarker.MESSAGE).toString().split(";");
+			problems = marker.getAttribute("QuickFixMessage").toString().split(";");
 		} catch (CoreException e1) {
 			
 			e1.printStackTrace();

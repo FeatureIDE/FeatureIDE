@@ -110,6 +110,7 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 			{
 //				String message = "Detected a code clone (" + clone.getLineCount() + " lines ) starting at this line: ";
 				String message = "";
+				String formattedMessage = "";
 				int count = 0;
 				for (CloneOccurence occ : clone.getOccurences())
 				{			
@@ -118,6 +119,7 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 					String file  =  CloneAnalysisUtils.getFileFromPath(occ.getFile()).getLocation().toString();
 //					message += (" Occurrence " + count++ + " in file " + file + ";");
 					message +=  occ.getFile() + ";" ;
+					formattedMessage +=  occ.getFile().segment(6) + " - " +occ.getFile().lastSegment()+ ";" ;
 				}
 
 				final List<IPath> distinctFiles = clone.getDistinctFiles();
@@ -174,7 +176,7 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 					errorMap.put("third", "third value");
 					errorMap.put("fourth", "fourth value");
 					
-					CloneAnalysisMarkers.addProblemMarker(file, message, occ.getStartIndex(), markerPositions[0], markerPositions[1]);
+					CloneAnalysisMarkers.addProblemMarker(file, message,formattedMessage, occ.getStartIndex(), markerPositions[0], markerPositions[1]);
 					
 				}
 			}

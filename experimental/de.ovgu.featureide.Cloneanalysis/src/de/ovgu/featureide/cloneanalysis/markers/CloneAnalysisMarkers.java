@@ -54,18 +54,19 @@ public class CloneAnalysisMarkers
 //        }
 	}
 	
-	public static void addProblemMarker(IFile file, String message, int lineIndex, int startChar, int endChar)
+	public static void addProblemMarker(IFile file, String message,String formattedMessage, int lineIndex, int startChar, int endChar)
 	{
 		
 		try
 		{
 			IMarker marker = file.createMarker(IMarker.PROBLEM);
-			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.MESSAGE, formattedMessage);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
 			marker.setAttribute(IMarker.LINE_NUMBER, lineIndex);
 			marker.setAttribute(IMarker.CHAR_START, startChar);
 			marker.setAttribute(IMarker.CHAR_END, endChar);
 			marker.setAttribute(IJavaModelMarker.ID, 1244);
+			marker.setAttribute("QuickFixMessage", message);
 		} catch (CoreException e)
 		{
 			System.out.println("Marker creation failed");
