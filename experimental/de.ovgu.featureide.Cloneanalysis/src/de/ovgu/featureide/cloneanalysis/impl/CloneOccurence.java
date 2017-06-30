@@ -80,6 +80,13 @@ public class CloneOccurence
 	@Override
 	public String toString()
 	{
-		return this.getFile().lastSegment().toString() + ":" + String.valueOf(this.getStartIndex());
+				//subtract 5 places from the total length, so that it remains location independent.
+				int lengthOfThePath = this.getFile().segmentCount();
+				String featureName = this.getFile().segment(lengthOfThePath-5);
+				if(featureName.equalsIgnoreCase("features"))
+					return "["+this.getFile().segment(lengthOfThePath-4)+"]"+this.getFile().lastSegment().toString() + ":" + String.valueOf(this.getStartIndex());
+				else
+					return "["+this.getFile().segment(lengthOfThePath-5)+"]"+this.getFile().lastSegment().toString() + ":" + String.valueOf(this.getStartIndex());	
+//		return this.getFile().lastSegment().toString() + ":" + String.valueOf(this.getStartIndex());
 	}
 }

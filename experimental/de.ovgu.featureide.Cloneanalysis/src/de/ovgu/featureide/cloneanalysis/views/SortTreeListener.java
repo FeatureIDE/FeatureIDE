@@ -42,7 +42,8 @@ public class SortTreeListener implements SelectionListener {
 		int numOfColumns = columns.length; 
 		int columnIndex = this.findColumnIndex(columns, column, numOfColumns); 
 
-		if ((column.equals(sortColumn)) && (tree.getSortDirection() == SWT.UP))
+//		if ((column.equals(sortColumn)) && (tree.getSortDirection() == SWT.UP))
+		if ((column.equals(sortColumn)) && (tree.getSortDirection() == SWT.DOWN))
 			sortDescending = false;
 		else 
 			sortDescending = true;
@@ -62,14 +63,16 @@ public class SortTreeListener implements SelectionListener {
 		if ((sortDescending == false)) {
 			//Ascending order
 			sortDescending = false;
-			tree.setSortDirection(SWT.DOWN);
+//			tree.setSortDirection(SWT.DOWN);
+			tree.setSortDirection(SWT.UP);
 			System.out.println(results);
 			cloneViewer.setInput(results);
 			cloneViewer.expandToLevel(1);
 			cloneViewer.refresh();
 		} else {
 			//Descending order
-			tree.setSortDirection(SWT.UP);
+//			tree.setSortDirection(SWT.UP);
+			tree.setSortDirection(SWT.DOWN);
 			sortDescending = true;
 			cloneViewer.setInput(results);
 			cloneViewer.expandToLevel(1);
