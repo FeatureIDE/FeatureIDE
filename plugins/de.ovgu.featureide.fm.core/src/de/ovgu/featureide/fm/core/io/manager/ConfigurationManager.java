@@ -25,30 +25,39 @@ import java.nio.file.Path;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Responsible to load and save all information for a feature model instance.
  * 
  * @author Sebastian Krieter
  */
-public class ConfigurationManager extends AFileManager<Configuration> {
+public class ConfigurationManager extends FileManager<Configuration> {
 
-	private static class ObjectCreator extends AFileManager.ObjectCreator<Configuration> {
-		private final Configuration configuration;
+	private static class ObjectCreator extends FileManager.ObjectCreator<Configuration> {
+		private final Path modelFile;
 
-		public ObjectCreator(Configuration configuration) {
-			super(Configuration.class, ConfigurationManager.class, ConfigFormatManager.getInstance());
-			this.configuration = configuration;
+		public ObjectCreator(Path modelFile) {
+			super();
+			this.modelFile = modelFile;
 		}
 
 		@Override
-		protected Configuration createObject(Path path, IPersistentFormat<Configuration> format) throws NoSuchExtensionException {
-			return configuration;
+		protected Configuration createObject() {
+			final FeatureModelManager featureModelManager = FeatureModelManager.getInstance(modelFile);
+			return new Configuration(featureModelManager.getObject());
+		}
+
+		@Override
+		protected Snapshot<Configuration> createSnapshot(Configuration object) {
+			return new Snapshot<>(object.clone());
 		}
 	}
 
@@ -58,31 +67,59 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	}
 
 	@CheckForNull
-	public static ConfigurationManager getInstance(Path path) {
-		return AFileManager.getInstance(path);
+	public static ConfigurationManager getInstance(Path path, Path modelFile) {
+		return FileManager.getInstance(path, new ObjectCreator(modelFile), ConfigurationManager.class, ConfigFormatManager.getInstance());
 	}
 
-	@CheckForNull
-	public static ConfigurationManager getInstance(Path path, Configuration configuration) {
-		return AFileManager.getInstance(path, new ObjectCreator(configuration));
+	public static Configuration load(Path configurationFile, Path modelFile) {
+		final ConfigurationManager instance = getInstance(configurationFile, modelFile);
+		return instance.getObject();
 	}
 
-	public static FileHandler<Configuration> load(Path path, Configuration configuration) {
-		return AFileManager.getFileHandler(path, new ObjectCreator(configuration));
+	public static Configuration load(Path configurationFile, Path modelFile, ProblemList problems) {
+		final ConfigurationManager instance = getInstance(configurationFile, modelFile);
+		problems.addAll(instance.getLastProblems());
+		return instance.getObject();
 	}
 
-	protected ConfigurationManager(Configuration configuration, String absolutePath, IPersistentFormat<Configuration> modelHandler) {
-		super(configuration, absolutePath, modelHandler);
+	// TODO !!! react on feature name change
+	private class FeatureModelChangeListner implements IEventListener {
+		public void propertyChange(FeatureIDEEvent evt) {
+			final EventType eventType = evt.getEventType();
+			switch (eventType) {
+			case FEATURE_ORDER_CHANGED:
+				// TODO !!! react on feature order
+				break;
+			case FEATURE_NAME_CHANGED:
+				// TODO !!! react on feature name change
+				//				String oldName = (String) evt.getOldValue();
+				//				String newName = (String) evt.getNewValue();
+				//				FeatureModelManager.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
+				break;
+			case MODEL_DATA_OVERRIDDEN:
+				// TODO !!! check correctness
+				setObject(new Configuration(getObject(), featureModelManager.getObject()));
+			default:
+				break;
+			}
+		}
 	}
 
-	@Override
-	protected Configuration copyObject(Configuration oldObject) {
-		return oldObject.clone();
+	private FeatureModelManager featureModelManager;
+
+	protected ConfigurationManager(SimpleFileHandler<Configuration> fileHandler, ObjectCreator objectCreator) {
+		super(fileHandler, objectCreator);
+
+		featureModelManager.addListener(new FeatureModelChangeListner());
 	}
 
 	@Override
 	public boolean externalSave(Runnable externalSaveMethod) {
 		return true;
+	}
+
+	public FeatureModelManager getFeatureModelManager() {
+		return featureModelManager;
 	}
 
 }

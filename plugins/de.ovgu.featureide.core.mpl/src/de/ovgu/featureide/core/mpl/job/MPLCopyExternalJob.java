@@ -21,7 +21,6 @@
 package de.ovgu.featureide.core.mpl.job;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COPIED_SOURCE_FILES_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.COPYING_SOURCE_FILES;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -29,42 +28,30 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * 
  * @author Sebastian Krieter
  */
-public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments, Boolean> {
-	
-	public static class Arguments implements JobArguments<Boolean> {
-		private final IFolder srcFolder;
-		private final IFolder destFolder;
-		
-		public Arguments(IFolder srcFolder, IFolder destFolder) {
-			this.srcFolder = srcFolder;
-			this.destFolder = destFolder;
-		}
+public class MPLCopyExternalJob implements LongRunningMethod<Boolean> {
 
-		@Override
-		public MPLCopyExternalJob createJob() {
-			return new MPLCopyExternalJob(this);
-		}
-	}
-	
-	protected MPLCopyExternalJob(Arguments arguments) {
-		super(COPYING_SOURCE_FILES, arguments);
+	private final IFolder srcFolder;
+	private final IFolder destFolder;
+
+	protected MPLCopyExternalJob(IFolder srcFolder, IFolder destFolder) {
+		this.srcFolder = srcFolder;
+		this.destFolder = destFolder;
+		// super(COPYING_SOURCE_FILES, arguments);
 	}
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor = workMonitor;
-		IPath destPath = arguments.destFolder.getFullPath();
-		
+		IPath destPath = destFolder.getFullPath();
+
 		try {
-			IResource[] srcMembers = arguments.srcFolder.members();
+			IResource[] srcMembers = srcFolder.members();
 			for (int i = 0; i < srcMembers.length; i++) {
 				IResource srcMember = srcMembers[i];
 				IPath px = destPath.append(srcMember.getName());

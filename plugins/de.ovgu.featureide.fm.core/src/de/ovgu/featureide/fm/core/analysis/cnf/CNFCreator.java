@@ -172,7 +172,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 
 	public static void getClauseFromNode(IVariables s, final List<LiteralSet> clauses, final Node node) {
 		final Node cnfNode = Node.buildCNF(node);
-		// final Node cnfNode = constraint.getNode().toCNF();
+		// final Node cnfNode = node.toCNF();
 		if (cnfNode instanceof And) {
 			for (Node andChild : cnfNode.getChildren()) {
 				clauses.add(getClause(s, andChild));

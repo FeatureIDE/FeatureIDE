@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import de.ovgu.featureide.fm.core.FeatureStatus;
-
 /**
  * Manages all additional properties of a feature.
  * 
@@ -38,16 +36,10 @@ public interface IFeatureProperty {
 
 	IFeature getFeature();
 
-	FeatureStatus getFeatureStatus();
-
 	void setDescription(CharSequence description);
 
 	@Deprecated
 	void setDisplayName(CharSequence name);
-
-	void setFeatureStatus(FeatureStatus status);
-
-	void setFeatureStatus(FeatureStatus stat, boolean fire);
 
 	boolean isConstraintSelected();
 

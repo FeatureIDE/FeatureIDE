@@ -31,7 +31,6 @@ import org.prop4j.NodeWriter;
 import composer.rules.meta.FeatureModelInfo;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -41,6 +40,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -73,7 +73,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		this.featureModel = featureModel;
 		this.useValidMethod = useValidMethod;
 		currentConfig = new Configuration(featureModel);
-		propagator = ProjectManager.getProject(featureModel).getStatus().getPropagator(currentConfig);
+		propagator = FeatureModelManager.getInstance(featureModel).getSnapshot().getPropagator(currentConfig);
 		validClause = createdValidClause();
 	}
 	

@@ -90,4 +90,9 @@ public class CNFFormat implements IFeatureModelFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "CNF";
+	}
+
 }

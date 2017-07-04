@@ -23,10 +23,10 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -76,7 +76,7 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 						return "1";
 					}
 
-					final ConfigurationPropagator propagator = ProjectManager.getProject(innerModel).getStatus().getPropagator(ignoreAbstract);
+					final ConfigurationPropagator propagator = FeatureModelManager.getInstance(innerModel).getSnapshot().getPropagator(ignoreAbstract);
 					final long number = LongRunningWrapper.runMethod(propagator.number(timeout));
 
 					return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
@@ -111,7 +111,7 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 	@Override
 	protected void initChildren() {
 
-		Boolean isValid = ProjectManager.getAnalyzer(model).isValid();
+		Boolean isValid = FeatureModelManager.getAnalyzer(model).isValid();
 
 		addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
 

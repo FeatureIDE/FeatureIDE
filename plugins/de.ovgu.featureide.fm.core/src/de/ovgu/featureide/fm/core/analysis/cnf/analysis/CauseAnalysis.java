@@ -27,8 +27,9 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ModifiableSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -69,6 +70,15 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 			}
 		}
 
+	}
+
+	@Override
+	protected ISatSolver initSolver(CNF satInstance) {
+		try {
+			return new ModifiableSatSolver(satInstance);
+		} catch (RuntimeContradictionException e) {
+			return null;
+		}
 	}
 
 	public CauseAnalysis(CNF satInstance) {

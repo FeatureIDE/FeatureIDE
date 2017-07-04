@@ -80,9 +80,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private Button defaultButton = null;
 	private Button activate = null;
 
-	// TODO _interfaces: unnecessary with new configuration file format
-//	private IFolder configFolder;
-
 	/**
 	 * This flags is <code>true</code> if the composer supports a feature order
 	 */
@@ -103,7 +100,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	public void doSave(IProgressMonitor monitor) {
 		if (dirty) {
 			updateOrderEditor();
-			
+
 			if (hasFeatureOrder) {
 				writeToOrderFile(); // save the feature order also in .order if file
 									// exists
@@ -113,28 +110,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				defaultFeatureList();
 			}
 
-
-			// TODO _interfaces: unnecessary with new configuration file format
-//			if (hasFeatureOrder && configFolder.exists()) {
-//				try {
-//					for (IResource res : configFolder.members()) {
-//						updateConfigurationOrder(res);
-//					}
-//				} catch (CoreException e) {
-//					FMUIPlugin.getDefault().logError(e);
-//				}
-//			}
 			super.doSave(monitor);
 		}
 	}
-
-	// TODO _interfaces: unnecessary with new configuration file format
-//	@Override
-//	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-//		super.init(site, input);
-////		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
-////		configFolder = project.getFolder(getProjectConfigurationPath(project));
-//	}
 
 	@Override
 	public void initEditor() {
@@ -163,7 +141,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			// This flag is true if a concrete feature was added or removed
 			boolean changed = updateFeatureList();
 			updateFeatureOrderList();
-	
+
 			if (changed) {
 				setDirty();
 			}
@@ -415,8 +393,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			Collection<String> list = featureModelEditor.getFeatureModel().getFeatureOrderList();
 			if (list.isEmpty()) {
 				list = FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.getFeatureModel()); // set
-																					// default
-																					// values
+				// default
+				// values
 			}
 
 			for (String featureName : list) {
@@ -479,30 +457,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		}
 		return new LinkedList<String>();
 	}
-
-
-	// TODO _interfaces: unnecessary with new configuration file format
-//	/**
-//	 * Renames the features of the given configuration file and <br>
-//	 * synchronizes the order with the feature model.
-//	 * 
-//	 * @param resource
-//	 *            The configuration file to update
-//	 */
-//	private void updateConfigurationOrder(IResource resource) {
-//		if (!(resource instanceof IFile)) {
-//			return;
-//		}
-//		final IFile res = (IFile) resource;
-//		
-//		final Configuration config = new Configuration(featureModelEditor.getFeatureModel(), Configuration.PARAM_LAZY);
-//		try {
-//			new ConfigurationReader(config).readFromFile(res);
-//			new ConfigurationWriter(config).saveToFile(res);
-//		} catch (CoreException | IOException e) {
-//			FMCorePlugin.getDefault().logError(e);
-//		}
-//	}
 
 	private void enableUI(boolean selection) {
 		featurelist.setEnabled(selection);

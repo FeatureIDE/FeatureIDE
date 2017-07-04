@@ -52,7 +52,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -60,6 +59,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 
@@ -407,15 +407,15 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					String nodeName = node.getNodeName();
 					boolean value = node.getNodeValue().equals(TRUE);
 					if (nodeName.equals(CALCULATE_AUTO)) {
-						ProjectManager.getAnalyzer(featureModel).runCalculationAutomatically = value;
+						FeatureModelManager.getAnalyzer(featureModel).setRunCalculationAutomatically(value);
 					} else if (nodeName.equals(CALCULATE_CONSTRAINTS)) {
-						ProjectManager.getAnalyzer(featureModel).calculateConstraints = value;
+						FeatureModelManager.getAnalyzer(featureModel).setCalculateConstraints(value);
 					} else if (nodeName.equals(CALCULATE_REDUNDANT)) {
-						ProjectManager.getAnalyzer(featureModel).calculateRedundantConstraints = value;
+						FeatureModelManager.getAnalyzer(featureModel).setCalculateRedundantConstraints(value);
 					} else if (nodeName.equals(CALCULATE_FEATURES)) {
-						ProjectManager.getAnalyzer(featureModel).calculateFeatures = value;
+						FeatureModelManager.getAnalyzer(featureModel).setCalculateFeatures(value);
 					} else if (nodeName.equals(CALCULATE_TAUTOLOGY)) {
-						ProjectManager.getAnalyzer(featureModel).calculateTautologyConstraints = value;
+						FeatureModelManager.getAnalyzer(featureModel).setCalculateTautologyConstraints(value);
 					} else {
 						throwError("Unknown calculations attribute: " + nodeName, e);
 					}

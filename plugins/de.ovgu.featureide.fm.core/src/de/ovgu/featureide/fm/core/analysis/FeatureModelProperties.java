@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintDeadStatus;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintFalseSatisfiabilityStatus;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintRedundancyStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureDeterminedStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureParentStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureSelectionStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -77,6 +78,15 @@ public class FeatureModelProperties {
 	public boolean hasDeadFeatures() {
 		for (final FeatureProperties f : featureProperties) {
 			if (f.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasIndeterminateHiddenFeatures() {
+		for (final FeatureProperties f : featureProperties) {
+			if (f.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
 				return true;
 			}
 		}

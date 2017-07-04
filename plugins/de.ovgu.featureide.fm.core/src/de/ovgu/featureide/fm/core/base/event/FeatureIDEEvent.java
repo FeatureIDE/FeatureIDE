@@ -149,10 +149,10 @@ public class FeatureIDEEvent {
 		 * The model data was saved to file.
 		 */
 		MODEL_DATA_SAVED,
-		/**
-		 * The model data was loaded from file.
-		 */
-		MODEL_DATA_LOADED,
+//		/**
+//		 * The model data was loaded from file.
+//		 */
+//		MODEL_DATA_LOADED,
 		/**
 		 * The model data loaded from a file has overridden the internal model instance.
 		 */
@@ -188,7 +188,8 @@ public class FeatureIDEEvent {
 		/**
 		 * Default. Do nothing.
 		 */
-		DEFAULT,
+		// TODO !!! implement feature order event
+		DEFAULT, FEATURE_ORDER_CHANGED,
 	}
 	
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];

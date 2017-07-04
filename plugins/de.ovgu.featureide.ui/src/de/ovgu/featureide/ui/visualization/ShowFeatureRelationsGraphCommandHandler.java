@@ -38,7 +38,13 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IModalImplicationGraph;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -112,19 +118,31 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 	 * @param featureCenter
 	 */
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
+		final FeatureModelSnapshot snapshot = featureProject.getFeatureModelManager().getSnapshot();
 
 		// Get feature in the center
-		IFeature fc = featureProject.getFeatureModel().getFeature(featureCenter);
+		IFeature fc = snapshot.getObject().getFeature(featureCenter);
 
 		// Get formalized constraints, implies and excludes
-		List<String> formalizedRequires = new ArrayList<String>();
-		List<String> formalizedExcludes = new ArrayList<String>();
-		FeatureDependencies fd = new FeatureDependencies(featureProject.getFeatureModel());
-		for (IFeature f : fd.always(fc)) {
-			formalizedRequires.add(f.getName());
-		}
-		for (IFeature f : fd.never(fc)) {
-			formalizedExcludes.add(f.getName());
+		List<String> formalizedRequires = new ArrayList<>();
+		List<String> formalizedExcludes = new ArrayList<>();
+
+		final FeatureModelFormula formula = snapshot.getFormula();
+		final IVariables variables = formula.getVariables();
+		final int variable = variables.getVariable(fc.getName());
+
+		final IModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
+		modalImplicationGraph.complete(variable);
+
+		for (int strongylConnectedVar : modalImplicationGraph.getTraverser().getStronglyConnected(variable).getLiterals()) {
+			modalImplicationGraph.complete(strongylConnectedVar);
+			if (modalImplicationGraph.isStrongPath(variable, strongylConnectedVar)) {
+				if (strongylConnectedVar > 0) {
+					formalizedRequires.add(variables.getName(strongylConnectedVar));
+				} else {
+					formalizedExcludes.add(variables.getName(strongylConnectedVar));
+				}
+			}
 		}
 
 		// Get all features in order ignoring the mandatory features

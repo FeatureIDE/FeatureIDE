@@ -33,7 +33,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FeatureProject.FeatureProjectStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
@@ -44,6 +43,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.filter.base.OrFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -97,10 +97,10 @@ public class ConfigAnalysisUtils {
 	 * @return list of feature names
 	 */
 	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {
-		final FeatureProjectStatus status = featureProject.getStatus();
-		final IFilter<IFeature> coreFeatureFilter = new FeatureSetFilter(status.getAnalyzer().getCoreFeatures());
+		final FeatureModelSnapshot snapshot = featureProject.getFeatureModelManager().getSnapshot();
+		final IFilter<IFeature> coreFeatureFilter = new FeatureSetFilter(snapshot.getAnalyzer().getCoreFeatures());
 		final IFilter<IFeature> hiddenFeatureFilter = new HiddenFeatureFilter();
 		final IFilter<IFeature> noCoreNoHiddenFilter = new InverseFilter<>(new OrFilter<>(Arrays.asList(hiddenFeatureFilter, coreFeatureFilter)));
-		return Functional.mapToList(status.getFeatureModel().getFeatures(), noCoreNoHiddenFilter, FeatureUtils.GET_FEATURE_NAME);
+		return Functional.mapToList(snapshot.getObject().getFeatures(), noCoreNoHiddenFilter, FeatureUtils.GET_FEATURE_NAME);
 	}
 }

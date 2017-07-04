@@ -25,7 +25,6 @@ import java.util.List;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.PairWiseConfigurationGenerator;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -40,8 +39,8 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  */
 public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 
-	public IncLingConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	public IncLingConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
+		super(builder, featureProject);
 	}
 
 	@Override

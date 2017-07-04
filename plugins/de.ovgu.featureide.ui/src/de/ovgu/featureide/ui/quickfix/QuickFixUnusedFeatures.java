@@ -32,12 +32,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -84,9 +84,9 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
 		final ConfigurationPropagator propagator;
 		if (project != null) {
-			propagator = project.getStatus().getPropagator();
+			propagator = project.getFeatureModelManager().getSnapshot().getPropagator();
 		} else {
-			propagator = ProjectManager.getProject(featureModel).getStatus().getPropagator();
+			propagator = FeatureModelManager.getInstance(featureModel).getSnapshot().getPropagator();
 		}
 		List<List<String>> solutions = LongRunningWrapper.runMethod(propagator.coverFeatures(unusedFeatures, true), monitor);
 		for (List<String> solution : solutions) {

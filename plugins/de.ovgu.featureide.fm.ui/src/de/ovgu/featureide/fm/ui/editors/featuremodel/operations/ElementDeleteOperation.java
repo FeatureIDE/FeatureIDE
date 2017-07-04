@@ -42,12 +42,17 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IModalImplicationGraph;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -154,11 +159,18 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 				alreadyDeleted.add(feature);
 			} else {
 				// check for all equivalent features
-				FeatureDependencies featureDependencies = new FeatureDependencies(featureModel, false);
-				List<IFeature> equivalent = new LinkedList<IFeature>();
-				for (IFeature f2 : featureDependencies.getImpliedFeatures(feature)) {
-					if (featureDependencies.isAlways(f2, feature)) {
-						equivalent.add(f2);
+				final FeatureModelFormula formula = FeatureModelManager.getInstance(featureModel).getSnapshot().getFormula();
+				final IVariables variables = formula.getVariables();
+				final int variable = variables.getVariable(feature.getName());
+
+				final IModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
+				modalImplicationGraph.complete(variable);
+				
+				final List<IFeature> equivalent = new ArrayList<>();
+				for (int strongylConnectedVar : modalImplicationGraph.getTraverser().getStronglyConnected(variable).getLiterals()) {
+					modalImplicationGraph.complete(strongylConnectedVar);
+					if (modalImplicationGraph.isStrongPath(variable, strongylConnectedVar)) {
+						equivalent.add(featureModel.getFeature(variables.getName(strongylConnectedVar)));
 					}
 				}
 				removalMap.put(feature, equivalent);

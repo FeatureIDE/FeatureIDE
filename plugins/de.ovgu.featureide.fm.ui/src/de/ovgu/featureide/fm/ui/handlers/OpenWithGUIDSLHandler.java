@@ -64,7 +64,7 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 			String command = "java -cp \"" + jakarta + "\"";
 			command += " -jar \"" + guidsl + "\"";
 
-			IFeatureModel fm = FeatureModelManager.load(Paths.get(modelfile.getLocationURI())).getObject();
+			IFeatureModel fm = FeatureModelManager.load(Paths.get(modelfile.getLocationURI()));
 
 			// Parse XML to GUIDSL and save file as model.m
 			String loc = modelfile.getLocation().toOSString();

@@ -41,10 +41,10 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsSemanticalFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsContractComplexityNew;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgramSizeNew;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsSemanticalFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsSyntacticalFeatureModel;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 

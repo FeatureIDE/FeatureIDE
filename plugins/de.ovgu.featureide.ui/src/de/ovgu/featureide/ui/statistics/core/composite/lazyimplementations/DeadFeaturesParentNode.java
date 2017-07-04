@@ -22,9 +22,9 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -44,7 +44,7 @@ public class DeadFeaturesParentNode extends LazyParent {
 	@Override
 	protected void initChildren() {
 		// TODO Performance: Dead and core features should be calculated together.
-		List<IFeature> deadFeatures = ProjectManager.getAnalyzer(model).getDeadFeatures();
+		List<IFeature> deadFeatures = FeatureModelManager.getAnalyzer(model).getDeadFeatures();
 		setValue(deadFeatures.size());
 
 		for (IFeature feature : deadFeatures) {

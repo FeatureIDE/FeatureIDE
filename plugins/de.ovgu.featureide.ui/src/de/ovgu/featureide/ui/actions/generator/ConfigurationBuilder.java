@@ -245,28 +245,28 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		String jobName = "";
 		switch (buildType) {
 		case ALL_CURRENT:
-			configurationBuilder = new CurrentConfigurationsGenerator(this, featureModel, featureProject);
+			configurationBuilder = new CurrentConfigurationsGenerator(this, featureProject);
 			jobName = JOB_TITLE_CURRENT;
 			break;
 		case ALL_VALID:
-			configurationBuilder = new AllConfigrationsGenerator(this, featureModel, featureProject);
+			configurationBuilder = new AllConfigrationsGenerator(this, featureProject);
 			jobName = JOB_TITLE;
 			break;
 		case T_WISE:
 			if (algorithm.equals(INCLING)) {
-				configurationBuilder = new IncLingConfigurationGenerator(this, featureModel, featureProject);
+				configurationBuilder = new IncLingConfigurationGenerator(this, featureProject);
 			} else {
-				configurationBuilder = new SPLCAToolConfigurationGenerator(this, featureModel, featureProject, algorithm, t);
+				configurationBuilder = new SPLCAToolConfigurationGenerator(this, featureProject, algorithm, t);
 			}
 			jobName = JOB_TITLE_T_WISE;
 			break;
 		case RANDOM:
-			configurationBuilder = new RandConfigurationGenerator(this, featureModel, featureProject);
+			configurationBuilder = new RandConfigurationGenerator(this, featureProject);
 			jobName = JOB_TITLE_RANDOM;
 			break;
 		case INTEGRATION:
 			configurationNumber = 2;
-			configurationBuilder = new ModuleConfigurationGenerator(this, featureModel, featureProject, featureName);
+			configurationBuilder = new ModuleConfigurationGenerator(this, featureProject, featureName);
 			break;
 		default:
 			throw new RuntimeException(buildType + " not supported");

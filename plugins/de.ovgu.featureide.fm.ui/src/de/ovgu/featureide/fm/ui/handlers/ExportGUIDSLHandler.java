@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMExportHandler;
 
 /**
  * Exports feature model to GUIDSL format.
@@ -32,10 +32,10 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class ExportGUIDSLHandler extends AbstractExportHandler {
+public class ExportGUIDSLHandler extends AbstractFMExportHandler {
 
 	@Override
-	protected IFeatureModelFormat getFormat() {
+	protected IFeatureModelFormat getOutputFormat() {
 		final GuidslFormat fmWriter = new GuidslFormat();
 		// TODO Guidsl
 //		if (fmWriter.hasConcreteCompounds()

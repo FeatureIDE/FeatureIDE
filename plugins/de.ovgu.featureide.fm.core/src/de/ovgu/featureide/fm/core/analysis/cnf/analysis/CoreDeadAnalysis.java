@@ -20,11 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.analysis;
 
+import java.util.Arrays;
+
+import org.sat4j.core.VecInt;
+import org.sat4j.specs.IteratorInt;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ModifiableSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -53,6 +60,131 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 	}
 
 	public LiteralSet analyze(IMonitor monitor) throws Exception {
+		return analyze2(monitor);
+	}
+
+	@Override
+	protected ISatSolver initSolver(CNF satInstance) {
+		try {
+			return new ModifiableSatSolver(satInstance);
+		} catch (RuntimeContradictionException e) {
+			return null;
+		}
+	}
+
+	public LiteralSet analyze2(IMonitor monitor) throws Exception {
+		final int initialAssignmentLength = solver.getAssignmentSize();
+		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+		int[] model1 = solver.findSolution();
+
+		if (model1 != null) {
+			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+			int[] model2 = solver.findSolution();
+
+			if (variables != null) {
+				final int[] model3 = new int[model1.length];
+				for (int i = 0; i < variables.getLiterals().length; i++) {
+					final int index = variables.getLiterals()[i] - 1;
+					if (index >= 0) {
+						model3[index] = model1[index];
+					}
+				}
+				model1 = model3;
+			}
+
+			for (int i = 0; i < initialAssignmentLength; i++) {
+				model1[Math.abs(solver.assignmentGet(i)) - 1] = 0;
+			}
+
+			SatUtils.updateSolution(model1, model2);
+			solver.setSelectionStrategy(model1, model1.length > (SatUtils.countNegative(model2) + SatUtils.countNegative(model1)));
+
+			vars = new VecInt(model1.length);
+			split(model1, 0, model1.length);
+		}
+		return new LiteralSet(solver.getAssignmentArray(initialAssignmentLength, solver.getAssignmentSize()));
+	}
+
+	VecInt vars;
+
+	private void split(int[] model, int start, int end) {
+		vars.clear();
+		for (int j = start; j < end; j++) {
+			final int var = model[j];
+			if (var != 0) {
+				vars.push(-var);
+			}
+		}
+		switch (vars.size()) {
+		case 0:
+			return;
+		case 1:
+			test(model, 0);
+			break;
+		case 2:
+			test(model, 0);
+			test(model, 1);
+			break;
+		default:
+			try {
+				solver.addClause(new LiteralSet(Arrays.copyOf(vars.toArray(), vars.size())));
+				switch (solver.hasSolution()) {
+				case FALSE:
+					foundVariables(model, vars);
+					//				solver.removeLastClause();
+					break;
+				case TIMEOUT:
+					reportTimeout();
+					//				solver.removeLastClause();
+					break;
+				case TRUE:
+					SatUtils.updateSolution(model, solver.getSolution());
+					solver.shuffleOrder();
+
+					final int halfLength = (end - start) / 2;
+					if (halfLength > 0) {
+						split(model, start + halfLength, end);
+						split(model, start, start + halfLength);
+					}
+					break;
+				}
+				solver.removeLastClause();
+			} catch (RuntimeContradictionException e) {
+				foundVariables(model, vars);
+			}
+			break;
+		}
+	}
+
+	private void test(int[] model, int i) {
+		final int var = vars.get(i);
+		solver.assignmentPush(var);
+		switch (solver.hasSolution()) {
+		case FALSE:
+			solver.assignmentReplaceLast(-var);
+			model[Math.abs(var) - 1] = 0;
+			break;
+		case TIMEOUT:
+			solver.assignmentPop();
+			reportTimeout();
+			break;
+		case TRUE:
+			solver.assignmentPop();
+			SatUtils.updateSolution(model, solver.getSolution());
+			solver.shuffleOrder();
+			break;
+		}
+	}
+
+	private void foundVariables(int[] model, VecInt vars) {
+		for (IteratorInt iterator = vars.iterator(); iterator.hasNext();) {
+			final int var = iterator.next();
+			solver.assignmentPush(-var);
+			model[Math.abs(var) - 1] = 0;
+		}
+	}
+
+	public LiteralSet analyze1(IMonitor monitor) throws Exception {
 		final int initialAssignmentLength = solver.getAssignmentSize();
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findSolution();
@@ -90,6 +222,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
+						reportTimeout();
 						break;
 					case TRUE:
 						solver.assignmentPop();

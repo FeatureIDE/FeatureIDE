@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.core.experimental;
 
 import de.ovgu.featureide.common.Commons;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.runtimetest.RuntimeTest;
 import de.ovgu.runtimetest.RuntimeTest.Annotations.Constraint;
 import de.ovgu.runtimetest.RuntimeTest.Annotations.WarmUp;
@@ -59,7 +59,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 * Analyzes the model completely.
 	 */
 	private static void analyze(final int i) {
-		ProjectManager.getAnalyzer(getFM(i)).analyzeFeatureModel(null);
+		FeatureModelManager.getAnalyzer(getFM(i)).analyzeFeatureModel(null);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
@@ -116,7 +116,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 * Analyzes constraints only
 	 */
 	private void BUpdateConstraints(final int i) {
-		ProjectManager.getAnalyzer(getFM(i)).updateConstraints();
+		FeatureModelManager.getAnalyzer(getFM(i)).updateConstraints();
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
@@ -178,7 +178,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 * Analyzes features only
 	 */
 	private void BUpdateFeatures(final int i) {
-		ProjectManager.getAnalyzer(getFM(i)).updateFeatures();
+		FeatureModelManager.getAnalyzer(getFM(i)).updateFeatures();
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1100)

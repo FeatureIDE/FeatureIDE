@@ -29,22 +29,22 @@ import java.nio.charset.Charset;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.AdjList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
 
 /**
  * Reads / Writes a feature graph.
  * 
  * @author Sebastian Krieter
  */
-public class FGAdjListFormat implements IPersistentFormat<AdjList> {
+public class MIGAdjListFormat implements IPersistentFormat<ModalImplicationGraph> {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + FGAdjListFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + MIGAdjListFormat.class.getSimpleName();
 
 	@Override
-	public ProblemList read(AdjList object, CharSequence source) {
+	public ProblemList read(ModalImplicationGraph object, CharSequence source) {
 		ProblemList problems = new ProblemList();
 		try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(source.toString().getBytes(Charset.forName("UTF-8"))))) {
-			object.copyValues((AdjList) in.readObject());
+			object.copyValues((ModalImplicationGraph) in.readObject());
 		} catch (IOException | ClassNotFoundException e) {
 			problems.add(new Problem(e));
 		}
@@ -52,7 +52,7 @@ public class FGAdjListFormat implements IPersistentFormat<AdjList> {
 	}
 
 	@Override
-	public String write(AdjList object) {
+	public String write(ModalImplicationGraph object) {
 		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		String ret = null;
 		try (final ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream)) {
@@ -70,7 +70,7 @@ public class FGAdjListFormat implements IPersistentFormat<AdjList> {
 	}
 
 	@Override
-	public IPersistentFormat<AdjList> getInstance() {
+	public IPersistentFormat<ModalImplicationGraph> getInstance() {
 		return this;
 	}
 

@@ -24,17 +24,17 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMExportHandler;
 
 /**
  * Exports the feature model in DIMACS CNF format.
  * 
  * @author Sebastian Krieter
  */
-public class ExportDIMACSHandler extends AbstractExportHandler {
+public class ExportDIMACSHandler extends AbstractFMExportHandler {
 
 	@Override
-	protected IFeatureModelFormat getFormat() {
+	protected IFeatureModelFormat getOutputFormat() {
 		return new DIMACSFormat();
 	}
 

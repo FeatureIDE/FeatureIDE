@@ -28,7 +28,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -44,8 +43,8 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  */
 public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 
-	public CurrentConfigurationsGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	public CurrentConfigurationsGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
+		super(builder, featureProject);
 		builder.configurationNumber = Math.min(builder.configurationNumber, countConfigurations(featureProject.getConfigFolder()));
 	}
 

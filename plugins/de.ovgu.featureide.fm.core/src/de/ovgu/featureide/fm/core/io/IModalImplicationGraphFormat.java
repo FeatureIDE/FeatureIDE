@@ -20,13 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.AdjList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
 
 /**
  * Format for {@link IFeatureGraph feature graphs}.
  * 
  * @author Sebastian Krieter
  */
-public interface IModalImplicationGraphFormat extends IPersistentFormat<AdjList> {
+public interface IModalImplicationGraphFormat extends IPersistentFormat<ModalImplicationGraph> {
 
 }

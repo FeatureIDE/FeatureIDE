@@ -50,14 +50,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.UIJob;
 
-import de.ovgu.featureide.fm.core.FeatureProject;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -341,9 +340,9 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 		final int features = model.getNumberOfFeatures();
 		final int constraints = model.getConstraintCount();
-		final int concrete = ProjectManager.getAnalyzer(model).countConcreteFeatures();
-		final int terminal = ProjectManager.getAnalyzer(model).countTerminalFeatures();
-		final int hidden = ProjectManager.getAnalyzer(model).countHiddenFeatures();
+		final int concrete = FeatureModelManager.getAnalyzer(model).countConcreteFeatures();
+		final int terminal = FeatureModelManager.getAnalyzer(model).countTerminalFeatures();
+		final int hidden = FeatureModelManager.getAnalyzer(model).countHiddenFeatures();
 
 		if (init) {
 			// case: init
@@ -352,7 +351,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 				@Override
 				public void initChildren() {
 					// TODO catch time put
-					addChild(MODEL_VOID + ProjectManager.getAnalyzer(model).isValid());
+					addChild(MODEL_VOID + FeatureModelManager.getAnalyzer(model).isValid());
 					addChild(NUMBER_FEATURES + features);
 					addChild(NUMBER_CONCRETE + concrete);
 					addChild(NUMBER_ABSTRACT + (features - concrete));
@@ -373,9 +372,9 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			try {
 				// TODO catch time put
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
-					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + ProjectManager.getAnalyzer(model).isValid());
+					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + FeatureModelManager.getAnalyzer(model).isValid());
 				} else {
-					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + ProjectManager.getAnalyzer(model).isValid());
+					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + FeatureModelManager.getAnalyzer(model).isValid());
 				}
 			} catch (ConcurrentModificationException e) {
 
@@ -439,14 +438,14 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			}
 		};
 
-		if (!ignoreAbstractFeatures && ProjectManager.getAnalyzer(model).countConcreteFeatures() == 0) {
+		if (!ignoreAbstractFeatures && FeatureModelManager.getAnalyzer(model).countConcreteFeatures() == 0) {
 			// case: there is no concrete feature so there is only one program variant,
 			//       without this the calculation least much to long
 			p.addChild("1 " + variants);
 			return p;
 		}
 
-		final ConfigurationPropagator c = FeatureProject.getPropagator(model, ignoreAbstractFeatures);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(model, ignoreAbstractFeatures);
 		final long number = LongRunningWrapper.runMethod(c.number(TIMEOUT_CONFIGURATION));
 		String s = "";
 		if (number < 0)

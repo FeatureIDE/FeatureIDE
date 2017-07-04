@@ -28,18 +28,17 @@ import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.EmptySatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ModifiableSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds indetermined features.
  * 
  * @author Sebastian Krieter
  */
@@ -51,6 +50,10 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 
 	public IndeterminedAnalysis(ISatSolver solver) {
 		super(solver);
+	}
+	
+	protected ISatSolver initSolver(CNF satInstance) {
+		return new EmptySatSolver(satInstance);
 	}
 
 	public LiteralSet analyze(IMonitor monitor) throws Exception {
@@ -82,7 +85,9 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 			final SatResult hasSolution = modSolver.hasSolution();
 			switch (hasSolution) {
 			case FALSE:
+				break;
 			case TIMEOUT:
+				reportTimeout();
 				break;
 			case TRUE:
 				resultList.push(literal);
@@ -97,19 +102,6 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 		}
 
 		return new LiteralSet(Arrays.copyOf(resultList.toArray(), resultList.size()));
-	}
-
-	protected final boolean isRedundant(ISimpleSatSolver solver, LiteralSet curClause) {
-		final SatResult hasSolution = solver.hasSolution(SatUtils.negateSolution(curClause.getLiterals()));
-		switch (hasSolution) {
-		case FALSE:
-			return true;
-		case TIMEOUT:
-		case TRUE:
-			return false;
-		default:
-			throw new AssertionError(hasSolution);
-		}
 	}
 
 }

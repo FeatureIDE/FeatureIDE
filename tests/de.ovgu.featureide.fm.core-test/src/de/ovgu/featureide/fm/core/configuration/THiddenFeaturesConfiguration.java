@@ -27,8 +27,8 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -47,7 +47,7 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	public void testMandatoryHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></and>");
 		final Configuration c = new Configuration(fm);
-		final ConfigurationPropagator propagator = FeatureProject.getPropagator(c, true);
+		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(c, true);
 		assertEquals(1L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
 		LongRunningWrapper.runMethod(propagator.update());
 		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"), fm.getFeature("B"))), c.getSelectedFeatures());
@@ -57,7 +57,7 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	public void testOptionalHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
 		final Configuration c = new Configuration(fm);
-		final ConfigurationPropagator propagator = FeatureProject.getPropagator(c, true);
+		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(c, true);
 		assertEquals(1L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
 		LongRunningWrapper.runMethod(propagator.update());
 		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"))), c.getSelectedFeatures());
@@ -68,7 +68,7 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 		final IFeatureModel fm = loadXML(
 				"<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></alt>");
 		final Configuration c = new Configuration(fm);
-		final ConfigurationPropagator propagator = FeatureProject.getPropagator(c, true);
+		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(c, true);
 		assertEquals(2L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
 
 		//set={S,B}
@@ -86,7 +86,7 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	public void testHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
 		final Configuration c = new Configuration(fm);
-		final ConfigurationPropagator propagator = FeatureProject.getPropagator(c, true);
+		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(c, true);
 		assertEquals(1L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
 		LongRunningWrapper.runMethod(propagator.update());
 		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"))), c.getSelectedFeatures());

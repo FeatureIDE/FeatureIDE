@@ -106,7 +106,7 @@ public class InterfaceProject {
 		this.featureProject = featureProject;
 
 		if (projectReference != null) {
-			featureModel = FeatureModelManager.load(Paths.get(projectReference.getFile("model.xml").getLocationURI())).getObject();
+			featureModel = FeatureModelManager.load(Paths.get(projectReference.getFile("model.xml").getLocationURI()));
 		} else {
 			featureModel = null;
 		}

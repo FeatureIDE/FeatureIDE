@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  * Based on {@link SimpleFileHandler}.
  * Provides convenient methods for reading / writing files with a certain {@link IPersistentFormat format}.
  * 
- * @see AFileManager
+ * @see FileManager
  * 
  * @author Sebastian Krieter
  */

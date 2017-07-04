@@ -39,8 +39,8 @@ public class SlicedVariables extends Variables {
 
 	public SlicedVariables(Variables orgVariables, Collection<String> varNameList) {
 		super(orgVariables);
-		
-		orgToInternal = new int[orgVariables.size() + 1];
+
+		orgToInternal = new int[orgVariables.maxVariableID() + 1];
 		internalToOrg = new int[varNameList.size() + 1];
 
 		for (String varName : varNameList) {
@@ -67,7 +67,6 @@ public class SlicedVariables extends Variables {
 
 	@Override
 	public int size() {
-//		return internalMapping.getNumberOfVariables();
 		return internalToOrg.length - 1;
 	}
 

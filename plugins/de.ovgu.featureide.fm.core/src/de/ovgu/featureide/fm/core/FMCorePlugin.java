@@ -28,13 +28,17 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
+
+import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.osgi.framework.BundleContext;
 
-import de.ovgu.featureide.fm.core.FeatureProject.FeatureProjectStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -51,9 +55,12 @@ import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -117,10 +124,10 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			return;
 		}
 
-		final FeatureProjectStatus status = ProjectManager.getProject(Paths.get(file.getProject().getLocationURI())).getStatus();
-		final IFeatureModel fm = status.getFeatureModel();
+		final FeatureModelSnapshot snapshot = FeatureModelManager.getInstance(Paths.get(file.getProject().getLocationURI())).getSnapshot();
+		final IFeatureModel fm = snapshot.getObject();
 		try {
-			FeatureModelAnalyzer fma = status.getAnalyzer();
+			FeatureModelAnalyzer fma = snapshot.getAnalyzer();
 			fma.analyzeFeatureModel(null);
 
 			final StringBuilder sb = new StringBuilder();
@@ -189,6 +196,61 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		} catch (Exception e) {
 			logError(e);
 		}
+	}
+	
+	@CheckForNull
+	public static IFolder createFolder(IProject project, String name) {
+		final IFolder folder = getFolder(project, name);
+		if (folder != null && !folder.exists()) {
+			try {
+				folder.create(false, true, null);
+			} catch (CoreException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
+		return folder;
+	}
+
+	@CheckForNull
+	public static IFolder getFolder(IProject project, String name) {
+		IFolder folder = null;
+		if (name != null && !name.trim().isEmpty()) {
+			for (String folderName : name.split("[/]")) {
+				folder = (folder == null) ? project.getFolder(folderName) : folder.getFolder(folderName);
+			}
+		}
+		return folder;
+	}
+	
+	/**
+	 * Creates a {@link LongRunningMethod} for every project with the given arguments.
+	 * 
+	 * @param projects the list of projects
+	 * @param arguments the arguments for the job
+	 * @param autostart if {@code true} the jobs is started automatically.
+	 * @return the created job or a {@link JobSequence} if more than one project is given.
+	 *         Returns {@code null} if {@code projects} is empty.
+	 */
+	public static LongRunningMethod<?> startJobs(List<LongRunningMethod<?>> projects, String jobName, boolean autostart) {
+		LongRunningMethod<?> ret;
+		switch (projects.size()) {
+		case 0:
+			return null;
+		case 1:
+			ret = projects.get(0);
+			break;
+		default:
+			final JobSequence jobSequence = new JobSequence();
+			jobSequence.setIgnorePreviousJobFail(true);
+			for (LongRunningMethod<?> p : projects) {
+				jobSequence.addJob(p);
+			}
+			ret = jobSequence;
+		}
+		if (autostart) {
+			LongRunningWrapper.getRunner(ret, jobName).schedule();
+		}
+		return ret;
 	}
 
 }

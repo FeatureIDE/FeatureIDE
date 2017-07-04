@@ -48,8 +48,6 @@ public interface IFeatureModelStructure {
 
 	boolean hasHidden();
 
-	boolean hasIndetHidden();
-
 	boolean hasMandatoryFeatures();
 
 	boolean hasOptionalFeatures();
@@ -63,20 +61,6 @@ public interface IFeatureModelStructure {
 	void replaceRoot(IFeatureStructure feature);
 
 	void setRoot(IFeatureStructure root);
-
-//	boolean hasFalseOptionalFeatures();
-//
-//	boolean hasUnsatisfiableConstraints();
-//
-//	boolean hasTautologyConstraints();
-//
-//	boolean hasDeadConstraints();
-//
-//	boolean hasVoidModelConstraints();
-//
-//	boolean hasRedundantConstraints();
-//
-//	boolean hasDeadFeatures();
 
 	void setShowHiddenFeatures(boolean showHiddenFeatures);
 

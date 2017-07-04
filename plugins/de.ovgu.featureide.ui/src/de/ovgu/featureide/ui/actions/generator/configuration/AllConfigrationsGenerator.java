@@ -30,7 +30,6 @@ import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
@@ -57,8 +56,8 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	 * @param builder
 	 * @param featureModel
 	 */
-	public AllConfigrationsGenerator(final ConfigurationBuilder builder, final IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	public AllConfigrationsGenerator(final ConfigurationBuilder builder, IFeatureProject featureProject) {
+		super(builder, featureProject);
 		numberJob = new LongRunningJob<>(IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS, new LongRunningMethod<Boolean>() {
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {

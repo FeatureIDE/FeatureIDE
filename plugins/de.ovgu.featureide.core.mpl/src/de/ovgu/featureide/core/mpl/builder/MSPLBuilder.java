@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * A simple multi product line builder.
@@ -55,8 +56,7 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
  */
 public class MSPLBuilder extends IncrementalProjectBuilder {
 
-	public static final String BUILDER_ID = MPLPlugin.PLUGIN_ID
-		+ ".MSPLBuilder";
+	public static final String BUILDER_ID = MPLPlugin.PLUGIN_ID + ".MSPLBuilder";
 	public static final String COMPOSER_KEY = "composer";
 
 	public MSPLBuilder() {
@@ -65,26 +65,26 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		// TODO: prevent automatic build
-//		IProject project = getProject();
-//		if (project != null) {
-//			cleanProject(CorePlugin.getFeatureProject(project), monitor);
-//		} else {
-//			MPLPlugin.getDefault().logWarning(NO_PROJECT_GOT);
-//		}
+		//		IProject project = getProject();
+		//		if (project != null) {
+		//			cleanProject(CorePlugin.getFeatureProject(project), monitor);
+		//		} else {
+		//			MPLPlugin.getDefault().logWarning(NO_PROJECT_GOT);
+		//		}
 	}
 
-//	private boolean cleanProject(IFeatureProject featureProject, IProgressMonitor monitor) {
-//		final IFolder buildFolder = featureProject.getBuildFolder();
-//		try {
-//			for (IResource member : buildFolder.members()) {
-//				member.delete(true, monitor);
-//			}
-//		} catch (CoreException e) {
-//			MPLPlugin.getDefault().logError(e);
-//			return false;
-//		}
-//		return true;
-//	}
+	//	private boolean cleanProject(IFeatureProject featureProject, IProgressMonitor monitor) {
+	//		final IFolder buildFolder = featureProject.getBuildFolder();
+	//		try {
+	//			for (IResource member : buildFolder.members()) {
+	//				member.delete(true, monitor);
+	//			}
+	//		} catch (CoreException e) {
+	//			MPLPlugin.getDefault().logError(e);
+	//			return false;
+	//		}
+	//		return true;
+	//	}
 
 	private final HashMap<String, Boolean> buildMap = new HashMap<String, Boolean>();
 
@@ -94,8 +94,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 		final IProject project = getProject();
 		if (project != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
-			if (featureProject == null
-				|| !featureProject.buildRelevantChanges()) {
+			if (featureProject == null || !featureProject.buildRelevantChanges()) {
 				return null;
 			}
 
@@ -120,7 +119,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();
-				final LongRunningMethod<?> job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
+				final LongRunningMethod<?> job = new MPLBuildProjectJob(featureProject, featureProject, buildFolder, config, null);
 
 				String tempConfigName = featureProject.getCurrentConfiguration().getName();
 				final String configName;
@@ -134,7 +133,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				JobSequence buildSequence = new JobSequence();
 				buildSequence.setIgnorePreviousJobFail(false);
 				buildSequence.addJob(job);
-				final IRunner<Boolean> runner = LongRunningWrapper.getRunner(buildSequence);
+				final IRunner<Boolean> runner = LongRunningWrapper.getRunner(buildSequence, StringTable.BUILD_EXTERNAL_PROJECT);
 				runner.addJobFinishedListener(new JobFinishListener() {
 					@Override
 					public void jobFinished(IJob finishedJob) {

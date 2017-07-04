@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.io.manager.AFileManager;
+import de.ovgu.featureide.fm.core.io.manager.FileManager;
 
 /**
  * Default implementation of {@link ExternalChangeListener}.<br/>
@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 public class DefaultExternalChangeListener extends ExternalChangeListener {
 
 	@Override
-	protected void doUpdate(AFileManager<?> fileManager) {
+	protected void doUpdate(FileManager<?> fileManager) {
 		fileManager.override();
 	}
 

@@ -22,9 +22,9 @@ package de.ovgu.featureide.ui.views.configMap.filters;
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FeatureProject.FeatureProjectStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 
@@ -46,10 +46,10 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
-		final FeatureProjectStatus status = configurationMap.getFeatureProject().getStatus();
-		IFeatureModel featureModel = status.getFeatureModel();
+		final FeatureModelSnapshot snapshot = configurationMap.getFeatureProject().getFeatureModelManager().getSnapshot();
+		IFeatureModel featureModel = snapshot.getObject();
 		if (featureModel != featureModelFilterIsInitializedFor) {
-			this.deadFeatures = status.getAnalyzer().getDeadFeatures();
+			this.deadFeatures = snapshot.getAnalyzer().getDeadFeatures();
 			featureModelFilterIsInitializedFor = featureModel;
 		}
 	}

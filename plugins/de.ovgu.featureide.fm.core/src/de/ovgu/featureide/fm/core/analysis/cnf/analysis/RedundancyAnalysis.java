@@ -25,17 +25,23 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.sat4j.specs.IConstr;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ModifiableSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds redundancies by removing single constraints.
  * 
  * @author Sebastian Krieter
  */
-public class RedundancyAnalysis extends ARedundancyAnalysis {
+public class RedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 
 	public RedundancyAnalysis(CNF satInstance) {
 		super(satInstance);
@@ -55,6 +61,15 @@ public class RedundancyAnalysis extends ARedundancyAnalysis {
 		this.clauseList = clauseList;
 	}
 
+	@Override
+	protected ISatSolver initSolver(CNF satInstance) {
+		try {
+			return new ModifiableSatSolver(satInstance);
+		} catch (RuntimeContradictionException e) {
+			return null;
+		}
+	}
+
 	public List<LiteralSet> analyze(IMonitor monitor) throws Exception {
 		if (clauseList == null) {
 			return Collections.emptyList();
@@ -63,14 +78,18 @@ public class RedundancyAnalysis extends ARedundancyAnalysis {
 			clauseGroupSize = new int[clauseList.size()];
 			Arrays.fill(clauseGroupSize, 1);
 		}
-		monitor.setRemainingWork(clauseList.size() + 1);
+		monitor.setRemainingWork(clauseGroupSize.length + 1);
 
 		final List<LiteralSet> resultList = new ArrayList<>(clauseGroupSize.length);
 		for (int i = 0; i < clauseList.size(); i++) {
 			resultList.add(null);
 		}
-		// TODO Find a better way of sorting
-		//		final Integer[] index = Functional.getSortedIndex(resultList, new ClauseLengthComparatorDsc());
+
+		final List<IConstr> constrs = new ArrayList<>(clauseList.size());
+		for (LiteralSet clause : clauseList) {
+			constrs.add(solver.addClause(clause));
+		}
+
 		monitor.step();
 
 		int endIndex = 0;
@@ -78,16 +97,41 @@ public class RedundancyAnalysis extends ARedundancyAnalysis {
 			int startIndex = endIndex;
 			endIndex += clauseGroupSize[i];
 			boolean completelyRedundant = true;
+			boolean removedAtLeastOne = false;
 			for (int j = startIndex; j < endIndex; j++) {
-				final LiteralSet clause = clauseList.get(j);
-				if (!isRedundant(solver, clause)) {
-					solver.addClause(clause);
-					completelyRedundant = false;
+				final IConstr cm = constrs.get(j);
+				if (cm != null) {
+					removedAtLeastOne = true;
+					solver.removeClause(cm);
 				}
 			}
+
+			if (removedAtLeastOne) {
+				for (int j = startIndex; j < endIndex; j++) {
+					final LiteralSet clause = clauseList.get(j);
+					final int[] negateClause = SatUtils.negateSolution(clause.getLiterals());
+
+					final SatResult hasSolution = solver.hasSolution(negateClause);
+					switch (hasSolution) {
+					case FALSE:
+						break;
+					case TIMEOUT:
+						reportTimeout();
+						break;
+					case TRUE:
+						solver.addClause(clause);
+						completelyRedundant = false;
+						break;
+					default:
+						throw new AssertionError(hasSolution);
+					}
+				}
+			}
+
 			if (completelyRedundant) {
 				resultList.set(i, clauseList.get(startIndex));
 			}
+			monitor.step();
 		}
 
 		return resultList;

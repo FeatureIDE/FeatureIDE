@@ -42,7 +42,7 @@ public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOp
 	@Override
 	public FeatureIDEEvent operation() {
 		graphicalFeatureModel.getLayout().showHiddenFeatures(!graphicalFeatureModel.getLayout().showHiddenFeatures());
-		// TODO add specific handling in FeatureDiagram editor so not everything needs to be reloaded
+		// TODO !!? add specific handling in FeatureDiagram editor so not everything needs to be reloaded
 		return new FeatureIDEEvent(graphicalFeatureModel, EventType.MODEL_DATA_CHANGED);
 	}
 

@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMExportHandler;
 
 /**
  * Writes the content of a feature model xml file to a velvet model file.
@@ -32,10 +32,10 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class ExportVelvetHandler extends AbstractExportHandler {
+public class ExportVelvetHandler extends AbstractFMExportHandler {
 
 	@Override
-	protected IFeatureModelFormat getFormat() {
+	protected IFeatureModelFormat getOutputFormat() {
 		return new VelvetFeatureModelFormat();
 	}
 

@@ -47,6 +47,11 @@ public class CNF implements Serializable {
 		this.clauses = new ClauseList();
 	}
 
+	public CNF(List<LiteralSet> clauses) {
+		this.variables = new Variables();
+		this.clauses = new ClauseList(clauses);
+	}
+
 	/**
 	 * Copy constructor. <br/>
 	 * Also copies clause list (no deep copy).

@@ -46,10 +46,9 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	@SuppressWarnings("rawtypes")
 	private class JobFL extends JobChangeAdapter {
-		@SuppressWarnings("rawtypes")
 		private JobFinishListener listener;
 
-		public JobFL(@SuppressWarnings("rawtypes") JobFinishListener listener) {
+		public JobFL(JobFinishListener listener) {
 			this.listener = listener;
 		}
 

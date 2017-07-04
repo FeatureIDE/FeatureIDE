@@ -24,9 +24,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator.CountSolutionsMethod;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -45,7 +45,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testOnlyRoot() {
 		IFeatureModel fm = loadXML("<feature mandatory=\"true\" name=\"S\"/>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(1L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -53,7 +53,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testVoidOnlyRoot() {
 		IFeatureModel fm = loadXML("<feature mandatory=\"true\" name=\"S\"/>", "<rule><not><var>S</var></not></rule>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(0L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -61,7 +61,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testVoidModel() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"a\"/></and>", "<rule><not><var>a</var></not></rule>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		final CountSolutionsMethod number = c.number(1000);
 		final Long runMethod = LongRunningWrapper.runMethod(number);
@@ -71,7 +71,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testOnlyMandatory() {
 		IFeatureModel fm = loadXML("	<and mandatory=\"true\" name=\"S\">	<feature mandatory=\"true\" name=\"A\"/></and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(1L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -79,7 +79,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testOnlyOptional() {
 		IFeatureModel fm = loadXML("	<and mandatory=\"true\" name=\"S\">	<feature mandatory=\"false\" name=\"A\"/></and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(2L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -87,7 +87,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testAndGroup() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature name=\"B\"/></and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(2L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -95,7 +95,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testOnlyOrGroup() {
 		IFeatureModel fm = loadXML("<or mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature mandatory=\"true\" name=\"B\"/></or>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(3L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -104,7 +104,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testOnlyOrGroup2() {
 		IFeatureModel fm = loadXML("<or mandatory=\"true\" name=\"S\"><feature mandatory=\"false\" name=\"A\"/><feature mandatory=\"false\" name=\"B\"/></or>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(3L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -112,7 +112,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testAlternativeGroup() {
 		IFeatureModel fm = loadXML("<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature mandatory=\"true\" name=\"B\"/></alt>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(2L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -121,7 +121,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testAlternativeGroup2() {
 		IFeatureModel fm = loadXML(
 				"<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature mandatory=\"true\" name=\"B\"/><feature mandatory=\"true\" name=\"C\"/></alt>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(3L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -129,7 +129,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testAbstract() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature abstract=\"true\" name=\"C\"/></and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(2L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -137,7 +137,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testAbstract2() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature abstract=\"true\" name=\"C\"/></and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, false);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, false);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(1L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -146,7 +146,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testAbstract3() {
 		IFeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature abstract=\"true\" name=\"A\"/><feature name=\"B\"/><feature name=\"C\"/></and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, false);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, false);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(4L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -155,7 +155,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testAbstract4() {
 		IFeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature abstract=\"true\" name=\"A\"/><feature name=\"B\"/><feature name=\"C\"/></and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, false);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, false);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(4L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -164,7 +164,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testHidden() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature mandatory=\"false\" name=\"A\"/><feature hidden=\"true\" name=\"B\"/></and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(2L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -173,7 +173,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testDependendHidden() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\">" + "<feature name=\"A\"/>" + "<feature hidden=\"true\" name=\"B\"/>" + "</and>",
 				"<rule>" + "<eq>" + "<var>A</var>" + "<var>B</var>" + "</eq>" + "</rule>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(2L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -181,7 +181,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testWithSimplePositiveConstraint() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature name=\"A\"/></and>", "<rule><var>A</var></rule>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(1L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -189,7 +189,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testWithSimpleNegationConstraint() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature name=\"A\"/></and>", "<rule><not><var>A</var></not></rule>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(1L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -198,7 +198,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testWithImplicationConstraint() {
 		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature name=\"B\"/></and>",
 				"<rule><imp><var>A</var><var>B</var></imp></rule>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(1L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -208,7 +208,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 		IFeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature name=\"A\"/><feature name=\"B\"/><feature name=\"C\"/><feature name=\"D\"/></and>",
 				"<rule><disj><var>A</var><imp><var>B</var><eq><var>C</var><not><var>D</var></not></eq></imp></disj></rule>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(14L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -217,7 +217,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testCombination1() {
 		IFeatureModel fm = loadXML(
 				"<and name=\"S\">" + "<feature name=\"A\"/>" + "<feature mandatory=\"true\" name=\"B\"/>" + "<feature name=\"C\"/>" + "</and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(4L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -225,7 +225,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testCombination2() {
 		IFeatureModel fm = loadXML("<or name=\"S\">" + "<feature name=\"A\"/>" + "<feature name=\"B\"/>" + "<feature name=\"C\"/>" + "</or>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(7L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -233,7 +233,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testCombination3() {
 		IFeatureModel fm = loadXML("<alt name=\"S\">" + "<feature name=\"A\"/>" + "<feature name=\"B\"/>" + "<feature name=\"C\"/>" + "</alt>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(3L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -242,7 +242,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testCombination4() {
 		IFeatureModel fm = loadXML("<and name=\"S\">" + "<feature name=\"A\"/>" + "<feature mandatory=\"true\" name=\"B\"/>"
 				+ "<feature abstract=\"true\" name=\"C\"/>" + "</and>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, false);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, false);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(2L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -250,7 +250,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	@Test
 	public void testCombination5() {
 		IFeatureModel fm = loadXML("<or name=\"S\">" + "<feature name=\"A\"/>" + "<feature name=\"B\"/>" + "<feature abstract=\"true\" name=\"C\"/>" + "</or>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, false);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, false);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(4L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}
@@ -259,7 +259,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testCombination6() {
 		IFeatureModel fm = loadXML(
 				"<alt name=\"S\">" + "<feature name=\"A\"/>" + "<feature name=\"B\"/>" + "<feature abstract=\"true\" name=\"C\"/>" + "</alt>");
-		final ConfigurationPropagator c = FeatureProject.getPropagator(fm, true);
+		final ConfigurationPropagator c = FeatureModelManager.getPropagator(fm, true);
 		LongRunningWrapper.runMethod(c.update());
 		assertEquals(3L, LongRunningWrapper.runMethod(c.number(1000)).longValue());
 	}

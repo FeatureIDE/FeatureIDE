@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.analysis;
 import java.util.Arrays;
 
 import org.sat4j.core.VecInt;
+import org.sat4j.specs.IteratorInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -46,25 +47,17 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 
 	public DecisionPropagationAnalysisMIG(ISatSolver solver, IModalImplicationGraph featureGraph) {
 		super(solver);
-		this.traverser = featureGraph.traverse();
+		this.traverser = featureGraph.getTraverser();
 	}
 
 	public DecisionPropagationAnalysisMIG(CNF satInstance, IModalImplicationGraph featureGraph) {
 		super(satInstance);
-		this.traverser = featureGraph.traverse();
+		this.traverser = featureGraph.getTraverser();
 	}
 
 	public LiteralSet analyze(IMonitor monitor) throws Exception {
-		final int[] modelForDefinedVariables = new int[solver.getSatInstance().getVariables().size()];
-		for (int i = 0; i < assumptions.size(); i++) {
-			final int var = assumptions.getLiterals()[i];
-			final int j = Math.abs(var) - 1;
-			modelForDefinedVariables[j] = var;
-		}
-
-		traverser.init(modelForDefinedVariables);
 		if (changedVars == null) {
-			traverser.traverseDefined(assumptions);
+			traverser.markDefined(assumptions);
 		} else {
 			VecInt defined = new VecInt();
 			VecInt undefined = new VecInt();
@@ -78,19 +71,17 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 				}
 				undefined.push(changedVar);
 			}
-			traverser.traverseDefined(new LiteralSet(Arrays.copyOf(defined.toArray(), defined.size())));
-			traverser.traverseUndefined(Arrays.copyOf(undefined.toArray(), undefined.size()));
+			traverser.markDefinedAndUndefined(new LiteralSet(Arrays.copyOf(defined.toArray(), defined.size())),
+					new LiteralSet(Arrays.copyOf(undefined.toArray(), undefined.size())));
 		}
-		final VecInt v = traverser.getRelevantVariables();
+		final VecInt selectedVars = traverser.getVariablesMarkedForSelection();
+		final VecInt calculationVars = traverser.getVariablesMarkedForCalculation();
 
-		for (int k = 0; k < modelForDefinedVariables.length; k++) {
-			final int var = modelForDefinedVariables[k];
-			if (var != 0) {
-				solver.assignmentPush(var);
-			}
+		for (IteratorInt it = selectedVars.iterator(); it.hasNext();) {
+			solver.assignmentPush(it.next());
 		}
 
-		if (!v.isEmpty()) {
+		if (!calculationVars.isEmpty()) {
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 			final int[] model1 = solver.findSolution();
 
@@ -99,15 +90,12 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 				final int[] model2 = solver.findSolution();
 
 				SatUtils.updateSolution(model1, model2);
-				solver.setSelectionStrategy(model1, true);
-				for (int k = 0; k < modelForDefinedVariables.length; k++) {
-					final int var = modelForDefinedVariables[k];
-					if (var != 0) {
-						model1[Math.abs(var) - 1] = 0;
-					}
+				for (IteratorInt it = selectedVars.iterator(); it.hasNext();) {
+					model1[Math.abs(it.next()) - 1] = 0;
 				}
 
-				sat(model1, v);
+				solver.setSelectionStrategy(model1, true);
+				sat(model1, calculationVars);
 			}
 		}
 		return new LiteralSet(solver.getAssignmentArray(assumptions.size(), solver.getAssignmentSize()));
@@ -124,13 +112,18 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 				case FALSE:
 					solver.assignmentReplaceLast(varX);
 					model1[i] = 0;
-					final VecInt newVars = traverser.traverse2(varX, model1);
-					for (int j = 0; j < newVars.size(); j++) {
-						solver.assignmentPush(newVars.get(i));
+					final int[] stronglyConnected = traverser.getStronglyConnected(varX).getLiterals();
+					for (int literal : stronglyConnected) {
+						final int j = Math.abs(literal) - 1;
+						if (model1[j] != 0) {
+							model1[j] = 0;
+							solver.assignmentPush(literal);
+						}
 					}
 					break;
 				case TIMEOUT:
-					throw new RuntimeException();
+					reportTimeout();
+					break;
 				case TRUE:
 					solver.assignmentPop();
 					SatUtils.updateSolution(model1, solver.getSolution());

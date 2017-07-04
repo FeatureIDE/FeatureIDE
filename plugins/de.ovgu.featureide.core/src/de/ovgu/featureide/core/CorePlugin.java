@@ -93,8 +93,8 @@ import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMComposerManager;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -102,7 +102,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -497,45 +498,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 	}
 
-	public static IFolder createFolder(IProject project, String name) {
-		if ("".equals(name)) {
-			return null;
-		}
-		String[] names = name.split("[/]");
-		IFolder folder = null;
-		for (String folderName : names) {
-			if (folder == null) {
-				folder = project.getFolder(folderName);
-			} else {
-				folder = folder.getFolder(folderName);
-			}
-			try {
-				if (!folder.exists()) {
-					folder.create(false, true, null);
-				}
-			} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
-			}
-		}
-		return folder;
-	}
-
-	public static IFolder getFolder(IProject project, String name) {
-		if ("".equals(name)) {
-			return null;
-		}
-		String[] names = name.split("[/]");
-		IFolder folder = null;
-		for (String folderName : names) {
-			if (folder == null) {
-				folder = project.getFolder(folderName);
-			} else {
-				folder = folder.getFolder(folderName);
-			}
-		}
-		return folder;
-	}
-
 	/**
 	 * Creates the source-, features- and build-folder at the given paths.<br>
 	 * Also creates the bin folder if necessary.<br>
@@ -546,17 +508,17 @@ public class CorePlugin extends AbstractCorePlugin {
 			/** just create the bin folder if project has only the FeatureIDE Nature **/
 			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				if (!("".equals(buildPath) && "".equals(sourcePath)) && composer.hasSource()) {
-					createFolder(project, "bin");
+					FMCorePlugin.createFolder(project, "bin");
 				}
 			}
 		} catch (CoreException e) {
 			getDefault().logError(e);
 		}
 		if (composer.hasSource()) {
-			createFolder(project, sourcePath);
-			createFolder(project, buildPath);
+			FMCorePlugin.createFolder(project, sourcePath);
+			FMCorePlugin.createFolder(project, buildPath);
 		}
-		createFolder(project, configPath);
+		FMCorePlugin.createFolder(project, configPath);
 	}
 
 	private static IFeatureModel createFeatureModelFile(IProject project) {
@@ -780,36 +742,35 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void buildContextDocumentation(List<IProject> pl, String options, String featureName) {
-		final ArrayList<JobArguments<?>> arguments = new ArrayList<>(pl.size());
+		final ArrayList<LongRunningMethod<?>> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
-			arguments.add(new PrintDocumentationJob.Arguments("Docu_Context_" + featureName, options.split("\\s+"), new ContextMerger(), featureName, iProject));
+			arguments.add(new PrintDocumentationJob("Docu_Context_" + featureName, options.split("\\s+"), new ContextMerger(), featureName, iProject));
 		}
-		ProjectManager.startJobs(arguments, true);
+		FMCorePlugin.startJobs(arguments, StringTable.BUILD_DOCUMENTATION, true);
 	}
 
 	public void buildVariantDocumentation(List<IProject> pl, String options) {
-		final ArrayList<JobArguments<?>> arguments = new ArrayList<>(pl.size());
+		final ArrayList<LongRunningMethod<?>> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
-			arguments.add(new PrintDocumentationJob.Arguments("Docu_Variant", options.split("\\s+"), new VariantMerger(), null, iProject));
+			arguments.add(new PrintDocumentationJob("Docu_Variant", options.split("\\s+"), new VariantMerger(), null, iProject));
 		}
-		ProjectManager.startJobs(arguments, true);
+		FMCorePlugin.startJobs(arguments, StringTable.BUILD_DOCUMENTATION, true);
 	}
 
 	public void buildFeatureDocumentation(List<IProject> pl, String options, String featureName) {
-		final ArrayList<JobArguments<?>> arguments = new ArrayList<>(pl.size());
+		final ArrayList<LongRunningMethod<?>> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
-			arguments.add(new PrintDocumentationJob.Arguments("Docu_Feature_" + featureName, options.split("\\s+"), new FeatureModuleMerger(), featureName,
-					iProject));
+			arguments.add(new PrintDocumentationJob("Docu_Feature_" + featureName, options.split("\\s+"), new FeatureModuleMerger(), featureName, iProject));
 		}
-		ProjectManager.startJobs(arguments, true);
+		FMCorePlugin.startJobs(arguments, StringTable.BUILD_DOCUMENTATION, true);
 	}
 
 	public void buildSPLDocumentation(List<IProject> pl, String options) {
-		final ArrayList<JobArguments<?>> arguments = new ArrayList<>(pl.size());
+		final ArrayList<LongRunningMethod<?>> arguments = new ArrayList<>(pl.size());
 		for (IProject iProject : pl) {
-			arguments.add(new PrintDocumentationJob.Arguments("Docu_SPL", options.split("\\s+"), new SPLMerger(), null, iProject));
+			arguments.add(new PrintDocumentationJob("Docu_SPL", options.split("\\s+"), new SPLMerger(), null, iProject));
 		}
-		ProjectManager.startJobs(arguments, true);
+		FMCorePlugin.startJobs(arguments, StringTable.BUILD_DOCUMENTATION, true);
 	}
 
 }

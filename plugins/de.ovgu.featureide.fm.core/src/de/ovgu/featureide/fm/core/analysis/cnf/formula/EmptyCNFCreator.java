@@ -18,43 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.analysis;
-
-import java.util.List;
+package de.ovgu.featureide.fm.core.analysis.cnf.formula;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.cnf.FeatureModelCNF;
 
 /**
- * Finds core and dead features.
+ * Creates an empty {@link CNF}.
  * 
  * @author Sebastian Krieter
  */
-public abstract class ARedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
+public class EmptyCNFCreator extends ACreator<CNF> {
 
-	public ARedundancyAnalysis(CNF satInstance) {
-		super(satInstance);
-	}
-
-	public ARedundancyAnalysis(ISatSolver solver) {
-		super(solver);
-	}
-
-	protected boolean isRedundant(ISimpleSatSolver solver, LiteralSet curClause) {
-		final SatResult hasSolution = solver.hasSolution(SatUtils.negateSolution(curClause.getLiterals()));
-		switch (hasSolution) {
-		case FALSE:
-			return true;
-		case TIMEOUT:
-		case TRUE:
-			return false;
-		default:
-			throw new AssertionError(hasSolution);
-		}
+	@Override
+	protected CNF create() {
+		return new FeatureModelCNF(formula.getFeatureModel(), false);
 	}
 
 }

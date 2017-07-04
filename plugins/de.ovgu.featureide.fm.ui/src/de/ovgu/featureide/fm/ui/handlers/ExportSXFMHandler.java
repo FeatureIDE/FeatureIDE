@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMExportHandler;
 
 /**
  * Converts a feature model file into the SXFM format.
@@ -33,10 +33,10 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class ExportSXFMHandler extends AbstractExportHandler {
+public class ExportSXFMHandler extends AbstractFMExportHandler {
 
 	@Override
-	protected IFeatureModelFormat getFormat() {
+	protected IFeatureModelFormat getOutputFormat() {
 		return new SXFMFormat();
 	}
 

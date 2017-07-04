@@ -24,14 +24,14 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMImportHandler;
 
 /**
  * Reads a feature model given in DIMACS format.
  * 
  * @author Sebastian Krieter
  */
-public class ImportDIMACSHandler extends AbstractImportHandler {
+public class ImportDIMACSHandler extends AbstractFMImportHandler {
 	@Override
 	protected IFeatureModelFormat setModelReader() {
 		return new DIMACSFormat();

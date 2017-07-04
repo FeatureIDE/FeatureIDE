@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,31 +18,20 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job;
+package de.ovgu.featureide.fm.core.analysis.cnf.formula;
 
-
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 
 /**
- * This class implements support for Eclipse jobs.
- * The {@link JobArguments} object should be extended to add constructor 
- * parameters, and can be used to conveniently start several {@link AProjectJob}s.
+ * Creates a {@link CNF} without abstract features.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AProjectJob<T extends JobArguments<?>, R> implements LongRunningMethod<R> {
+public class NoAbstractCNFCreator extends SlicedCNFCreator {
 
-	protected final T arguments;
-	
-	protected IMonitor workMonitor;
-	
-	protected AProjectJob(T arguments) {
-		this.arguments = arguments;
-	}
-	
-	protected AProjectJob(String name, T arguments) {
-		this.arguments = arguments;
+	public NoAbstractCNFCreator() {
+		super(new AbstractFeatureFilter());
 	}
 
 }

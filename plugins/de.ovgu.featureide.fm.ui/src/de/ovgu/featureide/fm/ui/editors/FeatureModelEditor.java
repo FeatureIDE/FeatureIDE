@@ -28,7 +28,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
 import java.beans.PropertyChangeEvent;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -79,9 +78,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -131,8 +128,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	private UndoActionHandler undoAction;
 	private RedoActionHandler redoAction;
 	
-	private FeatureProject featureProject;
-
 	public FeatureModelEditor() {
 		super();
 	}
@@ -464,14 +459,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 		super.setInput(input);
 		
-		final Path path = Paths.get(file.getLocationURI());
-		if (ProjectManager.hasProjectData(path)) {
-			featureProject = ProjectManager.getProject(path);
-		} else {
-			featureProject = ProjectManager.addProject(Paths.get(file.getProject().getLocationURI()), path);
-		}
-
-		fmManager = (FeatureModelManager) featureProject.getFeatureModelManager();
+		fmManager = FeatureModelManager.getInstance(Paths.get(file.getLocationURI()));
 		fmManager.addListener(this);
 		createModelFileMarkers(fmManager.getLastProblems());
 
@@ -587,7 +575,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			markerHandler.createModelMarker(warning.message, warning.severity.getLevel(), warning.line);
 		}
 		if (!warnings.containsError()) {
-			if (!ProjectManager.getAnalyzer(getFeatureModel()).isValid()) {
+			if (!FeatureModelManager.getAnalyzer(getFeatureModel()).isValid()) {
 				markerHandler.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
 			}
 		}

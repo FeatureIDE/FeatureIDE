@@ -55,19 +55,20 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
@@ -88,8 +89,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private final JobSynchronizer configJobManager = new JobSynchronizer();
 
-	public FeatureProject featureProject;
-
 	private final List<IConfigurationEditorPage> allPages = new ArrayList<>(5);
 	private List<IConfigurationEditorPage> extensionPages;
 	private List<IConfigurationEditorPage> internalPages;
@@ -103,12 +102,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private ConfigurationManager configurationManager;
 	private FeatureModelManager featureModelManager;
+	private FeatureModelSnapshot featureModelSnapshot;
 
 	private EXPAND_ALGORITHM currentExpandAlgorithm = EXPAND_ALGORITHM.DEFUALT;
 
 	private int currentPageIndex = -1;
 
-	private boolean autoSelectFeatures = false;
+	private boolean autoSelectFeatures = true;
 	private boolean invalidFeatureModel = true;
 	private boolean containsError = false;
 
@@ -214,17 +214,11 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				}
 			}
 		}
-		final Path path = Paths.get(res.getLocationURI());
+		final Path modelPath = Paths.get(res.getLocationURI());
 
-		if (ProjectManager.hasProjectData(path)) {
-			featureProject = ProjectManager.getProject(path);
-		} else {
-			featureProject = ProjectManager.addProject(Paths.get(project.getLocationURI()), path);
-		}
-
-		configurationManager = (ConfigurationManager) featureProject.getConfigurationManager(Paths.get(file.getLocationURI()));
-
-		featureModelManager = FeatureModelManager.getInstance(path);
+		configurationManager = ConfigurationManager.getInstance(Paths.get(file.getLocationURI()), modelPath);
+		featureModelManager = configurationManager.getFeatureModelManager();
+		featureModelSnapshot = featureModelManager.getSnapshot();
 		invalidFeatureModel = featureModelManager.getLastProblems().containsError();
 		if (invalidFeatureModel) {
 			return;
@@ -268,13 +262,20 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	 * @return a string describing the absolute path of the selected model file
 	 * @see FileDialog#open()
 	 */
-	// TODO add all model extensions
 	private String openFileDialog() {
 		FileDialog dialog = new FileDialog(getSite().getWorkbenchWindow().getShell(), SWT.MULTI);
 		dialog.setText(SELECT_THE_CORRESPONDING_FEATUREMODEL_);
 		dialog.setFileName("model.xml");
-		dialog.setFilterExtensions(new String[] { "*.xml", "*.velvet" });
-		dialog.setFilterNames(new String[] { "XML *.xml", "VELVET *.velvet" });
+		final ArrayList<String> suffixes = new ArrayList<>();
+		final ArrayList<String> names = new ArrayList<>();
+		for (IFeatureModelFormat extension : FMFormatManager.getInstance().getExtensions()) {
+			if (extension.supportsRead()) {
+				suffixes.add("*." + extension.getSuffix());
+				names.add(extension.getName() + " *." + extension.getSuffix());
+			}
+		}
+		dialog.setFilterExtensions(suffixes.toArray(new String[0]));
+		dialog.setFilterNames(names.toArray(new String[0]));
 		dialog.setFilterPath(file.getProject().getLocation().toOSString());
 		return dialog.open();
 	}
@@ -538,7 +539,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public ConfigurationPropagator getPropagator() {
-		return featureProject.getStatus().getPropagator(getConfiguration());
+		return featureModelSnapshot.getPropagator(getConfiguration());
 	}
 
 	public ConfigurationManager getConfigurationManager() {

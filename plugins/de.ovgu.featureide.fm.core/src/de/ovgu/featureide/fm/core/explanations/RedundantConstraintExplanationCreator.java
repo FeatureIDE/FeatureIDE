@@ -20,10 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,8 +33,9 @@ import org.prop4j.Literal;
 import org.prop4j.Literal.FeatureAttribute;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.LTMSCreator;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Generates explanations for redundant constraints using {@link LTMS}.
@@ -42,104 +43,37 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Sofia Ananieva
  * @author Timo Guenther
  */
-public class RedundantConstraintExplanationCreator extends ExplanationCreator {
-	/** The redundant constraint in the feature model. */
-	private IConstraint redundantConstraint;
+public class RedundantConstraintExplanationCreator extends ExplanationCreator<IConstraint> {
+
 	/**
-	 * The CNF without the clauses of the redundant constraint.
-	 * It is later used as the input for the LTMS.
-	 * It is stored separately from the CNF so the CNF does not have to be overridden and can continue to be reused.
-	 * It is created lazily when needed and reset when any of the variables it depends on is changed:
-	 * the feature model, the feature model's CNF representation or the redundant constraint.
+	 * An {@link LTMS} with a CNF without the clauses of the redundant constraint.
+	 * It is stored separately as it must be computed for every new feature model element.
+	 * It is created lazily when needed and reset when any of the feature model element it depends on is changed.
 	 */
-	private Node cnfWithoutRedundantConstraintClauses;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public RedundantConstraintExplanationCreator() {
-		this(null);
+	private LTMS ltms;
+
+	@Override
+	public void setDefectElement(IConstraint defectElement) {
+		super.setDefectElement(defectElement);
+		ltms = null;
 	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public RedundantConstraintExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param redundantConstraint the redundant constraint in the feature model
-	 */
-	public RedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
-		super(fm);
-		setRedundantConstraint(redundantConstraint);
-	}
-	
-	/**
-	 * Returns the redundant constraint in the feature model.
-	 * @return the redundant constraint in the feature model
-	 */
-	public IConstraint getRedundantConstraint() {
-		return redundantConstraint;
-	}
-	
-	/**
-	 * Sets the redundant constraint in the feature model.
-	 * @param redundantConstraint the redundant constraint in the feature model
-	 */
-	public void setRedundantConstraint(IConstraint redundantConstraint) {
-		this.redundantConstraint = redundantConstraint;
-		setCNFWithoutRedundantConstraintClauses(null);
-	}
-	
-	/**
-	 * Returns the CNF without the clauses of the redundant constraint.
-	 * Creates it first if necessary.
-	 * @return the CNF without the clauses of the redundant constraint; not null
-	 */
-	protected Node getCNFWithoutRedundantConstraintClauses() {
-		if (cnfWithoutRedundantConstraintClauses == null) {
-			setCNFWithoutRedundantConstraintClauses(createCNFWithoutRedundantConstraintClauses());
-		}
-		return cnfWithoutRedundantConstraintClauses;
-	}
-	
-	/**
-	 * Sets the CNF without the clauses of the redundant constraint.
-	 * @param cnfWithoutRedundantConstraintClauses the CNF without the clauses of the redundant constraint
-	 */
-	protected void setCNFWithoutRedundantConstraintClauses(Node cnfWithoutRedundantConstraintClauses) {
-		this.cnfWithoutRedundantConstraintClauses = cnfWithoutRedundantConstraintClauses;
-		setLTMS(null);
-	}
-	
-	/**
-	 * Creates a copy of the CNF without the clauses of the redundant constraint.
-	 * @return a copy of the CNF without the clauses of the redundant constraint; not null
-	 */
-	protected Node createCNFWithoutRedundantConstraintClauses() {
-		return removeRedundantConstraintClauses(getCNF());
-	}
-	
+
 	/**
 	 * Returns a copy of the given CNF without clauses of the redundant constraint.
-	 * @param newCNF CNF to check
+	 * 
+	 * @param formula the feature model formula object
 	 * @return a copy of the given CNF without clauses of the redundant constraint
 	 * @throws IllegalStateException if the redundant constraint is not set
 	 */
-	private Node removeRedundantConstraintClauses(Node cnf) throws IllegalStateException {
-		if (getRedundantConstraint() == null) {
+	private Node removeRedundantConstraintClauses(FeatureModelFormula formula) throws IllegalStateException {
+		if (getDefectElement() == null) {
 			throw new IllegalStateException("Missing redundant constraint");
 		}
-		final List<Node> clauses = new LinkedList<>();
-		clause: for (final Node clause : cnf.getChildren()) {
+		final List<Node> clauses = new ArrayList<>();
+		clause: for (final Node clause : formula.getCNFNode().getChildren()) {
 			for (final Literal literal : clause.getLiterals()) {
 				if (literal.getSourceAttribute() == FeatureAttribute.CONSTRAINT
-						&& getFeatureModel().getConstraints().get(literal.getSourceIndex()) == redundantConstraint) {
+						&& formula.getFeatureModel().getConstraints().get(literal.getSourceIndex()) == getDefectElement()) {
 					continue clause;
 				}
 			}
@@ -147,28 +81,28 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 		}
 		return new And(clauses.toArray());
 	}
-	
-	@Override
-	protected LTMS createLTMS() {
-		return new LTMS(getCNFWithoutRedundantConstraintClauses());
-	}
-	
+
 	/**
-	 * Returns an explanation why the specified constraint of the specified feature model is redundant.
+	 * {@inheritDoc}
+	 * <br/><br/>
 	 * Uses a representation of the feature model without the redundant constraint.
 	 * Sets several initial truth value assumptions that lead to a violation of the redundant constraint.
 	 * Then propagates each set of values until a violation in a clause occurs.
 	 * Since a representation of the feature model without the redundant constraint is used,
 	 * the information of the constraint must already be stored differently in the feature model, making it redundant.
 	 * Finally combines all generated explanations into one.
+	 * 
 	 * @return an explanation why the specified constraint of the specified feature model is redundant
 	 */
 	@Override
-	public Explanation getExplanation() {
+	public Explanation getExplanation(FeatureModelFormula formula) {
 		final Explanation cumulatedExplanation = new Explanation();
 		cumulatedExplanation.setExplanationCount(0);
-		final LTMS ltms = getLTMS();
-		for (final Map<Object, Boolean> assignment : getContradictingAssignments(getRedundantConstraint().getNode())) {
+		if (ltms == null) {
+			ltms = new LTMS(removeRedundantConstraintClauses(formula));
+		}
+		final LTMS ltms = formula.getElement(new LTMSCreator());
+		for (final Map<Object, Boolean> assignment : getContradictingAssignments(getDefectElement().getNode())) {
 			ltms.setPremises(assignment);
 			final Explanation explanation = ltms.getExplanation();
 			if (explanation == null) {
@@ -176,12 +110,13 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 			}
 			cumulatedExplanation.addExplanation(explanation);
 		}
-		cumulatedExplanation.setDefectRedundantConstraint(getRedundantConstraint());
+		cumulatedExplanation.setDefectRedundantConstraint(getDefectElement());
 		return cumulatedExplanation;
 	}
-	
+
 	/**
 	 * Returns all value assumptions for which the conjunctive normal form of a redundant constraint is false.
+	 * 
 	 * @param clause any clause (not necessarily in conjunctive normal form)
 	 * @return A list which contains a mapping between a variable and its truth value
 	 */
@@ -195,9 +130,10 @@ public class RedundantConstraintExplanationCreator extends ExplanationCreator {
 		}
 		return assignments;
 	}
-	
+
 	/**
 	 * Returns all possible truth value assignments for the given clause.
+	 * 
 	 * @param clause any clause (not necessarily in conjunctive normal form)
 	 * @return all possible truth value assignments for the given clause
 	 */

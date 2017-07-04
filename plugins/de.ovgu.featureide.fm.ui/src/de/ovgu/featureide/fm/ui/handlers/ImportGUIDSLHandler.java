@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMImportHandler;
 
 /**
  * Converts a GUIDSL feature model into our feature model format.
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class ImportGUIDSLHandler extends AbstractImportHandler {
+public class ImportGUIDSLHandler extends AbstractFMImportHandler {
 
 	@Override
 	protected IFeatureModelFormat setModelReader() {

@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.PairWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.RandomConfigurationGenerator;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
@@ -35,8 +34,8 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  */
 public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
 
-	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
+		super(builder, featureProject);
 	}
 
 	@Override

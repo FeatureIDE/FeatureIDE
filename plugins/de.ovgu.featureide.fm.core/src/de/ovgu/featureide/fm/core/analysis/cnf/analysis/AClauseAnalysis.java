@@ -27,7 +27,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 
 /**
- * Finds core and dead features.
  * 
  * @author Sebastian Krieter
  */

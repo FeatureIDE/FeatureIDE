@@ -25,12 +25,22 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.io.MIGAdjListFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
 public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 
 	private final LinkedList<IFeatureProject> projectList = new LinkedList<>();
-	
+
 	@Override
 	protected void singleAction(IFeatureProject project) {
 		projectList.add(project);
@@ -38,17 +48,22 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 
 	@Override
 	protected void endAction() {
-		for (IFeatureProject project : projectList) {
+		for (final IFeatureProject project : projectList) {
 			final Path path = Paths.get(project.getProject().getFile("model.fg").getLocationURI());
-			// TODO !!! use new FG API
-//			final IRunner<IFeatureGraph> runner = LongRunningWrapper.getRunner(new FGBuilder(CNFCreator.createNodes(project.getFeatureModel())));
-//			runner.addJobFinishedListener(new JobFinishListener<IFeatureGraph>() {
-//				@Override
-//				public void jobFinished(IJob<IFeatureGraph> finishedJob) {
-//					FileHandler.save(path, finishedJob.getResults(), new FeatureGraphFormat());
-//				}
-//			});
-//			runner.schedule();
+
+			final IRunner<ModalImplicationGraph> runner = LongRunningWrapper.getRunner(new LongRunningMethod<ModalImplicationGraph>() {
+				@Override
+				public ModalImplicationGraph execute(IMonitor monitor) throws Exception {
+					return project.getFeatureModelManager().getSnapshot().getFormula().getElement(new ModalImplicationGraphCreator());
+				}
+			});
+			runner.addJobFinishedListener(new JobFinishListener<ModalImplicationGraph>() {
+				@Override
+				public void jobFinished(IJob<ModalImplicationGraph> finishedJob) {
+					FileHandler.save(path, finishedJob.getResults(), new MIGAdjListFormat());
+				}
+			});
+			runner.schedule();
 		}
 		projectList.clear();
 	}

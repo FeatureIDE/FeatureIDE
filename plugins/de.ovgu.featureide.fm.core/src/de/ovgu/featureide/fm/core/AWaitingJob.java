@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.jobs.Job;
  * 
  * @author Jens Meinicke
  */
+@Deprecated
 public abstract class AWaitingJob extends Job {
 
 	private boolean waiting = false;

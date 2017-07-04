@@ -24,56 +24,60 @@ import java.nio.file.Path;
 
 import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.AFileManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FileManager;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.manager.Snapshot;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * {@link AFileManager File manager} for {@link IGraphicalFeatureModel graphical feature model} representation.
+ * {@link FileManager File manager} for {@link IGraphicalFeatureModel graphical feature model} representation.
  * 
+ * @deprecated Use fileHandler instead. This class is of little use for {@link IGraphicalFeatureModel} as has not an dedicated editor. Will be removed.
  * @author Sebastian Krieter
  */
-public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeatureModel> {
+@Deprecated
+public class GraphicalFeatureModelManager extends FileManager<IGraphicalFeatureModel> {
 
-	private static class ObjectCreator extends AFileManager.ObjectCreator<IGraphicalFeatureModel> {
+	private static class ObjectCreator extends FileManager.ObjectCreator<IGraphicalFeatureModel> {
 		private final IGraphicalFeatureModel model;
 
 		public ObjectCreator(IGraphicalFeatureModel model) {
-			super(IGraphicalFeatureModel.class, GraphicalFeatureModelManager.class,
-					new FormatManager<GraphicalFeatureModelFormat>(new GraphicalFeatureModelFormat()));
+			super();
 			this.model = model;
 		}
 
 		@Override
-		protected IGraphicalFeatureModel createObject(Path path, IPersistentFormat<IGraphicalFeatureModel> format) throws NoSuchExtensionException {
+		protected IGraphicalFeatureModel createObject() {
 			return model;
+		}
+
+		@Override
+		protected Snapshot<IGraphicalFeatureModel> createSnapshot(IGraphicalFeatureModel object) {
+			return new Snapshot<>(object.clone());
 		}
 	}
 
 	@CheckForNull
-	public static GraphicalFeatureModelManager getInstance(Path path) {
-		return AFileManager.getInstance(path);
-	}
-
-	@CheckForNull
 	public static GraphicalFeatureModelManager getInstance(Path path, IGraphicalFeatureModel model) {
-		return AFileManager.getInstance(path, new ObjectCreator(model));
+		return FileManager.getInstance(path, new ObjectCreator(model), GraphicalFeatureModelManager.class,
+				new FormatManager<GraphicalFeatureModelFormat>(new GraphicalFeatureModelFormat()));
 	}
 
-	public static FileHandler<IGraphicalFeatureModel> load(Path path, IGraphicalFeatureModel model) {
-		return getFileHandler(path, new ObjectCreator(model));
+	public static IGraphicalFeatureModel load(Path path, IGraphicalFeatureModel model) {
+		final GraphicalFeatureModelManager instance = getInstance(path, model);
+		return instance.getObject();
 	}
 
-	protected GraphicalFeatureModelManager(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {
-		super(model, absolutePath, format);
+	public static IGraphicalFeatureModel load(Path path, IGraphicalFeatureModel model, ProblemList problems) {
+		final GraphicalFeatureModelManager instance = getInstance(path, model);
+		problems.addAll(instance.getLastProblems());
+		return instance.getObject();
 	}
 
-	@Override
-	protected IGraphicalFeatureModel copyObject(IGraphicalFeatureModel graphicalItem) {
-		return graphicalItem.clone();
+	protected GraphicalFeatureModelManager(SimpleFileHandler<IGraphicalFeatureModel> fileHndler, ObjectCreator objectCreator) {
+		super(fileHndler, objectCreator);
 	}
 
 	@Override

@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -40,8 +39,8 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 
 	private final String featureName;
 
-	public ModuleConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject, String featureName) {
-		super(builder, featureModel, featureProject);
+	public ModuleConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, String featureName) {
+		super(builder, featureProject);
 		this.featureName = featureName;
 	}
 

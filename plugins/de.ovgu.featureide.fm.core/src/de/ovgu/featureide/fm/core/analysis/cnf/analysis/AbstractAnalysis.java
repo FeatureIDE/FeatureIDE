@@ -25,6 +25,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeTimeoutException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -38,7 +39,10 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 
 	protected LiteralSet assumptions = null;
 
-	private T result;
+	private boolean timeoutOccured = false;
+	private boolean throwTimeoutException = true;
+
+	private T result = null;
 
 	public AbstractAnalysis(CNF satInstance) {
 		solver = initSolver(satInstance);
@@ -65,6 +69,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 			solver.assignmentPushAll(assumptions.getLiterals());
 		}
 		assumptions = new LiteralSet(solver.getAssignmentArray());
+		timeoutOccured = false;
 
 		monitor.checkCancel();
 		try {
@@ -79,15 +84,34 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 
 	protected abstract T analyze(IMonitor monitor) throws Exception;
 
-	public LiteralSet getAssumptions() {
+	protected final void reportTimeout() throws RuntimeTimeoutException {
+		timeoutOccured = true;
+		if (throwTimeoutException) {
+			throw new RuntimeTimeoutException();
+		}
+	}
+
+	public final LiteralSet getAssumptions() {
 		return assumptions;
 	}
 
-	public void setAssumptions(LiteralSet assumptions) {
+	public final void setAssumptions(LiteralSet assumptions) {
 		this.assumptions = assumptions;
 	}
 
-	public AnalysisResult<T> getResult() {
+	public final boolean isThrowTimeoutException() {
+		return throwTimeoutException;
+	}
+
+	public final void setThrowTimeoutException(boolean throwTimeoutException) {
+		this.throwTimeoutException = throwTimeoutException;
+	}
+
+	public final boolean isTimeoutOccured() {
+		return timeoutOccured;
+	}
+
+	public final AnalysisResult<T> getResult() {
 		return new AnalysisResult<>(this.getClass().getName(), assumptions, result);
 	}
 

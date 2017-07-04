@@ -21,33 +21,118 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.InternalFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Responsible to load and save all information for a feature model instance.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureModelManager extends AFileManager<IFeatureModel> {
+public class FeatureModelManager extends FileManager<IFeatureModel> {
 
-	private static final ObjectCreator<IFeatureModel> objectCreator = new ObjectCreator<IFeatureModel>(IFeatureModel.class, FeatureModelManager.class,
-			FMFormatManager.getInstance()) {
+	public static class FeatureModelSnapshot extends Snapshot<IFeatureModel> {
+
+		private final FeatureModelFormula formula;
+		private final FeatureModelAnalyzer analyzer;
+
+		public FeatureModelSnapshot(IFeatureModel featureModel) {
+			super(featureModel);
+
+			formula = new FeatureModelFormula(featureModel);
+			analyzer = new FeatureModelAnalyzer(formula);
+		}
+
+		public FeatureModelFormula getFormula() {
+			return formula;
+		}
+
+		public FeatureModelAnalyzer getAnalyzer() {
+			return analyzer;
+		}
+
+		public ConfigurationPropagator getPropagator() {
+			return new ConfigurationPropagator(formula, new Configuration(object));
+		}
+
+		public ConfigurationPropagator getPropagator(Configuration configuration) {
+			return new ConfigurationPropagator(formula, configuration);
+		}
+
+		public ConfigurationPropagator getPropagator(Configuration configuration, boolean includeAbstract) {
+			return new ConfigurationPropagator(formula, configuration, includeAbstract);
+		}
+
+		public ConfigurationPropagator getPropagator(boolean includeAbstract) {
+			return new ConfigurationPropagator(formula, new Configuration(object), includeAbstract);
+		}
+
+	}
+
+	private class FeatureModelChangeListner implements IEventListener {
+
+		public void propertyChange(FeatureIDEEvent evt) {
+			final EventType eventType = evt.getEventType();
+			switch (eventType) {
+			case FEATURE_NAME_CHANGED:
+				// TODO !!! react on name change! and maybe other changes?
+				//				String oldName = (String) evt.getOldValue();
+				//				String newName = (String) evt.getNewValue();
+				//				FeatureModelManager.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	private static final ObjectCreator<IFeatureModel> objectCreator = new ObjectCreator<IFeatureModel>() {
+		private IFeatureModelFactory factory = null;
+
 		@Override
-		protected IFeatureModel createObject(Path path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
-			final IFeatureModel featureModel = FMFactoryManager.getFactory(path.toAbsolutePath().toString(), format).createFeatureModel();
+		protected void setPath(Path path, IPersistentFormat<IFeatureModel> format) throws Exception {
+			super.setPath(path, format);
+			factory = FMFactoryManager.getFactory(path.toAbsolutePath().toString(), format);
+		}
+
+		@Override
+		protected IFeatureModel createObject() {
+			final IFeatureModel featureModel = factory.createFeatureModel();
 			featureModel.setSourceFile(path);
 			return featureModel;
 		}
+
+		@Override
+		protected Snapshot<IFeatureModel> createSnapshot(IFeatureModel object) {
+			final IFeatureModel clone = object.clone();
+			clone.setUndoContext(object.getUndoContext());
+			return new FeatureModelSnapshot(clone);
+		}
+
+		@Override
+		protected boolean compareObjects(IFeatureModel o1, IFeatureModel o2) {
+			final InternalFeatureModelFormat format = new InternalFeatureModelFormat();
+			final String s1 = format.getInstance().write(o1);
+			final String s2 = format.getInstance().write(o2);
+			return s1.equals(s2);
+		}
+
 	};
 
 	/**
@@ -61,7 +146,28 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	 */
 	@CheckForNull
 	public static FeatureModelManager getInstance(Path absolutePath) {
-		return (FeatureModelManager) AFileManager.getInstance(absolutePath, objectCreator);
+		return (FeatureModelManager) FileManager.getInstance(absolutePath, objectCreator, FeatureModelManager.class, FMFormatManager.getInstance());
+	}
+
+	@Deprecated
+	@CheckForNull
+	public static FeatureModelManager getInstance(IFeatureModel featureModel) {
+		final Path sourceFile = featureModel.getSourceFile();
+		if (sourceFile != null) {
+			return getInstance(sourceFile);
+		}
+		return null;
+	}
+
+	public static IFeatureModel load(Path path) {
+		final FeatureModelManager instance = getInstance(path);
+		return instance.getObject();
+	}
+
+	public static IFeatureModel load(Path path, ProblemList problems) {
+		final FeatureModelManager instance = getInstance(path);
+		problems.addAll(instance.getLastProblems());
+		return instance.getObject();
 	}
 
 	public static IFeatureModelFormat getFormat(String fileName) {
@@ -75,33 +181,39 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	}
 
 	public static boolean convert(Path inPath, Path outPath) {
-		IFeatureModel featureModel = load(inPath).getObject();
+		IFeatureModel featureModel = load(inPath);
 		if (featureModel == null) {
 			return false;
 		}
 		return save(featureModel, outPath);
 	}
 
-	protected FeatureModelManager(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> modelHandler) {
-		super(setSourcePath(model, absolutePath), absolutePath, modelHandler);
+	@Deprecated
+	public static ConfigurationPropagator getPropagator(Configuration configuration, boolean includeAbstractFeatures) {
+		return new ConfigurationPropagator(configuration, includeAbstractFeatures);
 	}
 
-	private static IFeatureModel setSourcePath(IFeatureModel model, String absolutePath) {
-		model.setSourceFile(Paths.get(absolutePath));
-		return model;
+	@Deprecated
+	public static ConfigurationPropagator getPropagator(IFeatureModel featureModel, boolean includeAbstractFeatures) {
+		final Configuration configuration = new Configuration(featureModel);
+		return new ConfigurationPropagator(configuration, includeAbstractFeatures);
 	}
 
-	@Override
-	protected boolean compareObjects(IFeatureModel o1, IFeatureModel o2) {
-		final InternalFeatureModelFormat format = new InternalFeatureModelFormat();
-		final String s1 = format.getInstance().write(o1);
-		final String s2 = format.getInstance().write(o2);
-		return s1.equals(s2);
+	protected FeatureModelManager(SimpleFileHandler<IFeatureModel> fileHandler, ObjectCreator<IFeatureModel> objectCreator) {
+		super(fileHandler, objectCreator);
+
+		variableObject.setSourceFile(path);
+		persistentObject.getObject().setSourceFile(path);
+
+		addListener(new FeatureModelChangeListner());
+
+		// TODO !!! Rename manager method save -> write
+		// TODO !!! Implement analyses for configurations
 	}
 
 	@Override
 	public void override() {
-		localObject.setUndoContext(variableObject.getUndoContext());
+		persistentObject.getObject().setUndoContext(variableObject.getUndoContext());
 		super.override();
 	}
 
@@ -111,19 +223,19 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	}
 
 	@Override
-	protected IFeatureModel copyObject(IFeatureModel oldObject) {
-		final IFeatureModel clone = oldObject.clone();
-		clone.setUndoContext(oldObject.getUndoContext());
-		return clone;
+	public FeatureModelSnapshot getSnapshot() {
+		return (FeatureModelSnapshot) super.getSnapshot();
 	}
 
-	public static FileHandler<IFeatureModel> load(Path path) {
-		return getFileHandler(path, objectCreator);
+	@Deprecated
+	public FeatureModelAnalyzer getVarAnalyzer() {
+		return new FeatureModelAnalyzer(new FeatureModelFormula(editObject()));
 	}
 
-	@Override
-	public boolean externalSave(Runnable externalSaveMethod) {
-		return true;
+	@Deprecated
+	public static FeatureModelAnalyzer getAnalyzer(IFeatureModel featureModel) {
+		final FeatureModelManager instance = getInstance(featureModel);
+		return instance == null ? new FeatureModelAnalyzer(new FeatureModelFormula(featureModel)) : instance.getSnapshot().getAnalyzer();
 	}
 
 }

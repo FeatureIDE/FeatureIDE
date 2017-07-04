@@ -20,10 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.VALID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.VELVET_FEATUREMODEL_IMPORTED;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,16 +28,11 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
-import org.sat4j.specs.TimeoutException;
-
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
-import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyzer;
 
 /**
  * Adds attributes and attribute constraints to a feature model.

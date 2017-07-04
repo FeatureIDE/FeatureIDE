@@ -25,10 +25,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RUN_MANUAL_CAL
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.ProjectManager;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Action to specify feature model analysis.<br>
@@ -48,10 +49,11 @@ public class RunManualCalculationsAction extends Action {
 
 	@Override
 	public void run() {
-		boolean oldValue = ProjectManager.getAnalyzer(featureModel).runCalculationAutomatically;
-		ProjectManager.getAnalyzer(featureModel).runCalculationAutomatically = true;
+		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
+		boolean oldValue = analyzer.isRunCalculationAutomatically();
+		analyzer.setRunCalculationAutomatically(true);
 		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
-		ProjectManager.getAnalyzer(featureModel).runCalculationAutomatically = oldValue;
+		analyzer.setRunCalculationAutomatically(oldValue);
 	}
 
 }

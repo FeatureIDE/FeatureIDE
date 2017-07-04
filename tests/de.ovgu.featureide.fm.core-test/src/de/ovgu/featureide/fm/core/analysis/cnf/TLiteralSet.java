@@ -18,40 +18,27 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.handlers.interfaces;
+package de.ovgu.featureide.fm.core.analysis.cnf;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import de.ovgu.featureide.fm.ui.handlers.base.AFolderHandler;
-import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
+import org.junit.Test;
 
 /**
- * Action to create a java project from a selected interface.
+ * Test methods of {@link LiteralSet}.
  * 
  * @author Sebastian Krieter
  */
-public class BuildJavaProjectHandler extends AFolderHandler  {
+public class TLiteralSet {
 
-	@Override
-	protected void singleAction(IFolder folder) {
-		IResource[] members = null;
-		try {
-			members = folder.members();
-		} catch (CoreException e) {
-			MPLUIPlugin.getDefault().logError(e);
-		}
-		
-		// TODO Build java projects
-//		if (members != null) {
-//			for (IResource resource : members) {
-//				if (resource.getName().endsWith(IOConstants.EXTENSION_SOLUTION) && resource instanceof IFile) {
-//					MPLPlugin.getDefault().buildJavaProject((IFile) resource, folder.getName());
-//					break;
-//				}
-//			}
-//		}		
+	private final LiteralSet refLiteralSet = new LiteralSet(-1, 2, 4, 6);
+
+	@Test
+	public void containsAllTest() {
+		assertTrue(refLiteralSet.containsAll(new LiteralSet(2, 4, 6)));
+		assertTrue(refLiteralSet.containsAll(new LiteralSet()));
+		assertFalse(refLiteralSet.containsAll(new LiteralSet(-2, -1, 2, 4, 6)));
+		assertFalse(refLiteralSet.containsAll(new LiteralSet(2, 4, 7)));
 	}
-	
 }

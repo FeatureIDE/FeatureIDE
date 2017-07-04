@@ -30,12 +30,12 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintRedundancyStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * TODO description
@@ -219,12 +219,12 @@ public class ComplexConstraintConverter {
 	 * If the feature model is a void model or unsatisfiable then a simple contradicting feature model will be created.
 	 */
 	protected boolean prepare() {
-		FeatureModelAnalyzer analyzer = ProjectManager.getAnalyzer(fm);
+		FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(fm);
 		
-		analyzer.calculateFeatures = true;
-		analyzer.calculateConstraints = true;
-		analyzer.calculateRedundantConstraints = true;
-		analyzer.calculateTautologyConstraints = true;
+		analyzer.setCalculateFeatures(true);
+		analyzer.setCalculateConstraints(true);
+		analyzer.setCalculateRedundantConstraints(true);
+		analyzer.setCalculateTautologyConstraints(true);
 		
 		analyzer.analyzeFeatureModel(null);
 		List<IConstraint> toRemove = new LinkedList<IConstraint>();

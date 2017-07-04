@@ -38,13 +38,13 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 /**
  * Capable of reading and writing a file in a certain format.
  * 
- * @see AFileManager
+ * @see FileManager
  * 
  * @author Sebastian Krieter
  */
 public class SimpleFileHandler<T> {
 
-	private static final Charset DEFAULT_CHARSET;
+	public static final Charset DEFAULT_CHARSET;
 	static {
 		final Charset utf8 = Charset.forName("UTF-8");
 		DEFAULT_CHARSET = utf8 != null ? utf8 : Charset.defaultCharset();
@@ -107,11 +107,11 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> String saveToString(T object, IPersistentFormat<T> format) {
-		return format.write(object);
+		return format.getInstance().write(object);
 	}
 
 	public static <T> ProblemList loadFromString(String source, T object, IPersistentFormat<T> format) {
-		return format.read(object, source);
+		return format.getInstance().read(object, source);
 	}
 
 	public SimpleFileHandler(Path path, T object, IPersistentFormat<T> format) {

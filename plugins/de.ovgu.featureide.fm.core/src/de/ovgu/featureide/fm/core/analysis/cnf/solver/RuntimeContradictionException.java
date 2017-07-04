@@ -21,7 +21,8 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
 /**
- * TODO description
+ * Exception thrown when a {@link solver ISatSolver} detects an obvious contradiction when adding new clauses.<br/>
+ * Doesn't need to be caught explicitly.
  * 
  * @author Sebastian Krieter
  */

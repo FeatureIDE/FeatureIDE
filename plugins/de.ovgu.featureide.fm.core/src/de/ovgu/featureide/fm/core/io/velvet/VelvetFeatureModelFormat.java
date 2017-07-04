@@ -376,7 +376,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		return FeatureModelManager.load(file.toPath()).getObject();
+		return FeatureModelManager.load(file.toPath());
 	}
 
 	private boolean checkExternalModelFile(Tree curNode) {
@@ -1336,8 +1336,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		if (modelMarkerHandler != null) {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
-		Logger.logWarning(message + " (at line " + curNode.getLine()
-				+ ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \"" + curNode.getText() + "\")");
+		Logger.logWarning(message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \""
+				+ curNode.getText() + "\")");
 	}
 
 	private Tree checkTree(Tree root) throws RecognitionException {
@@ -1386,6 +1386,11 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	@Override
 	public boolean supportsContent(CharSequence content) {
 		return supportsRead();
+	}
+
+	@Override
+	public String getName() {
+		return "Velvet";
 	}
 
 }

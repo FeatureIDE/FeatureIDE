@@ -34,7 +34,6 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -43,6 +42,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * A generator for feature models.
@@ -98,7 +98,7 @@ public abstract class Generator {
 	}
 
 	public static void generateConstraints(IFeatureModel fm, Random random, int numberOfConstraints) {
-		boolean valid = ProjectManager.getAnalyzer(fm).isValid();
+		boolean valid = FeatureModelManager.getAnalyzer(fm).isValid();
 		if (!valid) {
 			Logger.logInfo("Feature model not valid!");
 		}
@@ -123,7 +123,7 @@ public abstract class Generator {
 					node = new Not(node);
 			}
 			fm.addConstraint(new Constraint(fm, node));
-			if (!valid || ProjectManager.getAnalyzer(fm).isValid()) {
+			if (!valid || FeatureModelManager.getAnalyzer(fm).isValid()) {
 				i++;
 				System.out.println("E\t" + i + "\t" + node);
 			} else {
@@ -307,7 +307,7 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel arbitraryEdits(IFeatureModel originalFM, long id, int numberOfEdits) {
-		boolean valid = ProjectManager.getAnalyzer(originalFM).isValid();
+		boolean valid = FeatureModelManager.getAnalyzer(originalFM).isValid();
 		IFeatureModel fm = originalFM.clone(null);
 		IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
 		final Random random = new Random(id);
@@ -399,7 +399,7 @@ public abstract class Generator {
 				}
 			}
 
-			if (valid && !ProjectManager.getAnalyzer(fm).isValid()) {
+			if (valid && !FeatureModelManager.getAnalyzer(fm).isValid()) {
 				System.out.println("Void feature model by arbitrary edit	" + r);
 				fm = backup;
 				i--;

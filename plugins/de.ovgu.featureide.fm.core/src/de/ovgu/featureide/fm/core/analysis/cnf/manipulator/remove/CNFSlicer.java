@@ -39,9 +39,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.AbstractManipulator;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.heuristic.AFeatureOrderHeuristic;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.heuristic.MinimumClauseHeuristic;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -96,7 +96,7 @@ public class CNFSlicer extends AbstractManipulator {
 
 		final String[] names = orgCNF.getVariables().getNames();
 		final String[] variableObjects = Arrays.copyOf(names, names.length);
-		map = new DeprecatedFeature[orgCNF.getVariables().size() + 1];
+		map = new DeprecatedFeature[orgCNF.getVariables().maxVariableID() + 1];
 		numberOfDirtyFeatures = 0;
 		for (int curFeature : dirtyLiterals.getLiterals()) {
 			map[curFeature] = new DeprecatedFeature(curFeature);

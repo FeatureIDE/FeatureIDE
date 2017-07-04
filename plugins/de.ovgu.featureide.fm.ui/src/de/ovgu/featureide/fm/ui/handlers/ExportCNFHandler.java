@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.cnf.CNFFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMExportHandler;
 
 /**
  * 
@@ -33,10 +33,10 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class ExportCNFHandler extends AbstractExportHandler {
+public class ExportCNFHandler extends AbstractFMExportHandler {
 
 	@Override
-	protected IFeatureModelFormat getFormat() {
+	protected IFeatureModelFormat getOutputFormat() {
 		return new CNFFormat();
 	}
 

@@ -76,7 +76,6 @@ public class FeatureModel implements IFeatureModel {
 
 	protected final String factoryID;
 
-//	protected final FeatureModelAnalyzer analyser;
 	protected final List<IConstraint> constraints = new ArrayList<>();
 
 	/**
@@ -110,8 +109,6 @@ public class FeatureModel implements IFeatureModel {
 
 		property = createProperty();
 		structure = createStructure();
-
-//		analyser = createAnalyser();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
@@ -141,7 +138,6 @@ public class FeatureModel implements IFeatureModel {
 				}
 			}
 		}
-//		analyser = createAnalyser();
 	}
 
 	protected IFeatureModelProperty createProperty() {
@@ -183,11 +179,6 @@ public class FeatureModel implements IFeatureModel {
 	public IFeatureModel clone(IFeature newRoot) {
 		return new FeatureModel(this, newRoot);
 	}
-
-//	protected FeatureModelAnalyzer createAnalyser() {
-//		// TODO !!!
-//		return new FeatureModelAnalyzer(new FeatureProject(featureModelManager, configurationManagerList));
-//	}
 
 	@Override
 	public void createDefaultValues(CharSequence projectName) {
@@ -265,11 +256,6 @@ public class FeatureModel implements IFeatureModel {
 	protected void fireEvent(final EventType action) {
 		fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
-
-//	@Override
-//	public FeatureModelAnalyzer getAnalyser() {
-//		return analyser;
-//	}
 
 	@Override
 	public int getConstraintCount() {
@@ -368,12 +354,6 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public void handleModelDataChanged() {
 		fireEvent(EventType.MODEL_DATA_CHANGED);
-	}
-
-	@Override
-	public void handleModelDataLoaded() {
-		fireEvent(EventType.MODEL_DATA_LOADED);
-
 	}
 
 	@Override

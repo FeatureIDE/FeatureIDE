@@ -590,7 +590,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					if (uiJob == null || uiJob.getState() == Job.NONE) {
 						uiJob = new UIJob(UPDATE_OUTLINE_VIEW) {
 							public IStatus runInUIThread(IProgressMonitor monitor) {
-
 								if (viewer != null) {
 									if (viewer.getControl() != null && !viewer.getControl().isDisposed()) {
 										viewer.getControl().setRedraw(false);
@@ -614,7 +613,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 																expandedElements.add(f);
 														}
 														expandedElements.add("Constraints");
-														viewer.setExpandedElements(expandedElements.toArray());
+//														viewer.setExpandedElements(expandedElements.toArray());
 													}
 												}
 												syncCollapsedFeatures.setEnabled(true);
@@ -651,7 +650,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.getControl().setRedraw(true);
 										viewer.getControl().setEnabled(true);
 										viewer.refresh();
-
 									}
 								}
 								return Status.OK_STATUS;

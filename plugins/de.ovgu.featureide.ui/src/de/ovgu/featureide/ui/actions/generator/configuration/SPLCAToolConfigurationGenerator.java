@@ -39,7 +39,6 @@ import org.eclipse.ui.internal.util.BundleUtility;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -62,8 +61,8 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	private final String algorithm;
 	private final int t;
 
-	public SPLCAToolConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject, String algorithm, int t) {
-		super(builder, featureModel, featureProject);
+	public SPLCAToolConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, String algorithm, int t) {
+		super(builder, featureProject);
 		this.algorithm = algorithm;
 		this.t = t;
 	}
@@ -74,7 +73,6 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void runSPLCATool() {
 		CoveringArray ca = null;
 		final boolean casa = algorithm.equals(CASA.substring(0, CASA.indexOf(" ")));
@@ -90,7 +88,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 				CoveringArrayCASA.CASA_PATH = path.toOSString();
 			}
 
-			ca = new GUIDSL(new de.ovgu.featureide.fm.core.FeatureModel(featureModel)).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
+			ca = new GUIDSL(featureModel).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
 			if (ca == null) {
 				return;
 			}

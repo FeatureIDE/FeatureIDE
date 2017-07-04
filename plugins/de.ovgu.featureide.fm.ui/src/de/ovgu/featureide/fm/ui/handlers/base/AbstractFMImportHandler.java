@@ -60,7 +60,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public abstract class AbstractImportHandler extends AFileHandler {
+public abstract class AbstractFMImportHandler extends AFileHandler {
 
 	@Override
 	protected final void singleAction(IFile outputFile) {

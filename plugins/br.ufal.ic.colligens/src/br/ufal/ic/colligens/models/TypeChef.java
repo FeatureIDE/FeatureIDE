@@ -65,7 +65,7 @@ public class TypeChef {
 				project.getLocation().toOSString() + System.getProperty("file.separator") + "model.xml");
 		File outputFile = new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
 				+ System.getProperty("file.separator") + "cnf.fm");
-		final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath()).getObject();
+		final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath());
 		try (BufferedWriter print = new BufferedWriter(new FileWriter(outputFile))) {
 			print.write(NodeWriter.nodeToString(Nodes.convert(CNFCreator.createNodes(fm)),
 					NodeWriter.javaSymbols));

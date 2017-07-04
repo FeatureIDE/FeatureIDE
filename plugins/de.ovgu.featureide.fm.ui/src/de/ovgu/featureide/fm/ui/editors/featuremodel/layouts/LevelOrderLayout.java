@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
@@ -58,11 +59,10 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void layout(IGraphicalFeature root) {
-		LinkedList<LinkedList<IGraphicalFeature>> levels = calculateLevels(root);
+		List<List<IGraphicalFeature>> levels = calculateLevels(root);
 
 		int i = levels.size() - 1;
-		for (Iterator<LinkedList<IGraphicalFeature>> iterator = levels.descendingIterator(); iterator.hasNext();) {
-			LinkedList<IGraphicalFeature> level = iterator.next();
+		for (List<IGraphicalFeature> level : levels) {
 			layoutLevelInY(level, i--);
 			layoutLevelInX(level);
 		}
@@ -72,13 +72,14 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		featureDiagramBottom = FMPropertyManager.getLayoutMarginY() + FMPropertyManager.getFeatureSpaceY() * (levels.size() - 1);
 	}
 
-	private void layoutLevelInY(LinkedList<IGraphicalFeature> level, int i) {
-		int y = FMPropertyManager.getLayoutMarginY() + FMPropertyManager.getFeatureSpaceY() * i;
-		for (IGraphicalFeature feature : level)
+	private void layoutLevelInY(List<IGraphicalFeature> level, int i) {
+		final int y = FMPropertyManager.getLayoutMarginY() + FMPropertyManager.getFeatureSpaceY() * i;
+		for (IGraphicalFeature feature : level) {
 			setLocation(feature, new Point(0, y));
+		}
 	}
 
-	private void layoutLevelInX(LinkedList<IGraphicalFeature> level) {
+	private void layoutLevelInX(List<IGraphicalFeature> level) {
 		for (IGraphicalFeature feature : level)
 			if (!feature.isCollapsed() && feature.getGraphicalChildren().size() > 0) {
 				centerAboveChildren(feature);
@@ -92,10 +93,10 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		}
 	}
 
-	private int layoutFeatureInX(LinkedList<IGraphicalFeature> level, int j, int moveWidth, IGraphicalFeature lastFeature) {
+	private int layoutFeatureInX(List<IGraphicalFeature> level, int j, int moveWidth, IGraphicalFeature lastFeature) {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
-		
+
 		if (feature.getGraphicalChildren().size() == 0)
 			nextToLeftSibling(feature, lastFeature);
 		else {
@@ -118,7 +119,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		return moveWidth;
 	}
 
-	private void layoutSiblingsEquidistant(LinkedList<IGraphicalFeature> level, int j, IGraphicalFeature feature) {
+	private void layoutSiblingsEquidistant(List<IGraphicalFeature> level, int j, IGraphicalFeature feature) {
 		int width = FMPropertyManager.getFeatureSpaceX();
 		int l = 0;
 		int space = 0;
@@ -148,29 +149,27 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		}
 	}
 
-	private LinkedList<LinkedList<IGraphicalFeature>> calculateLevels(IGraphicalFeature root) {
-		LinkedList<LinkedList<IGraphicalFeature>> levels = new LinkedList<LinkedList<IGraphicalFeature>>();
+	private List<List<IGraphicalFeature>> calculateLevels(IGraphicalFeature root) {
+		List<List<IGraphicalFeature>> levels = new ArrayList<>();
 
-		LinkedList<IGraphicalFeature> level = new LinkedList<IGraphicalFeature>();
-		level.add(root);
+		List<IGraphicalFeature> level = Arrays.asList(root);
 
-		while (!level.isEmpty()) {
+		do {
 			levels.add(level);
-			LinkedList<IGraphicalFeature> newLevel = new LinkedList<IGraphicalFeature>();
+			List<IGraphicalFeature> newLevel = new ArrayList<>(0);
 			for (IGraphicalFeature feature : level) {
-				for (IGraphicalFeature child : getChildren(feature)) {
-					newLevel.add(child);
-				}
+				newLevel.addAll(feature.getGraphicalChildren());
 			}
 			level = newLevel;
-		}
+		} while (!level.isEmpty());
 
+		Collections.reverse(levels);
 		return levels;
 	}
 
 	private void centerAboveChildren(IGraphicalFeature feature) {
 		final List<IGraphicalFeature> graphicalChildren = getChildren(feature);
-		if(graphicalChildren.size() == 0) {
+		if (graphicalChildren.size() == 0) {
 			return;
 		}
 		int minX = getBounds(graphicalChildren.get(0)).x;

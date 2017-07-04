@@ -30,7 +30,6 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -73,7 +72,7 @@ public class TConfigurationReader {
 		assertNotNull(listFiles);
 		for (File f : listFiles) {
 			if (f.getName().equals(name)) {
-				fm = FeatureModelManager.load(f.toPath()).getObject();
+				fm = FeatureModelManager.load(f.toPath());
 				if (fm != null) {
 					break;
 				}
@@ -83,12 +82,12 @@ public class TConfigurationReader {
 	}
 
 	private boolean isValid(Configuration configuration) {
-		final ConfigurationPropagator propagator = FeatureProject.getPropagator(configuration, true);
+		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(configuration, true);
 		return LongRunningWrapper.runMethod(propagator.isValid());
 	}
 
 	private boolean isValidAfterUpdate(Configuration configuration) {
-		final ConfigurationPropagator propagator = FeatureProject.getPropagator(configuration, true);
+		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(configuration, true);
 		LongRunningWrapper.runMethod(propagator.update());
 		return LongRunningWrapper.runMethod(propagator.isValid());
 	}

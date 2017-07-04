@@ -21,33 +21,26 @@
 package de.ovgu.featureide.fm.ui.handlers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.fama.FAMAFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard;
 
@@ -60,7 +53,7 @@ public class ExportFAMAHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel fm = readModel(file);
+		final IFeatureModel fm = FeatureModelManager.load(Paths.get(file.getLocationURI()));
 
 		IConverterStrategy strategy = new NNFConverter();
 		ComplexConstraintConverter converter = new ComplexConstraintConverter();
@@ -102,27 +95,4 @@ public class ExportFAMAHandler extends AFileHandler {
 		FileHandler.save(Paths.get(path), result, new FAMAFormat());
 	}
 
-	/**
-	 * reads the featureModel from file
-	 * 
-	 * @param inputFile
-	 * @return featureModel
-	 * @throws UnsupportedModelException
-	 * @throws FileNotFoundException
-	 */
-	private IFeatureModel readModel(IFile inputFile) {
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(inputFile.getName());
-		IFeatureModel fm;
-		try {
-			fm = FMFactoryManager.getFactory(inputFile.getLocation().toString(), format).createFeatureModel();
-		} catch (NoSuchExtensionException e) {
-			fm = FMFactoryManager.getDefaultFactory().createFeatureModel();
-		}
-		try {
-			FileHandler.load(inputFile.getContents(), fm, format);
-		} catch (CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-		return fm;
-	}
 }

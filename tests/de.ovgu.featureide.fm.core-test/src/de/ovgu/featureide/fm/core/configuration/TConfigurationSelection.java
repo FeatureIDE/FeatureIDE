@@ -26,8 +26,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -43,14 +43,14 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 	}
 
 	private void testConfigurationValid(Configuration c, final long expectedValue) {
-		final ConfigurationPropagator propagator = FeatureProject.getPropagator(c, true);
+		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(c, true);
 		LongRunningWrapper.runMethod(propagator.update());
 		assertTrue(LongRunningWrapper.runMethod(propagator.isValid()));
 		assertEquals(expectedValue, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
 	}
 
 	private void testConfigurationInvalid(Configuration c) {
-		final ConfigurationPropagator propagator = FeatureProject.getPropagator(c, true);
+		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(c, true);
 		LongRunningWrapper.runMethod(propagator.update());
 		assertFalse(LongRunningWrapper.runMethod(propagator.isValid()));
 		assertEquals(0L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());

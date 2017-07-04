@@ -44,13 +44,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -109,11 +109,11 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
     	}
 
 		root.appendChild(calculations);
-		calculations.setAttribute(CALCULATE_AUTO, "" + ProjectManager.getAnalyzer(object).runCalculationAutomatically);
-		calculations.setAttribute(CALCULATE_FEATURES, "" + ProjectManager.getAnalyzer(object).calculateFeatures);
-		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + ProjectManager.getAnalyzer(object).calculateConstraints);
-		calculations.setAttribute(CALCULATE_REDUNDANT, "" + ProjectManager.getAnalyzer(object).calculateRedundantConstraints);
-		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + ProjectManager.getAnalyzer(object).calculateTautologyConstraints);
+		calculations.setAttribute(CALCULATE_AUTO, "" + FeatureModelManager.getAnalyzer(object).isRunCalculationAutomatically());
+		calculations.setAttribute(CALCULATE_FEATURES, "" + FeatureModelManager.getAnalyzer(object).isCalculateFeatures());
+		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + FeatureModelManager.getAnalyzer(object).isCalculateConstraints());
+		calculations.setAttribute(CALCULATE_REDUNDANT, "" + FeatureModelManager.getAnalyzer(object).isCalculateRedundantConstraints());
+		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + FeatureModelManager.getAnalyzer(object).isCalculateTautologyConstraints());
 
     	root.appendChild(comments);
     	for(String comment : object.getProperty().getComments()){

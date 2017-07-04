@@ -65,7 +65,7 @@ public class TFeatureModelAnalyzer {
 	private static IFeature FM1_F1 = FM_test_1.getFeature("F1");
 	private static IFeature FM1_F2 = FM_test_1.getFeature("F2");
 	private static IConstraint FM1_C1 = FM_test_1.getConstraints().get(0);
-	private static Map<IFeatureModelElement, Object> FM1_DATA = ProjectManager.getAnalyzer(FM_test_1).analyzeFeatureModel(null);
+	private static Map<IFeatureModelElement, Object> FM1_DATA = FeatureModelManager.getAnalyzer(FM_test_1).analyzeFeatureModel(null);
 
 	private static IFeatureModel FM_test_2 = init("test_2.xml");
 	private static IFeature FM2_F1 = FM_test_2.getFeature("F1");
@@ -74,13 +74,13 @@ public class TFeatureModelAnalyzer {
 	private static IConstraint FM2_C1 = FM_test_2.getConstraints().get(0);
 	private static IConstraint FM2_C2 = FM_test_2.getConstraints().get(1);
 	private static IConstraint FM2_C3 = FM_test_2.getConstraints().get(2);
-	private static Map<IFeatureModelElement, Object> FM2_DATA = ProjectManager.getAnalyzer(FM_test_2).analyzeFeatureModel(null);
+	private static Map<IFeatureModelElement, Object> FM2_DATA = FeatureModelManager.getAnalyzer(FM_test_2).analyzeFeatureModel(null);
 
 	private static IFeatureModel FM_test_3 = init("test_3.xml");
 	private static IFeature FM3_F2 = FM_test_3.getFeature("F2");
 	private static IFeature FM3_F3 = FM_test_3.getFeature("F3");
 	private static IConstraint FM3_C1 = FM_test_3.getConstraints().get(0);
-	private static Map<IFeatureModelElement, Object> FM3_DATA = ProjectManager.getAnalyzer(FM_test_3).analyzeFeatureModel(null);
+	private static Map<IFeatureModelElement, Object> FM3_DATA = FeatureModelManager.getAnalyzer(FM_test_3).analyzeFeatureModel(null);
 
 	private static IFeatureModel FM_test_4 = init("test_4.xml");
 	private static IFeature FM4_F1 = FM_test_4.getFeature("I");
@@ -93,17 +93,17 @@ public class TFeatureModelAnalyzer {
 	private static IFeature FM4_F8 = FM_test_4.getFeature("M");
 	private static IFeature FM4_F9 = FM_test_4.getFeature("C");
 	private static IFeature FM4_F10 = FM_test_4.getFeature("J");
-	private static Map<IFeatureModelElement, Object> FM4_DATA = ProjectManager.getAnalyzer(FM_test_4).analyzeFeatureModel(null);
+	private static Map<IFeatureModelElement, Object> FM4_DATA = FeatureModelManager.getAnalyzer(FM_test_4).analyzeFeatureModel(null);
 
 	private static IFeatureModel FM_test_7 = init("test_7.xml");
 	private static IFeature FM7_F1 = FM_test_7.getFeature("H");
 	private static IConstraint FM7_C1 = FM_test_7.getConstraints().get(0);
-	private static Map<IFeatureModelElement, Object> FM7_DATA = ProjectManager.getAnalyzer(FM_test_7).analyzeFeatureModel(null);
+	private static Map<IFeatureModelElement, Object> FM7_DATA = FeatureModelManager.getAnalyzer(FM_test_7).analyzeFeatureModel(null);
 
 	private static IFeatureModel FM_test_8 = init("test_8.xml");
 	private static IFeature FM8_F1 = FM_test_8.getFeature("B");
 	private static IFeature FM8_F2 = FM_test_8.getFeature("C");
-	private static Map<IFeatureModelElement, Object> FM8_DATA = ProjectManager.getAnalyzer(FM_test_8).analyzeFeatureModel(null);
+	private static Map<IFeatureModelElement, Object> FM8_DATA = FeatureModelManager.getAnalyzer(FM_test_8).analyzeFeatureModel(null);
 
 	/**
 	 * @return
@@ -120,7 +120,7 @@ public class TFeatureModelAnalyzer {
 		IFeatureModel fm = null;
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
-				fm = FeatureModelManager.load(f.toPath()).getObject();
+				fm = FeatureModelManager.load(f.toPath());
 				if (fm != null) {
 					break;
 				}

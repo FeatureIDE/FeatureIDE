@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -32,6 +31,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -41,10 +41,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * Create mpl interfaces.
@@ -52,69 +50,113 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class SliceFeatureModelJob implements LongRunningMethod<IFeatureModel> {
-
-	public static class Arguments implements JobArguments<IFeatureModel> {
-		private final boolean considerConstraints;
-		private final IFeatureModel featuremodel;
-		private final Collection<String> featureNames;
-		private final Path modelFile;
-
-		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
-			this.modelFile = modelFile;
-			this.featuremodel = featuremodel;
-			this.featureNames = featureNames;
-			this.considerConstraints = considerConstraints;
-		}
-
-		@Override
-		public SliceFeatureModelJob createJob() {
-			return new SliceFeatureModelJob(modelFile, featuremodel, featureNames, considerConstraints);
-		}
-	}
+public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
 	private static final String MARK1 = "?", MARK2 = "??";
 
 	private boolean changed = false;
 	private final boolean considerConstraints;
-	private final IFeatureModel featureModel;
+	private final FeatureModelFormula formula;
 	private final Collection<String> featureNames;
 
-	private final Path modelFile;
-
-	private IFeatureModel newInterfaceModel = null;
-
-	public SliceFeatureModelJob(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
-		this.modelFile = modelFile;
-		this.featureModel = featuremodel;
+	public SliceFeatureModel(IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
+		this.formula = FeatureModelManager.getInstance(featuremodel).getSnapshot().getFormula();
 		this.featureNames = featureNames;
 		this.considerConstraints = considerConstraints;
 	}
 
 	@Override
 	public IFeatureModel execute(IMonitor monitor) throws Exception {
-		newInterfaceModel = sliceModel(monitor);
-		saveModel();
-		return newInterfaceModel;
-	}
-
-	public IFeatureModel getInterfaceModel() {
-		return newInterfaceModel;
-	}
-
-	// TODO Change to own job
-	public IFeatureModel sliceModel(IMonitor monitor) {
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
-		monitor.setTaskName("Slicing Feature Model");
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(formula.getFeatureModel());
 		monitor.setRemainingWork(100);
 
 		monitor.checkCancel();
 		final CNF cnf = sliceFormula(monitor.subTask(80));
 		monitor.checkCancel();
-		final IFeatureModel m = sliceTree(featureNames, featureModel, factory, monitor.subTask(2));
+		final IFeatureModel m = sliceTree(featureNames, formula.getFeatureModel(), factory, monitor.subTask(2));
 		monitor.checkCancel();
 		merge(factory, cnf, m, monitor.subTask(18));
+
+		return m;
+	}
+
+	private CNF sliceFormula(IMonitor monitor) {
+		monitor.setTaskName("Slicing Feature Model Formula");
+		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(formula.getFeatureModel()));
+		removeFeatures.removeAll(featureNames);
+		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
+	}
+
+	private IFeatureModel sliceTree(Collection<String> selectedFeatureNames, IFeatureModel orgFeatureModel, IFeatureModelFactory factory, IMonitor monitor) {
+		monitor.setTaskName("Slicing Feature Tree");
+		monitor.setRemainingWork(2);
+		final IFeatureModel m = orgFeatureModel.clone();
+		// mark features
+		for (IFeature feat : m.getFeatures()) {
+			if (!selectedFeatureNames.contains(feat.getName())) {
+				feat.setName(MARK1);
+			}
+		}
+
+		IFeature root = m.getStructure().getRoot().getFeature();
+
+		m.getStructure().setRoot(null);
+		m.reset();
+
+		// set new abstract root
+		IFeature nroot = factory.createFeature(m, "__root__");
+		nroot.getStructure().setAbstract(true);
+		nroot.getStructure().setAnd();
+		nroot.getStructure().addChild(root.getStructure());
+		root.getStructure().setParent(nroot.getStructure());
+
+		// merge tree
+		cut(nroot);
+		do {
+			changed = false;
+			merge(nroot.getStructure(), GROUP_NO);
+		} while (changed);
+		monitor.step();
+
+		int count = 0;
+		Hashtable<String, IFeature> featureTable = new Hashtable<String, IFeature>();
+		LinkedList<IFeature> featureStack = new LinkedList<IFeature>();
+		featureStack.push(nroot);
+		while (!featureStack.isEmpty()) {
+			IFeature curFeature = featureStack.pop();
+			for (IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
+				featureStack.push(feature);
+			}
+			if (curFeature.getName().startsWith(MARK1)) {
+				curFeature.setName("_Abstract_" + count++);
+				curFeature.getStructure().setAbstract(true);
+			}
+			featureTable.put(curFeature.getName(), curFeature);
+		}
+		m.setFeatureTable(featureTable);
+		m.getStructure().setRoot(nroot.getStructure());
+
+		if (considerConstraints) {
+			final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
+			for (IConstraint constaint : orgFeatureModel.getConstraints()) {
+				final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
+				boolean containsAllfeatures = !containedFeatures.isEmpty();
+				for (IFeature feature : containedFeatures) {
+					if (!selectedFeatureNames.contains(feature.getName())) {
+						containsAllfeatures = false;
+						break;
+					}
+				}
+				if (containsAllfeatures) {
+					innerConstraintList.add(constaint);
+				}
+			}
+			for (IConstraint constraint : innerConstraintList) {
+				m.addConstraint(constraint.clone(m));
+			}
+		}
+		monitor.step();
 
 		return m;
 	}
@@ -306,102 +348,6 @@ public class SliceFeatureModelJob implements LongRunningMethod<IFeatureModel> {
 				}
 			}
 		}
-	}
-
-	private void saveModel() {
-		final Path filePath = modelFile.getFileName();
-		final Path root = modelFile.getRoot();
-		if (filePath != null && root != null) {
-			String fileName = filePath.toString();
-			final int extIndex = fileName.lastIndexOf('.');
-			fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
-					: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
-			final Path outputPath = root.resolve(modelFile.subpath(0, modelFile.getNameCount() - 1)).resolve(fileName);
-
-			FileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
-		}
-	}
-
-	private CNF sliceFormula(IMonitor monitor) {
-		monitor.setTaskName("Slicing Feature Model Formula");
-		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(featureModel));
-		removeFeatures.removeAll(featureNames);
-		final CNF satInstance = CNFCreator.createNodes(featureModel);
-		final CNF sliced = LongRunningWrapper.runMethod(new CNFSlicer(satInstance, removeFeatures), monitor.subTask(1));
-		return sliced;
-	}
-
-	private IFeatureModel sliceTree(Collection<String> selectedFeatureNames, IFeatureModel orgFeatureModel, IFeatureModelFactory factory, IMonitor monitor) {
-		monitor.setTaskName("Slicing Feature Tree");
-		monitor.setRemainingWork(2);
-		final IFeatureModel m = orgFeatureModel.clone();
-		// mark features
-		for (IFeature feat : m.getFeatures()) {
-			if (!selectedFeatureNames.contains(feat.getName())) {
-				feat.setName(MARK1);
-			}
-		}
-
-		IFeature root = m.getStructure().getRoot().getFeature();
-
-		m.getStructure().setRoot(null);
-		m.reset();
-
-		// set new abstract root
-		IFeature nroot = factory.createFeature(m, "__root__");
-		nroot.getStructure().setAbstract(true);
-		nroot.getStructure().setAnd();
-		nroot.getStructure().addChild(root.getStructure());
-		root.getStructure().setParent(nroot.getStructure());
-
-		// merge tree
-		cut(nroot);
-		do {
-			changed = false;
-			merge(nroot.getStructure(), GROUP_NO);
-		} while (changed);
-		monitor.step();
-
-		int count = 0;
-		Hashtable<String, IFeature> featureTable = new Hashtable<String, IFeature>();
-		LinkedList<IFeature> featureStack = new LinkedList<IFeature>();
-		featureStack.push(nroot);
-		while (!featureStack.isEmpty()) {
-			IFeature curFeature = featureStack.pop();
-			for (IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
-				featureStack.push(feature);
-			}
-			if (curFeature.getName().startsWith(MARK1)) {
-				curFeature.setName("_Abstract_" + count++);
-				curFeature.getStructure().setAbstract(true);
-			}
-			featureTable.put(curFeature.getName(), curFeature);
-		}
-		m.setFeatureTable(featureTable);
-		m.getStructure().setRoot(nroot.getStructure());
-
-		if (considerConstraints) {
-			final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
-			for (IConstraint constaint : orgFeatureModel.getConstraints()) {
-				final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
-				boolean containsAllfeatures = !containedFeatures.isEmpty();
-				for (IFeature feature : containedFeatures) {
-					if (!selectedFeatureNames.contains(feature.getName())) {
-						containsAllfeatures = false;
-						break;
-					}
-				}
-				if (containsAllfeatures) {
-					innerConstraintList.add(constaint);
-				}
-			}
-			for (IConstraint constraint : innerConstraintList) {
-				m.addConstraint(constraint.clone(m));
-			}
-		}
-		monitor.step();
-
-		return m;
 	}
 
 }

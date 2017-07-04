@@ -22,9 +22,9 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -43,7 +43,7 @@ public class CoreFeaturesParentNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		List<IFeature> coreFeatures = ProjectManager.getAnalyzer(model).getCoreFeatures();
+		List<IFeature> coreFeatures = FeatureModelManager.getAnalyzer(model).getCoreFeatures();
 		setValue(coreFeatures.size());
 
 		for (IFeature feature : coreFeatures) {

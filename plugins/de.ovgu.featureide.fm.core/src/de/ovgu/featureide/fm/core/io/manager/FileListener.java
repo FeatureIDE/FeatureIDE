@@ -43,11 +43,11 @@ import de.ovgu.featureide.fm.core.Logger;
 @Deprecated
 public abstract class FileListener<T> implements IResourceChangeListener {
 
-	private final AFileManager<T> fileManager;
+	private final FileManager<T> fileManager;
 
 	private final IPath eclipseFile;
 
-	protected FileListener(AFileManager<T> fileManager) {
+	protected FileListener(FileManager<T> fileManager) {
 		this.fileManager = fileManager;
 		IPath absolutePath2 = new org.eclipse.core.runtime.Path(fileManager.getAbsolutePath());
 		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();

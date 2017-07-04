@@ -105,7 +105,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 		sb.delete(0, sb.length());
 
 		sb.append("concept ");
-		
+
 		sb.append(root.getFeature().getName());
 		sb.append(" {");
 		sb.append(NEWLINE);
@@ -780,6 +780,11 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 	@Override
 	public boolean supportsContent(CharSequence content) {
 		return supportsRead();
+	}
+
+	@Override
+	public String getName() {
+		return "Velvet Light";
 	}
 
 }

@@ -35,13 +35,13 @@ import org.sat4j.specs.ContradictionException;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.AdjList.Vertex;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph.Vertex;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.base.IModalImplicationGraph;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class ModalImplicationGraphBuilder implements LongRunningMethod<AdjList> {
+public class ModalImplicationGraphBuilder extends AbstractAnalysis<ModalImplicationGraph> {
 
 	private static class TempVertex {
 		private final ArrayList<Integer> negStrongEdges = new ArrayList<>();
@@ -64,7 +64,7 @@ public class ModalImplicationGraphBuilder implements LongRunningMethod<AdjList> 
 		}
 	};
 
-	private final AdjList adjList;
+	private final ModalImplicationGraph adjList;
 	private final AdjMatrix adjMatrix;
 
 	private final Set<LiteralSet> cleanClauseSet = new HashSet<>();
@@ -75,22 +75,22 @@ public class ModalImplicationGraphBuilder implements LongRunningMethod<AdjList> 
 	private final List<LiteralSet> newClauseList = new ArrayList<>();
 	private final int numberOfVariables;
 	private final boolean detectStrong;
-	private final CNF cnf, emptyCNF;
+	private final CNF emptyCNF;
 
 	private ISatSolver solver;
 
-	private ModalImplicationGraphBuilder(CNF cnf, boolean detectStrong) {
-		this.cnf = cnf;
+	public ModalImplicationGraphBuilder(CNF cnf, boolean detectStrong) {
+		super(cnf);
 		this.emptyCNF = new CNF(cnf, false);
 		this.detectStrong = detectStrong;
 		numberOfVariables = cnf.getVariables().size();
 		dfsMark = new byte[numberOfVariables];
-		adjList = new AdjList(numberOfVariables);
+		adjList = new ModalImplicationGraph(numberOfVariables);
 		adjMatrix = new AdjMatrix(numberOfVariables);
 	}
 
 	@Override
-	public AdjList execute(IMonitor monitor) throws Exception {
+	public ModalImplicationGraph analyze(IMonitor monitor) throws Exception {
 		monitor.setRemainingWork(detectStrong ? 8 : 5);
 		if (!init()) {
 			return null;
@@ -298,7 +298,6 @@ public class ModalImplicationGraphBuilder implements LongRunningMethod<AdjList> 
 			testVariable();
 			dfsStack.add(-(i + 1));
 			testVariable();
-			//				System.out.println(adjMatrix.getNumVariables() - i);
 		}
 	}
 
@@ -435,11 +434,6 @@ public class ModalImplicationGraphBuilder implements LongRunningMethod<AdjList> 
 	}
 
 	private boolean init() throws ContradictionException {
-		// Init solver
-		solver = new AdvancedSatSolver(cnf);
-		//		solver.initSolutionList(1000);
-		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-
 		final boolean satisfiable = getCoreFeatures();
 		if (satisfiable) {
 			initEdges();
@@ -494,10 +488,13 @@ public class ModalImplicationGraphBuilder implements LongRunningMethod<AdjList> 
 			final Vertex vertex = new Vertex(adjMatrix.getCore(var - 1), var, posStrongEdges, negStrongEdges, posComplexClauses, negComplexClauses);
 			adjList.adjList.add(vertex);
 		}
+		if (detectStrong) {
+			Arrays.fill(adjList.complete, true);
+		}
 	}
 
 	private void initEdges() {
-		outer: for (final LiteralSet clause : cnf.getClauses()) {
+		outer: for (final LiteralSet clause : solver.getSatInstance().getClauses()) {
 			final int[] literals = clause.getLiterals();
 			final int[] unwantedVariables = new int[literals.length];
 

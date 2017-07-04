@@ -44,11 +44,9 @@ import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.IFeatureModelLayout;
 import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.Operator;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
@@ -58,6 +56,7 @@ import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Several convenience methods for handling feature models, features and constraints.
@@ -258,7 +257,7 @@ public final class FeatureUtils {
 	public static final FeatureModelAnalyzer createAnalyser(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return ProjectManager.getAnalyzer(featureModel);
+		return FeatureModelManager.getAnalyzer(featureModel);
 	}
 
 	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {
@@ -386,7 +385,7 @@ public final class FeatureUtils {
 	public static final FeatureModelAnalyzer getAnalyser(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return ProjectManager.getAnalyzer(featureModel);
+		return FeatureModelManager.getAnalyzer(featureModel);
 	}
 
 	public static final List<String> getAnnotations(IFeatureModel featureModel) {
@@ -507,7 +506,7 @@ public final class FeatureUtils {
 		final Node propNode = constraint.getNode();
 		if (propNode != null) {
 			fm.removeConstraint(constraint);
-			deadFeaturesBefore = ProjectManager.getAnalyzer(fm).getDeadFeatures();
+			deadFeaturesBefore = FeatureModelManager.getAnalyzer(fm).getDeadFeatures();
 			fm.addConstraint(new Constraint(fm, propNode));
 			fm.handleModelDataChanged();
 		}
@@ -617,12 +616,6 @@ public final class FeatureUtils {
 		return featureModel.getStructure().getFeaturesPreorder();
 	}
 
-	public static final FeatureStatus getFeatureStatus(IFeature feature) {
-		requireNonNull(feature);
-
-		return feature.getProperty().getFeatureStatus();
-	}
-
 	public static final Map<String, IFeature> getFeatureTable(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
@@ -690,13 +683,13 @@ public final class FeatureUtils {
 		return null;
 	}
 
-	public static final Iterable<Node> getPropositionalNodes(IFeatureModel featureModel) {
+	public static final List<Node> getPropositionalNodes(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return Functional.map(featureModel.getConstraints(), CONSTRAINT_TO_NODE);
+		return Functional.mapToList(featureModel.getConstraints(), CONSTRAINT_TO_NODE);
 	}
 
-	public static Iterable<Node> getPropositionalNodes(Iterable<IConstraint> constraints) {
+	public static List<Node> getPropositionalNodes(Iterable<IConstraint> constraints) {
 		requireNonNull(constraints);
 
 		return Functional.toList(Functional.map(constraints, CONSTRAINT_TO_NODE));
@@ -766,11 +759,11 @@ public final class FeatureUtils {
 		featureModel.handleModelDataChanged();
 	}
 
-	public static final void handleModelDataLoaded(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		featureModel.handleModelDataLoaded();
-	}
+//	public static final void handleModelDataLoaded(IFeatureModel featureModel) {
+//		requireNonNull(featureModel);
+//
+//		featureModel.handleModelDataLoaded();
+//	}
 
 	public static final void handleModelLayoutChanged(IFeatureModel featureModel) {
 		//		featureModel.getGraphicRepresenation().handleModelLayoutChanged();
@@ -857,7 +850,7 @@ public final class FeatureUtils {
 	public static final boolean hasIndetHidden(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return featureModel.getStructure().hasIndetHidden();
+		return getFeatureModelProperties(featureModel).hasIndeterminateHiddenFeatures();
 	}
 
 	public static final boolean hasInlineRule(IFeature feature) {
@@ -1252,8 +1245,8 @@ public final class FeatureUtils {
 		final IFeatureModel featureModel = constraint.getFeatureModel();
 		final IFeatureModel clonedModel = FeatureUtils.clone(constraint.getFeatureModel());
 		clonedModel.removeConstraint(constraint);
-		final Collection<IFeature> foFeatures = ProjectManager.getAnalyzer(clonedModel).getFalseOptionalFeatures();
-		for (IFeature feature : ProjectManager.getAnalyzer(featureModel).getFalseOptionalFeatures()) {
+		final Collection<IFeature> foFeatures = FeatureModelManager.getAnalyzer(clonedModel).getFalseOptionalFeatures();
+		for (IFeature feature : FeatureModelManager.getAnalyzer(featureModel).getFalseOptionalFeatures()) {
 			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
 				falseOptionalFeatures.add(feature);
 				found = true;
@@ -1282,13 +1275,6 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 
 		featureModel.setFeatureOrderUserDefined(featureOrderUserDefined);
-	}
-
-	public static final void setFeatureStatus(IFeature feature, FeatureStatus stat, boolean fire) {
-		requireNonNull(feature);
-		requireNonNull(stat);
-
-		feature.getProperty().setFeatureStatus(stat, fire);
 	}
 
 	public static final void setFeatureTable(IFeatureModel featureModel, final Hashtable<String, IFeature> featureTable) {
@@ -1438,15 +1424,15 @@ public final class FeatureUtils {
 	}
 
 	public static ConstraintProperties getConstraintProperties(IConstraint constraint) {
-		return ProjectManager.getAnalyzer(constraint.getFeatureModel()).getConstraintProperties(constraint);
+		return FeatureModelManager.getAnalyzer(constraint.getFeatureModel()).getConstraintProperties(constraint);
 	}
 
 	public static FeatureProperties getFeatureProperties(IFeature feature) {
-		return ProjectManager.getAnalyzer(feature.getFeatureModel()).getFeatureProperties(feature);
+		return FeatureModelManager.getAnalyzer(feature.getFeatureModel()).getFeatureProperties(feature);
 	}
 
 	public static FeatureModelProperties getFeatureModelProperties(IFeatureModel featureModel) {
-		return ProjectManager.getAnalyzer(featureModel).getFeatureModelProperties();
+		return FeatureModelManager.getAnalyzer(featureModel).getFeatureModelProperties();
 	}
 
 }

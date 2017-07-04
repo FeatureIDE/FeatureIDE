@@ -53,6 +53,9 @@ public class LiteralSet implements Cloneable, Serializable {
 
 	protected LiteralSet(int[] literals, boolean sort) {
 		this.literals = literals;
+		if (sort) {
+			Arrays.sort(this.literals);
+		}
 		hashCode = Arrays.hashCode(literals);
 	}
 
@@ -61,12 +64,17 @@ public class LiteralSet implements Cloneable, Serializable {
 	}
 
 	public boolean containsLiteral(int literal) {
-		for (int curLiteral : literals) {
-			if (curLiteral == literal) {
-				return true;
+		return Arrays.binarySearch(literals, literal) >= 0;
+	}
+
+	// TODO exploit that both sets are sorted
+	public boolean containsAll(LiteralSet otherLiteralSet) {
+		for (int otherLiteral : otherLiteralSet.getLiterals()) {
+			if (Arrays.binarySearch(literals, otherLiteral) < 0) {
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	public boolean contains(int variable) {
@@ -81,13 +89,25 @@ public class LiteralSet implements Cloneable, Serializable {
 	public int countNegative() {
 		int count = 0;
 		for (int i = 0; i < literals.length; i++) {
-			count += literals[i] >>> (Integer.SIZE - 1);
+			if (literals[i] < 0) {
+				count++;
+			} else {
+				break;
+			}
 		}
 		return count;
 	}
 
 	public int countPositive() {
-		return literals.length - countNegative();
+		int count = 0;
+		for (int i = literals.length - 1; i >= 0; i--) {
+			if (literals[i] > 0) {
+				count++;
+			} else {
+				break;
+			}
+		}
+		return count;
 	}
 
 	public int size() {
@@ -154,7 +174,15 @@ public class LiteralSet implements Cloneable, Serializable {
 		}
 		return new LiteralSet(negLiterals, false);
 	}
-	
+
+	public LiteralSet getPositive() {
+		return new LiteralSet(Arrays.copyOfRange(literals, literals.length - countPositive(), literals.length), false);
+	}
+
+	public LiteralSet getNegative() {
+		return new LiteralSet(Arrays.copyOfRange(literals, 0, countNegative()), false);
+	}
+
 	/**
 	 * Constructs a new {@link LiteralSet} that contains no duplicates and unwanted literals.
 	 * Also checks whether the set contains a literal and its negation.
@@ -213,6 +241,10 @@ public class LiteralSet implements Cloneable, Serializable {
 	@Override
 	public LiteralSet clone() {
 		return new LiteralSet(this);
+	}
+
+	public boolean isEmpty() {
+		return literals.length == 0;
 	}
 
 }

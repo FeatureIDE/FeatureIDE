@@ -27,15 +27,17 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds redundancies.
  * 
  * @author Sebastian Krieter
  */
-public class IndependentRedundancyAnalysis extends ARedundancyAnalysis {
+public class IndependentRedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 
 	public IndependentRedundancyAnalysis(CNF satInstance) {
 		super(satInstance);
@@ -70,16 +72,28 @@ public class IndependentRedundancyAnalysis extends ARedundancyAnalysis {
 			resultList.add(null);
 		}
 		monitor.step();
-
+		
 		int endIndex = 0;
-		for (int i = 0; i < clauseGroupSize.length; i++) {
+		groupLoop: for (int i = 0; i < clauseGroupSize.length; i++) {
 			int startIndex = endIndex;
 			endIndex += clauseGroupSize[i];
 			for (int j = startIndex; j < endIndex; j++) {
 				final LiteralSet clause = clauseList.get(j);
-				if (isRedundant(solver, clause)) {
+				final int[] negateClause = SatUtils.negateSolution(clause.getLiterals());
+				
+
+				final SatResult hasSolution = solver.hasSolution(negateClause);
+				switch (hasSolution) {
+				case FALSE:
 					resultList.set(i, clause);
+					continue groupLoop;
+				case TIMEOUT:
+					reportTimeout();
 					break;
+				case TRUE:
+					break;
+				default:
+					throw new AssertionError(hasSolution);
 				}
 			}
 		}

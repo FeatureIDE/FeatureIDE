@@ -45,7 +45,10 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.ProjectManager;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureDeterminedStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureParentStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureSelectionStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
@@ -54,6 +57,7 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -138,26 +142,17 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		IFeature feature = this.feature.getObject();
-		final FeatureModelAnalyzer analyser = ProjectManager.getAnalyzer(feature.getFeatureModel());
-		
-		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
-			// only color if the active profile is not the default profile
-			FeatureColor color = FeatureColorManager.getColor(feature);
-			if (color != FeatureColor.NO_COLOR) {
-				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
-			} else {
-				if (feature.getStructure().isRoot() && !analyser.isValid()) {
-					setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-					setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-					toolTip.append(VOID);
-				}
-				if (feature.getStructure().isConcrete()) {
-					toolTip.append(CONCRETE);
-				} else {
-					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					toolTip.append(ABSTRACT);
-				}
-			}
+		final FeatureModelAnalyzer analyser = FeatureModelManager.getAnalyzer(feature.getFeatureModel());
+
+		if (feature.getStructure().isRoot() && !analyser.isValid()) {
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+			toolTip.append(VOID);
+		} else if (feature.getStructure().isConcrete()) {
+			toolTip.append(CONCRETE);
+		} else {
+			setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
+			toolTip.append(ABSTRACT);
 		}
 
 		if (feature.getStructure().hasHiddenParent()) {
@@ -168,24 +163,19 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
 
-		switch (feature.getProperty().getFeatureStatus()) {
-		case DEAD:
+		final FeatureProperties featureProperties = FeatureUtils.getFeatureProperties(feature);
+		if (featureProperties.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 			toolTip.append(DEAD);
-			break;
-		case FALSE_OPTIONAL:
+		} else if (featureProperties.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
 			toolTip.append(FALSE_OPTIONAL);
-			break;
-		case INDETERMINATE_HIDDEN:
+		} else if (featureProperties.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
 			toolTip.append(INDETERMINATE_HIDDEN);
-			break;
-		default:
-			break;
 		}
 
 		if (!analyser.isValid()) {
@@ -194,6 +184,14 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			toolTip.setLength(0);
 			toolTip.trimToSize();
 			toolTip.append(VOID);
+		}
+
+		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
+			// only color if the active profile is not the default profile
+			FeatureColor color = FeatureColorManager.getColor(feature);
+			if (color != FeatureColor.NO_COLOR) {
+				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
+			}
 		}
 
 		if (feature instanceof ExtendedFeature) {

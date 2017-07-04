@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
@@ -166,16 +165,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public boolean hasHidden() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
 			if (f.getStructure().isHidden()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean hasIndetHidden() {
-		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (f.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
 				return true;
 			}
 		}

@@ -28,48 +28,37 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
-public abstract class AbstractExportHandler extends AFileHandler {
+public abstract class AbstractExportHandler<T> extends AFileHandler {
 
 	@Override
-	protected final void singleAction(IFile modelFile) {
+	protected final void singleAction(IFile inputFile) {
 		// Ask for file name
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		configureFileDialog(fileDialog);
-		final String filepath = fileDialog.open();
-		if (filepath == null) {
+		final String outputFile = fileDialog.open();
+		if (outputFile == null) {
 			return;
 		}
 
-		final Path path = Paths.get(modelFile.getLocationURI());
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(modelFile.getName());
-		IFeatureModelFactory factory;
-		try {
-			factory = FMFactoryManager.getFactory(path.toString(), format);
-		} catch (NoSuchExtensionException e) {
-			Logger.logError(e);
-			factory = FMFactoryManager.getDefaultFactory();
-		}
-		final IFeatureModel fm = factory.createFeatureModel();
-
-		FileHandler<IFeatureModel> handler = new FileHandler<>(fm);
-		// Read model
+		final Path path = Paths.get(inputFile.getLocationURI());
+		final IPersistentFormat<T> format = getInputFormat(path);
+		
+		final FileHandler<T> handler = new FileHandler<>(getObject(path, format));
 		handler.read(path, format);
-		handler.write(Paths.get(filepath), getFormat());
+		handler.write(Paths.get(outputFile), getOutputFormat());
 	}
 
+	protected abstract T getObject(Path path, IPersistentFormat<T> format);
+
 	/**
-	 * Returns an instance of {@link IFeatureModelFormat}.
+	 * Returns an instance of {@link IPersistentFormat}.
 	 */
-	protected abstract IFeatureModelFormat getFormat();
+	protected abstract IPersistentFormat<T> getOutputFormat();
+
+	protected abstract IPersistentFormat<T> getInputFormat(Path path);
 
 	protected void configureFileDialog(FileDialog fileDialog) {
 		fileDialog.setOverwrite(true);

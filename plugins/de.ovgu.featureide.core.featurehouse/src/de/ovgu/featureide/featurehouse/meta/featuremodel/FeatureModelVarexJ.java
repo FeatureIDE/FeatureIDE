@@ -29,12 +29,12 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Defines the content of the feature model class specific for VarexJ.
@@ -70,7 +70,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
-		final FeatureModelAnalyzer analyzer = ProjectManager.getAnalyzer(featureModel);
+		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
 		final List<IFeature> coreList = analyzer.getCoreFeatures();
 		final List<IFeature> deadList = analyzer.getDeadFeatures();
 		for (IFeature feature : features) {

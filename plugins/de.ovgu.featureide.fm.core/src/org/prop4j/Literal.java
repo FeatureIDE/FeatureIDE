@@ -67,12 +67,24 @@ public class Literal extends Node implements Cloneable {
 	 * @param FeatureAttribute The Enumeration element  
 	 */
 	public Literal(Object var, FeatureAttribute a) {
-		this(var);
+		this(var, true, a);
+	}	
+	
+	/**
+	 * Encodes a literal from the tree topology.
+	 * FeatureAttribute must not have the value Constraint.
+	 * Example with root as FeatureAttribute: origin = -1 * 5 + 3 = -2 
+	 * @param var The variable 
+	 * @param positive Whether the literal is positive 
+	 * @param FeatureAttribute The Enumeration element  
+	 */
+	public Literal(Object var, boolean positive, FeatureAttribute a) {
+		this(var, positive);
 		if (a == FeatureAttribute.CONSTRAINT) {
 			throw new InvalidParameterException("Parameter Constraint is not allowed");
 		}
 		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();  
-	}																	   
+	}	
 
 	/**
 	 * Encodes a literal from a constraint.

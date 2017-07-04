@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMImportHandler;
 
 /**
  * Reads a velvet feature model.
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class ImportVelvetHandler extends AbstractImportHandler {
+public class ImportVelvetHandler extends AbstractFMImportHandler {
 	@Override
 	protected IFeatureModelFormat setModelReader() {
 		return new VelvetFeatureModelFormat();

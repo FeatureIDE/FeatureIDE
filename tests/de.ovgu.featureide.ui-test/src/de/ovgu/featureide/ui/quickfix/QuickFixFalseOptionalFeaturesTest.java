@@ -34,7 +34,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -44,6 +43,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -101,7 +101,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
 			final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
-			final Collection<IFeature> core = ProjectManager.getAnalyzer(fm).getCoreFeatures();
+			final Collection<IFeature> core = FeatureModelManager.getAnalyzer(fm).getCoreFeatures();
 			final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 			
 			for (IFeature feature : concrete) {

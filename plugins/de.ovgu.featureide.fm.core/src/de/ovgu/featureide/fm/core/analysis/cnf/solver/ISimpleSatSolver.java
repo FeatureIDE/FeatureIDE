@@ -47,7 +47,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	/**
 	 * Adds a clause.
 	 * 
-	 * @param The clause to add.
+	 * @param mainClause The clause to add.
 	 * 
 	 * @return The identifying constraint object of the clause that can be used to remove it from the solver.
 	 * 
@@ -59,7 +59,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	/**
 	 * Adds multiple clauses.
 	 * 
-	 * @param A collection of clauses.
+	 * @param clauses A collection of clauses.
 	 * 
 	 * @return A list of the identifying constraint objects of the added clauses that can be used to remove them from the solver.
 	 * 
@@ -72,7 +72,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	 * Removes a certain clause. If possible, instead of using this method consider using {@link #removeLastClause()} as it runs faster.<br/>
 	 * <b>Note:</b> This method may not be supported by all solvers.
 	 * 
-	 * @param The identifying constraint object for the clause.
+	 * @param constr The identifying constraint object for the clause.
 	 * 
 	 * @see #addClauses(Iterable)
 	 * @see #addClause(LiteralSet)

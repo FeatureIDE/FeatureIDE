@@ -41,7 +41,18 @@ public class HasSolutionAnalysis extends AbstractAnalysis<Boolean> {
 	}
 
 	public Boolean analyze(IMonitor monitor) throws Exception {
-		return solver.hasSolution() == SatResult.TRUE;
+		final SatResult hasSolution = solver.hasSolution();
+		switch (hasSolution) {
+		case FALSE:
+			return false;
+		case TIMEOUT:
+			reportTimeout();
+			return false;
+		case TRUE:
+			return true;
+		default:
+			throw new AssertionError(hasSolution);
+		}
 	}
 
 }

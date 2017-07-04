@@ -57,7 +57,7 @@ public interface IFileManager<T> extends IEventManager {
 	 * @return {@code true} if successful write, {@code false} otherwise.
 	 */
 	boolean save();
-	
+
 	/**
 	 * Overrides the variable and persistent object with the local object.
 	 */
@@ -72,6 +72,11 @@ public interface IFileManager<T> extends IEventManager {
 	 * @return The variable object.
 	 */
 	T editObject();
+
+	/**
+	 * @return a snapshot of the persistent object.
+	 */
+	Snapshot<T> getSnapshot();
 
 	IPersistentFormat<T> getFormat();
 

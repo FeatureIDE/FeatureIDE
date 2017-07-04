@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID_;
-
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
@@ -36,13 +34,13 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.ProjectManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -87,10 +85,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 * more space for the symbols)
 	 */
 	private static final int LIFT_2 = 12;
-	/**
-	 * Width that the two color gradient needs to display itself
-	 */
-	private static final int GRADIENT_WIDTH = 250;
 
 	private static final int SYMBOL_SIZE = ROW_HEIGHT;
 	private static final String ALTERNATIVE_TOOLTIP = "Alternative group:\n\nExactly one of the features in this group must be selected,\n if the parent feature is selected.";
@@ -109,7 +103,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String INDET_HIDDEN_TOOLTIP = "Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
 	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
-	private static final String MODEL_CONST_TOOLTIP = CONSTRAINT_MAKES_THE_MODEL_VOID_;
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
 	private static final String EXPLANATION_TOOLTIP = "Placeholder";
 
@@ -181,7 +174,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	
 	private void refreshProperties(IFeatureModel featureModel)
 	{
-		final FeatureModelAnalyzer analyser = ProjectManager.getAnalyzer(featureModel);
+		final FeatureModelAnalyzer analyser = FeatureModelManager.getAnalyzer(featureModel);
 		
 		final IFeatureModelStructure fmStructure = featureModel.getStructure();
 		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
@@ -196,12 +189,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		hidden = fmStructure.hasHidden();
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getAllFeatures().size();
-		dead = analyser.calculateDeadConstraints && analyser.getFeatureModelProperties().hasDeadFeatures();
-		falseoptional = analyser.calculateFOConstraints && analyser.getFeatureModelProperties().hasFalseOptionalFeatures();
-		indetHidden = fmStructure.hasIndetHidden();
+		dead = analyser.isCalculateDeadConstraints() && analyser.getFeatureModelProperties().hasDeadFeatures();
+		falseoptional = analyser.isCalculateFOConstraints() && analyser.getFeatureModelProperties().hasFalseOptionalFeatures();
+		indetHidden = analyser.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
 
-		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
-		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
+		tautologyConst = analyser.isCalculateTautologyConstraints() && FeatureUtils.hasTautologyConst(featureModel);
+		redundantConst = analyser.isCalculateRedundantConstraints() && FeatureUtils.hasRedundantConst(featureModel);
 		implicitConst = isImplicit(graphicalFeatureModel);
 
 		
@@ -681,7 +674,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		//Label left
 		Label labelExplanation = new Label();
 
-		if (!ProjectManager.getAnalyzer(graphicalFeatureModel.getFeatureModel()).isValid()) {
+		if (!FeatureModelManager.getAnalyzer(graphicalFeatureModel.getFeatureModel()).isValid()) {
 			labelExplanation.setText("Feature model is void because of highlighted dependencies:");
 			explanationFigure.setToolTip(createToolTipContent("Feature model is void because of highlighted dependencies"));
 		} else {

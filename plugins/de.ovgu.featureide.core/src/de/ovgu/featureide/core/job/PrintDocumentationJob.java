@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.job;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION;
 
 import java.io.File;
@@ -53,6 +52,7 @@ import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
 import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder;
 import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -62,9 +62,8 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * This job generates Javadoc from the feature-aware comments in a selected location.
@@ -72,45 +71,35 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments, Boolean> {
-	
-	public static class Arguments implements JobArguments<Boolean> {
-		private final String foldername, featureName;
-		private final String[] options;
-		private final IProject project;
-		
-		private final ADocumentationCommentMerger merger;
-		
-		public Arguments(String foldername, String[] options, ADocumentationCommentMerger merger, String featureName, IProject project) {
-			this.foldername = foldername;
-			this.options = options;
-			this.merger = merger;
-			this.featureName = featureName;
-			this.project = project;			
-		}
+public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 
-		@Override
-		public PrintDocumentationJob createJob() {
-			return new PrintDocumentationJob(this);
-		}
-	}
-	
-	protected PrintDocumentationJob(Arguments arguments) {
-		super(BUILD_DOCUMENTATION, arguments);
+	private final String foldername, featureName;
+	private final String[] options;
+	private final IProject project;
+
+	private final ADocumentationCommentMerger merger;
+	private IMonitor workMonitor;
+
+	public PrintDocumentationJob(String foldername, String[] options, ADocumentationCommentMerger merger, String featureName, IProject project) {
+		this.foldername = foldername;
+		this.options = options;
+		this.merger = merger;
+		this.featureName = featureName;
+		this.project = project;
 	}
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor = workMonitor;	
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(arguments.project);
+		this.workMonitor = workMonitor;
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning(arguments.project.getName() + " is no FeatureIDE Project!");
+			CorePlugin.getDefault().logWarning(project.getName() + " is no FeatureIDE Project!");
 		}
-		
+
 		if (!deleteOldFolder()) {
 			return false;
 		}
-		
+
 		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
 		if (projectSignatures == null) {
 			CorePlugin.getDefault().logWarning("No signatures available!");
@@ -121,7 +110,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		final Collection<IFilter<?>> signatureFilters = new LinkedList<>();
 
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
-		if (arguments.merger instanceof VariantMerger) {
+		if (merger instanceof VariantMerger) {
 			// TODO !!! ignore abstract features (below)
 			final Configuration conf = new Configuration(featureProject.getFeatureModel());
 			try {
@@ -132,7 +121,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				return false;
 			}
 			final Collection<String> featureNames = conf.getSelectedFeatureNames();
-			
+
 			final int[] tempFeatureList = new int[featureNames.size()];
 			int count = 0;
 			for (String featureName : featureNames) {
@@ -142,7 +131,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				}
 			}
 			final int[] validFeatureIDs = new int[count];
-			
+
 			// sort feature list
 			int c = 0;
 			for (int j = 0; j < count; j++) {
@@ -160,28 +149,29 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			int i = 1;
 			for (SelectableFeature feature : conf.getFeatures()) {
 				Selection selection = feature.getSelection();
-				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue) : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue)
+						: new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
 			}
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
-			
-			arguments.merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
-		} else if (arguments.merger instanceof ContextMerger) {
+
+			merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
+		} else if (merger instanceof ContextMerger) {
 			final Node[] nodes = new Node[2];
 			nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
-			nodes[1] = new Literal(arguments.featureName, true);
+			nodes[1] = new Literal(featureName, true);
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
-			
-			arguments.merger.setValidFeatureIDs(featureIDs.length, featureIDs);
-		} else if (arguments.merger instanceof FeatureModuleMerger) {
-			final int index = projectSignatures.getFeatureID(arguments.featureName);
-			arguments.merger.setValidFeatureIDs(featureIDs.length, new int[]{index});
-			
+
+			merger.setValidFeatureIDs(featureIDs.length, featureIDs);
+		} else if (merger instanceof FeatureModuleMerger) {
+			final int index = projectSignatures.getFeatureID(featureName);
+			merger.setValidFeatureIDs(featureIDs.length, new int[] { index });
+
 			if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
 				final Node[] nodes = new Node[2];
 				nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
-				nodes[1] = new Literal(arguments.featureName, true);
+				nodes[1] = new Literal(featureName, true);
 				signatureFilters.add(new ConstraintFilter(nodes));
 				commentFilters.add(new ConstraintFilter(nodes));
 
@@ -189,10 +179,11 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 					@Override
 					public boolean isValid(BlockTag object) {
 						for (String featureName : object.getConstraint().getContainedFeatures()) {
-							if (featureName.equals(arguments.featureName)) {
+							if (featureName.equals(featureName)) {
 								return true;
 							}
-						};
+						}
+						;
 						return false;
 					}
 				});
@@ -201,21 +192,21 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				commentFilters.add(new FeatureFilter(index));
 			}
 		}
-		
+
 		final DocumentationBuilder builder = new DocumentationBuilder(featureProject);
-		builder.build(arguments.merger, commentFilters);
-		
+		builder.build(merger, commentFilters);
+
 		buildJavaDoc(projectSignatures.iterator(signatureFilters));
-		
+
 		return true;
 	}
 
 	protected String folderPath = null;
-	
+
 	private boolean deleteOldFolder() {
-		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername);
+		final IFolder folder = FMCorePlugin.createFolder(project, foldername);
 		folderPath = folder.getLocation().toOSString();
-		
+
 		try {
 			folder.delete(true, null);
 		} catch (CoreException e) {
@@ -226,30 +217,30 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 	}
 
 	private void buildJavaDoc(final SignatureIterator it) {
-		final String extFoldername = arguments.foldername + "/src/";
-		
-		CorePlugin.createFolder(arguments.project, extFoldername);
-		
+		final String extFoldername = foldername + "/src/";
+
+		FMCorePlugin.createFolder(project, extFoldername);
+
 		final HashSet<String> packageSet = new HashSet<String>();
 		final LinkedList<String> classList = new LinkedList<String>();
 		final ProjectStructure structure = new ProjectStructure(it);
 		final String docOutput = folderPath + File.separator + "doc" + File.separator;
 		final String srcOutput = folderPath + File.separator + "src" + File.separator;
-		
+
 		workMonitor.setRemainingWork(structure.getClasses().size() + 2);
-		
+
 		for (AbstractClassFragment javaClass : structure.getClasses()) {
 			String packagename = javaClass.getSignature().getPackage();
-			
+
 			String path = extFoldername + packagename.replace('.', '/');
-			
+
 			if (packagename.isEmpty()) {
 				classList.add(srcOutput + javaClass.getSignature().getName() + ".java");
 			} else {
 				packageSet.add(packagename);
 			}
-			
-			final IFolder folder = CorePlugin.createFolder(arguments.project, path);
+
+			final IFolder folder = FMCorePlugin.createFolder(project, path);
 			IFile file = folder.getFile(javaClass.getSignature().getName() + ".java");
 			try {
 				FileSystem.write(Paths.get(file.getLocationURI()), javaClass.toString().getBytes(Charset.forName("UTF-8")));
@@ -258,12 +249,12 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			}
 			workMonitor.worked();
 		}
-		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername + "/doc/");
-		
+		final IFolder folder = FMCorePlugin.createFolder(project, foldername + "/doc/");
+
 		final int defaultArguments = 4;
 		int numDefaultArguments = defaultArguments;
 		String[] args0 = null, args1 = null;
-		
+
 		if (!classList.isEmpty()) {
 			args0 = new String[classList.size()];
 			classList.toArray(args0);
@@ -279,39 +270,39 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			}
 			numDefaultArguments += packageSet.size();
 		}
-		
+
 		final String[] javadocargs;
-		if (arguments.options != null && arguments.options.length > 0 && !arguments.options[0].isEmpty()) {
-			javadocargs = new String[numDefaultArguments + arguments.options.length];
-			System.arraycopy(arguments.options, 0, javadocargs, numDefaultArguments, arguments.options.length);
+		if (options != null && options.length > 0 && !options[0].isEmpty()) {
+			javadocargs = new String[numDefaultArguments + options.length];
+			System.arraycopy(options, 0, javadocargs, numDefaultArguments, options.length);
 		} else {
 			javadocargs = new String[numDefaultArguments];
 		}
-		javadocargs[0] = "-d"; 
+		javadocargs[0] = "-d";
 		javadocargs[1] = docOutput;
 		javadocargs[2] = "-sourcepath";
 		javadocargs[3] = srcOutput;
 		if (args0 != null) {
 			System.arraycopy(args0, 0, javadocargs, defaultArguments, args0.length);
-		} 
+		}
 		if (args1 != null) {
 			System.arraycopy(args1, 0, javadocargs, defaultArguments + args0.length, args1.length);
 		}
-		
+
 		for (int j = 0; j < javadocargs.length; j++) {
 			System.out.println(javadocargs[j]);
 		}
-		
+
 		com.sun.tools.javadoc.Main.execute(javadocargs);
 		workMonitor.worked();
-		
+
 		try {
 			folder.refreshLocal(IFolder.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		workMonitor.worked();
-		
+
 		CorePlugin.getDefault().logInfo(BUILT_DOCUMENTATION);
 	}
 }

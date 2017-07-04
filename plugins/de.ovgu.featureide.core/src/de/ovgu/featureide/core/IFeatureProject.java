@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.QualifiedName;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.FeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
@@ -228,5 +227,4 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	
 	Collection<String> getUnusedConfigurationFeatures();
 
-	FeatureProject.FeatureProjectStatus getStatus();
 }

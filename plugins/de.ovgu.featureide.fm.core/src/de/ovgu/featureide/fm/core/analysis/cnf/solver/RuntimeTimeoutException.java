@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,19 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job.util;
-
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
 /**
- * This class is implemented by callers as an anonymous class to encapsulate
- * parameters for the job constructor, so multiple {@code Job}s can be called
- * with low effort.
+ * Exception thrown when an {@link analysis IAnalysis} experiences a solver timeout.<br/>
+ * Doesn't need to be caught explicitly.
  * 
  * @author Sebastian Krieter
  */
-public interface JobArguments<T> {
+public class RuntimeTimeoutException extends RuntimeException {
 
-	LongRunningMethod<T> createJob();
+	private static final long serialVersionUID = -6922001608864037759L;
+
+	public RuntimeTimeoutException() {
+		super();
+	}
+
+	public RuntimeTimeoutException(String message) {
+		super(message);
+	}
+
+	public RuntimeTimeoutException(Throwable cause) {
+		super(cause);
+	}
+
+	public RuntimeTimeoutException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

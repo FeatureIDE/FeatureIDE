@@ -25,8 +25,6 @@ import javax.annotation.Nonnull;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * All additional properties of an {@link IFeature}.
@@ -79,30 +77,12 @@ public class FeatureProperty implements IFeatureProperty {
 	}
 
 	@Override
-	public FeatureStatus getFeatureStatus() {
-		return status;
-	}
-
-	@Override
 	public void setDescription(@Nonnull final CharSequence description) {
 		this.description = description.toString();
 	}
 
 	@Override
 	public void setDisplayName(CharSequence name) {
-	}
-
-	@Override
-	public void setFeatureStatus(FeatureStatus status) {
-		this.status = status;
-	}
-
-	@Override
-	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
-		this.status = stat;
-		if (fire) {
-			correspondingFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
-		}
 	}
 
 	@Override

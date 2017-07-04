@@ -22,10 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
 
-import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -34,33 +30,30 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * 
  * @author Sebastian Krieter
  */
-public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
+public class VirtualFileManager<T> extends AFileManager<T> {
 
-	private final IEventManager eventManager = new DefaultEventManager();
+	private static class ObjectCreator<T> extends AFileManager.ObjectCreator<T> {
 
-	protected T variableObject;
+		private T object;
 
-	protected final IPersistentFormat<T> format;
+		public ObjectCreator(T object) {
+			this.object = object;
+		}
+
+		@Override
+		protected T createObject() {
+			return object;
+		}
+
+		@Override
+		protected Snapshot<T> createSnapshot(T object) {
+			return new Snapshot<T>(object);
+		}
+
+	}
 
 	public VirtualFileManager(T object, IPersistentFormat<T> format) {
-		this.format = format;
-		variableObject = object;
-	}
-
-	public IPersistentFormat<T> getFormat() {
-		return format;
-	}
-
-	public T getObject() {
-		return variableObject;
-	}
-
-	public T editObject() {
-		return variableObject;
-	}
-
-	public ProblemList getLastProblems() {
-		return new ProblemList();
+		super(format, VirtualFileManager.class.getName() + object.hashCode(), object, new ObjectCreator<>(object));
 	}
 
 	public boolean read() {
@@ -79,43 +72,18 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 		return true;
 	}
 
-	@Override
-	public void addListener(IEventListener listener) {
-		eventManager.addListener(listener);
-	}
-
-	@Override
-	public void fireEvent(FeatureIDEEvent event) {
-		eventManager.fireEvent(event);
-	}
-
-	@Override
-	public void removeListener(IEventListener listener) {
-		eventManager.removeListener(listener);
-	}
-
-	@Override
-	public void dispose() {
-		variableObject = null;
-	}
-
-	@Override
-	public String getAbsolutePath() {
-		return "";
-	}
-
 	public Path getPath() {
 		return null;
 	}
 
 	@Override
-	public String toString() {
-		return "Virtual File manager for " + variableObject;
+	public ProblemList getLastProblems() {
+		return new ProblemList();
 	}
 
 	@Override
-	public void setObject(T object) {
-		variableObject = object;
+	public String toString() {
+		return "Virtual File manager for " + variableObject;
 	}
 
 }

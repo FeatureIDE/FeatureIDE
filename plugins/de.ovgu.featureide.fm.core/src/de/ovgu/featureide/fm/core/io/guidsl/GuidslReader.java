@@ -122,7 +122,6 @@ public class GuidslReader {
 				Model root = (Model) myParser.parseAll();
 				readModelData(root);
 			}
-			featureModel.handleModelDataLoaded();
 		} catch (ParseException e) {
 			int line = e.currentToken.next.beginLine;
 			throw new UnsupportedModelException(e.getMessage(), line);
@@ -220,8 +219,6 @@ public class GuidslReader {
 				}
 			}
 		}
-
-		featureModel.handleModelDataLoaded();
 	}
 
 	private void readGProduction(GProduction gProduction, IFeature feature) throws UnsupportedModelException {

@@ -24,8 +24,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an instance of a satisfiability problem in CNF.<br/>
@@ -39,7 +41,12 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	private static final long serialVersionUID = -1767212780361483105L;
 
 	protected final String[] intToVar;
-	protected final HashMap<String, Integer> varToInt;
+	protected final Map<String, Integer> varToInt;
+
+	public Variables() {
+		this.intToVar = new String[0];
+		this.varToInt = Collections.emptyMap();
+	}
 
 	public Variables(Collection<String> varNameList) {
 		this.intToVar = new String[varNameList.size() + 1];
@@ -103,7 +110,22 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	}
 
 	@Override
+	public LiteralSet convertToVariables(List<String> variableNames, boolean sign) {
+		final int[] literals = new int[variableNames.size()];
+		int i = 0;
+		for (String varName : variableNames) {
+			literals[i++] = sign ? varToInt.get(varName) : -varToInt.get(varName);
+		}
+		return new LiteralSet(literals);
+	}
+
+	@Override
 	public int size() {
+		return intToVar.length - 1;
+	}
+
+	@Override
+	public int maxVariableID() {
 		return intToVar.length - 1;
 	}
 

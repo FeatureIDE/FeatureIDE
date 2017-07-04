@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
@@ -30,9 +31,12 @@ import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
+import de.ovgu.featureide.fm.core.job.SliceFeatureModel;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 import de.ovgu.featureide.fm.ui.wizards.FeatureModelSlicingWizard;
@@ -42,15 +46,34 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void singleAction(IFile file) {
-		final IFeatureModel featureModel = FeatureModelManager.load(Paths.get(file.getLocationURI())).getObject();
+	protected void singleAction(final IFile file) {
+		final FeatureModelManager project = FeatureModelManager.getInstance(Paths.get(file.getProject().getLocationURI()));
+		final IFeatureModel featureModel = project.getSnapshot().getObject();
 		if (featureModel != null) {
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
 			if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
-				final JobArguments arguments = new SliceFeatureModelJob.Arguments(Paths.get(file.getLocationURI()), featureModel,
-						(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES), true);
-				LongRunningWrapper.getRunner(arguments.createJob()).schedule();
+				final Collection<String> selectedFeatures = (Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES);
+				final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, selectedFeatures, true);
+
+				final IRunner<IFeatureModel> runner = LongRunningWrapper.getRunner(method, "Slicing Feature Model");
+				runner.addJobFinishedListener(new JobFinishListener<IFeatureModel>() {
+					@Override
+					public void jobFinished(IJob<IFeatureModel> finishedJob) {
+						final Path modelFile = Paths.get(file.getLocationURI());
+						final Path filePath = modelFile.getFileName();
+						final Path root = modelFile.getRoot();
+						if (filePath != null && root != null) {
+							String fileName = filePath.toString();
+							final int extIndex = fileName.lastIndexOf('.');
+							fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
+									: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
+
+							FeatureModelManager.save(featureModel, root.resolve(modelFile.subpath(0, modelFile.getNameCount() - 1)).resolve(fileName));
+						}
+					}
+				});
+				runner.schedule();
 			}
 		}
 

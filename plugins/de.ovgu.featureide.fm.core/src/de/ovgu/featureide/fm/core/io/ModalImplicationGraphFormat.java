@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.AdjList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
 
 /**
  * Reads / Writes a feature graph.
@@ -41,10 +41,10 @@ public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat
 	public static final String ID = PluginID.PLUGIN_ID + ".format.mig." + ModalImplicationGraphFormat.class.getSimpleName();
 
 	@Override
-	public ProblemList read(AdjList object, CharSequence source) {
+	public ProblemList read(ModalImplicationGraph object, CharSequence source) {
 		ProblemList problems = new ProblemList();
 		try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(source.toString().getBytes(Charset.forName("UTF-8"))))) {
-			final AdjList adjList = (AdjList) in.readObject();
+			final ModalImplicationGraph adjList = (ModalImplicationGraph) in.readObject();
 			object.copyValues(adjList);
 		} catch (IOException | ClassNotFoundException e) {
 			problems.add(new Problem(e));
@@ -53,7 +53,7 @@ public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat
 	}
 
 	@Override
-	public String write(AdjList object) {
+	public String write(ModalImplicationGraph object) {
 		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		String ret = null;
 		try (final ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream)) {

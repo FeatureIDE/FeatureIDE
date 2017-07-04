@@ -613,12 +613,12 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 */
 	void handleModelDataChanged();
 
-	/**
-	 * Fires the the event {@link FeatureIDEEvent.EventType#MODEL_DATA_LOADED} to listeners.
-	 * 
-	 * @since 3.0
-	 */
-	void handleModelDataLoaded();
+//	/**
+//	 * Fires the the event {@link FeatureIDEEvent.EventType#MODEL_DATA_LOADED} to listeners.
+//	 * 
+//	 * @since 3.0
+//	 */
+//	void handleModelDataLoaded();
 
 	/**
 	 * @since 3.0

@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMImportHandler;
 
 /**
  * Converts a SXFM feature model into our feature model format.
@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class ImportSXFMHandler extends AbstractImportHandler {
+public class ImportSXFMHandler extends AbstractFMImportHandler {
 	@Override
 	protected IFeatureModelFormat setModelReader() {
 		return new SXFMFormat();

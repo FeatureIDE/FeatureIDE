@@ -226,9 +226,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return Collections.unmodifiableList(features);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getConstraintIndex(de.ovgu.featureide.fm.core.base.impl.Constraint)
-	 */
 	@Override
 	public int getConstraintIndex(Constraint constraint) {
 		IGraphicalConstraint gConstarint = getGraphicalConstraint(constraint);
@@ -247,21 +244,14 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return index;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setActiveExplanation(de.ovgu.featureide.fm.core.explanations.Explanation)
-	 */
 	@Override
 	public void setActiveExplanation(Explanation exp) {
 		currentlyActiveExplanation = exp;
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getActiveExplanation(de.ovgu.featureide.fm.core.explanations.Explanation)
-	 */
 	@Override
 	public Explanation getActiveExplanation() {
-		// TODO Auto-generated method stub
 		return currentlyActiveExplanation;
 	}
 
