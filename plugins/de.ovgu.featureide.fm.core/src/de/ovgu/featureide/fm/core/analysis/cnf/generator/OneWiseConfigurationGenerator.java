@@ -26,6 +26,7 @@ import java.util.List;
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.IInternalVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
@@ -78,12 +79,13 @@ public class OneWiseConfigurationGenerator extends AbstractAnalysis<List<Literal
 
 			if (variables != null) {
 				for (int i = 0; i < variables.length; i++) {
-					final int index = variables[i] - 1;
-					if (index >= 0) {
-						variablesToCover.push(variables[i]);
+					final int var = variables[i];
+					if (var > 0) {
+						variablesToCover.push(var);
 					}
 				}
 			}
+			final IInternalVariables internalVariables = solver.getSatInstance().getInternalVariables();
 
 			while (!variablesToCover.isEmpty()) {
 				boolean firstVar = true;
@@ -113,13 +115,13 @@ public class OneWiseConfigurationGenerator extends AbstractAnalysis<List<Literal
 						lastSolution = solver.getSolution();
 						if (coverMode == 0) {
 							for (int j = i; j < variablesToCover.size(); j++) {
-								if (lastSolution[Math.abs(var)] < 0) {
+								if (lastSolution[internalVariables.convertToInternal(Math.abs(var)) - 1] < 0) {
 									variablesToCover.set(i, 0);
 								}
 							}
 						} else {
 							for (int j = i; j < variablesToCover.size(); j++) {
-								if (lastSolution[Math.abs(var)] > 0) {
+								if (lastSolution[internalVariables.convertToInternal(Math.abs(var)) - 1] > 0) {
 									variablesToCover.set(i, 0);
 								}
 							}

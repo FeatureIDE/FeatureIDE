@@ -107,6 +107,9 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void changeToAlternative() {
+		if(getChildrenCount() <= 1){
+			return;
+		}
 		and = false;
 		multiple = false;
 		fireChildrenChanged();
@@ -121,6 +124,9 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void changeToOr() {
+		if(getChildrenCount() <= 1){
+			return;
+		}
 		and = false;
 		multiple = true;
 		fireChildrenChanged();

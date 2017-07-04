@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="ATM">
 				<alt abstract="true" mandatory="true" name="Feature">
-					<feature mandatory="true" name="Balance"/>
-					<feature mandatory="true" name="Cash"/>
+					<feature name="Balance"/>
+					<feature name="Cash"/>
 				</alt>
 				<alt abstract="true" mandatory="true" name="Language">
-					<feature mandatory="true" name="English"/>
-					<feature mandatory="true" name="German"/>
+					<feature name="English"/>
+					<feature name="German"/>
 				</alt>
 			</and>
 		</struct>
 		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

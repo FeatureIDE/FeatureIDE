@@ -119,4 +119,10 @@ public class SlicedVariables extends Variables {
 		return internalLiteral > 0 ? convertedLiteral : -convertedLiteral;
 	}
 
+	@Override
+	public int getVariable(String varName) {
+		final Integer var = varToInt.get(varName);
+		return var == null ? 0 : orgToInternal[var] == 0 ? 0 : var;
+	}
+
 }

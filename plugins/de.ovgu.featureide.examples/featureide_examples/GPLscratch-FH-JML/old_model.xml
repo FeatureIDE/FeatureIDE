@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="GPLscratchFHJML">
 				<and mandatory="true" name="Base">
 					<feature name="Directed"/>
 				</and>
 				<alt abstract="true" mandatory="true" name="Weight">
-					<feature mandatory="true" name="Unweighted"/>
-					<feature mandatory="true" name="Weighted"/>
+					<feature name="Unweighted"/>
+					<feature name="Weighted"/>
 				</alt>
 				<alt abstract="true" name="Search">
-					<feature mandatory="true" name="BFS"/>
-					<feature mandatory="true" name="DFS"/>
+					<feature name="BFS"/>
+					<feature name="DFS"/>
 				</alt>
 			</and>
 		</struct>
 		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

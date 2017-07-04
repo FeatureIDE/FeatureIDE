@@ -78,8 +78,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().createFeatureModel();
-			FileHandler.load(f.toPath(), fm, FMFormatManager.getInstance());
+			final IFeatureModel fm = FeatureModelManager.load(f.toPath());
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);
@@ -100,26 +99,26 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
-			final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
-			final Collection<IFeature> core = FeatureModelManager.getAnalyzer(fm).getCoreFeatures();
-			final Collection<String> falseOptionalFeatures = new LinkedList<String>();
-			
-			for (IFeature feature : concrete) {
-				if (!core.contains(feature)) {
-					falseOptionalFeatures.add(feature.getName());
+		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
+		final Collection<IFeature> core = FeatureModelManager.getAnalyzer(fm).getCoreFeatures();
+		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
+
+		for (IFeature feature : concrete) {
+			if (!core.contains(feature)) {
+				falseOptionalFeatures.add(feature.getName());
+			}
+		}
+
+		final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
+		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
+		for (final Configuration conf : confs) {
+			for (final SelectableFeature feature : conf.getFeatures()) {
+				if (feature.getSelection() == Selection.UNDEFINED || feature.getSelection() == Selection.UNSELECTED) {
+					falseOptionalFeaturesTest.remove(feature.getName());
 				}
 			}
-			
-			final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
-			final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
-			for (final Configuration conf : confs) {
-				for (final SelectableFeature feature : conf.getFeatures()) {
-					if (feature.getSelection() == Selection.UNDEFINED || feature.getSelection() == Selection.UNSELECTED) {
-						falseOptionalFeaturesTest.remove(feature.getName());
-					}
-				}
-			}
-			
-			assertTrue(failureMessage, falseOptionalFeaturesTest.isEmpty());
+		}
+
+		assertTrue(failureMessage, falseOptionalFeaturesTest.isEmpty());
 	}
 }

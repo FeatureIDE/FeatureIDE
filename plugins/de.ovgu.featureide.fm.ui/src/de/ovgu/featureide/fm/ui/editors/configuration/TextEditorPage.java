@@ -104,6 +104,10 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 
 	@Override
 	public void pageChangeFrom(int newPageIndex) {
+		updateConfiguration();
+	}
+
+	public void updateConfiguration() {
 		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
 		final IPersistentFormat<Configuration> confFormat = configurationEditor.getConfigurationManager().getFormat();
 		if (!confFormat.getInstance().write(configurationEditor.getConfiguration()).equals(text)) {

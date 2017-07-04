@@ -64,7 +64,7 @@ public class AlternativeAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		boolean alt = feature.getStructure().isAlternative();
-		setEnabled(!alt && feature.getStructure().hasChildren());
+		setEnabled(!alt && feature.getStructure().hasChildren() && feature.getStructure().getChildrenCount() > 1);
 		setChecked(alt);
 	}
 

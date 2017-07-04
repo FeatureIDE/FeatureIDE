@@ -146,7 +146,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 		}
 	}
 
-	private void executeSaveOperation() {
+	public void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
 			final IFeatureModel fm = featureModelEditor.getFeatureModel();
@@ -157,6 +157,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 			op.addContext((IUndoContext) fm.getUndoContext());
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+				oldText = newText;
 			} catch (ExecutionException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}

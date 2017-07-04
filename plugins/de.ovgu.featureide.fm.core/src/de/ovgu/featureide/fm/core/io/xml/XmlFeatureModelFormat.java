@@ -265,12 +265,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		final Element fnod;
 		if (children.isEmpty()) {
 			fnod = doc.createElement(FEATURE);
-			final String description = feat.getProperty().getDescription();
-			if (description != null && !description.trim().isEmpty()) {
-				final Element descr = doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-				fnod.appendChild(descr);
-			}
+			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 		} else {
 			if (feat.getStructure().isAnd()) {
@@ -282,13 +277,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
-			final String description = feat.getProperty().getDescription();
-			if (description != null && !description.trim().isEmpty()) {
-				final Element descr = doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-				fnod.appendChild(descr);
-			}
-
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 
@@ -300,7 +288,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	protected void addDescription(Document doc, IFeature feat, Element fnod) {
 		final String description = feat.getProperty().getDescription();
-		if (description != null && !description.isEmpty()) {
+		if (description != null && !description.trim().isEmpty()) {
 			final Element descr = doc.createElement(DESCRIPTION);
 			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 			fnod.appendChild(descr);
@@ -599,7 +587,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod.setAttribute(HIDDEN, TRUE);
 		}
 		if (feat.getStructure().isMandatory()) {
-			fnod.setAttribute(MANDATORY, TRUE);
+			if(feat.getStructure().getParent() != null && feat.getStructure().getParent().isAnd()){
+				fnod.setAttribute(MANDATORY, TRUE);
+			} else if (feat.getStructure().getParent() == null){
+				fnod.setAttribute(MANDATORY, TRUE);
+			}
 		}
 		if (feat.getStructure().isAbstract()) {
 			fnod.setAttribute(ABSTRACT, TRUE);

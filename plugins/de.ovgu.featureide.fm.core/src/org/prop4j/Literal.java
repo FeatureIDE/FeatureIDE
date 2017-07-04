@@ -39,15 +39,10 @@ public class Literal extends Node implements Cloneable {
 	//annotate each literal of a formula with an attribute for explanation. If "Up", explain child relationship
 	// to parent from feature-tree. If "Constraint", explain using cross-tree constraint.
 	public enum FeatureAttribute {
-		UNDEFINED,
-		CHILD,
-		PARENT,
-		ROOT,
-		CONSTRAINT
+		UNDEFINED, CHILD, PARENT, ROOT, CONSTRAINT
 	};
 
 	public int origin; // attribute encodes relevant information for generating explanations
-
 
 	public Literal(Object var, boolean positive) {
 		this.var = var;
@@ -58,13 +53,20 @@ public class Literal extends Node implements Cloneable {
 		this.var = var;
 		positive = true;
 	}
-	
+
+	protected Literal(Literal oldLiteral) {
+		this.var = oldLiteral.var;
+		this.positive = oldLiteral.positive;
+		this.origin = oldLiteral.origin;
+	}
+
 	/**
 	 * Encodes a literal from the tree topology.
 	 * FeatureAttribute must not have the value Constraint.
-	 * Example with root as FeatureAttribute: origin = -1 * 5 + 3 = -2 
-	 * @param var The variable 
-	 * @param FeatureAttribute The Enumeration element  
+	 * Example with root as FeatureAttribute: origin = -1 * 5 + 3 = -2
+	 * 
+	 * @param var The variable
+	 * @param FeatureAttribute The Enumeration element
 	 */
 	public Literal(Object var, FeatureAttribute a) {
 		this(var, true, a);
@@ -83,21 +85,22 @@ public class Literal extends Node implements Cloneable {
 		if (a == FeatureAttribute.CONSTRAINT) {
 			throw new InvalidParameterException("Parameter Constraint is not allowed");
 		}
-		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();  
-	}	
+		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();
+	}
 
 	/**
 	 * Encodes a literal from a constraint.
+	 * 
 	 * @param var The variable
-	 * @param constraintIndex The index of a constraint  
+	 * @param constraintIndex The index of a constraint
 	 */
 	public Literal(Object var, int constraintIndex) {
 		this(var);
-		setOriginConstraint(constraintIndex);  
-	}										  
+		setOriginConstraint(constraintIndex);
+	}
 
 	/**
-	 * Decodes a constraint index.    
+	 * Decodes a constraint index.
 	 * Example with origin = 4: origin = 4 / 5 = 0. Returns a constraint with index 0.
 	 * 
 	 * @return The constraint-index
@@ -110,11 +113,11 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	/**
-	 * Decodes a FeatureAttribute. 
-	 * Example with FeatureAttribute root and origin of -2: -2 % 5 + 5 = 3. 
-	 * Returns a FeatureAttribute with value 3 (ordinal).   
+	 * Decodes a FeatureAttribute.
+	 * Example with FeatureAttribute root and origin of -2: -2 % 5 + 5 = 3.
+	 * Returns a FeatureAttribute with value 3 (ordinal).
 	 * 
-	 * @return FeatureAttribute The Enumeration element  
+	 * @return FeatureAttribute The Enumeration element
 	 */
 	public FeatureAttribute getSourceAttribute() {
 		int index = origin % FeatureAttribute.values().length;
@@ -125,8 +128,9 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	/**
-	 * Encodes a constraint-index.  
+	 * Encodes a constraint-index.
 	 * Example with constraintIndex = 0: origin = 0 * 5 + 4 = 4
+	 * 
 	 * @param constrIndex The index of a constraint
 	 */
 	public void setOriginConstraint(int constrIndex) {
@@ -159,7 +163,13 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	protected Node clausify() {
+	protected Node clausifyCNF() {
+		//nothing to do
+		return this;
+	}
+
+	@Override
+	protected Node clausifyDNF() {
 		//nothing to do
 		return this;
 	}
@@ -171,9 +181,7 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	public Literal clone() {
-		Literal copy = new Literal(var, positive);
-		copy.origin = this.origin;
-		return copy;
+		return new Literal(this);
 	}
 
 	@Override

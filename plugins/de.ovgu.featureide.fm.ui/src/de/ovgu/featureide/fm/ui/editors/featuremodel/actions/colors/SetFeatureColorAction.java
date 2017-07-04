@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -49,10 +50,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.wizards.SelectColorSchemeWizard;
+import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
 
 /**
  * ColorSelectedFeatureAction is the action that opens the ColorSelectedFeatureDialog
@@ -82,6 +84,7 @@ public class SetFeatureColorAction extends Action {
 				updateFeatureList(selection);
 		}
 	};
+
 	/**
 	 * @param viewer
 	 */
@@ -137,7 +140,9 @@ public class SetFeatureColorAction extends Action {
 				continue;
 			} else if (object instanceof AbstractGraphicalEditPart) {
 				AbstractGraphicalEditPart agep = (AbstractGraphicalEditPart) object;
-				IFeature feature = featureModel.getFeature(agep.getModel().toString());
+				IFeature feature = null;
+				if (agep.getModel() != null)
+					feature = featureModel.getFeature(agep.getModel().toString());
 				if (feature != null)
 					continue;
 			} else if (object instanceof FeatureEditPart) {
@@ -189,18 +194,24 @@ public class SetFeatureColorAction extends Action {
 		List<IFeature> features = new ArrayList<>(featureList);
 
 		if (!features.isEmpty()) {
-
 			if (featureModel != null) {
 				// only allow coloration if the active profile is not the default profile
 				if (FeatureColorManager.isDefault(featureModel)) {
-					Wizard selectColorSchemeWizard = new SelectColorSchemeWizard(featureModel);
+					Wizard colorSchemeWizard = new ColorSchemeWizard(featureModel);
 
-					WizardDialog dialog = new WizardDialog(shell, selectColorSchemeWizard);
+					WizardDialog dialog = new WizardDialog(shell, colorSchemeWizard);
 					dialog.create();
 
-					if (dialog.open() == Dialog.CANCEL) {
+					int dialogExitCode = dialog.open();
+					if (dialogExitCode == Dialog.CANCEL) {
+						return;
+					} else if (dialogExitCode == Dialog.OK && FeatureColorManager.getCurrentColorScheme(featureModel).isDefault()) {
+						MessageDialog.openError(shell, StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED,
+								StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG);
 						return;
 					}
+					
+
 				}
 			}
 

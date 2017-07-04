@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and mandatory="true" name="TankWar">
 				<alt abstract="true" mandatory="true" name="Platform">
-					<feature mandatory="true" name="PC"/>
-					<feature mandatory="true" name="Handy"/>
+					<feature name="PC"/>
+					<feature name="Handy"/>
 				</alt>
 				<or name="Tools">
-					<feature mandatory="true" name="Beschleunigung"/>
-					<feature mandatory="true" name="einfrieren"/>
-					<feature mandatory="true" name="Bombe"/>
-					<feature mandatory="true" name="Energie"/>
-					<feature mandatory="true" name="Feuerkraft"/>
-					<feature mandatory="true" name="Mars"/>
+					<feature name="Beschleunigung"/>
+					<feature name="einfrieren"/>
+					<feature name="Bombe"/>
+					<feature name="Energie"/>
+					<feature name="Feuerkraft"/>
+					<feature name="Mars"/>
 				</or>
 				<feature name="explodieren"/>
 				<and abstract="true" mandatory="true" name="GUI">
 					<alt abstract="true" mandatory="true" name="Map">
-						<feature mandatory="true" name="M_240"/>
-						<feature mandatory="true" name="M_600"/>
-						<feature mandatory="true" name="M_780"/>
+						<feature name="M_240"/>
+						<feature name="M_600"/>
+						<feature name="M_780"/>
 					</alt>
 					<and name="Image">
 						<feature name="fuer_PC"/>
@@ -28,25 +29,25 @@
 					</and>
 				</and>
 				<alt name="Record">
-					<feature mandatory="true" name="Re_fuer_PC"/>
-					<feature mandatory="true" name="Re_fuer_Handy"/>
+					<feature name="Re_fuer_PC"/>
+					<feature name="Re_fuer_Handy"/>
 				</alt>
 				<alt name="Soundeffekt">
-					<feature mandatory="true" name="Sound_fuer_pc"/>
-					<feature mandatory="true" name="Sound_fuer_Handy"/>
+					<feature name="Sound_fuer_pc"/>
+					<feature name="Sound_fuer_Handy"/>
 				</alt>
 				<alt abstract="true" mandatory="true" name="Language">
-					<feature mandatory="true" name="EN"/>
-					<feature mandatory="true" name="DE"/>
+					<feature name="EN"/>
+					<feature name="DE"/>
 				</alt>
 				<or abstract="true" mandatory="true" name="Tanks">
-					<feature mandatory="true" name="USA_M1Abrams"/>
-					<feature mandatory="true" name="Germany_Leopard"/>
-					<feature mandatory="true" name="China_Type99"/>
+					<feature name="USA_M1Abrams"/>
+					<feature name="Germany_Leopard"/>
+					<feature name="China_Type99"/>
 				</or>
 				<alt abstract="true" mandatory="true" name="AI">
-					<feature mandatory="true" name="Easy"/>
-					<feature mandatory="true" name="Hard"/>
+					<feature name="Easy"/>
+					<feature name="Hard"/>
 				</alt>
 			</and>
 		</struct>
@@ -100,6 +101,7 @@
 				</eq>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

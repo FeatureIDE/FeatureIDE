@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="GPLscratchFHJML">
 				<and mandatory="true" name="Base">
@@ -7,12 +8,12 @@
 					<feature name="MaxEdges"/>
 				</and>
 				<alt abstract="true" mandatory="true" name="Direction">
-					<feature mandatory="true" name="Directed"/>
-					<feature mandatory="true" name="Undirected"/>
+					<feature name="Directed"/>
+					<feature name="Undirected"/>
 				</alt>
 				<or abstract="true" name="Unique">
-					<feature mandatory="true" name="UniqueEdges"/>
-					<feature mandatory="true" name="UniqueNodes"/>
+					<feature name="UniqueEdges"/>
+					<feature name="UniqueNodes"/>
 				</or>
 				<and abstract="true" name="Algorithm">
 					<and name="Connection">
@@ -30,6 +31,7 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

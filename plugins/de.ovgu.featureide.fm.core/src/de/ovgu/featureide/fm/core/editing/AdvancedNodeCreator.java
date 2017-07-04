@@ -26,9 +26,9 @@ import java.util.ListIterator;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
+import org.prop4j.Literal.FeatureAttribute;
 import org.prop4j.Node;
 import org.prop4j.Or;
-import org.prop4j.Literal.FeatureAttribute;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;

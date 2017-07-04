@@ -174,7 +174,8 @@ public class MPLPlugin extends AbstractCorePlugin {
 		try {
 			if (project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				curFeatureProject = CorePlugin.getFeatureProject(project);
-			} else {
+			}
+			if (curFeatureProject == null) {
 				for (IFeatureProject fp : CorePlugin.getFeatureProjects()) {
 					if (constructInterfaceProjectName(fp.getProjectName()).equals(project.getName())) {
 						curFeatureProject = fp;

@@ -73,16 +73,18 @@ public abstract class Node {
 	 * This is the case iff this is a conjunction of disjunctions of literals.
 	 * Note that redundant nodes may be omitted.
 	 * This means that instead of one-literal conjunctions and disjunctions, the literal alone may be stored.
+	 * 
 	 * @return true iff this is in conjunctive normal form.
 	 */
 	public abstract boolean isConjunctiveNormalForm();
-	
+
 	/**
 	 * Returns true iff this is in clausal normal form.
 	 * This is a more narrow case of conjunctive normal form.
 	 * Specifically, redundant nodes may not be omitted.
 	 * In other words, this must be a conjunction of clauses.
 	 * Each clause must in turn contain nothing but a positive amount of literals.
+	 * 
 	 * @return true iff this is in clausal normal form
 	 */
 	public abstract boolean isClausalNormalForm();
@@ -91,7 +93,14 @@ public abstract class Node {
 		Node cnf = this;
 		cnf = cnf.eliminateNonCNFOperators();
 		cnf = deMorgan(cnf);
-		return cnf.clausify();
+		return cnf.clausifyCNF();
+	}
+
+	public Node toDNF() {
+		Node cnf = this;
+		cnf = cnf.eliminateNonCNFOperators();
+		cnf = deMorgan(cnf);
+		return cnf.clausifyDNF();
 	}
 
 	public Node toRegularCNF() {
@@ -334,7 +343,7 @@ public abstract class Node {
 		System.out.println(node);
 		node = node.eliminate(Not.class);
 		System.out.println(node);
-		node = node.clausify();
+		node = node.clausifyCNF();
 		System.out.println(node);
 		System.out.println();
 		return node;
@@ -420,7 +429,11 @@ public abstract class Node {
 		return this;
 	}
 
-	protected Node clausify() {
+	protected Node clausifyCNF() {
+		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
+	}
+
+	protected Node clausifyDNF() {
 		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
@@ -548,6 +561,7 @@ public abstract class Node {
 
 	/**
 	 * Returns all literals contained in this node and its children.
+	 * 
 	 * @return all literals contained in this node and its children
 	 */
 	public Set<Literal> getLiterals() {

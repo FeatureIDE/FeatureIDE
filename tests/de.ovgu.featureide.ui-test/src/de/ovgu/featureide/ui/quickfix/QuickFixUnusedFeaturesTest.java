@@ -79,8 +79,7 @@ public class QuickFixUnusedFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().createFeatureModel();
-			FileHandler.load(f.toPath(), fm, FMFormatManager.getInstance());
+			final IFeatureModel fm = FeatureModelManager.load(f.toPath());
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);
@@ -101,26 +100,24 @@ public class QuickFixUnusedFeaturesTest {
 
 	@Test
 	public void createConfigurationsTest() {
-		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
-		final Collection<IFeature> core = FeatureModelManager.getAnalyzer(fm).getCoreFeatures();
-		final Collection<IFeature> dead = FeatureModelManager.getAnalyzer(fm).getDeadFeatures();
-		final Collection<String> falseOptionalFeatures = new LinkedList<>();
+		final Collection<IFeature> common = FeatureModelManager.getAnalyzer(fm).getCommonFeatures();
+		final Collection<String> unusedFeatures = new LinkedList<>();
 
-		for (IFeature feature : concrete) {
-			if (!core.contains(feature) && !dead.contains(feature)) {
-				falseOptionalFeatures.add(feature.getName());
+		for (IFeature feature : common) {
+			if (feature.getStructure().isConcrete() && !feature.getStructure().hasHiddenParent()) {
+				unusedFeatures.add(feature.getName());
 			}
 		}
 
-		final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
-		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
+		final Collection<String> unusedFeaturesTest = new ArrayList<>(unusedFeatures);
+		final Collection<Configuration> confs = quickFix.createConfigurations(unusedFeatures, fm);
 		for (final Configuration conf : confs) {
 			for (final SelectableFeature feature : conf.getFeatures()) {
 				if (feature.getSelection() == Selection.SELECTED) {
-					falseOptionalFeaturesTest.remove(feature.getName());
+					unusedFeaturesTest.remove(feature.getName());
 				}
 			}
 		}
-		assertTrue(failureMessage, falseOptionalFeaturesTest.isEmpty());
+		assertTrue(failureMessage, unusedFeaturesTest.isEmpty());
 	}
 }

@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
- * Checks whether a feature is hidden.
+ * Checks whether a feature is optional.
  * 
  * @author Sebastian Krieter
  */

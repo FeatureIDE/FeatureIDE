@@ -966,10 +966,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			if (errorPropagation == null) {
 				errorPropagation = ErrorPropagation.createErrorPropagation(file);
 			}
-			if (delta == null) {
-				errorPropagation.force = true;
-			}			
 			if (errorPropagation != null) {
+				if (delta == null) {
+					errorPropagation.force = true;
+				}		
 				errorPropagation.addFile(file);
 			}
 		} catch (CoreException e) {

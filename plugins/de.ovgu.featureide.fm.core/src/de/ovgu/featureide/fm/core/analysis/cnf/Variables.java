@@ -137,8 +137,7 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 
 	@Override
 	public int getVariable(String varName, boolean sign) {
-		final Integer variable = varToInt.get(varName);
-		return variable == null ? 0 : sign ? variable : -variable;
+		return sign ? getVariable(varName) : -getVariable(varName);
 	}
 
 	@Override

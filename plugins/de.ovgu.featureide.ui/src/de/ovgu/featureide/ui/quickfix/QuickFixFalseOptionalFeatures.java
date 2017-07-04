@@ -80,13 +80,13 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
 		monitor.setTaskName("Create configurations");
 		monitor.setRemainingWork(unusedFeatures.size());
-		final List<Configuration> confs = new LinkedList<Configuration>();
+		final List<Configuration> confs = new LinkedList<>();
 		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
 		final ConfigurationPropagator propagator;
 		if (project != null) {
-			propagator = project.getFeatureModelManager().getSnapshot().getPropagator();
+			propagator = project.getFeatureModelManager().getSnapshot().getPropagator(false);
 		} else {
-			propagator = FeatureModelManager.getInstance(featureModel).getSnapshot().getPropagator();
+			propagator = FeatureModelManager.getInstance(featureModel).getSnapshot().getPropagator(false);
 		}
 		List<List<String>> solutions = LongRunningWrapper.runMethod(propagator.coverFeatures(unusedFeatures, false), monitor);
 		for (List<String> solution : solutions) {

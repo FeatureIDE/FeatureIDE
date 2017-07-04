@@ -304,7 +304,12 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (formula == null) {
 				return null;
 			}
-			final CNF clausesWithoutHidden = formula.getElement(new NoHiddenCNFCreator());
+			final CNF clausesWithoutHidden;
+			if (includeAbstractFeatures) {
+				clausesWithoutHidden = formula.getElement(new NoHiddenCNFCreator());
+			} else {
+				clausesWithoutHidden = formula.getElement(new NoAbstractNoHiddenCNFCreator());
+			}
 			final OneWiseConfigurationGenerator oneWiseConfigurationGenerator = new OneWiseConfigurationGenerator(
 					getSolverForCurrentConfiguration(false, false));
 			oneWiseConfigurationGenerator.setCoverMode(selection ? 1 : 0);

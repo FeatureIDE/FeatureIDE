@@ -160,7 +160,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			return;
 		}
 		super.postCompile(delta, file);
-		Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) {
+		Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file) != null ? CorePlugin.getFeatureProject(file).toString() : "") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {

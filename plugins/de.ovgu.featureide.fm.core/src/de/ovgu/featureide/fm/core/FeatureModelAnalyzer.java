@@ -76,6 +76,7 @@ import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCr
 import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.MandatoryFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.OptionalFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -412,7 +413,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	public List<IFeature> getFalseOptionalFeatures() {
-		final List<IFeature> optionalFeatures = Functional.filterToList(featureModel.getFeatures(), new OptionalFeatureFilter());
+		final List<IFeature> optionalFeatures = Functional.filterToList(featureModel.getFeatures(), new InverseFilter<>(new MandatoryFeatureFilter()));
 		List<LiteralSet> result = getFalseOptionalFeatures(optionalFeatures);
 
 		final List<IFeature> resultList = new ArrayList<>();

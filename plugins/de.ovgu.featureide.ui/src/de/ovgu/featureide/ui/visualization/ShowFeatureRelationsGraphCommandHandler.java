@@ -65,30 +65,32 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		} else {
 			project = (IProject) element;
 		}
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+
 		Shell shell = new Shell(Display.getCurrent());
 		shell.setText("Select feature");
 		shell.setSize(400, 200);
 		shell.setLayout(new FillLayout(SWT.VERTICAL));
 		final org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(shell, SWT.BORDER | SWT.V_SCROLL);
 
-		List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
-		for (String f : featureList) {
-			list.add(f);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		if (featureProject != null) {
+			List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
+			for (String f : featureList) {
+				list.add(f);
+			}
+
+			list.addSelectionListener(new SelectionListener() {
+
+				public void widgetSelected(SelectionEvent event) {
+					int[] selections = list.getSelectionIndices();
+					showFrog(featureProject, list.getItem(selections[0]));
+				}
+
+				public void widgetDefaultSelected(SelectionEvent event) {
+
+				}
+			});
 		}
-
-		list.addSelectionListener(new SelectionListener() {
-
-			public void widgetSelected(SelectionEvent event) {
-				int[] selections = list.getSelectionIndices();
-				showFrog(featureProject, list.getItem(selections[0]));
-			}
-
-			public void widgetDefaultSelected(SelectionEvent event) {
-
-			}
-		});
-
 		shell.open();
 
 	}

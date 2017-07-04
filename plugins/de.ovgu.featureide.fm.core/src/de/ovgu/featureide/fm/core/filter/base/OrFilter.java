@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.filter.base;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Returns the disjunction of multiple {@link IFilter}s.
@@ -34,8 +34,16 @@ public class OrFilter<T> extends ArrayList<IFilter<T>> implements IFilter<T> {
 
 	private static final long serialVersionUID = 1L;
 
-	public OrFilter(List<IFilter<T>> asList) {
-		super(asList);
+	public OrFilter() {
+		super();
+	}
+
+	public OrFilter(Collection<? extends IFilter<T>> c) {
+		super(c);
+	}
+
+	public OrFilter(int initialCapacity) {
+		super(initialCapacity);
 	}
 
 	@Override
