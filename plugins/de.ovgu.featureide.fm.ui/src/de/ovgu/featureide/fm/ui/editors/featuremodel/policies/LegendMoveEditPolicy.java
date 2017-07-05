@@ -20,32 +20,99 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.policies;
 
-import org.eclipse.draw2d.FreeformLayer;
+import java.util.List;
+
+import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.geometry.PrecisionRectangle;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGBA;
+
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * Allows to move the legend.
+ * Allows to move the legend. Also shows feedback if the moving operation is possible or not
+ * 
+ * @author Joshua Sprey
  */
 public class LegendMoveEditPolicy extends NonResizableEditPolicy {
+	
+	private boolean isValidPosition = true;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.editpolicies.NonResizableEditPolicy#createDragSourceFeedbackFigure()
+	 */
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
-		final FreeformLayer l = new FreeformLayer();
-		addFeedback(l);
-		return l;
+		RectangleFigure r = new RectangleFigure();
+		r.setLineStyle(Graphics.LINE_DASH);
+		r.setForegroundColor(ColorConstants.black);
+		r.setLineWidth(GUIDefaults.LEGEND_MOVING_FEEDBACK_BORDER_WIDTH);
+		if (isValidPosition) {
+			r.setBackgroundColor(GUIDefaults.LEGEND_MOVING_FEEDBACK_VALID);
+			r.setAlpha(GUIDefaults.LEGEND_MOVING_FEEDBACK_ALPHA);
+		} else {
+			r.setBackgroundColor(GUIDefaults.LEGEND_MOVING_FEEDBACK_INVALID);
+			r.setAlpha(GUIDefaults.LEGEND_MOVING_FEEDBACK_ALPHA);
+		}
+		r.setBounds(getInitialFeedbackBounds());
+		addFeedback(r);
+		return r;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.editpolicies.NonResizableEditPolicy#showChangeBoundsFeedback(org.eclipse.gef.requests.ChangeBoundsRequest)
+	 */
 
 	@Override
 	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
-		// call createDragSourceFeedbackFigure on start of the move
-		getDragSourceFeedbackFigure();
+		//Get the position where the the user wants to move the legend to
 		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
 
+		//Check that no figure intersects with the new position of the legend 
+		Rectangle newFeedback = new Rectangle(rect.getLocation(), rect.getSize());
+		getHostFigure().translateToRelative(newFeedback);
+		List<?> children = getHostFigure().getParent().getChildren();
+		for (Object f : children) {
+			if (f instanceof Figure && !(f instanceof LegendFigure)) {
+				Figure fFigure = (Figure) f;
+				if (newFeedback.intersects(fFigure.getBounds())) {
+					isValidPosition = false;
+				}
+			}
+		}
+
+		//Create new feedback
+		IFigure feedback = getDragSourceFeedbackFigure();
+		if (feedback instanceof RectangleFigure) {
+			RectangleFigure r = (RectangleFigure) feedback;
+			if (isValidPosition) {
+				r.setBackgroundColor(GUIDefaults.LEGEND_MOVING_FEEDBACK_VALID);
+				r.setAlpha(GUIDefaults.LEGEND_MOVING_FEEDBACK_ALPHA);
+			} else {
+				r.setBackgroundColor(GUIDefaults.LEGEND_MOVING_FEEDBACK_INVALID);
+				r.setAlpha(GUIDefaults.LEGEND_MOVING_FEEDBACK_ALPHA);
+			}
+		}
+		feedback.translateToRelative(rect);
+		feedback.setBounds(rect);
+		feedback.validate();
+		isValidPosition = true;
+	}
+
+	@Override
+	public boolean isDragAllowed() {
+		return true;
 	}
 }

@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -172,8 +173,13 @@ public class MoveAction extends Action {
 			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getModel() : (IGraphicalConstraint) element;
 			final Point newPos = constraint.getLocation().translate(deltaPos);
 			constraint.setLocation(newPos);
-		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {
-			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel);
+		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure)) {
+			LegendFigure legendFigure = null;
+			if(element instanceof LegendEditPart){
+				legendFigure = ((LegendEditPart) element).getFigure();
+			} else if(element instanceof LegendFigure) {
+				legendFigure = (LegendFigure) element;
+			}
 			final Point newPos = legendFigure.getLocation().translate(deltaPos);
 			legendFigure.setLocation(newPos);
 			featureModel.getLayout().setLegendPos(newPos.x(), newPos.y());

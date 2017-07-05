@@ -30,6 +30,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.HideLegendOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -41,12 +42,12 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class LegendAction extends Action {
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
-	public LegendAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
+	public LegendAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
-		if (!FMPropertyManager.isLegendHidden()) {
+		if (!featureModel.isLegendHidden()) {
 			this.setText(HIDE_LEGEND);
 		} else {
 			this.setText(SHOW_LEGEND);
@@ -57,7 +58,6 @@ public class LegendAction extends Action {
 	@Override
 	public void run() {
 		HideLegendOperation op = new HideLegendOperation(featureModel);
-
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
@@ -67,7 +67,7 @@ public class LegendAction extends Action {
 	}
 
 	public void refresh() {
-		if (!FMPropertyManager.isLegendHidden()) {
+		if (!featureModel.isLegendHidden()) {
 			this.setText(HIDE_LEGEND);
 		} else {
 			this.setText(SHOW_LEGEND);

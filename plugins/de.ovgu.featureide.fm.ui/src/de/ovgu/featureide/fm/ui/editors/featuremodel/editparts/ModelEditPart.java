@@ -46,24 +46,38 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Marcus Pinnecke
  */
 public class ModelEditPart extends AbstractGraphicalEditPart {
+
+	private Legend legend;
+
+	public Legend getLegend() {
+		return legend;
+	}
+
+	public void setLegend(Legend legend) {
+		if (legend == null)
+			return;
+		this.legend = legend;
+	}
+
 	ModelEditPart(IGraphicalFeatureModel featureModel) {
 		setModel(featureModel);
+		this.legend = new Legend(featureModel);
 	}
 
 	public IGraphicalFeatureModel getFeatureModel() {
 		return (IGraphicalFeatureModel) getModel();
 	}
-	
+
 	@Override
 	public RootEditPart getParent() {
 		return (RootEditPart) super.getParent();
 	}
-	
+
 	@Override
 	public IGraphicalFeatureModel getModel() {
 		return (IGraphicalFeatureModel) super.getModel();
 	}
-	
+
 	@Override
 	public ModelFigure getFigure() {
 		return (ModelFigure) super.getFigure();
@@ -90,8 +104,11 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		list.addAll(features);
 		list.addAll(constraints);
 
-		if (!FMPropertyManager.isLegendHidden()) {
-			list.add(new Legend(fm));
+		if (!fm.isLegendHidden()) {
+			if (legend == null)
+				legend = new Legend(fm);
+			list.add(legend);
+			fm.setLegend(legend);
 		}
 
 		return list;

@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+
 /**
  * Encapsulates layout functionality for the feature model.
  * 
