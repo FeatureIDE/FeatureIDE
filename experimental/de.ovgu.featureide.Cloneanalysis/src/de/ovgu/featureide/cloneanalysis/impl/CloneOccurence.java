@@ -31,6 +31,12 @@ public class CloneOccurence
 	 * The {@link Clone}, of which this is an occurence.
 	 */
 	private VariantAwareClone clone;
+	
+	/** 
+	 * variables to split the path
+	 */
+	private IPath folderPath = null, featurePath = null;
+	int lengthOfThePath;
 
 	public CloneOccurence(String path, int startIndex, Clone clone)
 	{
@@ -43,8 +49,35 @@ public class CloneOccurence
 	{
 		this.file = new Path(path);
 		this.startIndex = startIndex;
+		// code to split the path into feature path and folder path
+		split(file);
+	}
+
+	private void split(IPath file) 
+	{
+		
+		lengthOfThePath = this.getFile().segmentCount();
+		folderPath = getFolderPath(lengthOfThePath);
+		featurePath = this.getFile().uptoSegment(lengthOfThePath);
+		String temp = featurePath.toString();
+		 temp = temp.substring(folderPath.toString().length(),featurePath.toString().length());
+		featurePath = new Path(temp); 
 	}
 	
+	private IPath getFolderPath(int pathLength) 
+	{
+		
+		String featureName = this.getFile().segment(lengthOfThePath-5);
+		if(featureName.equalsIgnoreCase("features"))
+			return this.getFile().uptoSegment(pathLength-4);
+		else
+			return this.getFile().uptoSegment(pathLength-5);
+	}
+	
+	public IPath getFeaturePath(){
+		return featurePath;
+	}
+
 	/**
 	 * @return the file
 	 */
@@ -80,8 +113,8 @@ public class CloneOccurence
 	@Override
 	public String toString()
 	{
-				//subtract 5 places from the total length, so that it remains location independent.
-				int lengthOfThePath = this.getFile().segmentCount();
+				//subtract places from the total length, so that it remains location independent.
+				lengthOfThePath = this.getFile().segmentCount();
 				String featureName = this.getFile().segment(lengthOfThePath-5);
 				if(featureName.equalsIgnoreCase("features"))
 					return "["+this.getFile().segment(lengthOfThePath-4)+"]"+this.getFile().lastSegment().toString() + ":" + String.valueOf(this.getStartIndex());
