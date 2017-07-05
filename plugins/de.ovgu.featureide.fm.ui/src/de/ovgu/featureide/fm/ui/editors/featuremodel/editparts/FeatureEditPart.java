@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;

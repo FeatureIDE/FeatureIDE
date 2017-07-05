@@ -18,45 +18,22 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors;
+package de.ovgu.featureide.fm.ui.editors.featuremodel.filters;
 
-import java.util.List;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
- * Graphical representation of a feature.
+ * Checks whether a graphical feature is hidden.
  * 
- * @author Sebastian Krieter
+ * @author Christopher Sontag
  */
-public interface IGraphicalFeature extends IGraphicalElement {
+public class ConcreteGraphicalFeatureFilter implements IFilter<IGraphicalFeature> {
 
-	IFeature getObject();
-
-	boolean isCollapsed();
-	
-	boolean isConstraintSelected();
-
-	void setConstraintSelected(boolean selection);
-	
-	void setCollapsed(boolean collapse);
-	
-	void addTargetConnection(FeatureConnection connection);
-	
-	@CheckForNull
-	FeatureConnection getSourceConnection();
-	@Nonnull
-	List<FeatureConnection> getSourceConnectionAsList();
-
-	List<FeatureConnection> getTargetConnections();
-
-	IGraphicalFeature clone();
-	
-	boolean hasCollapsedParent();
-
-	List<IGraphicalFeature> getGraphicalChildren(boolean showHidden);
+	@Override
+	public boolean isValid(IGraphicalFeature object) {
+		return object.getObject().getStructure().isConcrete();
+	}
 
 }
