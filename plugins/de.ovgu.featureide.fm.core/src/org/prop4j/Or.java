@@ -57,12 +57,21 @@ public class Or extends Node implements Cloneable {
 	}
 
 	@Override
-	protected Node clausify() {
+	protected Node clausifyCNF() {
 		for (int i = 0; i < children.length; i++) {
-			children[i] = children[i].clausify();
+			children[i] = children[i].clausifyCNF();
 		}
 		fuseWithSimilarChildren();
 		return createCNF(children);
+	}
+	
+	@Override
+	protected Node clausifyDNF() {
+		for (int i = 0; i < children.length; i++) {
+			children[i] = children[i].clausifyDNF();
+		}
+		fuseWithSimilarChildren();
+		return this;
 	}
 	
 	private Node createCNF(Node[] children) {

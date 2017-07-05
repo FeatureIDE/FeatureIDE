@@ -22,7 +22,6 @@ package de.ovgu.featureide.ui.projectExplorer;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +38,6 @@ import org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
-import Jakarta.loader.SmokeTest;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -53,7 +51,6 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -246,7 +243,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	private void readCurrentConfiguration(IFeatureProject featureProject) {
 		final Configuration config = new Configuration(featureProject.getFeatureModel());
 		final IFile currentConfig = featureProject.getCurrentConfiguration();
-		FileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigurationManager.getFormat(currentConfig.getName()));
+		if (currentConfig != null) {
+			FileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigurationManager.getFormat(currentConfig.getName()));
+		}
 		selectedFeatures = new ArrayList<>(config.getSelectedFeatureNames());
 	}
 

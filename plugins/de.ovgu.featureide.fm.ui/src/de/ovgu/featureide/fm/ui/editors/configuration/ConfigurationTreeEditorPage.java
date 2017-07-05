@@ -1040,6 +1040,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (!configurationEditor.isAutoSelectFeatures()) {
 			return null;
 		}
+		if (configurationEditor.getConfiguration().getSelectedFeatures().size()==0) {
+			setDirty();
+		}
 		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
 		final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator().update(redundantManual, Arrays.asList(feature));
@@ -1058,7 +1061,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						public void run() {
 							updateFeatures.remove(feature);
 							refreshItem(item);
-							setDirty();
 						}
 					});
 				}

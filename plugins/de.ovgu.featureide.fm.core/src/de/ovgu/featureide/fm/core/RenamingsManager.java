@@ -37,7 +37,6 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
-import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
@@ -91,7 +90,6 @@ public class RenamingsManager implements IEventManager {
 				break;
 			}
 		}
-		FeatureColorManager.renameFeature(model, oldName, newName);
 		fireEvent(new FeatureIDEEvent(feature, EventType.FEATURE_NAME_CHANGED, oldName, newName));
 		return true;
 	}
