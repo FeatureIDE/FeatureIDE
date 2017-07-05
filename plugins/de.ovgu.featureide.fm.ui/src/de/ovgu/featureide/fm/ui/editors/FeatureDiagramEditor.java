@@ -241,6 +241,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private FeatureModelAnalyzer analyzer;
 
 	final FeatureDiagramEditorKeyHandler editorKeyHandler;
+	private FeatureDiagramLayoutManager layoutManager;
 
 	/** The currently active explanation. */
 	private Explanation activeExplanation;
@@ -956,7 +957,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	public void setLayout() {
-		FeatureDiagramLayoutManager layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(),
+		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(),
 				graphicalFeatureModel);
 
 		int previousLayout = graphicalFeatureModel.getLayout().getLayoutAlgorithm();
@@ -1346,6 +1347,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					if (obj instanceof LegendEditPart) {
 						LegendFigure fig = ((LegendEditPart) obj).getFigure();
 						fig.recreateLegend();
+						org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegendOnIntersect(graphicalFeatureModel);
+						if(newLegendPosition != null){
+							fig.setLocation(newLegendPosition);
+						}
 					}
 				}
 			}
