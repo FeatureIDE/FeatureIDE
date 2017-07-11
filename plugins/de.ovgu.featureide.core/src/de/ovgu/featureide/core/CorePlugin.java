@@ -574,19 +574,21 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, buildPath);
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
-		final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
-		IFeatureModelFactory factory;
-		try {
-			factory = FMFactoryManager.getFactory(modelPath.toString(), format);
-		} catch (NoSuchExtensionException e) {
-			Logger.logError(e);
-			factory = FMFactoryManager.getDefaultFactory();
-		}
-		IFeatureModel featureModel = factory.createFeatureModel();
-		FMComposerManager.getFMComposerExtension(project);
-		featureModel.createDefaultValues(project.getName());
+		if (!modelPath.toFile().exists()) {
+			final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+			IFeatureModelFactory factory;
+			try {
+				factory = FMFactoryManager.getFactory(modelPath.toString(), format);
+			} catch (NoSuchExtensionException e) {
+				Logger.logError(e);
+				factory = FMFactoryManager.getDefaultFactory();
+			}
+			IFeatureModel featureModel = factory.createFeatureModel();
+			FMComposerManager.getFMComposerExtension(project);
+			featureModel.createDefaultValues(project.getName());
 
-		FileHandler.save(modelPath, featureModel, format);
+			FileHandler.save(modelPath, featureModel, format);
+		}
 	}
 
 	/**
