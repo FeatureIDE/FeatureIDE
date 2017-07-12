@@ -119,7 +119,7 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 					String file  =  CloneAnalysisUtils.getFileFromPath(occ.getFile()).getLocation().toString();
 //					message += (" Occurrence " + count++ + " in file " + file + ";");
 					message +=  occ.getFile() + ";" ;
-					formattedMessage +=  occ.getFile().segment(6) + " - " +occ.getFile().lastSegment()+ ";" ;
+					formattedMessage +=  "[ "+occ.getFile().segment(6) + " ]   " +occ.getFile().lastSegment()+ ";    " ;
 				}
 
 				final List<IPath> distinctFiles = clone.getDistinctFiles();
