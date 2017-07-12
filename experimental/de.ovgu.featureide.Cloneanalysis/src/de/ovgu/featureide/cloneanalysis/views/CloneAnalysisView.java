@@ -1,12 +1,7 @@
 package de.ovgu.featureide.cloneanalysis.views;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.HashSet;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart;
@@ -28,7 +23,6 @@ import org.eclipse.swt.SWT;
 //import org.eclipse.jface.text.IMarkSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
@@ -43,9 +37,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 
+import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.results.CloneAnalysisResults;
 import de.ovgu.featureide.cloneanalysis.results.FeatureRootLocation;
 import de.ovgu.featureide.cloneanalysis.results.VariantAwareClone;
+import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
 
 @SuppressWarnings("restriction")
 public class CloneAnalysisView extends ViewPart 
@@ -61,13 +57,6 @@ public class CloneAnalysisView extends ViewPart
 	private Tree cloneTree;
 	private TreeViewer cloneViewer;
 	
-	private Text text;
-	private String fileName;
-	IPath path;
-	IFile ifile;
-	Path filePath;
-	File file;
-	private HashMap<String,String> fileLocations;
 
 	CloneAnalysisResults<VariantAwareClone> results = null;
 
@@ -139,8 +128,8 @@ public class CloneAnalysisView extends ViewPart
 		column15.setText(CloneAnalysisTreeColumn.SIZE.toString());
 		column15.setWidth(50);
 		cloneTree.setSortColumn(column15);
-//		cloneTree.setSortDirection(SWT.DOWN);
-		cloneTree.setSortDirection(SWT.UP);
+		cloneTree.setSortDirection(SWT.DOWN);
+//		cloneTree.setSortDirection(SWT.UP);
 		column15.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column2 = new TreeColumn(cloneTree, SWT.RIGHT);
@@ -265,30 +254,19 @@ public class CloneAnalysisView extends ViewPart
 		{
 			public void doubleClick(DoubleClickEvent event)
 			{
-				String selectedItem = null,selected = null;
 				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				selectedItem = selection.toString();
-				selectedItem = selectedItem.replaceAll("[\\[\\]]", "");
-				selected = selectedItem.substring(selectedItem.lastIndexOf(":"));
-				selectedItem = selectedItem.replaceAll(selected,"");
-				System.out.println(selectedItem);
-				fileName = selectedItem;
-				if(fileLocations.containsKey(fileName)){
-					String mapValue = fileLocations.get(fileName);
-					File fileToOpen = new File(mapValue);
-					if (fileToOpen.exists() && fileToOpen.isFile()) {
-						IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
+				Object obj =	selection.getFirstElement();
+				CloneOccurence clone = (CloneOccurence) obj;
+				IPath path = clone.getFile();
+				
+					IFile fileToOpen = CloneAnalysisUtils.getFileFromPath(path);
 						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
 						try {
-							IDE.openEditorOnFileStore( page, fileStore );
+							IDE.openEditor( page, fileToOpen, true );
 						} catch ( PartInitException exception ) {
 							//Put your exception handler here if you wish to
 						}
-					} else {
-						showMessage("File does not exist");
-					}
-				}
 			}
 		});
 	}
@@ -306,9 +284,8 @@ public class CloneAnalysisView extends ViewPart
 		cloneViewer.getControl().setFocus();
 	}
 
-	public void showResults(CloneAnalysisResults<VariantAwareClone> formattedResults, HashMap<String,String> fileLocations)
+	public void showResults(CloneAnalysisResults<VariantAwareClone> formattedResults)
 	{
-		this.fileLocations = fileLocations;
 		results = formattedResults;
 		createFilterActions();
 		cloneViewer.setInput(results);
