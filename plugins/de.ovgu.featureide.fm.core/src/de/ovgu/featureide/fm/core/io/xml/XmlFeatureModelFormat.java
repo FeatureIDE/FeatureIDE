@@ -125,7 +125,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		createXmlPropertiesPart(doc, properties, object);
 
 		root.appendChild(struct);
-		createXmlDocRec(doc, struct, object.getStructure().getRoot().getFeature());
+		createXmlDocRec(doc, struct, FeatureUtils.getRoot(object));
 
 		root.appendChild(constraints);
 		for (int i = 0; i < object.getConstraints().size(); i++) {
