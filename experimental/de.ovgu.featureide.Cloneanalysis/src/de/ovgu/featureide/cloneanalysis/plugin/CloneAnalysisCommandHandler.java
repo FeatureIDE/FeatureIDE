@@ -81,6 +81,7 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 //			System.out.println("relevant features null, q.q");
 //		else
 //		{
+		
 			System.out.println(formattedResults.getRelevantFeatures().size()
 					+ " relevant features ");
 			System.out.println(formattedResults.getRelevantFeatures().toString());
@@ -142,6 +143,7 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
  					allFiles.add(iPath);
 
  				}
+				int noOfFiles = 0;
 				for (CloneOccurence occ : clone.getOccurences())
 				{
 					final IFile file = CloneAnalysisUtils.getFileFromPath(occ.getFile());
@@ -157,6 +159,8 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 														CloneAnalysisUtils.getWorkspaceRoot()
 																.getLocation()).toString() : ""));
 					else{
+						noOfFiles++;
+						if(noOfFiles%50==0)
 						System.out.println("creating marker in file "
 								+ file.getLocation().toString());
 					}
