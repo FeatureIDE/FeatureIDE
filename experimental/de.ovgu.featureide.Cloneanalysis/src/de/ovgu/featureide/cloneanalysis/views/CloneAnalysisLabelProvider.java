@@ -22,6 +22,7 @@ public class CloneAnalysisLabelProvider extends LabelProvider implements ITableL
 	{
 		if (obj instanceof Clone)
 		{
+			//to populate columns in JFace Tree/view
 			VariantAwareClone clone = (VariantAwareClone) obj;
 			switch(index){
 			case 0 : return "Clone";
@@ -38,6 +39,7 @@ public class CloneAnalysisLabelProvider extends LabelProvider implements ITableL
 		{
 			if (obj instanceof CloneOccurence)
 			{
+				//to populate rows in JFace Tree/view
 				CloneOccurence occurence = (CloneOccurence) obj;
 				switch(index){
 				case 0 : return occurence.toString();
@@ -46,7 +48,9 @@ public class CloneAnalysisLabelProvider extends LabelProvider implements ITableL
 				case 3 : return String.valueOf(occurence.getClone().getTokenCount());
 				case 4 : return "";
 				case 5 : return ((VariantAwareClone)occurence.getClone()).getCloneVariantType().toString();
-				case 6 : return CloneAnalysisUtils.getRelevantFeatureOrProjectName(occurence);
+				//shortening the path
+				case 6 : return String.valueOf(occurence.getFeaturePath());
+//				case 6 : return CloneAnalysisUtils.getRelevantFeatureOrProjectName(occurence);
 					default: 
 						return "TODO";
 				}

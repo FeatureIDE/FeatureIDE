@@ -734,8 +734,25 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	}
 
 	@Override
-	public Iterator<?> getAnnotationIterator() {
-		return annotations.iterator();
+	public Iterator<Annotation> getAnnotationIterator() {
+		final Iterator<ColorAnnotation> origIter = annotations.iterator();
+		return new Iterator<Annotation>() {
+
+			@Override
+			public boolean hasNext() {
+				return origIter.hasNext();
+			}
+
+			@Override
+			public Annotation next() {
+				return origIter.next();
+			}
+			
+			@Override
+			public void remove() {
+				origIter.remove();
+			}
+		};
 	}
 
 	@Override

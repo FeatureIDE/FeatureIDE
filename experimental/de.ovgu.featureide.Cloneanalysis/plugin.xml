@@ -76,12 +76,40 @@
             file="contexts.xml">
       </contexts>
    </extension>
-<!--  <extension
+<!-- -->
+<!--
+<extension
          id="de.ovgu.featureide.cloneanalysis.cloneMarker"
          name="Code Clone"
          point="org.eclipse.core.resources.markers">
       <persistent value="false"/> 
       <super type="org.eclipse.core.resources.problemmarker"/> 
-   </extension> 
--->
+   </extension>
+   
+   <extension
+      point="org.eclipse.jdt.ui.quickFixProcessors">
+   <quickFixProcessor
+         class="de.ovgu.featureide.cloneanalysis.util.MyQuickFixProcessor"
+         id="org.eclipse.jdt.ui.text.correction.QuickFixProcessor"
+         name="My Quick Fix Processor">
+      <handledMarkerTypes>
+         <markerType
+               id="de.ovgu.featureide.cloneanalysis.cloneMarker">
+         </markerType>
+      </handledMarkerTypes>
+   </quickFixProcessor>
+</extension>
+   -->
+    
+
+<extension
+  point="org.eclipse.ui.ide.markerResolution">
+    <markerResolutionGenerator
+        class="de.ovgu.featureide.cloneanalysis.utils.QuickFixer"
+        markerType="org.eclipse.core.resources.problemmarker">
+        
+</markerResolutionGenerator>
+</extension>
+
+
 </plugin>

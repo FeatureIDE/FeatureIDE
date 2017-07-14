@@ -1,11 +1,13 @@
 package de.ovgu.featureide.cloneanalysis.plugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.pmd.cpd.Match;
 
@@ -54,10 +56,13 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 
 	private static final boolean UPDATE_MARKERS = true;
 	private static final boolean UPDATE_GRAPHS = false;
+	
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
+		
+		
 		IStructuredSelection currentSelection = null;
 		if (HandlerUtil.getCurrentSelection(event) instanceof IStructuredSelection)
 			currentSelection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
@@ -76,6 +81,7 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 //			System.out.println("relevant features null, q.q");
 //		else
 //		{
+		
 			System.out.println(formattedResults.getRelevantFeatures().size()
 					+ " relevant features ");
 			System.out.println(formattedResults.getRelevantFeatures().toString());
@@ -101,20 +107,25 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 			final IPath location = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			for (VariantAwareClone clone : formattedResults.getClones())
 			{
-				String message = "Detected a code clone(" + clone.getLineCount() + " lines) starting at this line: ";
-				
+//				String message = "Detected a code clone (" + clone.getLineCount() + " lines ) starting at this line: ";
+				String message = "";
+				String formattedMessage = "";
 				int count = 0;
 				for (CloneOccurence occ : clone.getOccurences())
-				{
+				{			
 					
-					String file = occ.getFile().makeRelativeTo(location).uptoSegment(1).toString()
-							+ "/" +  occ.toString();
-					message += (" Occurrence " + count++ + " in file " + file);
+//					String file = occ.getFile().makeRelativeTo(location).uptoSegment(1).toString()+ File.pathSeparator +  occ.toString();
+					String file  =  CloneAnalysisUtils.getFileFromPath(occ.getFile()).getLocation().toString();
+//					message += (" Occurrence " + count++ + " in file " + file + ";");
+					message +=  occ.getFile() + ";" ;
+					formattedMessage +=  "[ "+occ.getFile().segment(6) + " ]   " +occ.getFile().lastSegment()+ ";    " ;
 				}
 
 				final List<IPath> distinctFiles = clone.getDistinctFiles();
 				final Map<String, List<IPath>> allPathsForFileName = new HashMap<String, List<IPath>>();
+				int index = 0;
 				for (IPath iPath : distinctFiles) {
+					
 					String fileName = iPath.removeFirstSegments(iPath.segmentCount()-1).toString();
 					
 					List<IPath> allFiles;
@@ -122,17 +133,22 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
  						allFiles = allPathsForFileName.get(fileName);
  					else
  					{
- 						allFiles = new ArrayList<IPath>();
- 						allPathsForFileName.put(fileName, allFiles);
+ 				    
+ 					allFiles = new ArrayList<IPath>();
+ 			
+ 					allPathsForFileName.put(fileName, allFiles);
+ 			 			 					 					
  					}
 						
  					allFiles.add(iPath);
+
  				}
+				int noOfFiles = 0;
 				for (CloneOccurence occ : clone.getOccurences())
 				{
 					final IFile file = CloneAnalysisUtils.getFileFromPath(occ.getFile());
-					
-					if (allPathsForFileName.get(file.getName()).size() == 1) continue;
+									
+//					if (allPathsForFileName.get(file.getName()).size() == 1) continue;
 					
 					if (file == null || file.getLocation() == null)
 						System.out
@@ -142,20 +158,27 @@ public class CloneAnalysisCommandHandler extends AbstractHandler
 												.makeRelativeTo(
 														CloneAnalysisUtils.getWorkspaceRoot()
 																.getLocation()).toString() : ""));
-					else
+					else{
+						noOfFiles++;
+						if(noOfFiles%50==0)
 						System.out.println("creating marker in file "
 								+ file.getLocation().toString());
-					
+					}
 					
 					
 					final IDocument document = getDocumentForFile(file, documents);
 					final int[] markerPositions = getMarkerPositions(document, occ);
-					CloneAnalysisMarkers.addProblemMarker(file, message, occ.getStartIndex(), markerPositions[0], markerPositions[1]);
+					final Map<String, String> errorMap = new HashMap<String, String>();
+					errorMap.put("first", "first value");
+					errorMap.put("second", "second value");
+					errorMap.put("third", "third value");
+					errorMap.put("fourth", "fourth value");
+					
+					CloneAnalysisMarkers.addProblemMarker(file, message,formattedMessage, occ.getStartIndex(), markerPositions[0], markerPositions[1]);
 					
 				}
 			}
 		}
-
 		cloneAnalysisView.showResults(formattedResults);
 		// cloneAnalysisView.updateMatches(cpdResults);
 		time = System.currentTimeMillis() - time;

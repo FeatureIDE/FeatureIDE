@@ -2,6 +2,9 @@ package de.ovgu.featureide.cloneanalysis.views;
 
 import java.util.HashSet;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -11,26 +14,37 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+//import org.eclipse.jface.text.IMarkSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 
+import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.results.CloneAnalysisResults;
 import de.ovgu.featureide.cloneanalysis.results.FeatureRootLocation;
 import de.ovgu.featureide.cloneanalysis.results.VariantAwareClone;
+import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
 
-public class CloneAnalysisView extends ViewPart
+@SuppressWarnings("restriction")
+public class CloneAnalysisView extends ViewPart 
 {
 
 	/**
@@ -42,14 +56,16 @@ public class CloneAnalysisView extends ViewPart
 	
 	private Tree cloneTree;
 	private TreeViewer cloneViewer;
+	
 
 	CloneAnalysisResults<VariantAwareClone> results = null;
 
 	private Action action1;
 	private Action action2;
 	private Action doubleClickAction;
-
+	
 	private HashSet<Action> filterActions;
+	
 
 	class NameSorter extends ViewerSorter
 	{}
@@ -67,8 +83,10 @@ public class CloneAnalysisView extends ViewPart
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 */
+	@SuppressWarnings("deprecation")
 	public void createPartControl(Composite parent)
 	{
+		
 		cloneTree = new Tree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		cloneViewer = new TreeViewer(cloneTree);
 		cloneViewer.setContentProvider(new CloneAnalysisContentProvider(this));
@@ -86,6 +104,13 @@ public class CloneAnalysisView extends ViewPart
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
+	
+		//adding a selection service listener to the active file in the editor
+		ISelectionService selectionService = getSite().getWorkbenchWindow().getSelectionService();
+		selectionService.addPostSelectionListener(selectionListener);
+
+	 
+	 
 	}
 
 	private void addColumns()
@@ -104,11 +129,14 @@ public class CloneAnalysisView extends ViewPart
 		column15.setWidth(50);
 		cloneTree.setSortColumn(column15);
 		cloneTree.setSortDirection(SWT.DOWN);
+//		cloneTree.setSortDirection(SWT.UP);
+		column15.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column2 = new TreeColumn(cloneTree, SWT.RIGHT);
 		column2.setAlignment(SWT.LEFT);
 		column2.setText(CloneAnalysisTreeColumn.LENGTH.toString());
 		column2.setWidth(50);
+		column2.addSelectionListener(new SortTreeListener());
 		// cloneTree.setSortColumn(column2);
 		// cloneTree.setSortDirection(SWT.DOWN);
 
@@ -116,11 +144,13 @@ public class CloneAnalysisView extends ViewPart
 		column3.setAlignment(SWT.LEFT);
 		column3.setText(CloneAnalysisTreeColumn.TOKEN_COUNT.toString());
 		column3.setWidth(50);
+		column3.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column4 = new TreeColumn(cloneTree, SWT.RIGHT);
 		column4.setAlignment(SWT.LEFT);
 		column4.setText(CloneAnalysisTreeColumn.FILES_AFFECTED_COUNT.toString());
 		column4.setWidth(50);
+		column4.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column5 = new TreeColumn(cloneTree, SWT.RIGHT);
 		column5.setAlignment(SWT.LEFT);
@@ -203,16 +233,19 @@ public class CloneAnalysisView extends ViewPart
 		action2.setToolTipText("Action 2 tooltip");
 		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		doubleClickAction = new Action()
-		{
-			public void run()
-			{
-				// TreeItem<VariantAwareClone> selectedItem =
-				// matchViewer.getSelectionModel().getSelectedItem();
-				// showMessage("Double-click detected on " +
-				// selectedItem.toString());
-			}
-		};
+//		doubleClickAction = new Action()
+//		{
+//			public void run()
+//			{
+//				// TreeItem<VariantAwareClone> selectedItem =
+//				// matchViewer.getSelectionModel().getSelectedItem();
+//				// showMessage("Double-click detected on " +
+//				// selectedItem.toString());
+//				
+//
+//				
+//			}
+//		};
 	}
 
 	private void hookDoubleClickAction()
@@ -221,7 +254,19 @@ public class CloneAnalysisView extends ViewPart
 		{
 			public void doubleClick(DoubleClickEvent event)
 			{
-				doubleClickAction.run();
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				Object obj =	selection.getFirstElement();
+				CloneOccurence clone = (CloneOccurence) obj;
+				IPath path = clone.getFile();
+				
+					IFile fileToOpen = CloneAnalysisUtils.getFileFromPath(path);
+						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+						try {
+							IDE.openEditor( page, fileToOpen, true );
+						} catch ( PartInitException exception ) {
+							//Put your exception handler here if you wish to
+						}
 			}
 		});
 	}
@@ -351,4 +396,28 @@ public class CloneAnalysisView extends ViewPart
 			bars.getToolBarManager().add(filterAction);
 		}
 	}
+
+	//action listener implementing the "Set Linking Enabled" feature on the active perspective
+	private ISelectionListener selectionListener = new ISelectionListener() {
+		
+        public void selectionChanged(IWorkbenchPart sourcepart, ISelection selection) {
+        	if(PackageExplorerPart.getFromActivePerspective() != null){
+        		PackageExplorerPart.getFromActivePerspective().setLinkingEnabled(true);
+        	}else {
+        		PackageExplorerPart.openInActivePerspective().setLinkingEnabled(true);
+        	}
+        
+      
+         
+        
+        }    
+    };
+	
+	
+		public void dispose() {
+			// important: We need do unregister our listener when the view is disposed
+			getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(selectionListener);
+			super.dispose();
+		}
+
 }
