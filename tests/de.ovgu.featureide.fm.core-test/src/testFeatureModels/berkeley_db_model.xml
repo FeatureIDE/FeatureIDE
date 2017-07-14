@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
+		<properties/>
 		<struct>
 			<alt abstract="true" mandatory="true" name="BerkeleyDb">
-				<and abstract="true" mandatory="true" name="BerkeleyDB">
+				<and abstract="true" name="BerkeleyDB">
 					<alt abstract="true" name="FLogging">
-						<and abstract="true" mandatory="true" name="Logging">
+						<and abstract="true" name="Logging">
 							<feature name="featureLoggingFile"/>
 							<feature name="featureLoggingConsole"/>
 							<feature name="featureLoggingDbLog"/>
@@ -18,31 +19,31 @@
 						</and>
 					</alt>
 					<alt abstract="true" mandatory="true" name="FPersistency">
-						<and abstract="true" mandatory="true" name="Persistency">
+						<and abstract="true" name="Persistency">
 							<or abstract="true" name="FPersistencyFeatures">
-								<feature mandatory="true" name="featureChecksum"/>
-								<feature mandatory="true" name="featureFileHandleCache"/>
-								<feature mandatory="true" name="featureHandleFullDiscError"/>
-								<feature mandatory="true" name="featureEnvironmentLock"/>
-								<and abstract="true" mandatory="true" name="Checkpointer">
+								<feature name="featureChecksum"/>
+								<feature name="featureFileHandleCache"/>
+								<feature name="featureHandleFullDiscError"/>
+								<feature name="featureEnvironmentLock"/>
+								<and abstract="true" name="Checkpointer">
 									<feature name="featureCustomizableCheckpointerTime"/>
 									<feature name="featureCustomizableCheckpointerBytes"/>
 									<feature name="featureCheckpointerDaemon"/>
 								</and>
-								<and abstract="true" mandatory="true" name="Cleaner">
+								<and abstract="true" name="Cleaner">
 									<feature name="featureLookAheadCache"/>
 									<feature name="featureCleanerDaemon"/>
 								</and>
 							</or>
 							<alt abstract="true" mandatory="true" name="FIOFeature">
-								<and abstract="true" mandatory="true" name="NIO">
+								<and abstract="true" name="NIO">
 									<feature name="featureDirectNIO"/>
 									<alt abstract="true" mandatory="true" name="FNIOType">
-										<feature mandatory="true" name="featureNIO"/>
-										<feature mandatory="true" name="featureChunkedNIO"/>
+										<feature name="featureNIO"/>
+										<feature name="featureChunkedNIO"/>
 									</alt>
 								</and>
-								<and abstract="true" mandatory="true" name="IO">
+								<and abstract="true" name="IO">
 									<feature name="featureSynchronizedIO"/>
 									<feature mandatory="true" name="featureIO"/>
 								</and>
@@ -50,9 +51,9 @@
 						</and>
 					</alt>
 					<alt abstract="true" name="FStatistics">
-						<and abstract="true" mandatory="true" name="Statistics">
+						<and abstract="true" name="Statistics">
 							<or abstract="true" mandatory="true" name="FStatisticsFeatures">
-								<and abstract="true" mandatory="true" name="EnvStats">
+								<and abstract="true" name="EnvStats">
 									<feature name="featureStatisticsEnvLog"/>
 									<feature name="featureStatisticsEnvINCompressor"/>
 									<feature name="featureStatisticsEnvFSync"/>
@@ -62,34 +63,34 @@
 									<feature name="featureStatisticsEnvCaching"/>
 									<feature mandatory="true" name="featureStatisticsEnvBase"/>
 								</and>
-								<feature mandatory="true" name="featureStatisticsDatabase"/>
-								<feature mandatory="true" name="featureStatisticsLock"/>
-								<feature mandatory="true" name="featureStatisticsPreload"/>
-								<feature mandatory="true" name="featureStatisticsSequence"/>
-								<feature mandatory="true" name="featureStatisticsTransaction"/>
+								<feature name="featureStatisticsDatabase"/>
+								<feature name="featureStatisticsLock"/>
+								<feature name="featureStatisticsPreload"/>
+								<feature name="featureStatisticsSequence"/>
+								<feature name="featureStatisticsTransaction"/>
 							</or>
 							<feature mandatory="true" name="featureStatisticsBase"/>
 						</and>
 					</alt>
 					<feature name="featureMemoryBudget"/>
 					<or abstract="true" name="FConcurrency">
-						<feature mandatory="true" name="featureLatch"/>
-						<feature mandatory="true" name="featureFSync"/>
-						<feature mandatory="true" name="featureTransaction"/>
-						<feature mandatory="true" name="dummyFeatureLocking"/>
-						<feature mandatory="true" name="featureCheckLeaks"/>
+						<feature name="featureLatch"/>
+						<feature name="featureFSync"/>
+						<feature name="featureTransaction"/>
+						<feature name="dummyFeatureLocking"/>
+						<feature name="featureCheckLeaks"/>
 					</or>
 					<or abstract="true" name="FDbOperation">
-						<feature mandatory="true" name="featureDeleteDb"/>
-						<feature mandatory="true" name="featureTruncateDb"/>
+						<feature name="featureDeleteDb"/>
+						<feature name="featureTruncateDb"/>
 					</or>
 					<alt abstract="true" mandatory="true" name="FBtree">
-						<and abstract="true" mandatory="true" name="BTree">
+						<and abstract="true" name="BTree">
 							<feature name="featureVerifier"/>
 							<feature name="featureTreeVisitor"/>
 							<feature name="featureINCompressor"/>
 							<alt abstract="true" name="FEvictor">
-								<and abstract="true" mandatory="true" name="Evictor">
+								<and abstract="true" name="Evictor">
 									<feature name="featureCriticalEviction"/>
 									<feature name="featureEvictorDaemon"/>
 									<feature mandatory="true" name="featureEvictor"/>
@@ -301,7 +302,9 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments>
 			<c>Semantic Dependencies</c>
 		</comments>
+		<featureOrder userDefined="false"/>
 	</featureModel>

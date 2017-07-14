@@ -126,7 +126,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeAnd() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
-
 			if (origF.getStructure().isAnd()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
@@ -141,13 +140,12 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeOr() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
-
 			if (origF.getStructure().isOr()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertTrue(failureMessage, newFm.getFeature(origF.getName()).getStructure().isOr());
+					assertTrue(failureMessage, newF.getStructure().isOr());
 				}
 			}
 		}
@@ -156,7 +154,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeAlternative() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
-
 			if (origF.getStructure().isAlternative()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
@@ -171,7 +168,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureConcrete() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
-
 			if (origF.getStructure().isConcrete()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
@@ -216,7 +212,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	//TODO @Fabian @Test
 	public void testPropNodes() throws FileNotFoundException, UnsupportedModelException {
 		for (IConstraint constraint : origFm.getConstraints()) {
-			System.out.println(newFm.getConstraints());
 			assertFalse(failureMessage + constraint, newFm.getConstraints().contains(constraint));
 		}
 	}
