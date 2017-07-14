@@ -416,7 +416,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					//		    		if (feat.getName().trim().toLowerCase().equals("root"))
 					//		    			feat.setName("root_");
 					object.getStructure().setRoot(feat.getFeature().getStructure());
-					feat.getFeature().getStructure().changeToAnd();
+					feat.getFeature().getStructure().setAnd();
 					countIndent = 0;
 				} else if (lineText.startsWith(":m")) {
 					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
@@ -424,14 +424,14 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					featId = setNameGetID(feat.getFeature(), lineText);
 					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
-					feat.getFeature().getStructure().changeToAnd();
+					feat.getFeature().getStructure().setAnd();
 				} else if (lineText.startsWith(":o")) {
 					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
 					feat.getFeature().getStructure().setMandatory(false);
 					featId = setNameGetID(feat.getFeature(), lineText);
 					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
-					feat.getFeature().getStructure().changeToAnd();
+					feat.getFeature().getStructure().setAnd();
 				} else if (lineText.startsWith(":g")) {
 					//create an abstract feature for each group (could be optimized, but avoid mixing up several groups)
 					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
@@ -444,9 +444,9 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
 					lastFeat = feat;
 					if (lineText.contains("[1,1]")) {
-						lastFeat.getFeature().getStructure().changeToAlternative();
+						lastFeat.getFeature().getStructure().setAlternative();
 					} else if (lineText.contains("[1,*]")) {
-						lastFeat.getFeature().getStructure().changeToOr();
+						lastFeat.getFeature().getStructure().setOr();
 					} else if ((lineText.contains("[")) && (lineText.contains("]"))) {
 						int index = lineText.indexOf('[');
 						int start = Character.getNumericValue(lineText.charAt(index + 1));
@@ -476,7 +476,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					feat.getFeature().setName(name);
 					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
-					feat.getFeature().getStructure().changeToAnd();
+					feat.getFeature().getStructure().setAnd();
 				} else
 					throw new UnsupportedModelException(COULDNT_MATCH_WITH + "known Types: :r, :m, :o, :g, :", line);
 				addFeatureToModel(feat.getFeature());
@@ -487,6 +487,12 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 				lastFeat = feat;
 				line++;
+			}
+			//Check that there are only OR connections when the parent has more than one feature
+			for (IFeature f : object.getFeatures()) {
+				if(f.getStructure().isOr() && f.getStructure().getChildrenCount() <= 1) {
+					f.getStructure().setAnd();
+				}
 			}
 
 			handleArbitrayCardinality(arbCardGroupFeats);
@@ -504,11 +510,11 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					feature.getStructure().addChild(grantChild);
 				}
 				if (child.isAnd())
-					feature.getStructure().changeToAnd();
+					feature.getStructure().setAnd();
 				else if (child.isOr())
-					feature.getStructure().changeToOr();
+					feature.getStructure().setOr();
 				else if (child.isAlternative())
-					feature.getStructure().changeToAlternative();
+					feature.getStructure().setAlternative();
 				child.setParent(null);
 				feature.getStructure().removeChild(child);
 				object.deleteFeatureFromTable(child.getFeature());
