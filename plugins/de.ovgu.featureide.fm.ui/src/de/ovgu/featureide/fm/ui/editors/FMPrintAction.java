@@ -30,7 +30,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A PrintAction for the FeatureModelEditor that temporarily moves the

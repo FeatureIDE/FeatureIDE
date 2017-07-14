@@ -34,7 +34,6 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ModelFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * The main editpart that has all <code>FeatureEditPart</code>s as children.

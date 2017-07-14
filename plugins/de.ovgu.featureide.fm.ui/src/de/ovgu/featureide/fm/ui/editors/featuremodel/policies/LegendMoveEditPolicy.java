@@ -31,12 +31,9 @@ import org.eclipse.draw2d.geometry.PrecisionRectangle;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGBA;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Allows to move the legend. Also shows feedback if the moving operation is possible or not

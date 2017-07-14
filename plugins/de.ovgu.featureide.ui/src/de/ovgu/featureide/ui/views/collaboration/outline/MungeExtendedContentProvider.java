@@ -51,7 +51,6 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTModelForPP;
-import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Provides the content for the collaboration outline.

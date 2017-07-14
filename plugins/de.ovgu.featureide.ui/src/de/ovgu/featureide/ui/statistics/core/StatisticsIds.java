@@ -21,7 +21,6 @@
 package de.ovgu.featureide.ui.statistics.core;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ATOMIC_SETS_OF_THE_FEATURE_MODEL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SYNTACTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE___DETAILS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATION_TOOL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LINES_OF_CODE;
@@ -51,10 +50,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_UNIQ
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_UNIQUE_METHODS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RELATIVE_NUMBER_OF_FEATURES_IN_CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_PRODUCT_LINE_SPECIFICATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SYNTACTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TIMEOUT_STRING;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 
 import java.util.HashMap;
 

@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.filters;
 
-import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
