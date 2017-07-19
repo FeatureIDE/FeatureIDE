@@ -1098,7 +1098,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 							ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
 							//Get current configuration 
 							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-							final IFile document  = getEditorInput().getAdapter(IFile.class);
+							//Cast is necessary, don't remove 
+							final IFile document  = (IFile)getEditorInput().getAdapter(IFile.class);
 							
 							byte[] content;
 							try {
