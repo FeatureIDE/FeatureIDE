@@ -29,25 +29,28 @@ import org.prop4j.Node;
  * @author Sebastian Krieter
  */
 public abstract class AFeatureData implements IConstrainedObject {
-	protected final int startLineNumber, endLineNumber;
+	protected final SignaturePosition sigPosition;
+
+
 	protected final int id;
 
 	protected Node constraint;
 
 	protected String comment;
-
-	protected AFeatureData(int id, int lineNumber, int endLineNumber) {
-		this.startLineNumber = lineNumber;
-		this.endLineNumber = endLineNumber;
+	
+	protected String absolutePathToFile;
+	
+	protected AFeatureData(int id, SignaturePosition sigPosition) {
+		this.sigPosition = sigPosition;
 		this.id = id;
 	}
 
 	public int getStartLineNumber() {
-		return startLineNumber;
+		return sigPosition.getStartRow();
 	}
 
 	public int getEndLineNumber() {
-		return endLineNumber;
+		return sigPosition.getEndRow();
 	}
 
 	public Node getConstraint() {
@@ -72,6 +75,25 @@ public abstract class AFeatureData implements IConstrainedObject {
 
 	public boolean hasID(int id) {
 		return this.id == -1 || this.id == id;
+	}
+	public String getAbsoluteFilePath() {
+		return absolutePathToFile;
+	}
+
+	public void setAbsoluteFilePath(String absoluteFilePath) {
+		this.absolutePathToFile = absoluteFilePath;
+	}
+
+	public int getStartIDColumnNumber() {
+		return sigPosition.getIdentifierStart();
+	}
+
+	public int getEndIDColumnNumber() {
+		return sigPosition.getIdentifierEnd();
+	}
+	
+	public SignaturePosition getSigPosition() {
+		return sigPosition;
 	}
 
 }

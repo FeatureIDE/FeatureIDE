@@ -33,8 +33,8 @@ public class PreprocessorFeatureData extends AFeatureData {
 
 	private final HashSet<Integer> involvedFeatures = new HashSet<>();
 	
-	PreprocessorFeatureData(int startLineNumber, int endLineNumber) {
-		super(-1, startLineNumber, endLineNumber);
+	PreprocessorFeatureData(SignaturePosition position) {
+		super(-1, position);
 	}
 
 	public Collection<Integer> getInvolvedFeature() {

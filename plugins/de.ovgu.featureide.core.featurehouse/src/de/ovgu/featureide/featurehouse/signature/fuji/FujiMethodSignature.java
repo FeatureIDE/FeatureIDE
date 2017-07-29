@@ -135,8 +135,8 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		if (isConstructor != otherSig.isConstructor) {
 			return false;
 		}
-		
-		if (returnType != otherSig.returnType) {
+
+		if (!returnType.name().equals(otherSig.returnType.name())) {
 			return false;
 		}
 		
@@ -147,7 +147,7 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		Iterator<ParameterDeclaration> thisIt = parameterList.iterator();
 		Iterator<ParameterDeclaration> otherIt = otherSig.parameterList.iterator();
 		while (thisIt.hasNext()) {
-			if (thisIt.next().type() != otherIt.next().type()) {
+			if (!thisIt.next().type().fullName().equals(otherIt.next().type().fullName())) {
 				return false;
 			}
 		}

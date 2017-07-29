@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.featurehouse.signature.fuji;
 
+import AST.ASTNode;
+import AST.BoundTypeAccess;
+import AST.FieldDeclaration;
 import AST.TypeDecl;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
@@ -32,11 +35,13 @@ import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 public class FujiFieldSignature extends AbstractFieldSignature {
 
 	protected TypeDecl returnType;
+	protected FieldDeclaration field;
 
 	public FujiFieldSignature(AbstractClassSignature parent, String name,
-			String modifiers, TypeDecl returnType) {
+			String modifiers, TypeDecl returnType, FieldDeclaration field) {
 		super(parent, name, modifiers, returnType.name());
 		this.returnType = returnType;
+		this.field = field;
 	}
 
 	@Override
@@ -70,6 +75,10 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		super.computeHashCode();
 		hashCode = hashCodePrime * hashCode + type.hashCode();
 	}
+	
+	public String getFullFieldDeclaration(){
+		return field.toString();
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -80,11 +89,39 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 
 		FujiFieldSignature otherSig = (FujiFieldSignature) obj;
 
-		if (!super.sigEquals(otherSig)
-				|| returnType != otherSig.returnType
-		) {
+		if (!super.sigEquals(otherSig) || !returnType.name().equals(otherSig.returnType.name())) {
 			return false;
 		}
 		return true;
 	}
+	
+	public String getFullModifiersAndReturnTypes()
+	{
+		String result = "";
+		for (String modifier : getModifiers()) {
+			result += modifier + " ";
+		}
+		
+		result += getType();
+		findClassAccess(returnType);
+		
+//		result +=  " " + getName() +";\n";
+		
+		return result;
+	}
+	
+	private void findClassAccess(ASTNode<?> stmt)
+	{
+		if (stmt == null) 
+			return;
+		
+		if (stmt instanceof BoundTypeAccess) {
+			
+		} else {
+			for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
+				findClassAccess(stmt.getChildNoTransform(i));
+			}
+		}
+	}
+	
 }

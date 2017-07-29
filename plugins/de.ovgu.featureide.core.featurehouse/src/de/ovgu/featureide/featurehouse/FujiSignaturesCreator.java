@@ -56,6 +56,7 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
+import de.ovgu.featureide.core.signature.base.SignaturePosition;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
@@ -93,6 +94,13 @@ public class FujiSignaturesCreator {
 		public final AbstractSignature getSig() {
 			return sig;
 		}
+		
+		public void setAbsoluteFilePath(int featureID, String absoluteFilePath) {
+			if (ids.containsKey(featureID)) {
+				ids.get(featureID).setAbsoluteFilePath(absoluteFilePath);
+			}
+		}
+
 	}
 
 	private java.util.List<String> featureModulePathnames = null;
@@ -124,6 +132,8 @@ public class FujiSignaturesCreator {
 				continue;
 			}
 			String featurename = getFeatureName(unit);
+			
+			String absoluteFilePath = unit.relativeName();
 
 			List<TypeDecl> typeDeclList = unit.getTypeDeclList();
 			String pckg = unit.getPackageDecl();
@@ -145,9 +155,9 @@ public class FujiSignaturesCreator {
 
 					String typeString = null;
 					if (typeDecl instanceof ClassDecl) {
-						typeString = "class";
+						typeString = AbstractClassSignature.TYPE_CLASS;
 					} else if (typeDecl instanceof InterfaceDecl) {
-						typeString = "interface";
+						typeString = AbstractClassSignature.TYPE_INTERFACE;
 					}
 
 					AbstractClassSignature parent = null;
@@ -156,8 +166,17 @@ public class FujiSignaturesCreator {
 					}
 					featurename = getFeatureName(typeDecl);
 					FujiClassSignature curClassSig = (FujiClassSignature) addFeatureID(
+<<<<<<< HEAD
 							new FujiClassSignature(parent, name, modifierString, typeString, pckg, typeDecl, importList),
 							projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()));
+=======
+							new FujiClassSignature(parent, name,
+									modifierString, typeString, pckg, typeDecl,
+									importList),
+									projectSignatures.getFeatureID(featurename), 
+									typeDecl.getStart(), typeDecl.getEnd(), typeDecl.IDstart, typeDecl.IDend, 
+									absoluteFilePath);
+>>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
 					for (ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
 					}
@@ -179,8 +198,17 @@ public class FujiSignaturesCreator {
 							List<Access> exceptionList = method.getExceptionList();
 
 							featurename = getFeatureName(bodyDecl);
+<<<<<<< HEAD
 							addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type, false, parameterList, exceptionList),
 									projectSignatures.getFeatureID(featurename), Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()));
+=======
+							addFeatureID(new FujiMethodSignature(curClassSig,
+									name, modifierString, type, false,
+									parameterList, exceptionList),
+									projectSignatures.getFeatureID(featurename), 
+									method.getStart(), method.getEnd(), method.IDstart, method.IDend, 
+									absoluteFilePath);
+>>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
 
 						} else if (bodyDecl instanceof FieldDeclaration) {
 							FieldDeclaration field = (FieldDeclaration) bodyDecl;
@@ -195,8 +223,16 @@ public class FujiSignaturesCreator {
 							TypeDecl type = field.type();
 
 							featurename = getFeatureName(bodyDecl);
+<<<<<<< HEAD
 							addFeatureID(new FujiFieldSignature(curClassSig, name, modifierString, type), projectSignatures.getFeatureID(featurename),
 									Symbol.getLine(field.getStart()), Symbol.getLine(field.getEnd()));
+=======
+							addFeatureID(new FujiFieldSignature(curClassSig,
+									name, modifierString, type, field),
+									projectSignatures.getFeatureID(featurename), 
+									field.getStart(), field.getEnd(), field.IDstart, field.IDend, 
+									absoluteFilePath);
+>>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
 
 						} else if (bodyDecl instanceof ConstructorDecl) {
 							ConstructorDecl constructor = (ConstructorDecl) bodyDecl;
@@ -214,9 +250,19 @@ public class FujiSignaturesCreator {
 								List<Access> exceptionList = constructor.getExceptionList();
 
 								featurename = getFeatureName(bodyDecl);
+<<<<<<< HEAD
 								addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type, true, parameterList, exceptionList),
 										projectSignatures.getFeatureID(featurename), Symbol.getLine(constructor.getStart()),
 										Symbol.getLine(constructor.getEnd()));
+=======
+								addFeatureID(new FujiMethodSignature(
+										curClassSig, name, modifierString,
+										type, true, parameterList,
+										exceptionList),
+										projectSignatures.getFeatureID(featurename), 
+										constructor.getStart(), constructor.getEnd(), constructor.IDstart, constructor.IDend, 
+										absoluteFilePath);
+>>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
 							}
 
 						} else if (bodyDecl instanceof MemberClassDecl) {
@@ -245,15 +291,23 @@ public class FujiSignaturesCreator {
 
 		return projectSignatures;
 	}
+<<<<<<< HEAD
 
 	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int startLine, int endLine) {
+=======
+	
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int start, int end, int identifierStart, int identifierEnd, String absoluteFilePath) {
+>>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
 		SignatureReference sigRef = signatureSet.get(sig);
 		if (sigRef == null) {
 			sigRef = new SignatureReference(sig);
 			signatureSet.put(sig, sigRef);
 			signatureTable.put(sig.getFullName(), sig);
 		}
-		sigRef.addID((FOPFeatureData) featureDataConstructor.create(featureID, startLine, endLine));
+		SignaturePosition position = new SignaturePosition(Symbol.getLine(start), Symbol.getLine(end), Symbol.getColumn(start), Symbol.getColumn(end),
+				Symbol.getColumn(identifierStart), Symbol.getColumn(identifierEnd));
+		sigRef.addID((FOPFeatureData) featureDataConstructor.create(featureID, position));
+		sigRef.setAbsoluteFilePath(featureID, absoluteFilePath);
 		return sigRef.getSig();
 	}
 

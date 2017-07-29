@@ -89,7 +89,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			}
 			IFeature parent = removeFeature(element, removalMap, alreadyDeleted);
 			
-			commonAncestorList = Features.getCommonAncestor(commonAncestorList, parent);
+			commonAncestorList = Features.getCommonAncestors(commonAncestorList, parent);
 		}
 
 		removeContainedFeatures(removalMap, alreadyDeleted);

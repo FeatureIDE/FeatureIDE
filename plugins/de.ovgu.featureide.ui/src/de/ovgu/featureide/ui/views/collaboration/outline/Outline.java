@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -52,6 +52,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -115,7 +116,7 @@ import de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider;
 /**
  * Another outline view displaying the same information as the collaboration
  * diagram
- * 
+ *
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Reimar Schroeter
@@ -125,7 +126,7 @@ import de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider;
 /*
  * TODO #404 fix bug: do not close the tree if a corresponding file was opened
  * with an other way e.g. via collaboration diagram
- * 
+ *
  * TODO Sometimes the outline has no content -> display a warning / message
  */
 public class Outline extends ViewPart implements ICurrentBuildListener, IPropertyChangeListener {
@@ -136,10 +137,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	private IEventListener colorChangedListener = new IEventListener(){
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
-			update(iFile);	
-		}		
+			update(iFile);
+		}
 	};
-	
+
 	private TreeViewer viewer;
 	private IFile iFile;
 	private IEditorPart active_editor;
@@ -429,7 +430,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	/**
 	 * handles all the editorActions
-	 * 
+	 *
 	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
 
@@ -493,10 +494,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	private TreeViewerListenerImpl treeListener;
 
 	@Override
-	public void createPartControl(Composite parent) {		
+	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
-		
+
 
 		addContentProv(new NotAvailableContentProv(), new NotAvailableLabelProv());
 		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
@@ -525,7 +526,18 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		viewer.addTreeListener(treeListener);
 		viewer.addSelectionChangedListener(selectionChangedListener);
 
-		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());		
+		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
+
+		createContextMenu();
+	}
+
+	private void createContextMenu() {
+		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		Control control = viewer.getControl();
+		Menu menu = menuMgr.createContextMenu(control);
+		control.setMenu(menu);
+		getSite().registerContextMenu(menuMgr, viewer);
 	}
 
 	/**
@@ -573,7 +585,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	/**
 	 * Sets the new input or disables the viewer in case no editor is open
-	 * 
+	 *
 	 */
 	private void update(IFile iFile2) {
 		if (viewer != null) {
@@ -623,7 +635,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 												if (contextMenu == null
 														|| contextMenu.getFeatureModel() != ((FeatureModelEditor) active_editor).getFeatureModel()) {
 													if (contextMenu != null) {
-														
+
 														// the listener isn't
 														// recreated, if it still
 														// exists
@@ -775,7 +787,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	/**
 	 * provides functionality to expand and collapse all items in viewer
-	 * 
+	 *
 	 * @param iToolBarManager
 	 */
 	public void addToolbar(IToolBarManager iToolBarManager) {
@@ -840,7 +852,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	/**
 	 * Jumps to a line in the given editor
-	 * 
+	 *
 	 * @param editorPart
 	 * @param lineNumber
 	 */
@@ -864,7 +876,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	/**
 	 * Highlights the whole if-Block for a FSTDirective
-	 * 
+	 *
 	 * @param editorPart
 	 * @param startLine
 	 *            the first line of a directive
@@ -985,7 +997,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider
 		 * #init()

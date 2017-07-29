@@ -21,6 +21,8 @@
 package de.ovgu.featureide.core.signature.base;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.prop4j.Node;
 import org.prop4j.Or;
@@ -57,8 +59,14 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	protected AFeatureData[] featureData = null;
 	protected String mergedjavaDocComment = null;
 	
+<<<<<<< HEAD
 	protected int startLine = -1;
 	protected int endLine = -1;
+=======
+	protected final boolean staticSignature;
+	
+	protected final Set<ExtendedSignature> invocationSignatures;
+>>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
 	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
@@ -85,12 +93,16 @@ public abstract class AbstractSignature implements IConstrainedObject {
 			this.visibility = VISIBILITY_DEFAULT;
 		}
 		
+		this.staticSignature = (Arrays.binarySearch(this.modifiers, "static") >= 0);
+		
 		this.finalSignature = Arrays.binarySearch(this.modifiers, "final") >= 0;
+		
 		if (type == null) {
 			this.type = "void";
 		} else {
 			this.type = type;
 		}
+		this.invocationSignatures = new HashSet<ExtendedSignature>();
 	}
 	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type, int startLine, int endLine) {
@@ -175,20 +187,23 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		return finalSignature;
 	}
 
+	/**
+	 * @return the isStatic
+	 */
+	public boolean isStatic() {
+		return staticSignature;
+	}
+
 	public void setMergedjavaDocComment(String mergedjavaDocComment) {
 		this.mergedjavaDocComment = mergedjavaDocComment;
 	}
 	
 	public void setFeatureData(AFeatureData[] featureData) {
-		if (this.featureData == null) {
-			this.featureData = featureData;
-		}
+		this.featureData = featureData;
 	}
 	
 	public void setFeatureData(AFeatureData featureData) {
-		if (this.featureData == null) {
-			this.featureData = new AFeatureData[]{featureData};
-		}
+		this.featureData = new AFeatureData[]{featureData};
 	}
 
 	public int hasFeature(int id) {
@@ -276,5 +291,17 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		}		
 		
 		return new Or(constraints).toCNF();
+	}
+	
+	public void addInvocationSignature(ExtendedSignature signature)
+	{
+		invocationSignatures.add(signature);
+	}
+
+	/**
+	 * @return the invocationSignatures
+	 */
+	public Set<ExtendedSignature> getInvocationSignatures() {
+		return invocationSignatures;
 	}
 }

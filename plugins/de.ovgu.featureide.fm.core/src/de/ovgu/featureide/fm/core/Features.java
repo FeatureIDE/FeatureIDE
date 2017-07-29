@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * Convenience methods for traversing the feature tree structure.
- * 
+ *
  * @author Sebastian Krieter
  */
 public final class Features {
@@ -93,29 +93,67 @@ public final class Features {
 		return result;
 	}
 
+
 	public static IFeature getCommonAncestor(Collection<IFeature> features) {
 		List<IFeature> commonAncestorList = null;
 		for (IFeature feature : features) {
 			commonAncestorList = Features.getCommonAncestor(commonAncestorList, FeatureUtils.getParent(feature));
 		}
-		return commonAncestorList.get(commonAncestorList.size() - 1);
+		return commonAncestorList;
 	}
 
-	public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList, IFeature parent) {
+	public static List<Feature> getCommonAncestors(Collection<Feature> features) {
+		List<Feature> commonAncestorList = null;
+		for (Feature feature : features) {
+			commonAncestorList = Features.getCommonAncestors(commonAncestorList, feature);
+
+		}
+		return commonAncestorList;
+	}
+
+
+public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList, IFeature parent) {
+	if (commonAncestorList == null) {
+		commonAncestorList = new LinkedList<>();
+		while (parent != null) {
+			commonAncestorList.add(0, parent);
+			parent = FeatureUtils.getParent(parent);
+		}
+	} else if (parent != null) {
+		LinkedList<IFeature> parentList = new LinkedList<>();
+		while (parent != null) {
+			parentList.addFirst(parent);
+			parent = FeatureUtils.getParent(parent);
+		}
+		final Iterator<IFeature> iterator1 = parentList.iterator();
+		final Iterator<IFeature> iterator2 = commonAncestorList.iterator();
+		int i = 0;
+		while (iterator1.hasNext() && iterator2.hasNext()) {
+			if (!iterator1.next().equals(iterator2.next())) {
+				break;
+			}
+			i++;
+		}
+		commonAncestorList = commonAncestorList.subList(0, i);
+	}
+	return commonAncestorList;
+}
+
+	public static List<Feature> getCommonAncestors(List<Feature> commonAncestorList, Feature parent) {
 		if (commonAncestorList == null) {
 			commonAncestorList = new LinkedList<>();
 			while (parent != null) {
 				commonAncestorList.add(0, parent);
-				parent = FeatureUtils.getParent(parent);
-			}
-		} else if (parent != null) {
-			LinkedList<IFeature> parentList = new LinkedList<>();
-			while (parent != null) {
-				parentList.addFirst(parent);
-				parent = FeatureUtils.getParent(parent);
-			}
-			final Iterator<IFeature> iterator1 = parentList.iterator();
-			final Iterator<IFeature> iterator2 = commonAncestorList.iterator();
+				parent = parent.getParent();
+		}
+	} else if (parent != null) {
+		LinkedList<Feature> parentList = new LinkedList<>();
+		while (parent != null) {
+			parentList.addFirst(parent);
+			parent = parent.getParent();
+		}
+		final Iterator<Feature> iterator1 = parentList.iterator();
+		final Iterator<Feature> iterator2 = commonAncestorList.iterator();
 			int i = 0;
 			while (iterator1.hasNext() && iterator2.hasNext()) {
 				if (!iterator1.next().equals(iterator2.next())) {

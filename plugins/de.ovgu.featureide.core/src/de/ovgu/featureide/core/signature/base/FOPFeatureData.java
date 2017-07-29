@@ -37,8 +37,8 @@ public class FOPFeatureData extends AFeatureData {
 	private ArrayList<AbstractSignature> calledSignatures;
 	private ArrayList<String> usedNonPrimitveTypes;
 	
-	FOPFeatureData(int id, int startLineNumber, int endLineNumber) {
-		super(id, startLineNumber, endLineNumber);
+	public FOPFeatureData(int id, SignaturePosition sigPosition) {
+		super(id, sigPosition);
 		this.calledSignatures = null;
 		this.usesExternalMethods = false;
 		this.usesOriginal = false;
@@ -72,7 +72,8 @@ public class FOPFeatureData extends AFeatureData {
 		if (this.calledSignatures == null) {
 			this.calledSignatures = new ArrayList<AbstractSignature>();
 		}
-		this.calledSignatures.add(signature);
+		//if (!this.calledSignatures.contains(signature)) 
+			this.calledSignatures.add(signature);
 	}
 	
 	public void addUsedNonPrimitveType(String usedNonPrimitveType) {
@@ -83,4 +84,5 @@ public class FOPFeatureData extends AFeatureData {
 			this.usedNonPrimitveTypes.add(usedNonPrimitveType);
 		}
 	}
+	
 }
