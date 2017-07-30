@@ -89,7 +89,9 @@ public class Explanation implements Cloneable {
 			if (getMode() == Mode.REDUNDANT_CONSTRAINT) {
 				return 1;
 			}
-			return (float) reasonCounts.get(this)/getExplanationCount();
+			float confidence = (float) reasonCounts.get(this)/getExplanationCount();
+			confidence = Math.max(0.0f, Math.min(1.0f, confidence)); //Clamp between 0 and 1 (just in case).
+			return confidence;
 		}
 		
 		@Override
