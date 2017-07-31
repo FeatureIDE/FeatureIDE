@@ -58,15 +58,11 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	
 	protected AFeatureData[] featureData = null;
 	protected String mergedjavaDocComment = null;
-	
-
 	protected int startLine = -1;
 	protected int endLine = -1;
-
 	protected final boolean staticSignature;
 	
 	protected final Set<ExtendedSignature> invocationSignatures;
-
 	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
@@ -126,7 +122,6 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	public void setEndLine(int endLine) {
 		this.endLine = endLine;
 	}
-
 	protected void setFullName(String perfixName) {
 		this.fullName = perfixName + '.' + name;
 	}
@@ -199,11 +194,15 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	}
 	
 	public void setFeatureData(AFeatureData[] featureData) {
+		if (this.featureData == null) {
 		this.featureData = featureData;
+		}
 	}
 	
 	public void setFeatureData(AFeatureData featureData) {
+		if (this.featureData == null) {
 		this.featureData = new AFeatureData[]{featureData};
+		}
 	}
 
 	public int hasFeature(int id) {

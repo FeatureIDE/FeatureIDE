@@ -37,8 +37,8 @@ public class FOPFeatureData extends AFeatureData {
 	private ArrayList<AbstractSignature> calledSignatures;
 	private ArrayList<String> usedNonPrimitveTypes;
 	
-	public FOPFeatureData(int id, SignaturePosition sigPosition) {
-		super(id, sigPosition);
+	FOPFeatureData(int id, int startLineNumber, int endLineNumber) {
+		super(id, startLineNumber, endLineNumber);
 		this.calledSignatures = null;
 		this.usesExternalMethods = false;
 		this.usesOriginal = false;
