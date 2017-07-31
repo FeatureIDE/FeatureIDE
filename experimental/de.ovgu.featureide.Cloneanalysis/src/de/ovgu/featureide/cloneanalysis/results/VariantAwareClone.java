@@ -72,7 +72,7 @@ public class VariantAwareClone extends Clone
 			return;
 		final IFile file = ResourcesPlugin.getWorkspace().getRoot()
 				.getFileForLocation(occurence.getFile());
-		final Feature feature = featureProject.getFeatureModel().getFeature(
+		final Feature feature = (Feature) featureProject.getFeatureModel().getFeature(
 				featureProject.getFeatureName(file));
 
 		if (feature != null)

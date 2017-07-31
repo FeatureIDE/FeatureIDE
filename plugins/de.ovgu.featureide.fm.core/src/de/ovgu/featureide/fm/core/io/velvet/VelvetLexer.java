@@ -1,20 +1,19 @@
-// $ANTLR 3.4 Velvet.g 2015-09-20 21:45:06
 // $ANTLR 3.4 Velvet.g 2016-07-17 21:07:31
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- *
+ * 
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -99,7 +98,7 @@ public class VelvetLexer extends Lexer {
         return new Lexer[] {};
     }
 
-    public VelvetLexer() {}
+    public VelvetLexer() {} 
     public VelvetLexer(CharStream input) {
         this(input, new RecognizerSharedState());
     }
@@ -116,7 +115,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:4:10: ( 'abstract' )
             // Velvet.g:4:12: 'abstract'
             {
-            match("abstract");
+            match("abstract"); 
 
 
 
@@ -139,7 +138,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:5:16: ( '==' )
             // Velvet.g:5:18: '=='
             {
-            match("==");
+            match("=="); 
 
 
 
@@ -162,7 +161,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:6:17: ( '>' )
             // Velvet.g:6:19: '>'
             {
-            match('>');
+            match('>'); 
 
             }
 
@@ -183,7 +182,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:7:20: ( '>=' )
             // Velvet.g:7:22: '>='
             {
-            match(">=");
+            match(">="); 
 
 
 
@@ -206,7 +205,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:8:14: ( '<' )
             // Velvet.g:8:16: '<'
             {
-            match('<');
+            match('<'); 
 
             }
 
@@ -227,7 +226,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:9:17: ( '<=' )
             // Velvet.g:9:19: '<='
             {
-            match("<=");
+            match("<="); 
 
 
 
@@ -250,7 +249,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:10:20: ( '!=' )
             // Velvet.g:10:22: '!='
             {
-            match("!=");
+            match("!="); 
 
 
 
@@ -273,7 +272,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:11:12: ( 'cinterface' )
             // Velvet.g:11:14: 'cinterface'
             {
-            match("cinterface");
+            match("cinterface"); 
 
 
 
@@ -296,7 +295,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:12:7: ( ':' )
             // Velvet.g:12:9: ':'
             {
-            match(':');
+            match(':'); 
 
             }
 
@@ -317,7 +316,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:13:7: ( ',' )
             // Velvet.g:13:9: ','
             {
-            match(',');
+            match(','); 
 
             }
 
@@ -338,7 +337,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:14:9: ( 'concept' )
             // Velvet.g:14:11: 'concept'
             {
-            match("concept");
+            match("concept"); 
 
 
 
@@ -361,7 +360,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:15:12: ( 'constraint' )
             // Velvet.g:15:14: 'constraint'
             {
-            match("constraint");
+            match("constraint"); 
 
 
 
@@ -384,7 +383,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:16:13: ( 'description' )
             // Velvet.g:16:15: 'description'
             {
-            match("description");
+            match("description"); 
 
 
 
@@ -407,7 +406,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:17:7: ( '}' )
             // Velvet.g:17:9: '}'
             {
-            match('}');
+            match('}'); 
 
             }
 
@@ -428,7 +427,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:18:7: ( ')' )
             // Velvet.g:18:9: ')'
             {
-            match(')');
+            match(')'); 
 
             }
 
@@ -449,7 +448,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:19:4: ( '=' )
             // Velvet.g:19:6: '='
             {
-            match('=');
+            match('='); 
 
             }
 
@@ -470,7 +469,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:20:9: ( 'feature' )
             // Velvet.g:20:11: 'feature'
             {
-            match("feature");
+            match("feature"); 
 
 
 
@@ -493,7 +492,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:21:8: ( 'import' )
             // Velvet.g:21:10: 'import'
             {
-            match("import");
+            match("import"); 
 
 
 
@@ -507,7 +506,6 @@ public class VelvetLexer extends Lexer {
         }
     }
     // $ANTLR end "IMPORT"
-
     // $ANTLR start "IMPORTINSTANCE"
     public final void mIMPORTINSTANCE() throws RecognitionException {
         try {
@@ -516,7 +514,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:21:16: ( 'instance' )
             // Velvet.g:21:18: 'instance'
             {
-            match("instance");
+            match("instance"); 
 
 
 
@@ -539,7 +537,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:22:17: ( 'interface' )
             // Velvet.g:22:19: 'interface'
             {
-            match("interface");
+            match("interface"); 
 
 
 
@@ -562,7 +560,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:23:11: ( 'mandatory' )
             // Velvet.g:23:13: 'mandatory'
             {
-            match("mandatory");
+            match("mandatory"); 
 
 
 
@@ -585,7 +583,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:24:7: ( '-' )
             // Velvet.g:24:9: '-'
             {
-            match('-');
+            match('-'); 
 
             }
 
@@ -606,7 +604,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:25:7: ( 'oneOf' )
             // Velvet.g:25:9: 'oneOf'
             {
-            match("oneOf");
+            match("oneOf"); 
 
 
 
@@ -629,7 +627,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:26:8: ( '&&' )
             // Velvet.g:26:10: '&&'
             {
-            match("&&");
+            match("&&"); 
 
 
 
@@ -652,7 +650,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:27:15: ( '<->' )
             // Velvet.g:27:17: '<->'
             {
-            match("<->");
+            match("<->"); 
 
 
 
@@ -675,7 +673,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:28:12: ( '->' )
             // Velvet.g:28:14: '->'
             {
-            match("->");
+            match("->"); 
 
 
 
@@ -698,7 +696,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:29:8: ( '!' )
             // Velvet.g:29:10: '!'
             {
-            match('!');
+            match('!'); 
 
             }
 
@@ -719,7 +717,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:30:7: ( '||' )
             // Velvet.g:30:9: '||'
             {
-            match("||");
+            match("||"); 
 
 
 
@@ -742,7 +740,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:31:8: ( 'xor' )
             // Velvet.g:31:10: 'xor'
             {
-            match("xor");
+            match("xor"); 
 
 
 
@@ -765,7 +763,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:32:6: ( '+' )
             // Velvet.g:32:8: '+'
             {
-            match('+');
+            match('+'); 
 
             }
 
@@ -786,7 +784,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:33:6: ( ';' )
             // Velvet.g:33:8: ';'
             {
-            match(';');
+            match(';'); 
 
             }
 
@@ -807,7 +805,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:34:8: ( 'someOf' )
             // Velvet.g:34:10: 'someOf'
             {
-            match("someOf");
+            match("someOf"); 
 
 
 
@@ -830,7 +828,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:35:9: ( '{' )
             // Velvet.g:35:11: '{'
             {
-            match('{');
+            match('{'); 
 
             }
 
@@ -851,7 +849,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:36:9: ( '(' )
             // Velvet.g:36:11: '('
             {
-            match('(');
+            match('('); 
 
             }
 
@@ -872,7 +870,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:37:5: ( 'use' )
             // Velvet.g:37:7: 'use'
             {
-            match("use");
+            match("use"); 
 
 
 
@@ -895,7 +893,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:38:10: ( 'bool' )
             // Velvet.g:38:12: 'bool'
             {
-            match("bool");
+            match("bool"); 
 
 
 
@@ -918,7 +916,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:39:11: ( 'float' )
             // Velvet.g:39:13: 'float'
             {
-            match("float");
+            match("float"); 
 
 
 
@@ -941,7 +939,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:40:9: ( 'int' )
             // Velvet.g:40:11: 'int'
             {
-            match("int");
+            match("int"); 
 
 
 
@@ -964,7 +962,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:41:12: ( 'string' )
             // Velvet.g:41:14: 'string'
             {
-            match("string");
+            match("string"); 
 
 
 
@@ -1005,7 +1003,7 @@ public class VelvetLexer extends Lexer {
                 case 1 :
                     // Velvet.g:219:11: 'true'
                     {
-                    match("true");
+                    match("true"); 
 
 
 
@@ -1014,7 +1012,7 @@ public class VelvetLexer extends Lexer {
                 case 2 :
                     // Velvet.g:220:4: 'false'
                     {
-                    match("false");
+                    match("false"); 
 
 
 
@@ -1102,7 +1100,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:226:8: ( ID ( '.' ID )+ )
             // Velvet.g:226:10: ID ( '.' ID )+
             {
-            mID();
+            mID(); 
 
 
             // Velvet.g:226:13: ( '.' ID )+
@@ -1121,9 +1119,9 @@ public class VelvetLexer extends Lexer {
             	case 1 :
             	    // Velvet.g:226:14: '.' ID
             	    {
-            	    match('.');
+            	    match('.'); 
 
-            	    mID();
+            	    mID(); 
 
 
             	    }
@@ -1259,7 +1257,7 @@ public class VelvetLexer extends Lexer {
                     } while (true);
 
 
-                    match('.');
+                    match('.'); 
 
                     // Velvet.g:233:25: ( '0' .. '9' )*
                     loop6:
@@ -1306,7 +1304,7 @@ public class VelvetLexer extends Lexer {
                         case 1 :
                             // Velvet.g:233:37: EXPONENT
                             {
-                            mEXPONENT();
+                            mEXPONENT(); 
 
 
                             }
@@ -1320,7 +1318,7 @@ public class VelvetLexer extends Lexer {
                 case 2 :
                     // Velvet.g:234:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
                     {
-                    match('.');
+                    match('.'); 
 
                     // Velvet.g:234:13: ( '0' .. '9' )+
                     int cnt8=0;
@@ -1372,7 +1370,7 @@ public class VelvetLexer extends Lexer {
                         case 1 :
                             // Velvet.g:234:25: EXPONENT
                             {
-                            mEXPONENT();
+                            mEXPONENT(); 
 
 
                             }
@@ -1425,7 +1423,7 @@ public class VelvetLexer extends Lexer {
                     } while (true);
 
 
-                    mEXPONENT();
+                    mEXPONENT(); 
 
 
                     }
@@ -1449,7 +1447,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:239:5: ( '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"' )
             // Velvet.g:239:8: '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"'
             {
-            match('\"');
+            match('\"'); 
 
             // Velvet.g:239:12: ( ESC_SEQ |~ ( '\\\\' | '\"' ) )*
             loop12:
@@ -1469,7 +1467,7 @@ public class VelvetLexer extends Lexer {
             	case 1 :
             	    // Velvet.g:239:14: ESC_SEQ
             	    {
-            	    mESC_SEQ();
+            	    mESC_SEQ(); 
 
 
             	    }
@@ -1496,7 +1494,7 @@ public class VelvetLexer extends Lexer {
             } while (true);
 
 
-            match('\"');
+            match('\"'); 
 
             }
 
@@ -1685,7 +1683,7 @@ public class VelvetLexer extends Lexer {
                 case 1 :
                     // Velvet.g:251:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
                     {
-                    match('\\');
+                    match('\\'); 
 
                     if ( input.LA(1)=='\"'||input.LA(1)=='\''||input.LA(1)=='\\'||input.LA(1)=='b'||input.LA(1)=='f'||input.LA(1)=='n'||input.LA(1)=='r'||input.LA(1)=='t' ) {
                         input.consume();
@@ -1702,7 +1700,7 @@ public class VelvetLexer extends Lexer {
                 case 2 :
                     // Velvet.g:252:9: UNICODE_ESC
                     {
-                    mUNICODE_ESC();
+                    mUNICODE_ESC(); 
 
 
                     }
@@ -1710,7 +1708,7 @@ public class VelvetLexer extends Lexer {
                 case 3 :
                     // Velvet.g:253:9: OCTAL_ESC
                     {
-                    mOCTAL_ESC();
+                    mOCTAL_ESC(); 
 
 
                     }
@@ -1781,7 +1779,7 @@ public class VelvetLexer extends Lexer {
                 case 1 :
                     // Velvet.g:258:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
                     {
-                    match('\\');
+                    match('\\'); 
 
                     if ( (input.LA(1) >= '0' && input.LA(1) <= '3') ) {
                         input.consume();
@@ -1818,7 +1816,7 @@ public class VelvetLexer extends Lexer {
                 case 2 :
                     // Velvet.g:259:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
                     {
-                    match('\\');
+                    match('\\'); 
 
                     if ( (input.LA(1) >= '0' && input.LA(1) <= '7') ) {
                         input.consume();
@@ -1845,7 +1843,7 @@ public class VelvetLexer extends Lexer {
                 case 3 :
                     // Velvet.g:260:9: '\\\\' ( '0' .. '7' )
                     {
-                    match('\\');
+                    match('\\'); 
 
                     if ( (input.LA(1) >= '0' && input.LA(1) <= '7') ) {
                         input.consume();
@@ -1875,20 +1873,20 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:265:5: ( '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
             // Velvet.g:265:9: '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
             {
-            match('\\');
+            match('\\'); 
 
-            match('u');
+            match('u'); 
 
-            mHEX_DIGIT();
-
-
-            mHEX_DIGIT();
+            mHEX_DIGIT(); 
 
 
-            mHEX_DIGIT();
+            mHEX_DIGIT(); 
 
 
-            mHEX_DIGIT();
+            mHEX_DIGIT(); 
+
+
+            mHEX_DIGIT(); 
 
 
             }
@@ -1943,7 +1941,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:274:14: ( '//' (~ ( '\\r' | '\\n' ) )* )
             // Velvet.g:274:15: '//' (~ ( '\\r' | '\\n' ) )*
             {
-            match("//");
+            match("//"); 
 
 
 
@@ -2008,7 +2006,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:276:14: ( '/*' (~ ( '*/' ) )* )
             // Velvet.g:276:15: '/*' (~ ( '*/' ) )*
             {
-            match("/*");
+            match("/*"); 
 
 
 
@@ -2063,14 +2061,14 @@ public class VelvetLexer extends Lexer {
     // $ANTLR end "ML_COMMENT"
 
     public void mTokens() throws RecognitionException {
-        // Velvet.g:1:8: ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE | COLON | COMMA | CONCEPT | CONSTRAINT | DESCRIPTION | END_C | END_R | EQ | FEATURE | IMPORT | IMPORTINSTANCE | IMPORTINTERFACE | MANDATORY | MINUS | ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | SEMI | SOMEOF | START_C | START_R | USE | VAR_BOOL | VAR_FLOAT | VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS | SL_COMMENT | ML_COMMENT )
+        // Velvet.g:1:8: ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE | COLON | COMMA | CONCEPT | CONSTRAINT | DESCRIPTION | END_C | END_R | EQ | FEATURE | IMPORTINSTANCE | IMPORTINTERFACE | MANDATORY | MINUS | ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | SEMI | SOMEOF | START_C | START_R | USE | VAR_BOOL | VAR_FLOAT | VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS | SL_COMMENT | ML_COMMENT )
         int alt19=48;
         alt19 = dfa19.predict(input);
         switch (alt19) {
             case 1 :
                 // Velvet.g:1:10: ABSTRACT
                 {
-                mABSTRACT();
+                mABSTRACT(); 
 
 
                 }
@@ -2078,7 +2076,7 @@ public class VelvetLexer extends Lexer {
             case 2 :
                 // Velvet.g:1:19: ATTR_OP_EQUALS
                 {
-                mATTR_OP_EQUALS();
+                mATTR_OP_EQUALS(); 
 
 
                 }
@@ -2086,7 +2084,7 @@ public class VelvetLexer extends Lexer {
             case 3 :
                 // Velvet.g:1:34: ATTR_OP_GREATER
                 {
-                mATTR_OP_GREATER();
+                mATTR_OP_GREATER(); 
 
 
                 }
@@ -2094,7 +2092,7 @@ public class VelvetLexer extends Lexer {
             case 4 :
                 // Velvet.g:1:50: ATTR_OP_GREATER_EQ
                 {
-                mATTR_OP_GREATER_EQ();
+                mATTR_OP_GREATER_EQ(); 
 
 
                 }
@@ -2102,7 +2100,7 @@ public class VelvetLexer extends Lexer {
             case 5 :
                 // Velvet.g:1:69: ATTR_OP_LESS
                 {
-                mATTR_OP_LESS();
+                mATTR_OP_LESS(); 
 
 
                 }
@@ -2110,7 +2108,7 @@ public class VelvetLexer extends Lexer {
             case 6 :
                 // Velvet.g:1:82: ATTR_OP_LESS_EQ
                 {
-                mATTR_OP_LESS_EQ();
+                mATTR_OP_LESS_EQ(); 
 
 
                 }
@@ -2118,7 +2116,7 @@ public class VelvetLexer extends Lexer {
             case 7 :
                 // Velvet.g:1:98: ATTR_OP_NOT_EQUALS
                 {
-                mATTR_OP_NOT_EQUALS();
+                mATTR_OP_NOT_EQUALS(); 
 
 
                 }
@@ -2126,7 +2124,7 @@ public class VelvetLexer extends Lexer {
             case 8 :
                 // Velvet.g:1:117: CINTERFACE
                 {
-                mCINTERFACE();
+                mCINTERFACE(); 
 
 
                 }
@@ -2134,7 +2132,7 @@ public class VelvetLexer extends Lexer {
             case 9 :
                 // Velvet.g:1:128: COLON
                 {
-                mCOLON();
+                mCOLON(); 
 
 
                 }
@@ -2142,7 +2140,7 @@ public class VelvetLexer extends Lexer {
             case 10 :
                 // Velvet.g:1:134: COMMA
                 {
-                mCOMMA();
+                mCOMMA(); 
 
 
                 }
@@ -2150,7 +2148,7 @@ public class VelvetLexer extends Lexer {
             case 11 :
                 // Velvet.g:1:140: CONCEPT
                 {
-                mCONCEPT();
+                mCONCEPT(); 
 
 
                 }
@@ -2158,7 +2156,7 @@ public class VelvetLexer extends Lexer {
             case 12 :
                 // Velvet.g:1:148: CONSTRAINT
                 {
-                mCONSTRAINT();
+                mCONSTRAINT(); 
 
 
                 }
@@ -2166,7 +2164,7 @@ public class VelvetLexer extends Lexer {
             case 13 :
                 // Velvet.g:1:159: DESCRIPTION
                 {
-                mDESCRIPTION();
+                mDESCRIPTION(); 
 
 
                 }
@@ -2174,7 +2172,7 @@ public class VelvetLexer extends Lexer {
             case 14 :
                 // Velvet.g:1:171: END_C
                 {
-                mEND_C();
+                mEND_C(); 
 
 
                 }
@@ -2182,7 +2180,7 @@ public class VelvetLexer extends Lexer {
             case 15 :
                 // Velvet.g:1:177: END_R
                 {
-                mEND_R();
+                mEND_R(); 
 
 
                 }
@@ -2190,7 +2188,7 @@ public class VelvetLexer extends Lexer {
             case 16 :
                 // Velvet.g:1:183: EQ
                 {
-                mEQ();
+                mEQ(); 
 
 
                 }
@@ -2198,336 +2196,252 @@ public class VelvetLexer extends Lexer {
             case 17 :
                 // Velvet.g:1:186: FEATURE
                 {
-                mFEATURE();
+                mFEATURE(); 
 
 
                 }
                 break;
             case 18 :
-                // Velvet.g:1:194: IMPORT
+                // Velvet.g:1:194: IMPORTINSTANCE
                 {
-                mIMPORT();
+                mIMPORT(); 
 
 
                 }
                 break;
             case 19 :
-                // Velvet.g:1:201: IMPORTINSTANCE
                 {
-                mIMPORTINSTANCE();
-
-
+                mIMPORTINSTANCE(); 
                 }
                 break;
-
             case 20 :
-
                 // Velvet.g:1:209: IMPORTINTERFACE
-
                 {
-                mIMPORTINTERFACE();
+                mIMPORTINTERFACE(); 
 
 
                 }
                 break;
-
             case 21 :
-
                 // Velvet.g:1:225: MANDATORY
-
                 {
-                mMANDATORY();
+                mMANDATORY(); 
 
 
                 }
                 break;
-
             case 22 :
-
                 // Velvet.g:1:235: MINUS
                 {
-                mMINUS();
+                mMINUS(); 
 
 
                 }
                 break;
-
             case 23 :
-
                 // Velvet.g:1:241: ONEOF
-
                 {
-                mONEOF();
+                mONEOF(); 
 
 
                 }
                 break;
-
             case 24 :
                 // Velvet.g:1:247: OP_AND
                 {
-                mOP_AND();
+                mOP_AND(); 
 
 
                 }
                 break;
-
             case 25 :
                 // Velvet.g:1:254: OP_EQUIVALENT
-
                 {
-                mOP_EQUIVALENT();
+                mOP_EQUIVALENT(); 
 
 
                 }
                 break;
-
             case 26 :
                 // Velvet.g:1:268: OP_IMPLIES
-
                 {
-                mOP_IMPLIES();
+                mOP_IMPLIES(); 
 
 
                 }
                 break;
-
             case 27 :
                 // Velvet.g:1:279: OP_NOT
-
                 {
-                mOP_NOT();
+                mOP_NOT(); 
 
 
                 }
                 break;
-
             case 28 :
-
                 // Velvet.g:1:286: OP_OR
-
                 {
-                mOP_OR();
+                mOP_OR(); 
 
 
                 }
                 break;
-
             case 29 :
-
                 // Velvet.g:1:292: OP_XOR
-
                 {
-                mOP_XOR();
+                mOP_XOR(); 
 
 
                 }
                 break;
-
             case 30 :
-
                 // Velvet.g:1:299: PLUS
-
                 {
-                mPLUS();
+                mPLUS(); 
 
 
                 }
                 break;
-
             case 31 :
-
                 // Velvet.g:1:304: SEMI
-
                 {
-                mSEMI();
+                mSEMI(); 
 
 
                 }
                 break;
-
             case 32 :
-
                 // Velvet.g:1:309: SOMEOF
-
                 {
-                mSOMEOF();
+                mSOMEOF(); 
 
 
                 }
                 break;
-
             case 33 :
-
                 // Velvet.g:1:316: START_C
-
                 {
-                mSTART_C();
+                mSTART_C(); 
 
 
                 }
                 break;
-
             case 34 :
-
                 // Velvet.g:1:324: START_R
-
                 {
-                mSTART_R();
+                mSTART_R(); 
 
 
                 }
                 break;
-
             case 35 :
-
                 // Velvet.g:1:332: USE
-
                 {
-                mUSE();
+                mUSE(); 
 
 
                 }
                 break;
-
             case 36 :
-
                 // Velvet.g:1:336: VAR_BOOL
-
                 {
-                mVAR_BOOL();
+                mVAR_BOOL(); 
 
 
                 }
                 break;
-
             case 37 :
-
                 // Velvet.g:1:345: VAR_FLOAT
-
                 {
-                mVAR_FLOAT();
+                mVAR_FLOAT(); 
 
 
                 }
                 break;
-
             case 38 :
-
                 // Velvet.g:1:355: VAR_INT
-
                 {
-                mVAR_INT();
+                mVAR_INT(); 
 
 
                 }
                 break;
-
             case 39 :
-
                 // Velvet.g:1:363: VAR_STRING
-
                 {
-                mVAR_STRING();
+                mVAR_STRING(); 
 
 
                 }
                 break;
-
             case 40 :
-
                 // Velvet.g:1:374: BOOLEAN
-
                 {
-                mBOOLEAN();
+                mBOOLEAN(); 
 
 
                 }
                 break;
-
             case 41 :
-
                 // Velvet.g:1:382: ID
-
                 {
-                mID();
+                mID(); 
 
 
                 }
                 break;
-
             case 42 :
-
                 // Velvet.g:1:385: IDPath
-
                 {
-                mIDPath();
+                mIDPath(); 
 
 
                 }
                 break;
-
             case 43 :
-
                 // Velvet.g:1:392: INT
-
                 {
-                mINT();
+                mINT(); 
 
 
                 }
                 break;
-
             case 44 :
-
                 // Velvet.g:1:396: FLOAT
-
                 {
-                mFLOAT();
+                mFLOAT(); 
 
 
                 }
                 break;
-
             case 45 :
-
                 // Velvet.g:1:402: STRING
-
                 {
-                mSTRING();
+                mSTRING(); 
 
 
                 }
                 break;
-
             case 46 :
-
                 // Velvet.g:1:409: WS
-
                 {
-                mWS();
+                mWS(); 
 
 
                 }
                 break;
-
             case 47 :
-
                 // Velvet.g:1:412: SL_COMMENT
-
                 {
-                mSL_COMMENT();
+                mSL_COMMENT(); 
 
 
                 }
                 break;
-
             case 48 :
-
                 // Velvet.g:1:423: ML_COMMENT
-
                 {
-                mML_COMMENT();
+                mML_COMMENT(); 
 
 
                 }
@@ -2962,6 +2876,6 @@ public class VelvetLexer extends Lexer {
             return "1:1: Tokens : ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE | COLON | COMMA | CONCEPT | CONSTRAINT | DESCRIPTION | END_C | END_R | EQ | FEATURE | IMPORT | IMPORTINSTANCE | IMPORTINTERFACE | MANDATORY | MINUS | ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | SEMI | SOMEOF | START_C | START_R | USE | VAR_BOOL | VAR_FLOAT | VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS | SL_COMMENT | ML_COMMENT );";
         }
     }
-
+ 
 
 }
