@@ -44,7 +44,7 @@ public abstract class ASelectionHandler extends AbstractHandler {
 	protected abstract void singleAction(Object element);
 
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public final Object execute(ExecutionEvent event) throws ExecutionException {
 		final ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection strSelection = (IStructuredSelection) selection;
