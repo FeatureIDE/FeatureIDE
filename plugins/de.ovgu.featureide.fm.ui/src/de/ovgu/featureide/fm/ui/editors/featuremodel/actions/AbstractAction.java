@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,33 +24,31 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetAbstractOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
 
 /**
  * Action to mark a feature as abstract.
+ * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class AbstractAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.abstract";
 
-	private ObjectUndoContext undoContext;
+	private IFeatureModel featureModel;
 
-	private FeatureModel featureModel;
-
-	public AbstractAction(Object viewer, FeatureModel featureModel, ObjectUndoContext undoContext) {
+	public AbstractAction(Object viewer, IFeatureModel featureModel, ObjectUndoContext undoContext) {
 		super("Abstract", viewer);
-		this.undoContext = undoContext;
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
 
-		setChecked(feature.isAbstract());
-		FeatureSetAbstractOperation op = new FeatureSetAbstractOperation(feature, featureModel);
-		op.addContext(undoContext);
+		setChecked(feature.getStructure().isAbstract());
+		SetFeatureToAbstractOperation op = new SetFeatureToAbstractOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -64,7 +62,7 @@ public class AbstractAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		setChecked(feature.isAbstract());
+		setChecked(feature.getStructure().isAbstract());
 	}
 
 }

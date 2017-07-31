@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,12 +23,14 @@ package de.ovgu.featureide.fm.core;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 /**
- * Compares two {@link Feature}s by their name.
+ * Compares two {@link IFeature}s by their name.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureComparator implements Comparator<Feature>, Serializable {
+public class FeatureComparator implements Comparator<IFeature>, Serializable {
 
 	private static final long serialVersionUID = 3133122730880756050L;
 
@@ -39,7 +41,7 @@ public class FeatureComparator implements Comparator<Feature>, Serializable {
 	}
 
 	@Override
-	public int compare(Feature feature1, Feature feature2) {
+	public int compare(IFeature feature1, IFeature feature2) {
 		return caseSensitive 
 			? feature1.getName().compareTo(feature2.getName()) 
 			: feature1.getName().compareToIgnoreCase(feature2.getName());

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,9 +27,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
 /**
@@ -37,14 +38,15 @@ import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
  * 
  * @author Christian Becker
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AbstractConstraintEditorAction extends Action {
 
 	protected Object viewer;
 
-	protected FeatureModel featuremodel;
+	protected IFeatureModel featuremodel;
 
-	protected XmlFeatureModelWriter writer;
+	protected IFeatureModelFormat writer;
 
 	protected String featuretext;
 
@@ -55,7 +57,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 		}
 	};
 
-	public AbstractConstraintEditorAction(Object viewer, FeatureModel featuremodel, String menuname) {
+	public AbstractConstraintEditorAction(Object viewer, IFeatureModel featuremodel, String menuname) {
 		super(menuname);
 		this.viewer = viewer;
 		this.featuremodel = featuremodel;
@@ -66,11 +68,11 @@ public abstract class AbstractConstraintEditorAction extends Action {
 	}
 
 	public void run() {
-		writer = new XmlFeatureModelWriter(featuremodel);
-		featuretext = writer.writeToString();
+		writer = new XmlFeatureModelFormat();
+		featuretext = writer.write(featuremodel);
 	}
 
-	protected void openEditor(Constraint constraint) {
+	protected void openEditor(IConstraint constraint) {
 		new ConstraintDialog(featuremodel, constraint);
 	}
 

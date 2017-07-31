@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,8 +31,11 @@ import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
- * Contains all deprecated functionality of {@link FeatureModel}.
+ * Contains all deprecated functionality of {@link IFeatureModel}.
  * 
  * @author Jens Meinicke
  */
@@ -39,7 +43,7 @@ abstract class DeprecatedFeatureModel {
 	
     public abstract FeatureModelAnalyzer getAnalyser();
 	
-    public abstract FeatureModelLayout getLayout();
+    public abstract IFeatureModelLayout getLayout();
     
 	public abstract RenamingsManager getRenamingsManager();
 	
@@ -66,7 +70,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkImplies(Set, Set)} instead.
 	 */
 	@Deprecated
-	public boolean checkImplies(Set<Feature> a, Set<Feature> b) throws TimeoutException {
+	public boolean checkImplies(Set<IFeature> a, Set<IFeature> b) throws TimeoutException {
 	    	return getAnalyser().checkImplies(a, b);
 	}
 
@@ -82,8 +86,8 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
 	 */
 	@Deprecated
-	public boolean areMutualExclusive(Set<Feature> context,
-			List<Set<Feature>> featureSets) throws TimeoutException {
+	public boolean areMutualExclusive(Set<IFeature> context,
+			List<Set<IFeature>> featureSets) throws TimeoutException {
 	    	return getAnalyser().areMutualExclusive(context, featureSets);
 	}
 
@@ -91,8 +95,8 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
 	 */
 	@Deprecated
-	public boolean mayBeMissing(Set<Feature> context,
-			List<Set<Feature>> featureSets) throws TimeoutException {
+	public boolean mayBeMissing(Set<IFeature> context,
+			List<Set<IFeature>> featureSets) throws TimeoutException {
 		return getAnalyser().mayBeMissing(context, featureSets);
 	}
 
@@ -100,7 +104,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#exists(Set)} instead.
 	 */
 	@Deprecated
-	public boolean exists(Set<Feature> features) throws TimeoutException {
+	public boolean exists(Set<IFeature> features) throws TimeoutException {
 	    	return getAnalyser().exists(features);
 	}
 
@@ -108,7 +112,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#conjunct(Set)} instead.
 	 */
 	@Deprecated
-	public Node conjunct(Set<Feature> b) {
+	public Node conjunct(Set<IFeature> b) {
 	    	return getAnalyser().conjunct(b);
 	}
 
@@ -149,15 +153,16 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getDeadFeatures()} instead.
 	 */
 	@Deprecated
-	public LinkedList<Feature> getDeadFeatures() {
-		return new LinkedList<Feature>(getAnalyser().getDeadFeatures());
+	public LinkedList<IFeature> getDeadFeatures() {
+		return new LinkedList<IFeature>(getAnalyser().getDeadFeatures());
 	}
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
 	 */
 	@Deprecated
 	public FMPoint getLegendPos() {
-	    return getLayout().getLegendPos();
+//	    return getLayout().getLegendPos();
+		return null;
 	}
 
 	/**
@@ -165,7 +170,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void setLegendPos(int x, int y) {
-	    getLayout().setLegendPos(x, y);
+//	    getLayout().setLegendPos(x, y);
 	}
 
 	/**
@@ -173,7 +178,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void setLegendAutoLayout(boolean b) {
-	    getLayout().setLegendAutoLayout(b);
+//	    getLayout().setLegendAutoLayout(b);
 	}
 
 	/**
@@ -181,7 +186,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean hasLegendAutoLayout() {
-	    return getLayout().hasLegendAutoLayout();
+//	    return getLayout().hasLegendAutoLayout();
+		return false;
 	}
 
 	/**
@@ -189,7 +195,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean hasFeaturesAutoLayout() {
-	    return getLayout().hasFeaturesAutoLayout();
+//	    return getLayout().hasFeaturesAutoLayout();
+		return false;
 	}
 
 	/**
@@ -197,7 +204,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean showHiddenFeatures() {
-	    return getLayout().showHiddenFeatures();
+//	    return getLayout().showHiddenFeatures();
+		return false;
 	}
 
 	/**
@@ -205,7 +213,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void showHiddenFeatures(boolean b) {
-	    getLayout().showHiddenFeatures(b);
+//	    getLayout().showHiddenFeatures(b);
 	}
 
 	/**
@@ -213,7 +221,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean verticalLayout() {
-	    return getLayout().verticalLayout();
+//	    return getLayout().verticalLayout();
+		return false;
 	}
 
 	/**
@@ -221,7 +230,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void verticalLayout(boolean b) {
-	    getLayout().verticalLayout(b);
+//	    getLayout().verticalLayout(b);
 	}
 	
 	@Deprecated
@@ -234,7 +243,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void setLayout(int newLayoutAlgorithm) {
-	    getLayout().setLayout(newLayoutAlgorithm);
+//	    getLayout().setLayout(newLayoutAlgorithm);
 	}
 
 	/**
@@ -242,7 +251,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public int getLayoutAlgorithm() {
-	    return getLayout().getLayoutAlgorithm();
+//	    return getLayout().getLayoutAlgorithm();
+		return 0;
 	}
 	
 	/**
@@ -290,7 +300,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void performRenamings(IFile file) {
-		getRenamingsManager().performRenamings(file);
+		getRenamingsManager().performRenamings(Paths.get(file.getLocationURI()));
 	}
 
 	/**
@@ -313,8 +323,8 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getCachedDeadFeatures()} instead.
 	 */
 	@Deprecated
-	public LinkedList<Feature> getCalculatedDeadFeatures() {
-		return new LinkedList<Feature>(getAnalyser().getCachedDeadFeatures());
+	public LinkedList<IFeature> getCalculatedDeadFeatures() {
+		return new LinkedList<IFeature>(getAnalyser().getCachedDeadFeatures());
 	}
 
 	/**
@@ -332,7 +342,7 @@ abstract class DeprecatedFeatureModel {
 	 * Or use {@link FeatureModelAnalyzer#getFalseOptionalFeatures()} to recalculate false optional features.
 	 */
 	@Deprecated
-	public LinkedList<Feature> getFalseOptionalFeatures() {
-		return new LinkedList<Feature>(getAnalyser().getCachedFalseOptionalFeatures());
+	public LinkedList<IFeature> getFalseOptionalFeatures() {
+		return new LinkedList<IFeature>(getAnalyser().getCachedFalseOptionalFeatures());
 	}
 }

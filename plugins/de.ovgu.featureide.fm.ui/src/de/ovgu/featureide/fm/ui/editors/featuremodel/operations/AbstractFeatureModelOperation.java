@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,28 +20,49 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import javax.annotation.Nonnull;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 
 /**
  * This operation should be used as superclass for all operations on the feature model.
  * It provides standard handling and refreshing of the model.
  * 
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
 public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
-	FeatureModel featureModel;
+	protected final IFeatureModel featureModel;
 
-	public AbstractFeatureModelOperation(FeatureModel featureModel, String label) {
+	protected Object editor = null;
+
+	protected boolean executed = false;
+
+	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
 		this.featureModel = featureModel;
+		addContext((IUndoContext) featureModel.getUndoContext());
+	}
+
+	@Override
+	public boolean canRedo() {
+		return !executed;
+	}
+
+	@Override
+	public boolean canUndo() {
+		return executed;
 	}
 
 	@Override
@@ -51,20 +72,55 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		redo();
-		featureModel.handleModelDataChanged();
+		try {
+			redo();
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+			throw new ExecutionException(e.getMessage());
+		}
 		return Status.OK_STATUS;
 	}
 
-	protected abstract void redo();
+	@Nonnull
+	protected abstract FeatureIDEEvent operation();
+
+	public void redo() {
+		fireEvent(operation());
+		executed = true;
+	}
 
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		undo();
-		featureModel.handleModelDataChanged();
+		try {
+			undo();
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+			throw new ExecutionException(e.getMessage());
+		}
 		return Status.OK_STATUS;
 	}
 
-	protected abstract void undo();
+	protected abstract FeatureIDEEvent inverseOperation();
+
+	public void undo() {
+		fireEvent(inverseOperation());
+		executed = false;
+	}
+
+	final protected void fireEvent(@Nonnull FeatureIDEEvent event) {
+		if (event == null) {
+			System.out.println(getClass() + " operation() must return a FeatureIDEEvent");
+			event = new FeatureIDEEvent(featureModel, null, null, null);
+		}
+		featureModel.fireEvent(event);
+	}
+
+	public Object getEditor() {
+		return editor;
+	}
+
+	public void setEditor(Object editor) {
+		this.editor = editor;
+	}
 
 }

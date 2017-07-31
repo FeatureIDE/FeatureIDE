@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,10 +26,12 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
+ * Filter to hide methods in the collaboration outline.
+ * 
   * @author Dominic Labsch
   * @author Daniel P�sche
  */
-public class HideAllMethods implements IFilter {
+public class HideAllMethods implements ICollaborationOutlineFilter {
 
 	@Override
 	public Object[] filter(Object[] obj) {

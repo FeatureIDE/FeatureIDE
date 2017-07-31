@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<exampleWizard>
+	<contentProvider name="Book Example">
+		<path>Part I/Chapter 3 (FeatureIDE in a Nutshell)</path>
+		<path>Part IV/Chapter 13 (Feature-Oriented Programming with FeatureIDE)</path>
+		<path>Part V/Chapter 19 (Overview on FeatureIDE)</path>
+	</contentProvider>
+	<contentProvider name="Composer">
+		<path>FeatureHouse</path>
+	</contentProvider>
+	<contentProvider name="Concepts">
+		<path>Feature-Oriented Programming/FeatureHouse</path>
+	</contentProvider>
+	<contentProvider name="Languages">
+		<path>Java</path>
+	</contentProvider>
+</exampleWizard>

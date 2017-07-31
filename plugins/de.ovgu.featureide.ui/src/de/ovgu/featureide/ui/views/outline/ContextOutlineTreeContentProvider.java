@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -37,12 +37,12 @@ import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.comparator.ClassFragmentComparator;
 import de.ovgu.featureide.core.signature.comparator.SignatureComparator;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Provides the content for the collaboration outline.
  * 
- * @author Reimar Schröter
+ * @author Reimar Schrï¿½ter
  * @author Sebastian Krieter
  */
 public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
@@ -84,7 +84,7 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 
 				return ar;
 			} else {
-				return new String[] { "loading..." };
+				return new String[] { "Feature Context Outline is not supported" };
 			}
 		} else {
 			return new String[] { "no feature project" };
@@ -122,12 +122,12 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 			final ProjectSignatures signatures = featureProject.getProjectSignatures();
 
 			if (signatures != null) {
-				final HashMap<String, Feature> featureMap = new HashMap<String, Feature>();
+				final HashMap<String, IFeature> featureMap = new HashMap<String, IFeature>();
 
 				final AFeatureData[] featureDataArray = sig.getFeatureData();
 				for (AFeatureData featureData : featureDataArray) {
 					final String featureName = signatures.getFeatureName(featureData.getID());
-					final Feature feature = featureProject.getFeatureModel().getFeature(featureName);
+					final IFeature feature = featureProject.getFeatureModel().getFeature(featureName);
 					if (!featureMap.containsKey(featureName)) {
 						featureMap.put(featureName, feature);
 					}

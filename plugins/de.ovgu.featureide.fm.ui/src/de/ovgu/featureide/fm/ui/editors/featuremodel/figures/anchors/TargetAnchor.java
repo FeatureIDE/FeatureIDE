@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,19 +24,20 @@ import org.eclipse.draw2d.AbstractConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
  * Used to get the point where all connections from child features end.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class TargetAnchor extends AbstractConnectionAnchor {
 
-	private Feature model;
+	private IGraphicalFeature model;
 
-	public TargetAnchor(IFigure owner, Feature model) {
+	public TargetAnchor(IFigure owner, IGraphicalFeature model) {
 		super(owner);
 		this.model = model;
 	}

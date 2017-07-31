@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,9 +28,9 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -39,41 +39,30 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Fabian Benduhn
  */
-public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
+public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 
 	/**
 	 * @param file
-	 * @throws UnsupportedModelException 
+	 * @throws UnsupportedModelException
 	 */
-	public TSXFMReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
-		super(fm,s);
+	public TSXFMReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
+		super(fm, s);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter(de.ovgu.featureide.fm.core.FeatureModel)
-	 */
 	@Override
-	protected IFeatureModelWriter getWriter(FeatureModel fm) {
-		return new SXFMWriter(fm);
+	protected IFeatureModelFormat getFormat() {
+		return new SXFMFormat();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getReader(de.ovgu.featureide.fm.core.FeatureModel)
-	 */
 	@Override
-	protected IFeatureModelReader getReader(FeatureModel fm) {
-		return new SXFMReader(fm);
+	public void testFeatureHidden() {
+
 	}
 
-	
-	@Override
-	public void testFeatureHidden(){
-		
-	}
-	
 	@Test
 	public void testPropNodes() {
-		for (Node n : newFm.getPropositionalNodes()) {
+		for (IConstraint constraint : newFm.getConstraints()) {
+			final Node n = constraint.getNode();
 			if (n instanceof Literal) {
 				// case: feature
 				continue;
@@ -85,24 +74,24 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
 				}
 			}
 			// case: feature1 or feature2 or feature3 ...
-			assertTrue(n + " is no Or Node",n instanceof Or);
+			assertTrue(n + " is no Or Node", n instanceof Or);
 			isCnf(n);
 		}
 	}
-	
+
 	private void isCnf(Node node) {
 		for (Node n : node.getChildren()) {
 			if (n instanceof Not) {
 				assertTrue("Not statement has to much children", n.getChildren().length == 1);
-				assertTrue(n + "is not a Literal after Not",n.getChildren()[0] instanceof Literal);
-			} else if (n instanceof Or) { 
+				assertTrue(n + "is not a Literal after Not", n.getChildren()[0] instanceof Literal);
+			} else if (n instanceof Or) {
 				isCnf(n);
 			} else {
-				assertTrue(n + " is no Literal",n instanceof Literal);
+				assertTrue(n + " is no Literal", n instanceof Literal);
 			}
 		}
 	}
-	
+
 	@Override
 	public void testDescription() {
 		// description not implemented

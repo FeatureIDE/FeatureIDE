@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -36,12 +35,13 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 
 /**
  * Deletes the selected features and moves their unselected children upwards.
@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
  * 
  * @author Thomas Thuem
  * @author Christian Becker
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DeleteAction extends Action {
 
@@ -58,7 +59,7 @@ public class DeleteAction extends Action {
 
 	private final Object viewer;
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -67,7 +68,7 @@ public class DeleteAction extends Action {
 		}
 	};
 
-	public DeleteAction(Object viewer, FeatureModel featureModel) {
+	public DeleteAction(Object viewer, IFeatureModel featureModel) {
 		super("Delete (Del)", deleteImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
@@ -80,8 +81,7 @@ public class DeleteAction extends Action {
 
 	@Override
 	public void run() {
-		DeleteOperation op = new DeleteOperation(viewer, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		ElementDeleteOperation op = new ElementDeleteOperation(viewer, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -98,20 +98,20 @@ public class DeleteAction extends Action {
 			return false;
 
 		// check that a possibly new root can be determined unique
-		Feature root = featureModel.getRoot();
-		Feature newRoot = root;
-		LinkedList<Feature> features = new LinkedList<Feature>(featureModel.getFeatures());
+		IFeature root = featureModel.getStructure().getRoot().getFeature();
+		IFeature newRoot = root;
+		LinkedList<IFeature> features = new LinkedList<IFeature>(Functional.toList(featureModel.getFeatures()));
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof Feature))
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature))
 				continue;
-			Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature() : (Feature) editPart;
+			IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : (IFeature) editPart;
 			if (feature == root) {
-				if (root.getChildrenCount() != 1)
+				if (root.getStructure().getChildrenCount() != 1)
 					return false;
-				newRoot = root.getFirstChild();
-				if (!newRoot.hasChildren())
+				newRoot = root.getStructure().getFirstChild().getFeature();
+				if (!newRoot.getStructure().hasChildren())
 					return false;
 			}
 			features.remove(feature);

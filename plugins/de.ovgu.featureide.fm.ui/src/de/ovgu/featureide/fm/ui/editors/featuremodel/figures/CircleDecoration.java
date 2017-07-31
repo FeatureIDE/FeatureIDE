@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import org.eclipse.draw2d.RotatableDecoration;
-import org.eclipse.draw2d.RoundedRectangle;
+import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -32,25 +32,45 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A decoration for a feature connection that indicates the mandatory property.
  * 
  * @author Thomas Thuem
+ * @author Jens Meinicke
  */
-public class CircleDecoration extends RoundedRectangle implements RotatableDecoration, GUIDefaults {
-
+public class CircleDecoration extends ConnectionDecoration implements GUIDefaults {
+	private final boolean fill;
+	
 	public CircleDecoration(boolean fill) {
-		super();
-		Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
-		setForegroundColor(decoratorForgroundColor);
-		setBackgroundColor(fill ? decoratorForgroundColor : FMPropertyManager.getDecoratorBackgroundColor());
-		setSize(SOURCE_ANCHOR_DIAMETER, SOURCE_ANCHOR_DIAMETER);
-
+		this.fill = fill;
+		final Color decoratorForegroundColor = FMPropertyManager.getDecoratorForegroundColor();
+		setForegroundColor(decoratorForegroundColor);
+		setBackgroundColor(fill ? decoratorForegroundColor : FMPropertyManager.getDecoratorBackgroundColor());
+		setSize(SOURCE_ANCHOR_DIAMETER + 1, SOURCE_ANCHOR_DIAMETER + 1);
 	}
 
 	@Override
 	public void setLocation(Point p) {
-		super.setLocation(p.translate(-SOURCE_ANCHOR_DIAMETER / 2, -SOURCE_ANCHOR_DIAMETER / 2));
+		super.setLocation(p.translate((-getBounds().width >> 1), (-getBounds().height >> 1)));
 	}
 
-	public void setReferencePoint(Point p) {
-
+	@Override
+	protected void fillShape(Graphics graphics) {
+		if (getActiveReason() != null && fill) {
+			graphics.setBackgroundColor(FMPropertyManager.getReasonColor(getActiveReason()));
+		}
+		final Rectangle bounds = new Rectangle(getBounds());
+		bounds.shrink(1, 1);
+		Draw2dHelper.fillCircle(graphics, bounds);
 	}
 
+	@Override
+	protected void outlineShape(Graphics graphics) {
+		if (getActiveReason() != null) {
+			graphics.setForegroundColor(FMPropertyManager.getReasonColor(getActiveReason()));
+			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
+		}
+		final Rectangle bounds = new Rectangle(getBounds());
+		bounds.shrink(1, 1);
+		graphics.drawOval(bounds);
+	}
+
+	@Override
+	public void setReferencePoint(Point p) {}
 }

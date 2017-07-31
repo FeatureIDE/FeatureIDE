@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,16 +22,20 @@ package de.ovgu.featureide.fm.core.io.guidsl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
- *  
+ * Test class of the {@link GuidslReader}.
+ * 
  * @author Fabian Benduhn
  */
 public class TGuidslReader {
@@ -41,54 +45,54 @@ public class TGuidslReader {
 	protected static String ALTERNATIVE_GROUP = "Root : Base ;Base : A| B	| C ;";
 
 	protected static String sep = System.getProperty("file.separator");
-	
+
 	@Test
 	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
-		GuidslReader reader = new GuidslReader(model);
-
-		reader.readFromString(AND_GROUP_ALL_OPTIONAL);
-		Feature a = model.getFeature("A");
-		Feature base = model.getFeature("Base");
-		assertTrue(base.isAnd());
-		assertFalse(a.isMandatory());
-
+		final IFeatureModel model = load(AND_GROUP_ALL_OPTIONAL);
+		IFeature a = model.getFeature("A");
+		IFeature base = model.getFeature("Base");
+		assertTrue(base.getStructure().isAnd());
+		assertFalse(a.getStructure().isMandatory());
 	}
 
 	@Test
 	public void testReaderAndGroupAMandatory() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
-		GuidslReader reader = new GuidslReader(model);
+		final IFeatureModel model = load(AND_GROUP_A_MANDATORY);
 
-		reader.readFromString(AND_GROUP_A_MANDATORY);
-
-		Feature base = model.getFeature("Base");
-		Feature a = model.getFeature("A");
-		assertTrue(base.isAnd());
-		assertTrue(a.isMandatory());
+		IFeature a = model.getFeature("A");
+		IFeature base = model.getFeature("Base");
+		assertTrue(base.getStructure().isAnd());
+		assertTrue(a.getStructure().isMandatory());
 	}
 
 	@Test
 	public void testReaderOrGroup() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
-		GuidslReader reader = new GuidslReader(model);
+		final IFeatureModel model = load(OR_GROUP);
 
-		reader.readFromString(OR_GROUP);
-
-		Feature base = model.getFeature("Base");
-		assertTrue(base.isOr());
-
+		IFeature base = model.getFeature("Base");
+		assertTrue(base.getStructure().isOr());
 	}
 
 	@Test
 	public void testReaderAlternativeGroup() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
-		GuidslReader reader = new GuidslReader(model);
+		final IFeatureModel model = load(ALTERNATIVE_GROUP);
 
-		reader.readFromString(ALTERNATIVE_GROUP);
-
-		Feature base = model.getFeature("Base");
-		assertTrue(base.isAlternative());
-
+		IFeature base = model.getFeature("Base");
+		assertTrue(base.getStructure().isAlternative());
 	}
+
+	private IFeatureModel load(String input) {
+		try {
+			final IFeatureModelFormat format = new GuidslFormat();
+			IFeatureModel model = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
+			if (format.read(model, input).containsError()) {
+				fail();
+			}
+			return model;
+		} catch (NoSuchExtensionException e) {
+			fail();
+		}
+		return null;
+	}
+
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,12 +30,10 @@ import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 import org.eclipse.gef.requests.CreateRequest;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.ExtendedFeature;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.LegendDragAndDropCommand;
@@ -47,14 +45,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  * Allows features to be moved onto the feature model diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 
-	private final FeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
 	private Command cmd;
 
-	public ModelLayoutEditPolicy(FeatureModel featureModel) {
+	public ModelLayoutEditPolicy(IGraphicalFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
 	}
@@ -64,14 +63,15 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 		if (child instanceof ConstraintEditPart) {
 			return new ConstraintMoveEditPolicy((ConstraintEditPart) child, this);
 		} else if (child instanceof FeatureEditPart) {
-			if (featureModel instanceof ExtendedFeatureModel) {
-				Feature feature = ((FeatureEditPart) child).getFeature();
-				if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
-					if (feature.getFeatureModel().getLayout().getLayoutAlgorithm() != 0) {
-						return null;
-					}
-				}
-			}
+// TODO _Interface : Removed Code
+//			if (featureModel instanceof ExtendedFeatureModel) {
+//				IFeature feature = ((FeatureEditPart) child).getFeature();
+//				if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
+//					if (feature.getFeatureModel().getGraphicRepresenation().getLayout().getLayoutAlgorithm() != 0) {
+//						return null;
+//					}
+//				}
+//			}
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
 		} else if (child instanceof LegendEditPart) {
 			return new LegendMoveEditPolicy();
@@ -88,15 +88,16 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			if (r.getEditParts().size() != 1) {
 				return null;
 			}
+			
 			Object editPart = r.getEditParts().get(0);
 			if (editPart instanceof FeatureEditPart) {
 				FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
-				Feature feature = featureEditPart.getFeature();
+				IGraphicalFeature feature = featureEditPart.getModel();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
 			} else if (editPart instanceof ConstraintEditPart) {
-				Constraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
+				IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getModel();
 
 				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
 					Point point = r.getLocation().getCopy();

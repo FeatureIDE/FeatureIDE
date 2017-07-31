@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,14 +26,17 @@ import java.util.Locale;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Defines the content of the feature model class specific for JPF-BDD.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelJPFBDD implements IFeatureModelClass {
 	
@@ -41,9 +44,9 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	private final static String ANNOTATION = "\t@gov.nasa.jpf.bdd.TrackWithBDD\r\n";
 	private static final String SELECTFEATURES = "\tpublic static void select_features() {\r\n";
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
-	public FeatureModelJPFBDD(FeatureModel featureModel) {
+	public FeatureModelJPFBDD(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}
 	
@@ -60,18 +63,18 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
-		for (String f : featureModel.getFeatureNames()) {
+		for (CharSequence f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append(ANNOTATION);
 			fields.append(FIELD_MODIFIER);
-			fields.append(f.toLowerCase(Locale.ENGLISH));
+			fields.append(f.toString().toLowerCase(Locale.ENGLISH));
 			fields.append(";\r\n");
 		}
 		
 		fields.append(SELECTFEATURES);
 		
-		for (String f : featureModel.getFeatureNames()) {
+		for (CharSequence f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append("\t\t");
-			fields.append(f.toLowerCase(Locale.ENGLISH));
+			fields.append(f.toString().toLowerCase(Locale.ENGLISH));
 			fields.append(" = Verify.getBoolean(false);\r\n");
 		}
 		fields.append("\t}\r\n");
@@ -81,7 +84,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone()).toCNF();//.eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);//.eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
 		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 		if (formula.contains("  &&  true  &&  ! false")) {
 			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));
@@ -98,7 +101,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	public String getSelection() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("\t/**\r\n\t * @return The current feature-selection.\r\n\t */\r\n\tpublic static String getSelection(boolean names) {\r\n\t\t");
-		ArrayList<Feature> features = new ArrayList<Feature>(featureModel.getConcreteFeatures());
+		ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel)));
 		stringBuilder.append("if (names) return ");
 		for (int i = 0;i < features.size();i++) {
 			if (i != 0) {

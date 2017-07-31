@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,21 +26,22 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LayoutSelectionOperation;
 
 /**
  * Action to select the layout for the feature model.
+ * @author Marcus Pinnecke (Feature interface)
  */
 public class LayoutSelectionAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 	private int newSelectedLayoutAlgorithm;
 	private int oldSelectedLayoutAlgorithm;
 
-	public LayoutSelectionAction(GraphicalViewerImpl viewer, FeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
+	public LayoutSelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
 		super(FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
 		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
@@ -50,7 +51,8 @@ public class LayoutSelectionAction extends Action {
 	@Override
 	public void run() {
 		LayoutSelectionOperation op = new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, oldSelectedLayoutAlgorithm);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		//TODO _interfaces Removed Code
+				op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

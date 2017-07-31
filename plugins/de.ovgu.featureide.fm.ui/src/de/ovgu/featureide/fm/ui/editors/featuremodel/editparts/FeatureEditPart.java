@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,36 +20,35 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.ConnectionAnchor;
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
-import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetMandatoryOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
 /**
@@ -57,29 +56,36 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditP
  * the models of features can provide connection anchors.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
-public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, PropertyConstants, PropertyChangeListener {
+public class FeatureEditPart extends ModelElementEditPart implements NodeEditPart {
 
 	private ConnectionAnchor sourceAnchor = null;
 	private ConnectionAnchor targetAnchor = null;
 
-	FeatureEditPart(Object feature) {
-		super();
+	FeatureEditPart(IGraphicalFeature feature) {
 		setModel(feature);
 	}
-
-	public Feature getFeature() {
-		return (Feature) getModel();
+	
+	@Override
+	public ModelEditPart getParent() {
+		return (ModelEditPart) super.getParent();
 	}
-
-	public FeatureFigure getFeatureFigure() {
-		return (FeatureFigure) getFigure();
+	
+	@Override
+	public IGraphicalFeature getModel() {
+		return (IGraphicalFeature) super.getModel();
+	}
+	
+	@Override
+	public FeatureFigure getFigure() {
+		return (FeatureFigure) super.getFigure();
 	}
 
 	@Override
-	protected IFigure createFigure() {
-		final Feature f = getFeature();
-		final FeatureFigure featureFigure = new FeatureFigure(f, f.getFeatureModel());
+	protected FeatureFigure createFigure() {
+		final IGraphicalFeature f = getModel();
+		final FeatureFigure featureFigure = new FeatureFigure(f, f.getGraphicalModel());
 		sourceAnchor = featureFigure.getSourceAnchor();
 		targetAnchor = featureFigure.getTargetAnchor();
 		return featureFigure;
@@ -87,65 +93,63 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected void createEditPolicies() {
-		final Feature f = getFeature();
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getFeatureModel(), f));
+		final IGraphicalFeature f = getModel();
+		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getGraphicalModel(), f));
 	}
 
 	private DirectEditManager manager;
 
 	public void showRenameManager() {
 		if (manager == null) {
-			final Feature f = getFeature();
-			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFeatureFigure()), f.getFeatureModel());
+			final IGraphicalFeature f = getModel();
+			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFigure()),
+					f.getGraphicalModel().getFeatureModel());
 		}
 		manager.show();
 	}
 
 	@Override
 	public void performRequest(Request request) {
-		Feature feature = getFeature();
-		FeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
+		IFeature feature = getModel().getObject();
+		IGraphicalFeatureModel featureModel = getParent().getModel();
 
-		for (Constraint constraint : featureModel.getConstraints()) {
-			if (constraint.isFeatureSelected())
+		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
+			if (constraint.isFeatureSelected()) {
 				constraint.setFeatureSelected(false);
+			}
 		}
 
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			if (feature.isRoot() || !feature.getParent().isAnd()) {
-				return;
-			}
-
-			FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel);
-			op.addContext((IUndoContext) featureModel.getUndoContext());
+			SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, featureModel);
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {
 				FMUIPlugin.getDefault().logError(e);
 
 			}
-
-			featureModel.handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			for (Constraint partOf : feature.getRelevantConstraints()) {
-				partOf.setFeatureSelected(true);
+			for (IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
+				featureModel.getGraphicalConstraint(partOf).setFeatureSelected(true);
 			}
 		}
 	}
 
 	@Override
 	protected List<FeatureConnection> getModelSourceConnections() {
-		return ((Feature) getModel()).getSourceConnections();
+		return getModel().getSourceConnectionAsList();
 	}
 
 	@Override
 	protected List<FeatureConnection> getModelTargetConnections() {
-		return ((Feature) getModel()).getTargetConnections();
+		return Collections.<FeatureConnection> emptyList();// getModel().getTargetConnections();
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
+		if (getModel().isCollapsed() && connection.getTarget() == connection.getSource()) {
+			return targetAnchor;
+		}
 		return sourceAnchor;
 	}
 
@@ -163,46 +167,145 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	public void activate() {
-		getFeature().addListener(this);
+		getModel().registerUIObject(this);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getFeature().removeListener(this);
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
-		String prop = event.getPropertyName();
-		if (LOCATION_CHANGED.equals(prop)) {
-			getFeatureFigure().setLocation((Point) event.getNewValue());
-			for (FeatureConnection connection : getFeature().getTargetConnections()) {
+	@Override
+	public void refresh() {
+		super.refresh();
+	}
+	
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		final EventType prop = event.getEventType();
+		FeatureConnection sourceConnection;
+		switch (prop) {
+		case CHILDREN_CHANGED:
+			getFigure().setLocation(getModel().getLocation());
+			for (FeatureConnection connection : getModel().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
-					connectionEditPart.refreshSourceDecoration();
-					connectionEditPart.refreshTargetDecoration();
-					connectionEditPart.refreshToolTip();
+					connectionEditPart.refresh();
 				}
 			}
-		} else if (CHILDREN_CHANGED.equals(prop)) {
-			getFeatureFigure().setProperties();
-			for (FeatureConnection connection : getFeature().getTargetConnections()) {
+			break;
+		case LOCATION_CHANGED:
+			getFigure().setLocation(getModel().getLocation());
+			getFigure().setProperties();
+			sourceConnection = getModel().getSourceConnection();
+			if (sourceConnection != null) {
+				IGraphicalFeature target = sourceConnection.getTarget();
+				final IGraphicalFeature newTarget = FeatureUIHelper.getGraphicalParent(getModel());
+				if (!equals(newTarget, target)) {
+					sourceConnection.setTarget(newTarget);
+					Map<?, ?> registry = getViewer().getEditPartRegistry();
+					ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+					if (connectionEditPart != null) {
+						refresh();
+					}
+				}
+			}
+
+			for (FeatureConnection connection : getModel().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
-					connectionEditPart.refreshSourceDecoration();
-					connectionEditPart.refreshTargetDecoration();
-					connectionEditPart.refreshToolTip();
+					connectionEditPart.refresh();
 				}
 			}
-		} else if (NAME_CHANGED.equals(prop)) {
-			getFeatureFigure().setName(getFeature().getDisplayName());
-			FeatureUIHelper.setSize(getFeature(), getFeatureFigure().getSize());
-		} else if (ATTRIBUTE_CHANGED.equals(prop)) {
-			getFeatureFigure().setProperties();
+			break;
+		case GROUP_TYPE_CHANGED:
+			getFigure().setProperties();
+			sourceConnection = getModel().getSourceConnection();
+			Map<?, ?> registry = getViewer().getEditPartRegistry();
+			ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			if (connectionEditPart != null) {
+				connectionEditPart.refreshSourceDecoration();
+				connectionEditPart.refreshTargetDecoration();
+				connectionEditPart.refreshToolTip();
+			}
+			break;
+		case FEATURE_NAME_CHANGED:
+			String displayName = getModel().getObject().getName();
+			
+			if (getModel().getGraphicalModel().getLayout().showShortNames() ){
+				int lastIndexOf = displayName.lastIndexOf(".");
+				displayName = displayName.substring(++lastIndexOf);
+			}
+			getFigure().setName(displayName);
+			getModel().setSize(getFigure().getSize());
+			break;
+		case COLOR_CHANGED:
+		case ATTRIBUTE_CHANGED:
+			getFigure().setProperties();
+		case COLLAPSED_ALL_CHANGED:
+		case COLLAPSED_CHANGED:
+			getFigure().setProperties();
+			/*
+			 * Reset the active reason in case we missed that it was set to null while this was collapsed.
+			 * In case it should not be null, the active reason will be set to the correct value in the upcoming feature model analysis anyway.
+			 */
+			setActiveReason(null);
+			break;
+		case MANDATORY_CHANGED:
+			sourceConnection = getModel().getSourceConnection();
+			registry = getViewer().getEditPartRegistry();
+			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart.refreshSourceDecoration();
+			break;
+		case FEATURE_DELETE:
+			deactivate();
+			break;
+		case PARENT_CHANGED:
+			sourceConnection = getModel().getSourceConnection();
+			registry = getViewer().getEditPartRegistry();
+			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart.refreshVisuals();
+			break;
+		case HIDDEN_CHANGED:
+			getFigure().setProperties();
+			sourceConnection = getModel().getSourceConnection();
+			registry = getViewer().getEditPartRegistry();
+			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart.refreshSourceDecoration();
+			break;
+		case ACTIVE_EXPLANATION_CHANGED:
+			break;
+		case ACTIVE_REASON_CHANGED:
+			setActiveReason((Explanation.Reason) event.getNewValue());
+			break;
+		default:
+			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
+			break;
 		}
+	}
+
+	/**
+	 * Sets the currently active reason.
+	 * Refreshes accordingly.
+	 * @param activeReason the new active reason
+	 */
+	protected void setActiveReason(Explanation.Reason activeReason) {
+		getFigure().setActiveReason(activeReason);
+		getFigure().setProperties();
+		final FeatureConnection sourceConnection = getModel().getSourceConnection();
+		if (sourceConnection == null || getViewer() == null) {
+			return;
+		}
+		final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
+		connectionEditPart.setActiveReason(activeReason);
+		connectionEditPart.refreshVisuals();
+	}
+
+	private static boolean equals(final IGraphicalFeature newTarget, final IGraphicalFeature target) {
+		return newTarget == null ? target == null : newTarget.equals(target);
 	}
 
 }

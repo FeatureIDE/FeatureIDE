@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,8 +22,8 @@ package de.ovgu.featureide.core.builder;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSITION_TOOL_FOUND_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_GET_PROJECT_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_MAKE_FEATURE_PROJECT_;
 
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -38,9 +38,10 @@ import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * A general builder used to build every <code>FeatureProject</code>. Using an
@@ -49,6 +50,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
@@ -68,7 +70,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		featureProject = CorePlugin.getFeatureProject(getProject());
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning(UNABLE_TO_MAKE_FEATURE_PROJECT_);
+
 			return false;
 		}
 
@@ -163,8 +165,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (configFile == null) {
 			return null;
 		}
-		FeatureModel featureModel = featureProject.getFeatureModel();
-		if (featureModel == null || featureModel.getRoot() == null) {
+		IFeatureModel featureModel = featureProject.getFeatureModel();
+		if (featureModel == null || featureModel.getStructure().getRoot() == null) {
 			return null;
 		}
 		composerExtension.performFullBuild(configFile);
@@ -177,12 +179,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 		Configuration c = new Configuration(featureModel);
-		ConfigurationReader reader = new ConfigurationReader(c);
-		try {
-			reader.readFromFile(configFile);
-		} catch (Exception e) {
-			CorePlugin.getDefault().logError(e);
-		}
+		FileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigurationManager.getFormat(configFile.getName()));
 		composerExtension.copyNotComposedFiles(c, null);
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);

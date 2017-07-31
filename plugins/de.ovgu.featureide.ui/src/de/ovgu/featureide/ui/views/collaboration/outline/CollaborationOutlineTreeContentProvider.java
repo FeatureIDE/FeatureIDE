@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -46,6 +46,7 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Provides the content for the collaboration outline.
@@ -152,7 +153,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 
-			List<String> featureOrder = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList();
+			List<String> featureOrder = Functional.toList(CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList());
 
 			obj = new FSTRole[roleList.size()];
 			int index = 0;
@@ -224,21 +225,21 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		return filter(obj);
 	}
 
-	private final Set<IFilter> filters = new HashSet<>();
+	private final Set<ICollaborationOutlineFilter> filters = new HashSet<>();
 
 	//add filter to filter set
-	public void addFilter(IFilter filter) {
+	public void addFilter(ICollaborationOutlineFilter filter) {
 		filters.add(filter);
 	}
 
 	//remove filter from filter set
-	public void removeFilter(IFilter filter) {
+	public void removeFilter(ICollaborationOutlineFilter filter) {
 		filters.remove(filter);
 	}
 
 	//apply all filters from filter set
 	private Object[] filter(Object[] obj) {
-		for (IFilter filter : filters) {
+		for (ICollaborationOutlineFilter filter : filters) {
 			obj = filter.filter(obj);
 		}
 		return obj;

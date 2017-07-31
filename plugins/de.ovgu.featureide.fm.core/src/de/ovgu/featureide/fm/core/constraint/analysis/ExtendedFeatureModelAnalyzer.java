@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,24 +20,24 @@
  */
 package de.ovgu.featureide.fm.core.constraint.analysis;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
 
-import com.google.common.collect.BiMap;
-
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 
 /**
  * Checks the {@link ExtendedFeatureModel} for validation.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 
 	private ExtendedFeatureModel efm;
-	private BiMap<String, Integer> map;
+	private HashMap<String, Integer> map;
 	private List<DeRestriction> deFm;
 	
 	private UniqueId idGen;

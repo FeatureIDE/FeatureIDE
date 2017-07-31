@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,30 +33,31 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 public class ExamplePlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.examples";
-	
+
 	private static ExamplePlugin plugin;
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.plugin.AbstractUIPlugin#getID()
-	 */
+	public static final String FeatureIDE_EXAMPLE_DIR = "featureide_examples";//$NON-NLS-1$
+	public static final String FeatureIDE_EXAMPLE_INDEX = "projects.xml";//$NON-NLS-1$
+
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
+
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		new Thread() {
+			public void run() {
+				try {
+					ClassLoader.getSystemClassLoader().loadClass("de.ovgu.featureide.examples.wizards.ProjectProvider");
+				} catch (ClassNotFoundException e) {
+					ExamplePlugin.getDefault().logError(e);
+				}
+			};
+		}.start();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,10 +25,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
-
-import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
 import org.sat4j.core.VecInt;
@@ -36,6 +34,8 @@ import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
+
+import junit.framework.JUnit4TestAdapter;
 
 /**
  * Tests for tautologies, node transformations, and node parsing
@@ -511,8 +511,8 @@ public class Prop4JTest {
 	public void testValidatorWithFeatureNames11() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
 		String constraint = "";
-		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
-		assertTrue(testValidatorWithoutFeatureNames(constraint));
+		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
+		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
 
@@ -521,8 +521,8 @@ public class Prop4JTest {
 	public void testValidatorWithFeatureNames12() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
 		String constraint = " ";
-		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
-		assertTrue(testValidatorWithoutFeatureNames(constraint));
+		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
+		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
 
@@ -541,7 +541,6 @@ public class Prop4JTest {
 		String constraint = "()()()()";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
-
 	}
 
 	@Test
@@ -642,19 +641,12 @@ public class Prop4JTest {
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 	}		
 
-	private boolean testValidatorWithFeatureNames(String constraint,
-			String[] featureNames) {
-		NodeReader n = new NodeReader();
-		Set<String> featureSet = new HashSet<String>(featureNames.length);
-		for (String feature : featureNames) {
-			featureSet.add(feature);
-		}
-		return n.isWellFormed(constraint, featureSet);
+	private boolean testValidatorWithFeatureNames(String constraint, String[] featureNames) {
+		return new NodeReader().isWellFormed(constraint, new HashSet<>(Arrays.asList(featureNames)));
 	}
 
 	private boolean testValidatorWithoutFeatureNames(String constraint) {
-		NodeReader n = new NodeReader();
-		return n.isWellFormed(constraint);
+		return new NodeReader().isWellFormed(constraint);
 	}
 
 	@Test

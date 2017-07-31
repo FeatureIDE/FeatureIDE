@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureComparator;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -38,20 +38,20 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public final class FeatureListNode extends LazyParent {
 	
-	private final Collection<Feature> list;
+	private final Collection<IFeature> list;
 	
 	private final boolean expand;
 	
-	public FeatureListNode(String description, Collection<Feature> collection) {
+	public FeatureListNode(String description, Collection<IFeature> collection) {
 		this(description, collection, collection.size(), true);
 	}
 
-	public FeatureListNode(String description, Collection<Feature> collection, Object value, boolean expand) {
+	public FeatureListNode(String description, Collection<IFeature> collection, Object value, boolean expand) {
 		super(description, value);
 		
 		this.expand = expand;
 		
-		List<Feature> list = new LinkedList<Feature>(collection);
+		List<IFeature> list = new LinkedList<IFeature>(collection);
 		Collections.sort(list, new FeatureComparator(false));
 		
 		this.list = list;
@@ -60,7 +60,7 @@ public final class FeatureListNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		for (Feature feat : list) {
+		for (IFeature feat : list) {
 			addChild(new FeatureNode(feat, expand));
 		}
 	}

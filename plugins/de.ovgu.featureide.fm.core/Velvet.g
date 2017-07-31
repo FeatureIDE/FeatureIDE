@@ -6,6 +6,8 @@ options {
 }
 
 tokens {
+	IMPORT			='import';
+	
 	MANDATORY		='mandatory';
 	ABSTRACT		='abstract';
 	SOMEOF			='someOf';
@@ -71,12 +73,32 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;}
 public void emitErrorMessage(String msg) {
 	FMCorePlugin.getDefault().logError(new Exception(msg));
 }
+@Override    
+public void reportError(RecognitionException e) {
+	throw new InternalSyntaxException(e);
+}
+
+public class InternalSyntaxException extends RuntimeException{
+	private final RecognitionException e;
+	public InternalSyntaxException(RecognitionException e){
+		this.e = e;	
+	}
+	
+	public RecognitionException getException(){
+		return e;
+	}
+}
 }
 
 velvetModel
-	: (concept|cinterface) EOF
+	: imp? (concept|cinterface) EOF
 	;
-	
+
+imp
+	: (IMPORT name SEMI)+
+	-> ^(IMPORT name+)
+	;
+
 concept 
 	: CONCEPT ID  
 		(COLON conceptBaseExt)? (instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports)? 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,9 +22,11 @@ package de.ovgu.featureide.core.mpl.builder;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_GOT;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -37,8 +39,12 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
@@ -49,9 +55,10 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
  */
 public class MSPLBuilder extends IncrementalProjectBuilder {
 
-	public static final String BUILDER_ID = MPLPlugin.PLUGIN_ID + ".MSPLBuilder";
+	public static final String BUILDER_ID = MPLPlugin.PLUGIN_ID
+		+ ".MSPLBuilder";
 	public static final String COMPOSER_KEY = "composer";
-	
+
 	public MSPLBuilder() {
 		super();
 	}
@@ -65,7 +72,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 //			MPLPlugin.getDefault().logWarning(NO_PROJECT_GOT);
 //		}
 	}
-	
+
 //	private boolean cleanProject(IFeatureProject featureProject, IProgressMonitor monitor) {
 //		final IFolder buildFolder = featureProject.getBuildFolder();
 //		try {
@@ -78,19 +85,20 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 //		}
 //		return true;
 //	}
-	
+
 	private final HashMap<String, Boolean> buildMap = new HashMap<String, Boolean>();
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
 		final IProject project = getProject();
 		if (project != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
-			if (featureProject == null || !featureProject.buildRelevantChanges()) {
+			if (featureProject == null
+				|| !featureProject.buildRelevantChanges()) {
 				return null;
 			}
-			
+
 			Boolean building;
 			synchronized (buildMap) {
 				building = buildMap.get(project.getName());
@@ -103,15 +111,17 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 					buildMap.put(project.getName(), true);
 				}
 			}
-			
+
 			try {
 				final Configuration config = new Configuration(featureProject.getFeatureModel());
-				new ConfigurationReader(config).readFromFile(featureProject.getCurrentConfiguration());
-				
+
+				final IFile configFile = featureProject.getCurrentConfiguration();
+				FileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigurationManager.getFormat(configFile.getName()));
+
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();
-				final IJob job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
-				
+				final LongRunningMethod<?> job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
+
 				String tempConfigName = featureProject.getCurrentConfiguration().getName();
 				final String configName;
 				final int splitIndex = tempConfigName.lastIndexOf('.');
@@ -120,13 +130,14 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				} else {
 					configName = tempConfigName;
 				}
-				
+
 				JobSequence buildSequence = new JobSequence();
 				buildSequence.setIgnorePreviousJobFail(false);
 				buildSequence.addJob(job);
-				buildSequence.addJobFinishedListener(new JobFinishListener() {
+				final IRunner<Boolean> runner = LongRunningWrapper.getRunner(buildSequence);
+				runner.addJobFinishedListener(new JobFinishListener() {
 					@Override
-					public void jobFinished(IJob finishedJob, boolean success) {
+					public void jobFinished(IJob finishedJob) {
 						MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
 						synchronized (buildMap) {
 							buildMap.put(project.getName(), false);
@@ -134,7 +145,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 						featureProject.built();
 					}
 				});
-				buildSequence.schedule();
+				runner.schedule();
 			} catch (Exception e) {
 				MPLPlugin.getDefault().logError(e);
 				synchronized (buildMap) {

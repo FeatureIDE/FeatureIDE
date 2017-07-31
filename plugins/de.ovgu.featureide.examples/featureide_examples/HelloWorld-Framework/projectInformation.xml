@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<exampleWizard>
+	<contentProvider name="Book Example">
+		<path>Part V/Chapter 17 (Tool Support Beyond Preprocessors and Feature Modules)</path>
+		<path>Part V/Chapter 19 (Overview on FeatureIDE)</path>
+	</contentProvider>
+	<contentProvider name="Composer">
+		<path>Framework</path>
+	</contentProvider>
+	<contentProvider name="Concepts">
+		<path>Framework</path>
+	</contentProvider>
+	<contentProvider name="Languages">
+		<path>Java</path>
+	</contentProvider>
+</exampleWizard>

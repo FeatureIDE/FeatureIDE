@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,7 +26,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.QualifiedName;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PluginID;
 
 /**
  * Provides all {@link QualifiedName}s for the {@link FMPropertyManager}.
@@ -76,6 +76,6 @@ public class FMPropertyManagerDefaults {
 	 * @return The new QualifiedName
 	 */
 	static QualifiedName createName(String name) {
-		return new QualifiedName(FMCorePlugin.PLUGIN_ID + "." + name, FMCorePlugin.PLUGIN_ID + "." + name);
+		return new QualifiedName(PluginID.PLUGIN_ID + "." + name, PluginID.PLUGIN_ID + "." + name);
 	}
 }

@@ -40,7 +40,7 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 	}
 
 	@Override
-	public boolean hasFeaureOrder() {
+	public boolean hasFeatureOrder() {
 		return false;
 	}
 

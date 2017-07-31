@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,21 +21,14 @@
 package de.ovgu.featureide.core.fstmodel;
 
 /**
- * TODO description
+ * Initialization entry at the {@link FSTModel} for AsmetaL.
  * 
  * @author Florian Proksch
  */
 public class FSTAsmetaLInitialization extends FSTField {
 
-	/**
-	 * @param name
-	 * @param type
-	 * @param modifiers
-	 */	
-	
 	public FSTAsmetaLInitialization(String name, String type, String modifiers) {
 		super(name, type, modifiers);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public FSTAsmetaLInitialization(String fieldName, String typeName, String modifiers,

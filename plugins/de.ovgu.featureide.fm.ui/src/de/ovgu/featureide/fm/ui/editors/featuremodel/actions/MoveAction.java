@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,10 +32,12 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -49,6 +51,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * 
  * @author Guenter Ulreich
  * @author Andy Koch
+ * @author Marcus Pinnecke
  */
 public class MoveAction extends Action {
 	public static final int stepwidth = 2;
@@ -67,7 +70,7 @@ public class MoveAction extends Action {
 	private boolean isLegendMoving;
 
 	private final GraphicalViewerImpl viewer;
-	private final FeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
 	private final HashMap<Object, Point> endPositions = new HashMap<Object, Point>();
 
@@ -91,7 +94,7 @@ public class MoveAction extends Action {
 	 *            the according GraphicalViewerImpl
 	 * @param direction
 	 */
-	public MoveAction(Object viewer, FeatureModel featureModel, Object graphicalViewer, int direction) {
+	public MoveAction(Object viewer, IGraphicalFeatureModel featureModel, Object graphicalViewer, int direction) {
 		super(MOVING);
 		this.setId(ID);
 		if (viewer instanceof GraphicalViewerImpl) {
@@ -156,19 +159,19 @@ public class MoveAction extends Action {
 	 * @param doStop states whether new position is final position
 	 */
 	private void moveFigure(Object element, boolean doStop) {
-		if ((element instanceof FeatureEditPart) || (element instanceof Feature)) {
-			Feature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (Feature) element;
-			final Point newPos = FeatureUIHelper.getLocation(feature).translate(deltaPos);
+		if ((element instanceof FeatureEditPart) || (element instanceof IFeature)) {
+			IGraphicalFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getModel() : (IGraphicalFeature) element;
+			final Point newPos = feature.getLocation().translate(deltaPos);
 
 			if (doStop) {
 				this.endPositions.put(element, newPos);
 			}
 
-			FeatureUIHelper.setLocation(feature, newPos);
-		} else if ((element instanceof ConstraintEditPart) || (element instanceof Constraint)) {
-			Constraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (Constraint) element;
-			final Point newPos = FeatureUIHelper.getLocation(constraint).translate(deltaPos);
-			FeatureUIHelper.setLocation(constraint, newPos);
+			feature.setLocation(newPos);
+		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
+			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getModel() : (IGraphicalConstraint) element;
+			final Point newPos = constraint.getLocation().translate(deltaPos);
+			constraint.setLocation(newPos);
 		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {
 			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel);
 			final Point newPos = legendFigure.getLocation().translate(deltaPos);
@@ -183,7 +186,7 @@ public class MoveAction extends Action {
 	private void stop() {
 		this.doMove(true);
 		if (!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout())
-			featureModel.handleModelDataChanged();
+			featureModel.getFeatureModel().handleModelDataChanged();
 
 		this.init();
 	}

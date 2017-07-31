@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,21 +22,24 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
 import java.util.Locale;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Defines the content of the feature model class specific for KeY.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelKeY implements IFeatureModelClass {
 
 	private final static String HEAD = "/**\r\n * Variability encoding of the feature model for KeY.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
-	public FeatureModelKeY(FeatureModel featureModel) {
+	public FeatureModelKeY(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}
 	
@@ -53,9 +56,9 @@ public class FeatureModelKeY implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		final StringBuilder fields = new StringBuilder();
-		for (final String f : featureModel.getFeatureNames()) {
+		for (final CharSequence f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append(FIELD_MODIFIER);
-			fields.append(f.toLowerCase(Locale.ENGLISH));
+			fields.append(f.toString().toLowerCase(Locale.ENGLISH));
 			fields.append(";\r\n");
 		}
 		return fields.toString();

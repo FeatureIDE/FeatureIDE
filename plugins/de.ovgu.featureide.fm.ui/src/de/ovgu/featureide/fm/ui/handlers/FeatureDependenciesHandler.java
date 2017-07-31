@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,10 +40,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.FeatureDependencies;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
@@ -50,12 +50,13 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * calculates and shows dependencies between features in a MessageBox
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureDependenciesHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(final IFile inputFile) {
-		final FeatureModel mod = readModel(inputFile);
+		final IFeatureModel mod = readModel(inputFile);
 		Job job = new Job(CALCULATING_FEATURE_DEPENDENCIES) {
 			protected IStatus run(IProgressMonitor monitor) {
 				final String text = new FeatureDependencies(mod).toStringWithLegend();
@@ -128,20 +129,8 @@ public class FeatureDependenciesHandler extends AFileHandler {
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
-	private FeatureModel readModel(IFile inputFile) {
-		FeatureModel fm = new FeatureModel();
-		// XmlFeatureModelReader fmReader = new
-		// XmlFeatureModelReader(fm,inputFile.getProject());
-		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
-
-		try {
-			fmReader.readFromFile(inputFile);
-		} catch (FileNotFoundException e) {
-			FMUIPlugin.getDefault().logError(e);
-		} catch (UnsupportedModelException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-		return fm;
+	private IFeatureModel readModel(IFile inputFile) {
+		return FeatureModelManager.readFromFile(Paths.get(inputFile.getLocationURI()));
 	}
 
 }

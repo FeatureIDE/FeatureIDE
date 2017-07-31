@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -51,7 +51,6 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassSubNodeParent;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ContractCountNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldSubNodeParent;
@@ -59,6 +58,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Invar
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodContractNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodSubNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsSemanticalFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 import de.ovgu.featureide.ui.statistics.ui.ConfigDialog;
 
@@ -88,8 +88,8 @@ public class TreeClickListener implements IDoubleClickListener {
 		final Object[] selectedObjects = ((TreeSelection) event.getSelection()).toArray();
 
 		for (Object selected : selectedObjects) {
-			if (selected instanceof ConfigParentNode.ConfigNode) {
-				handleConfigNodes(event, selected);
+			if (selected instanceof StatisticsSemanticalFeatureModel.ConfigNode) {
+				handleStatisticsSemanticalNodes(event, selected);
 			} else if (selected instanceof AbstractSortModeNode && view.getExpandedState(selected)) {
 				final AbstractSortModeNode sortNode = ((AbstractSortModeNode) selected);
 				sortNode.setSortByValue(!(selected instanceof ClassNodeParent || selected instanceof FieldNodeParent || selected instanceof MethodNodeParent || sortNode
@@ -138,8 +138,8 @@ public class TreeClickListener implements IDoubleClickListener {
 	 * config-node - but only if their isn't already a calculation in progress.
 	 * 
 	 */
-	private void handleConfigNodes(DoubleClickEvent event, Object selected) {
-		final ConfigParentNode.ConfigNode clickedNode = (ConfigParentNode.ConfigNode) selected;
+	private void handleStatisticsSemanticalNodes(DoubleClickEvent event, Object selected) {
+		final StatisticsSemanticalFeatureModel.ConfigNode clickedNode = (StatisticsSemanticalFeatureModel.ConfigNode) selected;
 		if (!clickedNode.isCalculating()) {
 			ConfigDialog dial = new ConfigDialog(event.getViewer().getControl().getShell(), clickedNode.getDescription());
 			if (dial.open() == ConfigDialog.OK) {

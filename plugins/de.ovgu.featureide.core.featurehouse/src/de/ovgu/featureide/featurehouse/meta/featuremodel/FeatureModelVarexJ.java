@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,15 +28,17 @@ import java.util.Locale;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureComparator;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Defines the content of the feature model class specific for VarexJ.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelVarexJ implements IFeatureModelClass {
 
@@ -44,12 +46,12 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	private final static String ANNOTATION = "\t@Conditional\r\n";
 
-	private final FeatureModel featureModel;
-	private final ArrayList<Feature> features;
+	private final IFeatureModel featureModel;
+	private final ArrayList<IFeature> features;
 
-	public FeatureModelVarexJ(FeatureModel featureModel) {
+	public FeatureModelVarexJ(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
-		features = new ArrayList<Feature>(featureModel.getFeatures());
+		features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
 		Collections.sort(features, new FeatureComparator(true));
 	}
 	
@@ -66,8 +68,8 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
-		final List<List<Feature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		for (Feature feature : features) {
+		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
+		for (IFeature feature : features) {
 			final boolean isCoreFeature = deadCoreList.get(0).contains(feature);
 			final boolean isDeadFeature = deadCoreList.get(1).contains(feature);
 			if (!isCoreFeature && !isDeadFeature) {
@@ -88,7 +90,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone()).toCNF();
+		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
 		String formula = nodes.toString(NodeWriter.javaSymbols);
 		if (formula.contains(TRUE_FALSE)) {
 			formula = formula.substring(0, formula.indexOf(TRUE_FALSE));

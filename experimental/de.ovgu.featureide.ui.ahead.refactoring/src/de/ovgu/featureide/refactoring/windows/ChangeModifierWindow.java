@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -328,7 +328,7 @@ public class ChangeModifierWindow implements SelectionListener, Window,
 
 		if (e.getSource() == this.change) {
 
-			// Wenn die Änderung schon einmal versucht wurde
+			// Wenn die ï¿½nderung schon einmal versucht wurde
 			if (conflicts != null) {
 				try {
 					boolean successful = changeModifier();
@@ -342,7 +342,7 @@ public class ChangeModifierWindow implements SelectionListener, Window,
 				return;
 			}
 
-			// Wenn die Änderung zum ersten mal versucht wird
+			// Wenn die ï¿½nderung zum ersten mal versucht wird
 			if (this.publicMod.getSelection() == false
 					&& this.protectedMod.getSelection() == false
 					&& this.privateMod.getSelection() == false

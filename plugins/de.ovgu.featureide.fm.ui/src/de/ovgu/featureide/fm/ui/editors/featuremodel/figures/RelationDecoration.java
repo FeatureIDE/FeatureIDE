@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,18 +20,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import java.util.LinkedList;
+import java.util.List;
 
-import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -40,169 +38,106 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author Thomas Thuem
  */
-public class RelationDecoration extends Ellipse implements RotatableDecoration, GUIDefaults {
+public class RelationDecoration extends ConnectionDecoration implements GUIDefaults {
 
-	private boolean fill;
+	private final boolean fill;
 
 	private Point referencePoint;
 
-	private Feature lastChild;
-	private LinkedList<Feature> children;
+	private IGraphicalFeature lastChild;
+	private List<IGraphicalFeature> children;
 
-	private boolean vertical;
-	private FeatureModel featureModel;
+	private IGraphicalFeatureModel featureModel;
 
-	public RelationDecoration(boolean fill, Feature lastChild, LinkedList<Feature> children) {
-		super();
+	public RelationDecoration(final boolean fill, final IGraphicalFeature lastChild) {
 		this.fill = fill;
-		this.children = children;
 		this.lastChild = lastChild;
-		final Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
-		setForegroundColor(decoratorForgroundColor);
-		setBackgroundColor(decoratorForgroundColor);
-		final int diameter = getTargetAnchorDiameter();
-		setSize(diameter, diameter >> 1);
+		if (lastChild == null) {
+			children = null;
+		} else {
+			children = FeatureUIHelper.getGraphicalSiblings(lastChild);
+		}
+		setForegroundColor(FMPropertyManager.getDecoratorForegroundColor());
+		setBackgroundColor(FMPropertyManager.getDecoratorForegroundColor());
+		setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
 		if (lastChild != null) {
-			featureModel = lastChild.getFeatureModel();
-			this.vertical = FeatureUIHelper.hasVerticalLayout(featureModel);
+			featureModel = lastChild.getGraphicalModel();
 		}
 	}
 
 	@Override
-	public void setLocation(Point p) {
-
-		if (this instanceof LegendRelationDecoration)
-			super.setLocation(p.translate(-getTargetAnchorDiameter() / 2, 0));
-		else if (vertical)
-			super.setLocation(p.translate(0, -10));
-		else
-			super.setLocation(p.translate(-getTargetAnchorDiameter() / 2, 0));
+	public void setLocation(final Point p) {
+		if (this instanceof LegendRelationDecoration) {
+			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
+		} else {
+			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
+			if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
+				super.setLocation(p.translate(0, (-getBounds().width >> 1)));
+			} else {
+				super.setLocation(p.translate((-getBounds().width >> 1), 0));
+			}
+		}
 	}
 
-	public void setReferencePoint(Point p) {
+	@Override
+	public void setReferencePoint(final Point p) {
 		referencePoint = p;
 	}
 
 	@Override
-	protected void fillShape(Graphics graphics) {
-		if (!fill)
-			return;
-
-		double highestAngle1 = Integer.MAX_VALUE;
-		double highestAngle2 = Integer.MIN_VALUE;
-
-		Rectangle r = calculateRectangle();
-
-		Point center = r.getCenter();
-		if (this instanceof LegendRelationDecoration) {
-			highestAngle2 = HALF_ARC ? 360 : calculateAngle(center, getFeatureLocation());
-			highestAngle1 = HALF_ARC ? 180 : calculateAngle(center, referencePoint);
-			graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
-		} else {
-
-			if (children != null) {
-				for (int i = 0; i < children.size(); i++) {
-					Feature temp;
-					temp = this.lastChild;
-					this.lastChild = children.get(i);
-					if (!(this.lastChild.isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
-						double angle2 = HALF_ARC ? 360 : calculateAngle(center, getFeatureLocation());
-						double angle1 = HALF_ARC ? 180 : calculateAngle(center, getFeatureLocation());
-						if (angle2 > 450 && !vertical) {
-							highestAngle1 = 180;
-						} else {
-							if (angle1 < highestAngle1) {
-								highestAngle1 = angle1;
-							}
-							if (angle2 > highestAngle2) {
-								highestAngle2 = angle2;
-							} else {
-								this.lastChild = temp;
-							}
-						}
-
-					}
-				}
-			} else {
-				highestAngle2 = HALF_ARC ? 360 : calculateAngle(center, getFeatureLocation());
-			}
-
-			r.shrink(7, 7);
-
-			if (vertical) {
-				r.shrink(1, 1);
-				if (highestAngle2 < 270)
-					graphics.fillArc(r.x - 20, r.y + 10, r.width, r.height, 270, (180));
-				else
-					graphics.fillArc(r.x - 20, r.y + 10, r.width, r.height, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
-			} else {
-				if (highestAngle1 > 360)
-					graphics.fillArc(r, 180, 180);
-				//				if(highestAngle2>450)
-				graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
-				//				else
-				//					graphics.fillArc(r,(int) highestAngle1, (int)(highestAngle2 - highestAngle1));
-			}
-		}
-	}
+	protected void fillShape(final Graphics graphics) {	}
 
 	@Override
-	protected void outlineShape(Graphics graphics) {
-		if (fill)
-			return;
+	protected void outlineShape(final Graphics graphics) {
+		drawShape(graphics);
+	}
 
-		Rectangle r = calculateRectangle();
-
-		double highestAngle1 = Integer.MAX_VALUE;
-		double highestAngle2 = Integer.MIN_VALUE;
-
-		if (this instanceof LegendRelationDecoration) {
-			highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
-			highestAngle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), referencePoint);
-			graphics.drawArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
+	private void drawShape(final Graphics graphics) {
+		if (getActiveReason() != null) {
+			final Color reasonColor = FMPropertyManager.getReasonColor(getActiveReason());
+			graphics.setForegroundColor(reasonColor);
+			graphics.setBackgroundColor(reasonColor);
+			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
+		}
+		
+		boolean verticalLayout = false;
+		if (featureModel != null) {
+			verticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
+		}
+		double minAngle = Double.MAX_VALUE;
+		double maxAngle = Double.MIN_VALUE;
+		final Rectangle r;
+		if (verticalLayout) {
+			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1, 1);
 		} else {
-
-			if (children != null) {
-				for (int i = 0; i < children.size(); i++) {
-					Feature temp;
-					temp = this.lastChild;
-					this.lastChild = children.get(i);
-					if (!(this.lastChild.isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
-						double angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
-						double angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), getFeatureLocation());
-						if (angle2 > 450 && !vertical) {
-							highestAngle1 = 180;
-						} else {
-							if (angle1 < highestAngle1)
-								highestAngle1 = angle1;
-
-							if (angle2 > highestAngle2)
-								highestAngle2 = angle2;
-							else
-								this.lastChild = temp;
-
-						}
+			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1, 1);
+		}
+		final Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
+		
+		if (this instanceof LegendRelationDecoration) {
+			maxAngle = calculateAngle(center, getFeatureLocation());
+			minAngle = calculateAngle(center, referencePoint);
+		} else {
+			if (children != null && children.size() > 1) {
+				for (final IGraphicalFeature curChild : children) {
+					lastChild = curChild;
+					final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
+					final double currentAngle = calculateAngle(center, featureLocation);
+					if (currentAngle < minAngle) {
+						minAngle = currentAngle;
+					}
+					if (currentAngle > maxAngle) {
+						maxAngle = currentAngle;
 					}
 				}
 			} else {
-				highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
+				return;
 			}
-			r.shrink(7, 7);
-			r.y += FeatureUIHelper.getSize(lastChild.getParent()).height / 2;
-			if (vertical) {
-				r.shrink(2, 2);
-				if (highestAngle2 < 270)
-					graphics.drawArc(r.x - 20, r.y, r.width, r.height, 270, (180));
-				else
-					graphics.drawArc(r.x - 20, r.y, r.width, r.height, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
-			} else {
-				if (highestAngle1 > 360)
-					graphics.drawArc(r.x, r.y - 10, r.width, r.height, 180, 180);
-				if (highestAngle2 > 450)
-					graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
-				else
-					graphics.drawArc(r.x, r.y - 10, r.width, r.height, (int) (highestAngle1), (int) (highestAngle2 - highestAngle1));
-			}
+		}
+		if (fill) {
+			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int) (maxAngle - minAngle));
+		} else {
+			graphics.drawArc(r, (int) minAngle, (int) (maxAngle - minAngle));
 		}
 	}
 
@@ -214,23 +149,9 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		return TARGET_ANCHOR_DIAMETER;
 	}
 
-	private Rectangle calculateRectangle() {
-		Rectangle r = Rectangle.SINGLETON;
-		r.setBounds(getBounds());
-		r.y -= getTargetAnchorDiameter() / 2;
-		r.height = getTargetAnchorDiameter();
-		r.shrink(getLineWidth() + 1, getLineWidth() + 1);
-		return r;
-	}
-
-	private double calculateAngle(Point point, Point referencePoint) {
+	private double calculateAngle(final Point point, final Point referencePoint) {
 		int dx = referencePoint.x - point.x;
 		int dy = referencePoint.y - point.y;
-		if (vertical && !(this instanceof LegendRelationDecoration)) {
-			dx += 20;
-			dy -= 10;
-		}
 		return 360 - Math.round(Math.atan2(dy, dx) / Math.PI * 180);
 	}
-
 }

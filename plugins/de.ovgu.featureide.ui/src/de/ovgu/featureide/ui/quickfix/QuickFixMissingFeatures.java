@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -83,7 +83,7 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 			if (monitor.isCanceled()) {
 				break;
 			}
-			for (final Feature feature : configuration.getSelectedFeatures()) {
+			for (final IFeature feature : configuration.getSelectedFeatures()) {
 				if (unusedFeatures.remove(feature.getName())) {
 					monitor.worked(1);	
 				}

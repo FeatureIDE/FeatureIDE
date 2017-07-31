@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,25 +24,20 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VELVET;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
 
 /**
  * Reads a velvet feature model.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ImportVelvetHandler extends AbstractImportHandler {
 	@Override
-	protected IFeatureModelReader setModelReader(FeatureModel fm) {
-		return ModelIOFactory.getModelReader(fm, ModelIOFactory.TYPE_VELVET_IMPORT);
-	}
-
-	@Override
-	protected FeatureModel createFeatureModel() {
-		return ModelIOFactory.getNewFeatureModel(ModelIOFactory.TYPE_VELVET_IMPORT);
+	protected IFeatureModelFormat setModelReader() {
+		return new VelvetFeatureModelFormat();
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 
 /**
@@ -32,12 +31,13 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * 
  * @author Fabian Wielgorz
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ExportSXFMHandler extends AbstractExportHandler {
 
 	@Override
-	protected IFeatureModelWriter getFeatureModelWriter(FeatureModel fm) {
-		return new SXFMWriter(fm);
+	protected IFeatureModelFormat getFormat() {
+		return new SXFMFormat();
 	}
 
 	@Override

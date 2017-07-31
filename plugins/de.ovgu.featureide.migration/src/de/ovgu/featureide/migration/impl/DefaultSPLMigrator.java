@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,13 +22,13 @@ package de.ovgu.featureide.migration.impl;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSPATH_OF_PROJECT_TO_MIGRATE_IS_NULL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INTERNAL_ASSERT_MESSAGE_PROJECT_IS_NULL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_OPEN_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA_PROJECTS_COULD_NOT_BE_CREATED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECTS_WERE_SELECTED_FOR_MIGRATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.INTERNAL_ASSERT_MESSAGE_PROJECT_IS_NULL;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -52,11 +52,14 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 
+/**
+ * @author Marcus Pinnecke (Feature interface)
+ */
 @SuppressWarnings(RESTRICTION)
 public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	public static final String PROJECT_PROPERTIES_FILE_NAME = "project.properties";
@@ -127,7 +130,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	}
 
 	private void convertToFeatureProject(MigrationConfigurationData configurationData) {
-		CorePlugin.setupFeatureProject(newProject, configurationData.composer.getId(), configurationData.sourcePath, configurationData.configPath, configurationData.buildPath, false);
+		CorePlugin.setupFeatureProject(newProject, configurationData.composer.getId(), configurationData.sourcePath, configurationData.configPath, configurationData.buildPath, false, false);
 
 		CorePlugin.getDefault().addProject(newProject);
 	}
@@ -280,23 +283,23 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * {@link IComposerExtensionBase Composers} needs.
 	 */
 	protected void adjustFeatureModel() {
-		final FeatureModel featureModelOfVariants = generateFeatureModelOfVariants();
+		final IFeatureModel featureModelOfVariants = generateFeatureModelOfVariants();
 
 		SPLMigrationUtils.writeFeatureModelToDefaultFile(newProject, featureModelOfVariants);
 	}
 
-	private FeatureModel generateFeatureModelOfVariants() {
+	private IFeatureModel generateFeatureModelOfVariants() {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(newProject);
-		final FeatureModel featureModel = featureProject.getFeatureModel();
+		final IFeatureModel featureModel = featureProject.getFeatureModel();
 
 		featureModel.reset();
 
-		featureModel.setRoot(new Feature(featureModel, "Base"));
-		featureModel.getRoot().changeToAlternative();
-		featureModel.getRoot().setAbstract(true);
+		featureModel.getStructure().setRoot(FMFactoryManager.getFactory(featureModel).createFeature(featureModel, "Base").getStructure());
+		featureModel.getStructure().getRoot().changeToAlternative();
+		featureModel.getStructure().getRoot().setAbstract(true);
 
 		for (IProject project : projects)
-			featureModel.getRoot().addChild(new Feature(featureModel, project.getName()));
+			featureModel.getStructure().getRoot().addChild(FMFactoryManager.getFactory(featureModel).createFeature(featureModel, project.getName()).getStructure());
 
 		return featureModel;
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,27 +20,39 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import de.ovgu.featureide.fm.core.Feature;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.annotation.Nonnull;
+
+import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A representation of a selectable feature for the configuration process.
+ * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SelectableFeature extends TreeElement {
 
 	private Selection manual = Selection.UNDEFINED;
 
 	private Selection automatic = Selection.UNDEFINED;
-	
+
 	private Selection recommended = Selection.UNDEFINED;
 
-	private final Feature feature;
+	private final IFeature feature;
 
-	private final Configuration configuration;
+	private int recommendationValue = -1;
+	private Map<Integer, Node> openClauses = null;
 
 	private String name;
 
-	public SelectableFeature(Configuration configuration, Feature feature) {
-		this.configuration = configuration;
+	public SelectableFeature(IFeature feature) {
 		this.feature = feature;
 	}
 
@@ -52,7 +64,7 @@ public class SelectableFeature extends TreeElement {
 		return manual;
 	}
 
-	protected void setManual(Selection manual) {
+	public void setManual(Selection manual) {
 		if (manual == Selection.UNDEFINED || automatic == Selection.UNDEFINED) {
 			this.manual = manual;
 		} else if (manual != automatic) {
@@ -64,7 +76,7 @@ public class SelectableFeature extends TreeElement {
 		return automatic;
 	}
 
-	protected void setAutomatic(Selection automatic) {
+	public void setAutomatic(Selection automatic) {
 		if (automatic == Selection.UNDEFINED || manual == Selection.UNDEFINED || manual == automatic) {
 			this.automatic = automatic;
 		} else {
@@ -76,15 +88,11 @@ public class SelectableFeature extends TreeElement {
 		if (name != null) {
 			return name;
 		}
-		return feature == null ? null : feature.getName();
+		return feature == null ? "" : feature.getName();
 	}
 
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
-	}
-	
-	public Configuration getConfiguration() {
-		return configuration;
 	}
 
 	public String toString() {
@@ -94,13 +102,48 @@ public class SelectableFeature extends TreeElement {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public Selection getRecommended() {
 		return recommended;
 	}
-	
+
 	public void setRecommended(Selection recommended) {
 		this.recommended = recommended;
+	}
+
+	public int getRecommendationValue() {
+		return recommendationValue;
+	}
+
+	public void setRecommendationValue(int recommendationValue) {
+		this.recommendationValue = recommendationValue;
+	}
+
+	@Nonnull
+	public Collection<Node> getOpenClauses() {
+		if (openClauses == null) {
+			return Collections.emptyList();
+		}
+		return openClauses.values();
+	}
+
+	public void addOpenClause(int index, Node openClause) {
+		if (openClauses == null) {
+			openClauses = new TreeMap<>();
+		}
+		openClauses.put(index, openClause);
+	}
+
+	public void clearOpenClauses() {
+		openClauses = null;
+	}
+
+	@Nonnull
+	public Set<Integer> getOpenClauseIndexes() {
+		if (openClauses != null) {
+			return openClauses.keySet();
+		}
+		return Collections.emptySet();
 	}
 
 }

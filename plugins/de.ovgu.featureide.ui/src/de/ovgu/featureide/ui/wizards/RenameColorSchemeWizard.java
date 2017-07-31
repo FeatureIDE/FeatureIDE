@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,7 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_COLORSC
 
 import org.eclipse.jface.wizard.Wizard;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -40,12 +40,12 @@ public class RenameColorSchemeWizard extends Wizard {
 
 	public RenameColorSchemePage page;
 	
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	/**
 	 * Constructor for RenameColorSchemeWizard.
 	 */
-	public RenameColorSchemeWizard(FeatureModel featureModel) {
+	public RenameColorSchemeWizard(IFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
 		setWindowTitle(RENAME_COLORSCHEME);

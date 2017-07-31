@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -59,9 +59,14 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	protected AFeatureData[] featureData = null;
 	protected String mergedjavaDocComment = null;
 	
+<<<<<<< HEAD
+	protected int startLine = -1;
+	protected int endLine = -1;
+=======
 	protected final boolean staticSignature;
 	
 	protected final Set<ExtendedSignature> invocationSignatures;
+>>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
 	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
@@ -100,6 +105,28 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		this.invocationSignatures = new HashSet<ExtendedSignature>();
 	}
 	
+	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type, int startLine, int endLine) {
+		this(parent, name, modifierString, type);
+		this.startLine = startLine;
+		this.endLine = endLine;
+	}
+
+	public int getStartLine() {
+		return startLine;
+	}
+
+	public void setStartLine(int startLine) {
+		this.startLine = startLine;
+	}
+
+	public int getEndLine() {
+		return endLine;
+	}
+
+	public void setEndLine(int endLine) {
+		this.endLine = endLine;
+	}
+
 	protected void setFullName(String perfixName) {
 		this.fullName = perfixName + '.' + name;
 	}

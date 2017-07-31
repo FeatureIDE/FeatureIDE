@@ -1,18 +1,18 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -57,6 +57,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -67,17 +68,22 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.annotation.LogService;
 import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * Assigns color annotations to the editor.
- * 
+ *
  * @author Sebastian Krieter
  */
 public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/** Key used to piggyback the model to the editors model. */
-	private static final Object KEY = new Object();
+	public static final Object KEY = new Object();
 
 	private static boolean highlighting = true;
 
@@ -99,6 +105,12 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private int openConnections = 0;
 	private int docLines, docLength;
 
+	private IEventListener colorChangeListener = new IEventListener() {
+		@Override
+		public void propertyChange(FeatureIDEEvent event) {
+			updateAnnotations(true);
+		}
+	};
 	private IDocumentListener documentListener = new IDocumentListener() {
 		@Override
 		public void documentChanged(DocumentEvent event) {
@@ -126,22 +138,44 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		docLines = document.getNumberOfLines();
 		docLength = document.getLength();
 
+		FeatureColorManager.addListener(colorChangeListener);
+
 		updateAnnotations(true);
 
 		editor.addPropertyListener(new IPropertyListener() {
 			@Override
 			public void propertyChanged(Object source, int propId) {
 				if (propId == IEditorPart.PROP_DIRTY && !((ITextEditor) source).isDirty()) {
+					composer.buildFSTModel();
 					updateAnnotations(true);
 				}
 			}
 		});
 	}
 
+	public IFeatureModel getFeatureModel() {
+		return project.getFeatureModel();
+	}
+
+	public IFeature getFeature(int line) {
+		FSTDirective found = null;
+		for (FSTDirective fst : validDirectiveList) {
+			if (fst.getStartLine() <= line && line <= fst.getEndLine()) {
+				found = fst;
+			}
+		}
+		if (found == null) {
+			return null;
+		}
+		String name = found.getFeatureNames().get(0);
+		IFeature feature = project.getFeatureModel().getFeature(name);
+		return feature;
+	}
+
 	/**
 	 * Attaches a coverage annotation model for the given editor if the editor
 	 * can be annotated. Does nothing if the model is already attached.
-	 * 
+	 *
 	 * @param editor
 	 *            Editor to attach a annotation model to
 	 */
@@ -164,7 +198,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 						IDocument document = provider.getDocument(input);
 						colormodel = new ColorAnnotationModel(document, file, project, editor);
 						modelex.addAnnotationModel(KEY, colormodel);
-
+						//						colormodel.updateAnnotations(!editor.isDirty());
 						return true;
 					}
 				} else {
@@ -178,7 +212,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	/**
 	 * Detaches the coverage annotation model from the given editor. If the
 	 * editor does not have a model attached, this method does nothing.
-	 * 
+	 *
 	 * @param editor
 	 *            Editor to detach the annotation model from
 	 */
@@ -197,9 +231,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/**
 	 * Changes the whether the editor highlights the directives or not.
-	 * 
+	 *
 	 * Updates the annotations if the value changed.
-	 * 
+	 *
 	 * @param highlighting
 	 *            true: highlights directives in the editor
 	 */
@@ -213,10 +247,10 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	/**
 	 * This method is called, when the document is changed,
 	 * but the number of lines stays the same.
-	 * 
+	 *
 	 * It updates the offset and length of annotations,
 	 * with an offset greater than the CHANGE_OFFSET.
-	 * 
+	 *
 	 * @param offset the change offset
 	 * @param newLength the length of the changed document
 	 */
@@ -241,9 +275,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	/**
 	 * This method is called, when the document is saved or
 	 * when the document and the number of lines are changed.
-	 * 
+	 *
 	 * It removes all annotations and creates new.
-	 * 
+	 *
 	 * @param createNew
 	 *            true: builds new FSTModel
 	 *            false: only gets new FSTDirectives
@@ -254,10 +288,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		}
 		if (createNew) {
 			annotatedPositions = new HashMap<Integer, Position>(docLines);
-			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {//our FeatureHouseComposerAnnotations
+			if (project.getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 				try {
 					createFOPAnnotations();
-
 				} catch (BadLocationException e) {
 					CorePlugin.getDefault().logError(e);
 				}
@@ -266,19 +299,19 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				createAnnotations();
 			}
 		} else {
-			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {//ourFeatureHouseComposerAnnotations
+			if (project.getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 				try {
 					createFOPAnnotations();
 				} catch (BadLocationException e) {
 					CorePlugin.getDefault().logError(e);
 				}
+			} else {
+				if (!directiveMap.isEmpty()) {
+					annotatedPositions.clear();
+					updateDirectives();
+					createAnnotations();
+				}
 			}
-			if (!directiveMap.isEmpty()) {
-				annotatedPositions.clear();
-				updateDirectives();
-				createAnnotations();
-			}
-
 		}
 	}
 
@@ -298,14 +331,14 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	/**
 	 * Builds the FSTModel of the feature project and
 	 * creates a list of all directives with valid colors
-	 * 
+	 *
 	 * @return the directive list
 	 */
 	private void createDirectiveList() {
 		directiveMap.clear();
 		validDirectiveList.clear();
 		FSTModel model = project.getFSTModel();
-		if (model == null) {
+		if (model == null || model.getClasses().isEmpty()) {
 			composer.buildFSTModel();
 			model = project.getFSTModel();
 		}
@@ -313,28 +346,22 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			return;
 		}
 
-		int index = 0;
 		for (FSTFeature fstFeature : model.getFeatures()) {
 			for (FSTRole role : fstFeature.getRoles()) {
 				if (file.equals(role.getFile())) {
 					for (FSTDirective dir : role.getDirectives()) {
 						directiveMap.put(dir.getId(), dir);
-						index++;
+						validDirectiveList.add(dir);
 					}
 				}
 			}
-		}
-
-		for (int i = 0; i < index; i++) {
-			FSTDirective dir = directiveMap.get(i);
-			validDirectiveList.add(dir);
 		}
 	}
 
 	/**
 	 * Assigns the mapped colors to the FSTDirectives
 	 * from the changed document.
-	 * 
+	 *
 	 * @return the directive list
 	 */
 	private void updateDirectives() {
@@ -395,11 +422,16 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		}
 
 		clear();
+		directiveMap.clear();
+		validDirectiveList.clear();
 
 		if (file.getParent() instanceof IFolder) {
 			if (isInBuildFolder((IFolder) file.getParent())) {
 				/* annotations for generated files */
 				FSTClass clazz = model.getClass(model.getAbsoluteClassName(file));
+				if (clazz == null) {
+					return;
+				}
 				if (!clazz.hasComposedLines) {
 					clazz.hasComposedLines = true;
 					composer.postCompile(null, file);
@@ -419,6 +451,14 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			} else {
 				/* annotations for source files */
 				String featureName = getFeature((IFolder) file.getParent());
+
+				FSTDirective div = new FSTDirective();
+				div.setStartLine(0, 0);
+				div.setEndLine(document.getNumberOfLines() - 1, 0);
+				div.setFeatureName(featureName);
+				directiveMap.put(0, div);
+				validDirectiveList.add(div);
+
 				if (featureName != null) {
 					FSTFeature fstFeature = model.getFeature(featureName);
 					if (fstFeature != null) {
@@ -439,7 +479,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/**
 	 * Creates Annotations for FOP Composed File
-	 * 
+	 *
 	 * @param event
 	 * @param fstFeature
 	 * @param m
@@ -453,15 +493,26 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		int endline = m.getComposedLine() + m.getMethodLength() - 1;
 		int lineOffset = document.getLineOffset(startline);
 		int length = 0;
+
+		//Add directive to map for coloring issuesq
+		FSTDirective div = new FSTDirective();
+		div.setStartLine(startline, 0);
+		div.setEndLine(endline, 0);
+		div.setFeatureName(m.getRole().getFeature().getName());
+		directiveMap.put(directiveMap.size(), div);
+		validDirectiveList.add(div);
+
 		for (int line = startline; line <= endline; line++) {
 			length += document.getLineLength(line);
 			// bar at the left of the editor
+
 			Position methodposition = new Position(document.getLineOffset(line), document.getLineLength(line));
 			ColorAnnotation cafh = new ColorAnnotation(m.getRole().getFeature().getColor(), methodposition, ColorAnnotation.TYPE_IMAGE);
 			cafh.setText(m.getRole().getFeature().getName());
 			annotations.add(cafh);
 			event.annotationAdded(cafh);
 		}
+
 		Position methodposition = new Position(lineOffset, length);
 		// bar at the right of the editor
 		ColorAnnotation cafho = new ColorAnnotation(m.getRole().getFeature().getColor(), methodposition, ColorAnnotation.TYPE_OVERVIEW);
@@ -479,7 +530,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/**
 	 * Checks whether the File is in the SourceFolder
-	 * 
+	 *
 	 * @param folder
 	 * @return Feature from the SourceFolder
 	 */
@@ -496,7 +547,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/**
 	 * Checks whether the File is in the BuildFolder
-	 * 
+	 *
 	 * @param folder
 	 * @return true if BuildFolder or child of BuildFolder
 	 */
@@ -528,8 +579,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				int overViewStartOffset = document.getLineOffset(startline);
 				int overViewLength = 0;
 				for (int line = startline; line <= endline; line++) {
+					int length = document.getLineLength(line);
 					if (line < endline || directive.getEndLength() > 0) {
-						int length = document.getLineLength(line);
 						int lineOffset = document.getLineOffset(line);
 
 						if (line == directive.getEndLine()) {
@@ -603,7 +654,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/**
 	 * Creates a new overview ruler annotation.
-	 * 
+	 *
 	 */
 	private void createOverViewRuler(AnnotationModelEvent event, FSTDirective directive, final int color, Position newPos) {
 		ColorAnnotation ca = new ColorAnnotation(color, newPos, ColorAnnotation.TYPE_OVERVIEW);
@@ -614,7 +665,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/**
 	 * Returns whether the given annotation has a child <b>with a color</b> at the given line.
-	 * 
+	 *
 	 * @param directive The directive
 	 * @param line The line
 	 * @return <code>true</code> if there is a child at the line
@@ -625,7 +676,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/**
 	 * Returns whether the given annotation has a child at the given line.
-	 * 
+	 *
 	 * @param directive The directive
 	 * @param line The line
 	 * @return <code>true</code> if there is a child at the line
@@ -656,10 +707,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			if (child.getEndLength() > 0) {
 				childEnd++;
 			}
-			if (childEnd > lastLine) {
-				lastLine = childEnd;
-			}
-			lastLine = getLastChildLine(child, lastLine);
+			lastLine = Math.max(childEnd, lastLine);
+			lastLine = Math.max(getLastChildLine(child, lastLine), lastLine);
 		}
 		return lastLine;
 	}
@@ -715,6 +764,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		if (--openConnections == 0) {
 			document.removeDocumentListener(documentListener);
 		}
+		FeatureColorManager.removeListener(colorChangeListener);
 	}
 
 	/**
@@ -733,6 +783,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		throw new UnsupportedOperationException();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Iterator<Annotation> getAnnotationIterator() {
 		final Iterator<ColorAnnotation> origIter = annotations.iterator();
@@ -747,12 +798,15 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			public Annotation next() {
 				return origIter.next();
 			}
-			
+
 			@Override
 			public void remove() {
 				origIter.remove();
 			}
 		};
+		
+	public Iterator getAnnotationIterator() {
+		return annotations.iterator();
 	}
 
 	@Override

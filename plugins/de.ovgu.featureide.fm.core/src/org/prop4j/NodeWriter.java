@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -97,7 +97,7 @@ public class NodeWriter {
 		return nodeToString(node, symbols, optionalBrackets, false, parent);
 	}
 	
-	protected static String nodeToString(Node node, String[] symbols, boolean optionalBrackets, boolean addQuotationMarks)
+	public static String nodeToString(Node node, String[] symbols, boolean optionalBrackets, boolean addQuotationMarks)
 	{
 		return nodeToString(node, symbols, optionalBrackets, addQuotationMarks, null);
 	}
@@ -114,23 +114,25 @@ public class NodeWriter {
 	 * @return the textual representation
 	 */
 	protected static String nodeToString(Node node, String[] symbols, boolean optionalBrackets, boolean addQuotationMarks, Class<? extends Node> parent) {
-		if (node instanceof Literal)
-		{
-			if (addQuotationMarks)
-			{
-				String returnnode = (((Literal) node).positive ? "" : symbols[0] );
-				if (((Literal) node).var.toString().contains(" "))
-					returnnode += "\""  + ((Literal) node).var + "\"";
-				else 
-					returnnode += ((Literal) node).var;
-				return returnnode;
-			}else
-			{
-				return (((Literal) node).positive ? "" : symbols[0] ) + ((Literal) node).var;
+		if (node instanceof Literal) {
+			final Literal literal = (Literal) node;
+			final String featureName = literal.var.toString();
+			final String returnNode = (literal.positive ? "" : symbols[0]);
+			if (addQuotationMarks) {
+				if (featureName.matches(".*?\\s+.*")) {
+					return returnNode + "\"" + featureName + "\"";
+				}
+				for (final String op : symbols) {
+					if (featureName.equalsIgnoreCase(op)) {
+						return returnNode + "\"" + featureName + "\"";
+					}
+				}
 			}
+			return returnNode + featureName;
 		}
-		if (node instanceof Not)
-			return symbols[0] + " " + nodeToString(node.getChildren()[0], symbols, optionalBrackets, addQuotationMarks, node.getClass());
+		if (node instanceof Not) {
+			return symbols[0] + nodeToString(node.getChildren()[0], symbols, optionalBrackets, addQuotationMarks, node.getClass());
+		}
 		return multipleNodeToString(node, symbols, optionalBrackets, parent, addQuotationMarks);
 	}
 

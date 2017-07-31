@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,47 +20,56 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
-import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
 /**
  * An editpart to display cross-tree constraints below the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
-public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, PropertyChangeListener {
+public class ConstraintEditPart extends ModelElementEditPart {
 
-	ConstraintEditPart(Object constraint) {
-		super();
+	public ConstraintEditPart(IGraphicalConstraint constraint) {
 		setModel(constraint);
 	}
 
-	public Constraint getConstraintModel() {
-		return (Constraint) getModel();
+	public IGraphicalConstraint getConstraintModel() {
+		return (IGraphicalConstraint) getModel();
 	}
-
-	public ConstraintFigure getConstraintFigure() {
-		return (ConstraintFigure) getFigure();
+	
+	@Override
+	public ModelEditPart getParent() {
+		return (ModelEditPart) super.getParent();
+	}
+	
+	@Override
+	public IGraphicalConstraint getModel() {
+		return (IGraphicalConstraint) super.getModel();
+	}
+	
+	@Override
+	public ConstraintFigure getFigure() {
+		return (ConstraintFigure) super.getFigure();
 	}
 
 	@Override
-	protected IFigure createFigure() {
-		return new ConstraintFigure(getConstraintModel());
+	protected ConstraintFigure createFigure() {
+		return new ConstraintFigure(getModel());
 	}
 
 	@Override
@@ -69,12 +78,13 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 	}
 
 	public void performRequest(Request request) {
+		final IGraphicalConstraint constraintModel = getModel();
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintDialog(getConstraintModel().getFeatureModel(), getConstraintModel());
+			new ConstraintDialog(constraintModel.getObject().getFeatureModel(), constraintModel.getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
-				for (Feature containedFeature : getConstraintModel().getContainedFeatures()) {
-					containedFeature.setConstraintSelected(true);
+				for (IFeature containedFeature : constraintModel.getObject().getContainedFeatures()) {
+					FeatureUIHelper.getGraphicalFeature(containedFeature, constraintModel.getGraphicalModel()).setConstraintSelected(true);
 				}
 			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);
@@ -84,22 +94,40 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 
 	@Override
 	public void activate() {
-		getConstraintModel().addListener(this);
+		getModel().registerUIObject(this);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getConstraintModel().removeListener(this);
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
-		String prop = event.getPropertyName();
-		if (LOCATION_CHANGED.equals(prop)) {
-			getConstraintFigure().setLocation((Point) event.getNewValue());
-		} else if (ATTRIBUTE_CHANGED.equals(prop) || CONSTRAINT_SELECTED.equals(prop)) {
-			getConstraintFigure().setConstraintProperties();
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		final EventType prop = event.getEventType();
+		switch (prop) {
+		case CONSTRAINT_MOVE:
+		case LOCATION_CHANGED:
+			getFigure().setLocation(getModel().getLocation());
+			break;
+		case CONSTRAINT_MODIFY:
+			getFigure().setConstraintProperties();
+			getModel().setSize(getFigure().getSize());
+			break;
+		case ATTRIBUTE_CHANGED:
+		case CONSTRAINT_SELECTED:
+			getFigure().setConstraintProperties();
+			break;
+		case ACTIVE_EXPLANATION_CHANGED:
+			break;
+		case ACTIVE_REASON_CHANGED:
+			getFigure().setActiveReason((Explanation.Reason) event.getNewValue());
+			getFigure().setConstraintProperties();
+			break;
+		default:
+			FMUIPlugin.getDefault().logWarning(event + " @ " + getModel() + " not handled.");
+			break;
 		}
 	}
 

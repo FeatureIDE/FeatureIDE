@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,9 +23,11 @@ package de.ovgu.featureide.core.mpl.job;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_FEATURE_INTERFACES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_FEATURE_INTERFACES;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -37,8 +39,9 @@ import de.ovgu.featureide.core.signature.ProjectStructure;
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.io.IOConstants;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
@@ -46,26 +49,29 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterfacesJob.Arguments> {
+public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterfacesJob.Arguments, Boolean> {
 	
 	public static class Arguments extends JobArguments {
 		private final String foldername;
+		private final IProject project;
 		
-		public Arguments(String foldername) {
+		public Arguments(String foldername, IProject project) {
 			super(Arguments.class);
 			this.foldername = foldername;
+			this.project = project;
 		}
 	}
 	
 	protected PrintFeatureInterfacesJob(Arguments arguments) {
 		super(BUILD_FEATURE_INTERFACES, arguments);
 	}
-	
+
 	@Override
-	protected boolean work() {
-		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+	public Boolean execute(IMonitor workMonitor) throws Exception {
+		this.workMonitor = workMonitor;
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(arguments.project);
 		if (interfaceProject == null) {
-			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			MPLPlugin.getDefault().logWarning(arguments.project.getName() + " is no Interface Project!");
 			return false;
 		}
 		ProjectSignatures projectSignatures = interfaceProject.getProjectSignatures();		
@@ -80,7 +86,7 @@ public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterface
 			return false;
 		}
 
-		workMonitor.setMaxAbsoluteWork(features.size());
+		workMonitor.setRemainingWork(features.size());
 		int[] curFeature = new int[1];
 		SignatureIterator it = interfaceProject.getProjectSignatures().iterator();
 		
@@ -97,13 +103,12 @@ public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterface
 					(packagename.isEmpty() ? "" :"/" + packagename);
 				
 				folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
-				IOConstants.writeToFile(
-						folder.getFile(role.getSignature().getName() + IOConstants.EXTENSION_JAVA),
-						role.toShortString());
+				
+				FileSystem.write(Paths.get(folder.getFile(role.getSignature().getName() + ".java").getLocationURI()), role.toShortString());
 			}
 			workMonitor.worked();
 		}
-		IOConstants.writeToFile(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt"), 
+		FileSystem.write(Paths.get(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt").getLocationURI()), 
 				projectSignatures.getStatisticsString());
 		MPLPlugin.getDefault().logInfo(BUILT_FEATURE_INTERFACES);
 		

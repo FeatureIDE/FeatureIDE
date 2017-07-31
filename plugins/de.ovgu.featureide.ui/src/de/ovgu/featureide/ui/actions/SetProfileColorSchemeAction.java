@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,7 +22,7 @@ package de.ovgu.featureide.ui.actions;
 
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.DefaultColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
@@ -31,17 +31,18 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * 
  * @author Jonas Weigt
  * @author Christian Harnisch
+ * @author Marcus Pinnecke
  */
 
 public class SetProfileColorSchemeAction extends Action {
-	private FeatureModel model;
+	private IFeatureModel model;
 	private String newProfileColorSchemeName;
 
 	/*
 	 * Constructor
 	 */
-	public SetProfileColorSchemeAction(String text, int style, FeatureModel model) {
-		super(text, Action.AS_CHECK_BOX);
+	public SetProfileColorSchemeAction(String text, int style, IFeatureModel model) {
+		super(text, style);
 		this.model = model;
 		this.newProfileColorSchemeName = text;
 	}
@@ -50,11 +51,11 @@ public class SetProfileColorSchemeAction extends Action {
 	 * Changes selected color scheme and saves the configuration 
 	 */
 	public void run() {
-		if (FeatureColorManager.isCurrentColorScheme(model, newProfileColorSchemeName)) {
-			FeatureColorManager.setActive(model, DefaultColorScheme.defaultName);
-		} else {
-			FeatureColorManager.setActive(model, newProfileColorSchemeName);
-		}
+		String clrSchemeName = newProfileColorSchemeName;
+		
+		if (FeatureColorManager.isCurrentColorScheme(model, clrSchemeName))
+			clrSchemeName = DefaultColorScheme.defaultName;
 
+		FeatureColorManager.setActive(model, clrSchemeName);
 	}
 }

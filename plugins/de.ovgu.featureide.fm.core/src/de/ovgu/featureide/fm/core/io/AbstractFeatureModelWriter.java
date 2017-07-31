@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,54 +20,30 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
- * Default writer to be extended for each feature model format.
+ * Default reader to be extended for each feature model format.
  * 
- * If IFile support is needed, the {@link FeatureModelWriterIFileWrapper} has to be used.
+ * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
+ * 
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
-public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter {
+@Deprecated
+public abstract class AbstractFeatureModelWriter extends AbstractObjectWriter<IFeatureModel> implements IFeatureModelWriter {
 
-	/**
-	 * the feature model to write out
-	 */
-	protected FeatureModel featureModel;
-	
-	public void setFeatureModel(FeatureModel featureModel) {
-		this.featureModel = featureModel;
+	@Override
+	public IFeatureModel getFeatureModel() {
+		return getObject();
 	}
-	
-	public FeatureModel getFeatureModel() {
-		return featureModel;
+
+	@Override
+	public void setFeatureModel(IFeatureModel featureModel) {
+		setObject(featureModel);
 	}
-	
-	public void writeToFile(File file) {
-		FileOutputStream output = null;
-		try {
-			if (!file.exists()) file.createNewFile();
-			output = new FileOutputStream(file);
-			output.write(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
-			output.flush();
-		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
-		} finally {
-			try {
-				if (output != null) { 
-					output.close();
-				}
-			} catch (IOException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-		}
-	}
-	
+
 }

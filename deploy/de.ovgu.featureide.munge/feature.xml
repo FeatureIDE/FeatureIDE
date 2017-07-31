@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.munge"
       label="FeatureIDE extension for Munge (optional)"
-      version="2.7.4.qualifier"
+      version="3.3.1.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -191,13 +191,17 @@ Library.
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="de.ovgu.featureide.core"/>
       <import plugin="de.ovgu.featureide.fm.core"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="de.ovgu.featureide.ui"/>
+      <import plugin="de.ovgu.featureide.fm.ui"/>
+      <import plugin="org.eclipse.core.expressions"/>
    </requires>
 
    <plugin
          id="de.ovgu.featureide.core.munge"
          download-size="0"
          install-size="0"
-         version="2.7.4.qualifier"
+         version="3.3.1.qualifier"
          unpack="false"/>
 
 </feature>

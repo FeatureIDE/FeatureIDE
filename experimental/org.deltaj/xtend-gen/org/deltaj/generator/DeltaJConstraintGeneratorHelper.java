@@ -43,6 +43,7 @@ public class DeltaJConstraintGeneratorHelper {
   protected CharSequence _genComment(final JavaVerbatim javaVerbatim) {
     List<String> _javaVerbatimLines = this._deltaJGeneratorExtensions.javaVerbatimLines(javaVerbatim);
     final Function1<String, String> _function = new Function1<String, String>() {
+      @Override
       public String apply(final String line) {
         return ("// " + line);
       }
@@ -138,6 +139,7 @@ public class DeltaJConstraintGeneratorHelper {
     _builder.append(methodName, "");
     _builder.append(", (");
     final Function1<Type, CharSequence> _function = new Function1<Type, CharSequence>() {
+      @Override
       public CharSequence apply(final Type t) {
         return DeltaJConstraintGeneratorHelper.this.typeGenerator.compileType(t);
       }

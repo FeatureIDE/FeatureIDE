@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,10 +29,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TAUTOLOGY;
  * @author Jens Meinicke
  */
 public interface XMLFeatureModelTags {
+	static final String PROPERTIES = "properties";
 	static final String FEATURE_MODEL = "featureModel";
 	static final String STRUCT = "struct";
 	static final String FEATURE_ORDER = "featureOrder";
 	static final String CONSTRAINTS = "constraints";
+	static final String CONSTRAINT = "constraint";
+	static final String COLLAPSED = "collapsed";
+	static final String FEATURES = "features";
 	static final String CHOSEN_LAYOUT_ALGORITHM = "chosenLayoutAlgorithm";
 	static final String C = "c";
 	static final String TRUE = "true";
@@ -56,6 +60,8 @@ public interface XMLFeatureModelTags {
 	static final String NAME = "name";
 	static final String FALSE = "false";
 	static final String SHOW_HIDDEN_FEATURES = "showHiddenFeatures";
+	static final String SHOW_COLLAPSED_CONSTRAINTS = "showCollapsedConstraints";
+	static final String SHOW_SHORT_NAMES = "showShortNames";
 	static final String HORIZONTAL_LAYOUT = "horizontalLayout";
 	static final String RULE = "rule";
 	static final String UNKNOWN = "unknown";

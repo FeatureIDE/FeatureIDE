@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,67 +20,11 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
-
 /**
- * An instance of this class represents a connection between a feature and its
- * parent. It is necessary because every figure in GEF needs a associated model.
+ * Only used for legacy purposes.
  * 
- * @author Thomas Thuem
- *
+ * @author Sebastian Krieter
  */
-public class FeatureConnection implements PropertyConstants, IGraphicItem {
-	
-	private Feature source;
-	
-	private Feature target;
-	
-	public FeatureConnection(Feature source) {
-		this.source = source;
-	}
-	
-	public Feature getSource() {
-		return source;
-	}
-	
-	public Feature getTarget() {
-		return target;
-	}
-	
-	public void setTarget(Feature target) {
-		if (this.target == target)
-			return;
-		this.target = target;
-		fireParentChanged();
-	}
-
-	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-	
-	public void addListener(PropertyChangeListener listener) {
-		if (!listenerList.contains(listener))
-			listenerList.add(listener);
-	}
-	
-	public void removeListener(PropertyChangeListener listener) {
-		listenerList.remove(listener);
-	}
-	
-	private void fireParentChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, PARENT_CHANGED, Boolean.FALSE, Boolean.TRUE);
-		for (PropertyChangeListener listener : listenerList)
-			listener.propertyChange(event);
-	}
-	
-	@Override
-	public String toString() {
-		return source + " - " + target;
-	}
-	
-	@Override
-	public GraphicItem getItemType() {
-		return GraphicItem.Connection;
-	}
+public class FeatureConnection {
 
 }

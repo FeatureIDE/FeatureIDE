@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,9 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
 
 /**
@@ -30,10 +29,11 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * 
  * @author Fabian Wielgorz
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ImportSXFMHandler extends AbstractImportHandler {
 	@Override
-	protected IFeatureModelReader setModelReader(FeatureModel fm) {
-		return new SXFMReader(fm);
+	protected IFeatureModelFormat setModelReader() {
+		return new SXFMFormat();
 	}
 }

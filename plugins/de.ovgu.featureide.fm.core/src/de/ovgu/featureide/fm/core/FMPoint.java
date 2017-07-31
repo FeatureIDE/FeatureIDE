@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,25 +21,11 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * A simple point; saves a X and a Y coordinate at the feature model diagram.
+ * @deprecated. Only used for legacy purposes.
  * 
- * @author Soenke Holthusen
+ * @author Sebastian Krieter
  */
+@Deprecated
 public class FMPoint {
-	public int x;
-	public int y;
-
-	public FMPoint(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
 
 }

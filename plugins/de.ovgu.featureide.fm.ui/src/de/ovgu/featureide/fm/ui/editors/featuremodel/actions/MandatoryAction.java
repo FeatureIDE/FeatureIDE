@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,34 +21,33 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetMandatoryOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 
 /**
  * Turns a feature in an And-group into a mandatory feature.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class MandatoryAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.mandatory";
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public MandatoryAction(Object viewer, FeatureModel featureModel) {
-		super("Mandatory (Double Click)", viewer);
+	public MandatoryAction(Object viewer, IFeatureModel featureModel) {
+		super("Mandatory", viewer);
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		setChecked(feature.isMandatory());
-		FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		setChecked(feature.getStructure().isMandatory());
+		SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -61,8 +60,8 @@ public class MandatoryAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		setEnabled(!feature.isRoot() && feature.getParent().isAnd());
-		setChecked(feature.isMandatory());
+		setEnabled(!feature.getStructure().isRoot() && feature.getStructure().getParent().isAnd());
+		setChecked(feature.getStructure().isMandatory());
 	}
 
 }

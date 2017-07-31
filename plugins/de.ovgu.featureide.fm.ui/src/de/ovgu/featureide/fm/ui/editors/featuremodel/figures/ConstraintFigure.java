@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
@@ -38,10 +37,9 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -50,8 +48,9 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A figure to view a cross-tree constraint below the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
-public class ConstraintFigure extends Figure implements GUIDefaults {
+public class ConstraintFigure extends ModelElementFigure implements GUIDefaults {
 
 	public final static String VOID_MODEL = CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
 	public final static String UNSATISFIABLE = CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
@@ -63,6 +62,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private static final IFigure VOID_LABEL = new Label(VOID_MODEL);
 	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);
 	private static final IFigure TAUTOLOGY_LABEL = new Label(TAUTOLOGY);
+	private static final IFigure REDUNDANCE_LABEL = new Label(REDUNDANCE);
 
 	private static final String[] symbols;
 	static {
@@ -75,32 +75,35 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 	private final Label label = new Label();
 
-	private Constraint constraint;
+	private IGraphicalConstraint graphicalConstraint;
 
-	public ConstraintFigure(Constraint constraint) {
+	public ConstraintFigure(IGraphicalConstraint constraint) {
 		super();
-		this.constraint = constraint;
+		this.graphicalConstraint = constraint;
 		setLayoutManager(new FreeformLayout());
 
 		label.setForegroundColor(CONSTRAINT_FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(CONSTRAINT_INSETS.left, CONSTRAINT_INSETS.top));
 
-		setText(getConstraintText(constraint));
+		setText(getConstraintText(constraint.getObject()));
 
-		FeatureUIHelper.setSize(constraint, getSize());
+		constraint.setSize(getSize());
 
 		add(label);
 		setOpaque(true);
 
-		if (FeatureUIHelper.getLocation(constraint) != null)
-			setLocation(FeatureUIHelper.getLocation(constraint));
+		if (constraint.getLocation() != null)
+			setLocation(constraint.getLocation());
 
 		init();
 	}
 
 	private void init() {
-		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
+		setText(getConstraintText(graphicalConstraint.getObject()));
+
+		setBorder(FMPropertyManager.getConstraintBorder(graphicalConstraint.isFeatureSelected()));
+		setToolTip(null);
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
 
@@ -110,75 +113,73 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public void setConstraintProperties() {
 		init();
 
-		ConstraintAttribute constraintAttribute = constraint.getConstraintAttribute();
-		if (constraintAttribute == ConstraintAttribute.NORMAL) {
-			return;
-		}
-		if (constraintAttribute == ConstraintAttribute.VOID_MODEL) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+		IConstraint constraint = this.graphicalConstraint.getObject();
+
+		switch (constraint.getConstraintAttribute()) {
+		case NORMAL:
+			break;
+		case VOID_MODEL:
 			setToolTip(VOID_LABEL);
-			return;
-		}
-
-		if (constraintAttribute == ConstraintAttribute.UNSATISFIABLE) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			break;
+		case UNSATISFIABLE:
 			setToolTip(UNSATISFIABLE_LABEL);
-			return;
-		}
-
-		if (constraintAttribute == ConstraintAttribute.TAUTOLOGY) {
+			break;
+		case TAUTOLOGY:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setToolTip(TAUTOLOGY_LABEL);
-			return;
-		}
-
-		StringBuilder toolTip = new StringBuilder();
-		if (!constraint.getDeadFeatures().isEmpty()) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			toolTip.append(DEAD_FEATURE);
-			ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
-			for (Feature dead : constraint.getDeadFeatures()) {
-				deadFeatures.add(dead.toString());
-			}
-			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
-
-			for (String dead : deadFeatures) {
-				toolTip.append("\n   ");
-				toolTip.append(dead);
-			}
-			setToolTip(new Label(toolTip.toString()));
-		}
-
-		if (!constraint.getFalseOptional().isEmpty()) {
-			if (constraint.getDeadFeatures().isEmpty()) {
-				setBackgroundColor(FMPropertyManager.getWarningColor());
-			} else {
-				toolTip.append("\n\n");
-			}
-
-			ArrayList<String> falseOptionalFeatures = new ArrayList<String>(constraint.getFalseOptional().size());
-			for (Feature feature : constraint.getFalseOptional()) {
-				falseOptionalFeatures.add(feature.toString());
-			}
-			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
-
-			toolTip.append(FALSE_OPTIONAL);
-			for (String feature : falseOptionalFeatures) {
-				toolTip.append("\n   ");
-				toolTip.append(feature);
-			}
-			setToolTip(new Label(toolTip.toString()));
-			return;
-		}
-
-		if (constraintAttribute == ConstraintAttribute.REDUNDANT) {
+			break;
+		case REDUNDANT:
+		case IMPLICIT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(new Label(REDUNDANCE));
-			return;
+			setToolTip(REDUNDANCE_LABEL);
+			break;
+		case DEAD:
+		case FALSE_OPTIONAL:
+			final StringBuilder toolTip = new StringBuilder();
+			if (!constraint.getDeadFeatures().isEmpty()) {
+				toolTip.append(DEAD_FEATURE);
+				ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
+				for (IFeature dead : constraint.getDeadFeatures()) {
+					deadFeatures.add(dead.toString());
+				}
+				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
+
+				for (String dead : deadFeatures) {
+					toolTip.append("\n   ");
+					toolTip.append(dead);
+				}
+				setToolTip(new Label(toolTip.toString()));
+			}
+
+			if (!constraint.getFalseOptional().isEmpty()) {
+				if (!constraint.getDeadFeatures().isEmpty()) {
+					toolTip.append("\n\n");
+				}
+
+				ArrayList<String> falseOptionalFeatures = new ArrayList<String>();
+				for (IFeature feature : constraint.getFalseOptional()) {
+					falseOptionalFeatures.add(feature.toString());
+				}
+				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
+
+				toolTip.append(FALSE_OPTIONAL);
+				for (String feature : falseOptionalFeatures) {
+					toolTip.append("\n   ");
+					toolTip.append(feature);
+				}
+				setToolTip(new Label(toolTip.toString()));
+			}
+			break;
+		default:
+			break;
+		}
+		
+		if (getActiveReason() != null) {
+			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
 	}
 
-	private String getConstraintText(Constraint constraint) {
+	private String getConstraintText(IConstraint constraint) {
 		return constraint.getNode().toString(symbols);
 	}
 
@@ -207,5 +208,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
 	}
-
+	
+	@Override
+	public ModelFigure getParent() {
+		return (ModelFigure) super.getParent();
+	}
 }

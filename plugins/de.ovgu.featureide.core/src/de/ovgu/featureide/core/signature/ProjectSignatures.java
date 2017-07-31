@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,14 +33,15 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.filter.IFilter;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /** 
  * Holds the signature information for a whole java project.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
@@ -119,18 +120,18 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	private final String[] featureNames;
 	private AbstractSignature[] signatureArray = null;
 	
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	
 	private int hashCode = 0;
 	private boolean hasHashCode = false;
 	
-	public ProjectSignatures(FeatureModel featureModel) {
+	public ProjectSignatures(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 		final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
 		int countConcreteFeatures = 0;
 		
-		for (Feature feature : featureModel.getFeatures()) {
-			if (feature.isConcrete()) {
+		for (IFeature feature : featureModel.getFeatures()) {
+			if (feature.getStructure().isConcrete()) {
 				tempFeatureNames[countConcreteFeatures++] = feature.getName();
 			}
 		}
@@ -198,7 +199,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		return signatureArray.length;
 	}
 	
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 	

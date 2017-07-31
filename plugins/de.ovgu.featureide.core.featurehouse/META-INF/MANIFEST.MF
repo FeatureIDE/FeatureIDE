@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for FeatureHouse
 Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse;singleton:=true
-Bundle-Version: 2.7.4.qualifier
+Bundle-Version: 3.3.1.qualifier
 Bundle-Activator: de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -31,6 +31,11 @@ Bundle-ClassPath: lib/FeatureHouse.jar,
  lib/pmd-java-5.2.2.jar
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
+<<<<<<< HEAD
+ org.eclipse.jdt.internal.core
+Export-Package: cide.features,
+ de.ovgu.featureide.featurehouse,
+=======
  org.eclipse.jdt.core.refactoring,
  org.eclipse.jdt.core.refactoring.descriptors,
  org.eclipse.jdt.internal.core,
@@ -39,8 +44,13 @@ Import-Package: org.eclipse.core.expressions,
  org.eclipse.jface.text,
  org.eclipse.ui.texteditor
 Export-Package: de.ovgu.featureide.featurehouse,
+>>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
  de.ovgu.featureide.featurehouse.errorpropagation,
  de.ovgu.featureide.featurehouse.meta,
  de.ovgu.featureide.featurehouse.meta.featuremodel,
  de.ovgu.featureide.featurehouse.model,
- de.ovgu.featureide.featurehouse.signature.fuji
+ de.ovgu.featureide.featurehouse.signature.documentation,
+ de.ovgu.featureide.featurehouse.signature.fuji,
+ de.ovgu.featureide.featurehouse.ui.handlers,
+ de.ovgu.featureide.featurehouse.ui.handlers.toggle,
+ fuji

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+         point="de.ovgu.featureide.core.composers">
+		<composer
+            class="de.ovgu.featureide.core.runtime.RuntimeParameters"
+            description="Generator for Runtime Variability"
+            id="de.ovgu.featureide.core.composer.runtime"
+            name="Runtime Parameters"
+            nature="de.ovgu.featureide.core.composer.runtime">
+		</composer>
+	</extension>
+	<extension point = "org.eclipse.debug.core.launchConfigurationTypes">
+		<launchConfigurationType
+         delegate="de.ovgu.featureide.core.runtime.RuntimeLaunchConfigurationDelegate"
+         id="org.eclipse.jdt.launching.localJavaApplication"
+         modes="run, debug"
+         name="Java Application"
+         public="false"
+         sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
+         sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
+		</launchConfigurationType>
+	</extension>
+ <extension
+       point="de.ovgu.featureide.fm.core.FMComposer">
+    <fmComposer
+          class="de.ovgu.featureide.core.runtime.RuntimeFMComposerExtension"
+          id="de.ovgu.featureide.core.runtime.fmcomposer"
+          composer="de.ovgu.featureide.core.composer.runtime"
+          name="RuntimeFMComposer">
+    </fmComposer>
+ </extension>
+</plugin>

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -41,12 +41,14 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Context Completion
  * 
- * @author Reimar Schröter
+ * @author Reimar Schrï¿½ter
+ * @author Marcus Pinnecke
  */
 @SuppressWarnings("restriction")
 public class AnnoCompletion implements IJavaCompletionProposalComputer {
@@ -78,11 +80,11 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	public void sessionStarted() {
 	}
 
-	public List<CompletionProposal> getCompl(IFeatureProject featureProject, CharSequence prefix) {
+	public List<CompletionProposal> getCompl(final IFeatureProject featureProject, final CharSequence prefix) {
 		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();
 
-		List<String> featureNames = featureProject.getFeatureModel().getConcreteFeatureNames();
-		for (String string : featureNames) {
+		final Iterable<String> featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
+		for (final String string : featureNames) {
 			CompletionProposal pr = null;
 			pr = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
 			pr.setName(string.toCharArray());
@@ -149,7 +151,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			int offsetOfLine = context.getDocument().getLineOffset(line);
 			int lineLength = context.getDocument().getLineLength(line);
 			String lineContent = context.getDocument().get(offsetOfLine,lineLength);
-			if (!lineContent.contains("#if")){
+			if (!lineContent.contains("#if") && !lineContent.contains("#elif") && !lineContent.contains("#condition")){
 				return false;
 			}
 		} catch (BadLocationException e1) {

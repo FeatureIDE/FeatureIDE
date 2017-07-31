@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -31,8 +31,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -44,48 +44,23 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke
  */
 public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults, IColorProvider {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.
-	 * jface.viewers.ILabelProviderListener)
-	 */
 	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-	 */
 	@Override
 	public void dispose() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang
-	 * .Object, java.lang.String)
-	 */
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse
-	 * .jface.viewers.ILabelProviderListener)
-	 */
 	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
@@ -94,72 +69,55 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof Feature) {
-			if ((((Feature) element).isRoot()))
+		if (element instanceof IFeature) {
+			if ((((IFeature) element).getStructure().isRoot()))
 				return null; // TODO: Add here icon for feature model
-			if (((Feature) element).getParent().isAlternative()) {
+			if (((IFeature) element).getStructure().getParent().isAlternative()) {
 				return IMG_XOR;
-			} else if (((Feature) element).getParent().isOr()) {
+			} else if (((IFeature) element).getStructure().getParent().isOr()) {
 				return IMG_OR;
-			} else if (((Feature) element).isMandatory()) {
+			} else if (((IFeature) element).getStructure().isMandatory()) {
 				return IMG_MANDATORY;
 			} else {
 				return IMG_OPTIONAL;
 			}
 		} else if (element instanceof String) {
 			return null; // TODO: Add here icon for "constraint" node
-		} else if (element instanceof Constraint) {
+		} else if (element instanceof IConstraint) {
 			return null; // TODO: Add here icon for CONSTRAINT_ELEMENT node
 		} else
 			return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
 	@Override
 	public String getText(Object element) {
-		if (element instanceof Feature)
-			return ((Feature) element).getName();
-		else if (element instanceof Constraint)
-			return ((Constraint) element).getNode().toString(NodeWriter.logicalSymbols);
+		if (element instanceof IFeature)
+			return ((IFeature) element).getName();
+		else if (element instanceof IConstraint)
+			return ((IConstraint) element).getNode().toString(NodeWriter.logicalSymbols);
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return "";
 
 		return element.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
-	 */
 	@Override
 	public Font getFont(Object element) {
 		return DEFAULT_FONT;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-	 */
 	@Override
 	public Color getForeground(Object element) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Color getBackground(Object element) {
 		Color col = null;
 
-		if (element instanceof Feature) {
-			Feature feature = (Feature) element;
+		if (element instanceof IFeature) {
+			IFeature feature = (IFeature) element;
 			FeatureColor color = FeatureColorManager.getColor(feature);
 			if (color != FeatureColor.NO_COLOR) {
 				col = new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
@@ -167,4 +125,5 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 		}
 		return col;
 	}
+
 }

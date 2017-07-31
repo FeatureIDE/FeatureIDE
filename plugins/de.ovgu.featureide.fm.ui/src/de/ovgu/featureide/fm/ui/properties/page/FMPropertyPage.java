@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -176,7 +176,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 		selectorFeatureBorder = createSelectorEntry(colorGroup, COLOR_BORDER, FMPropertyManager.getFeatureBorderColor().getRGB(), COLOR_BORDER_TIP);
 		//		selectorHiddenBackground = createSelectorEntry(colorGroup, COLOR_HIDDEN, PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB(), COLOR_HIDDEN_TIP);
-		selectorConnection = createSelectorEntry(colorGroup, COLOR_CONNECTION, FMPropertyManager.getConnectionForgroundColor().getRGB(), COLOR_CONNECTION_TIP);
+		selectorConnection = createSelectorEntry(colorGroup, COLOR_CONNECTION, FMPropertyManager.getConnectionForegroundColor().getRGB(), COLOR_CONNECTION_TIP);
 		selectorConstraint = createSelectorEntry(colorGroup, COLOR_CONSTRAINT, FMPropertyManager.getConstraintBackgroundColor().getRGB(), COLOR_CONSTRAINT_TIP);
 		selectorWarning = createSelectorEntry(colorGroup, COLOR_WARNING, FMPropertyManager.getWarningColor().getRGB(), COLOR_WARNING_TIP);
 		selectorDeadBackground = createSelectorEntry(colorGroup, COLOR_ERROR, FMPropertyManager.getDeadFeatureBackgroundColor().getRGB(), COLOR_DEAD_TIP);
@@ -376,7 +376,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		//		PersistentPropertyManager.setHiddenFeatureBackgroundColor(new Color(null, selectorHiddenBackground.getColorValue()));
 		FMPropertyManager.setDeadFeatureBackgroundColor(new Color(null, selectorDeadBackground.getColorValue()));
 		FMPropertyManager.setConstraintBackgroundColor(new Color(null, selectorConstraint.getColorValue()));
-		FMPropertyManager.setConnectionForgroundColor(new Color(null, selectorConnection.getColorValue()));
+		FMPropertyManager.setConnectionForegroundColor(new Color(null, selectorConnection.getColorValue()));
 		FMPropertyManager.setWarningColor(new Color(null, selectorWarning.getColorValue()));
 		FMPropertyManager.setFeatureBorderColor(new Color(null, selectorFeatureBorder.getColorValue()));
 		FMPropertyManager.setHideBorderColor(buttonHideBorderColor.getSelection());
@@ -491,7 +491,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		//		selectorHiddenBackground.setColorValue(PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB());
 		selectorDeadBackground.setColorValue(FMPropertyManager.getDeadFeatureBackgroundColor().getRGB());
 		selectorConstraint.setColorValue(FMPropertyManager.getConstraintBackgroundColor().getRGB());
-		selectorConnection.setColorValue(FMPropertyManager.getConnectionForgroundColor().getRGB());
+		selectorConnection.setColorValue(FMPropertyManager.getConnectionForegroundColor().getRGB());
 		selectorWarning.setColorValue(FMPropertyManager.getWarningColor().getRGB());
 		selectorFeatureBorder.setEnabled(FMPropertyManager.isBorderColorHidden());
 		selectorFeatureBorder.setColorValue(FMPropertyManager.getFeatureBorderColor().getRGB());

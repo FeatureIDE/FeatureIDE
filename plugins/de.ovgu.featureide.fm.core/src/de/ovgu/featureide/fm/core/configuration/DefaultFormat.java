@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,95 +28,114 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_CORRUPT__NO
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Simple configuration format.</br> Lists all selected features in the
- * user-defined order (if specified).
+ * Simple configuration format.<br/>
+ * Lists all selected features in the user-defined order (if specified).
  * 
  * @author Sebastian Krieter
  */
-public class DefaultFormat extends ConfigurationFormat {
+public class DefaultFormat implements IConfigurationFormat {
 
-	public List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException {
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + DefaultFormat.class.getSimpleName();
+
+	private static final String NEWLINE = System.lineSeparator();
+
+	@Override
+	public ProblemList read(Configuration configuration, CharSequence source) {
 		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
-		final List<ConfigurationReader.Warning> warnings = new LinkedList<>();
+		final ProblemList warnings = new ProblemList();
 
 		final boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
 		configuration.resetValues();
-		
+
 		String line = null;
 		int lineNumber = 1;
-		while ((line = reader.readLine()) != null) {
-			if (line.startsWith("#") || line.isEmpty() || line.equals(" ")) {
-				continue;
-			}
-			// the string tokenizer is used to also support the expression
-			// format used by FeatureHouse
-			final StringTokenizer tokenizer = new StringTokenizer(line);
-			final LinkedList<String> hiddenFeatures = new LinkedList<>();
-			while (tokenizer.hasMoreTokens()) {
-				String name = tokenizer.nextToken(" ");
-				if (name.startsWith("\"")) {
-					try {
-						name = name.substring(1);
-						name += tokenizer.nextToken("\"");
-						if (!tokenizer.nextToken(" ").startsWith("\"")) {
-							warnings.add(new ConfigurationReader.Warning(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
+		try (BufferedReader reader = new BufferedReader(new StringReader(source.toString()))) {
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#") || line.isEmpty() || line.equals(" ")) {
+					continue;
+				}
+				// the string tokenizer is used to also support the expression
+				// format used by FeatureHouse
+				final StringTokenizer tokenizer = new StringTokenizer(line);
+				final LinkedList<String> hiddenFeatures = new LinkedList<>();
+				while (tokenizer.hasMoreTokens()) {
+					String name = tokenizer.nextToken(" ");
+					if (name.startsWith("\"")) {
+						try {
+							name = name.substring(1);
+							name += tokenizer.nextToken("\"");
+							if (!tokenizer.nextToken(" ").startsWith("\"")) {
+								warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
+							}
+						} catch (RuntimeException e) {
+							warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 						}
-					} catch (RuntimeException e) {
-						warnings.add(new ConfigurationReader.Warning(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
+					}
+					name = renamingsManager.getNewName(name);
+					IFeature feature = configuration.getFeatureModel().getFeature(name);
+					if (feature != null && feature.getStructure().hasHiddenParent()) {
+						hiddenFeatures.add(name);
+					} else {
+						try {
+							configuration.setManual(name, Selection.SELECTED);
+						} catch (FeatureNotFoundException e) {
+							warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
+						} catch (SelectionNotPossibleException e) {
+							warnings.add(new Problem(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
+						}
 					}
 				}
-				name = renamingsManager.getNewName(name);
-				Feature feature = configuration.getFeatureModel().getFeature(name);
-				if (feature != null && feature.hasHiddenParent()) {
-					hiddenFeatures.add(name);
-				} else {
+				for (String name : hiddenFeatures) {
 					try {
-						configuration.setManual(name, Selection.SELECTED);
+						configuration.setAutomatic(name, Selection.SELECTED);
 					} catch (FeatureNotFoundException e) {
-						warnings.add(new ConfigurationReader.Warning(FEATURE + name + DOES_NOT_EXIST, lineNumber));
+						warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} catch (SelectionNotPossibleException e) {
-						warnings.add(new ConfigurationReader.Warning(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
+						warnings.add(new Problem(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
 					}
 				}
+				lineNumber++;
 			}
-			for (String name : hiddenFeatures) {
-				try {
-					configuration.setAutomatic(name, Selection.SELECTED);
-				} catch (FeatureNotFoundException e) {
-					warnings.add(new ConfigurationReader.Warning(FEATURE + name + DOES_NOT_EXIST, lineNumber));
-				} catch (SelectionNotPossibleException e) {
-					warnings.add(new ConfigurationReader.Warning(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
-				}
-			}
-			lineNumber++;
+		} catch (IOException e) {
+			warnings.clear();
+			warnings.add(new Problem(e));
+			configuration.setPropagate(orgPropagate);
+			return warnings;
 		}
 		configuration.setPropagate(orgPropagate);
-		configuration.update();
+		configuration.update(true, null);
 		return warnings;
 	}
 
 	public String readLine(String line) {
-
 		return null;
 	}
 
 	@Override
 	public String write(Configuration configuration) {
 		final StringBuilder buffer = new StringBuilder();
-		final FeatureModel featureModel = configuration.getFeatureModel();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
 		if (featureModel.isFeatureOrderUserDefined()) {
-			final List<String> list = featureModel.getFeatureOrderList();
+			final List<String> list = Functional.toList(featureModel.getFeatureOrderList());
 			final Set<String> featureSet = configuration.getSelectedFeatureNames();
 			for (String s : list) {
 				if (featureSet.contains(s)) {
@@ -135,7 +154,7 @@ public class DefaultFormat extends ConfigurationFormat {
 	}
 
 	private void writeSelectedFeatures(SelectableFeature feature, StringBuilder buffer) {
-		if (feature.getFeature().isConcrete() && feature.getSelection() == Selection.SELECTED) {
+		if (feature.getFeature().getStructure().isConcrete() && feature.getSelection() == Selection.SELECTED) {
 			if (feature.getName().contains(" ")) {
 				buffer.append("\"" + feature.getName() + "\"" + NEWLINE);
 			} else {
@@ -145,6 +164,31 @@ public class DefaultFormat extends ConfigurationFormat {
 		for (TreeElement child : feature.getChildren()) {
 			writeSelectedFeatures((SelectableFeature) child, buffer);
 		}
+	}
+
+	@Override
+	public String getSuffix() {
+		return StringTable.CONFIG;
+	}
+
+	@Override
+	public IPersistentFormat<Configuration> getInstance() {
+		return this;
+	}
+
+	@Override
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 }

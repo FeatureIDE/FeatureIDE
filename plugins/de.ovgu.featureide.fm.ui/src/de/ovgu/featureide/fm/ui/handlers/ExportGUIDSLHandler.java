@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,30 +20,29 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 
 /**
  * Exports feature model to GUIDSL format.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ExportGUIDSLHandler extends AbstractExportHandler {
 
 	@Override
-	protected IFeatureModelWriter getFeatureModelWriter(FeatureModel fm) {
-		final GuidslWriter fmWriter = new GuidslWriter(fm);
-		if (fmWriter.hasConcreteCompounds()
-				&& !MessageDialog.openQuestion(new Shell(), "Warning!",
-						"The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)")) {
-			return null;
-		}
+	protected IFeatureModelFormat getFormat() {
+		final GuidslFormat fmWriter = new GuidslFormat();
+		// TODO Guidsl
+//		if (fmWriter.hasConcreteCompounds()
+//				&& !MessageDialog.openQuestion(new Shell(), "Warning!",
+//						"The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)")) {
+//			return null;
+//		}
 		return fmWriter;
 	}
 
@@ -52,7 +51,7 @@ public class ExportGUIDSLHandler extends AbstractExportHandler {
 		super.configureFileDialog(fileDialog);
 		fileDialog.setFileName("model.m");
 		fileDialog.setFilterExtensions(new String[] { "*.m" });
-		fileDialog.setFilterNames(new String[] { "GUIDSL foramt *.m" });
+		fileDialog.setFilterNames(new String[] { "GUIDSL format *.m" });
 	}
 
 }

@@ -1,18 +1,18 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -58,12 +58,12 @@ import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
 import de.ovgu.featureide.core.signature.base.SignaturePosition;
 
 /**
- * TODO description
- * 
+ * Collects all signatures in a Munge project.
+ *
  * @author Sebastian Krieter
  */
 public abstract class MungeSignatureBuilder {
-	
+
 	private static String readFile(IFile file) throws CoreException {
 		final int bufferSize = 1024;
 		final char[] buffer = new char[bufferSize];
@@ -82,10 +82,10 @@ public abstract class MungeSignatureBuilder {
 		}
 		return contents.toString();
 	}
-	
+
 	private static Collection<AbstractSignature> parse(ProjectSignatures projectSignatures, ASTNode root) {
 		final HashMap<AbstractSignature, AbstractSignature> map = new HashMap<>();
-		
+
 		final CompilationUnit cu = (CompilationUnit) root;
 		final PackageDeclaration pckgDecl = cu.getPackage();
 		final String packageName = (pckgDecl == null) ? null : pckgDecl.getName().getFullyQualifiedName();
@@ -97,10 +97,10 @@ public abstract class MungeSignatureBuilder {
 				cl.add(comment);
 			}
 		}
-		
+
 		final ListIterator<Javadoc> it = cl.listIterator();
 		final FeatureDataConstructor featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_PP);
-		
+
 		root.accept(new ASTVisitor() {
 			private BodyDeclaration curDeclaration = null;
 			private PreprocessorFeatureData curfeatureData = null;
@@ -122,31 +122,38 @@ public abstract class MungeSignatureBuilder {
 						}
 					}
 					lastComment = sb.toString();
-					
+
 					curfeatureData.setComment(lastComment);
 					lastCommentedMethod = (curDeclaration instanceof MethodDeclaration) ? (MethodDeclaration) curDeclaration : null;
 				}
 				return false;
 			}
-			
+
 			private void attachFeatureData(AbstractSignature curSignature, BodyDeclaration curDeclaration) {
 				this.curDeclaration = curDeclaration;
 				final Javadoc javadoc = curDeclaration.getJavadoc();
 				final int startPosition = (javadoc == null) ? curDeclaration.getStartPosition() : curDeclaration.getStartPosition() + javadoc.getLength();
-				int startRow = cu.getLineNumber(startPosition);
-				int endRow = cu.getLineNumber(curDeclaration.getStartPosition() + curDeclaration.getLength());
-				SignaturePosition pos = new SignaturePosition(startRow, endRow, 0, 0, 0, 0);
-				curfeatureData = (PreprocessorFeatureData) featureDataConstructor.create(null, pos);
+				curfeatureData = (PreprocessorFeatureData) featureDataConstructor.create(null, unit.getLineNumber(startPosition), unit.getLineNumber(curDeclaration.getStartPosition() + curDeclaration.getLength()));
 				curSignature.setFeatureData(curfeatureData);
 				map.put(curSignature, curSignature);
 			}
-			
+
+			@Override
+			public boolean visit(CompilationUnit unit){
+				this.unit = unit;
+				return true;
+			}
+
+			CompilationUnit unit = null;
+
 			@Override
 			public boolean visit(MethodDeclaration node) {
-				final MungeMethodSignature methodSignature = new MungeMethodSignature(getParent(node.getParent()), 
-						node.getName().getIdentifier(), node.getModifiers(), node.getReturnType2(), node.parameters(), 
-						node.isConstructor());
-				
+				int pos = unit.getLineNumber(node.getBody().getStartPosition());
+				int end =  unit.getLineNumber(node.getBody().getStartPosition() + node.getBody().getLength());
+				final MungeMethodSignature methodSignature = new MungeMethodSignature(getParent(node.getParent()),
+						node.getName().getIdentifier(), node.getModifiers(), node.getReturnType2(), node.parameters(),
+						node.isConstructor(), pos, end);
+
 				attachFeatureData(methodSignature, node);
 
 				if (node.getJavadoc() == null && lastCommentedMethod != null && lastCommentedMethod.getName().equals(node.getName())) {
@@ -156,7 +163,7 @@ public abstract class MungeSignatureBuilder {
 				}
 				return true;
 			}
-			
+
 			private AbstractClassSignature getParent(ASTNode astnode) {
 				final AbstractClassSignature sig;
 				if (astnode instanceof TypeDeclaration) {
@@ -167,36 +174,35 @@ public abstract class MungeSignatureBuilder {
 				}
 				AbstractClassSignature uniqueSig = (AbstractClassSignature) map.get(sig);
 				if (uniqueSig == null) {
-					map.put(sig, sig);
-					uniqueSig = sig;
+					visit((TypeDeclaration)astnode);
 				}
 				return uniqueSig;
 			}
-			
+
 			@Override
 			public boolean visit(FieldDeclaration node) {
 				for (Iterator<?> it = node.fragments().iterator(); it.hasNext();) {
 					VariableDeclarationFragment fragment = (VariableDeclarationFragment) it.next();
-					
-					final MungeFieldSignature fieldSignature = new MungeFieldSignature(getParent(node.getParent()), 
+
+					final MungeFieldSignature fieldSignature = new MungeFieldSignature(getParent(node.getParent()),
 							fragment.getName().getIdentifier(), node.getModifiers(), node.getType());
-					
+
 					attachFeatureData(fieldSignature, node);
 				}
-				
+
 				return true;
 			}
-			
+
 			@Override
 			public boolean visit(TypeDeclaration node) {
 				final MungeClassSignature classSignature = new MungeClassSignature(getParent(node.getParent()),
 						node.getName().getIdentifier(), node.getModifiers(), node.isInterface() ? "interface" : "class", packageName);
-				
+
 				attachFeatureData(classSignature, node);
-				
+
 				return super.visit(node);
 			}
-			
+
 		});
 		return map.keySet();
 	}
@@ -228,7 +234,7 @@ public abstract class MungeSignatureBuilder {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		
+
 		projectSignatures.setSignatureArray(signatureList.toArray(new AbstractSignature[0]));
 		return projectSignatures;
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -65,8 +65,13 @@ public class ClassFigure extends Figure implements GUIDefaults {
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(CLASS_INSETS.left, CLASS_INSETS.top));
 		this.height = height;
-		this.setName(c.getName());
-	
+
+		String name = c.getName();
+		if (name.contains("/")) {
+			name = name.substring(name.lastIndexOf("/")+1,name.length());
+		}
+		this.setName(name);
+		
 		this.add(label);
 		this.setOpaque(false);
 			

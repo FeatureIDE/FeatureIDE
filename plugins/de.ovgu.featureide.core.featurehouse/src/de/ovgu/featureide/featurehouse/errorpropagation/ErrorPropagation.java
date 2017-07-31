@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -51,7 +51,8 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 
 /**
@@ -341,9 +342,9 @@ public abstract class ErrorPropagation {
 			return null;
 		}
 
-		Collection<Feature> features = featureProject.getFeatureModel().getFeatures();
+		Collection<IFeature> features = Functional.toList(featureProject.getFeatureModel().getFeatures());
 		for (String confFeature : configurationFeatures) {
-			for (Feature feature : features) {
+			for (IFeature feature : features) {
 				if (feature.getName().equals(confFeature)) {
 					list.add(feature.getName());
 				}

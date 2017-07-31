@@ -200,6 +200,25 @@ Library.
       <update label="FeatureIDE Update Site" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy"/>
    </url>
 
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.cdt"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.core.filebuffers"/>
+      <import plugin="de.ovgu.featureide.fm.core"/>
+      <import plugin="de.ovgu.featureide.core"/>
+      <import plugin="de.ovgu.featureide.fm.ui"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.ltk.core.refactoring"/>
+      <import plugin="org.eclipse.ltk.ui.refactoring"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+   </requires>
+
    <plugin
          id="br.ufal.ic.colligens"
          download-size="0"

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,18 +21,37 @@
 package org.prop4j;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A constraint that is true iff both children have the same boolean value.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
-public class Equals extends Node {
+public class Equals extends Node implements Cloneable {
 	
 	public Equals(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);
 	}
-	
+
+	@Override
+	public boolean isConjunctiveNormalForm() {
+		return false;
+	}
+
+	@Override
+	public boolean isClausalNormalForm() {
+		return false;
+	}
+
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new And(
+				new Or(new Not(newChildren[0]), newChildren[1]),
+				new Or(new Not(newChildren[1]), newChildren[0]));
+	}
+
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		super.eliminate(list);
@@ -45,6 +64,11 @@ public class Equals extends Node {
 	@Override
 	public Node clone() {
 		return new Equals(children[0].clone(), children[1].clone());
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		return children[0].getValue(map) == children[1].getValue(map);
 	}
 	
 }

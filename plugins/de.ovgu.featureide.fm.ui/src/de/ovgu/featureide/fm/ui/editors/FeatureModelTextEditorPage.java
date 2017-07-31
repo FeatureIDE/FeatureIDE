@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 
-import java.beans.PropertyChangeEvent;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.CoreException;
@@ -35,14 +33,16 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangedOperation;
 
 /**
  * Displays the source.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelTextEditorPage extends TextEditor implements IFeatureModelEditorPage {
 
@@ -75,7 +75,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		final String text = featureModelEditor.featureModelWriter.writeToString();
+		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(featureModelEditor.getFeatureModel());
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);
@@ -129,7 +129,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 
 	}
 
@@ -146,19 +146,21 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 		}
 	}
 
-	private void executeSaveOperation() {
+	public void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
-			final FeatureModel fm = featureModelEditor.featureModel;
-			SourceChangeOperation op = new SourceChangeOperation(fm, featureModelEditor, newText, oldText);
+			final IFeatureModel fm = featureModelEditor.getFeatureModel();
+			
+			//TODO _interfaces replace text with DocumentEvent (delta)
+			SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);
 
 			op.addContext((IUndoContext) fm.getUndoContext());
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+				oldText = newText;
 			} catch (ExecutionException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
-			oldText = newText;
 		}
 	}
 

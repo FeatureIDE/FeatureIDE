@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,15 +24,16 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Layouts the features at the feature diagram using a breadth first search.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 
@@ -46,26 +47,27 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	int yoffset;
 
 	@Override
-	public void layoutFeatureModel(FeatureModel featureModel) {
+	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
-		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
+		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
-		layout(yoffset, featureModel.getConstraints());
+		layout(yoffset, featureModel.getVisibleConstraints());
 	}
 
-	private void layout(LayoutableFeature root) {
-		if (root == null)
+	private void layout(IGraphicalFeature root) {
+		if (root == null || root.getObject().getStructure().isHidden()) {
 			return;
-		LinkedList<LayoutableFeature> list = new LinkedList<LayoutableFeature>();
+		}
+		LinkedList<IGraphicalFeature> list = new LinkedList<>();
 		list.add(root);
 
 		yoffset += FMPropertyManager.getLayoutMarginY();
+		
 		while (!list.isEmpty()) {
 			//center the features of the level
 			int width = 2 * FMPropertyManager.getLayoutMarginX() - FMPropertyManager.getFeatureSpaceX();
-			for (LayoutableFeature feature : list) {
-				width += FeatureUIHelper.getSize(feature.getFeature()).width + FMPropertyManager.getFeatureSpaceX();
-
+			for (IGraphicalFeature feature : list) {
+				width += feature.getSize().width + FMPropertyManager.getFeatureSpaceX();
 			}
 
 			int xoffset = controlWidth / 2 - width / 2;
@@ -73,13 +75,11 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			//set location of each feature at this level
 			int levelSize = list.size();
 			for (int i = 0; i < levelSize; i++) {
-				LayoutableFeature feature = list.removeFirst();
-				Feature f = feature.getFeature();
-				FeatureUIHelper.setLocation(f, new Point(xoffset, yoffset));
-				xoffset += FeatureUIHelper.getSize(f).width + FMPropertyManager.getFeatureSpaceX();
+				IGraphicalFeature feature = list.removeFirst();
+				setLocation(feature, new Point(xoffset, yoffset));
+				xoffset += feature.getSize().width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
-				for (LayoutableFeature child : feature.getChildren())
-					list.add(child);
+				list.addAll(getChildren(feature));
 			}
 			yoffset += FMPropertyManager.getFeatureSpaceY();
 		}

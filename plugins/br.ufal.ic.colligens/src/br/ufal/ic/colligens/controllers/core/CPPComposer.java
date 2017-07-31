@@ -54,7 +54,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -161,35 +161,29 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 		if (!prepareFullBuild(config))
 			return;
-		//
-		//
-		// Job job = new Job("Analyzing!") {
-		// @Override
-		// protected IStatus run(IProgressMonitor monitor) {
-		// //this perfom a build using the Feature configuration selected
-		// IFolder buildFolder = featureProject.getBuildFolder();
-		//
-		// if (buildFolder.getName().equals("src")) {
-		// buildFolder =
-		// featureProject.getProject().getFolder(System.getProperty("file.separator")
-		// +
-		// "build");
-		// }
-		// runTypeChefAnalyzes(featureProject.getSourceFolder());
-		//
-		// if(continueCompilationFlag){
-		// runBuild(getActivatedFeatureArgs(), featureProject.getSourceFolder(),
-		// buildFolder);
-		// }
-		// return Status.OK_STATUS;
-		// }
-		// };
-		// job.setPriority(Job.SHORT);
-		// job.schedule();
-		//
-		//
-		//
-		//
+		
+		Job job = new Job("Analyzing!") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				// this perfom a build using the Feature configuration selected
+				IFolder buildFolder = featureProject.getBuildFolder();
+
+				if (buildFolder.getName().equals("src")) {
+					buildFolder = featureProject.getProject().getFolder(System.getProperty("file.separator") + "build");
+				}
+				runTypeChefAnalyzes(featureProject.getSourceFolder());
+
+				if (continueCompilationFlag) {
+					final LinkedList<String> lst_selectedFeatures = new LinkedList<String>();
+					lst_selectedFeatures.addAll(activatedFeatures);
+					runBuild(getActivatedFeatureArgs(lst_selectedFeatures) , featureProject.getSourceFolder(), buildFolder);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.SHORT);
+		job.schedule();
+
 		if (cppModelBuilder != null) {
 			cppModelBuilder.buildModel();
 		}
@@ -418,13 +412,12 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 		// find includes
 		String projectName = sourceFolder.getProject().getName();
-		System.out.println(projectName);
+		
 		ICProject project = CoreModel.getDefault().getCModel()
 				.getCProject(projectName);
 		try {
 			IIncludeReference includes[] = project.getIncludeReferences();
 			for (int i = 0; i < includes.length; i++) {
-				// System.out.println(includes[i].getElementName());
 				compilerArgs.add("-I" + includes[i].getElementName());
 			}
 			if (!Colligens.getDefault().getPreferenceStore().getString("LIBS")
@@ -477,7 +470,6 @@ public class CPPComposer extends PPComposerExtensionClass {
 			for (Iterator<IResource> iterator = prjController.getList()
 					.iterator(); iterator.hasNext();) {
 				IResource type = iterator.next();
-				System.out.println(type.getLocation().toOSString());
 			}
 			typeChef.run(prjController.getList());
 
@@ -645,7 +637,6 @@ public class CPPComposer extends PPComposerExtensionClass {
 	 * Show variants with errors
 	 */
 	private synchronized void verifyVariantsWithProblems() {
-		System.out.println("akkkkkkk");
 		threadInExecId.remove(Thread.currentThread().getId());
 		if (threadInExecId.isEmpty()) {
 			final Display display = Display.getDefault();
@@ -694,7 +685,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 		List<String> myActivatedFeatures = new LinkedList<String>();
 
-		for (Feature feature : configuration.getSelectedFeatures()) {
+		for (IFeature feature : configuration.getSelectedFeatures()) {
 			myActivatedFeatures.add(feature.getName());
 		}
 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Represents the legend in the FeatureModel
@@ -32,21 +31,20 @@ import de.ovgu.featureide.fm.core.IGraphicItem;
  * @author Fabian Benduhn
  */
 public class Legend implements IGraphicItem {
-	private final FeatureModel model;
+	private final IGraphicalFeatureModel model;
 	private Point pos;
 
-	public Legend(FeatureModel model) {
+	public Legend(IGraphicalFeatureModel model) {
 		this.model = model;
-		final FMPoint legendPos = model.getLayout().getLegendPos();
-		this.pos = new Point(legendPos.x, legendPos.y);
+		this.pos = model.getLayout().getLegendPos().getCopy();
 	}
 
-	public FeatureModel getModel() {
+	public IGraphicalFeatureModel getModel() {
 		return model;
 	}
 
 	public void update() {
-		model.handleModelDataChanged();
+		model.getFeatureModel().handleModelDataChanged();
 	}
 
 	public Point getPos() {

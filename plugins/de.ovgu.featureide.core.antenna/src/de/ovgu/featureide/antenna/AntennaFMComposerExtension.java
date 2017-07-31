@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -55,7 +55,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
 			NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
 	
-	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
+	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z][\\w\\.\\-]*$";
 	
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
@@ -68,7 +68,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	}
 
 	@Override
-	public boolean hasFeaureOrder() {
+	public boolean hasFeatureOrder() {
 		return false;
 	}
 	

@@ -72,10 +72,6 @@
 								<reference
 										definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
 								</reference>
-								<test
-										args="de.ovgu.featureide.core.featurehouse.ui.commands.fuji"
-										property="de.ovgu.featureide.core.featurehouse.properties.toggle.fuji">
-								</test>
 							</and>
 						</with>
 					</visibleWhen>
@@ -277,15 +273,6 @@
 		<persistent
 				value="true">
 		</persistent>
-	</extension>
-	<extension
-			point="de.ovgu.featureide.core.wizard">
-		<newProjectWizard
-				class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
-				composerid="de.ovgu.featureide.composer.featurehouse"
-				id="de.ovgu.featureide.core.featurehouse.newProjectWizard"
-				name="FeatureHouseNewProjectWizard">
-		</newProjectWizard>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.propertyTesters">

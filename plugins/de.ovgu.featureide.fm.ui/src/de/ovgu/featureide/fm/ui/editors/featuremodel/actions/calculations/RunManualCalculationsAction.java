@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,18 +25,22 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RUN_MANUAL_CAL
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Action to specify feature model analysis.<br>
+ * A manual call of the feature model analysis.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class RunManualCalculationsAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public RunManualCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(RUN_MANUAL_CALCULATIONS);
 		this.featureModel = featureModel;
 	}
@@ -45,7 +49,7 @@ public class RunManualCalculationsAction extends Action {
 	public void run() {
 		boolean oldValue = featureModel.getAnalyser().runCalculationAutomatically;
 		featureModel.getAnalyser().runCalculationAutomatically = true;
-		featureModel.handleModelDataLoaded();
+		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
 		featureModel.getAnalyser().runCalculationAutomatically = oldValue;
 	}
 

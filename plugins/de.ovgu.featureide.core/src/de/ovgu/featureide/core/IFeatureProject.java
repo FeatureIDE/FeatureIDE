@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,6 +26,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABILITY_AW
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -35,7 +37,8 @@ import org.eclipse.core.runtime.QualifiedName;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 
 public interface IFeatureProject extends IBuilderMarkerHandler {
@@ -137,7 +140,10 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	FSTModel getFSTModel();
 
-	FeatureModel getFeatureModel();
+	// TODO _Refactor: remove
+	IFeatureModel getFeatureModel();
+
+	FeatureModelManager getFeatureModelManager();
 
 	IFile getModelFile();
 	
@@ -167,7 +173,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 *   specified by the nature or builder (every project has the same nature
 	 *   and builder, which can be extended by other eclipse plug-ins)
 	 */
-	IComposerExtensionClass getComposer();
+	@CheckForNull IComposerExtensionClass getComposer();
 	
 	/**
 	 * Sets the JAVA class path that is in order to build the project

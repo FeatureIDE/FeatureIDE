@@ -1,0 +1,5 @@
+<plugin>
+	<interface id="interfaces.IMessage">
+		<class>World</class>
+	</interface>
+</plugin>

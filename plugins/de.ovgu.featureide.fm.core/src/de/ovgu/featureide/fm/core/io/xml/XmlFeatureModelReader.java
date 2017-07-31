@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,8 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_FEATURE_NAME;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_INTEGER_VALUE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
@@ -33,6 +31,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -52,56 +51,87 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 
 /**
  * Parses a FeatureModel from XML
  * 
+ * @deprecated Use {@link XmlFeatureModelFormat} and {@link FileHandler} instead.
+ * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
+@Deprecated
 public class XmlFeatureModelReader extends AbstractFeatureModelReader implements XMLFeatureModelTags {
 
-	public XmlFeatureModelReader(FeatureModel featureModel) {
+	public XmlFeatureModelReader(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
+	
 
 	@Override
 	protected synchronized void parseInputStream(final InputStream inputStream)
 			throws UnsupportedModelException {
 		featureModel.reset();
-		featureModel.getLayout().showHiddenFeatures(true);
-		featureModel.getLayout().verticalLayout(false);
+// TODO _interfaces Removed Code
+//		featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
+//		featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
 		Document  doc = null;
 		try {
 			doc = PositionalXMLReader.readXML(inputStream);
 		} catch (SAXParseException e) {
 			throw new UnsupportedModelException(e.getMessage(), e.getLineNumber());
 		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		} catch (SAXException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		} catch (ParserConfigurationException e) {
-			FMCorePlugin.getDefault().logError(e);
+			Logger.logError(e);
 		}
 		doc.getDocumentElement().normalize();
+		
+		final Collection<PropertiesParser> customProperties = new ArrayList<>();
+		
 		for (Element e : getElements(doc.getElementsByTagName(FEATURE_MODEL))) {
 			setFeatureModelAttributes(e);
 			parseStruct(e.getElementsByTagName(STRUCT));
 			parseConstraints(e.getElementsByTagName(CONSTRAINTS));
 			parseCalculations(e.getElementsByTagName(CALCULATIONS));
 			parseComments(e.getElementsByTagName(COMMENTS));
-			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));	
+			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));
+			
+			XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
+			customProperties.addAll(propertyLoader.parseProperties());
 		}
-		if (featureModel.getRoot() == null) {
+		if (FeatureUtils.getRoot(featureModel) == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
 		}
-		featureModel.handleModelDataLoaded();
+		
+		importCustomProperties(customProperties, featureModel);
+		
+		//featureModel.handleModelDataLoaded();
+	}
+
+	private void importCustomProperties(Collection<PropertiesParser> customProperties, IFeatureModel featureModel) {
+		for (PropertiesParser parser : customProperties) {
+			switch (parser.getType()) {
+			case FEATURE_PROPERTIES_PARSER: {
+				for(String featureName : parser.getIdentifier()) {
+					featureModel.getFeature(featureName).getCustomProperties().setEntrySet(parser.getPropertyEntries(featureName));
+				}
+			} break;
+			default: throw new UnsupportedOperationException("Unkown property container parser type " + parser.getType());
+			}
+		}
 	}
 
 	/**
@@ -124,23 +154,24 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	 * Adds attributes to the feature model
 	 */
 	private void setFeatureModelAttributes(Element eElement) {
-		String algorithm = eElement.getAttribute(CHOSEN_LAYOUT_ALGORITHM);
-		if (!algorithm.equals("")) {
-			featureModel.getLayout().setLayout(
-					Integer.parseInt(algorithm));
-		}
-		String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
-		if (layout.equals(TRUE)) {
-			featureModel.getLayout().verticalLayout(false);
-		} else if (layout.equals(FALSE)) {
-			featureModel.getLayout().verticalLayout(true);
-		}
-		String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
-		if (showHidden.equals(TRUE)) {
-			featureModel.getLayout().showHiddenFeatures(true);
-		} else if (showHidden.equals(FALSE)) {
-			featureModel.getLayout().showHiddenFeatures(false);
-		}
+		// TODO _interfaces Legacy Code
+//		String algorithm = eElement.getAttribute(CHOSEN_LAYOUT_ALGORITHM);
+//		if (!algorithm.equals("")) {
+//			featureModel.getGraphicRepresenation().getLayout().setLayout(
+//					Integer.parseInt(algorithm));
+//		}
+//		String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
+//		if (layout.equals(TRUE)) {
+//			featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
+//		} else if (layout.equals(FALSE)) {
+//			featureModel.getGraphicRepresenation().getLayout().verticalLayout(true);
+//		}
+//		String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
+//		if (showHidden.equals(TRUE)) {
+//			featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
+//		} else if (showHidden.equals(FALSE)) {
+//			featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(false);
+//		}
 	}
 
 	/**
@@ -152,7 +183,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 		}
 	}
 	
-	private void parseFeatures(NodeList nodeList, Feature parent) throws UnsupportedModelException {
+	private void parseFeatures(NodeList nodeList, IFeature parent) throws UnsupportedModelException {
 		for (Element e : getElements(nodeList)) {
 			String nodeName = e.getNodeName();
 			if (nodeName.equals(DESCRIPTION)) {
@@ -163,14 +194,14 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
 					nodeValue = nodeValue.trim(); 
 				} 
-				parent.setDescription(nodeValue);
+				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
 			boolean mandatory = false;
 			boolean _abstract = false;
 			boolean hidden = false;
 			String name = "";
-			FMPoint featureLocation = null;
+//			FMPoint featureLocation = null;
 			if (e.hasAttributes()) {
 				NamedNodeMap nodeMap = e.getAttributes();
 				for (int i = 0; i < nodeMap.getLength(); i++) {
@@ -186,50 +217,50 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					} else if (attributeName.equals(HIDDEN)) {
 						hidden = attributeValue.equals(TRUE);
 					} else if (attributeName.equals(COORDINATES)) {
-						String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
-						String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
-						try {
-							featureLocation = new FMPoint(Integer.parseInt (subStringX),
-										Integer.parseInt (subStringY));
-						} catch (NumberFormatException error) {
-							throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, e);
-						}
+// TODO _interfaces Legacy Code
+//						String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
+//						String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
+//						try {
+//							featureLocation = new FMPoint(Integer.parseInt (subStringX),
+//										Integer.parseInt (subStringY));
+//						} catch (NumberFormatException error) {
+//							throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, e);
+//						}
 					} else {
 						throwError("Unknown feature attribute: " + attributeName, e);
 					}
 
 				}
 			}
+			
 			if (featureModel.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
-			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
-				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
-			}
-			Feature f = new Feature(featureModel, name);
-			f.setMandatory(true);
+			IFeature f = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, name);
+			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
-				f.setAnd();
+				f.getStructure().setAnd();
 			} else if (nodeName.equals(ALT)) {
-				f.setAlternative();
+				f.getStructure().setAlternative();
 			} else if (nodeName.equals(OR)) {
-				f.setOr();
+				f.getStructure().setOr();
 			} else if (nodeName.equals(FEATURE)) {
 				
 			} else {
 				throwError("Unknown feature type: " + nodeName, e);
 			}
-			f.setAbstract(_abstract);
-			f.setMandatory(mandatory);
-			f.setHidden(hidden);
-			if (featureLocation != null) {
-				f.setNewLocation(featureLocation);
-			}
+			f.getStructure().setAbstract(_abstract);
+			f.getStructure().setMandatory(mandatory);
+			f.getStructure().setHidden(hidden);
+			// TODO _interfaces Removed Code
+//			if (featureLocation != null) {
+//				f.getGraphicRepresenation().setLocation(featureLocation);
+//			}
 			featureModel.addFeature(f);
 			if (parent == null) {
-				featureModel.setRoot(f);
+				featureModel.getStructure().setRoot(f.getStructure());
 			} else {
-				parent.addChild(f);
+				parent.getStructure().addChild(f.getStructure());
 			}
 			if (e.hasChildNodes()) {
 				parseFeatures(e.getChildNodes(), f);
@@ -245,22 +276,23 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			for (Element child: getElements(e.getChildNodes())) {
 				String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					Constraint c = new Constraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
+					IConstraint c = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {
 							org.w3c.dom.Node node = nodeMap.item(i);
 							String attributeName = node.getNodeName();
-							String attributeValue = node.getNodeValue();
+//							String attributeValue = node.getNodeValue();
 							if (attributeName.equals(COORDINATES)) {
-								String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
-								String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
-								try {
-									c.setLocation(new FMPoint(Integer.parseInt (subStringX),
-												Integer.parseInt (subStringY)));
-								} catch (NumberFormatException error) {
-									throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
-								}
+// TODO _interfaces Legacy Code
+//								String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
+//								String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
+//								try {
+//									c.getGraphicRepresenation().setLocation(new FMPoint(Integer.parseInt (subStringX),
+//												Integer.parseInt (subStringY)));
+//								} catch (NumberFormatException error) {
+//									throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
+//								}
 							} else {
 								throwError("Unknown constraint attribute: " + attributeName, node);
 							}
@@ -320,7 +352,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	private void parseComments2(NodeList nodeList) throws UnsupportedModelException {
 		for (Element e: getElements(nodeList)) {
 			if (e.getNodeName().equals(C)) {
-				featureModel.addComment(e.getTextContent());
+				featureModel.getProperty().addComment(e.getTextContent());
 			} else {
 				throwError("Unknown comment attribute: " + e.getNodeName(), e);
 			}

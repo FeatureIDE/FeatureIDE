@@ -40,11 +40,9 @@ import de.fosd.typechef.options.FrontendOptions;
 import de.fosd.typechef.options.FrontendOptionsWithConfigFiles;
 import de.fosd.typechef.options.OptionException;
 import de.fosd.typechef.options.Options;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 @SuppressWarnings(RESTRICTION)
@@ -73,17 +71,14 @@ public class TypeChef {
 		BufferedWriter print = null;
 		try {
 			print = new BufferedWriter(new FileWriter(outputFile));
-			FeatureModel fm = new FeatureModel();
-			FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(
-					new XmlFeatureModelReader(fm));
-			fmReader.readFromFile(inputFile);
-			Node nodes = NodeCreator.createNodes(fm.clone()).toCNF();
+			
+			final IFeatureModel fm = FeatureModelManager.readFromFile(inputFile.toPath());
+			
+			Node nodes = AdvancedNodeCreator.createCNF(fm);
 			StringBuilder cnf = new StringBuilder();
 			cnf.append(nodes.toString(NodeWriter.javaSymbols));
 			print.write(cnf.toString());
 		} catch (FileNotFoundException e) {
-			Colligens.getDefault().logError(e);
-		} catch (UnsupportedModelException e) {
 			Colligens.getDefault().logError(e);
 		} catch (IOException e) {
 			Colligens.getDefault().logError(e);

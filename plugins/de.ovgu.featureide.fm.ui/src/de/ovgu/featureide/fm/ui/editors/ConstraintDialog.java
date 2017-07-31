@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -46,14 +46,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_CONSTRAIN
 import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YOU_CAN_CREATE_OR_EDIT_CONSTRAINTS_WITH_THIS_DIALOG_;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -100,19 +97,21 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
+import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Constraints;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.core.Operator;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationResult;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
 
 /**
  * A simple editor for propositional constraints written below the feature
@@ -378,12 +377,12 @@ public class ConstraintDialog implements GUIDefaults {
 
 		static final String CONSTRAINT_CONTAINS_UNKNOWN_FEATURES = "Constraint contains %s unknown feature names.";
 
-		static final String CONSTRAINT_CONNOT_BE_SAVED = "Your constraint is invalid and can not be saved: %s";
+		static final String CONSTRAINT_CONNOT_BE_SAVED = "Your constraint is invalid and can not be saved:\n%s";
 
 	}
 
 	/**
-	 * Current constraint editing mode
+	 * Current constraint editing mode.
 	 */
 	private Mode mode = Mode.CREATE;
 
@@ -411,10 +410,10 @@ public class ConstraintDialog implements GUIDefaults {
 	private Group buttonGroup;
 	private Composite constraintTextComposite;
 	private SimpleSyntaxHighlightEditor constraintText;
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private Button okButton;
 
-	private Constraint constraint;
+	private IConstraint constraint;
 	private String defaultDetailsText;
 
 	private String defaultHeaderText;
@@ -422,7 +421,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private Button cancelButton;
 
 	/**
-	 * The dialogs title text
+	 * The dialogs title text.
 	 */
 	private static final String DEFAULT_DIALOG_TITLE = CONSTRAINT_DIALOG;
 
@@ -442,14 +441,14 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
-			headerPanel.setDetails(
-					String.format(BEFORE_THIS_PROCESS_HAS_ENDED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE.toLowerCase() : StringTable.VERB_SAVE),
-							okButton.getText()), HeaderPanel.HeaderDescriptionImage.NONE);
+			headerPanel.setDetails(String.format(BEFORE_THIS_PROCESS_HAS_ENDED,
+					(mode == Mode.UPDATE ? StringTable.VERB_UPDATE.toLowerCase() : StringTable.VERB_SAVE), okButton.getText()),
+					HeaderPanel.HeaderDescriptionImage.NONE);
 		}
 	};
 
 	/**
-	 * Called when the validation test for VOIDS_MODEL has completed
+	 * Called when the validation test for VOIDS_MODEL has completed.
 	 */
 	private IConsumer<ValidationMessage> onVoidsModelCheckComplete = new IConsumer<ValidationMessage>() {
 		@Override
@@ -461,7 +460,7 @@ public class ConstraintDialog implements GUIDefaults {
 	};
 
 	/**
-	 * Called when the validation test for FALSE_OPTIONAL has completed
+	 * Called when the validation test for FALSE_OPTIONAL has completed.
 	 */
 	private IConsumer<ValidationMessage> onFalseOptionalCheckComplete = new IConsumer<ValidationMessage>() {
 		@Override
@@ -473,7 +472,7 @@ public class ConstraintDialog implements GUIDefaults {
 	};
 
 	/**
-	 * Called when the validation test for DEAD_FEATURES has completed
+	 * Called when the validation test for DEAD_FEATURES has completed.
 	 */
 	private IConsumer<ValidationMessage> onDeadFeatureCheckComplete = new IConsumer<ValidationMessage>() {
 		@Override
@@ -485,7 +484,7 @@ public class ConstraintDialog implements GUIDefaults {
 	};
 
 	/**
-	 * Called when the validation test for REDUNDANT_CHECK has completed
+	 * Called when the validation test for REDUNDANT_CHECK has completed.
 	 */
 	private IConsumer<ValidationMessage> onIsRedundantCheckComplete = new IConsumer<ValidationMessage>() {
 		@Override
@@ -497,7 +496,7 @@ public class ConstraintDialog implements GUIDefaults {
 	};
 
 	/**
-	 * Called when the validation test has finished
+	 * Called when the validation test has finished.
 	 */
 	private IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
 		@Override
@@ -509,7 +508,7 @@ public class ConstraintDialog implements GUIDefaults {
 	};
 
 	/**
-	 * Called when the validation test for "tautology" has completed
+	 * Called when the validation test for "tautology" has completed.
 	 */
 	private IConsumer<ValidationMessage> onIsTautology = new IConsumer<ValidationMessage>() {
 		@Override
@@ -521,7 +520,7 @@ public class ConstraintDialog implements GUIDefaults {
 	};
 
 	/**
-	 * Called when the validation test for SATISFIABLE_TEST has completed
+	 * Called when the validation test for SATISFIABLE_TEST has completed.
 	 */
 	private IConsumer<ValidationMessage> onIsNotSatisfiable = new IConsumer<ValidationMessage>() {
 		@Override
@@ -532,12 +531,7 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 	};
 
-	/**
-	 * 
-	 * @param featuremodel
-	 * @param constraint
-	 */
-	public ConstraintDialog(final FeatureModel featuremodel, final Constraint constraint) {
+	public ConstraintDialog(final IFeatureModel featuremodel, final IConstraint constraint) {
 		this.constraint = constraint;
 		this.featureModel = featuremodel;
 
@@ -551,7 +545,7 @@ public class ConstraintDialog implements GUIDefaults {
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
 
-			initialConstraint = Constraints.autoQuote(constraint);
+			initialConstraint = constraint.getNode().toString(NodeWriter.textualSymbols);
 
 			mode = Mode.UPDATE;
 		}
@@ -599,23 +593,20 @@ public class ConstraintDialog implements GUIDefaults {
 	private void closeShell() {
 		final NodeReader nodeReader = new NodeReader();
 		final String input = constraintText.getText().trim();
-		final Node propNode = nodeReader.stringToNode(input, featureModel.getFeatureNames());
+		final Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		AbstractOperation op = null;
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
-			int index = 0;
-			for (Constraint c : featureModel.getConstraints()) {
+			for (IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
-					op = new ConstraintEditOperation(propNode, featureModel, index);
+					op = new EditConstraintOperation(featureModel, c, propNode);
 					break;
 				}
-				index++;
 			}
 		}
 		if (op == null) {
-			op = new ConstraintCreateOperation(propNode, featureModel);
+			op = new CreateConstraintOperation(propNode, featureModel);
 		}
-		op.addContext((IUndoContext) featureModel.getUndoContext());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
@@ -623,54 +614,15 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 
 		shell.dispose();
-
 	}
 
 	/**
-	 * returns a List of all features that are caused to be dead by the
-	 * constraint input
-	 * 
-	 * @param input
-	 *            constraint to be evaluated
-	 * @param model
-	 *            the feature model
-	 * @return List of all dead Features, empty if no feature is caused to be
-	 *         dead
-	 */
-	public List<Feature> getDeadFeatures(String input, FeatureModel model) {
-		Collection<Feature> deadFeaturesBefore = null;
-		FeatureModel clonedModel = model.clone();
-
-		NodeReader nodeReader = new NodeReader();
-
-		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
-
-		if (propNode != null) {
-			if (constraint != null) {
-				clonedModel.removeConstraint(constraint);
-			}
-			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
-			clonedModel.addPropositionalNode(propNode);
-			clonedModel.handleModelDataChanged();
-		}
-
-		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
-		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
-			if (!deadFeaturesBefore.contains(l)) {
-				deadFeaturesAfter.add(l);
-
-			}
-		}
-		return deadFeaturesAfter;
-	}
-
-	/**
-	 * initializes the bottom part of the dialog
+	 * Initializes the bottom part of the dialog
 	 * 
 	 * @param featuremodel
 	 * @param constraint
 	 */
-	private void initBottom(final FeatureModel featuremodel, final Constraint constraint) {
+	private void initBottom(final IFeatureModel featuremodel, final IConstraint constraint) {
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
 		Composite lastComposite = new Composite(shell, SWT.NONE);
@@ -732,7 +684,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * initializes the Group containing the operator buttons
+	 * Initializes the group containing the operator buttons.
 	 */
 	private void initButtonGroup() {
 		buttonGroup = new Group(shell, SWT.NONE);
@@ -760,7 +712,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * initializes the Text containing the constraint
+	 * Initializes the text containing the constraint.
 	 */
 	private void initConstraintText() {
 		constraintTextComposite = new Composite(shell, SWT.NONE);
@@ -780,10 +732,9 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);
-		constraintText.setPossibleWords(featureModel.getFeatureNames());
+		constraintText.setPossibleWords(Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		constraintText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				if (constraintText.getText().trim().isEmpty()) {
@@ -798,12 +749,11 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * initializes the group containing the searchText and featureTable
+	 * Initializes the group containing the searchText and featureTable.
 	 * 
 	 * @param featuremodel
 	 */
-	private void initFeatureGroup(final FeatureModel featuremodel) {
-
+	private void initFeatureGroup(final IFeatureModel featuremodel) {
 		featureGroup = new Group(shell, SWT.NONE);
 		featureGroup.setText("Features");
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -840,7 +790,7 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public int compare(Viewer viewer, Object feature1, Object feature2) {
 
-				return ((Feature) feature1).getName().compareToIgnoreCase(((Feature) feature2).getName());
+				return ((IFeature) feature1).getName().compareToIgnoreCase(((IFeature) feature2).getName());
 			}
 
 		});
@@ -848,7 +798,7 @@ public class ConstraintDialog implements GUIDefaults {
 		viewerNameColumn.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-				cell.setText(((Feature) cell.getElement()).getName());
+				cell.setText(((IFeature) cell.getElement()).getName());
 				cell.setImage(FEATURE_SYMBOL);
 			}
 		});
@@ -862,7 +812,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 						@Override
 						public boolean select(Viewer viewer, Object parentElement, Object element) {
-							return ((Feature) element).getName().toLowerCase(Locale.ENGLISH).contains(searchFeatureText.getText().toLowerCase(Locale.ENGLISH));
+							return ((IFeature) element).getName().toLowerCase(Locale.ENGLISH).contains(searchFeatureText.getText().toLowerCase(Locale.ENGLISH));
 						}
 
 					};
@@ -908,11 +858,11 @@ public class ConstraintDialog implements GUIDefaults {
 			public void handleEvent(Event event) {
 				TableItem[] selectedItem = featureTable.getSelection();
 				String featureName = selectedItem[0].getText();
-				if (featureName.matches(".*\\s.*")) {
+				if (featureName.matches(".*?\\s+.*")) {
 					featureName = "\"" + featureName + "\"";
 				} else {
 					for (String op : Operator.NAMES) {
-						if (featureName.equals(op.toLowerCase())) {
+						if (featureName.equalsIgnoreCase(op)) {
 							featureName = "\"" + featureName + "\"";
 							break;
 						}
@@ -926,7 +876,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * initializes the upper part of the dialog
+	 * Initializes the upper part of the dialog.
 	 */
 	private void initHead() {
 		headerPanel = new HeaderPanel(shell);
@@ -935,7 +885,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * initializes the shell
+	 * Initializes the shell.
 	 */
 	private void initShell() {
 		shell = new Shell(Display.getCurrent(), SWT.APPLICATION_MODAL | SWT.SHEET);
@@ -992,8 +942,9 @@ public class ConstraintDialog implements GUIDefaults {
 			for (char c = Character.MIN_VALUE; c < Character.MAX_VALUE; c++)
 				autoActivationCharacters[c] = c;
 
-			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(
-					featureModel.getFeatureNames()), keyStroke, autoActivationCharacters);
+			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(),
+					new ConstraintContentProposalProvider(Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))), keyStroke,
+					autoActivationCharacters);
 
 			adapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
 			adapter.setPopupSize(new Point(250, 85));
@@ -1007,7 +958,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 	/**
 	 * Updates the dialogs state, changing the default button and setting the
-	 * text for this button depending on the current {@link ConstraintDialog.DialogState}
+	 * text for this button depending on the current {@link ConstraintDialog.DialogState}.
 	 * 
 	 * @param state
 	 *            The state to consider
@@ -1033,41 +984,28 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * validates the current constraint in constraintText
+	 * Validates the current constraint in constraintText.
 	 * 
 	 */
 	private void validate() {
 		headerPanel.setDetails(StringTable.CHECKING_CONSTRAINTS, HeaderPanel.HeaderDescriptionImage.NONE);
-
-		Display.getDefault().asyncExec(new Runnable() {
-
+		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
-				ValidationResult result = VALIDATOR.validateSync(featureModel, constraintText.getText());
+				final String text = constraintText.getText();
+				final List<String> featureNamesList = FeatureUtils.getFeatureNamesList(featureModel);
+				final NodeReader nodeReader = new NodeReader();
+				final boolean wellFormed = nodeReader.isWellFormed(text.trim(), featureNamesList);
 
-				constraintText.UnderlineEverything(result != ValidationResult.OK && constraintText.getUnknownWords().isEmpty());
+				constraintText.underlineEverything(!wellFormed && constraintText.getUnknownWords().isEmpty());
 
-				if (result == ValidationResult.OK) {
-					VALIDATOR.validateAsync(constraint, VALIDATION_TIME_OUT, featureModel, constraintText.getText(), onCheckStarted, onVoidsModelCheckComplete,
+				if (wellFormed) {
+					VALIDATOR.validateAsync(constraint, VALIDATION_TIME_OUT, featureModel, text, onCheckStarted, onVoidsModelCheckComplete,
 							onFalseOptionalCheckComplete, onDeadFeatureCheckComplete, onIsRedundantCheckComplete, onCheckEnded, onIsTautology,
 							onIsNotSatisfiable);
 					updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
 				} else {
-					String details = new String();
-
-					if (result == ValidationResult.NOT_WELLFORMED) {
-						if (constraintText.getUnknownWords().isEmpty()) {
-							details = StringTable.CONSTRAINT_CONTAINS_SYNTAX_ERRORS;
-						} else {
-							int count = constraintText.getUnknownWords().size();
-							details = (count == 1 ? StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURE : String.format(
-									StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURES, count));
-						}
-					} else
-						details = "";
-
-					headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, details), HeaderPanel.HeaderDescriptionImage.ERROR);
-
+					headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()), HeaderPanel.HeaderDescriptionImage.ERROR);
 					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 				}
 			}

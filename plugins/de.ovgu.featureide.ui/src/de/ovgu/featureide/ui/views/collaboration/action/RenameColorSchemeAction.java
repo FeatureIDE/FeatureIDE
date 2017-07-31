@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
 
@@ -46,7 +46,7 @@ public class RenameColorSchemeAction extends AbstractColorAction {
 	 * @see de.ovgu.featureide.ui.views.collaboration.color.action.AbstractColorAction#action(de.ovgu.featureide.fm.core.Feature)
 	 */
 	@Override
-	protected boolean action(FeatureModel fm, String collName) {
+	protected boolean action(IFeatureModel fm, String collName) {
 		RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(fm);
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -44,7 +44,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	private final Map<IFeatureProject, IComposerExtensionClass> projectComposerMap;
 	private IComposerExtensionClass defaultComposerExtensionClass;
 
-	public ComposerExtensionProxy(IConfigurationElement configurationElement) {
+	public ComposerExtensionProxy(IConfigurationElement configurationElement) throws Exception {
 		this.configElement = configurationElement;
 		name = configElement.getAttribute("name");
 		id = configElement.getAttribute("id");
@@ -54,6 +54,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 			defaultComposerExtensionClass = (IComposerExtensionClass) configElement.createExecutableExtension("class");
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
+			throw e;
 		}
 	}
 
@@ -114,8 +115,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	}
 
 	@Override
-	public boolean hasCompositionMechanisms() {
-		return defaultComposerExtensionClass.hasCompositionMechanisms();
+	public String[] getCompositionMechanisms() {
+		return defaultComposerExtensionClass.getCompositionMechanisms();
 	}
 
 	@Override

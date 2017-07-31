@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -31,6 +31,11 @@ public interface ILanguage {
 	 * @return The translation for: REDUNDANT_CONSTRAINT
 	 */
 	public String getRedundantConst();
+	
+	/**
+	 * @return The translation for: IMPLICIT_CONSTRAINT
+	 */
+	public String getImplicitConst();
 
 	/**
 	 * @return The translation for: UNSATISFIABLE_CONSTRAINT
@@ -96,6 +101,11 @@ public interface ILanguage {
 	 * @return The word for: "Hidden"
 	 */
 	public String getHidden();
+	
+	/**
+	 * @return The word for: "Collapsed"
+	 */
+	public String getCollapsed();
 
 	/**
 	 * @return The translation for: "Dead"

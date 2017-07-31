@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-	<extension-point id="de.ovgu.featureide.ui.views.outline" name="Outline" schema="schema/de.ovgu.featureide.ui.views.outline.exsd"/>     
-
+	<extension-point id="de.ovgu.featureide.ui.views.outline" name="Outline" schema="schema/de.ovgu.featureide.ui.views.outline.exsd"/>
 	<extension
 			point="org.eclipse.ui.newWizards">
 		<wizard
@@ -111,6 +110,14 @@
 				name="FeatureIDE Statistics"
 				restorable="true">
 		</view>
+  <view
+        category="FeatureIDE"
+        class="de.ovgu.featureide.ui.views.configMap.ConfigurationMap"
+        icon="icons/FeatureIconSmall.ico"
+        id="de.ovgu.featureide.ui.views.configMap"
+        name="Configuration Map"
+        restorable="true">
+  </view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.perspectives">
@@ -1114,6 +1121,20 @@
 				</visibleWhen>
 			</command>
 			<command
+					commandId="de.ovgu.featureide.ui.commands.buildFeatureGraph"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.fm.ui.actions.buildFeatureGraph"
+					label="Build Feature Graph"
+					tooltip="Builds a graph with all non-core features and computes the transitive hull."
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
 					commandId="de.ovgu.featureide.ui.commands.setConfiguration"
 					icon="icons/currentconfiguration.gif"
 					id="de.ovgu.featureide.fm.ui.actions.setConfiguration"
@@ -1146,33 +1167,6 @@
 					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.fm.ui.menus.popupMenuNoFP"
 					label="FeatureIDE">
-				<visibleWhen
-						checkEnabled="false">
-					<with
-							variable="activeMenuSelection">
-						<iterate ifEmpty="false"
-								operator="or">
-							<test
-									args="de.ovgu.featureide.core.featureProjectNature"
-									property="de.ovgu.featureide.fm.ui.properties.nature"
-									value="false">
-							</test>
-						</iterate>
-					</with>
-				</visibleWhen>
-				<command
-						commandId="de.ovgu.featureide.ui.commands.Conversion"
-						icon="icons/FeatureIconSmall.ico"
-						id="de.ovgu.featureide.fm.ui.actions.addFeatureIDENature"
-						label="Add FeatureIDE Nature"
-						style="push">
-					<visibleWhen
-							checkEnabled="false">
-						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-						</reference>
-					</visibleWhen>
-				</command>
 			</menu>
 		</menuContribution>
 		<menuContribution
@@ -1185,7 +1179,43 @@
          label="Enable Editor Highlighting"
          style="toggle">
 			</command>
+   <command
+         commandId="de.ovgu.featureide.fm.ui.colorscheme"
+         icon="icons/FeatureColorIcon.gif"
+         label="Feature Color"
+         style="push">
+   </command>
 		</menuContribution>
+  <menuContribution
+        allPopups="false"
+        locationURI="popup:org.eclipse.ui.projectConfigure">
+     <command
+           commandId="de.ovgu.featureide.ui.commands.Conversion"
+           icon="icons/FeatureIconSmall.ico"
+           id="de.ovgu.featureide.fm.ui.actions.addFeatureIDENature"
+           label="Convert to FeatureIDE Project..."
+           style="push">
+        <visibleWhen
+              checkEnabled="false">
+           <and>
+              <reference
+                    definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+              </reference>
+              <with
+                      variable="activeMenuSelection">
+                <iterate ifEmpty="false"
+                            operator="or">
+                      <test
+                                  args="de.ovgu.featureide.core.featureProjectNature"
+                                  property="de.ovgu.featureide.fm.ui.properties.nature"
+                                  value="false">
+                      </test>
+                </iterate>
+          </with>
+           </and>
+        </visibleWhen>
+     </command>
+  </menuContribution>
 	</extension>
 	<extension
 			point="org.eclipse.ui.commands">
@@ -1211,6 +1241,10 @@
 				name="Product Generator">
 		</command>
 		<command
+				id="de.ovgu.featureide.ui.commands.buildFeatureGraph"
+				name="Build Feature Graph">
+		</command>
+		<command
 				id="de.ovgu.featureide.ui.mpl.commands.javadoc.context"
 				name="Create context documentation (Javadoc)">
 		</command>
@@ -1231,6 +1265,7 @@
 				name="Create documentation statistics">
 		</command>
   <command
+        defaultHandler="de.ovgu.featureide.ui.handlers.ColorSchemeHandler"
         id="de.ovgu.featureide.fm.ui.colorscheme"
         name="Colorscheme">
   </command>
@@ -1248,6 +1283,10 @@
 		<handler
 				class="de.ovgu.featureide.ui.handlers.BuildProductsHandler"
 				commandId="de.ovgu.featureide.ui.commands.productGenerator">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.ui.handlers.BuildFeatureGraphHandler"
+				commandId="de.ovgu.featureide.ui.commands.buildFeatureGraph">
 		</handler>
 	  <handler
 	        class="de.ovgu.featureide.ui.handlers.VariantDocumentationHandler"
@@ -1396,5 +1435,36 @@
     </navigatorContent>
  </extension>
 	
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
+         <menu
+               icon="icons/FeatureIconSmall.ico"
+               id="popup:de.ovgu.featureide.fm.ui.menus.popupMenu.visualizations"
+               label="Visualization">
+               				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+					</reference>
+				</visibleWhen>
+            <command
+                  commandId="de.ovgu.featureide.ui.visualization.command.featurerelations"
+                  label="Feature Relations Graph"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="de.ovgu.featureide.ui.visualization.ShowFeatureRelationsGraphCommandHandler"
+            id="de.ovgu.featureide.ui.visualization.command.featurerelations"
+            name="Feature Relations Graph">
+      </command>
+   </extension>
 	
 </plugin>

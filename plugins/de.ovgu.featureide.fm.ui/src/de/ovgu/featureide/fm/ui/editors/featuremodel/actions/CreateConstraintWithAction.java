@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,8 +27,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -47,7 +47,7 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	 * @param viewer
 	 * @param featuremodel
 	 */
-	public CreateConstraintWithAction(Object viewer, FeatureModel featuremodel) {
+	public CreateConstraintWithAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel);
 
 		if (viewer instanceof GraphicalViewerImpl)
@@ -61,7 +61,7 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 			if (selection.size() == 1) {
 				Object editPart = selection.getFirstElement();
 
-				Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature() : null;
+				IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : null;
 
 				if (feature != null) {
 					updateConstraintActionText(feature.getName());

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -58,14 +58,17 @@ import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.filter.MethodFilter;
 import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Generates Feature Stubs
  * 
  * @author Stefan Krueger
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureStubsGenerator {
 
@@ -89,7 +92,7 @@ public class FeatureStubsGenerator {
 //		String fhc = FeatureHouseComposer.getClassPaths(featureProject);
 //		String[] fujiOptions = new String[] { "-" + fuji.Main.OptionName.CLASSPATH, fhc, "-" + fuji.Main.OptionName.PROG_MODE, "-" + fuji.Main.OptionName.COMPOSTION_STRATEGY,
 //				fuji.Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", featureProject.getSourcePath() };
-		FeatureModel fm = featureProject.getFeatureModel();
+		IFeatureModel fm = featureProject.getFeatureModel();
 		fm.getAnalyser().setDependencies();
 
 //		try {
@@ -107,10 +110,10 @@ public class FeatureStubsGenerator {
 //			FeatureHouseCorePlugin.getDefault().logError(e1);
 //		}
 		
-		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
-		efsj.addJobFinishedListener(new JobFinishListener() {
+		IRunner<ProjectSignatures> efsj = LongRunningWrapper.getRunner(new ExtendedFujiSignaturesJob(featureProject));
+		efsj.addJobFinishedListener(new JobFinishListener<ProjectSignatures>() {
 			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
+			public void jobFinished(IJob<ProjectSignatures> finishedJob) {
 				getFeatures(featureProject.getFSTModel().getProjectSignatures());
 			}
 			

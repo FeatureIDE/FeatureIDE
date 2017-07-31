@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
 
 /**
@@ -37,15 +37,16 @@ import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
  * 
  * @author Jonas Weigt
  * @author Christian Harnisch
+ * @author Marcus Pinnecke
  */
 public class AddProfileColorSchemeAction extends Action {
 
 	
-	private FeatureModel model;
+	private IFeatureModel model;
 	/*
 	 * Constructor
 	 */
-	public AddProfileColorSchemeAction(String text, FeatureModel model) {
+	public AddProfileColorSchemeAction(String text, IFeatureModel model) {
 		super(text);
 		this.model = model;	
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));

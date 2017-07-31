@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,6 +22,7 @@ package de.ovgu.featureide.munge.signatures;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXTENDS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLEMENTS;
+
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;

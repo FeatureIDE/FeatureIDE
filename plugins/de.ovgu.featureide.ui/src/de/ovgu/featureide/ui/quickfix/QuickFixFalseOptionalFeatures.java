@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,23 +20,27 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGURATIONS;
-
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
-
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 
 /**
  * Creates configurations where false optional features are unused.
@@ -50,93 +54,66 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 	}
 
 	public void run(final IMarker marker) {
-		Job job = new AStoppableJob(getLabel()) {
+		Job job = new Job(getLabel()) {
+
 			@Override
-			protected boolean work() throws Exception {
+			protected IStatus run(final IProgressMonitor monitor) {
 				if (project != null) {
-					final Collection<String> falseOptionalFeatures = project.getFalseOptionalConfigurationFeatures();
-					final List<Configuration> confs = createConfigurations(falseOptionalFeatures, workMonitor.getMonitor());
-					writeConfigurations(confs);
+					IMonitor monitor2 = new ProgressMonitor("Cover unused features", monitor);
+					monitor2.setRemainingWork(2);
+					IMonitor subTask = monitor2.subTask(1);
+					subTask.setTaskName("Collect unused features");
+					final Collection<String> unusedFeatures = project.getFalseOptionalConfigurationFeatures();
+					subTask.step();
+					subTask.done();
+					createConfigurations(unusedFeatures, monitor2.subTask(1), false);
+					monitor2.done();
 				}
-				return true;
+				return Status.OK_STATUS;
 			}
 		};
 		job.schedule();
 	}
-	
-	private List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, final IProgressMonitor monitor) {
-		return createConfigurations(falseOptionalFeatures, featureModel, monitor);
-	}
-		
-	List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, FeatureModel featureModel, final IProgressMonitor monitor) {
-		if (monitor != null) {
-			monitor.beginTask(CREATE_CONFIGURATIONS, falseOptionalFeatures.size());
-		}
-		for (Feature dead : featureModel.getAnalyser().getDeadFeatures()) {
-			falseOptionalFeatures.remove(dead.getName());
-		}
-		
+
+	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
+		monitor.setTaskName("Create configurations");
+		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
-		while (!falseOptionalFeatures.isEmpty()) {
-			monitor.subTask(createShortMessage(falseOptionalFeatures));
-			if (monitor.isCanceled()) {
-				break;
-			}
-			final Configuration configuration = new Configuration(featureModel, true);
-			List<String> deselected = new LinkedList<String>();
-			for (final String feature : falseOptionalFeatures) {
-				if (configuration.getSelectablefeature(feature).getSelection() == Selection.UNDEFINED) {
-					configuration.setManual(feature, Selection.UNSELECTED);
-					deselected.add(feature);
-					if (monitor != null) {
-						monitor.worked(1);
+		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
+		Configuration configuration = new Configuration(featureModel, false);
+		try {
+			List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, false);
+			for (List<String> solution : solutions) {
+				configuration = new Configuration(featureModel, false);
+				for (String feature : solution) {
+					if (!"True".equals(feature)) {
+						configuration.setManual(feature, Selection.SELECTED);
 					}
 				}
-			}
-			if (monitor.isCanceled()) {
-				break;
-			}
-			
-			for (final String feature : deselected) {
-				if (falseOptionalFeatures.remove(feature)) {
-					monitor.worked(1);	
+				if (collect) {
+					confs.add(configuration);
+				} else {
+					final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
+					writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
 				}
 			}
-			
-			// select further features to get a valid configuration
-			final List<SelectableFeature> features = new LinkedList<SelectableFeature>();
-			for (final SelectableFeature feature : configuration.getFeatures()) {
-				if (configuration.isValid()) {
-					break;
-				}
-				if (feature.getSelection() == Selection.UNDEFINED) {
-					configuration.setManual(feature, Selection.SELECTED);
-					features.add(feature);
-				}
-			}
-			
-			// deselect unneccessary features
-			boolean unselected = true;
-			final List<SelectableFeature> unselectedFeatures = new LinkedList<SelectableFeature>(); 
-			while (unselected) {
-				unselected = false;
-				unselectedFeatures.clear();
-				for (final SelectableFeature feature : features) {
-					if (feature.getAutomatic() == Selection.UNDEFINED) {
-						configuration.setManual(feature, Selection.UNSELECTED);
-						if (!configuration.isValid()) {
-							configuration.setManual(feature, Selection.SELECTED);
-							break;
-						}
-						unselectedFeatures.add(feature);
-						unselected = true;
-					}
-				}
-				features.removeAll(unselectedFeatures);
-			}
-			
-			confs.add(configuration);
+		} catch (TimeoutException e1) {
+			e1.printStackTrace();
 		}
+
 		return confs;
 	}
+
+	/**
+	 * For testing purpose only.
+	 * 
+	 * @param falseOptionalFeatures
+	 * @param fm
+	 * @return
+	 */
+	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
+		this.featureModel = fm;
+		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
+	}
+
 }

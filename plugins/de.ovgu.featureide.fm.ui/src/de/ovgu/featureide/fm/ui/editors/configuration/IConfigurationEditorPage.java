@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,16 +20,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
-import java.beans.PropertyChangeEvent;
-
 import org.eclipse.ui.IEditorPart;
+
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 
 /**
  * Basic interface for all pages at configuration editor.
  * 
  * @author Jens Meinicke
  */
-public interface IConfigurationEditorPage extends IEditorPart {
+public interface IConfigurationEditorPage extends IEditorPart, IEventListener {
 
 	/**
 	 * 
@@ -58,12 +58,6 @@ public interface IConfigurationEditorPage extends IEditorPart {
 	public String getPageText();
 
 	/**
-	 * Called after this page has been added to the editor.
-	 * Called if the file has been changed.
-	 */
-	public void propertyChange(PropertyChangeEvent evt);
-
-	/**
 	 * Called if the tab has been changed from this page.
 	 * 
 	 * @param index of the new page
@@ -81,4 +75,13 @@ public interface IConfigurationEditorPage extends IEditorPart {
 	 * @return This page. You can also call a constructor.
 	 */
 	public IConfigurationEditorPage getPage();
+
+	/**
+	 * Called if this page is about to change to another page.
+	 * 
+	 * @param newPageIndex
+	 * 
+	 * @return {@code true} if the user is allowed to change the page
+	 */
+	public boolean allowPageChange(int newPageIndex);
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,8 +25,8 @@ import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 /**
@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * Contains {@link FSTRole}s with their corresponding {@link FSTClass}.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FSTFeature {
 
@@ -60,8 +61,8 @@ public class FSTFeature {
 		if (model == null) {
 			return FeatureColor.NO_COLOR.getValue();
 		}
-		final FeatureModel featureModel = model.getFeatureProject().getFeatureModel();
-		Feature feature = featureModel.getFeature(name);
+		final IFeatureModel featureModel = model.getFeatureProject().getFeatureModel();
+		IFeature feature = featureModel.getFeature(name);
 		return FeatureColorManager.getColor(feature).getValue();
 	}
 

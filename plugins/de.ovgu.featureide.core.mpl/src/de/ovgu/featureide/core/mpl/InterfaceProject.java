@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,76 +20,89 @@
  */
 package de.ovgu.featureide.core.mpl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Holds all relevant information about the interface project.
  * 
  * @author Sebastian Krieter
  * @author Reimar Schroeter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class InterfaceProject {
 	private final IProject projectReference;
 	private final IFeatureProject featureProject;
-	
+
 	private ProjectSignatures projectSignatures = null;
-	
-//	private final ViewTagPool viewTagPool = new ViewTagPool();
-//	private final AbstractStringProvider stringProvider = new JavaStringProvider();
-	
+
+	// private final ViewTagPool viewTagPool = new ViewTagPool();
+	// private final AbstractStringProvider stringProvider = new
+	// JavaStringProvider();
+
 	private ViewTag filterViewTag = null;
 	private int configLimit = 1000;
-	
+
 	private Configuration configuration;
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	private String[] featureNames;
-	
-//	private IChainJob loadJob = null;
-//	private boolean loadAgain = false;
-	
+
+	// private IChainJob loadJob = null;
+	// private boolean loadAgain = false;
+
 	public InterfaceProject(IFeatureProject featureProject) {
 		this(null, featureProject);
 	}
-	
+
 	public InterfaceProject(IProject projectReference) {
 		this(projectReference, null);
 	}
-	
-	private class FeaturePropertyChangeListener implements PropertyChangeListener {
+
+	private class FeaturePropertyChangeListener implements IEventListener {
 		private final int id;
-		
+
 		public FeaturePropertyChangeListener(int id) {
-			 this.id = id;
+			this.id = id;
 		}
-		
+
 		@Override
-		public void propertyChange(PropertyChangeEvent event) {
-			String prop = event.getPropertyName();
-			if (Feature.LOCATION_CHANGED.equals(prop)) {
-				
-			} else if (Feature.CHILDREN_CHANGED.equals(prop)) {
-				
-			} else if (Feature.NAME_CHANGED.equals(prop)) {
-				featureNames[id] = ((Feature)event.getSource()).getName();
-			} else if (Feature.ATTRIBUTE_CHANGED.equals(prop)) {
-				
+		public void propertyChange(FeatureIDEEvent event) {
+			EventType prop = event.getEventType();
+			if (EventType.LOCATION_CHANGED == prop) {
+
+			} else if (EventType.GROUP_TYPE_CHANGED == prop) {
+
+			} else if (EventType.FEATURE_NAME_CHANGED.equals(prop)) {
+				featureNames[id] = ((IFeature) event.getSource()).getName();
+			} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
+
 			}
 		}
 	}
-	
+
 	public InterfaceProject(IProject projectReference, IFeatureProject featureProject) {
 		if (projectReference == null) {
 			this.projectReference = featureProject.getProject();
@@ -97,34 +110,32 @@ public class InterfaceProject {
 			this.projectReference = projectReference;
 		}
 		this.featureProject = featureProject;
-		
+
 		if (projectReference != null) {
-			featureModel = FileLoader.loadFeatureModel(projectReference);
+			final Path featureModelPath = Paths.get(projectReference.getFile("model.xml").getLocationURI());
+			final IFeatureModelFormat format = FeatureModelManager.getFormat(featureModelPath.getFileName().toString());
+			IFeatureModelFactory factory;
+			try {
+				factory = FMFactoryManager.getFactory(featureModelPath.toString(), format);
+			} catch (NoSuchExtensionException e) {
+				Logger.logError(e);
+				factory = FMFactoryManager.getDefaultFactory();
+			}
+			featureModel = factory.createFeatureModel();
+			FileHandler.load(featureModelPath, featureModel, format);
 		} else {
 			featureModel = null;
 		}
 		initFeatureNames();
-//		if (featureModel != null) {
-//			featureNames = new String[featureModel.getNumberOfFeatures()];
-//			int i = 0;
-//			Collection<Entry<String, Feature>> x = featureModel.getFeatureTable().entrySet();
-//			for (Entry<String, Feature> entry : x) {
-//				entry.getValue().addListener(new FeaturePropertyChangeListener(i));
-//				featureNames[i++] = entry.getKey();
-//			}
-////			Arrays.sort(featureNames);
-//		} else {
-//			featureNames = null;
-//		}
 	}
-	
+
 	private void initFeatureNames() {
 		if (featureModel != null) {
 			final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
 			int count = 0;
-			
-			for (Feature feature : featureModel.getFeatures()) {
-				if (feature.isConcrete()) {
+
+			for (IFeature feature : featureModel.getFeatures()) {
+				if (feature.getStructure().isConcrete()) {
 					feature.addListener(new FeaturePropertyChangeListener(count));
 					tempFeatureNames[count++] = feature.getName();
 				}
@@ -132,14 +143,14 @@ public class InterfaceProject {
 			featureNames = new String[count];
 			System.arraycopy(tempFeatureNames, 0, featureNames, 0, count);
 
-//			Arrays.sort(featureNames);
-//			loadSignatures(true);
+			// Arrays.sort(featureNames);
+			// loadSignatures(true);
 		} else {
 			featureNames = null;
 			projectSignatures = null;
 		}
 	}
-	
+
 	public int[] getFeatureIDs(Collection<String> featureNames) {
 		int[] ids = new int[featureNames.size()];
 		int i = -1;
@@ -148,7 +159,7 @@ public class InterfaceProject {
 		}
 		return ids;
 	}
-	
+
 	public int getFeatureID(String featureName) {
 		for (int i = 0; i < featureNames.length; ++i) {
 			if (featureNames[i].equals(featureName)) {
@@ -156,27 +167,27 @@ public class InterfaceProject {
 			}
 		}
 		return -1;
-//		return Arrays.binarySearch(featureNames, featureName);
+		// return Arrays.binarySearch(featureNames, featureName);
 	}
-	
+
 	public String getFeatureName(int id) {
 		return featureNames[id];
 	}
-	
+
 	public int getFeatureCount() {
 		return featureNames.length;
 	}
-	
-//	public void loadSignatures(boolean again) {
-//		if (loadJob == null) {
-//			loadJob = new CreateFujiSignaturesJob();
-//			loadJob.setProject(projectReference);
-//			JobManager.addJob(projectReference, loadJob);
-//		} else if (again) {
-//			loadAgain = true;
-//		}
-//	}
-	
+
+	// public void loadSignatures(boolean again) {
+	// if (loadJob == null) {
+	// loadJob = new CreateFujiSignaturesJob();
+	// loadJob.setProject(projectReference);
+	// JobManager.addJob(projectReference, loadJob);
+	// } else if (again) {
+	// loadAgain = true;
+	// }
+	// }
+
 	public ProjectSignatures getProjectSignatures() {
 		return projectSignatures;
 	}
@@ -184,75 +195,77 @@ public class InterfaceProject {
 	public IProject getProjectReference() {
 		return projectReference;
 	}
-	
+
 	public IFeatureProject getFeatureProjectReference() {
 		return featureProject;
 	}
-	
-	public FeatureModel getFeatureModel() {
+
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
-	
+
 	public int getConfigLimit() {
 		return configLimit;
 	}
-	
+
 	public Configuration getConfiguration() {
 		if (configuration == null) {
+			final IFile configFile = featureProject.getCurrentConfiguration();
 			configuration = new Configuration(featureModel);
-			FileLoader.loadConfiguration(this);
+			FileHandler.load(Paths.get(configFile.getLocationURI()), configuration,
+					ConfigurationManager.getFormat(configFile.getName()));
 		}
 		return configuration;
 	}
-	
+
 	public ViewTag getFilterViewTag() {
 		return filterViewTag;
 	}
-	
-//	public ViewTagPool getViewTagPool() {
-//		return viewTagPool;
-//	}
 
-//	public AbstractStringProvider getStringProvider() {
-//		return stringProvider;
-//	}
-	
+	// public ViewTagPool getViewTagPool() {
+	// return viewTagPool;
+	// }
+
+	// public AbstractStringProvider getStringProvider() {
+	// return stringProvider;
+	// }
+
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
 	}
 
 	public void setProjectSignatures(ProjectSignatures projectSignatures) {
 		this.projectSignatures = projectSignatures;
-//		loadJob = null;
-//		if (loadAgain) {
-//			loadSignatures(false);
-//			loadAgain = false;
-//		}
+		// loadJob = null;
+		// if (loadAgain) {
+		// loadSignatures(false);
+		// loadAgain = false;
+		// }
 	}
 
 	public void setConfigLimit(int configLimit) {
 		this.configLimit = configLimit;
 	}
-	
+
 	public void setFilterViewTag(ViewTag filterViewTag) {
 		this.filterViewTag = filterViewTag;
 	}
-	
+
 	public void setFilterViewTag(String viewName, int viewLevel) {
 		if (viewName != null) {
 			this.filterViewTag = new ViewTag(viewName, viewLevel);
 		}
 	}
-	
+
 	public void clearFilterViewTag() {
 		this.filterViewTag = null;
 	}
-	
-//	public void scaleUpViewTag(String name, int level) {
-//		viewTagPool.scaleUpViewTags(name, level);
-//	}
-//	
-//	public void removeViewTag(String name) {
-//		viewTagPool.removeViewTag(name);
-//	}
+
+	// public void scaleUpViewTag(String name, int level) {
+	// viewTagPool.scaleUpViewTags(name, level);
+	// }
+	//
+	// public void removeViewTag(String name) {
+	// viewTagPool.removeViewTag(name);
+	// }
 }

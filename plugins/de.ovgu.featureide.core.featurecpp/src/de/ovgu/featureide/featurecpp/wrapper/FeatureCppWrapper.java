@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.AbstractList;
 import java.util.LinkedList;
 
@@ -72,7 +73,7 @@ public class FeatureCppWrapper {
 	private final static String EXE_MAC_OS_X 	= "fc++v0.8MacOSX";
 	private final static String EXE_WINDOWS 	= "fc++v0.7WIN.exe";
 	
-	private ModelMarkerHandler modelMarkerHandler;
+	private ModelMarkerHandler<IResource> modelMarkerHandler;
 	
 	final String featureCppExecutableName;
 
@@ -133,12 +134,12 @@ public class FeatureCppWrapper {
 		}
 		buildFolder = build.getRawLocation().toOSString();
 		buildDirectory = build;
-		modelMarkerHandler = new ModelMarkerHandler(build.getProject());
+		modelMarkerHandler = new ModelMarkerHandler<IResource>(build.getProject());
 		return true;
 	}
 
-	public void compose(IFile config) {
-		assert (config != null && config.exists()) : CONFIGURATION_FILE_DOES_NOT_EXIST;
+	public void compose(java.nio.file.Path config) {
+		assert (config != null && Files.exists(config)) : CONFIGURATION_FILE_DOES_NOT_EXIST;
 		try {
 			if (!buildDirectory.exists())
 				buildDirectory.create(false, true, null);
@@ -157,8 +158,10 @@ public class FeatureCppWrapper {
 		} else {
 			command.add(GPP);
 		}
-		command.add(config.getRawLocation().toOSString());
-		process(command);
+		if (config != null) {
+			command.add(config.toString());
+			process(command);
+		}
 	}
 
 	private void process(AbstractList<String> command) {

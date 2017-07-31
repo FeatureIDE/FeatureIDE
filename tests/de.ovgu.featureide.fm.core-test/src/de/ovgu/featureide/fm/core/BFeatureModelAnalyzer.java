@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,14 +20,13 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.util.HashMap;
-
 import org.junit.Test;
 
 import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * This is a benchmark for analyzes at the {@link FeatureModel}.
+ * This is a benchmark for analyzes at the {@link IFeatureModel}.
  * The test cases do not analyze the validity of the analyses.
  * 
  * All timeouts are set to around 4 times the measured times(with intel i5 @ 3,3 GHz)
@@ -114,7 +113,7 @@ public class BFeatureModelAnalyzer {
 	 * Analyzes constraints only
 	 */
 	private void BUpdateConstraints(final int i) {
-		getFM(i).getAnalyser().updateConstraints(new HashMap<Object, Object>(), new HashMap<Object, Object>());
+		getFM(i).getAnalyser().updateConstraints();
 	}
 	
 	@Test (timeout=2500) // 0.509 @ i5(3,3GHz)
@@ -176,7 +175,7 @@ public class BFeatureModelAnalyzer {
 	 * Analyzes features only
 	 */
 	private void BUpdateFeatures(final int i) {
-		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
+		getFM(i).getAnalyser().updateFeatures();
 	}
 	
 	@Test (timeout=1000) // 0.053s @ i5(3,3GHz)
@@ -234,7 +233,7 @@ public class BFeatureModelAnalyzer {
 		BUpdateFeatures(1000);
 	}
 	
-	private static FeatureModel getFM(final int i) {
+	private static IFeatureModel getFM(final int i) {
 		switch (i) {
 		case 1:
 			return Commons.loadFeatureModelFromFile("berkeley_db_model.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);

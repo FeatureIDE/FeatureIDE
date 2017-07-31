@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -44,10 +44,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public interface GUIDefaults {
-
-	public static final boolean HALF_ARC = false;
-
-	public static final boolean OR_CIRCLES = false;
 
 	//general settings
 
@@ -102,7 +98,8 @@ public interface GUIDefaults {
 	public static final Color DECORATOR_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static final int SOURCE_ANCHOR_DIAMETER = 9;
 
-	public static final int TARGET_ANCHOR_DIAMETER = HALF_ARC ? 20 : 40;
+	public static final int TARGET_ANCHOR_DIAMETER = 25;
+	public static final int TARGET_ANCHOR_DIAMETER_VERTICAL = 38;
 
 	//cross-tree constraints
 
@@ -113,6 +110,9 @@ public interface GUIDefaults {
 	public static final Border CONSTRAINT_BORDER = new LineBorder(CONSTRAINT_BORDER_COLOR, 0);
 	public static final Color CONSTRAINT_SELECTED_BORDER_COLOR = GUIBasics.createBorderColor(CONSTRAINT_BACKGROUND);
 	public static final Border CONSTRAINT_SELECTED_BORDER = new LineBorder(CONSTRAINT_SELECTED_BORDER_COLOR, 3);
+	public static final Color IMPLICIT_CONSTRAINT = GUIBasics.createColor(1.0, 0.0, 0.0);
+	public static final Border IMPLICIT_CONSTRAINT_BORDER = new LineBorder(IMPLICIT_CONSTRAINT, 2);
+
 
 	//false constraints
 
@@ -131,6 +131,12 @@ public interface GUIDefaults {
 	public static final int FEATURE_SPACE_X = 5;
 	public static final int FEATURE_SPACE_Y = 30 + 20;
 	public static final int CONSTRAINT_SPACE_Y = 5 + 20;
+	
+	//space between text and bounds for collapsed decorator
+	public static final int COLLAPSED_DECORATOR_X_SPACE = 3;
+	public static final int COLLAPSED_DECORATOR_Y_SPACE = 2;
+	public static final int COLLAPSED_DECORATOR_FEATURE_SPACE = -1;
+	public static final int COLLAPSED_DECORATOR_ARC_RADIUS = 5;
 
 	//legend
 	public static final int LEGEND_WIDTH = 105;

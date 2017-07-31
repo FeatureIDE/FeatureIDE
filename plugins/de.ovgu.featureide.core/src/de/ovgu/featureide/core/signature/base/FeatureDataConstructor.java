@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,7 +26,7 @@ import org.prop4j.Node;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 
 /**
- * TODO description
+ * Creates new {@link AFeatureData} objects.
  * 
  * @author Sebastian Krieter
  */

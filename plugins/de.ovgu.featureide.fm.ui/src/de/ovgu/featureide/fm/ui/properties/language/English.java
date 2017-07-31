@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -49,11 +49,13 @@ public class English implements ILanguage {
 	private static final String INTERFACED = FROM_INTERFACE;
 	private static final String CONCRETE = "Concrete";
 	private static final String HIDDEN = "Hidden";
+	private static final String COLLAPSED = "Collapsed";
 	private static final String DEAD = "Dead feature";
 	private static final String FALSE_OPTIONAL = FALSE_OPTIONAL_FEATURE;
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = INDETERMINATE_HIDDEN;
 	private static final String REDUNDANT = REDUNDANT_CONSTRAINT;
+	private static final String IMPLICIT = "Implicit constraint";
 	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
 	private static final String VOID_MODEL_CONST = CONSTRAINT_MAKES_THE_MODEL_VOID;
@@ -61,6 +63,11 @@ public class English implements ILanguage {
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
+	}
+	
+	@Override
+	public String getImplicitConst() {
+		return IMPLICIT;
 	}
 
 	@Override
@@ -126,6 +133,11 @@ public class English implements ILanguage {
 	@Override
 	public String getHidden() {
 		return HIDDEN;
+	}
+	
+	@Override
+	public String getCollapsed() {
+		return COLLAPSED;
 	}
 
 	@Override

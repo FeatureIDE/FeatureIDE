@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -51,7 +51,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.UIJob;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
@@ -65,6 +65,7 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  * Calculates the edit category and provides as a content to the view.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ViewContentProvider implements IStructuredContentProvider, ITreeContentProvider, GUIDefaults {
 
@@ -181,8 +182,8 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	private static ModelComparator comparator = new ModelComparator(TIMEOUT);
 
-	public void calculateContent(final FeatureModel oldModel, final FeatureModel newModel, IProgressMonitor monitor) {
-		if (oldModel.getRoot() == null || newModel.getRoot() == null)
+	public void calculateContent(final IFeatureModel oldModel, final IFeatureModel newModel, IProgressMonitor monitor) {
+		if (oldModel.getStructure().getRoot() == null || newModel.getStructure().getRoot() == null)
 			return;
 
 		if (isCanceled())
@@ -273,7 +274,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * @param oldModel
 	 * @param newModel
 	 */
-	private void setHeadAndExamples(IProgressMonitor monitor, FeatureModel oldModel, FeatureModel newModel) {
+	private void setHeadAndExamples(IProgressMonitor monitor, IFeatureModel oldModel, IFeatureModel newModel) {
 		monitor.setTaskName(COMPARE_MODELS);
 		TreeObject head = calculateHead(oldModel, newModel, comparator);
 		TreeElement[] children = invisibleRoot.getChildren();
@@ -287,7 +288,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * Calculates the content of the first line
 	 * Compares the old with the new model
 	 */
-	private TreeObject calculateHead(FeatureModel oldModel, FeatureModel newModel, ModelComparator comparator) {
+	private TreeObject calculateHead(IFeatureModel oldModel, IFeatureModel newModel, ModelComparator comparator) {
 		long start = System.currentTimeMillis();
 
 		Comparison comparison = comparator.compare(oldModel, newModel);
@@ -331,7 +332,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * @param init A flag which indicates if the statistics only should be initialized or if they should be calculated
 	 * @param monitor The monitor of the running job
 	 */
-	private void addStatistics(TreeParent root, final String text, final FeatureModel model, int position, boolean init, IProgressMonitor monitor) {
+	private void addStatistics(TreeParent root, final String text, final IFeatureModel model, int position, boolean init, IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.setTaskName("Calculate: \"" + text + "\"");
 		}
@@ -435,7 +436,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		}
 	}
 
-	private TreeParent calculateNumberOfVariants(FeatureModel model, boolean ignoreAbstractFeatures) {
+	private TreeParent calculateNumberOfVariants(IFeatureModel model, boolean ignoreAbstractFeatures) {
 
 		String variants = ignoreAbstractFeatures ? CONFIGURATIONS : PROGRAM_VARIANTS;
 		TreeParent p = new TreeParent(NUMBER_OF + variants, null, true) {

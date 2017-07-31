@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<exampleWizard>
+	<contentProvider name="Book Example">
+		<path>Part I/Chapter 4 (An Elevator as a Running Example)</path>
+	</contentProvider>
+	<contentProvider name="Book Example">
+		<path>Part III/Chapter 10 (Developing an Elevator with Conditional Compilation)</path>
+	</contentProvider>
+	<contentProvider name="Book Example">
+		<path>Part IV/Chapter 14 (Developing an Elevator with Feature-Oriented Programming)</path>
+	</contentProvider>
+	<contentProvider name="Languages">
+		<path>Java</path>
+	</contentProvider>
+</exampleWizard>

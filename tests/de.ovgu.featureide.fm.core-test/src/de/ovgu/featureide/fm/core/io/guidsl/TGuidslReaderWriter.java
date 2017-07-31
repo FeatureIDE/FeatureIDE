@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,10 +21,10 @@
 package de.ovgu.featureide.fm.core.io.guidsl;
 
 import static org.junit.Assert.assertTrue;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -33,42 +33,30 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Fabian Benduhn
  */
-public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
+public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter {
 	/**
 	 * @param file
-	 * @throws UnsupportedModelException 
+	 * @throws UnsupportedModelException
 	 */
-	public TGuidslReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
+	public TGuidslReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
 		super(fm, s);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter()
-	 */
 	@Override
-	protected IFeatureModelWriter getWriter(FeatureModel fm) {
-		return new GuidslWriter(fm);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getReader()
-	 */
-	@Override
-	protected IFeatureModelReader getReader(FeatureModel fm) {
-		return new GuidslReader(fm);
+	protected IFeatureModelFormat getFormat() {
+		return new GuidslFormat();
 	}
 
 	//guidsl does not save concrete compound features
 	@Override
-	public void testFeatureConcrete(){
-		for (Feature origF : origFm.getFeatures()) {
-			if (!origF.isConcrete()&&origF.isConcrete()) {
-				Feature newF = newFm.getFeature(origF.getName());
-				if (newF == null){
+	public void testFeatureConcrete() {
+		for (IFeature origF : origFm.getFeatures()) {
+			if (!origF.getStructure().isConcrete() && origF.getStructure().isConcrete()) {
+				IFeature newF = newFm.getFeature(origF.getName());
+				if (newF == null) {
 					//fail("Feature " + origF.getName() + " cannot be found");
-				}	else {
-					assertTrue(failureMessage+origF, newFm
-							.getFeature(origF.getName()).isConcrete());
+				} else {
+					assertTrue(failureMessage + origF, newFm.getFeature(origF.getName()).getStructure().isConcrete());
 				}
 			}
 		}
@@ -78,5 +66,5 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
 	public void testDescription() {
 		// description not implemented
 	}
-	
+
 }

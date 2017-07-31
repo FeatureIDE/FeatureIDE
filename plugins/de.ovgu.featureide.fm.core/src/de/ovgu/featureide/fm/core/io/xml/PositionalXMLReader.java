@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -47,6 +47,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * @author Jens Meinicke
  */
+@Deprecated
 public class PositionalXMLReader {
     final static String LINE_NUMBER_KEY_NAME = "lineNumber";
 

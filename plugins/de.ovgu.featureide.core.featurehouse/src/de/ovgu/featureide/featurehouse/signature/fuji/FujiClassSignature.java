@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -56,7 +56,6 @@ public class FujiClassSignature extends AbstractClassSignature {
 			if (!superClass.fullName().equals("java.lang.Object")) {
 				addExtend(superClass.fullName());
 			}
-			@SuppressWarnings("unchecked")
 			Iterator<TypeDecl> implementInterfaceIt = classDecl.interfacesIterator();
 			while (implementInterfaceIt.hasNext()) {
 				TypeDecl implementType = implementInterfaceIt.next();
@@ -64,7 +63,6 @@ public class FujiClassSignature extends AbstractClassSignature {
 				addImplement(implementType.fullName());
 			}
 		} else if (typeDecl instanceof InterfaceDecl) {
-			@SuppressWarnings("unchecked")
 			Iterator<TypeDecl> superInterfaceIt = ((InterfaceDecl)typeDecl).superinterfacesIterator();
 			while (superInterfaceIt.hasNext()) {
 				TypeDecl superInterface = superInterfaceIt.next();
@@ -80,12 +78,12 @@ public class FujiClassSignature extends AbstractClassSignature {
 	public String toString() {		
 		StringBuilder sb = new StringBuilder();
 		
-		for (ImportDecl importDecl : importList) {
-			sb.append("import ");
-			sb.append(importDecl.typeName());
-			sb.append(';');
-			sb.append(LINE_SEPARATOR);
-		}
+//		for (ImportDecl importDecl : importList) {
+//			sb.append("import ");
+//			sb.append(importDecl.typeName());
+//			sb.append(';');
+//			sb.append(LINE_SEPARATOR);
+//		}
 		
 //		sb.append(super.toString());
 //		sb.append(LINE_SEPARATOR);
