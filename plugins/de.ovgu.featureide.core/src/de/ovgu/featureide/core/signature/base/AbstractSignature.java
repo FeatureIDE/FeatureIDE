@@ -59,14 +59,14 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	protected AFeatureData[] featureData = null;
 	protected String mergedjavaDocComment = null;
 	
-<<<<<<< HEAD
+
 	protected int startLine = -1;
 	protected int endLine = -1;
-=======
+
 	protected final boolean staticSignature;
 	
 	protected final Set<ExtendedSignature> invocationSignatures;
->>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
+
 	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
