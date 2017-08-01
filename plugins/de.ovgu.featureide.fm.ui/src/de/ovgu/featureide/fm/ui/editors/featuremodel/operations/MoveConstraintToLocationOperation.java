@@ -40,7 +40,7 @@ public class MoveConstraintToLocationOperation extends AbstractFeatureModelOpera
 	private Point oldPos;
 	private IGraphicalFeatureModel graphicalFeatureModel;
 	private IConstraint constraint;
-	
+
 	public MoveConstraintToLocationOperation(IGraphicalFeatureModel graphicalFeatureModel, Point newPos, IConstraint constraint) {
 		super(graphicalFeatureModel.getFeatureModel(), MOVE_CONSTRAINT);
 		this.graphicalFeatureModel = graphicalFeatureModel;
