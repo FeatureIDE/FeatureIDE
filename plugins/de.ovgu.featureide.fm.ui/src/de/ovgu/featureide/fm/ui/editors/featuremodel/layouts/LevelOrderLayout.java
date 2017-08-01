@@ -95,7 +95,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private int layoutFeatureInX(LinkedList<IGraphicalFeature> level, int j, int moveWidth, IGraphicalFeature lastFeature) {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
-		
+
 		if (getChildren(feature).size() == 0)
 			nextToLeftSibling(feature, lastFeature);
 		else {
@@ -170,7 +170,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void centerAboveChildren(IGraphicalFeature feature) {
 		final List<IGraphicalFeature> graphicalChildren = getChildren(feature);
-		if(graphicalChildren.size() == 0) {
+		if (graphicalChildren.size() == 0) {
 			return;
 		}
 		int minX = getBounds(graphicalChildren.get(0)).x;

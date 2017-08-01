@@ -110,9 +110,9 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	void layout(int yoffset, List<IGraphicalConstraint> constraints) {
-		//Added offset to avoid colliding with the collapse decorator
-		int y = yoffset + FMPropertyManager.getConstraintSpace() + 20;
-		boolean depthFirst = this instanceof DepthFirstLayout;
+		//added 2 times getConstraintSpace to prevent intersecting with the collapsed decorator
+		int y = yoffset + FMPropertyManager.getConstraintSpace() * 2;
+		boolean depthFirst = this instanceof DepthFirstLayout || this instanceof VerticalLayout;
 		for (IGraphicalConstraint constraint : constraints) {
 			Dimension size = constraint.getSize();
 			int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
@@ -178,7 +178,7 @@ abstract public class FeatureDiagramLayoutManager {
 		boolean topLeft = true;
 		boolean botLeft = true;
 		boolean botRight = true;
-		
+
 		/*
 		 * check if features would intersect with the legend on the edges
 		 */
@@ -241,8 +241,7 @@ abstract public class FeatureDiagramLayoutManager {
 			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		}
 	}
-	
-	
+
 	/**
 	 * sets the position of the legend only when intersecting
 	 */
@@ -300,18 +299,17 @@ abstract public class FeatureDiagramLayoutManager {
 		boolean topLeft = true;
 		boolean botLeft = true;
 		boolean botRight = true;
-		
+
 		boolean intersects = false;
 
 		Rectangle legend = legendFigure.getBounds();
-		
 
 		for (IGraphicalFeature feature : nonHidden) {
 			final Point tempLocation = feature.getLocation();
 			if (null != tempLocation) {
 				final Rectangle featureRect = new Rectangle(tempLocation, feature.getSize());
-				if(legend.intersects(featureRect)) {
-					intersects =  true;
+				if (legend.intersects(featureRect)) {
+					intersects = true;
 				}
 			}
 		}
@@ -319,13 +317,13 @@ abstract public class FeatureDiagramLayoutManager {
 			final Point tempLocation = consts.getLocation();
 			if (null != tempLocation) {
 				final Rectangle featureRect = new Rectangle(tempLocation, consts.getSize());
-				if(legend.intersects(featureRect)) {
-					intersects =  true;
+				if (legend.intersects(featureRect)) {
+					intersects = true;
 				}
 			}
 		}
-		
-		if(intersects) {
+
+		if (intersects) {
 			/*
 			 * check if features would intersect with the legend on the edges
 			 */
@@ -372,7 +370,6 @@ abstract public class FeatureDiagramLayoutManager {
 						botRight = false;
 				}
 			}
-			
 
 			/*
 			 * set the legend position
