@@ -31,11 +31,6 @@ Bundle-ClassPath: lib/FeatureHouse.jar,
  lib/pmd-java-5.2.2.jar
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
-<<<<<<< HEAD
- org.eclipse.jdt.internal.core
-Export-Package: cide.features,
- de.ovgu.featureide.featurehouse,
-=======
  org.eclipse.jdt.core.refactoring,
  org.eclipse.jdt.core.refactoring.descriptors,
  org.eclipse.jdt.internal.core,
@@ -43,8 +38,8 @@ Export-Package: cide.features,
  org.eclipse.jdt.internal.ui.packageview,
  org.eclipse.jface.text,
  org.eclipse.ui.texteditor
-Export-Package: de.ovgu.featureide.featurehouse,
->>>>>>> refs/remotes/FeatureIDE/fop-pullup-codeclones
+Export-Package: cide.features,
+ de.ovgu.featureide.featurehouse,
  de.ovgu.featureide.featurehouse.errorpropagation,
  de.ovgu.featureide.featurehouse.meta,
  de.ovgu.featureide.featurehouse.meta.featuremodel,
