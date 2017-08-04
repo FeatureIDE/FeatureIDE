@@ -72,6 +72,8 @@ import de.ovgu.featureide.featurehouse.refactoring.RenameRefactoring;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
 
 /**
@@ -455,7 +457,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 			
 			final List<String> impliedFeatures = implied.getValue();
 			if (impliedFeatures.size() == allFeatures.size() && impliedFeatures.containsAll(allFeatures))
-				return refactoring.getFeatureProject().getFeatureModel().getFeature(implied.getKey());
+				return (Feature) refactoring.getFeatureProject().getFeatureModel().getFeature(implied.getKey());
 		} 
 		return null;
 	}
@@ -470,9 +472,9 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	
 	private Map<String, List<String>> getImplies() {
 		final Map<String, List<String>> implies = new HashMap<>();
-		final List<Constraint> constraints = refactoring.getFeatureProject().getFeatureModel().getConstraints();
+		final List<IConstraint> constraints = refactoring.getFeatureProject().getFeatureModel().getConstraints();
 		
-		for (Constraint constraint : constraints) {
+		for (IConstraint constraint : constraints) {
 			if (!(constraint.getNode() instanceof Implies)) continue;
 			
 			final Node[] children = constraint.getNode().getChildren();
@@ -540,7 +542,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		super.dispose();
 	}
 
-	public Feature getDestinationFeature() {
+	public IFeature getDestinationFeature() {
 		final String featureName = parentFeatureCombo.getText();
 		if (featureName.isEmpty())
 			return null;
@@ -575,7 +577,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	}
 
 	private void initializeRefactoring() {
-		final Feature destination = getDestinationFeature();
+		final Feature destination = (Feature) getDestinationFeature();
 		if (destination != null)
 			refactoring.setDestinationFeature(destination);
 		refactoring.setPullUpSignatures(getPullUpMembers(destination));

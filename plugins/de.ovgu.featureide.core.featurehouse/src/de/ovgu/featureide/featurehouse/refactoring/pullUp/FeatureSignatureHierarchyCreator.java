@@ -81,7 +81,7 @@ public class FeatureSignatureHierarchyCreator {
 	}
 	
 	private Feature getFeature(String featureName){
-		return projectSignatures.getFeatureModel().getFeature(featureName);
+		return (Feature) projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 	
 	private void addSubClassesAndMembers(final ExtendedPullUpSignature parentExtendSignature, 

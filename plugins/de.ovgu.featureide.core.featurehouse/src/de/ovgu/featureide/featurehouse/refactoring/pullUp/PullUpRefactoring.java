@@ -113,7 +113,7 @@ public class PullUpRefactoring extends Refactoring {
 		
 		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
 		final String featureName = projectSignatures.getFeatureName(featureData.getID());
-		return projectSignatures.getFeatureModel().getFeature(featureName);
+		return (Feature) projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 
 	protected AFeatureData getFeatureDataForFile(final AbstractSignature signature, final String file){

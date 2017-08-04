@@ -173,7 +173,7 @@ public class RefactoringUtil {
 	public static Feature getFeatureForId(ProjectSignatures projectSignatures, int featureId)
 	{
 		final String featureName = projectSignatures.getFeatureName(featureId);
-		return projectSignatures.getFeatureModel().getFeature(featureName);
+		return (Feature) projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 	
 	public static Set<AbstractSignature> getMatchedSignaturesForClass(Set<? extends AbstractSignature> signatures, String matchingFile) {
