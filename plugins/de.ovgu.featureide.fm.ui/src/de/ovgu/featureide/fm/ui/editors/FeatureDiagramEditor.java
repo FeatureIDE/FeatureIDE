@@ -149,6 +149,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLa
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
@@ -239,6 +240,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private FeatureModelAnalyzer analyzer;
 
 	final FeatureDiagramEditorKeyHandler editorKeyHandler;
+	private FeatureDiagramLayoutManager layoutManager;
 
 	/** The currently active explanation. */
 	private Explanation activeExplanation;
@@ -363,9 +365,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					return;
 				int difX = newLoc.x - oldLoc.x;
 
-				if (!FMPropertyManager.isLegendHidden()) {
-					moveLegend(graphicalFeatureModel, difX);
-				}
+				moveLegend(graphicalFeatureModel, difX);
+				
 				setLayout();
 			}
 
@@ -378,10 +379,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			 * @param delta
 			 */
 			private void moveLegend(IGraphicalFeatureModel fm, int delta) {
-				LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(fm);
-				if (legendFigure != null) {
-					org.eclipse.draw2d.geometry.Point location = legendFigure.getLocation();
-					legendFigure.setLocation(new org.eclipse.draw2d.geometry.Point(location.x + delta, location.y));
+				if (!graphicalFeatureModel.isLegendHidden()) {
+					for (Object obj : getEditPartRegistry().values()) {
+						if (obj instanceof LegendEditPart) {
+							LegendFigure fig = ((LegendEditPart) obj).getFigure();
+							fig.recreateLegend();
+						}
+					}
 				}
 			}
 
@@ -514,7 +518,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		exportFeatureModelAction = new ExportFeatureModelAction(featureModelEditor);
 		legendLayoutAction = new LegendLayoutAction(this, graphicalFeatureModel);
-		legendAction = new LegendAction(this, featureModel);
+		legendAction = new LegendAction(this, graphicalFeatureModel);
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this, graphicalFeatureModel);
 		showCollapsedConstraintsAction = new ShowCollapsedConstraintsAction(this, graphicalFeatureModel);
 
@@ -950,7 +954,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	public void setLayout() {
-		FeatureDiagramLayoutManager layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(),
+		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(),
 				graphicalFeatureModel);
 
 		int previousLayout = graphicalFeatureModel.getLayout().getLayoutAlgorithm();
@@ -965,8 +969,16 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			Point size = getControl().getSize();
 			layoutManager.setControlSize(size.x, size.y);
 		}
-		layoutManager.layout(graphicalFeatureModel);
+		layoutManager.layout(graphicalFeatureModel, this);
 
+		if (!graphicalFeatureModel.isLegendHidden()) {
+			for (Object obj : getEditPartRegistry().values()) {
+				if (obj instanceof LegendEditPart) {
+					LegendFigure fig = ((LegendEditPart) obj).getFigure();
+					fig.recreateLegend();
+				}
+			}
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -991,7 +1003,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IFeature newCompound = null;
 			if (event.getNewValue() != null && event.getNewValue() instanceof IFeature) {
 				newCompound = (IFeature) event.getNewValue();
-				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound).getGraphicalChildren()) {
+				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound).getGraphicalChildren(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
 				IFeature oldParent = (IFeature) event.getOldValue();
@@ -1176,7 +1188,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			if (oldParent != null) {
 				graphicalFeatureModel.getGraphicalFeature(oldParent).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 				//and update the children that their parent changed
-				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(oldParent).getGraphicalChildren()) {
+				for (IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(oldParent).getGraphicalChildren(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
 				refreshChildAll(oldParent);
@@ -1213,6 +1225,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			legendLayoutAction.refresh();
 			break;
 		case LEGEND_LAYOUT_CHANGED:
+			if (event.getSource() instanceof Boolean && ((Boolean) event.getSource())) {
+				//Layout hidden property changed. Needs to be saved to the graphical model
+				featureModelEditor.setPageModified(true);
+			}
 			legendLayoutAction.refresh();
 			internRefresh(false);
 			break;
@@ -1231,7 +1247,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case COLLAPSED_CHANGED:
 			//Reload editpart to notify the diagramm that the IGraphicalModel has changed
 			reload();
-
 			if (event.getNewValue() == null) {
 				IFeature selectedFeature = (IFeature) event.getSource();
 				refreshChildAll(selectedFeature);
@@ -1239,7 +1254,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			internRefresh(false);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
-
 			//Center collapsed feature after operation
 			if (event.getSource() instanceof IFeature) {
 				centerPointOnScreen((IFeature) event.getSource());
@@ -1327,9 +1341,17 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 
 			//Refresh the legend.
-			LegendFigure legend = FeatureUIHelper.getLegendFigure(graphicalFeatureModel);
-			if (legend != null && legend.isVisible()) {
-				legend.recreateLegend();
+			if (!graphicalFeatureModel.isLegendHidden()) {
+				for (Object obj : getEditPartRegistry().values()) {
+					if (obj instanceof LegendEditPart) {
+						LegendFigure fig = ((LegendEditPart) obj).getFigure();
+						fig.recreateLegend();
+						org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegendOnIntersect(graphicalFeatureModel);
+						if(newLegendPosition != null){
+							fig.setLocation(newLegendPosition);
+						}
+					}
+				}
 			}
 			break;
 		case DEFAULT:
@@ -1342,9 +1364,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		for (IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
 			page.propertyChange(event);
 		}
-
-		setLayout();
-
 	}
 
 	private void deregisterEditParts() {
@@ -1415,12 +1434,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			Map<?, ?> registry2 = getEditPartRegistry();
 			ConnectionEditPart connectionEditPart2 = (ConnectionEditPart) registry2.get(connection);
 			if (connectionEditPart2 != null) {
-				//FMUIPlugin.getDefault().logInfo("Refresh Connection: " + connectionEditPart2);
 				connectionEditPart2.refresh();
 			}
 		}
 		//Refresh Feature
-		//FMUIPlugin.getDefault().logInfo("Refresh Feature: " + editPart);
 		editPart.refresh();
 	}
 

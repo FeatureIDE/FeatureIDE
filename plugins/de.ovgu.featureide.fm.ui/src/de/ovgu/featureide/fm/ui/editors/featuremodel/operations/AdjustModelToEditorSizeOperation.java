@@ -153,7 +153,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 				((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 				((FeatureDiagramEditor) getEditor()).internRefresh(true);
 				
-				for(IGraphicalFeature child : graphicalF.getGraphicalChildren())
+				for(IGraphicalFeature child : graphicalF.getGraphicalChildren(graphicalFeatureModel.getLayout().showHiddenFeatures()))
 				{
 					childList.add(child.getObject());
 				}

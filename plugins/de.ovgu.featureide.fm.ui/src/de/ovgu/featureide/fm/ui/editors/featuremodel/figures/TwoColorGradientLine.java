@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.XYLayout;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;

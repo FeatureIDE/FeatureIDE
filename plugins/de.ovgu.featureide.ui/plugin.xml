@@ -5,23 +5,23 @@
 	<extension
 			point="org.eclipse.ui.newWizards">
 		<wizard
-				canFinishEarly="false"
-				category="de.ovgu.featureide.ui.category"
-				class="de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard"
-				hasPages="true"
-				icon="icons/NewFeatureProjectIcon.png"
-				id="de.ovgu.featureide.ui.FeatureProjectWizard"
-				name="FeatureIDE Project"
-				project="true"/>
+        canFinishEarly="false"
+        category="de.ovgu.featureide.ui.category"
+        class="de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard"
+        hasPages="true"
+        icon="icons/NewFeatureProjectIcon.png"
+        id="de.ovgu.featureide.ui.FeatureProjectWizard"
+        name="FeatureIDE Project"
+        project="true"/>
 		<wizard
-				canFinishEarly="false"
-				category="de.ovgu.featureide.ui.category"
-				class="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
-				hasPages="true"
-				icon="icons/NewFeatureProjectIcon.png"
-				id="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
-				name="FeatureIDE Source File"
-				project="false">
+        canFinishEarly="false"
+        category="de.ovgu.featureide.ui.category"
+        class="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
+        hasPages="true"
+        icon="icons/NewFeatureProjectIcon.png"
+        id="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
+        name="FeatureIDE Source File"
+        project="false">
 		</wizard>
 		<wizard
 				category="de.ovgu.featureide.ui.category"
@@ -1476,6 +1476,54 @@
           </or>
        </triggerPoints>
     </navigatorContent>
+    <commonWizard
+          menuGroupId="de.ovgu.featureide.ui.wizards.groupProjectExplorer"
+          type="new"
+          wizardId="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="de.ovgu.featureide.ui.FeatureIDEperspective">
+             </equals>
+          </with></enablement>
+    </commonWizard>
+    <commonWizard
+          menuGroupId="de.ovgu.featureide.ui.wizards.groupProjectExplorer"
+          type="new"
+          wizardId="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="de.ovgu.featureide.ui.FeatureIDEperspective">
+             </equals>
+          </with></enablement>
+    </commonWizard>
+    <commonWizard
+          menuGroupId="de.ovgu.featureide.ui.wizards.groupProjectExplorer"
+          type="new"
+          wizardId="de.ovgu.featureide.fm.ui.wizard.NewFeatureModelWizard">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="de.ovgu.featureide.ui.FeatureIDEperspective">
+             </equals>
+          </with></enablement>
+    </commonWizard>
+    <commonWizard
+          menuGroupId="additions"
+          type="new"
+          wizardId="de.ovgu.featureide.ui.FeatureProjectWizard">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="de.ovgu.featureide.ui.FeatureIDEperspective">
+             </equals>
+          </with></enablement>
+    </commonWizard>
  </extension>
 	
 	

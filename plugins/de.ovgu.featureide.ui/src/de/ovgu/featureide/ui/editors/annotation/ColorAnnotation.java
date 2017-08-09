@@ -107,10 +107,4 @@ public class ColorAnnotation extends Annotation {
 	public boolean isImageAnnotation() {
 		return type == TYPE_IMAGE && id != -1;
 	}
-
-	// TODO #305 delete this method and fix tool tip for annotations
-	@Override
-	public void setText(String text) {
-		super.setText(null);
-	}
 }

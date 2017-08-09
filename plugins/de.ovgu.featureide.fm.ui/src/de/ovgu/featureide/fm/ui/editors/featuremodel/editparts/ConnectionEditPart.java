@@ -56,6 +56,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
@@ -97,17 +98,17 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	public FeatureConnection getModel() {
 		return (FeatureConnection) super.getModel();
 	}
-	
+
 	@Override
 	public FeatureEditPart getSource() {
 		return (FeatureEditPart) super.getSource();
 	}
-	
+
 	@Override
 	public FeatureEditPart getTarget() {
 		return (FeatureEditPart) super.getTarget();
 	}
-	
+
 	@Override
 	public ConnectionFigure getFigure() {
 		return (ConnectionFigure) super.getFigure();
@@ -231,23 +232,28 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		boolean parentHidden = false;
 
-		CircleDecoration sourceDecoration = null;
+		ConnectionDecoration sourceDecoration = null;
 		while (!sourceParent.getStructure().isRoot()) {
 			sourceParent = sourceParent.getStructure().getParent().getFeature();
 			if (sourceParent.getStructure().isHidden())
 				parentHidden = true;
 
 		}
-		if (graphicalSource == graphicalTarget && graphicalSource.isCollapsed()) {
-			getFigure().setSourceDecoration(new CollapsedDecoration(graphicalTarget));
-			return;
-		} else if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
-			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
-				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
+
+		if (graphicalSource == graphicalTarget) {
+			if (graphicalSource.isCollapsed()) {
+				sourceDecoration = new CollapsedDecoration(graphicalTarget);
+			}
+		} else {
+			if (target.getStructure().isAnd()
+					&& (!source.getStructure().isHidden() || FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+				if (!(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+					sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
+				}
 			}
 		}
+
 		getFigure().setSourceDecoration(sourceDecoration);
-		
 		if (sourceDecoration != null && activeReasonDown != null) {
 			sourceDecoration.setActiveReason(activeReasonDown);
 		}
@@ -259,7 +265,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		if (target == null) {
 			return;
 		}
-		
+
 		/*
 		 * Add a target decoration only if this is the main connection.
 		 * The main connection is the first sibling and the only one with a target decoration.
@@ -268,18 +274,15 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		final IGraphicalFeature source = getModel().getSource();
 		final IFeatureStructure sourceStructure = source.getObject().getStructure();
 		final IFeatureStructure mainSourceStructure = targetStructure.getFirstChild();
-		RelationDecoration targetDecoration = null;
-		if (sourceStructure == mainSourceStructure
-				&& !targetStructure.isAnd()
-				&& targetStructure.getChildrenCount() > 1) {
-			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
-			final IGraphicalFeature lastChild = FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel())
-					? graphicalChildren.get(0)
-					: graphicalChildren.get(graphicalChildren.size() - 1);
-			targetDecoration = new RelationDecoration(targetStructure.isMultiple(), lastChild);
+		ConnectionDecoration targetDecoration = null;
+		if (sourceStructure == mainSourceStructure && !targetStructure.isAnd() && targetStructure.getChildrenCount() > 1) {
+				final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
+				final IGraphicalFeature lastChild = FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel()) ? graphicalChildren.get(0)
+						: graphicalChildren.get(graphicalChildren.size() - 1);
+				targetDecoration = new RelationDecoration(targetStructure.isMultiple(), lastChild);
 		}
 		getFigure().setTargetDecoration(targetDecoration);
-		
+
 		/*
 		 * Refresh the active reason of the target decoration of the main connection (which might not be this one).
 		 * We have to do this whenever any connection is refreshed as the main connection might not be refreshed even though its target decoration has to be.
@@ -289,7 +292,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		if (mainConnectionEditPart == null) {
 			return;
 		}
-		final RelationDecoration mainTargetDecoration = mainConnectionEditPart.getFigure().getTargetDecoration();
+		final ConnectionDecoration mainTargetDecoration = (ConnectionDecoration) mainConnectionEditPart.getFigure().getTargetDecoration();
 		if (mainTargetDecoration == null) {
 			return;
 		}
@@ -347,7 +350,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			refreshSourceDecoration();
 		}
 	}
-	
+
 	/**
 	 * Sets the active reason.
 	 * @param activeReason the new active reason; null to reset
@@ -370,10 +373,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				throw new IllegalArgumentException("Reason does not denote a vertical child relationship");
 		}
 	}
-	
+
 	/**
 	 * Returns the active reason for use with the main connection's target decoration.
 	 * The main active reason has the maximum confidence of all reasons of all siblings.
+	 * 
 	 * @return the active reason for use with the main connection's target decoration
 	 */
 	private Reason getMainActiveReason() {
@@ -414,7 +418,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		}
 		return mainActiveReason;
 	}
-	
+
 	/**
 	 * Checks if the target and source features are from an external feature
 	 * model.
@@ -429,7 +433,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			return false;
 		}
 		final IFeature target = graphicalTarget.getObject();
-		return (source instanceof ExtendedFeature && ((ExtendedFeature) source).isFromExtern()
-				&& target instanceof ExtendedFeature && ((ExtendedFeature) target).isFromExtern());
+		return (source instanceof ExtendedFeature 
+				&& ((ExtendedFeature) source).isFromExtern() 
+				&& target instanceof ExtendedFeature
+				&& ((ExtendedFeature) target).isFromExtern());
 	}
 }

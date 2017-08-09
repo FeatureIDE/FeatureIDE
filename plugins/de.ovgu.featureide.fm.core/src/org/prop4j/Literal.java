@@ -56,6 +56,11 @@ public class Literal extends Node implements Cloneable {
 		this.positive = positive;
 	}
 
+	protected Literal(Literal oldLiteral) {
+		this.var = oldLiteral.var;
+		this.positive = oldLiteral.positive;
+	}
+
 	public void flip() {
 		positive = !positive;
 	}
@@ -82,7 +87,13 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	protected Node clausify() {
+	protected Node clausifyCNF() {
+		//nothing to do
+		return this;
+	}
+
+	@Override
+	protected Node clausifyDNF() {
 		//nothing to do
 		return this;
 	}
@@ -103,7 +114,7 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	public Literal clone() {
-		return new Literal(var, positive);
+		return new Literal(this);
 	}
 
 	@Override

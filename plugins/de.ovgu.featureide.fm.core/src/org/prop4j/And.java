@@ -21,6 +21,8 @@
 package org.prop4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +33,10 @@ import java.util.Map;
  */
 public class And extends Node {
 
-	public And(Object ...children) {
+	public And(Object... children) {
 		setChildren(children);
 	}
-	
+
 	public And(Node[] children) {
 		setChildren(children);
 	}
@@ -69,12 +71,83 @@ public class And extends Node {
 	}
 
 	@Override
-	protected Node clausify() {
+	protected Node clausifyCNF() {
 		for (int i = 0; i < children.length; i++) {
-			children[i] = children[i].clausify();
+			children[i] = children[i].clausifyCNF();
 		}
 		fuseWithSimilarChildren();
 		return this;
+	}
+
+	@Override
+	protected Node clausifyDNF() {
+		for (int i = 0; i < children.length; i++) {
+			children[i] = children[i].clausifyDNF();
+		}
+		fuseWithSimilarChildren();
+		return createDNF(children);
+	}
+
+	private Node createDNF(Node[] children) {
+		LinkedList<LinkedList<Node>> clauses = new LinkedList<>();
+		clauses.add(new LinkedList<Node>());
+		for (Node child : children) {
+			LinkedList<Node[]> newClauses = new LinkedList<>();
+			if (child instanceof Or) {
+				for (Node and : child.children) {
+					if (and instanceof And) {
+						newClauses.add(and.children);
+					} else {
+						newClauses.add(new Node[] { and });
+					}
+				}
+			} else {
+				newClauses.add(new Node[] { child });
+			}
+
+			clauses = updateClauses(clauses, newClauses);
+		}
+
+		final Node[] newChildren = new Node[clauses.size()];
+		int i = 0;
+		for (LinkedList<Node> clause : clauses) {
+			newChildren[i++] = new And(clause);
+		}
+		return new Or(newChildren);
+	}
+
+	private LinkedList<LinkedList<Node>> updateClauses(LinkedList<LinkedList<Node>> clauses, LinkedList<Node[]> newClauses) {
+		LinkedList<LinkedList<Node>> updatedClauses = new LinkedList<>();
+		for (LinkedList<Node> clause : clauses) {
+			boolean intersection = false;
+			for (Node[] list : newClauses) {
+				if (clause.containsAll(Arrays.asList(list))) {
+					intersection = true;
+					break;
+				}
+			}
+			if (intersection) {
+				add(updatedClauses, clause);
+			} else {
+				for (Node[] list : newClauses) {
+					LinkedList<Node> newClause = clone(clause);
+					for (Node node : list) {
+						newClause.add(node.clone());
+					}
+					add(updatedClauses, newClause);
+				}
+			}
+		}
+		return updatedClauses;
+	}
+
+	private void add(LinkedList<LinkedList<Node>> clauses, LinkedList<Node> newClause) {
+		for (LinkedList<Node> clause : clauses) {
+			if (newClause.containsAll(clause)) {
+				return;
+			}
+		}
+		clauses.add(newClause);
 	}
 
 	@Override
@@ -91,24 +164,24 @@ public class And extends Node {
 			nodes.add(node);
 		}
 	}
-	
+
 	@Override
 	public void simplify() {
 		List<Node> nodes = new ArrayList<Node>();
-		
+
 		for (int i = 0; i < children.length; i++) {
 			collectChildren(children[i], nodes);
 		}
-		
+
 		int size = nodes.size();
 		if (size != children.length) {
 			Node[] newChildren = nodes.toArray(new Node[size]);
 			setChildren(newChildren);
 		}
-		
+
 		super.simplify();
 	}
-	
+
 	@Override
 	public Node clone() {
 		return new And(clone(children));
