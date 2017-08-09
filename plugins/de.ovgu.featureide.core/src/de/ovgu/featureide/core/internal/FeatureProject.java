@@ -95,7 +95,6 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
@@ -133,11 +132,21 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		 * listens to changed feature names
 		 */
 		public void propertyChange(FeatureIDEEvent evt) {
-
-			if (EventType.FEATURE_NAME_CHANGED == evt.getEventType()) {
+			switch(evt.getEventType()){
+			case FEATURE_NAME_CHANGED:
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
 				FeatureProject.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
+				break;
+			case MODEL_DATA_SAVED:
+				try {
+					createAndDeleteFeatureFolders();
+				} catch (CoreException e) {
+					CorePlugin.getDefault().logError(e);
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}

@@ -79,8 +79,9 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 		this.origFm = fm;
 		this.newFm = writeAndReadModel();
+//		System.out.println("ori:\n" + origFm);
+//		System.out.println("new:\n" + newFm);
 		this.failureMessage = "(" + s + ")";
-
 	}
 
 	@Parameters
@@ -93,7 +94,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		final FileFilter fileFilter = getFileFilter(".xml");
 		if (fileFilter == null)
 			throw new RuntimeException();
-		
+
 		for (File f : MODEL_FILE_FOLDER.listFiles(fileFilter)) {
 			Object[] models = new Object[2];
 			IFeatureModel fm = FeatureModelManager.readFromFile(f.toPath());
@@ -126,7 +127,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeAnd() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
-
 			if (origF.getStructure().isAnd()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
@@ -141,14 +141,11 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeOr() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
-
 			if (origF.getStructure().isOr()) {
 				IFeature newF = newFm.getFeature(origF.getName());
-				if (newF == null) {
-					// fail("Feature " + origF.getName() + " cannot be found");
-				} else {
-					assertTrue(failureMessage, newFm.getFeature(origF.getName()).getStructure().isOr());
-				}
+//				System.out.println("origF:[" + origF.getStructure().isOr() + "]" + origF + "\nnewF:[" + newF.getStructure().isOr() + "]"
+//						+ newF + "\n: ");
+				assertTrue(failureMessage, newF.getStructure().isOr());
 			}
 		}
 	}
@@ -156,14 +153,9 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeAlternative() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
-
 			if (origF.getStructure().isAlternative()) {
 				IFeature newF = newFm.getFeature(origF.getName());
-				if (newF == null) {
-					// fail("Feature " + origF.getName() + " cannot be found");
-				} else {
-					assertTrue(failureMessage, newFm.getFeature(origF.getName()).getStructure().isAlternative());
-				}
+				assertTrue(failureMessage, newF.getStructure().isAlternative());
 			}
 		}
 	}
@@ -171,7 +163,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureConcrete() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
-
 			if (origF.getStructure().isConcrete()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
@@ -192,7 +183,8 @@ public abstract class TAbstractFeatureModelReaderWriter {
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertEquals(failureMessage + "Feature: " + origF.getName(), origF.getStructure().isHidden(), newFm.getFeature(origF.getName()).getStructure().isHidden());
+					assertEquals(failureMessage + "Feature: " + origF.getName(), origF.getStructure().isHidden(),
+							newFm.getFeature(origF.getName()).getStructure().isHidden());
 				}
 			}
 		}
@@ -216,7 +208,6 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	//TODO @Fabian @Test
 	public void testPropNodes() throws FileNotFoundException, UnsupportedModelException {
 		for (IConstraint constraint : origFm.getConstraints()) {
-			System.out.println(newFm.getConstraints());
 			assertFalse(failureMessage + constraint, newFm.getConstraints().contains(constraint));
 		}
 	}

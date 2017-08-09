@@ -22,12 +22,12 @@ package de.ovgu.featureide.fm.core.configuration.io;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.nio.file.DirectoryStream.Filter;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;

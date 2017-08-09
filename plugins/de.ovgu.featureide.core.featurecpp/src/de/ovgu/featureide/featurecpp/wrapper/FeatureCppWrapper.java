@@ -234,7 +234,7 @@ public class FeatureCppWrapper {
 	 * @deprecated is set automatically at constructor.
 	 */
 	private void openMessageBox(IOException e) {
-		if ("java.io.IOException: java.io.IOException: error=13, Permission denied".equals(e.getCause().toString())) {
+		if (e != null && e.getCause() != null && "java.io.IOException: java.io.IOException: error=13, Permission denied".equals(e.getCause().toString())) {
 			UIJob uiJob = new UIJob("") {
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					MessageBox d = new MessageBox(new Shell(), SWT.ICON_ERROR);

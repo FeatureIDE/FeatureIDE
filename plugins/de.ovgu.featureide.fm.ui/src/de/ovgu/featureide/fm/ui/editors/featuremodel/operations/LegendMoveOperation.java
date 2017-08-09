@@ -30,7 +30,6 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
@@ -47,11 +46,13 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 	private Point newLocation;
 	private Point oldLocation;
 	private boolean wasAutoLayout;
+	private LegendFigure legendFigure;
 
 	public LegendMoveOperation(IGraphicalFeatureModel featureModel, Point newLocation, LegendFigure legendFigure) {
 		super(featureModel, LABEL);
 		this.newLocation = newLocation;
 		this.oldLocation = legendFigure.getLocation();
+		this.legendFigure = legendFigure;
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		FeatureUIHelper.getLegendFigure(graphicalFeatureModel).setLocation(newLocation);
+		legendFigure.setLocation(newLocation);
 		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(newLocation.x, newLocation.y);
 		layout.setLegendAutoLayout(false);
@@ -72,7 +73,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		FeatureUIHelper.getLegendFigure(graphicalFeatureModel).setLocation(oldLocation);
+		legendFigure.setLocation(oldLocation);
 		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(oldLocation.x, oldLocation.y);
 		layout.setLegendAutoLayout(wasAutoLayout);

@@ -64,9 +64,10 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -365,7 +366,8 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 */
 	private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
 		try {
-			FeatureIndent lastFeat = new FeatureIndent(object, -1);
+			final IFeatureModelFactory factory = FMFactoryManager.getFactory(object);
+			FeatureIndent lastFeat = new FeatureIndent(null, -1, null);
 			// List of Features with arbitrary cardinalities
 			LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();
 			String lineText = reader.readLine();
@@ -390,8 +392,8 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					//					lastFeat = (FeatureIndent) lastFeat.getParent();
 					//					relativeIndent = countIndent - lastFeat.getIndentation();
 
-					if (!lastFeat.getStructure().isRoot()) {
-						lastFeat = (FeatureIndent) lastFeat.getStructure().getParent().getFeature();
+					if (lastFeat != null) {
+						lastFeat = lastFeat.getParent();
 						relativeIndent = countIndent - lastFeat.getIndentation();
 					}
 				}
@@ -411,59 +413,59 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 				lineText = new String(lineTextChars);
 
 				if (lineText.startsWith(":r")) {
-					feat = new FeatureIndent(object, 0);
-					feat.getStructure().setMandatory(true);
-					featId = setNameGetID(feat, lineText);
+					feat = new FeatureIndent(null, 0, factory.createFeature(object, ""));
+					feat.getFeature().getStructure().setMandatory(true);
+					featId = setNameGetID(feat.getFeature(), lineText);
 					//		    		if (feat.getName().trim().toLowerCase().equals("root"))
 					//		    			feat.setName("root_");
-					object.getStructure().setRoot(feat.getStructure());
-					feat.getStructure().changeToAnd();
+					object.getStructure().setRoot(feat.getFeature().getStructure());
+					feat.getFeature().getStructure().setAnd();
 					countIndent = 0;
 				} else if (lineText.startsWith(":m")) {
-					feat = new FeatureIndent(object, countIndent);
-					feat.getStructure().setMandatory(true);
-					featId = setNameGetID(feat, lineText);
-					feat.getStructure().setParent(lastFeat.getStructure());
-					lastFeat.getStructure().addChild(feat.getStructure());
-					feat.getStructure().changeToAnd();
+					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
+					feat.getFeature().getStructure().setMandatory(true);
+					featId = setNameGetID(feat.getFeature(), lineText);
+					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
+					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
+					feat.getFeature().getStructure().setAnd();
 				} else if (lineText.startsWith(":o")) {
-					feat = new FeatureIndent(object, countIndent);
-					feat.getStructure().setMandatory(false);
-					featId = setNameGetID(feat, lineText);
-					feat.getStructure().setParent(lastFeat.getStructure());
-					lastFeat.getStructure().addChild(feat.getStructure());
-					feat.getStructure().changeToAnd();
+					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
+					feat.getFeature().getStructure().setMandatory(false);
+					featId = setNameGetID(feat.getFeature(), lineText);
+					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
+					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
+					feat.getFeature().getStructure().setAnd();
 				} else if (lineText.startsWith(":g")) {
 					//create an abstract feature for each group (could be optimized, but avoid mixing up several groups)
-					feat = new FeatureIndent(object, countIndent);
-					feat.getStructure().setMandatory(true);
-					feat.getStructure().setAbstract(true);
+					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
+					feat.getFeature().getStructure().setMandatory(true);
+					feat.getFeature().getStructure().setAbstract(true);
 					//try to generate a name that hopefully does not exist in the model
-					featId = lastFeat.getName() + EMPTY___ + (lastFeat.getStructure().getChildrenCount() + 1);
-					feat.setName(featId);
-					feat.getStructure().setParent(lastFeat.getStructure());
-					lastFeat.getStructure().addChild(feat.getStructure());
+					featId = lastFeat.getFeature().getName() + EMPTY___ + (lastFeat.getFeature().getStructure().getChildrenCount() + 1);
+					feat.getFeature().setName(featId);
+					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
+					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
 					lastFeat = feat;
 					if (lineText.contains("[1,1]")) {
-						lastFeat.getStructure().changeToAlternative();
+						lastFeat.getFeature().getStructure().setAlternative();
 					} else if (lineText.contains("[1,*]")) {
-						lastFeat.getStructure().changeToOr();
+						lastFeat.getFeature().getStructure().setOr();
 					} else if ((lineText.contains("[")) && (lineText.contains("]"))) {
 						int index = lineText.indexOf('[');
 						int start = Character.getNumericValue(lineText.charAt(index + 1));
 						int end = Character.getNumericValue(lineText.charAt(index + 3));
-						FeatCardinality featCard = new FeatCardinality(lastFeat, start, end);
+						FeatCardinality featCard = new FeatCardinality(lastFeat.getFeature(), start, end);
 						arbCardGroupFeats.add(featCard);
 					} else
 						throw new UnsupportedModelException(COULDNT + DETERMINE_GROUP_CARDINALITY, line);
 					//lastFeat = feat;
 					//featId = featId + "_ ";
 					line++;
-					addFeatureToModel(feat);
+					addFeatureToModel(feat.getFeature());
 					continue;
 				} else if (lineText.startsWith(":")) {
-					feat = new FeatureIndent(object, countIndent);
-					feat.getStructure().setMandatory(true);
+					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
+					feat.getFeature().getStructure().setMandatory(true);
 					String name;
 					if (lineText.contains("(")) {
 						name = lineText.substring(2, lineText.indexOf('('));
@@ -474,20 +476,26 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					}
 					if (Character.isDigit(name.charAt(0)))
 						name = "a" + name;
-					feat.setName(name);
-					feat.getStructure().setParent(lastFeat.getStructure());
-					lastFeat.getStructure().addChild(feat.getStructure());
-					feat.getStructure().changeToAnd();
+					feat.getFeature().setName(name);
+					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
+					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
+					feat.getFeature().getStructure().setAnd();
 				} else
 					throw new UnsupportedModelException(COULDNT_MATCH_WITH + "known Types: :r, :m, :o, :g, :", line);
-				addFeatureToModel(feat);
+				addFeatureToModel(feat.getFeature());
 
 				if (idTable.containsKey(featId))
 					throw new UnsupportedModelException("Feature \"" + featId + "\" occured" + SECOND_TIME_COMMA__BUT_MAY_ONLY_OCCUR_ONCE, line);
-				idTable.put(featId, feat);
+				idTable.put(featId, feat.getFeature());
 
 				lastFeat = feat;
 				line++;
+			}
+			//Check that there are only OR connections when the parent has more than one feature
+			for (IFeature f : object.getFeatures()) {
+				if(f.getStructure().isOr() && f.getStructure().getChildrenCount() <= 1) {
+					f.getStructure().setAnd();
+				}
 			}
 
 			handleArbitrayCardinality(arbCardGroupFeats);
@@ -505,11 +513,11 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					feature.getStructure().addChild(grantChild);
 				}
 				if (child.isAnd())
-					feature.getStructure().changeToAnd();
+					feature.getStructure().setAnd();
 				else if (child.isOr())
-					feature.getStructure().changeToOr();
+					feature.getStructure().setOr();
 				else if (child.isAlternative())
-					feature.getStructure().changeToAlternative();
+					feature.getStructure().setAlternative();
 				child.setParent(null);
 				feature.getStructure().removeChild(child);
 				object.deleteFeatureFromTable(child.getFeature());
@@ -791,17 +799,28 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		}
 	}
 
-	private static class FeatureIndent extends Feature {
+	private static class FeatureIndent {
 
+		private final FeatureIndent parent;
+		private final IFeature feature;
 		private final int indentation;
 
-		private FeatureIndent(IFeatureModel featureModel, int indent) {
-			super(featureModel, "");
-			indentation = indent;
+		private FeatureIndent(FeatureIndent parent, int indentation, IFeature feature) {
+			this.parent = parent;
+			this.indentation = indentation;
+			this.feature = feature;
 		}
 
 		private int getIndentation() {
 			return indentation;
+		}
+
+		public FeatureIndent getParent() {
+			return parent;
+		}
+
+		public IFeature getFeature() {
+			return feature;
 		}
 
 	}

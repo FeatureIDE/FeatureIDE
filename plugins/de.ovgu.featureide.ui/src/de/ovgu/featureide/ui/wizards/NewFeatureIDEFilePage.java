@@ -24,18 +24,18 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CLASS_NAME_MUS
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATES_A_NEW_LANGUAGE_SPECIFIC_FEATUREIDE_SOURCE_FILE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_NAME_MUST_CORRESPOND_TO_AN_EXISTING_FOLDER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_WITH_THIS_CLASS_NAME_ALREADY_EXISTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MODULE_NAME_IS_INVALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATUREIDE_SOURCE_FILE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FEATURE_SELECTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_SELECTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PACKAGE_NAME_MUST_BE_VALID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PUBLIC_CLASS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PUBLIC_INTERFACE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_FORMAT_IS_NOT_SUPPORTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_PROJECT_IS_NOT_A_FEATUREIDE_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_CLASS_NAME_MUST_BE_SPECIFIED;
-import static de.ovgu.featureide.fm.core.localization.StringTable.PUBLIC_CLASS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.PUBLIC_INTERFACE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 
 import java.util.ArrayList;
 import java.util.Collection;

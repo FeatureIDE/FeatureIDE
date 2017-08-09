@@ -162,11 +162,11 @@ public class FeatureColorManager implements IEventListener {
 		}
 
 		if (!colorSchemes.containsKey(project)) {
-			initColorSchemes(project);
+			initColorSchemes(project, featureModel);
 		}
 		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
 		if (currentSchemes.isEmpty()) {
-			initColorSchemes(project);
+			initColorSchemes(project, featureModel);
 			currentSchemes = colorSchemes.get(project);
 		}
 
@@ -193,10 +193,11 @@ public class FeatureColorManager implements IEventListener {
 	/**
 	 * Initializes and loads all color schemes for the given project.
 	 */
-	private static void initColorSchemes(IProject project) {
+	private static void initColorSchemes(IProject project, IFeatureModel featureModel) {
 		Map<String, ColorScheme> newEntry = new HashMap<>();
 		newEntry.put(DefaultColorScheme.defaultName, new DefaultColorScheme());
 		colorSchemes.put(project, newEntry);
+		featureModel.getRenamingsManager().addListener(INSTANCE);
 
 		IFolder profileFolder = project.getFolder(".profiles");
 		if (!profileFolder.exists()) {
@@ -292,7 +293,7 @@ public class FeatureColorManager implements IEventListener {
 	public static Collection<ColorScheme> getColorSchemes(IFeatureModel featureModel) {
 		IProject project = getProject(featureModel);
 		if (!colorSchemes.containsKey(project)) {
-			initColorSchemes(project);
+			initColorSchemes(project, featureModel);
 		}
 		return colorSchemes.get(project).values();
 	}
@@ -327,7 +328,7 @@ public class FeatureColorManager implements IEventListener {
 		if (currentSchemes.containsKey(csName)) {
 			throw new RuntimeException("scheme " + csName + " already exists");
 		}
-		featureModel.getRenamingsManager().addListener(INSTANCE);
+		//		featureModel.getRenamingsManager().addListener(INSTANCE);
 		currentSchemes.put(csName, newColorScheme);
 	}
 

@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +42,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ArmEvent;
@@ -101,6 +104,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
@@ -307,9 +311,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		// info label
 		gridData = new GridData();
-		gridData.horizontalAlignment = SWT.FILL;
+		gridData.horizontalAlignment = SWT.LEFT;
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalAlignment = SWT.CENTER;
+		gridData.minimumWidth = 250;
+		gridData.widthHint = 300;
 		infoLabel = new Label(compositeTop, SWT.NONE);
 		infoLabel.setLayoutData(gridData);
 		if (configurationEditor.hasValidFeatureModel()) {
@@ -1056,7 +1062,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						public void run() {
 							updateFeatures.remove(feature);
 							refreshItem(item);
-							setDirty();
 						}
 					});
 				}
@@ -1088,6 +1093,27 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
 						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
+						if(configurationEditor instanceof ConfigurationEditor){
+							ConfigurationEditor editor = (ConfigurationEditor) configurationEditor;
+							ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
+							//Get current configuration 
+							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
+							//Cast is necessary, don't remove 
+							final IFile document  = (IFile)getEditorInput().getAdapter(IFile.class);
+							
+							byte[] content;
+							try {
+								content = new byte[document.getContents().available()];
+								document.getContents().read(content);
+								if(!source.equals(new String(content))){
+									setDirty();
+								}
+							} catch (IOException e) {
+								FMUIPlugin.getDefault().logError(e);
+							} catch (CoreException e) {
+								FMUIPlugin.getDefault().logError(e);
+							}
+						}
 					}
 				}
 			});

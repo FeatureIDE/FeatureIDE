@@ -194,7 +194,11 @@ public class MungeExtendedContentProvider implements ITreeContentProvider {
 					}
 				}
 
- 				Collection<String> featureOrder = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList();
+				IFeatureProject project = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile());
+				Collection<String> featureOrder = new ArrayList<>();
+				if (project != null) {
+					featureOrder = project.getFeatureModel().getFeatureOrderList();
+				}
 
 				if (((FSTMethod) parentElement).getFSTDirectives().size() == 0) {
 					obj = new FSTRole[roleList.size()];

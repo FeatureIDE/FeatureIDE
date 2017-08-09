@@ -47,6 +47,7 @@ public class NodeReader {
 	public final static String[] textualSymbols = new String[] { IFF, IMPLIES, "or", "and", "not" };
 	public final static String[] shortSymbols = new String[] { "<=>", "=>", "|", "&", "-" };
 	public final static String[] logicalSymbols = new String[] { "\u21D4", "\u21D2", "\u2228", "\u2227", "\u00AC" };
+	public final static String[] javaSymbols = new String[] { "==", "=>", "||", "&&", "!" };
 
 	private static final String featureNameMarker = "#";
 	private static final String subExpressionMarker = "$";
@@ -66,6 +67,7 @@ public class NodeReader {
 	private ParseException errorMessage = null;
 
 	private boolean ignoreMissingFeatures = false;
+	private boolean ignoreUnparsableSubExpressions = false;
 
 	public void activateShortSymbols() {
 		symbols = shortSymbols;
@@ -77,6 +79,10 @@ public class NodeReader {
 
 	public void activateLogicalSymbols() {
 		symbols = logicalSymbols;
+	}
+
+	public void activateJavaSymbols() {
+		symbols = javaSymbols;
 	}
 
 	public Node stringToNode(String constraint) {
@@ -136,6 +142,14 @@ public class NodeReader {
 		this.ignoreMissingFeatures = ignoreMissingFeatures;
 	}
 
+	public boolean isIgnoreUnparsableSubExpressions() {
+		return ignoreUnparsableSubExpressions;
+	}
+
+	public void setIgnoreUnparsableSubExpressions(boolean ignoreUnparsableSubExpressions) {
+		this.ignoreUnparsableSubExpressions = ignoreUnparsableSubExpressions;
+	}
+
 	/**
 	 * Checking expression on correct syntax
 	 * 
@@ -152,7 +166,7 @@ public class NodeReader {
 	private Node checkExpression(String constraint, List<String> quotedFeatureNames, List<String> subExpressions) throws ParseException {
 		constraint = " " + constraint + " ";
 		if ("  ".equals(constraint)) {
-			return getInvalidLiteral("Sub expression is empty");
+			return getInvalidLiteral("Sub expression is empty", "");
 		}
 		// traverse all symbols
 		for (int i = 0; i < symbols.length; i++) {
@@ -168,12 +182,12 @@ public class NodeReader {
 				final Node node1, node2;
 				if (i == 4) {
 					node1 = null;
-					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression")
+					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression", constraint)
 							: checkExpression(rightSide, quotedFeatureNames, subExpressions);
 				} else {
-					node1 = (leftSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on left side")
+					node1 = (leftSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on left side", constraint)
 							: checkExpression(leftSide, quotedFeatureNames, subExpressions);
-					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on right side")
+					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on right side", constraint)
 							: checkExpression(rightSide, quotedFeatureNames, subExpressions);
 				}
 
@@ -202,7 +216,7 @@ public class NodeReader {
 			if (subExpressionMatcher.start() == 0 && subExpressionMatcher.end() == constraint.length()) {
 				return checkExpression(subExpressions.get(Integer.parseInt(constraint.substring(1))).trim(), quotedFeatureNames, subExpressions);
 			} else {
-				return getInvalidLiteral("Missing operator");
+				return getInvalidLiteral("Missing operator", constraint);
 			}
 		} else {
 			String featureName;
@@ -211,25 +225,29 @@ public class NodeReader {
 				if (featureNameMatcher.start() == 0 && featureNameMatcher.end() == constraint.length()) {
 					featureName = quotedFeatureNames.get(Integer.parseInt(constraint.substring(1)));
 				} else {
-					return getInvalidLiteral("Missing operator");
+					return getInvalidLiteral("Missing operator", constraint);
 				}
 			} else {
 				if (constraint.contains(" ")) {
-					return getInvalidLiteral("'" + constraint + "' is no valid feature name");
+					return getInvalidLiteral("'" + constraint + "' is no valid feature name", constraint);
 				}
 				featureName = constraint;
 			}
 			featureName = featureName.replace(replacedFeatureNameMarker, featureNameMarker).replace(replacedSubExpressionMarker, subExpressionMarker);
 			if (featureNames != null && !featureNames.contains(featureName)) {
-				return getInvalidLiteral("'" + featureName + "' is no valid feature name");
+				return getInvalidLiteral("'" + featureName + "' is no valid feature name", featureName);
 			}
 			return new Literal(featureName);
 		}
 	}
 
-	private Node getInvalidLiteral(String message) throws ParseException {
+	private Node getInvalidLiteral(String message, String constraint) throws ParseException {
 		if (ignoreMissingFeatures) {
-			return new Literal("FALSE");
+			if (ignoreUnparsableSubExpressions) {
+				return new ErrorLiteral(constraint);
+			} else {
+				return new Literal("FALSE");				
+			}
 		} else {
 			throw new ParseException(message, 0);
 		}

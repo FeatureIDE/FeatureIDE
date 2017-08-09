@@ -23,9 +23,13 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_COLLAPSED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_EXPANDED;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -41,6 +45,7 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 
 	private IFeature feature;
 	private IGraphicalFeatureModel graphicalFeatureModel;
+	private List<FeatureConnection> targetConnections = new ArrayList<>();
 
 	/**
 	 * @param label
@@ -72,6 +77,8 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 			
 			IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.setCollapsed(!graphicalFeature.isCollapsed());
+			targetConnections = graphicalFeature.getTargetConnections();
+			graphicalFeature.getTargetConnections().clear();
 			
 			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, null, null);
 		}
@@ -80,6 +87,9 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
+		if (feature.getStructure().hasChildren()) {
+			graphicalFeatureModel.getGraphicalFeature(feature).getTargetConnections().addAll(targetConnections);
+		}
 		return operation();
 	}
 
