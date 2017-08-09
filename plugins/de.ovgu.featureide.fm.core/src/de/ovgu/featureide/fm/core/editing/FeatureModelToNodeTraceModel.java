@@ -401,6 +401,14 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		return traces.get(clauseIndex);
 	}
 	
+	/**
+	 * Returns the amount of traces in this trace model.
+	 * @return the amount of traces in this trace model
+	 */
+	public int getTraceCount() {
+		return traces.size();
+	}
+	
 	@Override
 	protected FeatureModelToNodeTraceModel clone() {
 		final FeatureModelToNodeTraceModel clone = new FeatureModelToNodeTraceModel();
