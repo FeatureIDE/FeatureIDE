@@ -109,16 +109,20 @@ public class DimacsReader {
 	 * @throws ParseException if there is no token left in the input but the reader is not yet done
 	 */
 	private String readToken() throws ParseException {
-		if (!scanner.hasNext()) {
-			if (lastClause) {
-				return null;
+		String token;
+		while (true) {
+			if (!scanner.hasNext()) {
+				if (lastClause) {
+					return null;
+				}
+				throw new ParseException("Unexpected end of input", -1);
 			}
-			throw new ParseException("Unexpected end of input", -1);
-		}
-		final String token = scanner.next();
-		if (COMMENT.equals(token)) {
-			readComment(scanner.nextLine());
-			return readToken();
+			token = scanner.next();
+			if (COMMENT.equals(token)) {
+				readComment(scanner.nextLine());
+				continue; //Keep reading tokens...
+			}
+			break; //... until a non-comment token is found.
 		}
 		return token;
 	}
