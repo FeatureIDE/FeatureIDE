@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
 
 /**
- * Abstract implementation of {@link FeatureModelExlanationCreator}.
+ * Abstract implementation of {@link FeatureModelExplanationCreator}.
  * 
  * @author Timo G&uuml;nther
  */
