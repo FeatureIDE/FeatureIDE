@@ -52,7 +52,7 @@ public abstract class MusFeatureModelExplanationCreator extends AbstractFeatureM
 	 * @param fm the feature model context
 	 */
 	protected MusFeatureModelExplanationCreator(IFeatureModel fm) {
-		super();
+		super(fm);
 	}
 	
 	/**
