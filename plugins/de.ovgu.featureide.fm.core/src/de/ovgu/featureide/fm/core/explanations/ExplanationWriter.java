@@ -151,8 +151,11 @@ public class ExplanationWriter {
 	 */
 	protected String getDefectElementString() throws IllegalStateException {
 		String s = "";
-		if (explanation.getDefectElement() instanceof IFeature) {
-			final IFeature feature = (IFeature) explanation.getDefectElement();
+		final IFeatureModelElement element = explanation.getDefectElement() != null
+				? explanation.getDefectElement()
+				: explanation.getAutomaticSelection().getFeature();
+		if (element instanceof IFeature) {
+			final IFeature feature = (IFeature) element;
 			if (feature.getStructure().isAbstract()) {
 				s += "abstract ";
 			} else if (feature.getStructure().isConcrete()) {
@@ -183,6 +186,17 @@ public class ExplanationWriter {
 				return "false-optional";
 			case REDUNDANT_CONSTRAINT:
 				return explanation.isImplicit() ? "transitive" : "redundant";
+			case AUTOMATIC_SELECTION:
+				switch (explanation.getAutomaticSelection().getAutomatic()) {
+					case SELECTED:
+						return "automatically selected";
+					case UNSELECTED:
+						return "automatically unselected";
+					case UNDEFINED:
+						throw new IllegalStateException("Feature is not automatically selected or unselected");
+					default:
+						throw new IllegalStateException("Unknown feature selection state");
+				}
 			default:
 				throw new IllegalStateException("Unkown defect type");
 		}
@@ -197,36 +211,55 @@ public class ExplanationWriter {
 	public String getReasonString(Reason reason) throws IllegalArgumentException {
 		String s = null;
 		
-		final FeatureModelElementTrace trace = reason.getTrace();
-		final Set<IFeatureModelElement> sourceElements = trace.getElements();
-		final String joinedSourceElements = join(sourceElements);
-		final IFeature parent;
-		switch (trace.getOrigin()) {
-			case CHILD_UP:
-				parent = (IFeature) trace.getElement();
-				s = String.format("%s is a child of %s (i.e, %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				break;
-			case CHILD_DOWN:
-				parent = (IFeature) trace.getElement();
-				if (parent.getStructure().isAlternative()) {
-					s = String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				} else if (parent.getStructure().isOr()) {
-					s = String.format("%s are or-children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				} else {
-					s = String.format("%s is a mandatory child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				}
-				break;
-			case CHILD_HORIZONTAL:
-				s = String.format("%s are alternatives (i.e., %s).", joinedSourceElements, trace.toString(getSymbols()));
-				break;
-			case CONSTRAINT:
-				s = String.format("%s is a constraint.", joinedSourceElements);
-				break;
-			case ROOT:
-				s = String.format("%s is the root.", joinedSourceElements);
-				break;
-			default:
-				throw new IllegalStateException("Reason has unexpected source attribute");
+		if (reason.getTrace() != null) {
+			final FeatureModelElementTrace trace = reason.getTrace();
+			final Set<IFeatureModelElement> sourceElements = trace.getElements();
+			final String joinedSourceElements = join(sourceElements);
+			final IFeature parent;
+			switch (trace.getOrigin()) {
+				case CHILD_UP:
+					parent = (IFeature) trace.getElement();
+					s = String.format("%s is a child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+					break;
+				case CHILD_DOWN:
+					parent = (IFeature) trace.getElement();
+					if (parent.getStructure().isAlternative()) {
+						s = String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+					} else if (parent.getStructure().isOr()) {
+						s = String.format("%s are or-children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+					} else {
+						s = String.format("%s is a mandatory child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+					}
+					break;
+				case CHILD_HORIZONTAL:
+					s = String.format("%s are alternatives (i.e., %s).", joinedSourceElements, trace.toString(getSymbols()));
+					break;
+				case CONSTRAINT:
+					s = String.format("%s is a constraint.", joinedSourceElements);
+					break;
+				case ROOT:
+					s = String.format("%s is the root.", joinedSourceElements);
+					break;
+				default:
+					throw new IllegalStateException("Reason has unexpected source attribute");
+			}
+		} else if (reason.getFeatureSelection() != null) {
+			final String selectionString;
+			switch (reason.getFeatureSelection().getSelection()) {
+				case SELECTED:
+					selectionString = "selected";
+					break;
+				case UNSELECTED:
+					selectionString = "unselected";
+					break;
+				case UNDEFINED:
+					selectionString = "neither selected nor unselected";
+				default:
+					throw new IllegalStateException("Unknown feature selection state");
+			}
+			s = String.format("%s is %s.", reason.getFeatureSelection().getFeature().getName(), selectionString);
+		} else {
+			throw new IllegalStateException("Unknown reason type");
 		}
 		
 		final Explanation explanation = reason.getExplanation();

@@ -30,6 +30,7 @@ import java.util.Set;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
 
 /**
@@ -41,7 +42,27 @@ import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureMo
  */
 public class Explanation implements Cloneable {
 	/**
+	 * <p>
 	 * The atomic unit an explanation is composed of.
+	 * </p>
+	 * 
+	 * <p>
+	 * Refers to exactly one of the following:
+	 * </p>
+	 * 
+	 * <ol>
+	 * <li>The {@link FeatureModelElementTrace trace} to a {@link IFeatureModelElement feature model element}</li>
+	 * <li>The {@link SelectableFeature selection} of a {@link IFeature feature}</li>
+	 * </ol>
+	 * 
+	 * <p>
+	 * These elements are possible reasons in the following explanation scenarios:
+	 * </p>
+	 * 
+	 * <ul>
+	 * <li>Feature model defects: 1</li>
+	 * <li>Configurations: 1, 2</li>
+	 * </ul>
 	 * 
 	 * @author Timo G&uuml;nther
 	 * @author Sofia Ananieva
@@ -49,6 +70,8 @@ public class Explanation implements Cloneable {
 	public class Reason implements Cloneable {
 		/** The trace of this reason. */
 		private final FeatureModelElementTrace trace;
+		/** The feature that has been selected or unselected. */
+		private final SelectableFeature featureSelection;
 		
 		/**
 		 * Constructs a new instance of this class.
@@ -56,11 +79,30 @@ public class Explanation implements Cloneable {
 		 */
 		private Reason(FeatureModelElementTrace trace) {
 			this.trace = trace;
+			this.featureSelection = null;
+		}
+		
+		/**
+		 * Constructs a new instance of this class.
+		 * @param featureSelection the feature that has been selected or unselected; not null
+		 */
+		private Reason(SelectableFeature featureSelection) {
+			this.trace = null;
+			this.featureSelection = featureSelection;
+		}
+		
+		/**
+		 * Constructs a new instance of this class.
+		 * @param other instance to clone
+		 */
+		private Reason(Reason other) {
+			this.trace = other.trace;
+			this.featureSelection = other.featureSelection;
 		}
 		
 		/**
 		 * Returns the containing explanation.
-		 * @return the containing explanation
+		 * @return the containing explanation; not null
 		 */
 		public Explanation getExplanation() {
 			return Explanation.this;
@@ -72,6 +114,14 @@ public class Explanation implements Cloneable {
 		 */
 		public FeatureModelElementTrace getTrace() {
 			return trace;
+		}
+		
+		/**
+		 * Returns the feature that has been selected or unselected.
+		 * @return the feature that has been selected or unselected; not null
+		 */
+		public SelectableFeature getFeatureSelection() {
+			return featureSelection;
 		}
 		
 		/**
@@ -96,7 +146,7 @@ public class Explanation implements Cloneable {
 		
 		@Override
 		public Reason clone() {
-			return new Reason(trace);
+			return new Reason(this);
 		}
 		
 		@Override
@@ -104,6 +154,7 @@ public class Explanation implements Cloneable {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ((trace == null) ? 0 : trace.hashCode());
+			result = prime * result + ((featureSelection == null) ? 0 : featureSelection.hashCode());
 			return result;
 		}
 		
@@ -121,13 +172,19 @@ public class Explanation implements Cloneable {
 					return false;
 			} else if (!trace.equals(other.trace))
 				return false;
+			if (featureSelection == null) {
+				if (other.featureSelection != null)
+					return false;
+			} else if (!featureSelection.equals(other.featureSelection))
+				return false;
 			return true;
 		}
 		
 		@Override
 		public String toString() {
 			return getClass().getSimpleName() + " ["
-					+ "trace=" + trace + "]";
+					+ "trace=" + trace + ", "
+					+ "featureSelection=" + featureSelection + "]";
 		}
 	}
 	
@@ -137,13 +194,16 @@ public class Explanation implements Cloneable {
 	public static enum Mode {
 		REDUNDANT_CONSTRAINT,
 		DEAD_FEATURE,
-		FALSE_OPTIONAL_FEATURE
+		FALSE_OPTIONAL_FEATURE,
+		AUTOMATIC_SELECTION,
 	}
 	
 	/** The explanation mode. */
 	private Mode mode;
 	/** The defect feature model element. */
 	private IFeatureModelElement defectElement;
+	/** The automatic selection. */
+	private SelectableFeature automaticSelection;
 	/** True if this explanation is for an implicit constraint. */
 	private boolean implicit;
 	
@@ -169,12 +229,21 @@ public class Explanation implements Cloneable {
 	}
 	
 	/**
+	 * Returns the automatic selection.
+	 * @return the automatic selection
+	 */
+	public SelectableFeature getAutomaticSelection() {
+		return automaticSelection;
+	}
+	
+	/**
 	 * Sets the defect feature model element to a dead feature.
 	 * Also sets the mode accordingly.
 	 * @param defectElement dead feature
 	 */
 	public void setDefectDeadFeature(IFeature defectElement) {
 		this.mode = Explanation.Mode.DEAD_FEATURE;
+		this.automaticSelection = null;
 		this.defectElement = defectElement;
 	}
 	
@@ -185,6 +254,7 @@ public class Explanation implements Cloneable {
 	 */
 	public void setDefectFalseOptionalFeature(IFeature defectElement) {
 		this.mode = Explanation.Mode.FALSE_OPTIONAL_FEATURE;
+		this.automaticSelection = null;
 		this.defectElement = defectElement;
 	}
 	
@@ -195,7 +265,19 @@ public class Explanation implements Cloneable {
 	 */
 	public void setDefectRedundantConstraint(IConstraint defectElement) {
 		this.mode = Explanation.Mode.REDUNDANT_CONSTRAINT;
+		this.automaticSelection = null;
 		this.defectElement = defectElement;
+	}
+	
+	/**
+	 * Sets the automatic selection.
+	 * Also sets the mode accordingly.
+	 * @param automaticSelection the automatic selection
+	 */
+	public void setAutomaticSelection(SelectableFeature automaticSelection) {
+		this.mode = Explanation.Mode.AUTOMATIC_SELECTION;
+		this.automaticSelection = automaticSelection;
+		this.defectElement = null;
 	}
 	
 	/**
@@ -254,7 +336,7 @@ public class Explanation implements Cloneable {
 	 * @param count how often to add the given reason
 	 */
 	protected void addReason(Reason reason, int count) {
-		reason = new Reason(reason.getTrace());
+		reason = new Reason(reason);
 		final Integer reasonCount = reasonCounts.get(reason);
 		reasonCounts.put(reason, (reasonCount == null ? 0 : reasonCount) + count);
 	}
@@ -278,11 +360,19 @@ public class Explanation implements Cloneable {
 	}
 	
 	/**
+	 * Adds a new reason to this explanation.
+	 * @param featureSelection a selected or unselected feature
+	 */
+	public void addReason(SelectableFeature featureSelection) {
+		addReason(new Reason(featureSelection));
+	}
+	
+	/**
 	 * Adds the given reason to this explanation if it is not already contained.
 	 * @param reason reason to add
 	 */
 	public void addUniqueReason(Reason reason) {
-		reason = new Reason(reason.getTrace());
+		reason = new Reason(reason);
 		final Integer value = reasonCounts.get(reason);
 		if (value == null) {
 			reasonCounts.put(reason, 1);
@@ -305,6 +395,14 @@ public class Explanation implements Cloneable {
 	 */
 	public void addUniqueReason(FeatureModelElementTrace trace) {
 		addUniqueReason(new Reason(trace));
+	}
+	
+	/**
+	 * Adds a new reason to this explanation if it is not already contained.
+	 * @param featureSelection a selected or unselected feature
+	 */
+	public void addUniqueReason(SelectableFeature featureSelection) {
+		addUniqueReason(new Reason(featureSelection));
 	}
 	
 	/**
@@ -453,6 +551,7 @@ public class Explanation implements Cloneable {
 		return getClass().getSimpleName() + " ["
 				+ "mode=" + mode + ", "
 				+ "defectElement=" + defectElement + ", "
+				+ "automaticSelection=" + automaticSelection + ", "
 				+ "implicit=" + implicit + ", "
 				+ "reasonCounts=" + reasonCounts + ", "
 				+ "explanationCount=" + explanationCount + "]";

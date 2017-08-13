@@ -100,6 +100,10 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
+import de.ovgu.featureide.fm.core.explanations.AutomaticSelectionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
@@ -155,6 +159,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
+
+	/** Generates explanations for automatic selections. */
+	private final AutomaticSelectionExplanationCreator automaticSelectionExplanationCreator = ExplanationCreatorFactory.getDefault().getAutomaticSelectionExplanationCreator();
 
 	protected IConfigurationEditor configurationEditor = null;
 
@@ -1070,6 +1077,55 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return job;
 	}
 
+	/**
+	 * Returns an explanation for the given feature selection.
+	 * Generates it first if necessary.
+	 * @param featureSelection a feature selection; not null
+	 * @return an explanation for the given feature selection; null if none could be found
+	 */
+	public Explanation getExplanation(SelectableFeature featureSelection) {
+		switch (featureSelection.getAutomatic()) {
+			case SELECTED:
+			case UNSELECTED:
+				return getAutomaticSelectionExplanation(featureSelection);
+			case UNDEFINED:
+				break;
+			default:
+				throw new IllegalStateException("Unknown feature selection state");
+		}
+		return null;
+	}
+
+	/**
+	 * Returns an explanation why the given feature is automatically selected or unselected.
+	 * Generates it first if necessary.
+	 * @param automaticSelection an automatically selected feature; not null
+	 * @return  an explanation why the given feature is automatically selected or unselected; null if none could be found
+	 */
+	public Explanation getAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
+		//TODO Remember previously generated explanations.
+		return createAutomaticSelectionExplanation(automaticSelection);
+	}
+
+	/**
+	 * Returns a new explanation for the given automatic selection.
+	 * @param automaticSelection the automatic selection
+	 * @return a new explanation for the given automatic selection; null if none could be generated
+	 */
+	protected Explanation createAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
+		final Configuration config = configurationEditor.getConfiguration();
+		if (config == null) {
+			return null;
+		}
+		final IFeatureModel fm = config.getFeatureModel();
+		if (fm == null) {
+			return null;
+		}
+		automaticSelectionExplanationCreator.setConfiguration(config);
+		automaticSelectionExplanationCreator.setAutomaticSelection(automaticSelection);
+		return automaticSelectionExplanationCreator.getExplanation();
+	}
+
 	protected void lockItem(TreeItem item) {
 		item.setGrayed(true);
 		item.setChecked(true);
@@ -1208,6 +1264,21 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				sb.append("Open Clauses:\n");
 				for (Node clause : openClauses) {
 					sb.append(clause.toString(NodeWriter.logicalSymbols)).append('\n');
+				}
+			}
+
+			//Print the explanation.
+			final Explanation explanation = getExplanation(feature);
+			if (explanation != null && explanation.getReasons() != null && !explanation.getReasons().isEmpty()) {
+				if (sb.length() > 0) {
+					sb.append("\n\n");
+				}
+				final ExplanationWriter wr = new ExplanationWriter(explanation);
+				sb.append(wr.getHeaderString());
+				for (final Explanation.Reason reason : explanation.getReasons()) {
+					sb.append(System.lineSeparator());
+					sb.append("\u2022 ");
+					sb.append(wr.getReasonString(reason));
 				}
 			}
 

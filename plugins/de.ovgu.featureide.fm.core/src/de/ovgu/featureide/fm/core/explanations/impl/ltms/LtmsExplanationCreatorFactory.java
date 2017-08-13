@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.core.explanations.impl.ltms;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.explanations.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCreator;
@@ -60,5 +62,15 @@ public class LtmsExplanationCreatorFactory extends ExplanationCreatorFactory {
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm) {
 		return new LtmsRedundantConstraintExplanationCreator(fm);
+	}
+	
+	@Override
+	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator(Configuration config) {
+		throw new UnsupportedOperationException();
 	}
 }

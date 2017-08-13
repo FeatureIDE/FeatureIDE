@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.explanations.impl.mus.MusExplanationCreatorFactory;
 
 /**
@@ -75,4 +76,17 @@ public abstract class ExplanationCreatorFactory {
 	 * @return an instance of {@link RedundantConstraintExplanationCreator}
 	 */
 	public abstract RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm);
+	
+	/**
+	 * Returns an instance of {@link AutomaticSelectionExplanationCreator}.
+	 * @return an instance of {@link AutomaticSelectionExplanationCreator}
+	 */
+	public abstract AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator();
+	
+	/**
+	 * Returns an instance of {@link AutomaticSelectionExplanationCreator}.
+	 * @param config the configuration
+	 * @return an instance of {@link AutomaticSelectionExplanationCreator}
+	 */
+	public abstract AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator(Configuration config);
 }
