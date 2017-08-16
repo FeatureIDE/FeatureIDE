@@ -68,10 +68,10 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.featurehouse.refactoring.RenameRefactoring;
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
+//import de.ovgu.featureide.featurehouse.refactoring.RenameRefactoring;
+//import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.Features;
+//import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
@@ -88,12 +88,12 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	private static class PullUpHierarchyContentProvider implements ITreeContentProvider {
 
 		private Map<AbstractSignature, List<ClonedFeatures>> clonedSignatures;
-		private final Feature sourceFeature;
+		private final IFeature sourceFeature;
 		
 		public void dispose() {
 		}
 		
-		public PullUpHierarchyContentProvider(Feature feature){
+		public PullUpHierarchyContentProvider(IFeature feature){
 			sourceFeature = feature;
 		}
 
@@ -154,7 +154,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 				case MEMBER_COLUMN:
 					return fLabelProvider.getText(element);
 				case ACTION_COLUMN:
-					if (element instanceof Feature)
+					if (element instanceof IFeature)
 						return "Clone";
 				default:
 					return null;
@@ -283,7 +283,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 			       
 			       final Object item = event.item.getData();
 			       final TreeItem treeItem = (TreeItem)event.item;
-			       if (item instanceof Feature) 
+			       if (item instanceof IFeature) 
 						checkSignature(treeItem);
 			       else 
 						checkChildren(treeItem);
@@ -445,26 +445,26 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		SWTUtil.setDefaultVisibleItemCount(parentFeatureCombo);
 		parentFeatureCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		final ArrayList<Feature> features = new ArrayList<>();
+		final ArrayList<IFeature> features = new ArrayList<>();
 		features.add(refactoring.getSourceFeature());
 		fillParentFeatureComboBox(features);
 	}
 	
-	private Feature determineDestinationFeature(final List<String> allFeatures) {
+	private IFeature determineDestinationFeature(final List<String> allFeatures) {
 		final Map<String, List<String>> implies = getImplies();
 
 		for (Entry<String, List<String>> implied : implies.entrySet()) {
 			
 			final List<String> impliedFeatures = implied.getValue();
 			if (impliedFeatures.size() == allFeatures.size() && impliedFeatures.containsAll(allFeatures))
-				return (Feature) refactoring.getFeatureProject().getFeatureModel().getFeature(implied.getKey());
+				return refactoring.getFeatureProject().getFeatureModel().getFeature(implied.getKey());
 		} 
 		return null;
 	}
 	
-	private List<String>  getFeaturesNames(final List<Feature> features) {
+	private List<String>  getFeaturesNames(final List<IFeature> features) {
 		List<String> allFeatures = new ArrayList<>();
-		for (Feature feature : features) {
+		for (IFeature feature : features) {
 			allFeatures.add(feature.getName());
 		}
 		return allFeatures;
@@ -501,13 +501,13 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		return features;
 	}
 	
-	private void fillParentFeatureComboBox(List<Feature> features)
+	private void fillParentFeatureComboBox(List<IFeature> features)
 	{
-		final List<Feature> commonAncestors = Features.getCommonAncestors(features);
+		final List<IFeature> commonAncestors = Features.getCommonAncestors(features);
 		
 		parentFeatureCombo.removeAll();
 
-		for (Feature feature : commonAncestors) {
+		for (IFeature feature : commonAncestors) {
 			if (feature.equals(refactoring.getSourceFeature())) continue;
 			parentFeatureCombo.add(feature.getName());
 		}
@@ -577,14 +577,14 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	}
 
 	private void initializeRefactoring() {
-		final Feature destination = (Feature) getDestinationFeature();
+		final IFeature destination = (IFeature) getDestinationFeature();
 		if (destination != null)
 			refactoring.setDestinationFeature(destination);
 		refactoring.setPullUpSignatures(getPullUpMembers(destination));
 		refactoring.setDeletableSignatures(getDeletableMembers(destination));
 	}
 
-	private Set<ExtendedPullUpSignature> getPullUpMembers(final Feature destinationFeature) {
+	private Set<ExtendedPullUpSignature> getPullUpMembers(final IFeature destinationFeature) {
 		Set<ExtendedPullUpSignature> members = new HashSet<>();
 	
 		fTableViewer.expandAll();
@@ -610,7 +610,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		return members;
 	}
 
-	private Set<ExtendedPullUpSignature> getDeletableMembers(final Feature destinationFeature) {
+	private Set<ExtendedPullUpSignature> getDeletableMembers(final IFeature destinationFeature) {
 		Set<ExtendedPullUpSignature> members = new HashSet<>();
 		
 		fTableViewer.expandAll();
@@ -623,7 +623,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 				for (TreeItem childItem : treeItem.getItems()) {
 					if (!childItem.getChecked()) continue;
 						
-					final Feature feature = (Feature) childItem.getData();
+					final IFeature feature = (IFeature) childItem.getData();
 					if (feature.equals(destinationFeature)) continue;
 					
 					final int featureID = refactoring.getProjectSignatures().getFeatureID(feature.getName());
@@ -704,12 +704,12 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		}
 	}
 	
-	private List<Feature> getSelectedPullUpFeatures(){
-		List<Feature> features = new ArrayList<>();
+	private List<IFeature> getSelectedPullUpFeatures(){
+		List<IFeature> features = new ArrayList<>();
 		features.add(refactoring.getSourceFeature());
 		for (TreeItem item : fTableViewer.getTree().getItems()) {
 			for (TreeItem childItem : item.getItems()) {
-				Feature feature = (Feature) childItem.getData();
+				IFeature feature = (IFeature) childItem.getData();
 				if (childItem.getChecked() && !features.contains(feature)) features.add(feature);
 			}
 		}

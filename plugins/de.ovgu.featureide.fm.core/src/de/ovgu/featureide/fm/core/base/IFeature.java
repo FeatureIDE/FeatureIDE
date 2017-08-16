@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * <br/>
  * <br/>
  * FeatureIDE provides an adapter implementation {@link de.ovgu.featureide.fm.core.base.impl.AFeature AFeature} which is a abstract base
- * class and which should be prefered as starting point for custom implementations. This base class contains ready-to-use implementations for both
+ * class and which should be preferred as starting point for custom implementations. This base class contains ready-to-use implementations for both
  * <code>IFeature</code> and {@link IFeatureModelElement}.
  * <br/>
  * <br/>
@@ -63,7 +63,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * <br/>
  * <br/>
  * <b>Notes on equals method</b>: Any implementation have to provide a {@link Object#equals(Object)} implementation when the feature implementation should be
- * fully useable in the FeatureIDE system (and therefore, have to be an instance of {@link IFeatureModelElement}), which at least returns <b>true</b> when the
+ * fully usable in the FeatureIDE system (and therefore, have to be an instance of {@link IFeatureModelElement}), which at least returns <b>true</b> when the
  * internal identifier of two features are the same, and otherwise <b>false</b>.
  * <br/>
  * <br/>
@@ -149,5 +149,15 @@ public interface IFeature extends IFeatureModelElement {
 	 */
 	@Nonnull
 	IFeatureStructure getStructure();
+
+	/**
+	 * @return parent
+	 */
+	IFeature getParent();
+
+	/**
+	 * @return
+	 */
+	boolean isConcrete();
 
 }

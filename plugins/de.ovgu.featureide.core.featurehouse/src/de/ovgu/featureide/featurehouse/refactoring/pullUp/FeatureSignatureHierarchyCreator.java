@@ -36,6 +36,7 @@ import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * TODO description
@@ -80,8 +81,8 @@ public class FeatureSignatureHierarchyCreator {
 		return hierarchy;
 	}
 	
-	private Feature getFeature(String featureName){
-		return (Feature) projectSignatures.getFeatureModel().getFeature(featureName);
+	private IFeature getFeature(String featureName){
+		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 	
 	private void addSubClassesAndMembers(final ExtendedPullUpSignature parentExtendSignature, 

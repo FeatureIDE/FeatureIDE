@@ -121,15 +121,15 @@ public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList
 		return commonAncestorList;
 	}
 	
-	public static List<Feature> getCommonAncestors(Collection<Feature> features) {
-		List<Feature> commonAncestorList = null;
-		for (Feature feature : features) {
+	public static List<IFeature> getCommonAncestors(Collection<IFeature> features) {
+		List<IFeature> commonAncestorList = null;
+		for (IFeature feature : features) {
 			commonAncestorList = Features.getCommonAncestors(commonAncestorList, feature);
 		}
 		return commonAncestorList;
 	}
 
-	public static List<Feature> getCommonAncestors(List<Feature> commonAncestorList, Feature parent) {
+	public static List<IFeature> getCommonAncestors(List<IFeature> commonAncestorList, IFeature parent) {
 		if (commonAncestorList == null) {
 			commonAncestorList = new LinkedList<>();
 			while (parent != null) {
@@ -137,13 +137,13 @@ public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList
 				parent = parent.getParent();
 			}
 		} else if (parent != null) {
-			LinkedList<Feature> parentList = new LinkedList<>();
+			LinkedList<IFeature> parentList = new LinkedList<>();
 			while (parent != null) {
 				parentList.addFirst(parent);
 				parent = parent.getParent();
 			}
-			final Iterator<Feature> iterator1 = parentList.iterator();
-			final Iterator<Feature> iterator2 = commonAncestorList.iterator();
+			final Iterator<IFeature> iterator1 = parentList.iterator();
+			final Iterator<IFeature> iterator2 = commonAncestorList.iterator();
 			int i = 0;
 			while (iterator1.hasNext() && iterator2.hasNext()) {
 				if (!iterator1.next().equals(iterator2.next())) {

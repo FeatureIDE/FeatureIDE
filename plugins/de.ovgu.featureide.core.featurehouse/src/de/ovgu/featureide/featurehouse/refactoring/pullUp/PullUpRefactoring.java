@@ -73,6 +73,7 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * TODO description
@@ -84,9 +85,9 @@ public class PullUpRefactoring extends Refactoring {
 	private final IFeatureProject featureProject;
 	private final AbstractClassSignature selectedElement;
 	private final String file;
-	private final Feature sourceFeature;
+	private final IFeature sourceFeature;
 	private final Map<AbstractSignature, List<ClonedFeatures>> clonedSignatures;
-	private Feature destinationFeature;
+	private IFeature destinationFeature;
 	private Set<ExtendedPullUpSignature> pullUpSignatures;
 	private Set<ExtendedPullUpSignature> deletableSignatures;
 	private List<Change> changes;
@@ -107,13 +108,13 @@ public class PullUpRefactoring extends Refactoring {
 		this.clonedSignatures = (new CloneSignatureMatcher(featureProject, selectedElement, file)).computeClonedSignatures();;
 	}
 	
-	private Feature determineSourceFeature() {
+	private IFeature determineSourceFeature() {
 		final AFeatureData featureData = getFeatureDataForFile(selectedElement, file);
 		if (featureData == null) return null;
 		
 		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
 		final String featureName = projectSignatures.getFeatureName(featureData.getID());
-		return (Feature) projectSignatures.getFeatureModel().getFeature(featureName);
+		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 
 	protected AFeatureData getFeatureDataForFile(final AbstractSignature signature, final String file){
@@ -130,15 +131,15 @@ public class PullUpRefactoring extends Refactoring {
 		return null;
 	}
 	
-	public Feature getSourceFeature() {
+	public IFeature getSourceFeature() {
 		return sourceFeature;
 	}
 
-	public void setDestinationFeature(Feature destinationFeature) {
+	public void setDestinationFeature(IFeature destinationFeature) {
 		this.destinationFeature = destinationFeature;
 	}
 	
-	public Feature getDestinationFeature() {
+	public IFeature getDestinationFeature() {
 		return destinationFeature;
 	}
 
@@ -201,13 +202,13 @@ public class PullUpRefactoring extends Refactoring {
 		}
 	}
 	
-	public List<Feature> getFeatureCandidates() {
+	public List<IFeature> getFeatureCandidates() {
 		
-		final List<Feature> features = new ArrayList<>();
+		final List<IFeature> features = new ArrayList<>();
 		
 		if (sourceFeature == null) return features; 
 		
-		Feature parentFeature = sourceFeature.getParent();
+		IFeature parentFeature = sourceFeature.getParent();
 		
 		while(parentFeature != null)
 		{

@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * TODO description
@@ -32,20 +33,20 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class FeatureSignatureHierarchy {
 
-	private final Feature feature;
+	private final IFeature feature;
 	
 	private final int featureId;
 	
 	private final Set<ExtendedPullUpSignature> children;
 
 
-	public FeatureSignatureHierarchy(final Feature feature, final int featureId) {
+	public FeatureSignatureHierarchy(final IFeature feature, final int featureId) {
 		this.feature = feature;
 		this.featureId = featureId;
 		this.children = new HashSet<>();
 	}
 	
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
 	}
 
