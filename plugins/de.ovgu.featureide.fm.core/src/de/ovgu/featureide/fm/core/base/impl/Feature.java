@@ -133,19 +133,21 @@ public class Feature extends AFeature {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.base.IFeature#getParent()
 	 */
-	@Override
+//	@Override
+	private Feature parent;
 	public IFeature getParent() {
-		// TODO Auto-generated method stub
-		return null;
+//		return null;
+		return parent;
 	}
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.base.IFeature#isConcrete()
 	 */
-	@Override
+//	@Override
+	private boolean concret;
 	public boolean isConcrete() {
-		// TODO Auto-generated method stub
-		return false;
+//		return false;
+		return concret;
 	}
 
 }
