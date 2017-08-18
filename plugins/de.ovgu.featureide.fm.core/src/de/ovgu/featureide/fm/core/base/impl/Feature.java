@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -96,6 +97,7 @@ public class Feature extends AFeature {
 	 * 
 	 * @since 3.0
 	 */
+	
 	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(oldFeature, featureModel, newFeatrureStructure);
 	}
@@ -134,20 +136,24 @@ public class Feature extends AFeature {
 	 * @see de.ovgu.featureide.fm.core.base.IFeature#getParent()
 	 */
 //	@Override
-	private Feature parent;
+
+//	private IFeature parent;
+	public IFeature feature;
 	public IFeature getParent() {
 //		return null;
-		return parent;
+//		return parent;
+		return FeatureUtils.getParent(feature);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.base.IFeature#isConcrete()
 	 */
 //	@Override
-	private boolean concret;
+//	private boolean concret;
 	public boolean isConcrete() {
 //		return false;
-		return concret;
+//		return concret;
+		return FeatureUtils.isConcrete(feature);
 	}
 
 }

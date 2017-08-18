@@ -11,12 +11,14 @@ import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.views.CloneVariantType;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.Feature;
+//import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 public class VariantAwareClone extends Clone
 {
 
-	private Set<Feature> relevantFeatures = null;
+	private Set<IFeature> relevantFeatures = null;
 	private CloneVariantType cloneVariantType = CloneVariantType.UNDEFINED;
 
 	public VariantAwareClone(Set<CloneOccurence> occurences, int lines, int tokens, int files,
@@ -72,13 +74,14 @@ public class VariantAwareClone extends Clone
 			return;
 		final IFile file = ResourcesPlugin.getWorkspace().getRoot()
 				.getFileForLocation(occurence.getFile());
-		final Feature feature = (Feature) featureProject.getFeatureModel().getFeature(
+		//can also be Feature
+		final IFeature feature = featureProject.getFeatureModel().getFeature(
 				featureProject.getFeatureName(file));
 
 		if (feature != null)
 		{
 			if (relevantFeatures == null)
-				relevantFeatures = new HashSet<Feature>();
+				relevantFeatures = new HashSet<IFeature>();
 
 			relevantFeatures.add(feature);
 
@@ -111,7 +114,7 @@ public class VariantAwareClone extends Clone
 	/**
 	 * @return the relevantFeatures
 	 */
-	public Set<Feature> getRelevantFeatures()
+	public Set<IFeature> getRelevantFeatures()
 	{
 		return relevantFeatures;
 	}
