@@ -20,6 +20,15 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+import de.ovgu.featureide.fm.core.FeatureConnection;
+import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -76,7 +85,49 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class Feature extends AFeature {
+public class Feature extends AFeature implements PropertyConstants {
+	
+	private String name;
+
+	private boolean mandatory;
+
+	private boolean concret;
+
+	private boolean and;
+
+	private boolean multiple;
+
+	private boolean hidden;
+
+	private boolean constraintSelected;
+
+	private List<Constraint> partOfConstraints = new LinkedList<Constraint>();
+
+	private FeatureStatus status;
+
+	private IFeatureModel featureModel;
+
+//	private FMPoint location;
+	
+	private String description;
+	
+	private Feature parent;
+	
+	/**
+	 * 
+	 * @return The description of the Feature.
+	 */
+//	@CheckForNull
+	public String getDescription() {
+		return description;
+	}
+	
+	/**
+	 * @param decription The description of the Feature.
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
 	/**
 	 * <b>Copy constructor</b>. Constructs a new instance of <code>Feature</code> given another feature <code>oldFeature</code>, a feature model
@@ -115,8 +166,126 @@ public class Feature extends AFeature {
 	 */
 	public Feature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
+		this.featureModel = featureModel;
+		this.name = name;
+		
+		this.mandatory = false;
+		this.concret = true;
+		this.and = true;
+		this.multiple = false;
+		this.hidden = false;
+		this.constraintSelected = false;
+		this.status = FeatureStatus.NORMAL;
+//		this.location = new FMPoint(0, 0);
+		this.description = null;
+		this.parent = null;
+		
+		sourceConnections.add(parentConnection);
+	}
+	
+	private FeatureConnection parentConnection = new FeatureConnection(this);
+
+	private final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
+	
+	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
+	
+	public boolean isAnd() {
+		return and;
+	}
+	public boolean isOr() {
+		return !and && multiple;
+	}
+	public boolean isAlternative() {
+		return !and && !multiple;
 	}
 
+	public void changeToAnd() {
+		and = true;
+		multiple = false;
+		fireChildrenChanged();
+	}
+	public void changeToOr() {
+		and = false;
+		multiple = true;
+		fireChildrenChanged();
+	}
+
+	public void changeToAlternative() {
+		and = false;
+		multiple = false;
+		fireChildrenChanged();
+	}
+
+	public void setAND(boolean and) {
+		this.and = and;
+		fireChildrenChanged();
+	}
+	
+	private void fireChildrenChanged() {
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
+
+	public boolean isMandatorySet() {
+		return mandatory;
+	}
+	public boolean isMandatory() {
+		return parent == null || !parent.isAnd() || mandatory;
+	}
+	
+	private void fireMandatoryChanged() {
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
+
+	public void setMandatory(boolean mandatory) {
+		this.mandatory = mandatory;
+		fireMandatoryChanged();
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hid) {
+		this.hidden = hid;
+		fireHiddenChanged();
+	}
+
+	public boolean isConstraintSelected() {
+		return constraintSelected;
+	}
+	public void setConstraintSelected(boolean selection) {
+		this.constraintSelected = selection;
+		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE,
+				Boolean.TRUE));
+	}
+	
+	public void fire(PropertyChangeEvent event) {
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
+
+	private void fireHiddenChanged() {
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
+	
+	public void setAbstract(boolean value) {
+		this.concret = !value;
+		fireChildrenChanged();
+	}
+
+	public Collection<Constraint> getRelevantConstraints() {
+		return partOfConstraints;
+	}
+	
 	@Override
 	protected IFeatureProperty createProperty() {
 		return new FeatureProperty(this);
@@ -154,6 +323,10 @@ public class Feature extends AFeature {
 //		return false;
 //		return concret;
 		return FeatureUtils.isConcrete(feature);
+	}
+	
+	public String getDisplayName() {
+		return FeatureUtils.getDisplayName(feature);
 	}
 
 }

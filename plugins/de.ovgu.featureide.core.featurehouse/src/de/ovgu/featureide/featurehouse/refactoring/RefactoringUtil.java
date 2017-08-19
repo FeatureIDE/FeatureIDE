@@ -49,6 +49,7 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * TODO description
@@ -170,10 +171,10 @@ public class RefactoringUtil {
 		return JavaCore.createCompilationUnitFrom(file);
 	}
 	
-	public static Feature getFeatureForId(ProjectSignatures projectSignatures, int featureId)
+	public static IFeature getFeatureForId(ProjectSignatures projectSignatures, int featureId)
 	{
 		final String featureName = projectSignatures.getFeatureName(featureId);
-		return (Feature) projectSignatures.getFeatureModel().getFeature(featureName);
+		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 	
 	public static Set<AbstractSignature> getMatchedSignaturesForClass(Set<? extends AbstractSignature> signatures, String matchingFile) {

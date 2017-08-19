@@ -47,7 +47,9 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.SignaturePosition;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
+//import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
  * TODO description
@@ -88,7 +90,7 @@ public class CloneSignatureMatcher {
 		Set<AbstractSignature> removableSignatures = new HashSet<>();
 		for (Entry<AbstractSignature, List<ClonedFeatures>> entry : clonedSignatures.entrySet()) {
 			
-			Feature feature = getFeatureForSignature(entry.getKey());
+			IFeature feature = getFeatureForSignature(entry.getKey());
 			Set<ClonedFeatures> removableClonedFeatures = new HashSet<>();
 			for (ClonedFeatures clonedFeatures : entry.getValue()) {
 				if (!clonedFeatures.getFeatures().contains(feature) || clonedFeatures.getFeatures().size() < 2) removableClonedFeatures.add(clonedFeatures);
@@ -119,7 +121,7 @@ public class CloneSignatureMatcher {
 		matchedSignatures.removeAll(removableConstructors);
 	}
 
-	private Feature getFeatureForSignature(AbstractSignature signature){
+	private IFeature getFeatureForSignature(AbstractSignature signature){
 		for (AFeatureData featureData : signature.getFeatureData()) {
 			if (featureData.getAbsoluteFilePath().equals(absoluteFileString)) 
 				return RefactoringUtil.getFeatureForId(projectSignatures, featureData.getID());
@@ -149,7 +151,7 @@ public class CloneSignatureMatcher {
 			if (!includedFiles.containsKey(cloneOccurence.getFile()) ) continue;
 			
 			final AFeatureData featureData = includedFiles.get(cloneOccurence.getFile());
-			final Feature feature = RefactoringUtil.getFeatureForId(projectSignatures, featureData.getID());
+			final Feature feature = (Feature) RefactoringUtil.getFeatureForId(projectSignatures, featureData.getID());
 
 			final int startRow = cloneOccurence.getStartIndex();
 			final int endRow = startRow + cloneOccurence.getClone().getLineCount() - 1;

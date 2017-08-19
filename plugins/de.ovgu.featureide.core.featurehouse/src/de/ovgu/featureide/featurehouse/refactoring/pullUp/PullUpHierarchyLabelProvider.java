@@ -28,7 +28,8 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.fm.core.Feature;
+//import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
 /**

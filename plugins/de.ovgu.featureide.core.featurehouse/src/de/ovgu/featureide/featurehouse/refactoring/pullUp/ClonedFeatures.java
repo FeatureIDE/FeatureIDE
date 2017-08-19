@@ -23,7 +23,8 @@ package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.ovgu.featureide.fm.core.Feature;
+//import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
  * TODO description
