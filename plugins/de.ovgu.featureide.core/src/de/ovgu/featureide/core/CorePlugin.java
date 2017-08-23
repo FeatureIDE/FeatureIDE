@@ -70,6 +70,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.internal.compiler.problem.ShouldNotImplement;
 import org.osgi.framework.BundleContext;
 import org.prop4j.Node;
 
@@ -362,8 +363,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * Starts composer specific changes of the project structure,
 	 * after adding the FeatureIDE nature to a project.
 	 */
-	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath) {
-		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false);
+	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
+		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
 		try {
@@ -456,8 +457,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param addCompiler <code>false</code> if the project already has a compiler
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addCompiler, boolean addNature) {
-		createProjectStructure(project, sourcePath, configPath, buildPath);
+			final String buildPath, boolean addCompiler, boolean addNature, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
+		createProjectStructure(project, sourcePath, configPath, buildPath, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
 		if (addCompiler) {
 			try {
@@ -558,20 +559,20 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param configPath
 	 * @param buildPath
 	 */
-	private static void createProjectStructure(IProject project, String sourcePath, String configPath, String buildPath) {
+	private static void createProjectStructure(IProject project, String sourcePath, String configPath, String buildPath, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
 		try {
 			/** just create the bin folder if project has only the FeatureIDE Nature **/
 			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if ("".equals(buildPath) && "".equals(sourcePath)) {
+				if ("".equals(buildPath) && "".equals(sourcePath) && shouldCreateBuildFolder) {
 					createFolder(project, "bin");
 				}
 			}
 		} catch (CoreException e) {
 			getDefault().logError(e);
 		}
-		createFolder(project, sourcePath);
+		if (shouldCreateSourceFolder) createFolder(project, sourcePath);
 		createFolder(project, configPath);
-		createFolder(project, buildPath);
+		if (shouldCreateBuildFolder) createFolder(project, buildPath);
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
 		if (!modelPath.toFile().exists()) {

@@ -326,7 +326,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 
 	@Override
 	public boolean hasSourceFolder() {
-		return false;
+		return true;
 	}
 
 	/**
@@ -477,12 +477,16 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			final IType itype = proj.findType(PROPERTY_MANAGER_PACKAGE + "." + PROPERTY_MANAGER_CLASS);
 			IMethod method = null;
 
-			for (final IMethod m : itype.getMethods()) {
-				if (m.getElementName().equals(GET_PROPERTY_METHOD)) {
-					method = m;
+			if (itype != null)
+				for (final IMethod m : itype.getMethods()) {
+					if (m.getElementName().equals(GET_PROPERTY_METHOD)) {
+						method = m;
+					}
 				}
-			}
-			final ArrayList<CallLocation[]> callLocs = getCallersOf(method);
+			
+			ArrayList<CallLocation[]> callLocs = new ArrayList<>();
+			if (method != null)
+				callLocs = getCallersOf(method);
 
 			String featureName;
 			String className;

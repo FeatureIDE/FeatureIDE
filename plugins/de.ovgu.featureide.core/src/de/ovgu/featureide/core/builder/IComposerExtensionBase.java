@@ -50,6 +50,11 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @return <code>false</code> if a source folder should not be created. Default: <code>true</code>
 	 */
 	boolean hasSourceFolder();
+	
+	/**
+	 * @return <code>false</code> if a build folder should not be created. Default: <code>true</code>
+	 */
+	boolean hasBuildFolder();
 
 	/**
 	 * @return <code>true</code> if the composition tool supports contract composition.
