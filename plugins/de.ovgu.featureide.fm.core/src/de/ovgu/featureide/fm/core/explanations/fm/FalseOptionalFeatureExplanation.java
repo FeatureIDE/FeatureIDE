@@ -18,32 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.fm;
 
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * Generates explanations for automatic selections in configurations.
- * These detail why a given feature must be selected or unselected given the other feature selections.
+ * An explanation for a false-optional feature in a feature model.
  * 
  * @author Timo G&uuml;nther
  */
-public interface AutomaticSelectionExplanationCreator extends ConfigurationExplanationCreator {
+public class FalseOptionalFeatureExplanation extends FeatureModelExplanation {
 	/**
-	 * Returns the automatic selection to explain.
-	 * @return the automatic selection to explain
+	 * Constructs a new instance of this class
+	 * @param subject the subject to be explained
 	 */
-	public SelectableFeature getAutomaticSelection();
+	public FalseOptionalFeatureExplanation(IFeature subject) {
+		super(subject);
+	}
 	
-	/**
-	 * Sets the automatic selection to explain
-	 * @param automaticSelection the automatic selection to explain
-	 */
-	public void setAutomaticSelection(SelectableFeature automaticSelection);
-	
-	/**
-	 * Returns an explanation why the specified automatic selection is necessary.
-	 */
 	@Override
-	public Explanation getExplanation() throws IllegalStateException;
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
+	}
+	
+	@Override
+	public FalseOptionalFeatureExplanationWriter getWriter() {
+		return new FalseOptionalFeatureExplanationWriter(this);
+	}
 }

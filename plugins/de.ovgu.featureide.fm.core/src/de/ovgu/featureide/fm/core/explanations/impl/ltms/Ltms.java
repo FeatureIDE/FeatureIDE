@@ -36,7 +36,7 @@ import java.util.TreeSet;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 
 /**
  * <p>

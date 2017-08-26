@@ -18,31 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.fm;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
 
 /**
- * Generates explanations for redundant constraints in feature models.
+ * Generates explanations for circumstances involving {@link IFeatureModel feature models}.
  * 
  * @author Timo G&uuml;nther
+ * @see {@link DeadFeatureExplanationCreator} for explaining dead features and void feature models
+ * @see {@link FalseOptionalFeatureExplanationCreator} for explaining false-optional features
+ * @see {@link RedundantConstraintExplanationCreator} for explaining redundant constraints
  */
-public interface RedundantConstraintExplanationCreator extends FeatureModelExplanationCreator {
+public interface FeatureModelExplanationCreator extends ExplanationCreator {
 	/**
-	 * Returns the redundant constraint in the feature model.
-	 * @return the redundant constraint in the feature model
+	 * Returns the feature model context.
+	 * @return the feature model context
 	 */
-	public IConstraint getRedundantConstraint();
+	public IFeatureModel getFeatureModel();
 	
 	/**
-	 * Sets the redundant constraint in the feature model.
-	 * @param redundantConstraint the redundant constraint in the feature model
+	 * Sets the feature model context.
+	 * @param fm the feature model context
 	 */
-	public void setRedundantConstraint(IConstraint redundantConstraint);
-	
-	/**
-	 * Returns an explanation why the specified constraint of the specified feature model is redundant.
-	 */
-	@Override
-	public Explanation getExplanation() throws IllegalStateException;
+	public void setFeatureModel(IFeatureModel fm);
 }

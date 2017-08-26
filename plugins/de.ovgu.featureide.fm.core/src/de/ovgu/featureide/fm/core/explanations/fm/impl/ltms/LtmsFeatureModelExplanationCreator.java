@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.ltms;
+package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -29,8 +29,9 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.AbstractFeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator} using an {@link Ltms LTMS}.
@@ -108,7 +109,7 @@ public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeature
 		for (final Set<Integer> c : clauseIndexes) {
 			explanations.add(getExplanation(c));
 		}
-		final Explanation cumulatedExplanation = new Explanation();
+		final Explanation cumulatedExplanation = getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
 		Explanation shortestExplanation = null;
 		for (final Explanation explanation : explanations) {

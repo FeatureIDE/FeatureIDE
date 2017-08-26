@@ -18,18 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.fm;
+
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 
 /**
- * Generates {@link Explanation explanations}.
+ * {@link ExplanationWriter} for instances of {@link FalseOptionalFeatureExplanation}.
  * 
  * @author Timo G&uuml;nther
  */
-public interface ExplanationCreator {
+public class FalseOptionalFeatureExplanationWriter extends FeatureModelExplanationWriter {
 	/**
-	 * Returns an explanation for the specified circumstance.
-	 * @return an explanation; null if none could be generated
-	 * @throws IllegalStateException if no defect is specified
+	 * Constructs a new instance of this class.
+	 * @param explanation explanation to transform
 	 */
-	public Explanation getExplanation() throws IllegalStateException;
+	public FalseOptionalFeatureExplanationWriter(FalseOptionalFeatureExplanation explanation) {
+		super(explanation);
+	}
+	
+	@Override
+	protected FalseOptionalFeatureExplanation getExplanation() {
+		return (FalseOptionalFeatureExplanation) super.getExplanation();
+	}
+	
+	@Override
+	protected String getSubjectString() {
+		return getSubjectString(getExplanation().getSubject());
+	}
+	
+	@Override
+	protected String getAttributeString() {
+		return "false-optional";
+	}
 }

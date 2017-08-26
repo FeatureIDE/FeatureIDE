@@ -18,25 +18,23 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.mus;
+package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.explanations.AutomaticSelectionExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 
 /**
- * Provides instances of {@link ExplanationCreator} using a {@link MusExtractor MUS extractor}.
+ * Provides instances of {@link FeatureModelExplanationCreator} using a {@link MusExtractor MUS extractor}.
  * 
  * @author Timo G&uuml;nther
  */
-public class MusExplanationCreatorFactory extends ExplanationCreatorFactory {
+public class MusFeatureModelExplanationCreatorFactory extends FeatureModelExplanationCreatorFactory {
 	@Override
 	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
 		return new MusDeadFeatureExplanationCreator();
@@ -64,15 +62,5 @@ public class MusExplanationCreatorFactory extends ExplanationCreatorFactory {
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm) {
 		return new MusRedundantConstraintExplanationCreator(fm);
-	}
-	
-	@Override
-	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
-		return new MusAutomaticSelectionExplanationCreator();
-	}
-	
-	@Override
-	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator(Configuration config) {
-		return new MusAutomaticSelectionExplanationCreator(config);
 	}
 }

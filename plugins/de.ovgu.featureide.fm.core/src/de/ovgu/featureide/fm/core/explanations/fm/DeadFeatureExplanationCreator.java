@@ -18,25 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.fm;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * Generates explanations for {@link Configuration configurations}.
+ * Generates explanations for dead features in feature models.
+ * Also supports explanations for void feature models by explaining why the root feature is dead.
  * 
  * @author Timo G&uuml;nther
  */
-public interface ConfigurationExplanationCreator extends ExplanationCreator {
+public interface DeadFeatureExplanationCreator extends FeatureModelExplanationCreator {
 	/**
-	 * Returns the configuration.
-	 * @return the configuration
+	 * Returns the dead feature in the feature model.
+	 * @return the dead feature in the feature model
 	 */
-	public Configuration getConfiguration();
+	public IFeature getDeadFeature();
 	
 	/**
-	 * Sets the configuration.
-	 * @param config the configuration
+	 * Sets the dead feature in the feature model.
+	 * @param deadFeature the dead feature in the feature model
 	 */
-	public void setConfiguration(Configuration config);
+	public void setDeadFeature(IFeature deadFeature);
+	
+	/**
+	 * Returns an explanation why the specified feature of the specified feature model is dead.
+	 * A dead root feature also means a void feature model.
+	 */
+	@Override
+	public DeadFeatureExplanation getExplanation() throws IllegalStateException;
 }

@@ -20,17 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import org.prop4j.NodeWriter;
-
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
-import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 
 /**
  * Transforms instances of {@link Explanation} into user-friendly strings in natural language.
@@ -38,9 +28,9 @@ import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
  * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */
-public class ExplanationWriter {
+public abstract class ExplanationWriter {
 	/** The explanation to be transformed. */
-	protected final Explanation explanation;
+	private final Explanation explanation;
 	/**
 	 * Whether to include the reason count versus explanation count when writing a reason.
 	 * This acts as an explanation for the reason's confidence.
@@ -55,6 +45,14 @@ public class ExplanationWriter {
 	 */
 	public ExplanationWriter(Explanation explanation) {
 		this.explanation = explanation;
+	}
+	
+	/**
+	 * Returns the explanation to be transformed.
+	 * @return the explanation to be transformed
+	 */
+	protected Explanation getExplanation() {
+		return explanation;
 	}
 	
 	/**
@@ -127,7 +125,7 @@ public class ExplanationWriter {
 	 * Returns a string saying that no explanation could be found.
 	 * @return a string saying that no explanation could be found
 	 */
-	public String getMissingExplanationString() {
+	protected String getMissingExplanationString() {
 		return "No explanation could be found.";
 	}
 	
@@ -135,72 +133,31 @@ public class ExplanationWriter {
 	 * Returns a user-friendly introduction to the explanation.
 	 * @return a user-friendly introduction to the explanation
 	 */
-	public String getIntroductionString() {
-		if (explanation.getMode() == Explanation.Mode.DEAD_FEATURE && FeatureUtils.isRoot((IFeature) explanation.getDefectElement())) {
-			return "The feature model is void because:";
-		}
-		return String.format("The %s is %s because:",
-				getDefectElementString(),
-				getDefectTypeString());
+	protected String getIntroductionString() {
+		return String.format("%s because:", getCircumstanceString());
 	}
 	
 	/**
-	 * Returns a string describing the defect element.
-	 * @return a string describing the defect element
-	 * @throws IllegalStateException if the type of the defect feature model element is unknown
+	 * Returns a user-friendly string of the circumstance to explain.
+	 * @return a user-friendly string of the circumstance to explain
 	 */
-	protected String getDefectElementString() throws IllegalStateException {
-		String s = "";
-		final IFeatureModelElement element = explanation.getDefectElement() != null
-				? explanation.getDefectElement()
-				: explanation.getAutomaticSelection().getFeature();
-		if (element instanceof IFeature) {
-			final IFeature feature = (IFeature) element;
-			if (feature.getStructure().isAbstract()) {
-				s += "abstract ";
-			} else if (feature.getStructure().isConcrete()) {
-				s += "concrete ";
-			}
-			s += "feature ";
-			s += feature.getName();
-		} else if (explanation.getDefectElement() instanceof IConstraint) {
-			final IConstraint constraint = (IConstraint) explanation.getDefectElement();
-			s += "constraint ";
-			s += constraint.getNode().toString(NodeWriter.logicalSymbols);
-		} else {
-			throw new IllegalStateException("Unknown feature model element type");
-		}
-		return s;
+	public String getCircumstanceString() {
+		return String.format("The %s is %s", getSubjectString(), getAttributeString());
 	}
 	
 	/**
-	 * Returns a string describing the defect type.
-	 * @return a string describing the defect type
-	 * @throws IllegalStateException if the defect type is unknown
+	 * Returns the subject of the explanation.
+	 * That is the element to be explained.
+	 * @return the subject of the explanation
 	 */
-	protected String getDefectTypeString() throws IllegalStateException {
-		switch (explanation.getMode()) {
-			case DEAD_FEATURE:
-				return "dead";
-			case FALSE_OPTIONAL_FEATURE:
-				return "false-optional";
-			case REDUNDANT_CONSTRAINT:
-				return explanation.isImplicit() ? "transitive" : "redundant";
-			case AUTOMATIC_SELECTION:
-				switch (explanation.getAutomaticSelection().getAutomatic()) {
-					case SELECTED:
-						return "automatically selected";
-					case UNSELECTED:
-						return "automatically unselected";
-					case UNDEFINED:
-						throw new IllegalStateException("Feature is not automatically selected or unselected");
-					default:
-						throw new IllegalStateException("Unknown feature selection state");
-				}
-			default:
-				throw new IllegalStateException("Unkown defect type");
-		}
-	}
+	protected abstract String getSubjectString();
+	
+	/**
+	 * Returns the attribute of the explanation.
+	 * That is what makes the subject worth explaining.
+	 * @return the attribute of the explanation
+	 */
+	protected abstract String getAttributeString();
 	
 	/**
 	 * Returns a user-friendly representation of the given reason.
@@ -209,90 +166,20 @@ public class ExplanationWriter {
 	 * @throws IllegalStateException if the reason's source attribute is unknown
 	 */
 	public String getReasonString(Reason reason) throws IllegalArgumentException {
-		String s = null;
-		
-		if (reason.getTrace() != null) {
-			final FeatureModelElementTrace trace = reason.getTrace();
-			final Set<IFeatureModelElement> sourceElements = trace.getElements();
-			final String joinedSourceElements = join(sourceElements);
-			final IFeature parent;
-			switch (trace.getOrigin()) {
-				case CHILD_UP:
-					parent = (IFeature) trace.getElement();
-					s = String.format("%s is a child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-					break;
-				case CHILD_DOWN:
-					parent = (IFeature) trace.getElement();
-					if (parent.getStructure().isAlternative()) {
-						s = String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-					} else if (parent.getStructure().isOr()) {
-						s = String.format("%s are or-children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-					} else {
-						s = String.format("%s is a mandatory child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-					}
-					break;
-				case CHILD_HORIZONTAL:
-					s = String.format("%s are alternatives (i.e., %s).", joinedSourceElements, trace.toString(getSymbols()));
-					break;
-				case CONSTRAINT:
-					s = String.format("%s is a constraint.", joinedSourceElements);
-					break;
-				case ROOT:
-					s = String.format("%s is the root.", joinedSourceElements);
-					break;
-				default:
-					throw new IllegalStateException("Reason has unexpected source attribute");
-			}
-		} else if (reason.getFeatureSelection() != null) {
-			final String selectionString;
-			switch (reason.getFeatureSelection().getSelection()) {
-				case SELECTED:
-					selectionString = "selected";
-					break;
-				case UNSELECTED:
-					selectionString = "unselected";
-					break;
-				case UNDEFINED:
-					selectionString = "neither selected nor unselected";
-				default:
-					throw new IllegalStateException("Unknown feature selection state");
-			}
-			s = String.format("%s is %s.", reason.getFeatureSelection().getFeature().getName(), selectionString);
-		} else {
-			throw new IllegalStateException("Unknown reason type");
-		}
-		
+		String s = getConcreteReasonString(reason);
 		final Explanation explanation = reason.getExplanation();
 		final int reasonCount = explanation.getReasonCounts().get(reason);
 		final int explanationCount = explanation.getExplanationCount();
 		if (isWritingReasonCounts() && reasonCount > 1 && explanationCount > 1) {
 			s = String.format("%s (%d/%d)", s, reasonCount, explanationCount);
 		}
-		
 		return s;
 	}
 	
 	/**
-	 * Joins the given elements.
-	 * @param elements elements to join
-	 * @return joined elements
+	 * Returns a user-friendly representation of the given concrete reason.
+	 * @param reason concrete reason to transform
+	 * @return a user-friendly representation of the given concrete reason
 	 */
-	private String join(Set<IFeatureModelElement> elements) {
-		String s = "";
-		int i = 0;
-		for (final Iterator<IFeatureModelElement> it = elements.iterator(); it.hasNext();) {
-			final IFeatureModelElement element = it.next();
-			if (i++ > 0) {
-				s += it.hasNext() ? ", " : i > 2 ? ", and " : " and ";
-			}
-			if (element instanceof IConstraint) {
-				final NodeWriter w = new NodeWriter(((IConstraint) element).getNode());
-				w.setSymbols(getSymbols());
-				s += w.nodeToString();
-			} else {
-				s += element.getName();
-			}
-		}
-		return s;
-	}
+	protected abstract String getConcreteReasonString(Reason reason);
 }

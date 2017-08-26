@@ -46,8 +46,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
-import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
@@ -84,9 +84,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	};
 	
 	/** The currently active reason directed {@link Origin#CHILD_UP upward}. */
-	private Reason activeReasonUp;
+	private FeatureModelReason activeReasonUp;
 	/** The currently active reason directed {@link Origin#CHILD_DOWN downward}. */
-	private Reason activeReasonDown;
+	private FeatureModelReason activeReasonDown;
 
 	private Figure toolTipContent = new Figure();
 
@@ -309,10 +309,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		toolTipContent.setLayoutManager(new GridLayout());
 		toolTipContent.add(new Label("Connection type:\n" + (target.getStructure().isAnd() ? "And" : (target.getStructure().isMultiple() ? "Or" : "Alternative"))));
 
-		final Reason activeReason = activeReasonUp != null ? activeReasonUp : activeReasonDown;
+		final FeatureModelReason activeReason = activeReasonUp != null ? activeReasonUp : activeReasonDown;
 		if (activeReason != null) {
 			String explanation = "This connection is involved in the selected defect:";
-			final ExplanationWriter w = new ExplanationWriter(activeReason.getExplanation());
+			final ExplanationWriter w = activeReason.getExplanation().getWriter();
 			if (activeReasonUp != null) {
 				explanation += "\n\u2022 " + w.getReasonString(activeReasonUp);
 			}
@@ -356,7 +356,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	 * @param activeReason the new active reason; null to reset
 	 * @throws IllegalArgumentException if the reason's origin is not a vertical child relationship
 	 */
-	public void setActiveReason(Reason activeReason) throws IllegalArgumentException {
+	public void setActiveReason(FeatureModelReason activeReason) throws IllegalArgumentException {
 		if (activeReason == null) {
 			this.activeReasonUp = null;
 			this.activeReasonDown = null;
@@ -380,7 +380,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	 * 
 	 * @return the active reason for use with the main connection's target decoration
 	 */
-	private Reason getMainActiveReason() {
+	private FeatureModelReason getMainActiveReason() {
 		final IGraphicalFeature target = getModel().getTarget();
 		if (target == null) {
 			return null;
@@ -388,7 +388,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		final IFeatureStructure targetStructure = target.getObject().getStructure();
 		final IGraphicalFeature source = getModel().getSource();
 		final IFeatureStructure sourceStructure = source.getObject().getStructure();
-		Reason mainActiveReason = null;
+		FeatureModelReason mainActiveReason = null;
 		for (final IFeatureStructure siblingStructure : targetStructure.getChildren()) {
 			final IGraphicalFeature sibling;
 			final ConnectionEditPart siblingConnectionEditPart;
@@ -409,7 +409,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			if (siblingConnectionEditPart == null) {
 				continue;
 			}
-			final Reason activeReason = siblingConnectionEditPart.activeReasonDown;
+			final FeatureModelReason activeReason = siblingConnectionEditPart.activeReasonDown;
 			if (activeReason != null
 					&& (mainActiveReason == null
 					|| mainActiveReason.getConfidence() < activeReason.getConfidence())) { //maximum confidence of all siblings

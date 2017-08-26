@@ -18,10 +18,11 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl;
+package de.ovgu.featureide.fm.core.explanations.config.impl;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.explanations.ConfigurationExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
 
 /**
  * Abstract implementation of {@link ConfigurationExplanationCreator}.

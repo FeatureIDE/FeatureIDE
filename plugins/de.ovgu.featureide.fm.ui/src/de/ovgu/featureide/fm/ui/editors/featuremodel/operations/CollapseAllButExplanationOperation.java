@@ -29,7 +29,7 @@ import java.util.Set;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -42,7 +42,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	/** The graphical feature model context. */
 	private final IGraphicalFeatureModel fm;
 	/** The currently active explanation. */
-	private final Explanation explanation;
+	private final FeatureModelExplanation explanation;
 	
 	/** The features that will be collapsed during the operation. */
 	private Set<IGraphicalFeature> collapsedFeatures;
@@ -52,7 +52,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 * @param fm the feature model context
 	 * @param explanation the currently active explanation
 	 */
-	public CollapseAllButExplanationOperation(IGraphicalFeatureModel fm, Explanation explanation) {
+	public CollapseAllButExplanationOperation(IGraphicalFeatureModel fm, FeatureModelExplanation explanation) {
 		super(fm.getFeatureModel(), COLLAPSE_ALL_BUT_EXPLANATION);
 		this.fm = fm;
 		this.explanation = explanation;
@@ -70,7 +70,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 * Returns the currently active explanation.
 	 * @return the currently active explanation
 	 */
-	public Explanation getExplanation() {
+	public FeatureModelExplanation getExplanation() {
 		return explanation;
 	}
 	
@@ -136,7 +136,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 		for (final IGraphicalFeature collapsedFeature : getCollapsedFeatures()) {
 			collapsedFeature.setCollapsed(true);
 		}
-		return new FeatureIDEEvent(getExplanation().getDefectElement(), EventType.COLLAPSED_ALL_CHANGED);
+		return new FeatureIDEEvent(getExplanation().getSubject(), EventType.COLLAPSED_ALL_CHANGED);
 	}
 	
 	@Override
@@ -144,6 +144,6 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 		for (final IGraphicalFeature collapsedFeature : getCollapsedFeatures()) {
 			collapsedFeature.setCollapsed(false);
 		}
-		return new FeatureIDEEvent(getExplanation().getDefectElement(), EventType.COLLAPSED_ALL_CHANGED);
+		return new FeatureIDEEvent(getExplanation().getSubject(), EventType.COLLAPSED_ALL_CHANGED);
 	}
 }

@@ -18,33 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.config;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
- * Generates explanations for dead features in feature models.
- * Also supports explanations for void feature models by explaining why the root feature is dead.
+ * An explanation for an automatic selection in a configuration.
  * 
  * @author Timo G&uuml;nther
  */
-public interface DeadFeatureExplanationCreator extends FeatureModelExplanationCreator {
+public class AutomaticSelectionExplanation extends ConfigurationExplanation {
 	/**
-	 * Returns the dead feature in the feature model.
-	 * @return the dead feature in the feature model
+	 * Constructs a new instance of this class.
+	 * @param subject the subject to be explained
 	 */
-	public IFeature getDeadFeature();
+	public AutomaticSelectionExplanation(SelectableFeature subject) {
+		super(subject);
+	}
 	
-	/**
-	 * Sets the dead feature in the feature model.
-	 * @param deadFeature the dead feature in the feature model
-	 */
-	public void setDeadFeature(IFeature deadFeature);
-	
-	/**
-	 * Returns an explanation why the specified feature of the specified feature model is dead.
-	 * A dead root feature also means a void feature model.
-	 */
 	@Override
-	public Explanation getExplanation() throws IllegalStateException;
+	public SelectableFeature getSubject() {
+		return (SelectableFeature) super.getSubject();
+	}
+	
+	@Override
+	public AutomaticSelectionExplanationWriter getWriter() {
+		return new AutomaticSelectionExplanationWriter(this);
+	}
 }

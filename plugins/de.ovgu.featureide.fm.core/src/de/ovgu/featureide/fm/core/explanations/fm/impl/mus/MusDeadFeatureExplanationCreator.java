@@ -18,14 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.mus;
+package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
+
+import java.util.Set;
 
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 
 /**
  * Implementation of {@link DeadFeatureExplanationCreator} using a {@link MusExtractor MUS extractor}.
@@ -39,7 +41,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	protected MusDeadFeatureExplanationCreator() {
+	public MusDeadFeatureExplanationCreator() {
 		this(null);
 	}
 	
@@ -47,7 +49,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	protected MusDeadFeatureExplanationCreator(IFeatureModel fm) {
+	public MusDeadFeatureExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -56,7 +58,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 	 * @param fm the feature model context
 	 * @param deadFeature the dead feature in the feature model
 	 */
-	protected MusDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
+	public MusDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
 		super(fm);
 		setDeadFeature(deadFeature);
 	}
@@ -72,9 +74,9 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 	}
 	
 	@Override
-	public Explanation getExplanation() throws IllegalStateException {
+	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
 		final MusExtractor oracle = getOracle();
-		final Explanation explanation;
+		final DeadFeatureExplanation explanation;
 		oracle.push();
 		try {
 			oracle.addAssumption(getDeadFeature().getName(), true);
@@ -82,7 +84,16 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		} finally {
 			oracle.pop();
 		}
-		explanation.setDefectDeadFeature(getDeadFeature());
 		return explanation;
+	}
+	
+	@Override
+	protected DeadFeatureExplanation getExplanation(Set<Integer> clauseIndexes) {
+		return (DeadFeatureExplanation) super.getExplanation(clauseIndexes);
+	}
+
+	@Override
+	protected DeadFeatureExplanation getConcreteExplanation() {
+		return new DeadFeatureExplanation(getDeadFeature());
 	}
 }

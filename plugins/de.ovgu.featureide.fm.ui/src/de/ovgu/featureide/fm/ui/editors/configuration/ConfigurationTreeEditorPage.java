@@ -100,10 +100,11 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
-import de.ovgu.featureide.fm.core.explanations.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
@@ -161,7 +162,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
 
 	/** Generates explanations for automatic selections. */
-	private final AutomaticSelectionExplanationCreator automaticSelectionExplanationCreator = ExplanationCreatorFactory.getDefault().getAutomaticSelectionExplanationCreator();
+	private final AutomaticSelectionExplanationCreator automaticSelectionExplanationCreator = ConfigurationExplanationCreatorFactory.getDefault().getAutomaticSelectionExplanationCreator();
 
 	protected IConfigurationEditor configurationEditor = null;
 
@@ -1273,9 +1274,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				if (sb.length() > 0) {
 					sb.append("\n\n");
 				}
-				final ExplanationWriter wr = new ExplanationWriter(explanation);
+				final ExplanationWriter wr = explanation.getWriter();
 				sb.append(wr.getHeaderString());
-				for (final Explanation.Reason reason : explanation.getReasons()) {
+				for (final Reason reason : explanation.getReasons()) {
 					sb.append(System.lineSeparator());
 					sb.append("\u2022 ");
 					sb.append(wr.getReasonString(reason));

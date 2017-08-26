@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl;
+package de.ovgu.featureide.fm.core.explanations.fm.impl;
 
 import java.util.Set;
 
@@ -29,7 +29,9 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.FeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator}.
@@ -162,11 +164,25 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return an explanation
 	 */
 	protected Explanation getExplanation(Set<Integer> clauseIndexes) {
-		final FeatureModelToNodeTraceModel traceModel = getTraceModel();
-		final Explanation explanation = new Explanation();
+		final Explanation explanation = getConcreteExplanation();
 		for (final Integer clauseIndex : clauseIndexes) {
-			explanation.addReason(traceModel.getTrace(clauseIndex));
+			explanation.addReason(getReason(clauseIndex));
 		}
 		return explanation;
 	}
+	
+	/**
+	 * Returns the reason for the given clause index.
+	 * @param clauseIndex index of the clause
+	 * @return the reason for the given clause index
+	 */
+	protected Reason getReason(int clauseIndex) {
+		return new FeatureModelReason(getTraceModel().getTrace(clauseIndex));
+	}
+	
+	/**
+	 * Returns a new concrete explanation.
+	 * @return a new concrete explanation
+	 */
+	protected abstract Explanation getConcreteExplanation();
 }

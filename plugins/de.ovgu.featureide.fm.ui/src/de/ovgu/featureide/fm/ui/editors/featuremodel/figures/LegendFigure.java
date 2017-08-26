@@ -39,7 +39,6 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
-import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -693,33 +692,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		//Label left
 		Label labelExplanation = new Label();
-
-		if (!graphicalFeatureModel.getFeatureModel().getAnalyser().valid()) {
-			labelExplanation.setText("Feature model is void because of highlighted dependencies:");
-			explanationFigure.setToolTip(createToolTipContent("Feature model is void because of highlighted dependencies"));
-		} else {
-			switch (explanation.getMode()) {
-			case DEAD_FEATURE:
-				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " is dead because of highlighted dependencies:");
-				explanationFigure.setToolTip(createToolTipContent(
-						"The feature\n" + explanation.getDefectElement().getName() + "\nis dead because of the highligthed dependencies."));
-				break;
-			case FALSE_OPTIONAL_FEATURE:
-				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " is false-optional because of highlighted dependencies:");
-				explanationFigure.setToolTip(createToolTipContent(
-						"The feature\n" + explanation.getDefectElement().getName() + "\nis false optional because of the highligthed dependencies."));
-				break;
-			case REDUNDANT_CONSTRAINT:
-				Constraint constraint = (Constraint) explanation.getDefectElement();
-				labelExplanation.setText("The selected constraint is redundant because of highlighted dependencies:");
-				explanationFigure.setToolTip(
-						createToolTipContent("The constraint\n" + constraint.getDisplayName() + "\nis redundant because of the highligthed dependencies."));
-				break;
-
-			default:
-				break;
-			}
-		}
+		final String circumstanceString = explanation.getWriter().getCircumstanceString();
+		labelExplanation.setText(String.format("%s because of the highlighted dependencies:", circumstanceString));
+		explanationFigure.setToolTip(createToolTipContent(String.format("%s%nbecause of the highlighted dependencies.", circumstanceString)));
 		int widthInPixels = createLabel(1, labelExplanation.getText(), FMPropertyManager.getFeatureForgroundColor(), "").getPreferredSize().width + 25;
 
 		//SetWidth depending of string

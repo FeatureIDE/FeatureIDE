@@ -18,18 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.fm;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * Generates {@link Explanation explanations}.
+ * Generates explanations for false-optional features in feature models.
  * 
  * @author Timo G&uuml;nther
  */
-public interface ExplanationCreator {
+public interface FalseOptionalFeatureExplanationCreator extends FeatureModelExplanationCreator {
 	/**
-	 * Returns an explanation for the specified circumstance.
-	 * @return an explanation; null if none could be generated
-	 * @throws IllegalStateException if no defect is specified
+	 * Returns the false-optional feature in the feature model.
+	 * @return the false-optional feature in the feature model
 	 */
-	public Explanation getExplanation() throws IllegalStateException;
+	public IFeature getFalseOptionalFeature();
+	
+	/**
+	 * Sets the false-optional feature in the feature model.
+	 * @param falseOptionalFeature the false-optional feature in the feature model
+	 */
+	public void setFalseOptionalFeature(IFeature falseOptionalFeature);
+	
+	/**
+	 * Returns an explanation why the specified feature of the specified feature model is false-optional.
+	 */
+	@Override
+	public FalseOptionalFeatureExplanation getExplanation() throws IllegalStateException;
 }

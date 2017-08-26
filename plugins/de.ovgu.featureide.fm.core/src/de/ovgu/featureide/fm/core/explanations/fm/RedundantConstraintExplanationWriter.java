@@ -18,31 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.fm;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 
 /**
- * Generates explanations for false-optional features in feature models.
+ * {@link ExplanationWriter} for instances of {@link RedundantConstraintExplanation}.
  * 
  * @author Timo G&uuml;nther
  */
-public interface FalseOptionalFeatureExplanationCreator extends FeatureModelExplanationCreator {
+public class RedundantConstraintExplanationWriter extends FeatureModelExplanationWriter {
 	/**
-	 * Returns the false-optional feature in the feature model.
-	 * @return the false-optional feature in the feature model
+	 * Constructs a new instance of this class.
+	 * @param explanation explanation to transform; not null
 	 */
-	public IFeature getFalseOptionalFeature();
-	
-	/**
-	 * Sets the false-optional feature in the feature model.
-	 * @param falseOptionalFeature the false-optional feature in the feature model
-	 */
-	public void setFalseOptionalFeature(IFeature falseOptionalFeature);
-	
-	/**
-	 * Returns an explanation why the specified feature of the specified feature model is false-optional.
-	 */
+	public RedundantConstraintExplanationWriter(RedundantConstraintExplanation explanation) {
+		super(explanation);
+	}
+
 	@Override
-	public Explanation getExplanation() throws IllegalStateException;
+	protected RedundantConstraintExplanation getExplanation() {
+		return (RedundantConstraintExplanation) super.getExplanation();
+	}
+	
+	@Override
+	protected String getSubjectString() {
+		return getSubjectString(getExplanation().getSubject());
+	}
+	
+	@Override
+	protected String getAttributeString() {
+		return getExplanation().isImplicit() ? "transitive" : "redundant";
+	}
 }

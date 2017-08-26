@@ -18,9 +18,10 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.mus;
+package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
@@ -30,7 +31,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 
 /**
  * Implementation of {@link RedundantConstraintExplanationCreator} using a {@link MusExtractor MUS extractor}.
@@ -44,7 +46,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	protected MusRedundantConstraintExplanationCreator() {
+	public MusRedundantConstraintExplanationCreator() {
 		this(null);
 	}
 	
@@ -52,7 +54,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	protected MusRedundantConstraintExplanationCreator(IFeatureModel fm) {
+	public MusRedundantConstraintExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -61,7 +63,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 * @param fm the feature model context
 	 * @param redundantConstraint the redundant constraint in the feature model
 	 */
-	protected MusRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
+	public MusRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
 		super(fm);
 		setRedundantConstraint(redundantConstraint);
 	}
@@ -93,8 +95,8 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	}
 	
 	@Override
-	public Explanation getExplanation() throws IllegalStateException {
-		final Explanation cumulatedExplanation = new Explanation();
+	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
+		final RedundantConstraintExplanation cumulatedExplanation = getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
 		final MusExtractor oracle = getOracle();
 		oracle.push();
@@ -103,7 +105,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			//Add each constraint but the redundant one.
 			final AdvancedNodeCreator nc = getNodeCreator();
 			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
-				if (constraint == redundantConstraint) {
+				if (constraint == getRedundantConstraint()) {
 					continue;
 				}
 				final Node constraintNode = nc.createConstraintNode(constraint);
@@ -126,7 +128,16 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			oracle.pop();
 			getTraceModel().removeTraces(constraintClauseCount);
 		}
-		cumulatedExplanation.setDefectRedundantConstraint(getRedundantConstraint());
 		return cumulatedExplanation;
+	}
+	
+	@Override
+	protected RedundantConstraintExplanation getExplanation(Set<Integer> clauseIndexes) {
+		return (RedundantConstraintExplanation) super.getExplanation(clauseIndexes);
+	}
+	
+	@Override
+	protected RedundantConstraintExplanation getConcreteExplanation() {
+		return new RedundantConstraintExplanation(getRedundantConstraint());
 	}
 }

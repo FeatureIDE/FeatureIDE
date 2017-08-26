@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -292,7 +292,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			setActiveReason(null); //reset
 			break;
 		case ACTIVE_REASON_CHANGED:
-			setActiveReason((Explanation.Reason) event.getNewValue());
+			setActiveReason((FeatureModelReason) event.getNewValue());
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
@@ -311,7 +311,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	 * </p>
 	 * @param activeReason the new active reason; null to reset
 	 */
-	protected void setActiveReason(Explanation.Reason activeReason) {
+	protected void setActiveReason(FeatureModelReason activeReason) {
 		//Update the figure.
 		if (activeReason == null //reset
 				|| activeReason.getTrace().getOrigin() == Origin.CHILD_HORIZONTAL) {

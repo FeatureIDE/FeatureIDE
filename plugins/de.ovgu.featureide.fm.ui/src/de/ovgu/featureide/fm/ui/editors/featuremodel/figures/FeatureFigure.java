@@ -56,8 +56,9 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -94,7 +95,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
 	private static String VOID = FEATURE_MODEL_IS_VOID;
 	
-	private final Set<Reason> activeReasons = new LinkedHashSet<>();
+	private final Set<FeatureModelReason> activeReasons = new LinkedHashSet<>();
 
 	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
 		super();
@@ -268,9 +269,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			}
 
 			if (getActiveReason() != null) {
-				final ExplanationWriter w = new ExplanationWriter(getActiveReason().getExplanation());
+				final ExplanationWriter w = getActiveReason().getExplanation().getWriter();
 				toolTip.append("\n\nThis feature is involved in the selected defect:");
-				for (final Reason activeReason : activeReasons) {
+				for (final FeatureModelReason activeReason : activeReasons) {
 					toolTip.append("\n\u2022 ");
 					toolTip.append(w.getReasonString(activeReason));
 				}
@@ -401,7 +402,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	 * </p>
 	 * @param activeReason the new active reason; null to reset
 	 */
-	public void setActiveReason(Reason activeReason) {
+	public void setActiveReason(FeatureModelReason activeReason) {
 		if (activeReason == null) {
 			activeReasons.clear();
 			super.setActiveReason(activeReason);

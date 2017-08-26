@@ -20,73 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.explanations.impl.mus.MusExplanationCreatorFactory;
-
 /**
  * Provides instances of {@link ExplanationCreator}.
  * 
  * @author Timo G&uuml;nther
  */
-public abstract class ExplanationCreatorFactory {
-	/**
-	 * Returns a default instance of this class.
-	 * @return a default instance of this class
-	 */
-	public static ExplanationCreatorFactory getDefault() {
-		return new MusExplanationCreatorFactory();
-	}
-	
-	/**
-	 * Returns an instance of {@link DeadFeatureExplanationCreator}.
-	 * @return an instance of {@link DeadFeatureExplanationCreator}
-	 */
-	public abstract DeadFeatureExplanationCreator getDeadFeatureExplanationCreator();
-	
-	/**
-	 * Returns an instance of {@link DeadFeatureExplanationCreator}.
-	 * @param fm the feature model context
-	 * @return an instance of {@link DeadFeatureExplanationCreator}
-	 */
-	public abstract DeadFeatureExplanationCreator getDeadFeatureExplanationCreator(IFeatureModel fm);
-	
-	/**
-	 * Returns an instance of {@link FalseOptionalFeatureExplanationCreator}.
-	 * @return an instance of {@link FalseOptionalFeatureExplanationCreator}
-	 */
-	public abstract FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator();
-	
-	/**
-	 * Returns an instance of {@link FalseOptionalFeatureExplanationCreator}.
-	 * @param fm the feature model context
-	 * @return an instance of {@link FalseOptionalFeatureExplanationCreator}
-	 */
-	public abstract FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator(IFeatureModel fm);
-	
-	/**
-	 * Returns an instance of {@link RedundantConstraintExplanationCreator}.
-	 * @return an instance of {@link RedundantConstraintExplanationCreator}
-	 */
-	public abstract RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator();
-	
-	/**
-	 * Returns an instance of {@link RedundantConstraintExplanationCreator}.
-	 * @param fm the feature model context
-	 * @return an instance of {@link RedundantConstraintExplanationCreator}
-	 */
-	public abstract RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm);
-	
-	/**
-	 * Returns an instance of {@link AutomaticSelectionExplanationCreator}.
-	 * @return an instance of {@link AutomaticSelectionExplanationCreator}
-	 */
-	public abstract AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator();
-	
-	/**
-	 * Returns an instance of {@link AutomaticSelectionExplanationCreator}.
-	 * @param config the configuration
-	 * @return an instance of {@link AutomaticSelectionExplanationCreator}
-	 */
-	public abstract AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator(Configuration config);
-}
+public interface ExplanationCreatorFactory {}

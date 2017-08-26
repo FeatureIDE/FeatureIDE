@@ -18,18 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.config;
+
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
- * Generates {@link Explanation explanations}.
+ * Generates explanations for automatic selections in configurations.
+ * These detail why a given feature must be selected or unselected given the other feature selections.
  * 
  * @author Timo G&uuml;nther
  */
-public interface ExplanationCreator {
+public interface AutomaticSelectionExplanationCreator extends ConfigurationExplanationCreator {
 	/**
-	 * Returns an explanation for the specified circumstance.
-	 * @return an explanation; null if none could be generated
-	 * @throws IllegalStateException if no defect is specified
+	 * Returns the automatic selection to explain.
+	 * @return the automatic selection to explain
 	 */
-	public Explanation getExplanation() throws IllegalStateException;
+	public SelectableFeature getAutomaticSelection();
+	
+	/**
+	 * Sets the automatic selection to explain
+	 * @param automaticSelection the automatic selection to explain
+	 */
+	public void setAutomaticSelection(SelectableFeature automaticSelection);
+	
+	/**
+	 * Returns an explanation why the specified automatic selection is necessary.
+	 */
+	@Override
+	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException;
 }

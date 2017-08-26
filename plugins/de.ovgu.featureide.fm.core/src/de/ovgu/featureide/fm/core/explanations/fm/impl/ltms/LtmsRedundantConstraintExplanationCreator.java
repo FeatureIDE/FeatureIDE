@@ -18,12 +18,14 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.ltms;
+package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.Node;
@@ -33,7 +35,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Implementation of {@link RedundantConstraintExplanationCreator} using an {@link Ltms LTMS}.
@@ -52,7 +56,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	protected LtmsRedundantConstraintExplanationCreator() {
+	public LtmsRedundantConstraintExplanationCreator() {
 		this(null);
 	}
 	
@@ -60,7 +64,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	protected LtmsRedundantConstraintExplanationCreator(IFeatureModel fm) {
+	public LtmsRedundantConstraintExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -69,7 +73,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	 * @param fm the feature model context
 	 * @param redundantConstraint the redundant constraint in the feature model
 	 */
-	protected LtmsRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
+	public LtmsRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
 		super(fm);
 		setRedundantConstraint(redundantConstraint);
 	}
@@ -164,8 +168,8 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	 * </p>
 	 */
 	@Override
-	public Explanation getExplanation() throws IllegalStateException {
-		final Explanation cumulatedExplanation = new Explanation();
+	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
+		final RedundantConstraintExplanation cumulatedExplanation = getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
 		final Ltms ltms = getLtms();
 		for (final Map<Object, Boolean> assignment : getRedundantConstraint().getNode().getContradictingAssignments()) {
@@ -176,7 +180,19 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 			}
 			cumulatedExplanation.addExplanation(explanation);
 		}
-		cumulatedExplanation.setDefectRedundantConstraint(getRedundantConstraint());
+		if (cumulatedExplanation.getExplanationCount() == 0) {
+			return null;
+		}
 		return cumulatedExplanation;
+	}
+	
+	@Override
+	protected RedundantConstraintExplanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
+		return (RedundantConstraintExplanation) super.getExplanation(clauseIndexes);
+	}
+	
+	@Override
+	protected RedundantConstraintExplanation getConcreteExplanation() {
+		return new RedundantConstraintExplanation(getRedundantConstraint());
 	}
 }

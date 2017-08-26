@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -123,7 +123,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			setActiveReason(null); //reset
 			break;
 		case ACTIVE_REASON_CHANGED:
-			setActiveReason((Explanation.Reason) event.getNewValue());
+			setActiveReason((FeatureModelReason) event.getNewValue());
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(event + " @ " + getModel() + " not handled.");
@@ -142,7 +142,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 	 * </p>
 	 * @param activeReason the new active reason; null to reset
 	 */
-	protected void setActiveReason(Explanation.Reason activeReason) {
+	protected void setActiveReason(FeatureModelReason activeReason) {
 		getFigure().setActiveReason(activeReason);
 		getFigure().setConstraintProperties();
 	}

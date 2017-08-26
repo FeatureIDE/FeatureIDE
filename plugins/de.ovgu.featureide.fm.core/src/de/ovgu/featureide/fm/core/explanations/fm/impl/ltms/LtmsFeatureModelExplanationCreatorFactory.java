@@ -18,22 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.ltms;
+package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.explanations.AutomaticSelectionExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.FalseOptionalFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.RedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
- * Provides instances of {@link ExplanationCreatorFactory} using an {@link Ltms LTMS}.
+ * Provides instances of {@link FeatureModelExplanationCreatorFactory} using an {@link Ltms LTMS}.
  * 
  * @author Timo G&uuml;nther
  */
-public class LtmsExplanationCreatorFactory extends ExplanationCreatorFactory {
+public class LtmsFeatureModelExplanationCreatorFactory extends FeatureModelExplanationCreatorFactory {
 	@Override
 	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
 		return new LtmsDeadFeatureExplanationCreator();
@@ -62,15 +61,5 @@ public class LtmsExplanationCreatorFactory extends ExplanationCreatorFactory {
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm) {
 		return new LtmsRedundantConstraintExplanationCreator(fm);
-	}
-	
-	@Override
-	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator(Configuration config) {
-		throw new UnsupportedOperationException();
 	}
 }

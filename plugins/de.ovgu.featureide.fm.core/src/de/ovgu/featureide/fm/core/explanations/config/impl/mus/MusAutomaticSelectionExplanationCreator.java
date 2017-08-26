@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.mus;
+package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,9 +29,10 @@ import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel;
-import de.ovgu.featureide.fm.core.explanations.AutomaticSelectionExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanation;
+import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationReason;
 
 /**
  * Implementation of {@link AutomaticSelectionExplanationCreator} using a {@link MusExtractor MUS extractor}.
@@ -51,7 +52,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	protected MusAutomaticSelectionExplanationCreator() {
+	public MusAutomaticSelectionExplanationCreator() {
 		this(null);
 	}
 	
@@ -59,7 +60,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	 * Constructs a new instance of this class.
 	 * @param config the configuration
 	 */
-	protected MusAutomaticSelectionExplanationCreator(Configuration config) {
+	public MusAutomaticSelectionExplanationCreator(Configuration config) {
 		this(config, null);
 	}
 	
@@ -68,7 +69,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	 * @param fm the feature model context
 	 * @param deadFeature the dead feature in the feature model
 	 */
-	protected MusAutomaticSelectionExplanationCreator(Configuration config, SelectableFeature automaticSelection) {
+	public MusAutomaticSelectionExplanationCreator(Configuration config, SelectableFeature automaticSelection) {
 		super(config);
 		setAutomaticSelection(automaticSelection);
 	}
@@ -84,9 +85,9 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	}
 	
 	@Override
-	public Explanation getExplanation() throws IllegalStateException {
+	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
 		final MusExtractor oracle = getOracle();
-		final Explanation explanation;
+		final AutomaticSelectionExplanation explanation;
 		oracle.push();
 		try {
 			selectedFeatures.clear();
@@ -128,22 +129,25 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 		} finally {
 			oracle.pop();
 		}
-		explanation.setAutomaticSelection(getAutomaticSelection());
 		return explanation;
 	}
 	
 	@Override
-	protected Explanation getExplanation(Set<Integer> clauseIndexes) {
-		final FeatureModelToNodeTraceModel traceModel = getTraceModel();
-		final Explanation explanation = new Explanation();
-		final int traceCount = traceModel.getTraceCount();
-		for (final Integer clauseIndex : clauseIndexes) {
-			if (clauseIndex >= traceCount) {
-				explanation.addReason(selectedFeatures.get(clauseIndex - traceCount));
-			} else {
-				explanation.addReason(traceModel.getTrace(clauseIndex));
-			}
+	protected AutomaticSelectionExplanation getExplanation(Set<Integer> clauseIndexes) {
+		return (AutomaticSelectionExplanation) super.getExplanation(clauseIndexes);
+	}
+	
+	@Override
+	protected Reason getReason(int clauseIndex) {
+		int selectionIndex = clauseIndex - getTraceModel().getTraceCount();
+		if (selectionIndex >= 0) {
+			return new ConfigurationReason(selectedFeatures.get(selectionIndex));
 		}
-		return explanation;
+		return super.getReason(clauseIndex);
+	}
+	
+	@Override
+	protected AutomaticSelectionExplanation getConcreteExplanation() {
+		return new AutomaticSelectionExplanation(getAutomaticSelection());
 	}
 }

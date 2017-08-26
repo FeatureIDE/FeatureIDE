@@ -96,6 +96,9 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
@@ -1314,12 +1317,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 			//Deactivate the old active explanation.
-			final Explanation oldActiveExplanation = (Explanation) event.getOldValue();
+			final FeatureModelExplanation oldActiveExplanation = (FeatureModelExplanation) event.getOldValue();
 			if (oldActiveExplanation != null) {
 				//Reset each element affected by the old active explanation.
 				final Set<IGraphicalElement> updatedElements = new HashSet<>();
-				for (final Explanation.Reason reason : oldActiveExplanation.getReasons()) {
-					for (final IFeatureModelElement sourceElement : reason.getTrace().getElements()) {
+				for (final Reason reason : oldActiveExplanation.getReasons()) {
+					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getTrace().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
 						if (updatedElements.add(element)) {
 							element.update(event);
@@ -1329,11 +1332,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 
 			//Activate the new active explanation.
-			final Explanation newActiveExplanation = (Explanation) event.getNewValue();
+			final FeatureModelExplanation newActiveExplanation = (FeatureModelExplanation) event.getNewValue();
 			if (newActiveExplanation != null) {
 				//Notify each element affected by the new active explanation of its new active reasons.
-				for (final Explanation.Reason reason : newActiveExplanation.getReasons()) {
-					for (final IFeatureModelElement sourceElement : reason.getTrace().getElements()) {
+				for (final Reason reason : newActiveExplanation.getReasons()) {
+					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getTrace().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
 						element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
 					}

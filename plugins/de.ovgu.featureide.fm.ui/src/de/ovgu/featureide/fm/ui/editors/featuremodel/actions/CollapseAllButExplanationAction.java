@@ -29,7 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllButExplanationOperation;
@@ -47,7 +47,7 @@ public class CollapseAllButExplanationAction extends Action {
 	private final IGraphicalFeatureModel fm;
 	
 	/** The currently active explanation. */
-	private Explanation explanation;
+	private FeatureModelExplanation explanation;
 	
 	/**
 	 * Constructs a new instance of this class.
@@ -69,7 +69,7 @@ public class CollapseAllButExplanationAction extends Action {
 				if (event.getEventType() != EventType.ACTIVE_EXPLANATION_CHANGED) {
 					return;
 				}
-				setExplanation((Explanation) event.getNewValue());
+				setExplanation((FeatureModelExplanation) event.getNewValue());
 			}
 		});
 	}
@@ -86,7 +86,7 @@ public class CollapseAllButExplanationAction extends Action {
 	 * Returns the currently active explanation.
 	 * @return the currently active explanation.
 	 */
-	public Explanation getExplanation() {
+	public FeatureModelExplanation getExplanation() {
 		return explanation;
 	}
 	
@@ -94,7 +94,7 @@ public class CollapseAllButExplanationAction extends Action {
 	 * Sets the currently active explanation.
 	 * @param explanation the new active explanation
 	 */
-	public void setExplanation(Explanation explanation) {
+	public void setExplanation(FeatureModelExplanation explanation) {
 		this.explanation = explanation;
 		setEnabled(explanation != null);
 	}

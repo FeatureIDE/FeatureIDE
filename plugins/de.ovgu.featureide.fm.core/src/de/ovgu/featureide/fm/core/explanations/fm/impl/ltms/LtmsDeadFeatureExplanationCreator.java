@@ -18,12 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.ltms;
+package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
+
+import java.util.Collection;
+import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.DeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Implementation of {@link DeadFeatureExplanationCreator} using an {@link Ltms LTMS}.
@@ -38,7 +42,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	protected LtmsDeadFeatureExplanationCreator() {
+	public LtmsDeadFeatureExplanationCreator() {
 		this(null);
 	}
 	
@@ -46,7 +50,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
 	 */
-	protected LtmsDeadFeatureExplanationCreator(IFeatureModel fm) {
+	public LtmsDeadFeatureExplanationCreator(IFeatureModel fm) {
 		this(fm, null);
 	}
 	
@@ -55,7 +59,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	 * @param fm the feature model context
 	 * @param deadFeature the dead feature in the feature model
 	 */
-	protected LtmsDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
+	public LtmsDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
 		super(fm);
 		setDeadFeature(deadFeature);
 	}
@@ -79,15 +83,20 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	 * </p>
 	 */
 	@Override
-	public Explanation getExplanation() throws IllegalStateException {
+	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
 		final Ltms ltms = getLtms();
 		ltms.clearPremises();
 		ltms.addPremise(getDeadFeature().getName(), true);
-		final Explanation explanation = getExplanation(ltms.getExplanations());
-		if (explanation == null) {
-			return null;
-		}
-		explanation.setDefectDeadFeature(getDeadFeature());
-		return explanation;
+		return getExplanation(ltms.getExplanations());
+	}
+	
+	@Override
+	protected DeadFeatureExplanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
+		return (DeadFeatureExplanation) super.getExplanation(clauseIndexes);
+	}
+	
+	@Override
+	protected DeadFeatureExplanation getConcreteExplanation() {
+		return new DeadFeatureExplanation(getDeadFeature());
 	}
 }

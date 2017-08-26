@@ -18,28 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.fm;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 
 /**
- * Generates explanations for defects in feature models.
+ * {@link ExplanationWriter} for instances of {@link DeadFeatureExplanation}.
  * 
  * @author Timo G&uuml;nther
- * @see {@link DeadFeatureExplanationCreator} for explaining dead features and void feature models
- * @see {@link FalseOptionalFeatureExplanationCreator} for explaining false-optional features
- * @see {@link RedundantConstraintExplanationCreator} for explaining redundant constraints
  */
-public interface FeatureModelExplanationCreator extends ExplanationCreator {
+public class DeadFeatureExplanationWriter extends FeatureModelExplanationWriter {
 	/**
-	 * Returns the feature model context.
-	 * @return the feature model context
+	 * Constructs a new instance of this class.
+	 * @param explanation explanation to transform
 	 */
-	public IFeatureModel getFeatureModel();
+	public DeadFeatureExplanationWriter(DeadFeatureExplanation explanation) {
+		super(explanation);
+	}
 	
-	/**
-	 * Sets the feature model context.
-	 * @param fm the feature model context
-	 */
-	public void setFeatureModel(IFeatureModel fm);
+	@Override
+	protected DeadFeatureExplanation getExplanation() {
+		return (DeadFeatureExplanation) super.getExplanation();
+	}
+	
+	@Override
+	protected String getSubjectString() {
+		return getExplanation().isVoid() ? "feature model" : getSubjectString(getExplanation().getSubject());
+	}
+	
+	@Override
+	protected String getAttributeString() {
+		return getExplanation().isVoid() ? "void" : "dead";
+	}
 }

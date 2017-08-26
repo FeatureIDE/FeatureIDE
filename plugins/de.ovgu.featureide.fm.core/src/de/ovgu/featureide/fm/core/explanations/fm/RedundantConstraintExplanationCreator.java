@@ -18,18 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.fm;
+
+import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
- * Generates {@link Explanation explanations}.
+ * Generates explanations for redundant constraints in feature models.
  * 
  * @author Timo G&uuml;nther
  */
-public interface ExplanationCreator {
+public interface RedundantConstraintExplanationCreator extends FeatureModelExplanationCreator {
 	/**
-	 * Returns an explanation for the specified circumstance.
-	 * @return an explanation; null if none could be generated
-	 * @throws IllegalStateException if no defect is specified
+	 * Returns the redundant constraint in the feature model.
+	 * @return the redundant constraint in the feature model
 	 */
-	public Explanation getExplanation() throws IllegalStateException;
+	public IConstraint getRedundantConstraint();
+	
+	/**
+	 * Sets the redundant constraint in the feature model.
+	 * @param redundantConstraint the redundant constraint in the feature model
+	 */
+	public void setRedundantConstraint(IConstraint redundantConstraint);
+	
+	/**
+	 * Returns an explanation why the specified constraint of the specified feature model is redundant.
+	 */
+	@Override
+	public RedundantConstraintExplanation getExplanation() throws IllegalStateException;
 }

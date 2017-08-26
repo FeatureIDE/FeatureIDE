@@ -18,18 +18,22 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations;
+package de.ovgu.featureide.fm.core.explanations.config;
+
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 
 /**
- * Generates {@link Explanation explanations}.
+ * An explanation for a circumstance involving a {@link Configuration configuration}.
  * 
  * @author Timo G&uuml;nther
  */
-public interface ExplanationCreator {
+public abstract class ConfigurationExplanation extends Explanation {
 	/**
-	 * Returns an explanation for the specified circumstance.
-	 * @return an explanation; null if none could be generated
-	 * @throws IllegalStateException if no defect is specified
+	 * Constructs a new instance of this class.
+	 * @param subject the subject to be explained
 	 */
-	public Explanation getExplanation() throws IllegalStateException;
+	protected ConfigurationExplanation(Object subject) {
+		super(subject);
+	}
 }

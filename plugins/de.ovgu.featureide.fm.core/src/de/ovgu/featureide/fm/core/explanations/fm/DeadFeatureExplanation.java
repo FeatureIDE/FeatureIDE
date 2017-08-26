@@ -18,34 +18,41 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
+package de.ovgu.featureide.fm.core.explanations.fm;
 
-import org.eclipse.draw2d.Figure;
-
-import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * A figure for feature model elements, meaning features and constraints.
+ * An explanation for dead features in feature models.
+ * Can also be an explanation for {@link #isVoid() void feature models} in case the dead feature is the root feature.
  * 
  * @author Timo G&uuml;nther
  */
-public abstract class ModelElementFigure extends Figure {
-	/** the currently active reason */
-	private FeatureModelReason activeReason;
-	
+public class DeadFeatureExplanation extends FeatureModelExplanation {
 	/**
-	 * Sets the currently active reason.
-	 * @param activeReason new active reason; null to reset
+	 * Constructs a new instance of this class.
+	 * @param subject the subject to be explained
 	 */
-	public void setActiveReason(FeatureModelReason activeReason) {
-		this.activeReason = activeReason;
+	public DeadFeatureExplanation(IFeature subject) {
+		super(subject);
+	}
+	
+	@Override
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	/**
-	 * Returns the currently active reason.
-	 * @return the currently active reason
+	 * Returns true iff this explanation is for a void feature model.
+	 * @return true iff this explanation is for a void feature model
 	 */
-	public FeatureModelReason getActiveReason() {
-		return activeReason;
+	public boolean isVoid() {
+		return FeatureUtils.isRoot(getSubject());
+	}
+	
+	@Override
+	public DeadFeatureExplanationWriter getWriter() {
+		return new DeadFeatureExplanationWriter(this);
 	}
 }
