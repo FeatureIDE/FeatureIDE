@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationWriter;
 
 /**
- * TODO description
+ * {@link ExplanationWriter} for instances of {@link ConfigurationExplanation}.
  * 
  * @author Timo G&uuml;nther
  */
