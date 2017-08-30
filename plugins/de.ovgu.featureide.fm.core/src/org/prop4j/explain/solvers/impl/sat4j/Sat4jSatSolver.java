@@ -72,6 +72,12 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	}
 	
 	@Override
+	public void addAssumption(Object variable, boolean value) {
+		addVariable(variable);
+		super.addAssumption(variable, value);
+	}
+	
+	@Override
 	public void addClause(Node clause) {
 		addVariables(clause.getUniqueVariables());
 		try {
@@ -92,9 +98,17 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	protected void addVariables(Set<Object> variables) {
 		for (final Object variable : variables) {
-			if (getIndexFromVariable(variable) == 0) {
-				addIndexFromVariable(variable);
-			}
+			addVariable(variable);
+		}
+	}
+	
+	/**
+	 * Adds the given variable to the solver and oracle if it has not already been added.
+	 * @param variable variable to add
+	 */
+	protected void addVariable(Object variable) {
+		if (getIndexFromVariable(variable) == 0) {
+			addIndexFromVariable(variable);
 		}
 	}
 	

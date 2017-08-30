@@ -166,6 +166,7 @@ public abstract class SatSolverTests extends SatProblemTests {
 		expected.put("B", false);
 		assertEquals(expected, solver.getModel());
 		solver.addAssumption("C", true);
+		expected.put("C", true);
 		assertEquals(expected, solver.getModel());
 	}
 	
