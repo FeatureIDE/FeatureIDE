@@ -61,57 +61,7 @@ package de.ovgu.featureide.fm.core;
 	 * @author Thomas Thuem
 	 *
 	 */
-	public class FeatureConnection implements PropertyConstants, IGraphicItem {
-		
-		private IFeature source;
-		
-		private IFeature target;
-		
-		public FeatureConnection(IFeature source) {
-			this.source = source;
-		}
-		
-		public IFeature getSource() {
-			return (IFeature) source;
-		}
-		
-		public IFeature getTarget() {
-			return (IFeature) target;
-		}
-		
-		public void setTarget(IFeature target) {
-			if (this.target == target)
-				return;
-			this.target = target;
-			fireParentChanged();
-		}
-
-		private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-		
-		public void addListener(PropertyChangeListener listener) {
-			if (!listenerList.contains(listener))
-				listenerList.add(listener);
-		}
-		
-		public void removeListener(PropertyChangeListener listener) {
-			listenerList.remove(listener);
-		}
-		
-		private void fireParentChanged() {
-			PropertyChangeEvent event = new PropertyChangeEvent(this, PARENT_CHANGED, Boolean.FALSE, Boolean.TRUE);
-			for (PropertyChangeListener listener : listenerList)
-				listener.propertyChange(event);
-		}
-		
-		@Override
-		public String toString() {
-			return source + " - " + target;
-		}
-		
-		@Override
-		public GraphicItem getItemType() {
-			return GraphicItem.Connection;
-		}
+	public class FeatureConnection {
 
 	}
 
