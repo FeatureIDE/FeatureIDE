@@ -495,7 +495,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	@Override
 	public boolean hasSourceFolder() {
-		return false;
+		return true;
 	}
 
 	@Override

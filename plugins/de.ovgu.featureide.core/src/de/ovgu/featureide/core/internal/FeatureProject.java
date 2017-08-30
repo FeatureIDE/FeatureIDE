@@ -132,7 +132,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		 * listens to changed feature names
 		 */
 		public void propertyChange(FeatureIDEEvent evt) {
-			switch(evt.getEventType()){
+			switch (evt.getEventType()) {
 			case FEATURE_NAME_CHANGED:
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
@@ -290,9 +290,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							break;
 						}
 					}
-					if(addedFeatures < 10 && addedFeatures > 0)
-					{
-						message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ")+2);						
+					if (addedFeatures < 10 && addedFeatures > 0) {
+						message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ") + 2);
 					}
 
 					return message.toString();
@@ -341,17 +340,19 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			// just create the bin folder if project hat only the FeatureIDE
 			// Nature
 			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if (!(projectBuildPath.isEmpty() && getProjectSourcePath().isEmpty())) {
-					binFolder = CorePlugin.createFolder(project, "bin");
+				if (projectBuildPath.isEmpty() && getProjectSourcePath().isEmpty()) {
+					binFolder = project.getFolder("bin");
 				}
 			}
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
 		libFolder = project.getFolder("lib");
-		buildFolder = CorePlugin.createFolder(project, projectBuildPath);
-		configFolder = CorePlugin.createFolder(project, getProjectConfigurationPath());
-		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
+
+		buildFolder = project.getFolder(projectBuildPath);
+		configFolder = project.getFolder(getProjectConfigurationPath());
+		sourceFolder = project.getFolder(getProjectSourcePath());
+
 		fstModel = null;
 		// loading model data and listen to changes in the model file
 		addModelListener();
@@ -368,10 +369,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
-		setPaths(getProjectSourcePath(), projectBuildPath, getProjectConfigurationPath());
+		setPaths(getProjectSourcePath(), getProjectBuildPath(), getProjectConfigurationPath());
 
-		// adds the compiler to the feature project if it is an older project
 		IComposerExtensionClass composer = getComposer();
+		// adds the compiler to the feature project if it is an older project
 		if (composer != null) {
 			if (sourceFolder != null) {
 				composer.addCompiler(getProject(), sourceFolder.getProjectRelativePath().toOSString(), configFolder.getProjectRelativePath().toOSString(),
@@ -863,7 +864,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				setAllFeatureModuleMarkers();
 			}
 		}
-		
+
 		IPath modelPath = modelFile.getModelFile().getFullPath();
 		if (checkModelChange(event.getDelta().findMember(modelPath))) {
 			return;
@@ -872,8 +873,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		try {
 			List<IFile> configs = getAllConfigurations();
 			IResourceDelta configurationDelta = event.getDelta().findMember(configFolder.getFullPath());
-			if(configurationDelta != null)
-			{
+			if (configurationDelta != null) {
 				for (IResourceDelta delta : configurationDelta.getAffectedChildren(IResourceDelta.REMOVED)) {
 					CorePlugin.getDefault().logInfo(delta.toString() + " was removed.");
 					//if configuration was removed update warnings

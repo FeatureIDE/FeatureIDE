@@ -1048,6 +1048,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 					}
 				}
+				graphicalFeatureModel.getGraphicalFeature(parent).update(new FeatureIDEEvent(newFeature, EventType.CHILDREN_CHANGED));
 			} else if (parent != null && parent == newFeature) {
 				if (parent.getStructure().hasChildren()) {
 					for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
