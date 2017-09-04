@@ -1319,7 +1319,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case ACTIVE_EXPLANATION_CHANGED:
 			//Deactivate the old active explanation.
 			final FeatureModelExplanation oldActiveExplanation = (FeatureModelExplanation) event.getOldValue();
-			try {
 			if (oldActiveExplanation != null) {
 				//Reset each element affected by the old active explanation.
 				final Set<IGraphicalElement> updatedElements = new HashSet<>();
@@ -1331,10 +1330,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						}
 					}
 				}
-			}
-			}catch(Exception e) {
-				e.printStackTrace();
-				throw e;
 			}
 
 			//Activate the new active explanation.
