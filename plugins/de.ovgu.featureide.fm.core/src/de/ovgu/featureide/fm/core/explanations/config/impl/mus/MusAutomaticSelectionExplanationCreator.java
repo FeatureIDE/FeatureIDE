@@ -109,7 +109,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					}
 					oracle.addAssumption(var, value); //Assumptions do not show up in the explanation.
 				} else {
-					switch (featureSelection.getSelection()) {
+					switch (featureSelection.getManual()) {
 						case SELECTED:
 							value = true;
 							break;
