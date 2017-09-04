@@ -1264,7 +1264,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 
 			//redraw the explanation after collapse
-			propertyChange(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, activeExplanation, activeExplanation));
+			setActiveExplanation(activeExplanation);
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			reload();
@@ -1277,7 +1277,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			centerPointOnScreen(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 
 			//redraw the explanation after collapse
-			propertyChange(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, activeExplanation, activeExplanation));
+			setActiveExplanation(activeExplanation);
 			break;
 		case COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
@@ -1319,6 +1319,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case ACTIVE_EXPLANATION_CHANGED:
 			//Deactivate the old active explanation.
 			final FeatureModelExplanation oldActiveExplanation = (FeatureModelExplanation) event.getOldValue();
+			try {
 			if (oldActiveExplanation != null) {
 				//Reset each element affected by the old active explanation.
 				final Set<IGraphicalElement> updatedElements = new HashSet<>();
@@ -1330,6 +1331,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						}
 					}
 				}
+			}
+			}catch(Exception e) {
+				e.printStackTrace();
+				throw e;
 			}
 
 			//Activate the new active explanation.
