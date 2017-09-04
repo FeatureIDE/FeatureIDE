@@ -41,16 +41,23 @@
 		<project name="Automotive02_V2" path="featureide_examples/FeatureModels/Automotive02_V2/.project"/>
 		<project name="Automotive02_V3" path="featureide_examples/FeatureModels/Automotive02_V3/.project"/>
 		<project name="Automotive02_V4" path="featureide_examples/FeatureModels/Automotive02_V4/.project"/>
+		<project name="axTLS" path="featureide_examples/FeatureModels/axTLS/.project"/>
 		<project name="BerkeleyDB" path="featureide_examples/FeatureModels/BerkeleyDB/.project"/>
+		<project name="Busybox_1.18.0" path="featureide_examples/FeatureModels/Busybox_1.18.0/.project"/>
 		<project name="E-Shop" path="featureide_examples/FeatureModels/E-Shop/.project"/>
+		<project name="EMBToolkit" path="featureide_examples/FeatureModels/EMBToolkit/.project"/>
 		<project name="FameDB" path="featureide_examples/FeatureModels/FameDB/.project"/>
 		<project name="FameDB2" path="featureide_examples/FeatureModels/FameDB2/.project"/>
 		<project name="FeatureIDE" path="featureide_examples/FeatureModels/FeatureIDE/.project"/>
 		<project name="GPLmedium" path="featureide_examples/FeatureModels/GPLmedium/.project"/>
 		<project name="GPLsmall" path="featureide_examples/FeatureModels/GPLsmall/.project"/>
 		<project name="GPLtiny" path="featureide_examples/FeatureModels/GPLtiny/.project"/>
+		<project name="Linux_2.6.33.3" path="featureide_examples/FeatureModels/Linux_2.6.33.3/.project"/>
 		<project name="SafeBali" path="featureide_examples/FeatureModels/SafeBali/.project"/>
 		<project name="TightVNC" path="featureide_examples/FeatureModels/TightVNC/.project"/>
+		<project name="uClibc" path="featureide_examples/FeatureModels/uClibc/.project"/>
+		<project name="uClibc-Base" path="featureide_examples/FeatureModels/uClibc-Base/.project"/>
+		<project name="uClibc-Distribution" path="featureide_examples/FeatureModels/uClibc-Distribution/.project"/>
 		<project name="DBMS-VELVET" path="featureide_examples/FeatureModels/VELVET/DBMS-VELVET/.project"/>
 		<project name="HelloWorldMPL-VELVET" path="featureide_examples/FeatureModels/VELVET/HelloWorldMPL-VELVET/.project"/>
 		<project name="Violet" path="featureide_examples/FeatureModels/Violet/.project"/>

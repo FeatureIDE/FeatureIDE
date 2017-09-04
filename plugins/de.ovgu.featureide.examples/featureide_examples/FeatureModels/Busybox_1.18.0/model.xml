@@ -1,0 +1,4162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="root">
+				<and name="FEATURE_MOUNT_LOOP">
+					<feature name="FEATURE_MOUNT_LOOP_CREATE"/>
+				</and>
+				<feature name="RX"/>
+				<feature name="CMP"/>
+				<feature name="VOLNAME"/>
+				<feature name="SMEMCAP"/>
+				<and name="SWAPONOFF">
+					<feature name="FEATURE_SWAPON_PRI"/>
+				</and>
+				<feature name="LOGNAME"/>
+				<and name="UNICODE_SUPPORT">
+					<feature mandatory="true" name="SUBST_WCHAR"/>
+					<feature name="UNICODE_WIDE_WCHARS"/>
+					<feature name="UNICODE_COMBINING_WCHARS"/>
+					<feature name="UNICODE_USING_LOCALE"/>
+					<and name="UNICODE_BIDI_SUPPORT">
+						<feature name="UNICODE_NEUTRAL_TABLE"/>
+					</and>
+					<feature name="UNICODE_PRESERVE_BROKEN"/>
+					<feature mandatory="true" name="LAST_SUPPORTED_WCHAR"/>
+					<feature name="FEATURE_CHECK_UNICODE_IN_ENV"/>
+				</and>
+				<feature name="TFTP"/>
+				<feature name="FEATURE_UNIX_LOCAL"/>
+				<feature name="FEATURE_PS_UNUSUAL_SYSTEMS"/>
+				<feature name="UNZIP"/>
+				<feature name="FBSPLASH"/>
+				<and name="DMESG">
+					<feature name="FEATURE_DMESG_PRETTY"/>
+				</and>
+				<feature mandatory="true" name="UDHCP_DEBUG"/>
+				<feature name="ID"/>
+				<feature name="VCONFIG"/>
+				<and name="FTPPUT">
+					<feature name="FEATURE_FTPGETPUT_LONG_OPTIONS"/>
+				</and>
+				<feature name="SED"/>
+				<feature name="FEATURE_VOLUMEID_ROMFS"/>
+				<feature name="DELUSER"/>
+				<and name="CHAT">
+					<feature name="FEATURE_CHAT_CLR_ABORT"/>
+					<feature name="FEATURE_CHAT_SEND_ESCAPES"/>
+					<feature name="FEATURE_CHAT_NOFAIL"/>
+					<feature name="FEATURE_CHAT_IMPLICIT_CR"/>
+					<feature name="FEATURE_CHAT_SWALLOW_OPTS"/>
+					<feature name="FEATURE_CHAT_VAR_ABORT_LEN"/>
+					<feature name="FEATURE_CHAT_TTY_HIFI"/>
+				</and>
+				<feature name="GUNZIP"/>
+				<feature name="FEATURE_VOLUMEID_LINUXRAID"/>
+				<and name="CPIO">
+					<and name="FEATURE_CPIO_O">
+						<feature name="FEATURE_CPIO_P"/>
+					</and>
+				</and>
+				<feature mandatory="true" name="BUSYBOX_EXEC_PATH"/>
+				<feature name="PATCH"/>
+				<and name="SV">
+					<feature mandatory="true" name="SV_DEFAULT_SERVICE_DIR"/>
+				</and>
+				<feature name="BASENAME"/>
+				<feature name="CATV"/>
+				<feature name="MKTEMP"/>
+				<feature name="LOADKMAP"/>
+				<and name="SETCONSOLE">
+					<feature name="FEATURE_SETCONSOLE_LONG_OPTIONS"/>
+				</and>
+				<and name="PASSWD">
+					<feature name="FEATURE_PASSWD_WEAK_CHECK"/>
+				</and>
+				<feature name="FEATURE_VOLUMEID_LINUXSWAP"/>
+				<feature name="ETHER_WAKE"/>
+				<and name="BBCONFIG">
+					<feature name="FEATURE_COMPRESS_BBCONFIG"/>
+				</and>
+				<feature name="MKFS_REISER"/>
+				<and name="TR">
+					<feature name="FEATURE_TR_CLASSES"/>
+					<feature name="FEATURE_TR_EQUIV"/>
+				</and>
+				<feature name="INCLUDE_SUSv2"/>
+				<feature name="GETSEBOOL"/>
+				<feature name="WALL"/>
+				<feature name="LN"/>
+				<and name="BOOTCHARTD">
+					<feature name="FEATURE_BOOTCHARTD_CONFIG_FILE"/>
+					<feature name="FEATURE_BOOTCHARTD_BLOATED_HEADER"/>
+				</and>
+				<and name="UNEXPAND">
+					<feature name="FEATURE_UNEXPAND_LONG_OPTIONS"/>
+				</and>
+				<feature name="WHOAMI"/>
+				<feature mandatory="true" name="DEFAULT_MODULES_DIR"/>
+				<feature name="FEATURE_FAST_TOP"/>
+				<feature name="LPR"/>
+				<and name="GZIP">
+					<feature name="FEATURE_GZIP_LONG_OPTIONS"/>
+				</and>
+				<alt abstract="true" mandatory="true" name="FEATURE_SH_IS_HUSH_alt">
+					<feature mandatory="true" name="FEATURE_SH_IS_ASH"/>
+					<feature mandatory="true" name="FEATURE_SH_IS_HUSH"/>
+					<feature mandatory="true" name="FEATURE_SH_IS_NONE"/>
+				</alt>
+				<feature name="VLOCK"/>
+				<feature name="MKFS_EXT2"/>
+				<and name="SHOW_USAGE">
+					<feature name="FEATURE_COMPRESS_USAGE"/>
+					<feature name="FEATURE_VERBOSE_USAGE"/>
+				</and>
+				<and name="SYSLOGD">
+					<feature name="FEATURE_ROTATE_LOGFILE"/>
+					<feature name="FEATURE_SYSLOGD_DUP"/>
+					<feature name="FEATURE_REMOTE_LOG"/>
+					<and name="FEATURE_IPC_SYSLOG">
+						<feature mandatory="true" name="FEATURE_IPC_SYSLOG_BUFFER_SIZE"/>
+						<and name="LOGREAD">
+							<feature name="FEATURE_LOGREAD_REDUCED_LOCKING"/>
+						</and>
+					</and>
+					<feature mandatory="true" name="FEATURE_SYSLOGD_READ_BUFFER_SIZE"/>
+				</and>
+				<and name="IPCALC">
+					<feature name="FEATURE_IPCALC_LONG_OPTIONS"/>
+					<feature name="FEATURE_IPCALC_FANCY"/>
+				</and>
+				<and name="DIFF">
+					<feature name="FEATURE_DIFF_LONG_OPTIONS"/>
+					<feature name="FEATURE_DIFF_DIR"/>
+				</and>
+				<feature name="CHGRP"/>
+				<feature name="READAHEAD"/>
+				<feature name="SELINUX"/>
+				<feature name="FEATURE_SHADOWPASSWDS"/>
+				<and name="LZOP">
+					<feature name="LZOP_COMPR_HIGH"/>
+				</and>
+				<and name="UNLZMA">
+					<feature name="FEATURE_LZMA_FAST"/>
+					<feature name="LZMA"/>
+				</and>
+				<feature name="CONSPY"/>
+				<feature name="LONG_OPTS"/>
+				<feature name="MSH"/>
+				<feature name="FDFORMAT"/>
+				<feature name="DUMPKMAP"/>
+				<feature name="FEATURE_IPV6"/>
+				<and name="NTPD">
+					<feature name="FEATURE_NTPD_SERVER"/>
+				</and>
+				<and name="SORT">
+					<feature name="FEATURE_SORT_BIG"/>
+				</and>
+				<feature mandatory="true" name="DEFAULT_DEPMOD_FILE"/>
+				<feature name="RDATE"/>
+				<feature mandatory="true" name="EXTRA_CFLAGS"/>
+				<and name="ADDUSER">
+					<feature mandatory="true" name="LAST_SYSTEM_ID"/>
+					<feature name="FEATURE_ADDUSER_LONG_OPTIONS"/>
+					<feature name="FEATURE_CHECK_NAMES"/>
+					<feature mandatory="true" name="FIRST_SYSTEM_ID"/>
+				</and>
+				<feature name="FAKEIDENTD"/>
+				<feature name="FEATURE_VOLUMEID_ISO9660"/>
+				<feature name="TRUE"/>
+				<and name="MOUNT">
+					<feature name="FEATURE_MOUNT_FSTAB"/>
+					<feature name="FEATURE_MOUNT_FAKE"/>
+					<feature name="FEATURE_MOUNT_FLAGS"/>
+					<feature name="FEATURE_MOUNT_LABEL"/>
+					<feature name="FEATURE_MOUNT_VERBOSE"/>
+					<feature name="FEATURE_MOUNT_NFS"/>
+					<feature name="FEATURE_MOUNT_CIFS"/>
+					<feature name="FEATURE_MOUNT_HELPERS"/>
+				</and>
+				<and name="DEVFSD">
+					<feature name="DEVFSD_MODLOAD"/>
+					<feature name="DEVFSD_VERBOSE"/>
+					<feature name="DEVFSD_FG_NP"/>
+				</and>
+				<feature name="FEATURE_CLEAN_UP"/>
+				<feature name="CTTYHACK"/>
+				<feature name="SUM"/>
+				<feature name="ZCIP"/>
+				<feature name="FEATURE_MODUTILS_ALIAS"/>
+				<feature name="UNCOMPRESS"/>
+				<and name="PIDOF">
+					<feature name="FEATURE_PIDOF_SINGLE"/>
+					<feature name="FEATURE_PIDOF_OMIT"/>
+				</and>
+				<feature name="SULOGIN"/>
+				<and name="MDEV">
+					<feature name="FEATURE_MDEV_LOAD_FIRMWARE"/>
+					<and name="FEATURE_MDEV_CONF">
+						<feature name="FEATURE_MDEV_EXEC"/>
+						<and name="FEATURE_MDEV_RENAME">
+							<feature name="FEATURE_MDEV_RENAME_REGEXP"/>
+						</and>
+					</and>
+				</and>
+				<feature name="LOAD_POLICY"/>
+				<and name="TAIL">
+					<feature name="FEATURE_FANCY_TAIL"/>
+				</and>
+				<and name="CROND">
+					<feature name="FEATURE_CROND_CALL_SENDMAIL"/>
+					<feature name="FEATURE_CROND_D"/>
+					<feature mandatory="true" name="FEATURE_CROND_DIR"/>
+				</and>
+				<feature name="IPCS"/>
+				<feature name="NOMMU"/>
+				<feature name="FEATURE_PRESERVE_HARDLINKS"/>
+				<feature name="UBIATTACH"/>
+				<and name="DF">
+					<feature name="FEATURE_DF_FANCY"/>
+				</and>
+				<and name="UMOUNT">
+					<feature name="FEATURE_UMOUNT_ALL"/>
+				</and>
+				<feature name="IPROUTE"/>
+				<and name="READLINK">
+					<feature name="FEATURE_READLINK_FOLLOW"/>
+				</and>
+				<feature name="SVLOGD"/>
+				<feature mandatory="true" name="PASSWORD_MINLEN"/>
+				<feature name="CHPST"/>
+				<feature name="FREE"/>
+				<and name="SETFILES">
+					<feature name="FEATURE_SETFILES_CHECK_OPTION"/>
+				</and>
+				<feature name="FLASH_LOCK"/>
+				<feature name="MOUNTPOINT"/>
+				<feature name="FEATURE_2_4_MODULES"/>
+				<feature name="LSPCI"/>
+				<feature name="FEATURE_SEAMLESS_Z"/>
+				<feature name="IOCTL_HEX2STR_ERROR"/>
+				<and name="HALT">
+					<and name="FEATURE_CALL_TELINIT">
+						<feature mandatory="true" name="TELINIT_PATH"/>
+					</and>
+				</and>
+				<and name="TASKSET">
+					<feature name="FEATURE_TASKSET_FANCY"/>
+				</and>
+				<and name="KILL">
+					<feature name="KILLALL5"/>
+					<feature name="KILLALL"/>
+				</and>
+				<feature name="IOSTAT"/>
+				<and name="EJECT">
+					<feature name="FEATURE_EJECT_SCSI"/>
+				</and>
+				<and name="HTTPD">
+					<feature name="FEATURE_HTTPD_USE_SENDFILE"/>
+					<feature name="FEATURE_HTTPD_GZIP"/>
+					<feature name="FEATURE_HTTPD_SETUID"/>
+					<and name="FEATURE_HTTPD_CGI">
+						<feature name="FEATURE_HTTPD_SET_REMOTE_PORT_TO_ENV"/>
+						<feature name="FEATURE_HTTPD_CONFIG_WITH_SCRIPT_INTERPR"/>
+					</and>
+					<and name="FEATURE_HTTPD_BASIC_AUTH">
+						<feature name="FEATURE_HTTPD_AUTH_MD5"/>
+					</and>
+					<feature name="FEATURE_HTTPD_PROXY"/>
+					<feature name="FEATURE_HTTPD_RANGES"/>
+					<feature name="FEATURE_HTTPD_ENCODE_URL_STR"/>
+					<feature name="FEATURE_HTTPD_ERROR_PAGES"/>
+				</and>
+				<feature name="ADJTIMEX"/>
+				<feature name="USLEEP"/>
+				<and name="MKDIR">
+					<feature name="FEATURE_MKDIR_LONG_OPTIONS"/>
+				</and>
+				<feature name="LOADFONT"/>
+				<feature name="PRINTENV"/>
+				<feature name="FSCK_MINIX"/>
+				<and name="FEATURE_INSTALLER">
+					<feature name="INSTALL_NO_USR"/>
+				</and>
+				<and name="MV">
+					<feature name="FEATURE_MV_LONG_OPTIONS"/>
+				</and>
+				<and name="POPMAILDIR">
+					<feature name="FEATURE_POPMAILDIR_DELIVERY"/>
+				</and>
+				<feature name="SETENFORCE"/>
+				<feature name="RUNSV"/>
+				<feature name="NMETER"/>
+				<feature name="DNSD"/>
+				<feature name="HOSTNAME"/>
+				<feature name="CHRT"/>
+				<and name="FEATURE_EDITING">
+					<feature name="FEATURE_EDITING_ASK_TERMINAL"/>
+					<feature name="FEATURE_EDITING_FANCY_PROMPT"/>
+					<and name="FEATURE_TAB_COMPLETION">
+						<feature name="FEATURE_USERNAME_COMPLETION"/>
+					</and>
+					<feature mandatory="true" name="FEATURE_EDITING_HISTORY"/>
+					<feature mandatory="true" name="FEATURE_EDITING_MAX_LEN"/>
+					<feature name="FEATURE_EDITING_VI"/>
+					<feature name="FEATURE_EDITING_SAVEHISTORY"/>
+				</and>
+				<and name="TAR">
+					<and name="FEATURE_TAR_LONG_OPTIONS">
+						<feature name="FEATURE_TAR_TO_COMMAND"/>
+					</and>
+					<feature name="FEATURE_TAR_SELINUX"/>
+					<feature name="FEATURE_TAR_NOPRESERVE_TIME"/>
+					<feature name="FEATURE_TAR_CREATE"/>
+					<feature name="FEATURE_TAR_OLDGNU_COMPATIBILITY"/>
+					<feature name="FEATURE_TAR_FROM"/>
+					<feature name="FEATURE_TAR_UNAME_GNAME"/>
+					<feature name="FEATURE_TAR_GNU_EXTENSIONS"/>
+					<feature name="FEATURE_TAR_AUTODETECT"/>
+					<feature name="FEATURE_TAR_OLDSUN_COMPATIBILITY"/>
+				</and>
+				<feature name="TCPSVD"/>
+				<feature name="GETTY"/>
+				<feature name="SESTATUS"/>
+				<feature name="PRINTF"/>
+				<feature name="FEATURE_VOLUMEID_SYSV"/>
+				<feature name="FEATURE_VOLUMEID_JFS"/>
+				<feature name="RENICE"/>
+				<and name="GREP">
+					<feature name="FEATURE_GREP_FGREP_ALIAS"/>
+					<feature name="FEATURE_GREP_CONTEXT"/>
+					<feature name="FEATURE_GREP_EGREP_ALIAS"/>
+				</and>
+				<and name="MAKEDEVS">
+					<alt abstract="true" mandatory="true" name="FEATURE_MAKEDEVS_TABLE_alt">
+						<feature mandatory="true" name="FEATURE_MAKEDEVS_LEAF"/>
+						<feature mandatory="true" name="FEATURE_MAKEDEVS_TABLE"/>
+					</alt>
+				</and>
+				<feature mandatory="true" name="IFUPDOWN_UDHCPC_CMD_OPTIONS"/>
+				<and name="TEST">
+					<feature name="FEATURE_TEST_64"/>
+				</and>
+				<and name="INIT">
+					<feature name="FEATURE_INIT_COREDUMPS"/>
+					<and name="FEATURE_USE_INITTAB">
+						<and name="FEATURE_KILL_REMOVED">
+							<feature mandatory="true" name="FEATURE_KILL_DELAY"/>
+						</and>
+					</and>
+					<feature name="FEATURE_INIT_SCTTY"/>
+					<feature name="FEATURE_INIT_SYSLOG"/>
+					<feature name="FEATURE_INITRD"/>
+					<feature mandatory="true" name="INIT_TERMINAL_TYPE"/>
+					<feature name="FEATURE_EXTRA_QUIET"/>
+				</and>
+				<feature name="FEATURE_AUTOWIDTH"/>
+				<and name="DEBUG">
+					<feature name="DEBUG_PESSIMIZE"/>
+				</and>
+				<feature name="COMM"/>
+				<and name="BEEP">
+					<feature mandatory="true" name="FEATURE_BEEP_LENGTH_MS"/>
+					<feature mandatory="true" name="FEATURE_BEEP_FREQ"/>
+				</and>
+				<and name="ACPID">
+					<feature name="FEATURE_ACPID_COMPAT"/>
+				</and>
+				<feature name="FEATURE_VOLUMEID_XFS"/>
+				<feature name="SETARCH"/>
+				<feature name="FLASHCP"/>
+				<feature name="LPQ"/>
+				<and name="TELNETD">
+					<and name="FEATURE_TELNETD_STANDALONE">
+						<feature name="FEATURE_TELNETD_INETD_WAIT"/>
+					</and>
+				</and>
+				<feature name="FDFLUSH"/>
+				<feature name="FEATURE_SH_NOFORK"/>
+				<feature name="DIRNAME"/>
+				<feature name="FEATURE_VOLUMEID_OCFS2"/>
+				<and name="WGET">
+					<feature name="FEATURE_WGET_TIMEOUT"/>
+					<feature name="FEATURE_WGET_STATUSBAR"/>
+					<feature name="FEATURE_WGET_AUTHENTICATION"/>
+					<feature name="FEATURE_WGET_LONG_OPTIONS"/>
+				</and>
+				<feature name="SETLOGCONS"/>
+				<and name="CP">
+					<feature name="FEATURE_CP_LONG_OPTIONS"/>
+				</and>
+				<alt abstract="true" mandatory="true" name="INSTALL_SH_APPLET_SCRIPT_WRAPPER_alt">
+					<feature mandatory="true" name="INSTALL_SH_APPLET_SYMLINK"/>
+					<feature mandatory="true" name="INSTALL_SH_APPLET_HARDLINK"/>
+					<feature mandatory="true" name="INSTALL_SH_APPLET_SCRIPT_WRAPPER"/>
+				</alt>
+				<feature name="HAVE_DOT_CONFIG"/>
+				<feature name="PIVOT_ROOT"/>
+				<and name="UNXZ">
+					<feature name="XZ"/>
+				</and>
+				<feature name="NSLOOKUP"/>
+				<feature name="FTPGET"/>
+				<feature name="MATCHPATHCON"/>
+				<and name="HUSH">
+					<feature name="HUSH_CASE"/>
+					<feature name="HUSH_RANDOM_SUPPORT"/>
+					<feature name="HUSH_EXPORT_N"/>
+					<and name="HUSH_INTERACTIVE">
+						<feature name="HUSH_SAVEHISTORY"/>
+						<feature name="HUSH_JOB"/>
+					</and>
+					<and name="HUSH_FUNCTIONS">
+						<feature name="HUSH_LOCAL"/>
+					</and>
+					<and name="HUSH_BASH_COMPAT">
+						<feature name="HUSH_BRACE_EXPANSION"/>
+					</and>
+					<feature name="HUSH_IF"/>
+					<feature name="HUSH_HELP"/>
+					<feature name="HUSH_TICK"/>
+					<feature name="HUSH_LOOPS"/>
+					<feature name="HUSH_MODE_X"/>
+				</and>
+				<feature name="NANDWRITE"/>
+				<feature name="SCRIPT"/>
+				<feature name="STTY"/>
+				<feature name="PMAP"/>
+				<and name="TFTPD">
+					<feature name="FEATURE_TFTP_PUT"/>
+					<and name="FEATURE_TFTP_BLOCKSIZE">
+						<feature name="FEATURE_TFTP_PROGRESS_BAR"/>
+					</and>
+					<feature name="TFTP_DEBUG"/>
+					<feature name="FEATURE_TFTP_GET"/>
+				</and>
+				<feature name="OPENVT"/>
+				<and name="BUILD_LIBBUSYBOX">
+					<feature name="FEATURE_SHARED_BUSYBOX"/>
+					<feature name="FEATURE_INDIVIDUAL"/>
+				</and>
+				<feature name="FOLD"/>
+				<feature name="UUENCODE"/>
+				<and name="HEAD">
+					<feature name="FEATURE_FANCY_HEAD"/>
+				</and>
+				<feature name="BB_SYSCTL"/>
+				<feature mandatory="true" name="UDHCPC_SLACK_FOR_BUGGY_SERVERS"/>
+				<feature name="ADD_SHELL"/>
+				<feature name="SLATTACH"/>
+				<feature name="FEATURE_DEVFS"/>
+				<feature name="SHOWKEY"/>
+				<feature name="LOCALE_SUPPORT"/>
+				<and name="SH_MATH_SUPPORT">
+					<feature name="SH_MATH_SUPPORT_64"/>
+				</and>
+				<feature name="UNAME"/>
+				<and name="CHOWN">
+					<feature name="FEATURE_CHOWN_LONG_OPTIONS"/>
+				</and>
+				<feature name="SETUIDGID"/>
+				<and name="START_STOP_DAEMON">
+					<feature name="FEATURE_START_STOP_DAEMON_LONG_OPTIONS"/>
+					<feature name="FEATURE_START_STOP_DAEMON_FANCY"/>
+				</and>
+				<feature name="FINDFS"/>
+				<and name="HDPARM">
+					<feature name="FEATURE_HDPARM_HDIO_TRISTATE_HWIF"/>
+					<feature name="FEATURE_HDPARM_GET_IDENTITY"/>
+					<feature name="FEATURE_HDPARM_HDIO_SCAN_HWIF"/>
+					<feature name="FEATURE_HDPARM_HDIO_GETSET_DMA"/>
+					<feature name="FEATURE_HDPARM_HDIO_UNREGISTER_HWIF"/>
+					<feature name="FEATURE_HDPARM_HDIO_DRIVE_RESET"/>
+				</and>
+				<feature name="MAN"/>
+				<feature name="FEATURE_NON_POSIX_CP"/>
+				<and name="REFORMIME">
+					<feature name="FEATURE_REFORMIME_COMPAT"/>
+				</and>
+				<feature name="PIPE_PROGRESS"/>
+				<feature name="RAIDAUTORUN"/>
+				<feature name="STRINGS"/>
+				<feature name="RDEV"/>
+				<and name="DPKG_DEB">
+					<feature name="FEATURE_DPKG_DEB_EXTRACT_ONLY"/>
+				</and>
+				<feature name="REALPATH"/>
+				<feature name="MKFS_VFAT"/>
+				<feature name="CAL"/>
+				<feature name="SENDMAIL"/>
+				<feature name="IFPLUGD"/>
+				<feature name="MD5SUM"/>
+				<feature name="FUSER"/>
+				<feature name="UBIDETACH"/>
+				<and name="GETOPT">
+					<feature name="FEATURE_GETOPT_LONG"/>
+				</and>
+				<and name="INSTALL">
+					<feature name="FEATURE_INSTALL_LONG_OPTIONS"/>
+				</and>
+				<and name="UDHCPC">
+					<feature name="FEATURE_UDHCPC_ARPING"/>
+				</and>
+				<alt abstract="true" mandatory="true" name="FEATURE_BUFFERS_GO_IN_BSS_alt">
+					<feature mandatory="true" name="FEATURE_BUFFERS_USE_MALLOC"/>
+					<feature mandatory="true" name="FEATURE_BUFFERS_GO_ON_STACK"/>
+					<feature mandatory="true" name="FEATURE_BUFFERS_GO_IN_BSS"/>
+				</alt>
+				<feature name="TAC"/>
+				<feature name="FEATURE_LOADFONT_PSF2"/>
+				<and name="DD">
+					<feature name="FEATURE_DD_IBS_OBS"/>
+					<and name="FEATURE_DD_SIGNAL_HANDLING">
+						<feature name="FEATURE_DD_THIRD_STATUS_LINE"/>
+					</and>
+				</and>
+				<feature name="FEATURE_HUMAN_READABLE"/>
+				<and name="RUN_PARTS">
+					<feature name="FEATURE_RUN_PARTS_LONG_OPTIONS"/>
+					<feature name="FEATURE_RUN_PARTS_FANCY"/>
+				</and>
+				<feature name="FEATURE_VERBOSE_CP_MESSAGE"/>
+				<feature name="WERROR"/>
+				<feature name="BUNZIP2"/>
+				<and name="FTPD">
+					<feature name="FEATURE_FTP_WRITE"/>
+					<feature name="FEATURE_FTPD_ACCEPT_BROKEN_LIST"/>
+				</and>
+				<and name="TRACEROUTE">
+					<feature name="FEATURE_TRACEROUTE_USE_ICMP"/>
+					<feature name="FEATURE_TRACEROUTE_VERBOSE"/>
+					<feature name="FEATURE_TRACEROUTE_SOURCE_ROUTE"/>
+					<feature name="TRACEROUTE6"/>
+				</and>
+				<feature name="RFKILL"/>
+				<feature name="FALSE"/>
+				<feature name="CHATTR"/>
+				<feature name="LFS"/>
+				<feature name="FSYNC"/>
+				<feature name="REV"/>
+				<alt abstract="true" mandatory="true" name="FEATURE_BASH_IS_HUSH_alt">
+					<feature mandatory="true" name="FEATURE_BASH_IS_ASH"/>
+					<feature mandatory="true" name="FEATURE_BASH_IS_HUSH"/>
+					<feature mandatory="true" name="FEATURE_BASH_IS_NONE"/>
+				</alt>
+				<feature name="CHPASSWD"/>
+				<feature name="RESTORECON"/>
+				<and name="DU">
+					<feature name="FEATURE_DU_DEFAULT_BLOCKSIZE_1K"/>
+				</and>
+				<feature name="FEATURE_INSMOD_LOADINKMEM"/>
+				<feature name="EXTRA_COMPAT"/>
+				<feature name="USE_PORTABLE_CODE"/>
+				<feature name="PSCAN"/>
+				<feature name="SHA512SUM"/>
+				<and name="DATE">
+					<feature name="FEATURE_DATE_ISOFMT"/>
+					<feature name="FEATURE_DATE_NANO"/>
+					<feature name="FEATURE_DATE_COMPAT"/>
+				</and>
+				<and name="SETFONT">
+					<feature mandatory="true" name="DEFAULT_SETFONT_DIR"/>
+					<feature name="FEATURE_SETFONT_TEXTUAL_MAP"/>
+				</and>
+				<feature name="RUNLEVEL"/>
+				<feature name="IONICE"/>
+				<and name="RESIZE">
+					<feature name="FEATURE_RESIZE_PRINT"/>
+				</and>
+				<feature name="FLASH_UNLOCK"/>
+				<feature name="FEATURE_LOADFONT_RAW"/>
+				<and name="IFUPDOWN">
+					<feature name="FEATURE_IFUPDOWN_IPV4"/>
+					<and name="FEATURE_IFUPDOWN_IP">
+						<feature name="FEATURE_IFUPDOWN_IFCONFIG_BUILTIN"/>
+						<feature name="FEATURE_IFUPDOWN_IP_BUILTIN"/>
+					</and>
+					<feature mandatory="true" name="IFUPDOWN_IFSTATE_PATH"/>
+					<feature name="FEATURE_IFUPDOWN_MAPPING"/>
+					<feature name="FEATURE_IFUPDOWN_IPV6"/>
+					<feature name="FEATURE_IFUPDOWN_EXTERNAL_DHCP"/>
+				</and>
+				<and name="FEATURE_SUID">
+					<and name="FEATURE_SUID_CONFIG">
+						<feature name="FEATURE_SUID_CONFIG_QUIET"/>
+					</and>
+				</and>
+				<feature name="ARP"/>
+				<and name="CHCON">
+					<feature name="FEATURE_CHCON_LONG_OPTIONS"/>
+				</and>
+				<and name="AR">
+					<feature name="FEATURE_AR_LONG_FILENAMES"/>
+					<feature name="FEATURE_AR_CREATE"/>
+				</and>
+				<feature name="READPROFILE"/>
+				<feature name="ENVUIDGID"/>
+				<feature name="LENGTH"/>
+				<and name="ADDGROUP">
+					<feature name="FEATURE_ADDUSER_TO_GROUP"/>
+					<feature name="FEATURE_ADDGROUP_LONG_OPTIONS"/>
+				</and>
+				<feature name="BASE64"/>
+				<and name="RUNCON">
+					<feature name="FEATURE_RUNCON_LONG_OPTIONS"/>
+				</and>
+				<alt abstract="true" mandatory="true" name="DMALLOC_alt">
+					<feature mandatory="true" name="NO_DEBUG_LIB"/>
+					<feature mandatory="true" name="DMALLOC"/>
+					<feature mandatory="true" name="EFENCE"/>
+				</alt>
+				<and name="IP">
+					<feature name="FEATURE_IP_RULE"/>
+					<feature name="FEATURE_IP_LINK"/>
+					<feature name="FEATURE_IP_TUNNEL"/>
+					<feature name="FEATURE_IP_ROUTE"/>
+					<feature name="FEATURE_IP_ADDRESS"/>
+					<feature name="FEATURE_IP_SHORT_FORMS"/>
+					<feature name="FEATURE_IP_RARE_PROTOCOLS"/>
+				</and>
+				<feature name="SEQ"/>
+				<feature name="FEATURE_SYSLOG"/>
+				<feature name="FEATURE_PREFER_APPLETS"/>
+				<feature name="DEALLOCVT"/>
+				<and name="MKSWAP">
+					<feature name="FEATURE_MKSWAP_UUID"/>
+				</and>
+				<feature name="MICROCOM"/>
+				<feature name="GETENFORCE"/>
+				<and name="LS">
+					<feature name="FEATURE_LS_TIMESTAMPS"/>
+					<feature name="FEATURE_LS_FILETYPES"/>
+					<feature name="FEATURE_LS_RECURSIVE"/>
+					<and name="FEATURE_LS_COLOR">
+						<feature name="FEATURE_LS_COLOR_IS_DEFAULT"/>
+					</and>
+					<feature name="FEATURE_LS_FOLLOWLINKS"/>
+					<feature name="FEATURE_LS_USERNAME"/>
+					<feature name="FEATURE_LS_SORTFILES"/>
+				</and>
+				<feature name="ROUTE"/>
+				<feature name="UUDECODE"/>
+				<feature name="TTYSIZE"/>
+				<and name="EXPR">
+					<feature name="EXPR_MATH_SUPPORT_64"/>
+				</and>
+				<feature name="IPRULE"/>
+				<feature name="WATCH"/>
+				<feature name="FGCONSOLE"/>
+				<feature name="FSCK"/>
+				<feature name="CRYPTPW"/>
+				<feature name="ED"/>
+				<feature name="WHO"/>
+				<feature name="FEATURE_SEAMLESS_GZ"/>
+				<and name="MAKEMIME">
+					<feature mandatory="true" name="FEATURE_MIME_CHARSET"/>
+				</and>
+				<feature name="FLOCK"/>
+				<and name="BRCTL">
+					<and name="FEATURE_BRCTL_FANCY">
+						<feature name="FEATURE_BRCTL_SHOW"/>
+					</and>
+				</and>
+				<feature name="DESKTOP"/>
+				<feature name="PLATFORM_LINUX"/>
+				<feature name="LOGGER"/>
+				<feature name="TIMEOUT"/>
+				<feature name="LSUSB"/>
+				<feature name="FEATURE_SEAMLESS_LZMA"/>
+				<feature name="MT"/>
+				<feature name="DEVMEM"/>
+				<feature name="POWERTOP"/>
+				<and name="TEE">
+					<feature name="FEATURE_TEE_USE_BLOCK_IO"/>
+				</and>
+				<feature name="FEATURE_SH_STANDALONE"/>
+				<feature name="FEATURE_DEVPTS"/>
+				<and name="HEXDUMP">
+					<feature name="FEATURE_HEXDUMP_REVERSE"/>
+					<feature name="HD"/>
+				</and>
+				<feature name="SWITCH_ROOT"/>
+				<and name="TUNCTL">
+					<feature name="FEATURE_TUNCTL_UG"/>
+				</and>
+				<feature name="FEATURE_INSMOD_KSYMOOPS_SYMBOLS"/>
+				<and name="LAST">
+					<alt abstract="true" mandatory="true" name="FEATURE_LAST_SMALL_alt">
+						<feature mandatory="true" name="FEATURE_LAST_SMALL"/>
+						<feature mandatory="true" name="FEATURE_LAST_FANCY"/>
+					</alt>
+				</and>
+				<and name="MODPROBE_SMALL">
+					<feature name="DEPMOD"/>
+					<feature name="FEATURE_MODPROBE_SMALL_OPTIONS_ON_CMDLINE"/>
+					<and name="LSMOD">
+						<feature name="FEATURE_LSMOD_PRETTY_2_6_OUTPUT"/>
+					</and>
+					<feature name="RMMOD"/>
+					<and name="MODPROBE">
+						<feature name="FEATURE_MODPROBE_BLACKLIST"/>
+					</and>
+					<feature name="INSMOD"/>
+					<feature name="FEATURE_MODPROBE_SMALL_CHECK_ALREADY_LOADED"/>
+				</and>
+				<and name="LOGIN">
+					<feature name="LOGIN_SCRIPTS"/>
+					<feature name="PAM"/>
+					<feature name="FEATURE_SECURETTY"/>
+					<feature name="FEATURE_NOLOGIN"/>
+				</and>
+				<feature name="BLOCKDEV"/>
+				<and name="FDISK">
+					<feature name="FDISK_SUPPORT_LARGE_DISKS"/>
+					<and name="FEATURE_FDISK_WRITABLE">
+						<feature name="FEATURE_AIX_LABEL"/>
+						<feature name="FEATURE_SGI_LABEL"/>
+						<feature name="FEATURE_GPT_LABEL"/>
+						<feature name="FEATURE_OSF_LABEL"/>
+						<feature name="FEATURE_FDISK_ADVANCED"/>
+						<feature name="FEATURE_SUN_LABEL"/>
+					</and>
+				</and>
+				<feature name="MORE"/>
+				<and name="KLOGD">
+					<feature name="FEATURE_KLOGD_KLOGCTL"/>
+				</and>
+				<feature mandatory="true" name="CROSS_COMPILER_PREFIX"/>
+				<and name="RUNSVDIR">
+					<feature name="FEATURE_RUNSVDIR_LOG"/>
+				</and>
+				<feature name="RTCWAKE"/>
+				<and name="FIND">
+					<feature name="FEATURE_FIND_REGEX"/>
+					<feature name="FEATURE_FIND_DELETE"/>
+					<feature name="FEATURE_FIND_MAXDEPTH"/>
+					<feature name="FEATURE_FIND_NOT"/>
+					<feature name="FEATURE_FIND_PRINT0"/>
+					<feature name="FEATURE_FIND_NEWER"/>
+					<feature name="FEATURE_FIND_CONTEXT"/>
+					<feature name="FEATURE_FIND_PERM"/>
+					<feature name="FEATURE_FIND_USER"/>
+					<feature name="FEATURE_FIND_MMIN"/>
+					<feature name="FEATURE_FIND_PRUNE"/>
+					<feature name="FEATURE_FIND_INUM"/>
+					<feature name="FEATURE_FIND_GROUP"/>
+					<feature name="FEATURE_FIND_TYPE"/>
+					<feature name="FEATURE_FIND_LINKS"/>
+					<feature name="FEATURE_FIND_PAREN"/>
+					<feature name="FEATURE_FIND_XDEV"/>
+					<feature name="FEATURE_FIND_SIZE"/>
+					<feature name="FEATURE_FIND_MTIME"/>
+					<feature name="FEATURE_FIND_EXEC"/>
+					<feature name="FEATURE_FIND_DEPTH"/>
+					<feature name="FEATURE_FIND_PATH"/>
+				</and>
+				<feature name="FEATURE_MD5_SHA1_SUM_CHECK"/>
+				<and name="DC">
+					<feature name="FEATURE_DC_LIBM"/>
+				</and>
+				<feature name="RPM2CPIO"/>
+				<and name="SLEEP">
+					<and name="FEATURE_FANCY_SLEEP">
+						<feature name="FEATURE_FLOAT_SLEEP"/>
+					</and>
+				</and>
+				<feature name="MESG"/>
+				<feature name="IPTUNNEL"/>
+				<alt abstract="true" mandatory="true" name="INSTALL_APPLET_DONT_alt">
+					<feature mandatory="true" name="INSTALL_APPLET_SYMLINKS"/>
+					<feature mandatory="true" name="INSTALL_APPLET_HARDLINKS"/>
+					<feature mandatory="true" name="INSTALL_APPLET_SCRIPT_WRAPPERS"/>
+					<feature mandatory="true" name="INSTALL_APPLET_DONT"/>
+				</alt>
+				<feature name="PWD"/>
+				<and name="AWK">
+					<feature name="FEATURE_AWK_LIBM"/>
+				</and>
+				<and name="ENV">
+					<feature name="FEATURE_ENV_LONG_OPTIONS"/>
+				</and>
+				<and name="SPLIT">
+					<feature name="FEATURE_SPLIT_FANCY"/>
+				</and>
+				<and name="ASH">
+					<feature name="ASH_BUILTIN_PRINTF"/>
+					<feature name="ASH_ALIAS"/>
+					<feature name="ASH_CMDCMD"/>
+					<feature name="ASH_BASH_COMPAT"/>
+					<feature name="ASH_MAIL"/>
+					<feature name="ASH_BUILTIN_ECHO"/>
+					<feature name="ASH_JOB_CONTROL"/>
+					<feature name="ASH_GETOPTS"/>
+					<feature name="ASH_OPTIMIZE_FOR_SIZE"/>
+					<feature name="ASH_BUILTIN_TEST"/>
+					<feature name="ASH_RANDOM_SUPPORT"/>
+					<feature name="ASH_EXPAND_PRMT"/>
+				</and>
+				<feature name="WHICH"/>
+				<feature name="FEATURE_WTMP"/>
+				<feature name="CHMOD"/>
+				<feature name="ENVDIR"/>
+				<and name="DELGROUP">
+					<feature name="FEATURE_DEL_USER_FROM_GROUP"/>
+				</and>
+				<feature name="CUT"/>
+				<feature name="SETSID"/>
+				<feature name="SHA1SUM"/>
+				<and name="USE_BB_PWD_GRP">
+					<feature name="USE_BB_SHADOW"/>
+				</and>
+				<feature name="NOHUP"/>
+				<and name="TOP">
+					<and name="FEATURE_TOP_CPU_USAGE_PERCENTAGE">
+						<feature name="FEATURE_TOP_DECIMALS"/>
+						<and name="FEATURE_TOP_CPU_GLOBAL_PERCENTS">
+							<feature name="FEATURE_TOP_SMP_CPU"/>
+						</and>
+					</and>
+					<feature name="FEATURE_SHOW_THREADS"/>
+					<feature name="FEATURE_TOP_SMP_PROCESS"/>
+					<feature name="FEATURE_TOPMEM"/>
+				</and>
+				<feature name="RPM"/>
+				<feature name="BZIP2"/>
+				<feature name="FLASH_ERASEALL"/>
+				<feature name="LPD"/>
+				<feature name="FEATURE_HWIB"/>
+				<feature name="FEATURE_PREFER_IPV4_ADDRESS"/>
+				<feature name="FEATURE_INSMOD_TRY_MMAP"/>
+				<and name="STAT">
+					<feature name="FEATURE_STAT_FORMAT"/>
+				</and>
+				<feature name="FEATURE_VOLUMEID_CRAMFS"/>
+				<feature name="FEATURE_VOLUMEID_BTRFS"/>
+				<feature name="FEATURE_SH_EXTRA_QUIET"/>
+				<feature name="SHA256SUM"/>
+				<feature name="IPLINK"/>
+				<feature name="FEATURE_VOLUMEID_HFS"/>
+				<feature name="IPCRM"/>
+				<and name="SU">
+					<feature name="FEATURE_SU_CHECKS_SHELLS"/>
+					<feature name="FEATURE_SU_SYSLOG"/>
+				</and>
+				<feature name="FEATURE_INSMOD_VERSION_CHECKING"/>
+				<feature name="FEATURE_UDHCP_PORT"/>
+				<feature name="UPTIME"/>
+				<and name="TELNET">
+					<feature name="FEATURE_TELNET_TTYPE"/>
+					<feature name="FEATURE_TELNET_AUTOLOGIN"/>
+				</and>
+				<feature name="SETKEYCODES"/>
+				<feature name="CLEAR"/>
+				<and name="FBSET">
+					<feature name="FEATURE_FBSET_FANCY"/>
+					<feature name="FEATURE_FBSET_READMODE"/>
+				</and>
+				<feature name="CAT"/>
+				<feature mandatory="true" name="FEATURE_COPYBUF_KB"/>
+				<feature name="FEATURE_SEAMLESS_XZ"/>
+				<feature name="SELINUXENABLED"/>
+				<and name="ECHO">
+					<feature name="FEATURE_FANCY_ECHO"/>
+				</and>
+				<feature name="IFENSLAVE"/>
+				<and name="USE_BB_CRYPT">
+					<feature name="USE_BB_CRYPT_SHA"/>
+				</and>
+				<and name="WC">
+					<feature name="FEATURE_WC_LARGE"/>
+				</and>
+				<feature name="FEATURE_VOLUMEID_EXT"/>
+				<feature name="FREERAMDISK"/>
+				<feature name="INOTIFYD"/>
+				<feature name="TUNE2FS"/>
+				<feature name="SYNC"/>
+				<feature name="UNIQ"/>
+				<and name="FEATURE_INSMOD_LOAD_MAP">
+					<feature name="FEATURE_INSMOD_LOAD_MAP_FULL"/>
+				</and>
+				<feature name="REMOVE_SHELL"/>
+				<feature name="SETSEBOOL"/>
+				<feature name="BLKID"/>
+				<feature name="NANDDUMP"/>
+				<and name="INETD">
+					<feature name="FEATURE_INETD_RPC"/>
+					<feature name="FEATURE_INETD_SUPPORT_BUILTIN_ECHO"/>
+					<feature name="FEATURE_INETD_SUPPORT_BUILTIN_DISCARD"/>
+					<feature name="FEATURE_INETD_SUPPORT_BUILTIN_TIME"/>
+					<feature name="FEATURE_INETD_SUPPORT_BUILTIN_CHARGEN"/>
+					<feature name="FEATURE_INETD_SUPPORT_BUILTIN_DAYTIME"/>
+				</and>
+				<feature name="HOSTID"/>
+				<and name="HWCLOCK">
+					<feature name="FEATURE_HWCLOCK_LONG_OPTIONS"/>
+					<feature name="FEATURE_HWCLOCK_ADJTIME_FHS"/>
+				</and>
+				<feature name="FEATURE_MINIX2"/>
+				<feature name="FEATURE_VOLUMEID_UDF"/>
+				<feature name="IPADDR"/>
+				<and name="VI">
+					<feature name="FEATURE_VI_DOT_CMD"/>
+					<feature name="FEATURE_VI_ASK_TERMINAL"/>
+					<feature name="FEATURE_VI_WIN_RESIZE"/>
+					<feature name="FEATURE_VI_8BIT"/>
+					<feature name="FEATURE_VI_SET"/>
+					<feature name="FEATURE_ALLOW_EXEC"/>
+					<feature mandatory="true" name="FEATURE_VI_MAX_LEN"/>
+					<feature name="FEATURE_VI_READONLY"/>
+					<feature name="FEATURE_VI_USE_SIGNALS"/>
+					<feature name="FEATURE_VI_OPTIMIZE_CURSOR"/>
+					<feature name="FEATURE_VI_SETOPTS"/>
+					<feature name="FEATURE_VI_SEARCH"/>
+					<feature name="FEATURE_VI_YANKMARK"/>
+					<feature name="FEATURE_VI_COLON"/>
+				</and>
+				<and name="LESS">
+					<feature name="FEATURE_LESS_FLAGS"/>
+					<feature mandatory="true" name="FEATURE_LESS_MAXLINES"/>
+					<feature name="FEATURE_LESS_REGEXP"/>
+					<feature name="FEATURE_LESS_WINCH"/>
+					<feature name="FEATURE_LESS_BRACKETS"/>
+					<feature name="FEATURE_LESS_MARKS"/>
+					<and name="FEATURE_LESS_DASHCMD">
+						<feature name="FEATURE_LESS_LINENUMS"/>
+					</and>
+				</and>
+				<feature name="FEATURE_SEAMLESS_BZ2"/>
+				<feature name="FEATURE_USE_TERMIOS"/>
+				<feature name="NICE"/>
+				<and name="PING">
+					<feature name="PING6"/>
+					<feature name="FEATURE_FANCY_PING"/>
+				</and>
+				<feature name="MKFS_MINIX"/>
+				<feature name="OD"/>
+				<and name="EXPAND">
+					<feature name="FEATURE_EXPAND_LONG_OPTIONS"/>
+				</and>
+				<and name="UDHCPD">
+					<feature mandatory="true" name="DHCPD_LEASES_FILE"/>
+					<feature name="FEATURE_UDHCPD_WRITE_LEASES_EARLY"/>
+					<feature name="DHCPRELAY"/>
+					<feature name="DUMPLEASES"/>
+				</and>
+				<feature name="SOFTLIMIT"/>
+				<feature name="DPKG"/>
+				<feature name="YES"/>
+				<feature mandatory="true" name="UDHCPC_DEFAULT_SCRIPT"/>
+				<feature name="FEATURE_PIDFILE"/>
+				<feature name="NBDCLIENT"/>
+				<feature name="LSATTR"/>
+				<feature name="CHROOT"/>
+				<feature name="FEATURE_CHECK_TAINTED_MODULE"/>
+				<feature name="TIME"/>
+				<feature mandatory="true" name="MD5_SIZE_VS_SPEED"/>
+				<feature name="FEATURE_UDHCP_RFC3397"/>
+				<feature name="CHVT"/>
+				<feature name="PGREP"/>
+				<feature name="VERBOSE_RESOLUTION_ERRORS"/>
+				<and name="RMDIR">
+					<feature name="FEATURE_RMDIR_LONG_OPTIONS"/>
+				</and>
+				<feature name="RM"/>
+				<feature name="CKSUM"/>
+				<feature name="FEATURE_MTAB_SUPPORT"/>
+				<feature name="LOSETUP"/>
+				<feature name="FEATURE_UTMP"/>
+				<feature name="CRONTAB"/>
+				<and name="NC">
+					<feature name="NC_SERVER"/>
+					<feature name="NC_110_COMPAT"/>
+					<feature name="NC_EXTRA"/>
+				</and>
+				<feature name="FEATURE_VOLUMEID_REISERFS"/>
+				<and name="NAMEIF">
+					<feature name="FEATURE_NAMEIF_EXTENDED"/>
+				</and>
+				<feature mandatory="true" name="PREFIX"/>
+				<feature name="ARPING"/>
+				<feature name="MONOTONIC_SYSCALL"/>
+				<and name="IFCONFIG">
+					<feature name="FEATURE_IFCONFIG_STATUS"/>
+					<feature name="FEATURE_IFCONFIG_HW"/>
+					<feature name="FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ"/>
+					<feature name="FEATURE_IFCONFIG_SLIP"/>
+					<feature name="FEATURE_IFCONFIG_BROADCAST_PLUS"/>
+				</and>
+				<feature name="UDPSVD"/>
+				<feature name="FEATURE_HAVE_RPC"/>
+				<feature name="MKFIFO"/>
+				<and name="DOS2UNIX">
+					<feature name="UNIX2DOS"/>
+				</and>
+				<and name="XARGS">
+					<feature name="FEATURE_XARGS_SUPPORT_CONFIRMATION"/>
+					<feature name="FEATURE_XARGS_SUPPORT_QUOTES"/>
+					<feature name="FEATURE_XARGS_SUPPORT_ZERO_TERM"/>
+					<feature name="FEATURE_XARGS_SUPPORT_TERMOPT"/>
+				</and>
+				<feature name="VOLUMEID"/>
+				<feature name="FEATURE_VOLUMEID_FAT"/>
+				<feature name="KBD_MODE"/>
+				<feature name="FEATURE_MODUTILS_SYMBOLS"/>
+				<and name="PS">
+					<feature name="FEATURE_PS_TIME"/>
+					<feature name="FEATURE_PS_ADDITIONAL_COLUMNS"/>
+					<feature name="FEATURE_PS_WIDE"/>
+				</and>
+				<feature name="RESET"/>
+				<feature name="SCRIPTREPLAY"/>
+				<and name="NETSTAT">
+					<feature name="FEATURE_NETSTAT_WIDE"/>
+					<feature name="FEATURE_NETSTAT_PRG"/>
+				</and>
+				<and name="STATIC">
+					<feature name="PIE"/>
+				</and>
+				<feature name="FEATURE_ETC_NETWORKS"/>
+				<feature name="TTY"/>
+				<feature name="TOUCH"/>
+				<feature name="PKILL"/>
+				<feature name="MKNOD"/>
+				<feature name="FEATURE_VOLUMEID_LUKS"/>
+				<feature name="MODINFO"/>
+				<feature name="FEATURE_VOLUMEID_NTFS"/>
+				<feature name="MPSTAT"/>
+				<feature name="WATCHDOG"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<conj>
+						<var>UNICODE_SUPPORT</var>
+						<var>LOCALE_SUPPORT</var>
+					</conj>
+					<disj>
+						<not>
+							<var>UNICODE_USING_LOCALE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>UNICODE_SUPPORT</var>
+						<not>
+							<var>UNICODE_USING_LOCALE</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_CHECK_UNICODE_IN_ENV</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>UNICODE_SUPPORT</var>
+						<not>
+							<var>UNICODE_USING_LOCALE</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>UNICODE_BIDI_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<conj>
+									<conj>
+										<conj>
+											<conj>
+												<conj>
+													<conj>
+														<conj>
+															<conj>
+																<conj>
+																	<conj>
+																		<conj>
+																			<conj>
+																				<disj>
+																					<not>
+																						<var>NAMEIF</var>
+																					</not>
+																					<not>
+																						<var>PLATFORM_LINUX</var>
+																					</not>
+																				</disj>
+																				<not>
+																					<var>SULOGIN</var>
+																				</not>
+																			</conj>
+																			<not>
+																				<var>PASSWD</var>
+																			</not>
+																		</conj>
+																		<not>
+																			<var>CROND</var>
+																		</not>
+																	</conj>
+																	<not>
+																		<var>FAKEIDENTD</var>
+																	</not>
+																</conj>
+																<not>
+																	<var>LOGIN</var>
+																</not>
+															</conj>
+															<not>
+																<var>INIT</var>
+															</not>
+														</conj>
+														<disj>
+															<not>
+																<var>ZCIP</var>
+															</not>
+															<not>
+																<var>PLATFORM_LINUX</var>
+															</not>
+														</disj>
+													</conj>
+													<not>
+														<var>INETD</var>
+													</not>
+												</conj>
+												<disj>
+													<not>
+														<var>FEATURE_MOUNT_NFS</var>
+													</not>
+													<not>
+														<var>MOUNT</var>
+													</not>
+												</disj>
+											</conj>
+											<not>
+												<var>LOGGER</var>
+											</not>
+										</conj>
+										<not>
+											<var>GETTY</var>
+										</not>
+									</conj>
+									<not>
+										<var>SU</var>
+									</not>
+								</conj>
+								<not>
+									<var>TELNETD</var>
+								</not>
+							</conj>
+							<disj>
+								<not>
+									<var>DEVFSD</var>
+								</not>
+								<not>
+									<var>PLATFORM_LINUX</var>
+								</not>
+							</disj>
+						</conj>
+						<var>FEATURE_SYSLOG</var>
+					</disj>
+					<disj>
+						<not>
+							<var>FEATURE_SYSLOG</var>
+						</not>
+						<disj>
+							<disj>
+								<disj>
+									<disj>
+										<disj>
+											<disj>
+												<disj>
+													<disj>
+														<disj>
+															<disj>
+																<disj>
+																	<disj>
+																		<disj>
+																			<disj>
+																				<conj>
+																					<var>NAMEIF</var>
+																					<var>PLATFORM_LINUX</var>
+																				</conj>
+																				<var>SULOGIN</var>
+																			</disj>
+																			<var>PASSWD</var>
+																		</disj>
+																		<var>CROND</var>
+																	</disj>
+																	<var>FAKEIDENTD</var>
+																</disj>
+																<var>LOGIN</var>
+															</disj>
+															<var>INIT</var>
+														</disj>
+														<conj>
+															<var>ZCIP</var>
+															<var>PLATFORM_LINUX</var>
+														</conj>
+													</disj>
+													<var>INETD</var>
+												</disj>
+												<conj>
+													<var>FEATURE_MOUNT_NFS</var>
+													<var>MOUNT</var>
+												</conj>
+											</disj>
+											<var>LOGGER</var>
+										</disj>
+										<var>GETTY</var>
+									</disj>
+									<var>SU</var>
+								</disj>
+								<var>TELNETD</var>
+							</disj>
+							<conj>
+								<var>DEVFSD</var>
+								<var>PLATFORM_LINUX</var>
+							</conj>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<disj>
+								<not>
+									<var>FEATURE_MOUNT_NFS</var>
+								</not>
+								<not>
+									<var>MOUNT</var>
+								</not>
+							</disj>
+							<disj>
+								<not>
+									<var>FEATURE_INETD_RPC</var>
+								</not>
+								<not>
+									<var>INETD</var>
+								</not>
+							</disj>
+						</conj>
+						<var>FEATURE_HAVE_RPC</var>
+					</disj>
+					<disj>
+						<not>
+							<var>FEATURE_HAVE_RPC</var>
+						</not>
+						<disj>
+							<conj>
+								<var>FEATURE_MOUNT_NFS</var>
+								<var>MOUNT</var>
+							</conj>
+							<conj>
+								<var>FEATURE_INETD_RPC</var>
+								<var>INETD</var>
+							</conj>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>STATIC</var>
+					</not>
+					<disj>
+						<not>
+							<var>PIE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<not>
+							<var>FEATURE_PREFER_APPLETS</var>
+						</not>
+						<conj>
+							<not>
+								<var>PIE</var>
+							</not>
+							<not>
+								<var>STATIC</var>
+							</not>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>BUILD_LIBBUSYBOX</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>FEATURE_INSTALLER</var>
+						<disj>
+							<var>FEATURE_SH_STANDALONE</var>
+							<var>FEATURE_PREFER_APPLETS</var>
+						</disj>
+					</disj>
+					<disj>
+						<not>
+							<var>INSTALL_APPLET_DONT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>MORE</var>
+						<disj>
+							<var>TOP</var>
+							<var>POWERTOP</var>
+						</disj>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>MORE</var>
+								</not>
+								<conj>
+									<not>
+										<var>TOP</var>
+									</not>
+									<not>
+										<var>POWERTOP</var>
+									</not>
+								</conj>
+							</conj>
+							<var>FEATURE_USE_TERMIOS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_USE_TERMIOS</var>
+							</not>
+							<disj>
+								<var>MORE</var>
+								<disj>
+									<var>TOP</var>
+									<var>POWERTOP</var>
+								</disj>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>GZIP</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>GZIP</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_GZIP_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_GZIP_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>GZIP</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>TAR</var>
+						<disj>
+							<var>FEATURE_SEAMLESS_Z</var>
+							<disj>
+								<var>FEATURE_SEAMLESS_GZ</var>
+								<disj>
+									<var>FEATURE_SEAMLESS_BZ2</var>
+									<disj>
+										<var>FEATURE_SEAMLESS_LZMA</var>
+										<var>FEATURE_SEAMLESS_XZ</var>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>TAR</var>
+								</not>
+								<conj>
+									<not>
+										<var>FEATURE_SEAMLESS_Z</var>
+									</not>
+									<conj>
+										<not>
+											<var>FEATURE_SEAMLESS_GZ</var>
+										</not>
+										<conj>
+											<not>
+												<var>FEATURE_SEAMLESS_BZ2</var>
+											</not>
+											<conj>
+												<not>
+													<var>FEATURE_SEAMLESS_LZMA</var>
+												</not>
+												<not>
+													<var>FEATURE_SEAMLESS_XZ</var>
+												</not>
+											</conj>
+										</conj>
+									</conj>
+								</conj>
+							</disj>
+							<var>FEATURE_TAR_AUTODETECT</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_TAR_AUTODETECT</var>
+							</not>
+							<conj>
+								<var>TAR</var>
+								<disj>
+									<var>FEATURE_SEAMLESS_Z</var>
+									<disj>
+										<var>FEATURE_SEAMLESS_GZ</var>
+										<disj>
+											<var>FEATURE_SEAMLESS_BZ2</var>
+											<disj>
+												<var>FEATURE_SEAMLESS_LZMA</var>
+												<var>FEATURE_SEAMLESS_XZ</var>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>TAR</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>TAR</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_TAR_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_TAR_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>TAR</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>TAR</var>
+						<var>SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_TAR_SELINUX</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>CHOWN</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>CHOWN</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_CHOWN_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_CHOWN_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>CHOWN</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>CP</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>CP</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_CP_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_CP_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>CP</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<not>
+							<var>DOS2UNIX</var>
+						</not>
+						<var>UNIX2DOS</var>
+					</disj>
+					<disj>
+						<not>
+							<var>UNIX2DOS</var>
+						</not>
+						<var>DOS2UNIX</var>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>ENV</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>ENV</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_ENV_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_ENV_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>ENV</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>EXPAND</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>EXPAND</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_EXPAND_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_EXPAND_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>EXPAND</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>INSTALL</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>INSTALL</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_INSTALL_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_INSTALL_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>INSTALL</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>LS</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>LS</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_LS_COLOR</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_LS_COLOR</var>
+							</not>
+							<conj>
+								<var>LS</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>MKDIR</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>MKDIR</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_MKDIR_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_MKDIR_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>MKDIR</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>MV</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>MV</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_MV_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_MV_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>MV</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>RMDIR</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>RMDIR</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_RMDIR_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_RMDIR_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>RMDIR</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>UNEXPAND</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>UNEXPAND</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_UNEXPAND_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_UNEXPAND_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>UNEXPAND</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>FEATURE_UTMP</var>
+					<conj>
+						<disj>
+							<not>
+								<var>FEATURE_UTMP</var>
+							</not>
+							<var>WHO</var>
+						</disj>
+						<disj>
+							<not>
+								<var>WHO</var>
+							</not>
+							<var>FEATURE_UTMP</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>CP</var>
+						<var>MV</var>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>CP</var>
+								</not>
+								<not>
+									<var>MV</var>
+								</not>
+							</conj>
+							<var>FEATURE_PRESERVE_HARDLINKS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_PRESERVE_HARDLINKS</var>
+							</not>
+							<disj>
+								<var>CP</var>
+								<var>MV</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>LS</var>
+						<disj>
+							<var>MORE</var>
+							<var>TELNET</var>
+						</disj>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>LS</var>
+								</not>
+								<conj>
+									<not>
+										<var>MORE</var>
+									</not>
+									<not>
+										<var>TELNET</var>
+									</not>
+								</conj>
+							</conj>
+							<var>FEATURE_AUTOWIDTH</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_AUTOWIDTH</var>
+							</not>
+							<disj>
+								<var>LS</var>
+								<disj>
+									<var>MORE</var>
+									<var>TELNET</var>
+								</disj>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>DF</var>
+						<disj>
+							<var>DU</var>
+							<var>LS</var>
+						</disj>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>DF</var>
+								</not>
+								<conj>
+									<not>
+										<var>DU</var>
+									</not>
+									<not>
+										<var>LS</var>
+									</not>
+								</conj>
+							</conj>
+							<var>FEATURE_HUMAN_READABLE</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_HUMAN_READABLE</var>
+							</not>
+							<disj>
+								<var>DF</var>
+								<disj>
+									<var>DU</var>
+									<var>LS</var>
+								</disj>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>MD5SUM</var>
+						<disj>
+							<var>SHA1SUM</var>
+							<disj>
+								<var>SHA256SUM</var>
+								<var>SHA512SUM</var>
+							</disj>
+						</disj>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>MD5SUM</var>
+								</not>
+								<conj>
+									<not>
+										<var>SHA1SUM</var>
+									</not>
+									<conj>
+										<not>
+											<var>SHA256SUM</var>
+										</not>
+										<not>
+											<var>SHA512SUM</var>
+										</not>
+									</conj>
+								</conj>
+							</conj>
+							<var>FEATURE_MD5_SHA1_SUM_CHECK</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_MD5_SHA1_SUM_CHECK</var>
+							</not>
+							<disj>
+								<var>MD5SUM</var>
+								<disj>
+									<var>SHA1SUM</var>
+									<disj>
+										<var>SHA256SUM</var>
+										<var>SHA512SUM</var>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>SETCONSOLE</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>SETCONSOLE</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_SETCONSOLE_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_SETCONSOLE_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>SETCONSOLE</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>LOADFONT</var>
+						<var>SETFONT</var>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>LOADFONT</var>
+								</not>
+								<not>
+									<var>SETFONT</var>
+								</not>
+							</conj>
+							<var>FEATURE_LOADFONT_PSF2</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_LOADFONT_PSF2</var>
+							</not>
+							<disj>
+								<var>LOADFONT</var>
+								<var>SETFONT</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>LOADFONT</var>
+						<var>SETFONT</var>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>LOADFONT</var>
+								</not>
+								<not>
+									<var>SETFONT</var>
+								</not>
+							</conj>
+							<var>FEATURE_LOADFONT_RAW</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_LOADFONT_RAW</var>
+							</not>
+							<disj>
+								<var>LOADFONT</var>
+								<var>SETFONT</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>RUN_PARTS</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>RUN_PARTS</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_RUN_PARTS_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_RUN_PARTS_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>RUN_PARTS</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>START_STOP_DAEMON</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>START_STOP_DAEMON</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_START_STOP_DAEMON_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_START_STOP_DAEMON_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>START_STOP_DAEMON</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>DIFF</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>DIFF</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_DIFF_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_DIFF_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>DIFF</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>FIND</var>
+						<var>FEATURE_FIND_DEPTH</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>FIND</var>
+								</not>
+								<not>
+									<var>FEATURE_FIND_DEPTH</var>
+								</not>
+							</disj>
+							<var>FEATURE_FIND_DELETE</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_FIND_DELETE</var>
+							</not>
+							<conj>
+								<var>FIND</var>
+								<var>FEATURE_FIND_DEPTH</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>FIND</var>
+						<var>SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_FIND_CONTEXT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>HALT</var>
+						<not>
+							<var>INIT</var>
+						</not>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>HALT</var>
+								</not>
+								<var>INIT</var>
+							</disj>
+							<var>FEATURE_CALL_TELINIT</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_CALL_TELINIT</var>
+							</not>
+							<conj>
+								<var>HALT</var>
+								<not>
+									<var>INIT</var>
+								</not>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USE_BB_PWD_GRP</var>
+						<var>FEATURE_SHADOWPASSWDS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USE_BB_PWD_GRP</var>
+								</not>
+								<not>
+									<var>FEATURE_SHADOWPASSWDS</var>
+								</not>
+							</disj>
+							<var>USE_BB_SHADOW</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USE_BB_SHADOW</var>
+							</not>
+							<conj>
+								<var>USE_BB_PWD_GRP</var>
+								<var>FEATURE_SHADOWPASSWDS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>ADDUSER</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>ADDUSER</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_ADDUSER_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_ADDUSER_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>ADDUSER</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>ADDGROUP</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>ADDGROUP</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_ADDGROUP_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_ADDGROUP_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>ADDGROUP</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<not>
+							<var>MODPROBE_SMALL</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>INSMOD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<not>
+							<var>MODPROBE_SMALL</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>RMMOD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<not>
+							<var>MODPROBE_SMALL</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>LSMOD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<not>
+							<var>MODPROBE_SMALL</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>MODPROBE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<not>
+							<var>MODPROBE_SMALL</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>DEPMOD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<disj>
+							<var>INSMOD</var>
+							<disj>
+								<var>RMMOD</var>
+								<var>LSMOD</var>
+							</disj>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_2_4_MODULES</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<disj>
+							<var>INSMOD</var>
+							<var>MODPROBE_SMALL</var>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_INSMOD_TRY_MMAP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<conj>
+							<var>FEATURE_2_4_MODULES</var>
+							<disj>
+								<var>INSMOD</var>
+								<var>MODPROBE</var>
+							</disj>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_INSMOD_VERSION_CHECKING</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<conj>
+							<var>FEATURE_2_4_MODULES</var>
+							<disj>
+								<var>INSMOD</var>
+								<var>MODPROBE</var>
+							</disj>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_INSMOD_KSYMOOPS_SYMBOLS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<conj>
+							<var>FEATURE_2_4_MODULES</var>
+							<disj>
+								<var>INSMOD</var>
+								<var>MODPROBE</var>
+							</disj>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_INSMOD_LOADINKMEM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<conj>
+							<var>FEATURE_2_4_MODULES</var>
+							<var>INSMOD</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_INSMOD_LOAD_MAP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<conj>
+							<disj>
+								<var>LSMOD</var>
+								<var>FEATURE_2_4_MODULES</var>
+							</disj>
+							<not>
+								<var>MODPROBE_SMALL</var>
+							</not>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>PLATFORM_LINUX</var>
+								</not>
+								<disj>
+									<conj>
+										<not>
+											<var>LSMOD</var>
+										</not>
+										<not>
+											<var>FEATURE_2_4_MODULES</var>
+										</not>
+									</conj>
+									<var>MODPROBE_SMALL</var>
+								</disj>
+							</disj>
+							<var>FEATURE_CHECK_TAINTED_MODULE</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_CHECK_TAINTED_MODULE</var>
+							</not>
+							<conj>
+								<var>PLATFORM_LINUX</var>
+								<conj>
+									<disj>
+										<var>LSMOD</var>
+										<var>FEATURE_2_4_MODULES</var>
+									</disj>
+									<not>
+										<var>MODPROBE_SMALL</var>
+									</not>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<disj>
+							<var>DEPMOD</var>
+							<var>MODPROBE</var>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>PLATFORM_LINUX</var>
+								</not>
+								<conj>
+									<not>
+										<var>DEPMOD</var>
+									</not>
+									<not>
+										<var>MODPROBE</var>
+									</not>
+								</conj>
+							</disj>
+							<var>FEATURE_MODUTILS_ALIAS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_MODUTILS_ALIAS</var>
+							</not>
+							<conj>
+								<var>PLATFORM_LINUX</var>
+								<disj>
+									<var>DEPMOD</var>
+									<var>MODPROBE</var>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PLATFORM_LINUX</var>
+						<disj>
+							<var>DEPMOD</var>
+							<var>MODPROBE</var>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>PLATFORM_LINUX</var>
+								</not>
+								<conj>
+									<not>
+										<var>DEPMOD</var>
+									</not>
+									<not>
+										<var>MODPROBE</var>
+									</not>
+								</conj>
+							</disj>
+							<var>FEATURE_MODUTILS_SYMBOLS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_MODUTILS_SYMBOLS</var>
+							</not>
+							<conj>
+								<var>PLATFORM_LINUX</var>
+								<disj>
+									<var>DEPMOD</var>
+									<var>MODPROBE</var>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>FDISK</var>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>LFS</var>
+								</not>
+								<not>
+									<var>FDISK</var>
+								</not>
+							</conj>
+							<var>FDISK_SUPPORT_LARGE_DISKS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FDISK_SUPPORT_LARGE_DISKS</var>
+							</not>
+							<disj>
+								<var>LFS</var>
+								<var>FDISK</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>FSCK_MINIX</var>
+						<var>MKFS_MINIX</var>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>FSCK_MINIX</var>
+								</not>
+								<not>
+									<var>MKFS_MINIX</var>
+								</not>
+							</conj>
+							<var>FEATURE_MINIX2</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_MINIX2</var>
+							</not>
+							<disj>
+								<var>FSCK_MINIX</var>
+								<var>MKFS_MINIX</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>HWCLOCK</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>HWCLOCK</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_HWCLOCK_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_HWCLOCK_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>HWCLOCK</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>MOUNT</var>
+					<conj>
+						<disj>
+							<conj>
+								<disj>
+									<not>
+										<var>FEATURE_MTAB_SUPPORT</var>
+									</not>
+									<conj>
+										<not>
+											<var>MOUNT</var>
+										</not>
+										<not>
+											<var>UMOUNT</var>
+										</not>
+									</conj>
+								</disj>
+								<not>
+									<var>MOUNT</var>
+								</not>
+							</conj>
+							<var>FEATURE_MOUNT_FAKE</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_MOUNT_FAKE</var>
+							</not>
+							<disj>
+								<conj>
+									<var>FEATURE_MTAB_SUPPORT</var>
+									<disj>
+										<var>MOUNT</var>
+										<var>UMOUNT</var>
+									</disj>
+								</conj>
+								<var>MOUNT</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>MOUNT</var>
+						<var>UMOUNT</var>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>MOUNT</var>
+								</not>
+								<not>
+									<var>UMOUNT</var>
+								</not>
+							</conj>
+							<var>FEATURE_MOUNT_LOOP</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_MOUNT_LOOP</var>
+							</not>
+							<disj>
+								<var>MOUNT</var>
+								<var>UMOUNT</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>MOUNT</var>
+						<var>UMOUNT</var>
+					</disj>
+					<disj>
+						<not>
+							<var>FEATURE_MTAB_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<disj>
+									<not>
+										<var>FEATURE_MOUNT_LABEL</var>
+									</not>
+									<not>
+										<var>MOUNT</var>
+									</not>
+								</disj>
+								<disj>
+									<not>
+										<var>FINDFS</var>
+									</not>
+									<not>
+										<var>PLATFORM_LINUX</var>
+									</not>
+								</disj>
+							</conj>
+							<disj>
+								<not>
+									<var>BLKID</var>
+								</not>
+								<not>
+									<var>PLATFORM_LINUX</var>
+								</not>
+							</disj>
+						</conj>
+						<var>VOLUMEID</var>
+					</disj>
+					<disj>
+						<not>
+							<var>VOLUMEID</var>
+						</not>
+						<disj>
+							<disj>
+								<conj>
+									<var>FEATURE_MOUNT_LABEL</var>
+									<var>MOUNT</var>
+								</conj>
+								<conj>
+									<var>FINDFS</var>
+									<var>PLATFORM_LINUX</var>
+								</conj>
+							</disj>
+							<conj>
+								<var>BLKID</var>
+								<var>PLATFORM_LINUX</var>
+							</conj>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_EXT</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_EXT</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_BTRFS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_BTRFS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_REISERFS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_REISERFS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_FAT</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_FAT</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_HFS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_HFS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_JFS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_JFS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_XFS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_XFS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_NTFS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_NTFS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_ISO9660</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_ISO9660</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_UDF</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_UDF</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_LUKS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_LUKS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_LINUXSWAP</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_LINUXSWAP</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_CRAMFS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_CRAMFS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_ROMFS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_ROMFS</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_SYSV</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_SYSV</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_OCFS2</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_OCFS2</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>VOLUMEID</var>
+					<conj>
+						<disj>
+							<not>
+								<var>VOLUMEID</var>
+							</not>
+							<var>FEATURE_VOLUMEID_LINUXRAID</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_VOLUMEID_LINUXRAID</var>
+							</not>
+							<var>VOLUMEID</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>FEATURE_WTMP</var>
+					<conj>
+						<disj>
+							<not>
+								<var>FEATURE_WTMP</var>
+							</not>
+							<var>LAST</var>
+						</disj>
+						<disj>
+							<not>
+								<var>LAST</var>
+							</not>
+							<var>FEATURE_WTMP</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>LFS</var>
+						<var>PLATFORM_LINUX</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>LFS</var>
+								</not>
+								<not>
+									<var>PLATFORM_LINUX</var>
+								</not>
+							</disj>
+							<var>READAHEAD</var>
+						</disj>
+						<disj>
+							<not>
+								<var>READAHEAD</var>
+							</not>
+							<conj>
+								<var>LFS</var>
+								<var>PLATFORM_LINUX</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>FEATURE_IPV6</var>
+					<conj>
+						<disj>
+							<not>
+								<var>FEATURE_IPV6</var>
+							</not>
+							<var>FEATURE_PREFER_IPV4_ADDRESS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_PREFER_IPV4_ADDRESS</var>
+							</not>
+							<var>FEATURE_IPV6</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>LONG_OPTS</var>
+						<disj>
+							<var>FTPGET</var>
+							<var>FTPPUT</var>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+								<conj>
+									<not>
+										<var>FTPGET</var>
+									</not>
+									<not>
+										<var>FTPPUT</var>
+									</not>
+								</conj>
+							</disj>
+							<var>FEATURE_FTPGETPUT_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_FTPGETPUT_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>LONG_OPTS</var>
+								<disj>
+									<var>FTPGET</var>
+									<var>FTPPUT</var>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>IFUPDOWN</var>
+						<not>
+							<var>FEATURE_IFUPDOWN_IP</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_IFUPDOWN_IFCONFIG_BUILTIN</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>IFUPDOWN</var>
+						<var>FEATURE_IPV6</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>IFUPDOWN</var>
+								</not>
+								<not>
+									<var>FEATURE_IPV6</var>
+								</not>
+							</disj>
+							<var>FEATURE_IFUPDOWN_IPV6</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_IFUPDOWN_IPV6</var>
+							</not>
+							<conj>
+								<var>IFUPDOWN</var>
+								<var>FEATURE_IPV6</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>FEATURE_IP_SHORT_FORMS</var>
+							</not>
+							<not>
+								<var>FEATURE_IP_ADDRESS</var>
+							</not>
+						</disj>
+						<var>IPADDR</var>
+					</disj>
+					<disj>
+						<not>
+							<var>IPADDR</var>
+						</not>
+						<conj>
+							<var>FEATURE_IP_SHORT_FORMS</var>
+							<var>FEATURE_IP_ADDRESS</var>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>FEATURE_IP_SHORT_FORMS</var>
+							</not>
+							<not>
+								<var>FEATURE_IP_LINK</var>
+							</not>
+						</disj>
+						<var>IPLINK</var>
+					</disj>
+					<disj>
+						<not>
+							<var>IPLINK</var>
+						</not>
+						<conj>
+							<var>FEATURE_IP_SHORT_FORMS</var>
+							<var>FEATURE_IP_LINK</var>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>FEATURE_IP_SHORT_FORMS</var>
+							</not>
+							<not>
+								<var>FEATURE_IP_ROUTE</var>
+							</not>
+						</disj>
+						<var>IPROUTE</var>
+					</disj>
+					<disj>
+						<not>
+							<var>IPROUTE</var>
+						</not>
+						<conj>
+							<var>FEATURE_IP_SHORT_FORMS</var>
+							<var>FEATURE_IP_ROUTE</var>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>FEATURE_IP_SHORT_FORMS</var>
+							</not>
+							<not>
+								<var>FEATURE_IP_TUNNEL</var>
+							</not>
+						</disj>
+						<var>IPTUNNEL</var>
+					</disj>
+					<disj>
+						<not>
+							<var>IPTUNNEL</var>
+						</not>
+						<conj>
+							<var>FEATURE_IP_SHORT_FORMS</var>
+							<var>FEATURE_IP_TUNNEL</var>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>FEATURE_IP_SHORT_FORMS</var>
+							</not>
+							<not>
+								<var>FEATURE_IP_RULE</var>
+							</not>
+						</disj>
+						<var>IPRULE</var>
+					</disj>
+					<disj>
+						<not>
+							<var>IPRULE</var>
+						</not>
+						<conj>
+							<var>FEATURE_IP_SHORT_FORMS</var>
+							<var>FEATURE_IP_RULE</var>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>IPCALC</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>IPCALC</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_IPCALC_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_IPCALC_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>IPCALC</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>FEATURE_IPV6</var>
+						<var>PING</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>FEATURE_IPV6</var>
+								</not>
+								<not>
+									<var>PING</var>
+								</not>
+							</disj>
+							<var>PING6</var>
+						</disj>
+						<disj>
+							<not>
+								<var>PING6</var>
+							</not>
+							<conj>
+								<var>FEATURE_IPV6</var>
+								<var>PING</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>TFTP</var>
+						<var>FEATURE_TFTP_BLOCKSIZE</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>TFTP</var>
+								</not>
+								<not>
+									<var>FEATURE_TFTP_BLOCKSIZE</var>
+								</not>
+							</disj>
+							<var>FEATURE_TFTP_PROGRESS_BAR</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_TFTP_PROGRESS_BAR</var>
+							</not>
+							<conj>
+								<var>TFTP</var>
+								<var>FEATURE_TFTP_BLOCKSIZE</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>FEATURE_IPV6</var>
+						<var>TRACEROUTE</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>FEATURE_IPV6</var>
+								</not>
+								<not>
+									<var>TRACEROUTE</var>
+								</not>
+							</disj>
+							<var>TRACEROUTE6</var>
+						</disj>
+						<disj>
+							<not>
+								<var>TRACEROUTE6</var>
+							</not>
+							<conj>
+								<var>FEATURE_IPV6</var>
+								<var>TRACEROUTE</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>IFUPDOWN</var>
+						<var>UDHCPC</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>IFUPDOWN</var>
+								</not>
+								<not>
+									<var>UDHCPC</var>
+								</not>
+							</disj>
+							<var>IFUPDOWN_UDHCPC_CMD_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>IFUPDOWN_UDHCPC_CMD_OPTIONS</var>
+							</not>
+							<conj>
+								<var>IFUPDOWN</var>
+								<var>UDHCPC</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>WGET</var>
+						<var>LONG_OPTS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>WGET</var>
+								</not>
+								<not>
+									<var>LONG_OPTS</var>
+								</not>
+							</disj>
+							<var>FEATURE_WGET_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_WGET_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>WGET</var>
+								<var>LONG_OPTS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PS</var>
+						<conj>
+							<var>DESKTOP</var>
+							<var>PLATFORM_LINUX</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>PS</var>
+								</not>
+								<disj>
+									<not>
+										<var>DESKTOP</var>
+									</not>
+									<not>
+										<var>PLATFORM_LINUX</var>
+									</not>
+								</disj>
+							</disj>
+							<var>FEATURE_PS_TIME</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_PS_TIME</var>
+							</not>
+							<conj>
+								<var>PS</var>
+								<conj>
+									<var>DESKTOP</var>
+									<var>PLATFORM_LINUX</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>PS</var>
+						<var>DESKTOP</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>PS</var>
+								</not>
+								<not>
+									<var>DESKTOP</var>
+								</not>
+							</disj>
+							<var>FEATURE_PS_ADDITIONAL_COLUMNS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_PS_ADDITIONAL_COLUMNS</var>
+							</not>
+							<conj>
+								<var>PS</var>
+								<var>DESKTOP</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>FEATURE_PS_TIME</var>
+					<disj>
+						<not>
+							<var>FEATURE_PS_UNUSUAL_SYSTEMS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>CHCON</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>SELINUX</var>
+						<conj>
+							<var>CHCON</var>
+							<var>LONG_OPTS</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>SELINUX</var>
+								</not>
+								<disj>
+									<not>
+										<var>CHCON</var>
+									</not>
+									<not>
+										<var>LONG_OPTS</var>
+									</not>
+								</disj>
+							</disj>
+							<var>FEATURE_CHCON_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_CHCON_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>SELINUX</var>
+								<conj>
+									<var>CHCON</var>
+									<var>LONG_OPTS</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>GETENFORCE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>GETSEBOOL</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>LOAD_POLICY</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>MATCHPATHCON</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>RESTORECON</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>RUNCON</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>SELINUX</var>
+						<conj>
+							<var>RUNCON</var>
+							<var>LONG_OPTS</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>SELINUX</var>
+								</not>
+								<disj>
+									<not>
+										<var>RUNCON</var>
+									</not>
+									<not>
+										<var>LONG_OPTS</var>
+									</not>
+								</disj>
+							</disj>
+							<var>FEATURE_RUNCON_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_RUNCON_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>SELINUX</var>
+								<conj>
+									<var>RUNCON</var>
+									<var>LONG_OPTS</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>SELINUXENABLED</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>SETENFORCE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>SETFILES</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>SETSEBOOL</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>SELINUX</var>
+					<disj>
+						<not>
+							<var>SESTATUS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>NOMMU</var>
+					</not>
+					<conj>
+						<disj>
+							<var>NOMMU</var>
+							<var>ASH</var>
+						</disj>
+						<disj>
+							<not>
+								<var>ASH</var>
+							</not>
+							<not>
+								<var>NOMMU</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>HUSH_INTERACTIVE</var>
+						<var>FEATURE_EDITING_SAVEHISTORY</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>HUSH_INTERACTIVE</var>
+								</not>
+								<not>
+									<var>FEATURE_EDITING_SAVEHISTORY</var>
+								</not>
+							</disj>
+							<var>HUSH_SAVEHISTORY</var>
+						</disj>
+						<disj>
+							<not>
+								<var>HUSH_SAVEHISTORY</var>
+							</not>
+							<conj>
+								<var>HUSH_INTERACTIVE</var>
+								<var>FEATURE_EDITING_SAVEHISTORY</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>ASH</var>
+						<not>
+							<var>NOMMU</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_SH_IS_ASH</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>HUSH</var>
+					<disj>
+						<not>
+							<var>FEATURE_SH_IS_HUSH</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>ASH</var>
+						<not>
+							<var>NOMMU</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_BASH_IS_ASH</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>HUSH</var>
+					<disj>
+						<not>
+							<var>FEATURE_BASH_IS_HUSH</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>ASH</var>
+						<var>HUSH</var>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>ASH</var>
+								</not>
+								<not>
+									<var>HUSH</var>
+								</not>
+							</conj>
+							<var>SH_MATH_SUPPORT</var>
+						</disj>
+						<disj>
+							<not>
+								<var>SH_MATH_SUPPORT</var>
+							</not>
+							<disj>
+								<var>ASH</var>
+								<var>HUSH</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>HUSH</var>
+						<var>ASH</var>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>HUSH</var>
+								</not>
+								<not>
+									<var>ASH</var>
+								</not>
+							</conj>
+							<var>FEATURE_SH_EXTRA_QUIET</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FEATURE_SH_EXTRA_QUIET</var>
+							</not>
+							<disj>
+								<var>HUSH</var>
+								<var>ASH</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<disj>
+							<var>HUSH</var>
+							<var>ASH</var>
+						</disj>
+						<var>FEATURE_PREFER_APPLETS</var>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_SH_STANDALONE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<disj>
+							<var>HUSH</var>
+							<var>ASH</var>
+						</disj>
+						<var>FEATURE_PREFER_APPLETS</var>
+					</conj>
+					<disj>
+						<not>
+							<var>FEATURE_SH_NOFORK</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="false" Constraints="false" Features="false" Redundant="false" Tautology="false"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

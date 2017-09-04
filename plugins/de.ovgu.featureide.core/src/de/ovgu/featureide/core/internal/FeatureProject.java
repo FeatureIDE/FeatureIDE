@@ -215,6 +215,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				public Boolean execute(IMonitor workMonitor) throws Exception {
 					try {
 						final IFolder folder = sourceFolder;
+						featureModelManager.read();
 						final IFeatureModel model = featureModelManager.getObject();
 						// prevent warnings, if the user has just created a project
 						// without any source files
@@ -867,6 +868,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		IPath modelPath = modelFile.getModelFile().getFullPath();
 		if (checkModelChange(event.getDelta().findMember(modelPath))) {
+			setAllFeatureModuleMarkers();
 			return;
 		}
 
