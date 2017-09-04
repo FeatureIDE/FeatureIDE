@@ -277,9 +277,12 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		ConnectionDecoration targetDecoration = null;
 		if (sourceStructure == mainSourceStructure && !targetStructure.isAnd() && targetStructure.getChildrenCount() > 1) {
 				final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
-				final IGraphicalFeature lastChild = FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel()) ? graphicalChildren.get(0)
-						: graphicalChildren.get(graphicalChildren.size() - 1);
-				targetDecoration = new RelationDecoration(targetStructure.isMultiple(), lastChild);
+				if (!graphicalChildren.isEmpty()) { //Even if the target has children, it might be collapsed, leading to no graphical children.
+					final IGraphicalFeature lastChild = FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel())
+							? graphicalChildren.get(0)
+							: graphicalChildren.get(graphicalChildren.size() - 1);
+					targetDecoration = new RelationDecoration(targetStructure.isMultiple(), lastChild);
+				}
 		}
 		getFigure().setTargetDecoration(targetDecoration);
 
