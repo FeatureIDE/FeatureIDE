@@ -1417,7 +1417,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 	}
 
-	private void refreshChildAll(IFeature parent) {
+	void refreshChildAll(IFeature parent) {
 		for (IFeatureStructure f : parent.getStructure().getChildren()) {
 			//Refresh children
 			refreshChildAll(f.getFeature());
