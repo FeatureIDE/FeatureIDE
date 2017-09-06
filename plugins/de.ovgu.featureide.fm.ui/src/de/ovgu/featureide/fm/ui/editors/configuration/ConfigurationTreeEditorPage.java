@@ -105,6 +105,9 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
@@ -163,6 +166,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	/** Generates explanations for automatic selections. */
 	private final AutomaticSelectionExplanationCreator automaticSelectionExplanationCreator = ConfigurationExplanationCreatorFactory.getDefault().getAutomaticSelectionExplanationCreator();
+	/** Generates explanations for dead features. */
+	private final DeadFeatureExplanationCreator deadFeatureExplanationCreator = FeatureModelExplanationCreatorFactory.getDefault().getDeadFeatureExplanationCreator();
+	/** Generates explanations for false-optional features. */
+	private final FalseOptionalFeatureExplanationCreator falseOptionalFeatureExplanationCreator = FeatureModelExplanationCreatorFactory.getDefault().getFalseOptionalFeatureExplanationCreator();
 
 	protected IConfigurationEditor configurationEditor = null;
 
@@ -1121,6 +1128,18 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		final IFeatureModel fm = config.getFeatureModel();
 		if (fm == null) {
 			return null;
+		}
+		switch (automaticSelection.getFeature().getProperty().getFeatureStatus()) {
+			case DEAD:
+				deadFeatureExplanationCreator.setFeatureModel(fm);
+				deadFeatureExplanationCreator.setDeadFeature(automaticSelection.getFeature());
+				return deadFeatureExplanationCreator.getExplanation();
+			case FALSE_OPTIONAL:
+				falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
+				falseOptionalFeatureExplanationCreator.setFalseOptionalFeature(automaticSelection.getFeature());
+				return falseOptionalFeatureExplanationCreator.getExplanation();
+			default:
+				break;
 		}
 		automaticSelectionExplanationCreator.setConfiguration(config);
 		automaticSelectionExplanationCreator.setAutomaticSelection(automaticSelection);
