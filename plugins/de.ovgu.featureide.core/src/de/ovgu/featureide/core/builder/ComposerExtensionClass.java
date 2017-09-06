@@ -430,7 +430,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 * @param config The configuration file to read from.
 	 * @return The temporary configuration file.
 	 */
-	public java.nio.file.Path createTemporaryConfigrationsFile(IFile config) {
+	public java.nio.file.Path createTemporaryConfigrationFile(IFile config) {
 		String configName = config.getName();
 		final int extIndex = configName.lastIndexOf('.');
 		if (extIndex > 0) {

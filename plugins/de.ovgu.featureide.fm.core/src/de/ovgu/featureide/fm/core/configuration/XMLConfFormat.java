@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
@@ -77,11 +78,11 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
 					selectablefeature = object.getSelectablefeature(featureName);
 					if (selectablefeature == null) {
-						createWarning("Invalid feature name: " + featureName, feature, warnings);
+						createError("Invalid feature name: " + featureName, feature, warnings);
 						continue;
 					}
 				} else {
-					createWarning("No feature name specified", feature, warnings);
+					createError("No feature name specified", feature, warnings);
 					continue;
 				}
 
@@ -91,12 +92,28 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 					createWarning("No manual selection state specified", feature, warnings);
 					continue;
 				}
-				
+
 				if (feature.hasAttribute(ATTRIBUTE_AUTOMATIC)) {
 					selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC), feature, warnings));
 				} else {
 					createWarning("No automatic selection state specified", feature, warnings);
 					continue;
+				}
+
+				final NamedNodeMap attributes = feature.getAttributes();
+				if (attributes.getLength() > 3) {
+					for (int i = 0; i < attributes.getLength(); i++) {
+						final String attributeName = attributes.item(i).getNodeName();
+						switch (attributeName) {
+						case ATTRIBUTE_NAME:
+						case ATTRIBUTE_MANUAL:
+						case ATTRIBUTE_AUTOMATIC:
+							break;
+						default:
+							createWarning("Unknown attribute: " + attributeName, feature, warnings);
+							break;
+						}
+					}
 				}
 			}
 		} else {
@@ -104,14 +121,19 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 		}
 	}
 
-	protected void createWarning(final String message, Element feature, List<Problem> warnings) {
-		final Object lineNumber = feature.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
+	protected void createWarning(final String message, Element element, List<Problem> warnings) {
+		final Object lineNumber = element.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
 		warnings.add(new Problem(message, (lineNumber instanceof Integer) ? (int) lineNumber : 1, Problem.Severity.WARNING));
+	}
+
+	protected void createError(final String message, Element element, List<Problem> warnings) {
+		final Object lineNumber = element.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
+		warnings.add(new Problem(message, (lineNumber instanceof Integer) ? (int) lineNumber : 1, Problem.Severity.ERROR));
 	}
 
 	private Selection getSelection(String selection, Element feature, List<Problem> warnings) {
 		if (selection == null) {
-			createWarning("Selection state not specified" + selection, feature, warnings);
+			createError("Selection state not specified" + selection, feature, warnings);
 			return Selection.UNDEFINED;
 		} else {
 			switch (selection) {
@@ -122,7 +144,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			case "unselected":
 				return Selection.UNSELECTED;
 			default:
-				createWarning("Invalid selection state: " + selection, feature, warnings);
+				createError("Invalid selection state: " + selection, feature, warnings);
 				return Selection.UNDEFINED;
 			}
 		}

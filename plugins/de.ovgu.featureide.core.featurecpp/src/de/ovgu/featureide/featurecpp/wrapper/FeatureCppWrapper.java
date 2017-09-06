@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.featurecpp.wrapper;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_FILE_DOES_NOT_EXIST;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GPP;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_AN_ABSOLUTE_PATH_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_PATH_;
@@ -35,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.AbstractList;
 import java.util.LinkedList;
 
@@ -139,7 +137,6 @@ public class FeatureCppWrapper {
 	}
 
 	public void compose(java.nio.file.Path config) {
-		assert (config != null && Files.exists(config)) : CONFIGURATION_FILE_DOES_NOT_EXIST;
 		try {
 			if (!buildDirectory.exists())
 				buildDirectory.create(false, true, null);
