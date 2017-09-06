@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.config;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationWriter;
 
@@ -44,7 +45,7 @@ public abstract class ConfigurationExplanationWriter extends FeatureModelExplana
 			return super.getConcreteReasonString(reason);
 		}
 		final SelectableFeature selection = ((ConfigurationReason) reason).getFeatureSelection();
-		final String selectionString;
+		String selectionString;
 		switch (selection.getSelection()) {
 			case SELECTED:
 				selectionString = "selected";
@@ -54,6 +55,16 @@ public abstract class ConfigurationExplanationWriter extends FeatureModelExplana
 				break;
 			case UNDEFINED:
 				selectionString = "neither selected nor unselected";
+			default:
+				throw new IllegalStateException("Unknown feature selection state");
+		}
+		switch (selection.getManual()) {
+			case SELECTED:
+			case UNSELECTED:
+				selectionString = String.format("manually %s", selectionString);
+				break;
+			case UNDEFINED:
+				break;
 			default:
 				throw new IllegalStateException("Unknown feature selection state");
 		}
