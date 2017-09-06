@@ -64,6 +64,8 @@ import de.ovgu.featureide.fm.core.conf.ConfigurationFG;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -93,7 +95,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			ConfigurationEditor.class.getName() + "#MODEL_PATH");
 
 	private final JobSynchronizer configJobManager = new JobSynchronizer();
-	
+
 	private final List<IConfigurationEditorPage> allPages = new ArrayList<>(5);
 	private List<IConfigurationEditorPage> extensionPages;
 	private List<IConfigurationEditorPage> internalPages;
@@ -149,7 +151,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		public void partActivated(IWorkbenchPart part) {
 		}
 	};
-	
+
 	public List<IConfigurationEditorPage> getExtensionPages() {
 		return extensionPages;
 	}
@@ -399,7 +401,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		textEditorPage = (TextEditorPage) initPage(new TextEditorPage());
 		allPages.add(textEditorPage);
 		internalPages = allPages.subList(0, allPages.size());
-		
+
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".ConfigurationEditor");
 		try {
 			for (IConfigurationElement e : config) {
@@ -416,8 +418,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		extensionPages = allPages.subList(internalPages.size(), allPages.size());
 
 		if (containsError()) {
-			setActivePage(internalPages.get(internalPages.size() - 1).getIndex());
+			setActivePage(textEditorPage.getIndex());
+		} else if (requiresAdvancedConfigurationPage()) {
+			setActivePage(internalPages.get(1).getIndex());
 		}
+	}
+
+	private boolean requiresAdvancedConfigurationPage() {
+		for (SelectableFeature feature : configurationManager.editObject().getFeatures()) {
+			if (feature.getManual() == Selection.UNSELECTED) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private IConfigurationEditorPage initPage(IConfigurationEditorPage page) {
