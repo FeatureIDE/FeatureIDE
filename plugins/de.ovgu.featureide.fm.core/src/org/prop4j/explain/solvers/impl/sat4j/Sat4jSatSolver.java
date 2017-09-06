@@ -282,4 +282,14 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		}
 		return vector;
 	}
+	
+	/**
+	 * Returns the internal clause index for the given Sat4J clause index.
+	 * Sat4J clause indexes start at 1 instead of 0.
+	 * @param index Sat4J clause index
+	 * @return internal clause index
+	 */
+	public int getClauseIndexFromIndex(int index) {
+		return index - 1;
+	}
 }

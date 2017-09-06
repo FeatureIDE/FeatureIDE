@@ -113,6 +113,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
 		nc.setIncludeBooleanValues(false);
 		nc.setCnfType(CNFType.Regular);
+		nc.setRecordTraceModel(true);
 		return nc;
 	}
 	

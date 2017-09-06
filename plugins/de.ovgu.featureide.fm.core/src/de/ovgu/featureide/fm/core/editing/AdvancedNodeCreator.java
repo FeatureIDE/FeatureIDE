@@ -130,6 +130,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/** The trace model. */
 	private FeatureModelToNodeTraceModel traceModel;
+	/** True to create the trace model while creating nodes. */
+	private boolean recordTraceModel = false;
 
 	public AdvancedNodeCreator() {
 	}
@@ -201,7 +203,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		case None:
 			clause = constraint.getNode().clone();
 			clauses.add(clause);
-			traceModel.addTraceConstraint(constraint);
+			if (isRecordingTraceModel()) {
+				traceModel.addTraceConstraint(constraint);
+			}
 			break;
 		case Regular:
 			compact = false;
@@ -212,12 +216,16 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 				for (Node andChild : cnfNode.getChildren()) {
 					clause = compact || andChild instanceof Or ? andChild : new Or(andChild);
 					clauses.add(clause);
-					traceModel.addTraceConstraint(constraint);
+					if (isRecordingTraceModel()) {
+						traceModel.addTraceConstraint(constraint);
+					}
 				}
 			} else {
 				clause = compact || cnfNode instanceof Or ? cnfNode : new Or(cnfNode);
 				clauses.add(clause);
-				traceModel.addTraceConstraint(constraint);
+				if (isRecordingTraceModel()) {
+					traceModel.addTraceConstraint(constraint);
+				}
 			}
 			break;
 		}
@@ -328,7 +336,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 					break;
 				}
 				clauses.add(clause);
-				traceModel.addTraceRoot(root);
+				if (isRecordingTraceModel()) {
+					traceModel.addTraceRoot(root);
+				}
 			}
 
 			final Iterable<IFeature> features = featureModel.getFeatures();
@@ -337,7 +347,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 					final IFeature childFeature = child.getFeature();
 					clause = new Or(getLiteral(feature, true), getLiteral(childFeature, false));
 					clauses.add(clause);
-					traceModel.addTraceChildUp(feature, Collections.singleton(childFeature));
+					if (isRecordingTraceModel()) {
+						traceModel.addTraceChildUp(feature, Collections.singleton(childFeature));
+					}
 				}
 
 				if (feature.getStructure().hasChildren()) {
@@ -347,7 +359,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 								final IFeature childFeature = child.getFeature();
 								clause = new Or(getLiteral(childFeature, true), getLiteral(feature, false));
 								clauses.add(clause);
-								traceModel.addTraceChildDown(feature, Collections.singleton(childFeature));
+								if (isRecordingTraceModel()) {
+									traceModel.addTraceChildDown(feature, Collections.singleton(childFeature));
+								}
 							}
 						}
 					} else if (feature.getStructure().isOr()) {
@@ -362,7 +376,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 						orLiterals[i] = getLiteral(feature, false);
 						clause = new Or(orLiterals);
 						clauses.add(clause);
-						traceModel.addTraceChildDown(feature, children);
+						if (isRecordingTraceModel()) {
+							traceModel.addTraceChildDown(feature, children);
+						}
 					} else if (feature.getStructure().isAlternative()) {
 						final List<IFeature> children = new LinkedList<>();
 						final Literal[] alternativeLiterals = new Literal[feature.getStructure().getChildrenCount() + 1];
@@ -375,7 +391,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 						alternativeLiterals[i] = getLiteral(feature, false);
 						clause = new Or(alternativeLiterals);
 						clauses.add(clause);
-						traceModel.addTraceChildDown(feature, children);
+						if (isRecordingTraceModel()) {
+							traceModel.addTraceChildDown(feature, children);
+						}
 
 						for (ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
 							final IFeatureStructure fs = it1.next();
@@ -384,7 +402,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 								final IFeature sibling2 = it2.next().getFeature();
 								clause = new Or(getLiteral(sibling1, false), getLiteral(sibling2, false));
 								clauses.add(clause);
-								traceModel.addTraceChildHorizontal(Arrays.asList(sibling1, sibling2));
+								if (isRecordingTraceModel()) {
+									traceModel.addTraceChildHorizontal(Arrays.asList(sibling1, sibling2));
+								}
 							}
 						}
 					}
@@ -453,7 +473,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	public void setFeatureModel(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
 		this.featureModel = featureModel;
 		this.excludedFeatureNames = excludedFeatureNames;
-		this.traceModel = new FeatureModelToNodeTraceModel();
+		this.traceModel = isRecordingTraceModel() ? new FeatureModelToNodeTraceModel() : null; //Reset the trace model.
 	}
 
 	/**
@@ -478,11 +498,39 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	/**
+	 * <p>
 	 * Returns the trace model.
 	 * The trace model keeps track of the origin of transformed elements.
+	 * </p>
+	 * 
+	 * <p>
+	 * Building the trace model must have been {@link #setRecordTraceModel(boolean) enabled} prior to creating the nodes.
+	 * As a performance concern, this is disabled by default.
+	 * </p>
 	 * @return the trace model
 	 */
 	public FeatureModelToNodeTraceModel getTraceModel() {
 		return traceModel;
+	}
+
+	/**
+	 * Returns true iff this creates a trace model while creating nodes.
+	 * Defaults to false.
+	 * @return true iff this creates a trace model while creating nodes
+	 */
+	public boolean isRecordingTraceModel() {
+		return recordTraceModel;
+	}
+
+	/**
+	 * Sets whether this should create a trace model while creating nodes.
+	 * @param recordTraceModel whether to create a trace model while creating nodes
+	 */
+	public void setRecordTraceModel(boolean recordTraceModel) {
+		boolean old = this.recordTraceModel;
+		this.recordTraceModel = recordTraceModel;
+		if (old != recordTraceModel) {
+			this.traceModel = isRecordingTraceModel() ? new FeatureModelToNodeTraceModel() : null; //Reset the trace model.
+		}
 	}
 }

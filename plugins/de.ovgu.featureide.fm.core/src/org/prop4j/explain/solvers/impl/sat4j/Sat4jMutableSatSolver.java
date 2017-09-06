@@ -174,6 +174,20 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	}
 	
 	@Override
+	public int getClauseIndexFromIndex(int index) {
+		index = super.getClauseIndexFromIndex(index);
+		int i = 0;
+		for (final Node clause : super.getClauses()) {
+			if (clause == null) {
+				index--;
+			} else if (i++ == index) {
+				return index;
+			}
+		}
+		throw new IndexOutOfBoundsException();
+	}
+	
+	@Override
 	public Map<Object, Boolean> getAssumptions() {
 		/*
 		 * Merge the assumptions of all scopes.
