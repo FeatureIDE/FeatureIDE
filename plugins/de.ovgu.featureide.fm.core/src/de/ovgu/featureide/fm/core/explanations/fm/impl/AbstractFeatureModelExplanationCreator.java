@@ -167,7 +167,11 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	protected Explanation getExplanation(Set<Integer> clauseIndexes) {
 		final Explanation explanation = getConcreteExplanation();
 		for (final Integer clauseIndex : clauseIndexes) {
-			explanation.addReason(getReason(clauseIndex));
+			final Reason reason = getReason(clauseIndex);
+			if (reason == null) {
+				continue;
+			}
+			explanation.addReason(reason);
 		}
 		return explanation;
 	}
