@@ -394,7 +394,8 @@ public class NodeCreator {
 
 		String s = getVariable(rootFeature.getName(), featureModel);
 
-		final Literal[] children = new Literal[rootFeature.getStructure().getChildrenCount()];
+		final Node[] children = new Node[rootFeature.getStructure().getChildrenCount()];
+		//Children need to be Node[] instead of Literal[] in case other children types are added throughout the lifecycle of the node.
 		int i = 0;
 		for (IFeatureStructure rootChild : rootFeature.getStructure().getChildren()) {
 			String var = getVariable(rootChild.getFeature().getName(), featureModel);
@@ -425,7 +426,7 @@ public class NodeCreator {
 			if (replacings.get(featureModel.getRenamingsManager().getOldName(rootFeature.getName())) == null) {
 				final Literal[] childrenDown = new Literal[children.length];
 				for (int j = 0; j < childrenDown.length; j++) {
-					childrenDown[j] = new Literal(children[j].var);
+					childrenDown[j] = new Literal(((Literal) children[j]).var);
 				}
 				final Node definitionDown = childrenDown.length == 1 ? childrenDown[0] : new Or(childrenDown);
 				nodes.add(new Implies(new Literal(s), definitionDown));
@@ -437,7 +438,7 @@ public class NodeCreator {
 				if (children.length > 1) {
 					final Literal[] childrenHorizontal = new Literal[children.length];
 					for (int j = 0; j < childrenHorizontal.length; j++) {
-						childrenHorizontal[j] = new Literal(children[j].var);
+						childrenHorizontal[j] = new Literal(((Literal) children[j]).var);
 					}
 					nodes.add(new AtMost(1, childrenHorizontal));
 				}
