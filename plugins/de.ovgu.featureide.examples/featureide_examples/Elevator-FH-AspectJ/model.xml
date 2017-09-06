@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="Elevator">
 				<feature mandatory="true" name="Base"/>
@@ -24,6 +25,7 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

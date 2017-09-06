@@ -678,7 +678,7 @@ public final class FeatureUtils {
 		for (IConstraint constraint : constraints) {
 			for (IFeature f : constraint.getContainedFeatures()) {
 				if (f != null && f.getName().equals(feature.getName())) {
-					relevant.append((relevant.length() == 0 ? " " : "\n ") + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
+					relevant.append((relevant.length() == 0 ? "" : "\n") + "\u2022 " + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
 					break;
 				}
 			}

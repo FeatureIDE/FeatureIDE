@@ -40,6 +40,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -111,7 +112,9 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 			final LinkedList<FSTRole> roles = classModel.getRoles();
 			
 			IFile roleFile = roles.getFirst().getFile();
-			IFolder buildFolder = CorePlugin.getFeatureProject(roleFile).getBuildFolder();
+			IFeatureProject project = CorePlugin.getFeatureProject(roleFile);
+			if (project == null) return;
+			IFolder buildFolder = project.getBuildFolder();
 			IFile file = buildFolder.getFile(fileName);
 			try {
 				if (!file.exists())

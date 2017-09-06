@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +42,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ArmEvent;
@@ -87,6 +90,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
@@ -96,10 +100,16 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
@@ -150,6 +160,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<>();
+
+	/** Generates explanations for automatic selections. */
+	private final AutomaticSelectionExplanationCreator automaticSelectionExplanationCreator = ConfigurationExplanationCreatorFactory.getDefault().getAutomaticSelectionExplanationCreator();
 
 	protected IConfigurationEditor configurationEditor = null;
 
@@ -206,16 +219,27 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	@Override
 	public void propertyChange(FeatureIDEEvent evt) {
 		if (evt != null) {
-			switch (evt.getEventType()) {
-			case MODEL_DATA_SAVED:
-				dirty = false;
-				break;
-			case MODEL_DATA_OVERRIDDEN:
-				refreshPage();
-				setDirty();
-				break;
-			default:
-				break;
+			if (evt.getSource() instanceof IFeatureModel) {
+				switch (evt.getEventType()) {
+				case MODEL_DATA_SAVED:
+				case MODEL_DATA_OVERRIDDEN:
+					refreshPage();
+					break;
+				default:
+					break;
+				}
+			} else if (evt.getSource() instanceof Configuration) {
+				switch (evt.getEventType()) {
+				case MODEL_DATA_SAVED:
+					dirty = false;
+					break;
+				case MODEL_DATA_OVERRIDDEN:
+					refreshPage();
+					setDirty();
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}
@@ -295,9 +319,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		// info label
 		gridData = new GridData();
-		gridData.horizontalAlignment = SWT.FILL;
+		gridData.horizontalAlignment = SWT.LEFT;
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalAlignment = SWT.CENTER;
+		gridData.minimumWidth = 250;
+		gridData.widthHint = 300;
 		infoLabel = new Label(compositeTop, SWT.NONE);
 		infoLabel.setLayoutData(gridData);
 		if (configurationEditor.hasValidFeatureModel()) {
@@ -598,7 +624,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			final FeatureModelAnalyzer analyzer = configurationEditor.getConfiguration().getFeatureModel().getAnalyser();
 			try {
 				if (!analyzer.isValid()) {
-					displayError(THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
+					displayError(
+							THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
 					return false;
 				}
 			} catch (TimeoutException e) {
@@ -920,11 +947,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		}
 
-		
 		final LongRunningMethod<List<Node>> jobs = configurationEditor.getConfiguration().getPropagator().findOpenClauses(manualFeatureList);
-		LongRunningJob<List<Node>> job = new LongRunningJob<List<Node>>("FindClauses", jobs); 
+		LongRunningJob<List<Node>> job = new LongRunningJob<List<Node>>("FindClauses", jobs);
 		job.schedule();
-		
+
 		job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
 			@Override
 			public void jobFinished(IJob<List<Node>> finishedJob) {
@@ -1028,8 +1054,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
-		final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator()
-				.update(redundantManual, Arrays.asList(feature));
+		final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator().update(redundantManual, Arrays.asList(feature));
 		final LongRunningJob<Void> job = new LongRunningJob<>("", update);
 		job.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
@@ -1051,6 +1076,55 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		});
 		return job;
+	}
+
+	/**
+	 * Returns an explanation for the given feature selection.
+	 * Generates it first if necessary.
+	 * @param featureSelection a feature selection; not null
+	 * @return an explanation for the given feature selection; null if none could be found
+	 */
+	public Explanation getExplanation(SelectableFeature featureSelection) {
+		switch (featureSelection.getAutomatic()) {
+			case SELECTED:
+			case UNSELECTED:
+				return getAutomaticSelectionExplanation(featureSelection);
+			case UNDEFINED:
+				break;
+			default:
+				throw new IllegalStateException("Unknown feature selection state");
+		}
+		return null;
+	}
+
+	/**
+	 * Returns an explanation why the given feature is automatically selected or unselected.
+	 * Generates it first if necessary.
+	 * @param automaticSelection an automatically selected feature; not null
+	 * @return  an explanation why the given feature is automatically selected or unselected; null if none could be found
+	 */
+	public Explanation getAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
+		//TODO Remember previously generated explanations.
+		return createAutomaticSelectionExplanation(automaticSelection);
+	}
+
+	/**
+	 * Returns a new explanation for the given automatic selection.
+	 * @param automaticSelection the automatic selection
+	 * @return a new explanation for the given automatic selection; null if none could be generated
+	 */
+	protected Explanation createAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
+		final Configuration config = configurationEditor.getConfiguration();
+		if (config == null) {
+			return null;
+		}
+		final IFeatureModel fm = config.getFeatureModel();
+		if (fm == null) {
+			return null;
+		}
+		automaticSelectionExplanationCreator.setConfiguration(config);
+		automaticSelectionExplanationCreator.setAutomaticSelection(automaticSelection);
+		return automaticSelectionExplanationCreator.getExplanation();
 	}
 
 	protected void lockItem(TreeItem item) {
@@ -1076,6 +1150,26 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
 						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
+						if(configurationEditor instanceof ConfigurationEditor){
+							ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
+							//Get current configuration 
+							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
+							//Cast is necessary, don't remove 
+							final IFile document  = (IFile)getEditorInput().getAdapter(IFile.class);
+							
+							byte[] content;
+							try {
+								content = new byte[document.getContents().available()];
+								document.getContents().read(content);
+								if(!source.equals(new String(content))){
+									setDirty();
+								}
+							} catch (IOException e) {
+								FMUIPlugin.getDefault().logError(e);
+							} catch (CoreException e) {
+								FMUIPlugin.getDefault().logError(e);
+							}
+						}
 					}
 				}
 			});
@@ -1169,15 +1263,30 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 				sb.append("Open Clauses:\n");
 				for (Node clause : openClauses) {
-					sb.append(NodeWriter.nodeToString(clause, NodeWriter.logicalSymbols)).append('\n');
+					sb.append(clause.toString(NodeWriter.logicalSymbols)).append('\n');
+				}
+			}
+
+			//Print the explanation.
+			final Explanation explanation = getExplanation(feature);
+			if (explanation != null && explanation.getReasons() != null && !explanation.getReasons().isEmpty()) {
+				if (sb.length() > 0) {
+					sb.append("\n\n");
+				}
+				final ExplanationWriter wr = explanation.getWriter();
+				sb.append(wr.getHeaderString());
+				for (final Reason reason : explanation.getReasons()) {
+					sb.append(System.lineSeparator());
+					sb.append("\u2022 ");
+					sb.append(wr.getReasonString(reason));
 				}
 			}
 
 			if (sb.length() > 0) {
 				tipItem = item;
 				final Rectangle bounds = item.getBounds();
-				final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12,bounds.y));
-				newToolTip(tree.getShell(), sb, false, displayPoint.x,displayPoint.y);
+				final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12, bounds.y));
+				newToolTip(tree.getShell(), sb, false, displayPoint.x, displayPoint.y);
 			}
 		}
 	}

@@ -22,22 +22,22 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import org.eclipse.draw2d.Figure;
 
-import de.ovgu.featureide.fm.core.explanations.Explanation.Reason;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 
 /**
  * A figure for feature model elements, meaning features and constraints.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class ModelElementFigure extends Figure {
 	/** the currently active reason */
-	private Reason activeReason;
+	private FeatureModelReason activeReason;
 	
 	/**
 	 * Sets the currently active reason.
-	 * @param activeReason new active reason
+	 * @param activeReason new active reason; null to reset
 	 */
-	public void setActiveReason(Reason activeReason) {
+	public void setActiveReason(FeatureModelReason activeReason) {
 		this.activeReason = activeReason;
 	}
 	
@@ -45,7 +45,7 @@ public abstract class ModelElementFigure extends Figure {
 	 * Returns the currently active reason.
 	 * @return the currently active reason
 	 */
-	public Reason getActiveReason() {
+	public FeatureModelReason getActiveReason() {
 		return activeReason;
 	}
 }

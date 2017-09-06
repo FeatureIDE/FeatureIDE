@@ -27,7 +27,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_RESOURCES
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
-import java.beans.PropertyChangeEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -83,7 +82,6 @@ import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -174,6 +172,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			diagramEditor.dispose();
 			getFeatureModel().removeListener(diagramEditor);
 			fmManager.removeListener(diagramEditor);
+			fmManager.override();
 		}
 		super.dispose();
 	}
@@ -194,6 +193,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 		// write the model to the file
 		if (getActivePage() == textEditor.getIndex()) {
+			textEditor.executeSaveOperation();
 			// textEditor.updateDiagram();
 			fmManager.externalSave(new Runnable() {
 				@Override
@@ -206,8 +206,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		}
 
 		setPageModified(false);
-		textEditor.resetTextEditor();
-		updateConfigurationEditors();
 	}
 
 	@Override
@@ -422,6 +420,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
 					diagramEditor.internRefresh(false);
+					//refresh root and children to prevent manual and another layout algorithm to omit connection
+					if (diagramEditor.getFeatureModel().getStructure().getRoot() != null) {
+						diagramEditor.refreshChildAll(diagramEditor.getFeatureModel().getStructure().getRoot().getFeature());
+					}
 					diagramEditor.analyzeFeatureModel();
 				}
 			});
@@ -698,32 +700,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	private void setOutlinePage(FmOutlinePage fmOutlinePage) {
 		outlinePage = fmOutlinePage;
-	}
-
-	/**
-	 * Sets the actual FeatureModel at the corresponding {@link ConfigurationEditor}s.
-	 * 
-	 * @see ConfigurationEditor#propertyChange(PropertyChangeEvent)
-	 */
-	private void updateConfigurationEditors() {
-		IProject project = getModelFile().getProject();
-		for (IWorkbenchWindow window : getSite().getWorkbenchWindow().getWorkbench().getWorkbenchWindows()) {
-			for (IWorkbenchPage page : window.getPages()) {
-				for (IEditorReference editorRef : page.getEditorReferences()) {
-					if (ConfigurationEditor.ID.equals(editorRef.getId())) {
-						try {
-							final IFile editorFile = (IFile) editorRef.getEditorInput().getAdapter(IFile.class);
-							if (editorFile.getProject().equals(project)) {
-								((ConfigurationEditor) editorRef.getEditor(true))
-										.propertyChange(new FeatureIDEEvent(getModelFile(), EventType.MODEL_DATA_SAVED, null, null));
-							}
-						} catch (PartInitException e) {
-							FMCorePlugin.getDefault().logError(e);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	@Override

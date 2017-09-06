@@ -90,6 +90,7 @@ public abstract class ErrorPropagation {
 	 */
 	public static ErrorPropagation createErrorPropagation(IFile sourceFile) {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(sourceFile);
+		if (featureProject == null) return null;
 		final String fileExtension = sourceFile.getFileExtension();
 		if ("java".equals(fileExtension)) {
 			return new JavaErrorPropagation(featureProject);

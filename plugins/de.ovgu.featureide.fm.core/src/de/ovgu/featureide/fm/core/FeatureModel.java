@@ -222,7 +222,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void setConstraints(final LinkedList<Constraint> constraints) {
-		FeatureUtils.setConstraints(model, Functional.map(Functional.toIterator(constraints), FeatureUtilsLegacy.CONSTRAINT_TO_ICONSTRANT));
+		FeatureUtils.setConstraints(model, Functional.map(constraints, FeatureUtilsLegacy.CONSTRAINT_TO_ICONSTRANT));
 	}
 
 	public void addPropositionalNode(Node node) {

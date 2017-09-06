@@ -97,6 +97,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private final List<IConfigurationEditorPage> allPages = new ArrayList<>(5);
 	private List<IConfigurationEditorPage> extensionPages;
 	private List<IConfigurationEditorPage> internalPages;
+	private TextEditorPage textEditorPage;
 
 	/**
 	 * The file of the corresponding feature model.
@@ -130,6 +131,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			}
 			if (configurationManager != null) {
 				configurationManager.removeListener(ConfigurationEditor.this);
+				configurationManager.override();
 			}
 			FeatureColorManager.removeListener(ConfigurationEditor.this);
 		}
@@ -394,7 +396,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			allPages.add(initPage(new ConfigurationPage()));
 			allPages.add(initPage(new AdvancedConfigurationPage()));
 		}
-		allPages.add(initPage(new TextEditorPage()));
+		textEditorPage = (TextEditorPage) initPage(new TextEditorPage());
+		allPages.add(textEditorPage);
 		internalPages = allPages.subList(0, allPages.size());
 		
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".ConfigurationEditor");
@@ -469,6 +472,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				if (configurationManager == null) {
 					currentPage.doSave(monitor);
 				} else {
+					textEditorPage.updateConfiguration();
 					configurationManager.externalSave(new Runnable() {
 						@Override
 						public void run() {

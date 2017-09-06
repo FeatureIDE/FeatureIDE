@@ -130,7 +130,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	}
 
 	private void convertToFeatureProject(MigrationConfigurationData configurationData) {
-		CorePlugin.setupFeatureProject(newProject, configurationData.composer.getId(), configurationData.sourcePath, configurationData.configPath, configurationData.buildPath, false, false);
+		CorePlugin.setupFeatureProject(newProject, configurationData.composer.getId(), configurationData.sourcePath, configurationData.configPath, configurationData.buildPath, false, false, configurationData.composer.hasSourceFolder(), configurationData.composer.hasBuildFolder());
 
 		CorePlugin.getDefault().addProject(newProject);
 	}
@@ -290,6 +290,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 	private IFeatureModel generateFeatureModelOfVariants() {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(newProject);
+		if (featureProject == null) return null;
 		final IFeatureModel featureModel = featureProject.getFeatureModel();
 
 		featureModel.reset();

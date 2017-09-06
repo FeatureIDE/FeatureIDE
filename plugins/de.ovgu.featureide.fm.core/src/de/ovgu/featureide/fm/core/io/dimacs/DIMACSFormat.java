@@ -20,24 +20,24 @@
  */
 package de.ovgu.featureide.fm.core.io.dimacs;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.prop4j.And;
-import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Or;
+import org.prop4j.transform.DimacsReader;
+import org.prop4j.transform.DimacsWriter;
 
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -46,9 +46,10 @@ import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
- * Reads / Writes feature models in the DIMACS CNF format.
+ * Reads and writes feature models in the DIMACS CNF format.
  * 
  * @author Sebastian Krieter
+ * @author Timo G&uuml;nther
  */
 public class DIMACSFormat implements IFeatureModelFormat {
 
@@ -57,145 +58,60 @@ public class DIMACSFormat implements IFeatureModelFormat {
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
-		final ArrayDeque<String> lines = new ArrayDeque<>();
-
-		String[] names = null;
-		int lineNumber = 1;
-		try (BufferedReader r = new BufferedReader(new StringReader(source.toString()))) {
-			String str = null;
-			while ((str = r.readLine()) != null) {
-				if (!str.isEmpty()) {
-					str = str.trim();
-					if (str.startsWith("p")) {
-						final String[] startLine = str.split("\\s+");
-						names = new String[Integer.parseInt(startLine[2]) + 1];
-					} else {
-						lines.add(str);
-					}
-				}
-				lineNumber++;
-			}
-		} catch (IOException e) {
-			problemList.add(new Problem(e, lineNumber));
+		
+		//Transform the input into a propositional node.
+		final DimacsReader r = new DimacsReader(source.toString());
+		r.setReadingVariableDirectory(true);
+		final Node read;
+		try {
+			read = r.read();
+		} catch (ParseException e) {
+			problemList.add(new Problem(e));
+			return problemList;
 		}
+		
+		//Add the propositional node to the feature model.
+		addNodeToFeatureModel(featureModel, read);
+		
+		return problemList;
+	}
+
+	/**
+	 * Adds the given propositional node to the given feature model.
+	 * The current implementation is naive in that it does not attempt to interpret any constraint as {@link IFeatureStructure structure}.
+	 * @param featureModel feature model to edit
+	 * @param node propositional node to add
+	 */
+	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node) {
+		//Add a dummy feature as root.
 		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
 		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__");
-
 		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);
 		featureModel.getStructure().setRoot(rootFeature.getStructure());
-
-		while (!lines.isEmpty()) {
-			final String line = lines.peek();
-			if (line.startsWith("c")) {
-				lines.poll();
-				final String[] commentLine = line.split("\\s+");
-				final String id = commentLine[1].trim();
-				final String name = commentLine[2].trim();
-				try {
-					names[Integer.parseInt(id)] = name;
-				} catch (NumberFormatException e) {
-				}
-			} else {
-				break;
-			}
-		}
-
-		final ArrayList<String> abstractNames = new ArrayList<>();
-		for (int i = 1; i < names.length; i++) {
-			String name = names[i];
-			if (name == null) {
-				name = "__Abstract__" + i;
-				abstractNames.add(name);
-			}
-			final IFeature feature = factory.createFeature(featureModel, name);
+		
+		//Add a feature for each variable.
+		final Set<String> variables = new LinkedHashSet<>(node.getContainedFeatures());
+		for (final String variable : variables) {
+			final IFeature feature = factory.createFeature(featureModel, variable);
 			featureModel.addFeature(feature);
 			rootFeature.getStructure().addChild(feature.getStructure());
 		}
-
-		final ArrayList<Or> clauses = new ArrayList<>();
-		while (!lines.isEmpty()) {
-			final String[] clauseLine = lines.poll().split("\\s+");
-			final Literal[] array = new Literal[clauseLine.length - 1];
-			for (int i = 0; i < clauseLine.length - 1; i++) {
-				final int varIndex = Integer.parseInt(clauseLine[i]);
-				array[i] = new Literal(names[Math.abs(varIndex)], varIndex > 0);
-			}
-			final Or propNode = new Or(array);
-			clauses.add(propNode);
+		
+		//Add a constraint for each conjunctive clause.
+		final List<Node> clauses = node instanceof And ? Arrays.asList(node.getChildren()) : Collections.singletonList(node);
+		for (final Node clause : clauses) {
+			final IConstraint constraint = factory.createConstraint(featureModel, clause);
+			featureModel.addConstraint(constraint);
 		}
-		Node cnf = new And(clauses.toArray(new Or[0]));
-
-		//		final FeatureRemover remover = new FeatureRemover(cnf, abstractNames, false);
-		//		cnf = remover.createNewClauseList(LongRunningWrapper.runMethod(remover, new ConsoleMonitor()));
-
-		for (Node clause : cnf.getChildren()) {
-			featureModel.addConstraint(factory.createConstraint(featureModel, clause));
-		}
-		return problemList;
 	}
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
-
-		final StringBuilder stringBuilder = new StringBuilder();
-		Map<String, Integer> featureMap = new HashMap<>();
-		int i = 1;
-		for (CharSequence name : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
-			featureMap.put(name.toString(), i);
-			stringBuilder.append("c ");
-			stringBuilder.append(i);
-			stringBuilder.append(' ');
-			stringBuilder.append(name.toString());
-			stringBuilder.append(System.lineSeparator());
-			i++;
-		}
-
-		int clauseCount = 0;
-		final StringBuilder clauseStringBuilder = new StringBuilder();
-		CHILDREN: for (Node and : nodes.getChildren()) {
-			if (and instanceof Literal) {
-				if (and.toString().equals("True") || and.toString().equals("-False")) {
-					continue;
-				}
-				if (((Literal) and).positive) {
-					clauseStringBuilder.append(featureMap.get(and.toString()));
-				} else {
-					clauseStringBuilder.append('-');
-					clauseStringBuilder.append(featureMap.get(((Literal) and).var.toString()));
-				}
-				clauseStringBuilder.append(' ');
-			} else {
-				for (Node literal : and.getChildren()) {
-					if (literal.toString().equals("True") || literal.toString().equals("-False")) {
-						continue CHILDREN;
-					}
-				}
-
-				for (Node literal : and.getChildren()) {
-					if (((Literal) literal).positive) {
-						clauseStringBuilder.append(featureMap.get(literal.toString()));
-					} else {
-						clauseStringBuilder.append('-');
-						clauseStringBuilder.append(featureMap.get(((Literal) literal).var.toString()));
-					}
-					clauseStringBuilder.append(' ');
-				}
-			}
-			clauseStringBuilder.append('0');
-			clauseStringBuilder.append(System.lineSeparator());
-			clauseCount++;
-		}
-
-		stringBuilder.append("p cnf ");
-		stringBuilder.append(featureModel.getNumberOfFeatures());
-		stringBuilder.append(' ');
-		stringBuilder.append(clauseCount);
-		stringBuilder.append(System.lineSeparator());
-		stringBuilder.append(clauseStringBuilder);
-
-		return stringBuilder.toString();
+		final Node in = AdvancedNodeCreator.createRegularCNF(featureModel);
+		final DimacsWriter w = new DimacsWriter(in);
+		w.setWritingVariableDirectory(true);
+		return w.write();
 	}
 
 	@Override

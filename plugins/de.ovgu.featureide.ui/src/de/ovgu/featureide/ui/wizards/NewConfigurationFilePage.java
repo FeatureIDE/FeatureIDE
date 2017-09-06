@@ -161,7 +161,8 @@ public class NewConfigurationFilePage extends WizardPage {
 					}
 					IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName());
 					IFeatureProject data = CorePlugin.getFeatureProject(res);
-					configFolder = data.getConfigFolder();
+					if (data != null)
+						configFolder = data.getConfigFolder();
 				}
 				dialogChanged();
 			}

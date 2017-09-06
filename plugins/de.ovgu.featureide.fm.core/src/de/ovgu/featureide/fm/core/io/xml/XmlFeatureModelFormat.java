@@ -106,9 +106,10 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			final XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
 			customProperties.addAll(propertyLoader.parseProperties());
 		}
+				
 		if (object.getStructure().getRoot() == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
-		}
+		}	
 
 		importCustomProperties(customProperties, object);
 	}
@@ -128,7 +129,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		createXmlPropertiesPart(doc, properties, object);
 
 		root.appendChild(struct);
-		createXmlDocRec(doc, struct, object.getStructure().getRoot().getFeature());
+		createXmlDocRec(doc, struct, FeatureUtils.getRoot(object));
 
 		root.appendChild(constraints);
 		for (int i = 0; i < object.getConstraints().size(); i++) {
@@ -264,12 +265,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		final Element fnod;
 		if (children.isEmpty()) {
 			fnod = doc.createElement(FEATURE);
-			final String description = feat.getProperty().getDescription();
-			if (description != null && !description.trim().isEmpty()) {
-				final Element descr = doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-				fnod.appendChild(descr);
-			}
+			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 		} else {
 			if (feat.getStructure().isAnd()) {
@@ -281,13 +277,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				fnod = doc.createElement(UNKNOWN);//Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
-			final String description = feat.getProperty().getDescription();
-			if (description != null && !description.trim().isEmpty()) {
-				final Element descr = doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-				fnod.appendChild(descr);
-			}
-
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 
@@ -299,7 +288,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	protected void addDescription(Document doc, IFeature feat, Element fnod) {
 		final String description = feat.getProperty().getDescription();
-		if (description != null && !description.isEmpty()) {
+		if (description != null && !description.trim().isEmpty()) {
 			final Element descr = doc.createElement(DESCRIPTION);
 			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 			fnod.appendChild(descr);
@@ -564,6 +553,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				parseFeatures(e.getChildNodes(), f);
 			}
 		}
+		
+		//Check that there are only OR connections when the parent has more than one feature
+		for (IFeature f : object.getFeatures()) {
+			if(f.getStructure().isOr() && f.getStructure().getChildrenCount() <= 1) {
+				f.getStructure().setAnd();
+			}
+		}
 	}
 
 	/**
@@ -597,7 +593,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod.setAttribute(HIDDEN, TRUE);
 		}
 		if (feat.getStructure().isMandatory()) {
-			fnod.setAttribute(MANDATORY, TRUE);
+			if(feat.getStructure().getParent() != null && feat.getStructure().getParent().isAnd()){
+				fnod.setAttribute(MANDATORY, TRUE);
+			} else if (feat.getStructure().getParent() == null){
+				fnod.setAttribute(MANDATORY, TRUE);
+			}
 		}
 		if (feat.getStructure().isAbstract()) {
 			fnod.setAttribute(ABSTRACT, TRUE);

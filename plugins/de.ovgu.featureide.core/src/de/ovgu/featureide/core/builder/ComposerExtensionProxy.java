@@ -149,4 +149,9 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return defaultComposerExtensionClass.getComposerObjectInstance(c);
 	}
 
+	@Override
+	public boolean hasBuildFolder() {
+		return defaultComposerExtensionClass.hasBuildFolder();
+	}
+
 }

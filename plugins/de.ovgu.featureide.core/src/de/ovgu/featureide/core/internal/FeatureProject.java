@@ -83,6 +83,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
+import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.job.ModelScheduleRule;
@@ -94,7 +95,6 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -133,11 +133,21 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		 * listens to changed feature names
 		 */
 		public void propertyChange(FeatureIDEEvent evt) {
-
-			if (EventType.FEATURE_NAME_CHANGED == evt.getEventType()) {
+			switch (evt.getEventType()) {
+			case FEATURE_NAME_CHANGED:
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
 				FeatureProject.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
+				break;
+			case MODEL_DATA_SAVED:
+				try {
+					createAndDeleteFeatureFolders();
+				} catch (CoreException e) {
+					CorePlugin.getDefault().logError(e);
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -206,6 +216,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				public Boolean execute(IMonitor workMonitor) throws Exception {
 					try {
 						final IFolder folder = sourceFolder;
+						featureModelManager.read();
 						final IFeatureModel model = featureModelManager.getObject();
 						// prevent warnings, if the user has just created a project
 						// without any source files
@@ -281,9 +292,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							break;
 						}
 					}
-					if(addedFeatures < 10 && addedFeatures > 0)
-					{
-						message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ")+2);						
+					if (addedFeatures < 10 && addedFeatures > 0) {
+						message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ") + 2);
 					}
 
 					return message.toString();
@@ -327,11 +337,22 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		String projectBuildPath = getProjectBuildPath();
 
+		try {
+			// just create the bin folder if project hat only the FeatureIDE
+			// Nature
+			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
+				if (projectBuildPath.isEmpty() && getProjectSourcePath().isEmpty()) {
+					binFolder = project.getFolder("bin");
+				}
+			}
+		} catch (CoreException e) {
+			LOGGER.logError(e);
+		}
 		libFolder = project.getFolder("lib");
-		binFolder = CorePlugin.getFolder(project, "bin");
 		buildFolder = CorePlugin.getFolder(project, projectBuildPath);
 		configFolder = CorePlugin.getFolder(project, getProjectConfigurationPath());
 		sourceFolder = CorePlugin.getFolder(project, getProjectSourcePath());
+
 		fstModel = null;
 		// loading model data and listen to changes in the model file
 		addModelListener();
@@ -348,10 +369,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
-		setPaths(getProjectSourcePath(), projectBuildPath, getProjectConfigurationPath());
+		setPaths(getProjectSourcePath(), getProjectBuildPath(), getProjectConfigurationPath());
 
-		// adds the compiler to the feature project if it is an older project
 		IComposerExtensionClass composer = getComposer();
+		// adds the compiler to the feature project if it is an older project
 		if (composer != null) {
 			if (sourceFolder != null) {
 				composer.addCompiler(getProject(), sourceFolder.getProjectRelativePath().toOSString(), configFolder.getProjectRelativePath().toOSString(),
@@ -837,17 +858,17 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				setAllFeatureModuleMarkers();
 			}
 		}
-		
+
 		IPath modelPath = modelFile.getModelFile().getFullPath();
 		if (checkModelChange(event.getDelta().findMember(modelPath))) {
+			setAllFeatureModuleMarkers();
 			return;
 		}
 
 		try {
 			List<IFile> configs = getAllConfigurations();
 			IResourceDelta configurationDelta = event.getDelta().findMember(configFolder.getFullPath());
-			if(configurationDelta != null)
-			{
+			if (configurationDelta != null) {
 				for (IResourceDelta delta : configurationDelta.getAffectedChildren(IResourceDelta.REMOVED)) {
 					CorePlugin.getDefault().logInfo(delta.toString() + " was removed.");
 					//if configuration was removed update warnings

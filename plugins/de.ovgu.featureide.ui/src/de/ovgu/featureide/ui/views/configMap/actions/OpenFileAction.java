@@ -29,6 +29,7 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**

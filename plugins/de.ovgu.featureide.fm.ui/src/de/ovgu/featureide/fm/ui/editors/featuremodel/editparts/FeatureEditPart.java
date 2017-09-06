@@ -38,7 +38,8 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -134,6 +135,17 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 				featureModel.getGraphicalConstraint(partOf).setFeatureSelected(true);
 			}
 		}
+	}
+	
+	/**
+	 * Returns the source connection.
+	 * @return the source connection; null if none exists
+	 */
+	protected ConnectionEditPart getSourceConnection() {
+		if (getSourceConnections().isEmpty()) {
+			return null;
+		}
+		return (ConnectionEditPart) getSourceConnections().get(0);
 	}
 
 	@Override
@@ -245,14 +257,14 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
 			getFigure().setProperties();
+			break;
 		case COLLAPSED_ALL_CHANGED:
 		case COLLAPSED_CHANGED:
-			getFigure().setProperties();
 			/*
 			 * Reset the active reason in case we missed that it was set to null while this was collapsed.
 			 * In case it should not be null, the active reason will be set to the correct value in the upcoming feature model analysis anyway.
 			 */
-			setActiveReason(null);
+			setActiveReason(null); //reset includes a refresh (getFigure().setProperties())
 			break;
 		case MANDATORY_CHANGED:
 			sourceConnection = getModel().getSourceConnection();
@@ -277,9 +289,10 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			connectionEditPart.refreshSourceDecoration();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
+			setActiveReason(null); //reset
 			break;
 		case ACTIVE_REASON_CHANGED:
-			setActiveReason((Explanation.Reason) event.getNewValue());
+			setActiveReason((FeatureModelReason) event.getNewValue());
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
@@ -288,20 +301,33 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	}
 
 	/**
+	 * <p>
 	 * Sets the currently active reason.
+	 * </p>
+	 * 
+	 * <p>
+	 * Propagates into the figure and the source connection.
 	 * Refreshes accordingly.
-	 * @param activeReason the new active reason
+	 * </p>
+	 * @param activeReason the new active reason; null to reset
 	 */
-	protected void setActiveReason(Explanation.Reason activeReason) {
-		getFigure().setActiveReason(activeReason);
-		getFigure().setProperties();
-		final FeatureConnection sourceConnection = getModel().getSourceConnection();
-		if (sourceConnection == null || getViewer() == null) {
-			return;
+	protected void setActiveReason(FeatureModelReason activeReason) {
+		//Update the figure.
+		if (activeReason == null //reset
+				|| activeReason.getTrace().getOrigin() == Origin.CHILD_HORIZONTAL) {
+			final FeatureFigure figure = getFigure();
+			figure.setActiveReason(activeReason);
+			figure.setProperties();
 		}
-		final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
-		connectionEditPart.setActiveReason(activeReason);
-		connectionEditPart.refreshVisuals();
+		
+		//Update the source connection.
+		if (activeReason == null //reset
+				|| activeReason.getTrace().getOrigin() == Origin.CHILD_UP
+				|| activeReason.getTrace().getOrigin() == Origin.CHILD_DOWN) {
+			final ConnectionEditPart sourceConnection = getSourceConnection();
+			sourceConnection.setActiveReason(activeReason);
+			sourceConnection.refreshVisuals();
+		}
 	}
 
 	private static boolean equals(final IGraphicalFeature newTarget, final IGraphicalFeature target) {

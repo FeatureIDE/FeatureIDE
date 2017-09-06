@@ -355,10 +355,9 @@ public class StringTable {
 	public static final String NO_LEFT_SYMBOL_FOUND = "No left symbol found";
 	public static final String NO_RIGHT_SYMBOL_FOUND = "No right symbol found";
 	public static final String NO_SYMBOL_FOUND = "No symbol found";
-	public static final String INVALID_POSITIONING_OF_PARENTHESES = "invalid positioning of parentheses";
+	public static final String INVALID_POSITIONING_OF_PARENTHESES = "Invalid positioning of parentheses";
 	public static final String INVALID_NUMBER_OF_QUOTATION_MARKS = "Invalid number of quotation marks";
 	public static final String WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED = "Whitespace before and after quoted feature name required";
-	public static final String NO_SYMBOL = " no symbol ";
 	public static final String IS_NOT_SUPPORTED = " is not supported";
 	public static final String EXPRESSION_IS_NOT_IN_CNF = "expression is not in conjunctive normal form";
 	public static final String ONLY = "only ";
@@ -1038,6 +1037,8 @@ public class StringTable {
 	public static final String CALCULATE_VOID_FEATURES = "Calculate Void Features";
 	public static final String CALCULATE_FALSE_OPTIONAL_FEATURES = "Calculate False Optional Features";
 	public static final String CALCULATE_DEAD_FEATURES = "Calculate Dead Features";
+	public static final String CURRENTLY_NO_COLOR_SCHEME_SELECTED = "No color scheme is selected";
+	public static final String CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG = "There is currently no color scheme selected. To color features please use the color scheme wizard and select a color scheme.";
 	
 	public static final String PUBLIC_CLASS = "public class";
 	public static final String PUBLIC_INTERFACE = "public interface";

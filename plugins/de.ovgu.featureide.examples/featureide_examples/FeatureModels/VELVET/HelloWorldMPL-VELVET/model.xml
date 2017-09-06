@@ -3,14 +3,7 @@
 		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="HelloWorldMPL">
-				<description>
-					
-				</description>
-				<feature name="Greetings">
-					<description>
-						
-					</description>
-				</feature>
+				<feature name="Greetings"/>
 			</and>
 		</struct>
 		<constraints/>

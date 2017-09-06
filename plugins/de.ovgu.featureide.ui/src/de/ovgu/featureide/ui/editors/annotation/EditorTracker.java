@@ -54,8 +54,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Sebastian Krieter
  */
 public class EditorTracker {
-	private static final Image TITLE_IMAGE = UIPlugin
-			.getImage("JakFileIcon.png");
+	private static final Image TITLE_IMAGE = UIPlugin.getImage("JakFileIcon.png");
 	private final IWorkbench workbench;
 	private HashSet<IWorkbenchPartReference> annotatedPartrefSet = new HashSet<IWorkbenchPartReference>();
 
@@ -78,16 +77,16 @@ public class EditorTracker {
 	private IPartListener2 partListener = new IPartListener2() {
 		public void partOpened(IWorkbenchPartReference partref) {
 			//System.out.println(OPENED+partref.getTitle());
-			
+
 		}
 
 		public void partActivated(IWorkbenchPartReference partref) {
-		//	System.out.println(ACTIVATED  +partref.getTitle());
+			//	System.out.println(ACTIVATED  +partref.getTitle());
 			annotateEditor(partref);
 		}
 
 		public void partBroughtToTop(IWorkbenchPartReference partref) {
-		//	System.out.println(TOTOP  +partref.getTitle());
+			//	System.out.println(TOTOP  +partref.getTitle());
 		}
 
 		public void partVisible(IWorkbenchPartReference partref) {
@@ -150,8 +149,7 @@ public class EditorTracker {
 	}
 
 	private void renameEditor(IWorkbenchPartReference partref)
-			throws IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, NoSuchMethodException, SecurityException {
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		if (!(partref.getPart(true) instanceof IEditorPart))
 			return;
 		IEditorPart editorPart = (IEditorPart) partref.getPart(true);
@@ -189,11 +187,9 @@ public class EditorTracker {
 	 * @throws InvocationTargetException
 	 */
 	@SuppressWarnings("rawtypes")
-	private void invokeMethod(WorkbenchPart obj, String methodname,
-			Class paramtype, Object parameter) throws NoSuchMethodException,
-			IllegalAccessException, InvocationTargetException {
-		Method method = WorkbenchPart.class.getDeclaredMethod(methodname,
-				paramtype);
+	private void invokeMethod(WorkbenchPart obj, String methodname, Class paramtype, Object parameter)
+			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		Method method = WorkbenchPart.class.getDeclaredMethod(methodname, paramtype);
 		method.setAccessible(true);
 		method.invoke(obj, (paramtype.cast(parameter)));
 	}
@@ -202,40 +198,38 @@ public class EditorTracker {
 
 	private String getTitle(IWorkbenchPartReference partRef, IFile file) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
-		if (partRef.getPart(true) instanceof IEditorPart) {
+		if (featureProject != null) {
+			if (partRef.getPart(true) instanceof IEditorPart) {
 
-			composer = featureProject.getComposer();
-			if (composer.hasFeatureFolder()) {
-				String feature = featureProject.getFeatureName(file);
-				if (feature != null) {
-					// case: a source file
-					if (composer.hasFeatureFolder()) {
-						return file.getName() + "[" + feature + "]";
-					}
-				} else {
-					if (isComposedFile(file.getParent(),
-							featureProject.getBuildFolder())) {
-						// case: a composed file
-						IFile configuration = featureProject
-								.getCurrentConfiguration();
-						if (configuration != null) {
-							String config = configuration.getName()
-									.split("[.]")[0];
-							if (config != null) {
-								return file.getName() + "<" + config + ">";
-							}
+				composer = featureProject.getComposer();
+				if (composer.hasFeatureFolder()) {
+					String feature = featureProject.getFeatureName(file);
+					if (feature != null) {
+						// case: a source file
+						if (composer.hasFeatureFolder()) {
+							return file.getName() + "[" + feature + "]";
 						}
 					} else {
-						String configuration = getConfiguration(file
-								.getParent());
-						if (configuration != null) {
-							// case: a generated products file
-							return file.getName() + "<" + configuration + ">";
+						if (isComposedFile(file.getParent(), featureProject.getBuildFolder())) {
+							// case: a composed file
+							IFile configuration = featureProject.getCurrentConfiguration();
+							if (configuration != null) {
+								String config = configuration.getName().split("[.]")[0];
+								if (config != null) {
+									return file.getName() + "<" + config + ">";
+								}
+							}
+						} else {
+							String configuration = getConfiguration(file.getParent());
+							if (configuration != null) {
+								// case: a generated products file
+								return file.getName() + "<" + configuration + ">";
+							}
 						}
 					}
 				}
-			}
 
+			}
 		}
 		// no change
 		return partRef.getTitle();
@@ -253,8 +247,7 @@ public class EditorTracker {
 		try {
 			for (IResource res : parent.members()) {
 				if (res instanceof IFile) {
-					if (composer.getConfigurationExtension().equals(
-							res.getFileExtension())) {
+					if (composer.getConfigurationExtension().equals(res.getFileExtension())) {
 						return res.getName().split("[.]")[0];
 					}
 				}

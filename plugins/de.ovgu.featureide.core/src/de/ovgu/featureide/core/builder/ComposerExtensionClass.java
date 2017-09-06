@@ -356,6 +356,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public boolean hasSource() {
 		return true;
 	}
+	
+	public boolean hasBuildFolder() {
+		return true;
+	}
 
 	public boolean canGeneratInParallelJobs() {
 		return true;

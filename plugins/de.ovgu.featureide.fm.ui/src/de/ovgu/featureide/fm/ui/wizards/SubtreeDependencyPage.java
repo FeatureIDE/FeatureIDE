@@ -133,7 +133,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		// iterate implicit constraints and generate explanations 
 		for (IConstraint redundantC : getImplicitConstraints()) {
 			redundantC.setConstraintAttribute(ConstraintAttribute.IMPLICIT, false);
-			subtreeModel.getAnalyser().addRedundantConstraintExplanation(completeFm, redundantC);
+			subtreeModel.getAnalyser().getRedundantConstraintExplanation(completeFm, redundantC);
 			
 			// remember if an implicit constraint exists to adapt legend 
 			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {

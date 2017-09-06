@@ -29,7 +29,9 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveConstraintToLocationOperation;
 
 /**
  * Executed command when dragging and dropping constraints
@@ -77,10 +79,13 @@ public class ConstraintDragAndDropCommand extends Command {
 		if (hasAutoLayout && (index == oldIndex))
 			return;
 
-
-		MoveConstraintOperation op = new MoveConstraintOperation(constraint.getObject(), featureModel.getFeatureModel(), index, oldIndex);
-		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
-
+		AbstractFeatureModelOperation op = null;
+		if(hasAutoLayout) {
+			op = new MoveConstraintOperation(constraint.getObject(), featureModel.getFeatureModel(), index, oldIndex);
+			op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
+		} else {
+			op = new MoveConstraintToLocationOperation(featureModel, newLocation, constraint.getObject());
+		}
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

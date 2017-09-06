@@ -358,11 +358,11 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * Starts composer specific changes of the project structure,
 	 * after adding the FeatureIDE nature to a project.
 	 */
-	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath) {
+	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath,
+			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
+		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		createProjectStructure(project, sourcePath, configPath, buildPath, composer);
 		IFeatureModel featureModel = createFeatureModelFile(project);
 		createConfigFile(project, configPath, featureModel, project.getName().split("[-]")[0] + ".");
 
@@ -425,10 +425,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param addCompiler <code>false</code> if the project already has a compiler
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addCompiler, boolean addNature) {
+			final String buildPath, boolean addCompiler, boolean addNature, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
+		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		createProjectStructure(project, sourcePath, configPath, buildPath, composer);
 		IFeatureModel featureModel = createFeatureModelFile(project);
 		createConfigFile(project, configPath, featureModel, "default.");
 
@@ -545,11 +545,12 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * Also creates the bin folder if necessary.<br>
 	 * Creates the default feature model.
 	 */
-	private static void createProjectStructure(IProject project, String sourcePath, String configPath, String buildPath, IComposerExtensionClass composer) {
+	private static void createProjectStructure(IProject project, String sourcePath, String configPath, String buildPath, IComposerExtensionClass composer,
+			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
 		try {
 			/** just create the bin folder if project has only the FeatureIDE Nature **/
 			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if (!("".equals(buildPath) && "".equals(sourcePath)) && composer.hasSource()) {
+				if (!("".equals(buildPath) && "".equals(sourcePath)) && shouldCreateBuildFolder && composer.hasSource()) {
 					createFolder(project, "bin");
 				}
 			}
@@ -557,8 +558,12 @@ public class CorePlugin extends AbstractCorePlugin {
 			getDefault().logError(e);
 		}
 		if (composer.hasSource()) {
-			createFolder(project, sourcePath);
-			createFolder(project, buildPath);
+			if (shouldCreateSourceFolder) {
+				createFolder(project, sourcePath);
+			}
+			if (shouldCreateBuildFolder) {
+				createFolder(project, buildPath);
+			}
 		}
 		createFolder(project, configPath);
 	}
@@ -566,20 +571,23 @@ public class CorePlugin extends AbstractCorePlugin {
 	private static IFeatureModel createFeatureModelFile(IProject project) {
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
-		final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
-		IFeatureModelFactory factory;
-		try {
-			factory = FMFactoryManager.getFactory(modelPath.toString(), format);
-		} catch (NoSuchExtensionException e) {
-			Logger.logError(e);
-			factory = FMFactoryManager.getDefaultFactory();
-		}
-		IFeatureModel featureModel = factory.createFeatureModel();
-		FMComposerManager.getFMComposerExtension(project);
-		featureModel.createDefaultValues(project.getName());
+		if (!modelPath.toFile().exists()) {
+			final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+			IFeatureModelFactory factory;
+			try {
+				factory = FMFactoryManager.getFactory(modelPath.toString(), format);
+			} catch (NoSuchExtensionException e) {
+				Logger.logError(e);
+				factory = FMFactoryManager.getDefaultFactory();
+			}
+			IFeatureModel featureModel = factory.createFeatureModel();
+			FMComposerManager.getFMComposerExtension(project);
+			featureModel.createDefaultValues(project.getName());
 
-		FileHandler.save(modelPath, featureModel, format);
-		return featureModel;
+			FileHandler.save(modelPath, featureModel, format);
+			return featureModel;
+		}
+		return null;
 	}
 
 	private static Configuration createConfigFile(IProject project, String configPath, IFeatureModel featureModel, final String configName) {

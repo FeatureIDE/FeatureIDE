@@ -93,34 +93,6 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Represents a function that takes one arguments of type <b>T</b> and returns a result of the same type.
-	 * <br/>
-	 * <br/>
-	 * <b>Example</b>
-	 * The following example shows a function which takes an integer and applied 2 times this integer (Java 1.8 syntax used).
-	 * <code>
-	 * <pre>
-	 * IdentityFunction<Integer> twoTimes = (integer) -> { integer.intValue() * 2 };
-	 * Integer value = twoTimes(7); // seven.equals("14")
-	 * </pre>
-	 * </code>
-	 * 
-	 * @see Functional#map(Iterable, IFunction)
-	 * @see Functional#join(Iterable, String, IFunction)
-	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
-	 * @see Functional#equals(Object)
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static class IdentityFunction<T> implements IFunction<T, T> {
-		@Override
-		public T invoke(T t) {
-			return t;
-		}
-	};
-
-	/**
 	 * Represents an operation that takes one arguments of type <b>T</b> and produces no result.
 	 * <br/>
 	 * <br/>
@@ -167,6 +139,34 @@ public abstract class Functional {
 	public static class NullConsumer<T> implements IConsumer<T> {
 		@Override
 		public void invoke(T t) {
+		}
+	};
+
+	/**
+	 * Represents a function that takes one arguments of type <b>T</b> and returns a result of the same type.
+	 * <br/>
+	 * <br/>
+	 * <b>Example</b>
+	 * The following example shows a function which takes an integer and applied 2 times this integer (Java 1.8 syntax used).
+	 * <code>
+	 * <pre>
+	 * IdentityFunction<Integer> twoTimes = (integer) -> { integer.intValue() * 2 };
+	 * Integer value = twoTimes(7); // seven.equals("14")
+	 * </pre>
+	 * </code>
+	 * 
+	 * @see Functional#map(Iterable, IFunction)
+	 * @see Functional#join(Iterable, String, IFunction)
+	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
+	 * @see Functional#equals(Object)
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 3.0
+	 */
+	public static class IdentityFunction<T> implements IFunction<T, T> {
+		@Override
+		public T invoke(T t) {
+			return t;
 		}
 	};
 
@@ -218,6 +218,20 @@ public abstract class Functional {
 			return t.toString();
 		}
 	};
+
+	private static class DefaultIterable<U, T extends U> implements Iterable<T> {
+
+		private final Iterator<T> iterator;
+
+		public DefaultIterable(Iterator<T> iterator) {
+			this.iterator = iterator;
+		}
+
+		@Override
+		public Iterator<T> iterator() {
+			return iterator;
+		}
+	}
 
 	/**
 	 * Implements an iterable iterator that invokes a user-defined {@link Functional.IFunction Function} <i>f</i> of type <b>T</b> and <b>U</b> on
@@ -357,11 +371,11 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U> predicate) {
-		return new FilterIterator<U, T>(source, predicate);
+		return predicate == null ? source : new FilterIterator<U, T>(source, predicate);
 	}
 
 	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final IFilter<U> predicate) {
-		return new FilterIterator<U, T>(source, predicate);
+		return predicate == null ? new DefaultIterable<>(source) : new FilterIterator<U, T>(source, predicate);
 	}
 
 	/**
@@ -445,6 +459,14 @@ public abstract class Functional {
 		return retval;
 	}
 
+	public static <T, R> List<R> mapToList(final Iterable<T> source, IFilter<T> filter, IFunction<T, R> mapFunction) {
+		return Functional.toList(Functional.map(Functional.filter(source, filter), mapFunction));
+	}
+
+	public static <T, R> List<R> mapToList(final Iterable<T> source, IFunction<T, R> mapFunction) {
+		return Functional.toList(Functional.map(source, mapFunction));
+	}
+
 	/**
 	 * Converts the iterator <i>source</i> of type <b>T</b> into a list of <b>Strings</b> using {@link #mapToString(Iterable)} on <b>source</b> and finally
 	 * {@link #toList(Iterable)} on the result. <br/>
@@ -477,7 +499,7 @@ public abstract class Functional {
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static <T> Set<String> mapToStringSet (final Iterable<T> source) {
+	public static <T> Set<String> mapToStringSet(final Iterable<T> source) {
 		return toSet(map(source, new ToStringFunction<T>()));
 	}
 
@@ -518,39 +540,11 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <T> Iterable<T> toIterator(Enumeration<T> enumeration) {
-		final Collection<T> col = new ArrayList<T>();
-		while (enumeration.hasMoreElements())
-			col.add(enumeration.nextElement());
-		return new Iterable<T>() {
-
-			@Override
-			public Iterator<T> iterator() {
-				return col.iterator();
-			}
-		};
-	}
-
-	/**
-	 * Converts the collection <i>collection</i> of type <b>T</b> into an Iterable of <b>T</b>.
-	 * <br/>
-	 * It is guaranteed not to remove any element from the iterator. <br/>
-	 * <br/>
-	 * <b>Note</b>: This is a <b>non-blocking</b> operation
-	 * 
-	 * @param Collection source
-	 * @return An iterable of <b>T</b> that were yielded by <b>collection</b>
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static <T> Iterable<T> toIterator(final Collection<T> collection) {
-		return new Iterable<T>() {
-
-			@Override
-			public Iterator<T> iterator() {
-				return collection.iterator();
-			}
-		};
+		final Collection<T> collection = new ArrayList<>();
+		while (enumeration.hasMoreElements()) {
+			collection.add(enumeration.nextElement());
+		}
+		return collection;
 	}
 
 	/**
@@ -683,9 +677,10 @@ public abstract class Functional {
 	 * @param lhs Iterable which should be checked of equality to <code>rhs</code>
 	 * @param rhs Iterable which should be checked of equality to <code>lhs</code>
 	 * @param map Converts elements from <b>T</b> to <b>U</b>
-	 * @return <b>true</b> if the elements in <code>lhs</code> are also in <b>rhs</b> and vice versa, otherwise <b>false</b>.<br/><u><b>Note on duplicates</b></u>: Duplicates in both
+	 * @return <b>true</b> if the elements in <code>lhs</code> are also in <b>rhs</b> and vice versa, otherwise <b>false</b>.<br/>
+	 *         <u><b>Note on duplicates</b></u>: Duplicates in both
 	 *         <code>lhs</code> and <code>rhs</code> are eliminated <u>before</u> the test of equality.
-	 *         
+	 * 
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
@@ -694,14 +689,15 @@ public abstract class Functional {
 		final Set<U> right = Functional.toSet(Functional.map(rhs, map));
 		return left.equals(right);
 	}
-	
+
 	/**
 	 * Returns an type-safe empty iterable of type <b>T</b> as convenience counterpart to {@link Collections#emptyIterator()} or
 	 * {@link Collections#emptyList()}.
 	 * <br/>
 	 * <br/>
 	 * The parameter <code>className</code> is required to infer the type of <b>T</b> at compile time.
-	 * <br/><br/>
+	 * <br/>
+	 * <br/>
 	 * <b>Example</b>
 	 * The following example shows how to create an empty iterable of type <code>IFeature</code>.
 	 * <code>

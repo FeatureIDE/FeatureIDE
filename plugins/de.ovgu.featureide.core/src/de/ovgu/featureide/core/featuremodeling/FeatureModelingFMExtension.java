@@ -58,7 +58,7 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	}
 	
 	@Override
-	public String getErroMessage() {
+	public String getErrorMessage() {
 		return ERROR_MESSAGE_NO_COMPOSER;
 	}
 	
@@ -66,4 +66,6 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	public boolean hasFeatureOrder() {
 		return false;
 	}
+	
+	
 }

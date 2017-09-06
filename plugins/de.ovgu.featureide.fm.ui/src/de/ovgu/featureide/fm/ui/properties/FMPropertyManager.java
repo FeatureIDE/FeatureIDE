@@ -34,7 +34,7 @@ import org.eclipse.swt.graphics.Color;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -579,16 +579,16 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return getDiagramBackgroundColor();
 	}
 	
-	public static Border getReasonBorder(Explanation.Reason reason) {
+	public static Border getReasonBorder(Reason reason) {
 		return GUIBasics.createLineBorder(getReasonColor(reason), getReasonLineWidth(reason));
 	}
 	
-	public static Color getReasonColor(Explanation.Reason reason) {
+	public static Color getReasonColor(Reason reason) {
 //		FMCorePlugin.getDefault().logInfo(reason.getSourceElement().getName() + " got color " + GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0));
 		return GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0);
 	}
 	
-	public static int getReasonLineWidth(Explanation.Reason reason) {
+	public static int getReasonLineWidth(Reason reason) {
 		return 3;
 	}
 

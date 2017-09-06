@@ -22,10 +22,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.LegendMoveEditPolicy;
 
 /**
  * EditPart for feature model legend
@@ -60,7 +60,7 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new NonResizableEditPolicy());
+		installEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE, new LegendMoveEditPolicy());
 	}
 
 }

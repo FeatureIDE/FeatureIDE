@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
-			<or mandatory="true" name="A1">
+			<and mandatory="true" name="A1">
 				<description>
 					Rooooooooot
 					1
@@ -15,18 +16,18 @@
 					9
 					0
 				</description>
-				<and mandatory="true" name="A2">
+				<and name="A2">
 					<and mandatory="true" name="A3">
 						<feature mandatory="true" name="C23"/>
 						<feature mandatory="true" name="C24"/>
 						<feature name="C25"/>
 						<feature mandatory="true" name="C26"/>
-						<or mandatory="true" name="A27">
-							<feature mandatory="true" name="C302"/>
-							<feature mandatory="true" name="C303"/>
-							<feature mandatory="true" name="C304"/>
-							<feature mandatory="true" name="C305"/>
-						</or>
+						<and mandatory="true" name="A27">
+							<feature name="C302"/>
+							<feature name="C303"/>
+							<feature name="C304"/>
+							<feature name="C305"/>
+						</and>
 					</and>
 					<feature name="C4"/>
 					<and mandatory="true" name="A5">
@@ -43,30 +44,30 @@
 							<feature mandatory="true" name="C278"/>
 						</and>
 						<feature mandatory="true" name="C51"/>
-						<or name="A52">
-							<feature mandatory="true" name="C496"/>
-							<feature mandatory="true" name="C497"/>
-							<feature mandatory="true" name="C498"/>
-							<feature mandatory="true" name="C499"/>
-						</or>
+						<and name="A52">
+							<feature name="C496"/>
+							<feature name="C497"/>
+							<feature name="C498"/>
+							<feature name="C499"/>
+						</and>
 						<feature mandatory="true" name="C53"/>
 						<and mandatory="true" name="A54">
 							<feature mandatory="true" name="C76"/>
 							<feature name="C77"/>
 							<feature name="C78"/>
-							<or mandatory="true" name="A79">
-								<feature mandatory="true" name="C86"/>
-								<feature mandatory="true" name="C87"/>
-								<and mandatory="true" name="A88">
+							<and mandatory="true" name="A79">
+								<feature name="C86"/>
+								<feature name="C87"/>
+								<and name="A88">
 									<feature mandatory="true" name="C102"/>
 									<feature mandatory="true" name="C103"/>
 									<feature name="C104"/>
 									<feature name="C105"/>
 									<feature mandatory="true" name="C106"/>
 								</and>
-								<feature mandatory="true" name="C89"/>
-								<feature mandatory="true" name="C90"/>
-								<and mandatory="true" name="A91">
+								<feature name="C89"/>
+								<feature name="C90"/>
+								<and name="A91">
 									<feature mandatory="true" name="C107"/>
 									<feature name="C108"/>
 									<and name="A109">
@@ -82,44 +83,44 @@
 										<feature name="C126"/>
 										<and name="A127">
 											<feature mandatory="true" name="C198"/>
-											<or mandatory="true" name="A199">
-												<feature mandatory="true" name="C459"/>
-												<feature mandatory="true" name="C460"/>
-												<feature mandatory="true" name="C461"/>
-												<feature mandatory="true" name="C462"/>
-												<feature mandatory="true" name="C463"/>
-												<feature mandatory="true" name="C464"/>
-												<feature mandatory="true" name="C465"/>
-												<feature mandatory="true" name="C466"/>
-												<feature mandatory="true" name="C467"/>
-												<feature mandatory="true" name="C468"/>
-											</or>
+											<and mandatory="true" name="A199">
+												<feature name="C459"/>
+												<feature name="C460"/>
+												<feature name="C461"/>
+												<feature name="C462"/>
+												<feature name="C463"/>
+												<feature name="C464"/>
+												<feature name="C465"/>
+												<feature name="C466"/>
+												<feature name="C467"/>
+												<feature name="C468"/>
+											</and>
 										</and>
 										<feature name="C128"/>
 										<feature name="C129"/>
 										<alt mandatory="true" name="A130">
-											<feature mandatory="true" name="C316"/>
-											<feature mandatory="true" name="C317"/>
-											<feature mandatory="true" name="C318"/>
-											<feature mandatory="true" name="C319"/>
-											<feature mandatory="true" name="C320"/>
-											<feature mandatory="true" name="C321"/>
-											<feature mandatory="true" name="C322"/>
-											<and mandatory="true" name="A323">
+											<feature name="C316"/>
+											<feature name="C317"/>
+											<feature name="C318"/>
+											<feature name="C319"/>
+											<feature name="C320"/>
+											<feature name="C321"/>
+											<feature name="C322"/>
+											<and name="A323">
 												<feature mandatory="true" name="C389"/>
 												<feature name="C390"/>
 												<feature mandatory="true" name="C391"/>
 											</and>
-											<and mandatory="true" name="A324">
+											<and name="A324">
 												<feature mandatory="true" name="C444"/>
 												<alt mandatory="true" name="A445">
-													<feature mandatory="true" name="C484"/>
-													<feature mandatory="true" name="C485"/>
-													<feature mandatory="true" name="C486"/>
-													<feature mandatory="true" name="C487"/>
+													<feature name="C484"/>
+													<feature name="C485"/>
+													<feature name="C486"/>
+													<feature name="C487"/>
 												</alt>
 											</and>
-											<feature mandatory="true" name="C325"/>
+											<feature name="C325"/>
 										</alt>
 									</and>
 									<feature mandatory="true" name="C110"/>
@@ -130,15 +131,15 @@
 									<feature name="C115"/>
 									<feature mandatory="true" name="C116"/>
 								</and>
-								<alt mandatory="true" name="A92">
-									<feature mandatory="true" name="C328"/>
-									<feature mandatory="true" name="C329"/>
-									<feature mandatory="true" name="C330"/>
-									<feature mandatory="true" name="C331"/>
-									<feature mandatory="true" name="C332"/>
+								<alt name="A92">
+									<feature name="C328"/>
+									<feature name="C329"/>
+									<feature name="C330"/>
+									<feature name="C331"/>
+									<feature name="C332"/>
 								</alt>
-								<feature mandatory="true" name="C93"/>
-							</or>
+								<feature name="C93"/>
+							</and>
 							<and mandatory="true" name="A80">
 								<and mandatory="true" name="A117">
 									<and mandatory="true" name="A155">
@@ -151,23 +152,23 @@
 									<feature mandatory="true" name="C156"/>
 									<feature name="C157"/>
 									<alt name="A158">
-										<feature mandatory="true" name="C165"/>
-										<feature mandatory="true" name="C166"/>
-										<feature mandatory="true" name="C167"/>
-										<feature mandatory="true" name="C168"/>
-										<feature mandatory="true" name="C169"/>
-										<feature mandatory="true" name="C170"/>
-										<feature mandatory="true" name="C171"/>
-										<feature mandatory="true" name="C172"/>
-										<feature mandatory="true" name="C173"/>
-										<feature mandatory="true" name="C174"/>
+										<feature name="C165"/>
+										<feature name="C166"/>
+										<feature name="C167"/>
+										<feature name="C168"/>
+										<feature name="C169"/>
+										<feature name="C170"/>
+										<feature name="C171"/>
+										<feature name="C172"/>
+										<feature name="C173"/>
+										<feature name="C174"/>
 									</alt>
-									<or mandatory="true" name="A159">
-										<feature mandatory="true" name="C215"/>
-										<feature mandatory="true" name="C216"/>
-										<feature mandatory="true" name="C217"/>
-										<feature mandatory="true" name="C218"/>
-									</or>
+									<and mandatory="true" name="A159">
+										<feature name="C215"/>
+										<feature name="C216"/>
+										<feature name="C217"/>
+										<feature name="C218"/>
+									</and>
 									<feature name="C160"/>
 									<feature name="C161"/>
 									<and mandatory="true" name="A162">
@@ -201,58 +202,58 @@
 								<and mandatory="true" name="A120">
 									<feature mandatory="true" name="C210"/>
 									<feature name="C211"/>
-									<or mandatory="true" name="A212">
-										<feature mandatory="true" name="C237"/>
-										<feature mandatory="true" name="C238"/>
-										<feature mandatory="true" name="C239"/>
-										<feature mandatory="true" name="C240"/>
-										<feature mandatory="true" name="C241"/>
-									</or>
+									<and mandatory="true" name="A212">
+										<feature name="C237"/>
+										<feature name="C238"/>
+										<feature name="C239"/>
+										<feature name="C240"/>
+										<feature name="C241"/>
+									</and>
 									<feature mandatory="true" name="C213"/>
 								</and>
 							</and>
 							<feature name="C81"/>
 							<feature name="C82"/>
 						</and>
-						<or name="A55">
-							<alt mandatory="true" name="A192">
-								<feature mandatory="true" name="C259"/>
-								<feature mandatory="true" name="C260"/>
-								<and mandatory="true" name="A261">
+						<and name="A55">
+							<alt name="A192">
+								<feature name="C259"/>
+								<feature name="C260"/>
+								<and name="A261">
 									<feature mandatory="true" name="C286"/>
 									<feature name="C287"/>
 									<feature name="C288"/>
 									<feature name="C289"/>
 								</and>
-								<feature mandatory="true" name="C262"/>
-								<or mandatory="true" name="A263">
-									<feature mandatory="true" name="C279"/>
-								</or>
-								<feature mandatory="true" name="C264"/>
-								<feature mandatory="true" name="C265"/>
-								<feature mandatory="true" name="C266"/>
-								<feature mandatory="true" name="C267"/>
+								<feature name="C262"/>
+								<and name="A263">
+									<feature name="C279"/>
+								</and>
+								<feature name="C264"/>
+								<feature name="C265"/>
+								<feature name="C266"/>
+								<feature name="C267"/>
 							</alt>
-							<feature mandatory="true" name="C193"/>
-							<alt mandatory="true" name="A194">
-								<feature mandatory="true" name="C226"/>
-								<feature mandatory="true" name="C227"/>
-								<feature mandatory="true" name="C228"/>
-								<feature mandatory="true" name="C229"/>
-								<feature mandatory="true" name="C230"/>
-								<feature mandatory="true" name="C231"/>
-								<feature mandatory="true" name="C232"/>
+							<feature name="C193"/>
+							<alt name="A194">
+								<feature name="C226"/>
+								<feature name="C227"/>
+								<feature name="C228"/>
+								<feature name="C229"/>
+								<feature name="C230"/>
+								<feature name="C231"/>
+								<feature name="C232"/>
 							</alt>
-							<feature mandatory="true" name="C195"/>
-							<feature mandatory="true" name="C196"/>
-							<or mandatory="true" name="A197">
-								<feature mandatory="true" name="C344"/>
-								<feature mandatory="true" name="C345"/>
-								<feature mandatory="true" name="C346"/>
-								<feature mandatory="true" name="C347"/>
-								<feature mandatory="true" name="C348"/>
-							</or>
-						</or>
+							<feature name="C195"/>
+							<feature name="C196"/>
+							<and name="A197">
+								<feature name="C344"/>
+								<feature name="C345"/>
+								<feature name="C346"/>
+								<feature name="C347"/>
+								<feature name="C348"/>
+							</and>
+						</and>
 						<feature mandatory="true" name="C56"/>
 						<feature mandatory="true" name="C57"/>
 					</and>
@@ -272,154 +273,154 @@
 							<description>
 								Description -.,1234567890
 							</description>
-							<feature mandatory="true" name="C99"/>
-							<and mandatory="true" name="A100">
+							<feature name="C99"/>
+							<and name="A100">
 								<feature mandatory="true" name="C135"/>
-								<or name="A136">
-									<feature mandatory="true" name="C175"/>
-									<feature mandatory="true" name="C176"/>
-									<feature mandatory="true" name="C177"/>
-									<or mandatory="true" name="A178">
-										<feature mandatory="true" name="C360"/>
-										<feature mandatory="true" name="C361"/>
-										<feature mandatory="true" name="C362"/>
-										<feature mandatory="true" name="C363"/>
-									</or>
-									<alt mandatory="true" name="A179">
-										<feature mandatory="true" name="C184"/>
-										<feature mandatory="true" name="C185"/>
-										<feature mandatory="true" name="C186"/>
-										<alt mandatory="true" name="A187">
-											<feature mandatory="true" name="C233"/>
-											<and mandatory="true" name="A234">
+								<and name="A136">
+									<feature name="C175"/>
+									<feature name="C176"/>
+									<feature name="C177"/>
+									<and name="A178">
+										<feature name="C360"/>
+										<feature name="C361"/>
+										<feature name="C362"/>
+										<feature name="C363"/>
+									</and>
+									<alt name="A179">
+										<feature name="C184"/>
+										<feature name="C185"/>
+										<feature name="C186"/>
+										<alt name="A187">
+											<feature name="C233"/>
+											<and name="A234">
 												<feature mandatory="true" name="C333"/>
 											</and>
-											<alt mandatory="true" name="A235">
-												<feature mandatory="true" name="C397"/>
-												<or mandatory="true" name="A398">
-													<feature mandatory="true" name="C412"/>
-													<feature mandatory="true" name="C413"/>
-													<feature mandatory="true" name="C414"/>
-													<feature mandatory="true" name="C415"/>
-													<feature mandatory="true" name="C416"/>
-													<feature mandatory="true" name="C417"/>
-													<alt mandatory="true" name="A418">
-														<feature mandatory="true" name="C500"/>
+											<alt name="A235">
+												<feature name="C397"/>
+												<and name="A398">
+													<feature name="C412"/>
+													<feature name="C413"/>
+													<feature name="C414"/>
+													<feature name="C415"/>
+													<feature name="C416"/>
+													<feature name="C417"/>
+													<alt name="A418">
+														<feature name="C500"/>
 													</alt>
-													<alt mandatory="true" name="A419">
-														<feature mandatory="true" name="C447"/>
-														<feature mandatory="true" name="C448"/>
-														<feature mandatory="true" name="C449"/>
+													<alt name="A419">
+														<feature name="C447"/>
+														<feature name="C448"/>
+														<feature name="C449"/>
 													</alt>
-												</or>
-												<feature mandatory="true" name="C399"/>
-												<feature mandatory="true" name="C400"/>
-												<feature mandatory="true" name="C401"/>
-												<feature mandatory="true" name="C402"/>
-												<feature mandatory="true" name="C403"/>
-												<feature mandatory="true" name="C404"/>
-												<feature mandatory="true" name="C405"/>
-												<feature mandatory="true" name="C406"/>
+												</and>
+												<feature name="C399"/>
+												<feature name="C400"/>
+												<feature name="C401"/>
+												<feature name="C402"/>
+												<feature name="C403"/>
+												<feature name="C404"/>
+												<feature name="C405"/>
+												<feature name="C406"/>
 											</alt>
-											<feature mandatory="true" name="C236"/>
+											<feature name="C236"/>
 										</alt>
-										<feature mandatory="true" name="C188"/>
-										<feature mandatory="true" name="C189"/>
-										<feature mandatory="true" name="C190"/>
-										<feature mandatory="true" name="C191"/>
+										<feature name="C188"/>
+										<feature name="C189"/>
+										<feature name="C190"/>
+										<feature name="C191"/>
 									</alt>
-									<feature mandatory="true" name="C180"/>
-									<feature mandatory="true" name="C181"/>
-									<feature mandatory="true" name="C182"/>
-									<feature mandatory="true" name="C183"/>
-								</or>
+									<feature name="C180"/>
+									<feature name="C181"/>
+									<feature name="C182"/>
+									<feature name="C183"/>
+								</and>
 								<feature name="C137"/>
 								<feature mandatory="true" name="C138"/>
 							</and>
-							<feature mandatory="true" name="C101"/>
+							<feature name="C101"/>
 						</alt>
 						<feature name="C20"/>
 						<and name="A21">
 							<and mandatory="true" name="A41">
 								<feature mandatory="true" name="C65"/>
-								<or mandatory="true" name="A66">
-									<feature mandatory="true" name="C145"/>
-									<feature mandatory="true" name="C146"/>
-									<feature mandatory="true" name="C147"/>
-									<feature mandatory="true" name="C148"/>
-									<feature mandatory="true" name="C149"/>
-									<feature mandatory="true" name="C150"/>
-									<feature mandatory="true" name="C151"/>
-									<feature mandatory="true" name="C152"/>
-									<feature mandatory="true" name="C153"/>
-									<alt mandatory="true" name="A154">
-										<feature mandatory="true" name="C250"/>
-										<feature mandatory="true" name="C251"/>
-										<feature mandatory="true" name="C252"/>
-										<feature mandatory="true" name="C253"/>
-										<feature mandatory="true" name="C254"/>
-										<alt mandatory="true" name="A255">
-											<feature mandatory="true" name="C450"/>
-											<feature mandatory="true" name="C451"/>
-											<feature mandatory="true" name="C452"/>
-											<feature mandatory="true" name="C453"/>
-											<feature mandatory="true" name="C454"/>
-											<feature mandatory="true" name="C455"/>
-											<feature mandatory="true" name="C456"/>
-											<feature mandatory="true" name="C457"/>
-											<feature mandatory="true" name="C458"/>
+								<and mandatory="true" name="A66">
+									<feature name="C145"/>
+									<feature name="C146"/>
+									<feature name="C147"/>
+									<feature name="C148"/>
+									<feature name="C149"/>
+									<feature name="C150"/>
+									<feature name="C151"/>
+									<feature name="C152"/>
+									<feature name="C153"/>
+									<alt name="A154">
+										<feature name="C250"/>
+										<feature name="C251"/>
+										<feature name="C252"/>
+										<feature name="C253"/>
+										<feature name="C254"/>
+										<alt name="A255">
+											<feature name="C450"/>
+											<feature name="C451"/>
+											<feature name="C452"/>
+											<feature name="C453"/>
+											<feature name="C454"/>
+											<feature name="C455"/>
+											<feature name="C456"/>
+											<feature name="C457"/>
+											<feature name="C458"/>
 										</alt>
-										<feature mandatory="true" name="C256"/>
-										<feature mandatory="true" name="C257"/>
-										<feature mandatory="true" name="C258"/>
+										<feature name="C256"/>
+										<feature name="C257"/>
+										<feature name="C258"/>
 									</alt>
-								</or>
+								</and>
 								<and mandatory="true" name="A67">
 									<feature mandatory="true" name="C327"/>
 								</and>
 								<and name="A68">
 									<feature mandatory="true" name="C219"/>
 									<alt name="A220">
-										<feature mandatory="true" name="C242"/>
-										<feature mandatory="true" name="C243"/>
-										<feature mandatory="true" name="C244"/>
-										<feature mandatory="true" name="C245"/>
-										<feature mandatory="true" name="C246"/>
-										<feature mandatory="true" name="C247"/>
-										<feature mandatory="true" name="C248"/>
-										<feature mandatory="true" name="C249"/>
+										<feature name="C242"/>
+										<feature name="C243"/>
+										<feature name="C244"/>
+										<feature name="C245"/>
+										<feature name="C246"/>
+										<feature name="C247"/>
+										<feature name="C248"/>
+										<feature name="C249"/>
 									</alt>
 									<feature name="C221"/>
 									<feature mandatory="true" name="C222"/>
-									<or mandatory="true" name="A223">
-										<feature mandatory="true" name="C408"/>
-										<feature mandatory="true" name="C409"/>
-										<feature mandatory="true" name="C410"/>
-									</or>
+									<and mandatory="true" name="A223">
+										<feature name="C408"/>
+										<feature name="C409"/>
+										<feature name="C410"/>
+									</and>
 									<feature mandatory="true" name="C224"/>
 									<feature name="C225"/>
 								</and>
 							</and>
 							<feature name="C42"/>
-							<or mandatory="true" name="A43">
-								<or mandatory="true" name="A349">
-									<feature mandatory="true" name="C477"/>
-									<feature mandatory="true" name="C478"/>
-									<feature mandatory="true" name="C479"/>
-									<feature mandatory="true" name="C480"/>
-									<feature mandatory="true" name="C481"/>
-									<feature mandatory="true" name="C482"/>
-								</or>
-								<feature mandatory="true" name="C350"/>
-								<feature mandatory="true" name="C351"/>
-								<feature mandatory="true" name="C352"/>
-								<feature mandatory="true" name="C353"/>
-								<feature mandatory="true" name="C354"/>
-								<feature mandatory="true" name="C355"/>
-							</or>
+							<and mandatory="true" name="A43">
+								<and name="A349">
+									<feature name="C477"/>
+									<feature name="C478"/>
+									<feature name="C479"/>
+									<feature name="C480"/>
+									<feature name="C481"/>
+									<feature name="C482"/>
+								</and>
+								<feature name="C350"/>
+								<feature name="C351"/>
+								<feature name="C352"/>
+								<feature name="C353"/>
+								<feature name="C354"/>
+								<feature name="C355"/>
+							</and>
 							<feature name="C44"/>
 							<alt mandatory="true" name="A45">
-								<and mandatory="true" name="A131">
+								<and name="A131">
 									<feature mandatory="true" name="C295"/>
 									<feature name="C296"/>
 									<and mandatory="true" name="A297">
@@ -431,9 +432,9 @@
 									<feature name="C300"/>
 									<feature name="C301"/>
 								</and>
-								<feature mandatory="true" name="C132"/>
-								<feature mandatory="true" name="C133"/>
-								<feature mandatory="true" name="C134"/>
+								<feature name="C132"/>
+								<feature name="C133"/>
+								<feature name="C134"/>
 							</alt>
 							<feature name="C46"/>
 							<feature name="C47"/>
@@ -442,29 +443,29 @@
 						</and>
 						<feature name="C22"/>
 					</and>
-					<or name="A8">
-						<alt mandatory="true" name="A10">
-							<alt mandatory="true" name="A13">
-								<and mandatory="true" name="A28">
+					<and name="A8">
+						<alt name="A10">
+							<alt name="A13">
+								<and name="A28">
 									<and mandatory="true" name="A69">
 										<feature mandatory="true" name="C214"/>
 									</and>
 									<feature name="C70"/>
-									<or name="A71">
-										<feature mandatory="true" name="C334"/>
-										<feature mandatory="true" name="C335"/>
-										<feature mandatory="true" name="C336"/>
-										<feature mandatory="true" name="C337"/>
-										<and mandatory="true" name="A338">
+									<and name="A71">
+										<feature name="C334"/>
+										<feature name="C335"/>
+										<feature name="C336"/>
+										<feature name="C337"/>
+										<and name="A338">
 											<feature mandatory="true" name="C356"/>
 											<feature name="C357"/>
 											<feature name="C358"/>
 										</and>
-										<feature mandatory="true" name="C339"/>
-										<feature mandatory="true" name="C340"/>
-										<feature mandatory="true" name="C341"/>
-										<feature mandatory="true" name="C342"/>
-										<and mandatory="true" name="A343">
+										<feature name="C339"/>
+										<feature name="C340"/>
+										<feature name="C341"/>
+										<feature name="C342"/>
+										<and name="A343">
 											<feature mandatory="true" name="C469"/>
 											<feature name="C470"/>
 											<feature name="C471"/>
@@ -474,17 +475,17 @@
 											<feature mandatory="true" name="C475"/>
 											<feature mandatory="true" name="C476"/>
 										</and>
-									</or>
-									<or name="A72">
-										<feature mandatory="true" name="C139"/>
-										<feature mandatory="true" name="C140"/>
-										<alt mandatory="true" name="A141">
-											<feature mandatory="true" name="C359"/>
+									</and>
+									<and name="A72">
+										<feature name="C139"/>
+										<feature name="C140"/>
+										<alt name="A141">
+											<feature name="C359"/>
 										</alt>
-										<feature mandatory="true" name="C142"/>
-										<feature mandatory="true" name="C143"/>
-										<feature mandatory="true" name="C144"/>
-									</or>
+										<feature name="C142"/>
+										<feature name="C143"/>
+										<feature name="C144"/>
+									</and>
 									<feature name="C73"/>
 									<feature name="C74"/>
 									<and mandatory="true" name="A75">
@@ -493,40 +494,40 @@
 										<feature mandatory="true" name="C85"/>
 									</and>
 								</and>
-								<feature mandatory="true" name="C29"/>
-								<or mandatory="true" name="A30">
-									<feature mandatory="true" name="C58"/>
-									<feature mandatory="true" name="C59"/>
-									<feature mandatory="true" name="C60"/>
-									<feature mandatory="true" name="C61"/>
-									<feature mandatory="true" name="C62"/>
-									<feature mandatory="true" name="C63"/>
-									<or mandatory="true" name="A64">
-										<feature mandatory="true" name="C280"/>
-										<feature mandatory="true" name="C281"/>
-										<feature mandatory="true" name="C282"/>
-										<feature mandatory="true" name="C283"/>
-										<feature mandatory="true" name="C284"/>
-										<feature mandatory="true" name="C285"/>
-									</or>
-								</or>
-								<feature mandatory="true" name="C31"/>
-								<feature mandatory="true" name="C32"/>
-								<alt mandatory="true" name="A33">
-									<feature mandatory="true" name="C200"/>
-									<feature mandatory="true" name="C201"/>
-									<feature mandatory="true" name="C202"/>
-									<feature mandatory="true" name="C203"/>
-									<feature mandatory="true" name="C204"/>
-									<feature mandatory="true" name="C205"/>
-									<feature mandatory="true" name="C206"/>
-									<feature mandatory="true" name="C207"/>
-									<feature mandatory="true" name="C208"/>
-									<and mandatory="true" name="A209">
+								<feature name="C29"/>
+								<and name="A30">
+									<feature name="C58"/>
+									<feature name="C59"/>
+									<feature name="C60"/>
+									<feature name="C61"/>
+									<feature name="C62"/>
+									<feature name="C63"/>
+									<and name="A64">
+										<feature name="C280"/>
+										<feature name="C281"/>
+										<feature name="C282"/>
+										<feature name="C283"/>
+										<feature name="C284"/>
+										<feature name="C285"/>
+									</and>
+								</and>
+								<feature name="C31"/>
+								<feature name="C32"/>
+								<alt name="A33">
+									<feature name="C200"/>
+									<feature name="C201"/>
+									<feature name="C202"/>
+									<feature name="C203"/>
+									<feature name="C204"/>
+									<feature name="C205"/>
+									<feature name="C206"/>
+									<feature name="C207"/>
+									<feature name="C208"/>
+									<and name="A209">
 										<feature mandatory="true" name="C495"/>
 									</and>
 								</alt>
-								<and mandatory="true" name="A34">
+								<and name="A34">
 									<and mandatory="true" name="A411">
 										<feature mandatory="true" name="C441"/>
 										<feature name="C442"/>
@@ -541,18 +542,18 @@
 										</and>
 									</and>
 								</and>
-								<feature mandatory="true" name="C35"/>
-								<or mandatory="true" name="A36">
-									<feature mandatory="true" name="C446"/>
-								</or>
+								<feature name="C35"/>
+								<and name="A36">
+									<feature name="C446"/>
+								</and>
 							</alt>
-							<feature mandatory="true" name="C14"/>
-							<or mandatory="true" name="A15">
-								<feature mandatory="true" name="C37"/>
-							</or>
-							<feature mandatory="true" name="C16"/>
+							<feature name="C14"/>
+							<and name="A15">
+								<feature name="C37"/>
+							</and>
+							<feature name="C16"/>
 						</alt>
-						<and mandatory="true" name="A11">
+						<and name="A11">
 							<and mandatory="true" name="A38">
 								<feature mandatory="true" name="C94"/>
 								<and name="A95">
@@ -560,8 +561,8 @@
 										<feature mandatory="true" name="C407"/>
 									</and>
 								</and>
-								<or name="A96">
-									<and mandatory="true" name="A306">
+								<and name="A96">
+									<and name="A306">
 										<feature mandatory="true" name="C435"/>
 										<feature name="C436"/>
 										<feature name="C437"/>
@@ -569,22 +570,22 @@
 										<feature name="C439"/>
 										<feature mandatory="true" name="C440"/>
 									</and>
-									<feature mandatory="true" name="C307"/>
-									<or mandatory="true" name="A308">
-										<feature mandatory="true" name="C420"/>
-										<feature mandatory="true" name="C421"/>
-										<feature mandatory="true" name="C422"/>
-										<feature mandatory="true" name="C423"/>
-										<feature mandatory="true" name="C424"/>
-										<feature mandatory="true" name="C425"/>
-										<feature mandatory="true" name="C426"/>
-										<feature mandatory="true" name="C427"/>
-										<feature mandatory="true" name="C428"/>
-										<feature mandatory="true" name="C429"/>
-									</or>
-									<feature mandatory="true" name="C309"/>
-									<feature mandatory="true" name="C310"/>
-									<and mandatory="true" name="A311">
+									<feature name="C307"/>
+									<and name="A308">
+										<feature name="C420"/>
+										<feature name="C421"/>
+										<feature name="C422"/>
+										<feature name="C423"/>
+										<feature name="C424"/>
+										<feature name="C425"/>
+										<feature name="C426"/>
+										<feature name="C427"/>
+										<feature name="C428"/>
+										<feature name="C429"/>
+									</and>
+									<feature name="C309"/>
+									<feature name="C310"/>
+									<and name="A311">
 										<and mandatory="true" name="A392">
 											<feature mandatory="true" name="C483"/>
 										</and>
@@ -593,11 +594,11 @@
 										<feature mandatory="true" name="C395"/>
 										<feature name="C396"/>
 									</and>
-									<feature mandatory="true" name="C312"/>
-									<feature mandatory="true" name="C313"/>
-									<feature mandatory="true" name="C314"/>
-									<feature mandatory="true" name="C315"/>
-								</or>
+									<feature name="C312"/>
+									<feature name="C313"/>
+									<feature name="C314"/>
+									<feature name="C315"/>
+								</and>
 								<and name="A97">
 									<feature mandatory="true" name="C326"/>
 								</and>
@@ -612,11 +613,11 @@
 								<feature mandatory="true" name="C294"/>
 							</and>
 						</and>
-						<feature mandatory="true" name="C12"/>
-					</or>
+						<feature name="C12"/>
+					</and>
 					<feature name="C9"/>
 				</and>
-			</or>
+			</and>
 		</struct>
 		<constraints>
 			<rule>
@@ -1838,7 +1839,7 @@
 				</disj>
 			</rule>
 		</constraints>
-		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

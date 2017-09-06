@@ -23,9 +23,9 @@ package org.prop4j.analyses;
 import org.prop4j.solver.FixedLiteralSelectionStrategy;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
-import org.sat4j.minisat.core.Solver;
 import org.prop4j.solver.SatInstance;
 import org.prop4j.solver.VarOrderHeap2;
+import org.sat4j.minisat.core.Solver;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 

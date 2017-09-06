@@ -220,7 +220,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	protected T persistentObject;
 	protected T variableObject;
-	protected T localObject;
 	protected T emptyObject;
 
 	private boolean modifying = false;
@@ -245,7 +244,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			}
 		}
 		persistentObject = copyObject(variableObject);
-		localObject = copyObject(variableObject);
 	}
 
 	@Override
@@ -303,13 +301,13 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				if (problemList != null) {
 					lastProblems.addAll(problemList);
 				}
-				changed = !compareObjects(tempObject, localObject);
+				changed = !compareObjects(tempObject, persistentObject);
 			} catch (Exception e) {
 				handleException(e);
 				return false;
 			}
 			if (changed) {
-				localObject = tempObject;
+				persistentObject = tempObject;
 			}
 			success = lastProblems.isEmpty();
 		}
@@ -325,9 +323,8 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			if (modifying) {
 				return;
 			}
-			final String write = format.getInstance().write(localObject);
+			final String write = format.getInstance().write(persistentObject);
 			format.getInstance().read(variableObject, write);
-			format.getInstance().read(persistentObject, write);
 			//			variableObject = copyObject(localObject);
 			//			persistentObject = copyObject(localObject);
 		}
@@ -366,7 +363,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				final byte[] content = format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET);
 				FileSystem.write(path, content);
 				persistentObject = copyObject(tempObject);
-				localObject = copyObject(tempObject);
 			} catch (Exception e) {
 				handleException(e);
 				return false;
@@ -391,7 +387,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				final T tempObject = copyObject(variableObject);
 				externalSaveMethod.run();
 				persistentObject = copyObject(tempObject);
-				localObject = copyObject(tempObject);
 			} catch (Exception e) {
 				handleException(e);
 				return false;
@@ -410,7 +405,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		synchronized (syncObject) {
 			persistentObject = null;
 			variableObject = null;
-			localObject = null;
 		}
 	}
 

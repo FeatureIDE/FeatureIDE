@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,7 +52,10 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.filter.base.OrFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -103,7 +107,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			case TIMEOUT:
 				return false;
 			case TRUE:
-				return false;
+				return true;
 			default:
 				throw new AssertionError(satResult);
 			}
@@ -542,17 +546,18 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			}
 			final IFeatureModel featureModel = configuration.getFeatureModel();
 
-			final AdvancedNodeCreator nodeCreator1;
-			final AdvancedNodeCreator nodeCreator2;
+			final AdvancedNodeCreator nodeCreator1, nodeCreator2;
+			final IFilter<IFeature> filter1, filter2;
 			if (configuration.ignoreAbstractFeatures) {
-				nodeCreator1 = new AdvancedNodeCreator(featureModel, new HiddenFeatureFilter());
+				filter1 = new HiddenFeatureFilter();
+				filter2 = null;
+				nodeCreator1 = new AdvancedNodeCreator(featureModel, filter1);
 				nodeCreator2 = new AdvancedNodeCreator(featureModel);
 			} else {
-				final OrFilter<IFeature> orFilter = new OrFilter<>();
-				orFilter.add(new HiddenFeatureFilter());
-				orFilter.add(new AbstractFeatureFilter());
-				nodeCreator1 = new AdvancedNodeCreator(featureModel, orFilter);
-				nodeCreator2 = new AdvancedNodeCreator(featureModel, new AbstractFeatureFilter());
+				filter1 = new OrFilter<>(Arrays.asList(new HiddenFeatureFilter(), new AbstractFeatureFilter()));
+				filter2 = new AbstractFeatureFilter();
+				nodeCreator1 = new AdvancedNodeCreator(featureModel, filter1);
+				nodeCreator2 = new AdvancedNodeCreator(featureModel, filter2);
 			}
 			nodeCreator1.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 			nodeCreator2.setCnfType(AdvancedNodeCreator.CNFType.Regular);
@@ -572,8 +577,9 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				Logger.logError(e);
 			}
 
-			rootNodeWithoutHidden = new SatInstance(buildThread1.getResults());
-			rootNode = new SatInstance(buildThread2.getResults());
+			final Iterable<IFeature> features = featureModel.getFeatures();
+			rootNodeWithoutHidden = new SatInstance(buildThread1.getResults(), Functional.mapToList(features, new InverseFilter<>(filter1), FeatureUtils.GET_FEATURE_NAME));
+			rootNode = new SatInstance(buildThread2.getResults(), Functional.mapToList(features, filter2 == null ? null : new InverseFilter<>(filter2), FeatureUtils.GET_FEATURE_NAME));
 			return null;
 		}
 	}
