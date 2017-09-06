@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +41,6 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 
 /**
  * Handles feature renamings.
@@ -108,12 +109,12 @@ public class RenamingsManager implements IEventManager {
 		renamings.clear();
 	};
 
-	public void performRenamings(java.nio.file.Path file) {
-		performRenamings(file.toString());
+	public void performRenamings(File file) {
+		performRenamings(file.toPath());
 	}
 
-	private void performRenamings(final String location) {
-		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(location);
+	public void performRenamings(Path path) {
+		final FeatureModelManager instance = FeatureModelManager.getInstance(path);
 		if (instance == null) {
 			return;
 		}

@@ -71,6 +71,10 @@ public class FeatureModeling extends ComposerExtensionClass {
 		return false;
 	}
 
+	public boolean hasSource() {
+		return false;
+	}
+
 	@Override
 	public boolean clean() {
 		return false;

@@ -50,7 +50,7 @@ public abstract class AbstractExportHandler extends AFileHandler {
 		}
 
 		final Path path = Paths.get(modelFile.getLocationURI());
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByExtension(modelFile.getFileExtension());
+		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(modelFile.getName());
 		IFeatureModelFactory factory;
 		try {
 			factory = FMFactoryManager.getFactory(path.toString(), format);

@@ -65,6 +65,20 @@
      </describer>
   </content-type>
   <content-type
+        base-type="org.eclipse.core.runtime.xml"
+        file-extensions="xml"
+        id="de.ovgu.featureide.fm.ui.featureModel.sxfm"
+        name="SXFM Feature Model"
+        priority="high">
+     <describer
+           class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+        <parameter
+              name="element"
+              value="feature_model">
+        </parameter>
+     </describer>
+  </content-type>
+  <content-type
         base-type="org.eclipse.core.runtime.text"
         file-extensions="velvet"
         id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
@@ -112,6 +126,9 @@
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.fm.ui.extendedfeatureModel">
 			</contentTypeBinding>
+   <contentTypeBinding
+         contentTypeId="de.ovgu.featureide.fm.ui.featureModel.sxfm">
+   </contentTypeBinding>
 		</editor>
 		<editor
         class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"

@@ -38,8 +38,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -116,7 +116,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				final Configuration config = new Configuration(featureProject.getFeatureModel());
 
 				final IFile configFile = featureProject.getCurrentConfiguration();
-				FileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigurationManager.getFormat(configFile.getName()));
+				FileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigFormatManager.getInstance());
 
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();

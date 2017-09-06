@@ -96,6 +96,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -103,8 +104,8 @@ import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -337,7 +338,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		String projectBuildPath = getProjectBuildPath();
 
 		try {
-
 			// just create the bin folder if project hat only the FeatureIDE
 			// Nature
 			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
@@ -349,10 +349,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 		libFolder = project.getFolder("lib");
-
-		buildFolder = project.getFolder(projectBuildPath);
-		configFolder = project.getFolder(getProjectConfigurationPath());
-		sourceFolder = project.getFolder(getProjectSourcePath());
+		buildFolder = CorePlugin.getFolder(project, projectBuildPath);
+		configFolder = CorePlugin.getFolder(project, getProjectConfigurationPath());
+		sourceFolder = CorePlugin.getFolder(project, getProjectSourcePath());
 
 		fstModel = null;
 		// loading model data and listen to changes in the model file
@@ -439,7 +438,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			// write feature order to model
 			// XmlFeatureModelWriter modelWriter = new
 			// XmlFeatureModelWriter(featureModel);
-			FeatureModelManager.writeToFile(featureModel, Paths.get(modelFile.getModelFile().getLocationURI()));
+			FeatureModelManager.save(featureModel, Paths.get(modelFile.getModelFile().getLocationURI()));
 		}
 		/*
 		 * TODO delete .order file in 2013 delete
@@ -555,18 +554,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					configFolder.accept(new IResourceVisitor() {
 						private final String suffix = "." + composer.getConfigurationExtension();
 						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
-						private final FileHandler<Configuration> handler = new FileHandler<>(config);
 
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
 							final String name = resource.getName();
 							if (resource instanceof IFile && name.endsWith(suffix)) {
-								final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(resource.getName());
-								final java.nio.file.Path path = Paths.get(resource.getLocationURI());
-								handler.setFormat(format);
-								handler.setPath(path);
-								handler.read();
-								handler.write();
+								ConfigurationManager.load(Paths.get(resource.getLocationURI()), config).write();
 							}
 							return true;
 						}
@@ -1008,10 +1001,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return configs;
 		try {
 			for (IResource res : configFolder.members()) {
-				if (!(res instanceof IFile))
-					continue;
-				if (LOGGER.getConfigurationExtensions().contains(res.getFileExtension()))
+				if (res instanceof IFile && ConfigFormatManager.getInstance().hasFormat(res.getName())) {
 					configs.add((IFile) res);
+				}
 			}
 		} catch (CoreException e) {
 			LOGGER.logError(e);
@@ -1033,7 +1025,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			public Boolean execute(IMonitor workMonitor) throws Exception {
 				workMonitor.setRemainingWork(2);
 				final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
-				final FileHandler<Configuration> reader = new FileHandler<>(config);
 				try {
 					IMonitor subTask = workMonitor.subTask(1);
 					subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
@@ -1048,7 +1039,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					// check validity
 					for (IFile file : files) {
 						subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
-						reader.read(Paths.get(file.getLocationURI()), ConfigurationManager.getFormat(file.getName()));
+						final ProblemList lastProblems = FileHandler.load(Paths.get(file.getLocationURI()), config, ConfigFormatManager.getInstance());
 						if (!config.isValid()) {
 							String name = file.getName();
 							name = name.substring(0, name.lastIndexOf('.'));
@@ -1057,7 +1048,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 						}
 						// create warnings (e.g., for features that are not available anymore)
-						for (Problem warning : reader.getLastProblems()) {
+						for (Problem warning : lastProblems) {
 							createConfigurationMarker(file, warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
 						}
 						subTask.step();
@@ -1129,13 +1120,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
 		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT);
-		final FileHandler<Configuration> reader = new FileHandler<>(configuration);
 
 		int row = 0;
 		for (IFile file : configurations) {
 			final boolean[] currentRow = selections[row++];
 			try {
-				reader.read(Paths.get(file.getLocationURI()), ConfigurationManager.getFormat(file.getName()));
+				FileHandler.load(Paths.get(file.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 			} catch (Exception e) {
 				FMCorePlugin.getDefault().logError(e);
 			}

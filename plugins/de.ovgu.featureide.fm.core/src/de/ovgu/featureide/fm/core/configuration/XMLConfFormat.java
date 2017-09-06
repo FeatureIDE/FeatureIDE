@@ -55,12 +55,12 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	public boolean supportsRead() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean supportsWrite() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -85,17 +85,17 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 					continue;
 				}
 
-				if (feature.hasAttribute(ATTRIBUTE_AUTOMATIC)) {
-					selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC), feature, warnings));
-				} else {
-					createWarning("No automatic selection state specified", feature, warnings);
-					continue;
-				}
-
 				if (feature.hasAttribute(ATTRIBUTE_MANUAL)) {
 					selectablefeature.setManual(getSelection(feature.getAttribute(ATTRIBUTE_MANUAL), feature, warnings));
 				} else {
 					createWarning("No manual selection state specified", feature, warnings);
+					continue;
+				}
+				
+				if (feature.hasAttribute(ATTRIBUTE_AUTOMATIC)) {
+					selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC), feature, warnings));
+				} else {
+					createWarning("No automatic selection state specified", feature, warnings);
 					continue;
 				}
 			}
@@ -157,6 +157,16 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
+	@Override
+	public String getName() {
+		return "XML";
 	}
 
 }

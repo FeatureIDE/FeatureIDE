@@ -50,8 +50,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -141,7 +141,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		final Path configPath = Paths.get(config.getLocationURI());
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
 
-		FileHandler.load(configPath, configuration, ConfigurationManager.getFormat(configPath.getFileName().toString()));
+		FileHandler.load(configPath, configuration, ConfigFormatManager.getInstance());
 
 		selectedFeatures = new LinkedList<String>();
 		for (final IFeature feature : configuration.getSelectedFeatures()) {

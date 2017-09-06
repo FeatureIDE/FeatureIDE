@@ -46,10 +46,10 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
@@ -244,7 +244,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		final Configuration config = new Configuration(featureProject.getFeatureModel());
 		final IFile currentConfig = featureProject.getCurrentConfiguration();
 		if (currentConfig != null) {
-			FileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigurationManager.getFormat(currentConfig.getName()));
+			FileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigFormatManager.getInstance());
 		}
 		selectedFeatures = new ArrayList<>(config.getSelectedFeatureNames());
 	}

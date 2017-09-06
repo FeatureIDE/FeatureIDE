@@ -40,12 +40,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import org.prop4j.And;
 import org.prop4j.Equals;
@@ -84,11 +85,13 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SXFMFormat.class.getSimpleName();
 
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<feature_model[\\s>]");
+
 	private final static String[] symbols = new String[] { "~", " and ", " or ", "", "", ", ", "", "", "" };
 
 	@Override
 	public String getSuffix() {
-		return "model";
+		return "xml";
 	}
 
 	@Override
@@ -272,15 +275,16 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+		idTable.clear();
+		warnings.clear();
 		line = 0;
-		idTable = new Hashtable<String, IFeature>();
-
+		object.reset();
 		buildFModelRec(doc);
 	}
 
 	private int line;
 
-	private Hashtable<String, IFeature> idTable;
+	private HashMap<String, IFeature> idTable = new HashMap<>();
 
 	/**
 	 * Recursively traverses the Document structure
@@ -837,6 +841,11 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 			this.end = end;
 		}
 
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }

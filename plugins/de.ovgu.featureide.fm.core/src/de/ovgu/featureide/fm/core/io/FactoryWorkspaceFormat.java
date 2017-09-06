@@ -104,4 +104,9 @@ public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspac
 		return ID;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }

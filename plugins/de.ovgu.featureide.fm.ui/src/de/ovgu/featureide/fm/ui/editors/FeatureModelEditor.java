@@ -27,7 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_RESOURCES
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -146,10 +146,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			manager = FMFactoryManager.getDefaultFactory();
 		}
 		IFeatureModel model = manager.createFeatureModel();
-		
-		if(getEditorInput() instanceof IFileEditorInput)
-		{
-			IFileEditorInput input = (IFileEditorInput)getEditorInput();
+
+		if (getEditorInput() instanceof IFileEditorInput) {
+			IFileEditorInput input = (IFileEditorInput) getEditorInput();
 			IFile sourceFile = input.getFile();
 			model.setSourceFile(sourceFile.getRawLocation().toFile().toPath());
 		}
@@ -206,7 +205,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			fmManager.save();
 		}
 
-		textEditor.resetTextEditor();
 		setPageModified(false);
 	}
 
@@ -422,6 +420,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
 					diagramEditor.internRefresh(false);
+					//refresh root and children to prevent manual and another layout algorithm to omit connection
+					if (diagramEditor.getFeatureModel().getStructure().getRoot() != null) {
+						diagramEditor.refreshChildAll(diagramEditor.getFeatureModel().getStructure().getRoot().getFeature());
+					}
 					diagramEditor.analyzeFeatureModel();
 				}
 			});
@@ -460,7 +462,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 		super.setInput(input);
 
-		fmManager = FeatureModelManager.getInstance(Paths.get(markerHandler.getModelFile().getLocationURI()));
+		final Path path = markerHandler.getModelFile().getLocation().toFile().toPath();
+		fmManager = FeatureModelManager.getInstance(path);
 		createModelFileMarkers(fmManager.getLastProblems());
 
 		// TODO _Interfaces Removed Code

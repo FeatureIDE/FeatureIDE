@@ -161,8 +161,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_NEXT = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
 
-	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
-	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
+	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<>();
+	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<>();
 
 	/** Generates explanations for automatic selections. */
 	private final AutomaticSelectionExplanationCreator automaticSelectionExplanationCreator = ConfigurationExplanationCreatorFactory.getDefault().getAutomaticSelectionExplanationCreator();
@@ -1170,7 +1170,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						autoExpand(currentDisplay);
 						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
 						if(configurationEditor instanceof ConfigurationEditor){
-							ConfigurationEditor editor = (ConfigurationEditor) configurationEditor;
 							ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
 							//Get current configuration 
 							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());

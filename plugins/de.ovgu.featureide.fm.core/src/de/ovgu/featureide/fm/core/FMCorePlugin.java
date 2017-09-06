@@ -26,6 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,9 +50,7 @@ import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
@@ -147,14 +146,9 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			return;
 		}
 
-		final IPersistentFormat<IFeatureModel> format = FeatureModelManager.getFormat(file.getName());
-		if (format == null) {
-			return;
-		}
-
-		final String path = file.getLocation().toString();
-		if (FileManagerMap.hasInstance(path)) {
-			final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(path);
+		final Path path = file.getLocation().toFile().toPath();
+		if (FeatureModelManager.hasInstance(path)) {
+			final FeatureModelManager instance = FeatureModelManager.getInstance(path);
 			if (instance != null) {
 				final IFeatureModel fm = instance.getObject();
 				try {

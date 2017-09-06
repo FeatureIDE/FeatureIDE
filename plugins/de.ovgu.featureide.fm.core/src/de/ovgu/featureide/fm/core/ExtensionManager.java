@@ -29,6 +29,7 @@ import java.util.List;
  * 
  * @author Sebastian Krieter
  */
+// TODO Check synchronization for get and add extension methods
 public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	public static class NoSuchExtensionException extends Exception {

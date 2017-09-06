@@ -33,7 +33,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -100,8 +100,8 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -179,7 +179,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 	private final IPersistentFormat<IGraphicalFeatureModel> format = new GraphicalFeatureModelFormat();
-	private final String extraPath;
+	private final Path extraPath;
 
 	private ScalableFreeformRootEditPart rootEditPart;
 
@@ -263,8 +263,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		graphicalFeatureModel.init();
 
 		if (featureModelEditor.fmManager != null) { // read-only feature model is currently only a view on the editable feature model and not persistent
-			extraPath = FileManagerMap.constructExtraPath(featureModelEditor.fmManager.getAbsolutePath(), format);
-			FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
+			extraPath = AFileManager.constructExtraPath(featureModelEditor.fmManager.getPath(), format);
+			FileHandler.load(extraPath, graphicalFeatureModel, format);
 			featureModelEditor.fmManager.addListener(this);
 		} else {
 			extraPath = null;
@@ -1092,7 +1092,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			internRefresh(true);
 			reload();
 			if (extraPath != null) {
-				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			break;
 		case MANDATORY_CHANGED:
@@ -1149,7 +1149,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case MODEL_DATA_OVERRIDDEN:
 			if (extraPath != null) {
-				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
@@ -1157,7 +1157,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					deregisterEditParts();
 					graphicalFeatureModel.init();
 					if (extraPath != null) {
-						FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
+						FileHandler.load(extraPath, graphicalFeatureModel, format);
 					}
 
 					setContents(graphicalFeatureModel);
@@ -1171,12 +1171,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			if (extraPath != null) {
-				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			deregisterEditParts();
 			graphicalFeatureModel.init();
 			if (extraPath != null) {
-				FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
+				FileHandler.load(extraPath, graphicalFeatureModel, format);
 			}
 			setContents(graphicalFeatureModel);
 			refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
@@ -1213,7 +1213,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case MODEL_LAYOUT_CHANGED:
 			reload();
 			if (extraPath != null) {
-				FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			break;
 		case REDRAW_DIAGRAM:
@@ -1417,7 +1417,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 	}
 
-	private void refreshChildAll(IFeature parent) {
+	void refreshChildAll(IFeature parent) {
 		for (IFeatureStructure f : parent.getStructure().getChildren()) {
 			//Refresh children
 			refreshChildAll(f.getFeature());
@@ -1490,7 +1490,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if (extraPath != null) {
-			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
+			FileHandler.save(extraPath, graphicalFeatureModel, format);
 		}
 	}
 

@@ -20,8 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import javax.annotation.CheckForNull;
+import java.nio.file.Path;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
@@ -34,22 +38,37 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class ConfigurationManager extends AFileManager<Configuration> {
 
+	private static class ObjectCreator extends AFileManager.ObjectCreator<Configuration> {
+		private final Configuration configuration;
+
+		public ObjectCreator(Configuration configuration) {
+			super(Configuration.class, ConfigurationManager.class, ConfigFormatManager.getInstance());
+			this.configuration = configuration;
+		}
+
+		@Override
+		protected Configuration createObject(Path path, IPersistentFormat<Configuration> format) throws NoSuchExtensionException {
+			return configuration;
+		}
+	}
+
+	@Nonnull
 	public static IPersistentFormat<Configuration> getDefaultFormat() {
 		return new DefaultFormat();
 	}
 
 	@CheckForNull
-	public static IPersistentFormat<Configuration> getFormat(String fileName) {
-		return ConfigFormatManager.getInstance().getFormatByFileName(fileName);
+	public static ConfigurationManager getInstance(Path path) {
+		return AFileManager.getInstance(path);
 	}
 
-	public static ConfigurationManager getInstance(Configuration configuration, String absolutePath) {
-		return getInstance(configuration, absolutePath, ConfigFormatManager.getInstance().getFormatByFileName(absolutePath));
+	@CheckForNull
+	public static ConfigurationManager getInstance(Path path, Configuration configuration) {
+		return AFileManager.getInstance(path, new ObjectCreator(configuration));
 	}
 
-	public static ConfigurationManager getInstance(Configuration configuration, String absolutePath, IPersistentFormat<Configuration> format) {
-		final ConfigurationManager instance = FileManagerMap.getInstance(configuration, absolutePath, format, ConfigurationManager.class, Configuration.class);
-		return instance;
+	public static FileHandler<Configuration> load(Path path, Configuration configuration) {
+		return AFileManager.getFileHandler(path, new ObjectCreator(configuration));
 	}
 
 	protected ConfigurationManager(Configuration configuration, String absolutePath, IPersistentFormat<Configuration> modelHandler) {

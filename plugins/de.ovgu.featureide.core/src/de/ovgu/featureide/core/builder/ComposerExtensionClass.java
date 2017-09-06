@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.builder;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -61,7 +62,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -328,7 +328,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public String getConfigurationExtension() {
-		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
+		return ConfigFormatManager.getInstance().getExtensions().get(0).getSuffix();
 	}
 
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
@@ -350,6 +350,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public boolean hasSourceFolder() {
+		return true;
+	}
+
+	public boolean hasSource() {
 		return true;
 	}
 	
@@ -428,25 +432,15 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 */
 	public java.nio.file.Path createTemporaryConfigrationsFile(IFile config) {
 		String configName = config.getName();
-		final String orgExtension;
 		final int extIndex = configName.lastIndexOf('.');
 		if (extIndex > 0) {
-			orgExtension = configName.substring(extIndex + 1);
 			configName = configName.substring(0, extIndex);
-		} else {
-			orgExtension = "";
 		}
 		CorePlugin.getDefault().logInfo("create config " + configName);
 
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_LAZY);
 
-		final IConfigurationFormat inFormat = ConfigFormatManager.getInstance().getFormatByExtension(orgExtension);
-		if (inFormat == null) {
-			CorePlugin.getDefault().logWarning("failed to read " + config);
-			return null;
-		}
-
-		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, inFormat);
+		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		if (problems.containsError()) {
 			CorePlugin.getDefault().logWarning("failed to read " + config);
 			return null;
@@ -457,7 +451,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			new JavaFileSystem().write(tempFile, new DefaultFormat().write(configuration).getBytes(Charset.defaultCharset()));
 			tempFile.toFile().deleteOnExit();
 			return tempFile;
-		} catch (Exception e) {
+		} catch (IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 

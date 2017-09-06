@@ -112,7 +112,7 @@ public class TFeatureModelAnalyzer {
 		IFeatureModel fm = null;
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
-				fm = FeatureModelManager.readFromFile(f.toPath());
+				fm = FeatureModelManager.load(f.toPath()).getObject();
 				if (fm!= null) {
 					break;
 				}
