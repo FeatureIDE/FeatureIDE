@@ -74,7 +74,7 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 		}
 		final Set<Integer> set = new LinkedHashSet<>(indexes.length);
 		for (final int index : indexes) {
-			set.add(index - 1); //Sat4J clause indexes start at 1.
+			set.add(getClauseIndexFromIndex(index));
 		}
 		return set;
 	}
