@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties>
+			<feature name="B">
+				<property data-type="STRING" key="key1" value="value1"/>
+			</feature>
+			<feature name="C">
+				<property data-type="INT" key="key2" value="23"/>
+				<property data-type="INT" key="key3" value="23"/>
+			</feature>
+		</properties>
+		<struct>
+			<and mandatory="true" name="A">
+				<feature name="B"/>
+				<and name="C">
+					<feature name="D"/>
+				</and>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
