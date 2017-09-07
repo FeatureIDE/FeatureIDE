@@ -58,7 +58,7 @@ public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeature
 	 * @param fm the feature model context
 	 */
 	protected LtmsFeatureModelExplanationCreator(IFeatureModel fm) {
-		super();
+		super(fm);
 	}
 	
 	/**
