@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+         point="de.ovgu.featureide.core.composers">
+		<composer
+            class="de.ovgu.featureide.core.cmake.CmakeBuildOptions"
+            description="Composes CMake option files."
+            id="de.ovgu.featureide.core.composer.cmake"
+            name="CMake Build Option Composer"
+            nature="de.ovgu.featureide.core.composer.runtime">
+		</composer>
+	</extension>
+</plugin>
