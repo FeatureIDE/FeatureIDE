@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="lib/fuji.jar" sourcepath="lib/fuji.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="/de.ovgu.featureide.fm.core/lib/annotations.jar"/>
+	<classpathentry kind="lib" path="C:/EclipseNewNeonRCPRAP/FeatureHouse-2011-03-15.jar"/>
+	<classpathentry kind="lib" path="C:/EclipseNewNeonRCPRAP/fuji_2017.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -39,6 +39,7 @@ Import-Package: org.eclipse.core.expressions,
  org.eclipse.jface.text,
  org.eclipse.ui.texteditor
 Export-Package: cide.features,
+ composer,
  de.ovgu.featureide.featurehouse,
  de.ovgu.featureide.featurehouse.errorpropagation,
  de.ovgu.featureide.featurehouse.meta,
