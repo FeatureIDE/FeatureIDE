@@ -23,6 +23,7 @@
 		<project name="Elevator-Antenna-v1.3" path="featureide_examples/Book/PP/Elevator-Antenna-v1.3/.project"/>
 		<project name="Elevator-Antenna-v1.4" path="featureide_examples/Book/PP/Elevator-Antenna-v1.4/.project"/>
 		<project name="Clock-FH-AsmetaL" path="featureide_examples/Clock-FH-AsmetaL/.project"/>
+		<project name="CMake-HelloWorld" path="featureide_examples/CMake-HelloWorld/.project"/>
 		<project name="DesktopSearcher-AHEAD" path="featureide_examples/DesktopSearcher-AHEAD/.project"/>
 		<project name="DiGraph-FH-JML" path="featureide_examples/DiGraph-FH-JML/.project"/>
 		<project name="Elevator-FH-AspectJ" path="featureide_examples/Elevator-FH-AspectJ/.project"/>
