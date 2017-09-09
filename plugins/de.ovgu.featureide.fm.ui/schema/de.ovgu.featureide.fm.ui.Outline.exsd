@@ -49,7 +49,7 @@
 
    <element name="Outline">
       <complexType>
-         <attribute name="OutlineProvider" type="string">
+         <attribute name="OutlineProvider" type="string" use="required">
             <annotation>
                <documentation>
                   

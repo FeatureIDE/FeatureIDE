@@ -18,37 +18,34 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.munge.ui.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.action;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.TreeViewer;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutlineLabelProvider;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Provides labels and images for Collaboration outline
+ * Action which expands all elements in a treeviewer
  * 
- * @author Reimar Schr�ter
+ * @author Christopher Sontag
  */
-public class MungeOutlineLabelProvider extends CollaborationOutlineLabelProvider {
+public class ExpandAllAction extends Action {
 
+		private TreeViewer viewer;
 
-	@Override
-	public String getText(Object element) {
-		if (element instanceof FSTClass) {
-			FSTClass fstclass = (FSTClass) element;
-			return fstclass.getName();
-		}else{
-			return super.getText(element);
+		/**
+		 * Constructor for ExpandAllAction
+		 * @param viewer
+		 */
+		public ExpandAllAction(TreeViewer viewer) {
+			super();
+			this.viewer = viewer;
+			this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif"));
 		}
-	}
 
-	public String getLabelProvName() {
-		return "Extended Outline";
-	}
+		public void run() {
+			viewer.expandAll();
+		}
 	
-	public void setForeground(TreeItem item, IFile iFile) {
-		return;
-	}
 }

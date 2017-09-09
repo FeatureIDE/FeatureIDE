@@ -693,4 +693,10 @@
         type="java.lang.Object">
   </propertyTester>
 	</extension>
+ <extension
+       point="de.ovgu.featureide.fm.ui.Outline">
+    <Outline
+          OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMOutlineProvider">
+    </Outline>
+ </extension>
 </plugin>

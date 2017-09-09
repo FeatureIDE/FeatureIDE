@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.munge.ui.outline;
+package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
 
@@ -64,11 +64,11 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.ICollaborationOutli
  * @author Daniel P�sche
  * @author Reimar Schr�ter
  */
-public class MungeExtendedContentProvider implements ITreeContentProvider {
+public class ExtendedContentProvider implements ITreeContentProvider {
 
 	protected FSTModel model;
 
-	public MungeExtendedContentProvider() {
+	public ExtendedContentProvider() {
 		
 	}
 
@@ -123,7 +123,7 @@ public class MungeExtendedContentProvider implements ITreeContentProvider {
 		if (featureProject != null) {
 			model = featureProject.getFSTModel();
 			
-			if(model instanceof FSTModelForPP){
+			if(model instanceof FSTModelForPP && ((FSTModelForPP) model).getExtendedFst()!=null){
 				model = ((FSTModelForPP) model).getExtendedFst();
 			} 
 			

@@ -1525,6 +1525,9 @@
     <Outline
           OutlineProvider="de.ovgu.featureide.ui.views.collaboration.outline.ContextOutline">
     </Outline>
+    <Outline
+          OutlineProvider="de.ovgu.featureide.ui.views.collaboration.outline.ExtendedOutline">
+    </Outline>
  </extension>
 	
 	

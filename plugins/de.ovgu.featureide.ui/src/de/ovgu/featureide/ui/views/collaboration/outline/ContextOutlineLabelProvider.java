@@ -177,7 +177,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
 	public void init() {
-		viewer.addSelectionChangedListener(sListner);
+		//viewer.addSelectionChangedListener(sListner);
 	}
 
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {

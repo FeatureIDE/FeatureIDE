@@ -20,24 +20,23 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.custom;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.TreeViewer;
 
 /**
  * Provides all data needed for the FeatureIDE Outline
  * 
  * @author Christopher Sontag
  */
-public abstract class OutlineProvider {
+public abstract class OutlineProvider implements ISelectionChangedListener, ITreeViewerListener {
 	
 	private ITreeContentProvider treeProvider = null;
 	private OutlineLabelProvider labelProvider = null;
-	private List<Action> actions = new ArrayList<>();
 	
 	public OutlineProvider() {
 	}
@@ -47,9 +46,9 @@ public abstract class OutlineProvider {
 		this.labelProvider = labelProvider;
 	}
 	
-	public void addAction(Action action) {
-		actions.add(action);
-	}
+	protected abstract void initContextMenuActions(IMenuManager manager);
+	
+	protected abstract void initToolbarActions(IToolBarManager manager);
 
 	public ITreeContentProvider getTreeProvider() {
 		return treeProvider;
@@ -67,15 +66,11 @@ public abstract class OutlineProvider {
 		this.labelProvider = labelProvider;
 	}
 
-	public abstract boolean checkSupported(String extension);
-
-	public List<Action> getActions() {
-		return actions;
-	}
-
-	public void setActions(List<Action> actions) {
-		this.actions = actions;
+	public abstract boolean isSupported(IFile file);
+	
+	public String getProviderName() {
+		return this.labelProvider.getLabelProvName();
 	}
 	
-	public abstract void handleUpdate(Viewer viewer, IFile iFile);
+	public abstract void handleUpdate(TreeViewer viewer, IFile iFile);
 }

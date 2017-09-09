@@ -69,11 +69,18 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 
 /**
  * 
- * Implements all functions needed for the FeatureIDE outline
+ * Provides the content for the collaboration outline.
  * 
+ * @author Jan Wedding
+ * @author Melanie Pflaume
+ * @author Stefan Krüger
+ * @author Florian Proksch
+ * @author Dominic Labsch
+ * @author Daniel P�sche
+ * @author Reimar Schröter
  * @author Christopher Sontag
  */
-public class ContextOutline extends OutlineProvider {
+public class ExtendedOutline extends OutlineProvider {
 
 	private static final Set<String> supportedTypes = new HashSet<>();
 	static {
@@ -89,9 +96,9 @@ public class ContextOutline extends OutlineProvider {
 	private TreeViewer viewer;
 	private IFile file;
 	private IFeatureModel featureModel;
-	
-	public ContextOutline() {
-		super(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
+
+	public ExtendedOutline() {
+		super(new ExtendedContentProvider(), new ExtendedOutlineLabelProvider());
 	}
 
 	@Override
@@ -165,7 +172,7 @@ public class ContextOutline extends OutlineProvider {
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
 	}
-	
+
 	/**
 	 * triggers a scrolling action to the selected field/method in the current
 	 * editor
@@ -176,8 +183,8 @@ public class ContextOutline extends OutlineProvider {
 			IWorkbench workbench = PlatformUI.getWorkbench();
 			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 			IWorkbenchPage page = window.getActivePage();
-			IEditorPart activeEditor = page.getActiveEditor(); 
-			
+			IEditorPart activeEditor = page.getActiveEditor();
+
 			//if a method or field is selected, the selection's FSTRole is always the first role of the first feature in the respective expandable
 			//list in the outline no matter if the currently opened file contains the method.
 			Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
@@ -213,7 +220,7 @@ public class ContextOutline extends OutlineProvider {
 				return;
 			}
 			if (!fileAlreadyOpen && r.getFile().isAccessible()) {
-				
+
 				IContentType contentType = null;
 				try {
 					file = r.getFile();
@@ -326,7 +333,7 @@ public class ContextOutline extends OutlineProvider {
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Jumps to a line in the given editor
 	 * 
@@ -396,5 +403,4 @@ public class ContextOutline extends OutlineProvider {
 		// TODO Auto-generated method stub
 		
 	}
-
 }
