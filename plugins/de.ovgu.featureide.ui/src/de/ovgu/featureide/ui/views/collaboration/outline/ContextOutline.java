@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -444,7 +445,6 @@ public class ContextOutline extends OutlineProvider {
 	@Override
 	public void treeExpanded(TreeExpansionEvent event) {
 		// TODO Auto-generated method stub
-		
 	}
 
 }

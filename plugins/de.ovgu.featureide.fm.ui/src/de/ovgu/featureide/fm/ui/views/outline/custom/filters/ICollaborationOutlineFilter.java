@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,35 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline.custom.action;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.TreeViewer;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
 
 /**
- * Action which collapse all elements in a treeviewer
+ * Interface to filter the content of the CollaborationOutline.
  * 
- * @author Christopher Sontag
+ * @author Dominic Labsch	
+ * @author Daniel P�sche
  */
-public class CollapseAllAction extends Action {
+public interface ICollaborationOutlineFilter {
 
-		private TreeViewer viewer;
-
-		/**
-		 * Constructor for CollapseAllAction
-		 * @param viewer
-		 */
-		public CollapseAllAction(TreeViewer viewer) {
-			super();
-			this.viewer = viewer;
-			this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
-		}
-
-		public void run() {
-			viewer.collapseAll();
-			viewer.expandToLevel(2);
-			this.firePropertyChange("COLLAPSE", null, null);
-		}
-	
+	public Object[] filter(Object[] obj);
+		
 }

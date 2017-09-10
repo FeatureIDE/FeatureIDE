@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.custom;
 
+
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -27,7 +28,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
  * 
  * @author Christopher Sontag
  */
+
 public abstract class OutlineProvider implements ISelectionChangedListener, ITreeViewerListener {
 	
 	private OutlineTreeContentProvider treeProvider = null;
@@ -51,6 +52,7 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 		this.labelProvider = labelProvider;
 	}
 	
+
 	protected abstract void initContextMenuActions(IMenuManager manager);
 	
 	protected abstract void initToolbarActions(IToolBarManager manager);

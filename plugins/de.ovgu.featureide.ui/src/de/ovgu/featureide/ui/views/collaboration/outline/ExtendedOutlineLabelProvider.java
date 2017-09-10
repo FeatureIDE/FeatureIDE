@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.swt.widgets.TreeItem;
-
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutlineLabelProvider;
 

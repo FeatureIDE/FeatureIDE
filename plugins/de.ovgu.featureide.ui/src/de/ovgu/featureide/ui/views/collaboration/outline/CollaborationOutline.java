@@ -65,7 +65,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
-import de.ovgu.featureide.fm.ui.views.outline.custom.Outline;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.FilterOutlineAction;
@@ -73,6 +72,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 import de.ovgu.featureide.ui.views.collaboration.outline.filters.HideAllFields;
 import de.ovgu.featureide.ui.views.collaboration.outline.filters.HideAllMethods;
 import de.ovgu.featureide.ui.views.collaboration.outline.filters.SortByOccurrenceInFeature;
+
 
 /**
  * 
@@ -445,7 +445,6 @@ public class CollaborationOutline extends OutlineProvider {
 	@Override
 	public void treeExpanded(TreeExpansionEvent event) {
 		// TODO Auto-generated method stub
-		
 	}
 
 }

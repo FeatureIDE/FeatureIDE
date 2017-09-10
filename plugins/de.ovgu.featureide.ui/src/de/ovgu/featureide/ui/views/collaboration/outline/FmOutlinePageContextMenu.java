@@ -62,7 +62,6 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -79,6 +78,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Context Menu for Outline view of FeatureModels
@@ -118,8 +118,8 @@ public class FmOutlinePageContextMenu {
 
 	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.view.outline.contextmenu";
 
-	public static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
-	public static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
+	public static final ImageDescriptor IMG_COLLAPSE = UIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
+	public static final ImageDescriptor IMG_EXPAND = UIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
 	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput) {
 		this(site, viewer, fInput);
