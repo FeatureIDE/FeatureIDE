@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -27,6 +29,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
+import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 /**
  * Provider for NotAvailable
@@ -64,6 +67,11 @@ public class NotAvailableOutlineProvider extends OutlineProvider {
 
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
+	}
+	
+	@Override
+	protected List<IOutlineFilter> getFilters() {
+		return null;
 	}
 
 	@Override

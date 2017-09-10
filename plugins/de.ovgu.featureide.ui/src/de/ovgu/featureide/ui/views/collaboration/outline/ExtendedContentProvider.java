@@ -32,11 +32,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -51,7 +49,7 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTModelForPP;
-import de.ovgu.featureide.fm.ui.views.outline.custom.filters.ICollaborationOutlineFilter;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 
 /**
  * Provides the content for the collaboration outline.
@@ -64,7 +62,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.ICollaborationOutli
  * @author Daniel P�sche
  * @author Reimar Schr�ter
  */
-public class ExtendedContentProvider implements ITreeContentProvider {
+public class ExtendedContentProvider extends OutlineTreeContentProvider {
 
 	protected FSTModel model;
 
@@ -285,26 +283,6 @@ public class ExtendedContentProvider implements ITreeContentProvider {
 		}
 
 		return filter(obj);
-	}
-
-	private final Set<ICollaborationOutlineFilter> filters = new HashSet<>();
-
-	//add filter to filter set
-	public void addFilter(ICollaborationOutlineFilter filter) {
-		filters.add(filter);
-	}
-
-	//remove filter from filter set
-	public void removeFilter(ICollaborationOutlineFilter filter) {
-		filters.remove(filter);
-	}
-
-	//apply all filters from filter set
-	private Object[] filter(Object[] obj) {
-		for (ICollaborationOutlineFilter filter : filters) {
-			obj = filter.filter(obj);
-		}
-		return obj;
 	}
 
 	@Override

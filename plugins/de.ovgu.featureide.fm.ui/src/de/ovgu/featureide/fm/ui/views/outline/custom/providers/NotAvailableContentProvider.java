@@ -22,8 +22,9 @@ package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.AN_OUTLINE_IS_NOT_AVAILABLE_;
 
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 
 /**
  * Content provider for displaying a not available message in the outline
@@ -35,7 +36,7 @@ import org.eclipse.jface.viewers.Viewer;
  * @author Daniel Psche
  * @author Christopher Sontag
  */
-public class NotAvailableContentProvider implements ITreeContentProvider {
+public class NotAvailableContentProvider extends OutlineTreeContentProvider {
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {

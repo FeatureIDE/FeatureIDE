@@ -20,13 +20,18 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.custom;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeViewer;
+
+import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 /**
  * Provides all data needed for the FeatureIDE Outline
@@ -35,13 +40,13 @@ import org.eclipse.jface.viewers.TreeViewer;
  */
 public abstract class OutlineProvider implements ISelectionChangedListener, ITreeViewerListener {
 	
-	private ITreeContentProvider treeProvider = null;
+	private OutlineTreeContentProvider treeProvider = null;
 	private OutlineLabelProvider labelProvider = null;
 	
 	public OutlineProvider() {
 	}
 
-	public OutlineProvider(ITreeContentProvider treeProvider, OutlineLabelProvider labelProvider) {
+	public OutlineProvider(OutlineTreeContentProvider treeProvider, OutlineLabelProvider labelProvider) {
 		this.treeProvider = treeProvider;
 		this.labelProvider = labelProvider;
 	}
@@ -49,12 +54,14 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	protected abstract void initContextMenuActions(IMenuManager manager);
 	
 	protected abstract void initToolbarActions(IToolBarManager manager);
+	
+	protected abstract List<IOutlineFilter> getFilters();
 
-	public ITreeContentProvider getTreeProvider() {
+	public OutlineTreeContentProvider getTreeProvider() {
 		return treeProvider;
 	}
 
-	public void setTreeProvider(ITreeContentProvider treeProvider) {
+	public void setTreeProvider(OutlineTreeContentProvider treeProvider) {
 		this.treeProvider = treeProvider;
 	}
 
@@ -73,4 +80,8 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	}
 	
 	public abstract void handleUpdate(TreeViewer viewer, IFile iFile);
+
+	public void handleExpandAll(PropertyChangeEvent event) {}
+
+	public void handleCollapseAll(PropertyChangeEvent event) {}
 }

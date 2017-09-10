@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.views.outline.custom.action;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.IPropertyListener;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -46,6 +47,7 @@ public class ExpandAllAction extends Action {
 
 		public void run() {
 			viewer.expandAll();
+			this.firePropertyChange("EXPAND", null, null);
 		}
 	
 }

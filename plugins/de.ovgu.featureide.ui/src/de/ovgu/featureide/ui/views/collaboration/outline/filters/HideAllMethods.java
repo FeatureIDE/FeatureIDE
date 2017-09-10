@@ -18,22 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
+package de.ovgu.featureide.ui.views.collaboration.outline.filters;
 
 import java.util.LinkedList;
 
-import de.ovgu.featureide.core.fstmodel.FSTField;
+import org.eclipse.jface.resource.ImageDescriptor;
+
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
+ * Filter to hide methods in the collaboration outline.
  * 
- * Filter to hide fields in the collaboration outline.
- * 
- * @author Dominic Labsch	
- * @author Daniel P�sche
+  * @author Dominic Labsch
+  * @author Daniel P�sche
  */
-public class HideAllFields implements ICollaborationOutlineFilter {
-
+public class HideAllMethods implements IOutlineFilter {
 
 	@Override
 	public Object[] filter(Object[] obj) {
@@ -41,7 +43,7 @@ public class HideAllFields implements ICollaborationOutlineFilter {
 
 		if (obj.length > 0 && obj[0] instanceof RoleElement) {
 			for (int i = 0; i < obj.length; i++) {
-				if (!(obj[i] instanceof FSTField)) {
+				if (!(obj[i] instanceof FSTMethod)) {
 					resultList.add(obj[i]);
 				}
 			}
@@ -50,6 +52,22 @@ public class HideAllFields implements ICollaborationOutlineFilter {
 		}
 		return resultList.toArray();
 
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getName()
+	 */
+	@Override
+	public String getName() {
+		return "Hide All Methods";
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getImage()
+	 */
+	@Override
+	public ImageDescriptor getImage() {
+		return UIPlugin.getDefault().getImageDescriptor("icons/methods_co.gif");
 	}
 
 }

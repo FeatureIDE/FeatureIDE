@@ -18,12 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
+package de.ovgu.featureide.ui.views.collaboration.outline.filters;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -32,6 +33,8 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Filter to sort the entries in the collaboration outline by their orrurence in the file.
@@ -39,7 +42,7 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
  * @author Dominic Labsch
  * @author Daniel P�sche
  */
-public class SortByOccurrenceInFeature implements ICollaborationOutlineFilter {
+public class SortByOccurrenceInFeature implements IOutlineFilter {
 	private IFile file;
 	private boolean enabled = false;
 
@@ -90,5 +93,21 @@ public class SortByOccurrenceInFeature implements ICollaborationOutlineFilter {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getName()
+	 */
+	@Override
+	public String getName() {
+		return "Sort By Occurence In Feature";
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getImage()
+	 */
+	@Override
+	public ImageDescriptor getImage() {
+		return UIPlugin.getDefault().getImageDescriptor("icons/alphab_sort_co.gif");
 	}
 }

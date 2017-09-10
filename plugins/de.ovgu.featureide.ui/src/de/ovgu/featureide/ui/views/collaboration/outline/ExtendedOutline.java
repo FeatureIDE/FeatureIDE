@@ -66,6 +66,12 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
+import de.ovgu.featureide.fm.ui.views.outline.custom.action.FilterOutlineAction;
+import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
+import de.ovgu.featureide.ui.views.collaboration.outline.filters.HideAllFields;
+import de.ovgu.featureide.ui.views.collaboration.outline.filters.HideAllMethods;
+import de.ovgu.featureide.ui.views.collaboration.outline.filters.SortByOccurrenceInFeature;
 
 /**
  * 
@@ -171,6 +177,50 @@ public class ExtendedOutline extends OutlineProvider {
 
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
+		FilterOutlineAction hideAllFields = new FilterOutlineAction(new HideAllFields()) {
+			@Override
+			public void run() {
+				OutlineTreeContentProvider treeProvider = getTreeProvider();
+				if (!treeProvider.hasFilter(getFilter())) {
+					treeProvider.addFilter(getFilter());
+				} else {
+					treeProvider.removeFilter(getFilter());
+				}
+				viewer.setInput(file);
+			}
+		};
+		manager.add(hideAllFields);
+		FilterOutlineAction hideAllMethods = new FilterOutlineAction(new HideAllMethods()) {
+			@Override
+			public void run() {
+				OutlineTreeContentProvider treeProvider = getTreeProvider();
+				if (!treeProvider.hasFilter(getFilter())) {
+					treeProvider.addFilter(getFilter());
+				} else {
+					treeProvider.removeFilter(getFilter());
+				}
+				viewer.setInput(file);
+			}
+		};
+		manager.add(hideAllMethods);
+		FilterOutlineAction sortByOccurrenceInFeature = new FilterOutlineAction(new SortByOccurrenceInFeature()) {
+			@Override
+			public void run() {
+				OutlineTreeContentProvider treeProvider = getTreeProvider();
+				if (!treeProvider.hasFilter(getFilter())) {
+					treeProvider.addFilter(getFilter());
+				} else {
+					treeProvider.removeFilter(getFilter());
+				}
+				viewer.setInput(file);
+			}
+		};
+		manager.add(sortByOccurrenceInFeature);
+	}
+	
+	@Override
+	protected List<IOutlineFilter> getFilters() {
+		return null;
 	}
 
 	/**

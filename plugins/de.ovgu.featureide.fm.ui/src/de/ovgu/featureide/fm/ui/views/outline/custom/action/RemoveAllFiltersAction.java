@@ -18,36 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
+package de.ovgu.featureide.fm.ui.views.outline.custom.action;
 
-import java.util.LinkedList;
-
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import org.eclipse.jface.action.Action;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 
 /**
- * Filter to hide methods in the collaboration outline.
+ * Action which manages a provider for changing when clicked
  * 
-  * @author Dominic Labsch
-  * @author Daniel P�sche
+ * @author Christopher Sontag
  */
-public class HideAllMethods implements ICollaborationOutlineFilter {
+public class RemoveAllFiltersAction extends Action {
 
-	@Override
-	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
+		private OutlineProvider provider;
 
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
-			for (int i = 0; i < obj.length; i++) {
-				if (!(obj[i] instanceof FSTMethod)) {
-					resultList.add(obj[i]);
-				}
-			}
-		}else{
-			return obj;
+		/**
+		 * Constructor for ChangeOutlineProviderAction
+		 * @param viewer
+		 */
+		public RemoveAllFiltersAction(OutlineProvider provider) {
+			super();
+			this.provider = provider;
+			this.setText("Remove Filters");
 		}
-		return resultList.toArray();
 
-	}
+		/**
+		 * Returns the outline provider
+		 * @return
+		 */
+		public OutlineProvider getProvider() {
+			return provider;
+		}
 
 }

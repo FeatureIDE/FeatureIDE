@@ -21,35 +21,34 @@
 package de.ovgu.featureide.fm.ui.views.outline.custom.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.IPropertyListener;
-import org.eclipse.ui.internal.IChangeListener;
-
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 /**
- * Action which collapse all elements in a treeviewer
+ * Action which manages a filter
  * 
  * @author Christopher Sontag
  */
-public class CollapseAllAction extends Action {
+public class FilterOutlineAction extends Action {
 
-		private TreeViewer viewer;
+		private IOutlineFilter filter;
 
 		/**
-		 * Constructor for CollapseAllAction
+		 * Constructor for FilterOutlineAction
 		 * @param viewer
 		 */
-		public CollapseAllAction(TreeViewer viewer) {
-			super();
-			this.viewer = viewer;
-			this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
+		public FilterOutlineAction(IOutlineFilter filter) {
+			super("", AS_CHECK_BOX);
+			this.filter = filter;
+			this.setText(filter.getName());
+			this.setImageDescriptor(filter.getImage());
 		}
 
-		public void run() {
-			viewer.collapseAll();
-			viewer.expandToLevel(2);
-			this.firePropertyChange("COLLAPSE", null, null);
+		/**
+		 * Returns the outline provider
+		 * @return
+		 */
+		public IOutlineFilter getFilter() {
+			return filter;
 		}
-	
+
 }

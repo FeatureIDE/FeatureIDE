@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -36,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 
 /**
  * This class is part of the outline. It provides the content that should be
@@ -46,22 +46,21 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
  */
-public class FmTreeContentProvider implements ITreeContentProvider {
+public class FmTreeContentProvider extends OutlineTreeContentProvider {
 
 	private IFeatureModel fModel;
 	private IGraphicalFeatureModel graphicalFeatureModel;
-
-	@Override
-	public void dispose() {
-	}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput != null) {
 			if (newInput instanceof IFeatureModel)
 				fModel = ((IFeatureModel) newInput);
-			else if (newInput instanceof IFile && newInput != null)
-				fModel = FeatureModelManager.getInstance(Paths.get(((IFile)newInput).getLocationURI())).getObject();
+			else if (newInput instanceof IFile && newInput != null) {
+				FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile)newInput).getLocationURI()));
+				if (fmm != null)
+					fModel = fmm.getObject();
+			}
 		}
 
 	}

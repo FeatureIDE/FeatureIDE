@@ -1097,6 +1097,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
+			
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;

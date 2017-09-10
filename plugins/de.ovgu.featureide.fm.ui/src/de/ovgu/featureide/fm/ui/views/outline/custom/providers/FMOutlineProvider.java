@@ -3,7 +3,11 @@ package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
+
+import java.beans.PropertyChangeListener;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.resources.IFile;
@@ -13,12 +17,15 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.internal.win32.GESTURECONFIG;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -31,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -51,11 +59,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.SyncCollapsedStateAction;
+import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmTreeContentProvider;
 
-public class FMOutlineProvider extends OutlineProvider {
+public class FMOutlineProvider extends OutlineProvider implements IEventListener {
 
 	private TreeViewer viewer;
 	private IFile file;
@@ -81,13 +91,13 @@ public class FMOutlineProvider extends OutlineProvider {
 		super(new FmTreeContentProvider(), new FMLabelProvider());
 	}
 
-	public FMOutlineProvider(ITreeContentProvider treeProvider, OutlineLabelProvider labelProvider) {
+	public FMOutlineProvider(OutlineTreeContentProvider treeProvider, OutlineLabelProvider labelProvider) {
 		super(treeProvider, labelProvider);
 	}
 
 	@Override
 	public boolean isSupported(IFile file) {
-		return file.getFileExtension().equalsIgnoreCase("xml");
+		return file.getFileExtension().equalsIgnoreCase("xml") && FeatureModelManager.getInstance(Paths.get(file.getLocationURI())) != null;
 	}
 
 	@Override
@@ -100,10 +110,14 @@ public class FMOutlineProvider extends OutlineProvider {
 		IWorkbenchPage page = window.getActivePage();
 		IEditorPart activeEditor = page.getActiveEditor();
 		FeatureModelEditor fTextEditor = (FeatureModelEditor) activeEditor;
-		featureModel = fTextEditor.getFeatureModel();
+		featureModel = fTextEditor.diagramEditor.getFeatureModel();
+		featureModel.addListener(this);
 		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
-		
-		if (featureModel != null && setFeatureColorAction==null) {
+
+		((FmTreeContentProvider) getTreeProvider()).setGraphicalFeatureModel(graphicalFeatureModel);
+		setExpandedElements();
+
+		if (featureModel != null && setFeatureColorAction == null) {
 			setFeatureColorAction = new SetFeatureColorAction(viewer, featureModel);
 			setFeatureColorAction.setEnabled(true);
 			mAction = new MandatoryAction(viewer, featureModel);
@@ -221,9 +235,25 @@ public class FMOutlineProvider extends OutlineProvider {
 		syncCollapsedStateAction.setEnabled(true);
 		manager.add(syncCollapsedStateAction);
 	}
+	
+	@Override
+	protected List<IOutlineFilter> getFilters() {
+		return null;
+	}
 
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
+	}
+
+	private void setExpandedElements() {
+		FmTreeContentProvider contentProvider = (FmTreeContentProvider) this.getTreeProvider();
+		ArrayList<Object> expandedElements = new ArrayList<>();
+		for (IFeature f : contentProvider.getFeatureModel().getFeatures()) {
+			if (f.getStructure().hasChildren() && !contentProvider.getGraphicalFeatureModel().getGraphicalFeature(f).isCollapsed())
+				expandedElements.add(f);
+		}
+		expandedElements.add("Constraints");
+		viewer.setExpandedElements(expandedElements.toArray());
 	}
 
 	/* (non-Javadoc)
@@ -233,8 +263,10 @@ public class FMOutlineProvider extends OutlineProvider {
 	public void treeCollapsed(TreeExpansionEvent event) {
 		if (graphicalFeatureModel != null && syncCollapsedStateAction.isChecked() && event.getElement() instanceof IFeature) {
 			IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getElement()));
-			graphicalFeature.setCollapsed(true);
-			featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
+			if (!graphicalFeature.isCollapsed()) {
+				graphicalFeature.setCollapsed(true);
+				featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
+			}
 		}
 
 	}
@@ -247,8 +279,46 @@ public class FMOutlineProvider extends OutlineProvider {
 		((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), file);
 		if (graphicalFeatureModel != null && syncCollapsedStateAction.isChecked() && event.getElement() instanceof IFeature) {
 			IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getElement()));
-			graphicalFeature.setCollapsed(false);
-			featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
+			if (graphicalFeature.isCollapsed()) {
+				graphicalFeature.setCollapsed(false);
+				featureModel.fireEvent(new FeatureIDEEvent(((IFeature) event.getElement()), EventType.COLLAPSED_CHANGED));
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
+	 */
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		viewer.getContentProvider().inputChanged(viewer, null, file);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#handleExpandAll(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
+	@Override
+	public void handleExpandAll(PropertyChangeEvent event) {
+		if (syncCollapsedStateAction.isChecked()) {
+			for (IFeature f : featureModel.getFeatures()) {
+				graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(false);
+			}
+			featureModel.fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#handleCollapseAll(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
+	@Override
+	public void handleCollapseAll(PropertyChangeEvent event) {
+		if (syncCollapsedStateAction.isChecked()) {
+			for (IFeature f : featureModel.getFeatures()) {
+				if (!f.getStructure().isRoot()) {
+					graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(true);
+				}
+			}
+			featureModel.fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
 		}
 	}
 

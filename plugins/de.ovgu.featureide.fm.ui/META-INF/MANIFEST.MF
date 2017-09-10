@@ -56,6 +56,7 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.views.featuremodeleditview,
  de.ovgu.featureide.fm.ui.views.outline,
  de.ovgu.featureide.fm.ui.views.outline.custom,
+ de.ovgu.featureide.fm.ui.views.outline.custom.action,
  de.ovgu.featureide.fm.ui.views.outline.custom.filters,
  de.ovgu.featureide.fm.ui.views.outline.standard,
  de.ovgu.featureide.fm.ui.wizards

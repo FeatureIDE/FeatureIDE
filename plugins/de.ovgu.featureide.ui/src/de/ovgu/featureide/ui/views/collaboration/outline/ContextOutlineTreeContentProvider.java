@@ -25,7 +25,6 @@ import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -38,6 +37,7 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.comparator.ClassFragmentComparator;
 import de.ovgu.featureide.core.signature.comparator.SignatureComparator;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 
 /**
  * Provides the content for the collaboration outline.
@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Reimar Schr�ter
  * @author Sebastian Krieter
  */
-public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
+public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvider {
 	ProjectStructure projectStructure = null;
 	IFeatureProject featureProject = null;
 
