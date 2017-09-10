@@ -125,7 +125,7 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		
 		final IConstr constraint = clauseConstraints.remove(clause);
 		if (constraint != null) {
-			getOracle().removeConstr(constraint);
+			getOracle().removeSubsumedConstr(constraint);
 		}
 		return clause;
 	}
