@@ -21,49 +21,26 @@
 package de.ovgu.featureide.fm.core.base.impl;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * Returns all features of a feature model in pre-order.
+ * Iterates over all features of a feature model in pre-order.
  * 
  * @author Sebastian Krieter
  */
-public class FeaturePreOrderIterator implements Iterator<IFeature> {
+public class FeaturePreOrder implements Iterable<IFeature> {
 
-	private final LinkedList<IFeatureStructure> featureStructureList = new LinkedList<>();
+	private final IFeatureModel featureModel;
 
-	public FeaturePreOrderIterator(IFeatureModel featureModel) {
-		final IFeatureStructure root = featureModel.getStructure().getRoot();
-		if (root != null) {
-			featureStructureList.add(root);
-		}
+	public FeaturePreOrder(IFeatureModel featureModel) {
+		this.featureModel = featureModel;
 	}
 
 	@Override
-	public boolean hasNext() {
-		return !featureStructureList.isEmpty();
-	}
-
-	@Override
-	public IFeature next() {
-		if (!hasNext()) {
-			throw new NoSuchElementException();
-		}
-		final IFeatureStructure removeFirst = featureStructureList.removeFirst();
-		if (removeFirst.hasChildren()) {
-			featureStructureList.addAll(0, removeFirst.getChildren());
-		}
-		return removeFirst.getFeature();
-	}
-
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException();
+	public Iterator<IFeature> iterator() {
+		return new FeaturePreOrderIterator(featureModel);
 	}
 
 }

@@ -28,7 +28,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.prop4j.NodeWriter;
@@ -425,7 +424,8 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderList(List<String> featureOrderList) {
-		final Set<String> basicSet = Functional.mapToStringSet(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter()));
+		final List<String> basicSet = Functional.mapToList(new FeaturePreOrder(this), new ConcreteFeatureFilter(), FeatureUtils.GET_FEATURE_NAME);
+		// TODO optimize performance
 		basicSet.removeAll(featureOrderList);
 		this.featureOrderList.clear();
 		this.featureOrderList.addAll(featureOrderList);
