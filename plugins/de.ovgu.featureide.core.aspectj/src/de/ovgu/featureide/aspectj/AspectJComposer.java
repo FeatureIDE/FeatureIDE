@@ -539,4 +539,13 @@ public class AspectJComposer extends ComposerExtensionClass {
 		return super.isComposable();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#hasPropertyManager()
+	 */
+	@Override
+	public boolean hasPropertyManager() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
