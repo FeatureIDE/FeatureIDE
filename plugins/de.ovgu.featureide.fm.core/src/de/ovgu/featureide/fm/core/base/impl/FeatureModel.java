@@ -106,7 +106,7 @@ public class FeatureModel implements IFeatureModel {
 		this.factoryID = factoryID;
 
 		id = getNextId();
-		featureOrderList = new LinkedList<String>();
+		featureOrderList = new LinkedList<>();
 		featureOrderUserDefined = false;
 
 		property = createProperty();
@@ -118,7 +118,7 @@ public class FeatureModel implements IFeatureModel {
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
 		factoryID = oldFeatureModel.factoryID;
 		id = oldFeatureModel.id;
-		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
+		featureOrderList = new LinkedList<>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
 		property = oldFeatureModel.getProperty().clone(this);
@@ -427,9 +427,9 @@ public class FeatureModel implements IFeatureModel {
 	public void setFeatureOrderList(List<String> featureOrderList) {
 		final Set<String> basicSet = Functional.mapToStringSet(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter()));
 		basicSet.removeAll(featureOrderList);
-		featureOrderList.clear();
-		featureOrderList.addAll(featureOrderList);
-		featureOrderList.addAll(basicSet);
+		this.featureOrderList.clear();
+		this.featureOrderList.addAll(featureOrderList);
+		this.featureOrderList.addAll(basicSet);
 	}
 
 	@Override
