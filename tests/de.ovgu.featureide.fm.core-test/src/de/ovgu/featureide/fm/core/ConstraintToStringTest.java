@@ -54,7 +54,11 @@ public class ConstraintToStringTest {
 		final IFeatureModelFactory factory = getFMFactory();
 		final IFeatureModel fm = factory.createFeatureModel();
 		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
-		Assert.assertEquals("A implies implies", NodeWriter.nodeToString(c.getNode(), NodeWriter.textualSymbols, false, false));
+		final NodeWriter nodeWriter = new NodeWriter(c.getNode());
+		nodeWriter.setSymbols(NodeWriter.textualSymbols);
+		nodeWriter.setEnforceBrackets(false);
+		nodeWriter.setEnquoteWhitespace(false);
+		Assert.assertEquals("A implies implies", nodeWriter.nodeToString());
 	}
 
 	@Test
@@ -100,10 +104,11 @@ public class ConstraintToStringTest {
 	@Test
 	public void testSplit1() {
 		final String constraint = "- (A  =>  \" A\"  |  - - (\"A \"  &  and  =>  \" and\"  &  \" and\"  |  \" and \"  &  \" and\"  &  - \" and\"))";
-		final String exptected = "not (A implies \" A\" or not not (\"A \" and \"and\" implies \" and\" and \" and\" or \" and \" and \" and\" and not \" and\"))";
+		final String exptected = "not (A implies \" A\" or not (not (\"A \" and \"and\" implies \" and\" and \" and\" or \" and \" and \" and\" and not \" and\")))";
 		final NodeReader nodeReader = new NodeReader();
 		nodeReader.activateShortSymbols();
-		Assert.assertEquals(exptected, nodeReader.stringToNode(constraint).toString(NodeWriter.textualSymbols));
+		final String string = nodeReader.stringToNode(constraint).toString(NodeWriter.textualSymbols);
+		Assert.assertEquals(exptected, string);
 	}
 	
 	@Test

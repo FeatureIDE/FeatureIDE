@@ -185,8 +185,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 				MPLPlugin.getDefault().logInfo(NO_MAPPING_FILE_SPECIFIED_);
 				return false;
 			}
-			final IFile configFile = externalFeatureProject.getProject().getFile("InterfaceMapping/"
-				+ mappingFileName);
+			final IFile configFile = externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
 			FileHandler.load(Paths.get(configFile.getLocationURI()), mappedProjects, ConfigFormatManager.getInstance());
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);

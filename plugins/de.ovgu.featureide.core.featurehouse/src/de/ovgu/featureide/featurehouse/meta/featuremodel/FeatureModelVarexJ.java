@@ -56,17 +56,17 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 		features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
 		Collections.sort(features, new FeatureComparator(true));
 	}
-	
+
 	@Override
 	public String getImports() {
 		return "import gov.nasa.jpf.annotation.Conditional;\r\n\r\n";
 	}
-		
+
 	@Override
 	public String getHead() {
 		return HEAD;
 	}
- 	
+
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
@@ -89,11 +89,13 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 		}
 		return fields.toString();
 	}
-	
+
 	@Override
 	public String getFormula() {
-		String formula = NodeWriter.nodeToString(Nodes.convert(CNFCreator.createNodes(featureModel)), NodeWriter.javaSymbols);
-		return VALID + "return " + formula.toLowerCase(Locale.ENGLISH) + ";\r\n\t}\r\n\r\n";
+		final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(featureModel)));
+		nodeWriter.setSymbols(NodeWriter.javaSymbols);
+		return VALID + "return " + nodeWriter.nodeToString().toLowerCase(Locale.ENGLISH) + ";" + System.lineSeparator() + "\t}" + System.lineSeparator()
+				+ System.lineSeparator();
 	}
 
 	@Override
@@ -104,10 +106,11 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	@Override
 	public String getSelection() {
 		final StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("\t/**\r\n\t * Select features to run a specific configuration.\r\n\t */\r\n\tpublic static void select(String[] selection) {\r\n\t\t");
-		for (int i = 0;i < features.size();i++) {
+		stringBuilder
+				.append("\t/**\r\n\t * Select features to run a specific configuration.\r\n\t */\r\n\tpublic static void select(String[] selection) {\r\n\t\t");
+		for (int i = 0; i < features.size(); i++) {
 			if (i != 0) {
-				stringBuilder.append("\r\n\t\t");	
+				stringBuilder.append("\r\n\t\t");
 			}
 			stringBuilder.append(features.get(i).getName().toLowerCase(Locale.ENGLISH));
 			stringBuilder.append(" = Boolean.valueOf(selection[");

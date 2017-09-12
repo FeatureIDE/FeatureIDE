@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 /**
  * A figure for connections.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public class ConnectionFigure extends PolylineConnection {
 	/**

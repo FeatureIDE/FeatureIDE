@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -371,12 +372,18 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
-		final String configPath = createTemporaryConfigrationsFile(config).toString();
+		
+		final Path temporaryConfigrationFile = createTemporaryConfigrationFile(config);
+		if (temporaryConfigrationFile == null) {
+			return;
+		}
+		final String configPath = temporaryConfigrationFile.toString();
+		
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
-
-		if (configPath == null || basePath == null || outputPath == null)
+		if (basePath == null || outputPath == null) {
 			return;
+		}
 
 		final SignatureSetter signatureSetter = new SignatureSetter();
 
@@ -629,7 +636,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = new FSTGenComposerExtension();
 		composer.addCompositionErrorListener(compositionErrorListener);
 		try {
-			String input = NodeWriter.nodeToString(Nodes.convert(CNFCreator.createNodes(featureProject.getFeatureModel())), NodeWriter.javaSymbols);
+			final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(featureProject.getFeatureModel())));
+			nodeWriter.setSymbols(NodeWriter.javaSymbols);
+			String input = nodeWriter.nodeToString();
 			input = input.replace("!", "! ");
 			
 			IFile cnfFile = featureProject.getSourceFolder().getFile("model.cnf");
@@ -990,7 +999,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final String configPath;
 		IFile currentConfiguration = featureProject.getCurrentConfiguration();
 		if (currentConfiguration != null) {
-			configPath = createTemporaryConfigrationsFile(currentConfiguration).toString();
+			final Path temporaryConfigrationFile = createTemporaryConfigrationFile(currentConfiguration);
+			if (temporaryConfigrationFile == null) {
+				return;
+			}
+			configPath = temporaryConfigrationFile.toString();
 		} else {
 			configPath = featureProject.getProject().getFile(".project").getRawLocation().toOSString();
 		}
@@ -1032,7 +1045,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
-		composer.run(getArguments(createTemporaryConfigrationsFile(configurationFile).toString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
+		final Path temporaryConfigrationFile = createTemporaryConfigrationFile(configurationFile);
+		if (temporaryConfigrationFile == null) {
+			return;
+		}
+		composer.run(getArguments(temporaryConfigrationFile.toString(), featureProject.getSourcePath(), folder.getLocation().toOSString(), getContractParameter()));
 		if (errorPropagation != null && errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, because the

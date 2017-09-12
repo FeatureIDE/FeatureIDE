@@ -84,6 +84,12 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		} else if (showShort.equals(FALSE)) {
 			object.getLayout().setShowShortNames(false);
 		}
+		String hideLegend = eElement.getAttribute(HIDE_LEGEND);
+		if (hideLegend.equals(TRUE)) {
+			object.setLegendHidden(true);
+		} else if (hideLegend.equals(FALSE)) {
+			object.setLegendHidden(false);
+		}
 	}
 
 	private void parseStruct(NodeList struct) {
@@ -204,6 +210,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		}
 		if (!object.getLayout().showCollapsedConstraints()) {
 			root.setAttribute(SHOW_COLLAPSED_CONSTRAINTS, FALSE);
+		}
+		if (object.isLegendHidden()) {
+			root.setAttribute(HIDE_LEGEND, TRUE);
 		}
 
 		doc.appendChild(root);

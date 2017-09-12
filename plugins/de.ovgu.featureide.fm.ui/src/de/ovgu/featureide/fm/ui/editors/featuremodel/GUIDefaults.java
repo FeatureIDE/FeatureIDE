@@ -143,6 +143,10 @@ public interface GUIDefaults {
 	public static final Color LEGEND_FOREGROUND = FEATURE_FOREGROUND;
 	public static final Color LEGEND_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static final Color LEGEND_BORDER_COLOR = LEGEND_FOREGROUND;
+	public static final Color LEGEND_MOVING_FEEDBACK_VALID = GUIBasics.createColor(0, 120, 0);
+	public static final Color LEGEND_MOVING_FEEDBACK_INVALID = GUIBasics.createColor(120, 0, 0);
+	public static final int LEGEND_MOVING_FEEDBACK_BORDER_WIDTH = 2;
+	public static final int LEGEND_MOVING_FEEDBACK_ALPHA = 35;
 	public static final Border LEGEND_BORDER = new LineBorder(LEGEND_BORDER_COLOR, 1);
 
 	/*

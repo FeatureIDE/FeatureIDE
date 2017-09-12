@@ -39,7 +39,7 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 
 	private final ProjectSignatures projectSignatures;
 	private final Node fmNode;
-	private final boolean[] selcetedFeatures;
+	private final boolean[] selectedFeatures;
 	private SatSolver solver;
 
 	public ContextFilter(String featureName, ProjectSignatures projectSignatures) {
@@ -49,7 +49,7 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 	public ContextFilter(Node[] constraints, ProjectSignatures projectSignatures) {
 		this.projectSignatures = projectSignatures;
 		fmNode = AdvancedNodeCreator.createNodes(projectSignatures.getFeatureModel());
-		selcetedFeatures = new boolean[projectSignatures.getFeatureModel().getNumberOfFeatures()];
+		selectedFeatures = new boolean[projectSignatures.getFeatureModel().getNumberOfFeatures()];
 
 		init(constraints);
 	}
@@ -62,14 +62,14 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 		Node[] fixClauses = new Node[constraints.length + 1];
 		fixClauses[0] = fmNode;
 		System.arraycopy(constraints, 0, fixClauses, 1, constraints.length);
-		Arrays.fill(selcetedFeatures, false);
+		Arrays.fill(selectedFeatures, false);
 
 		solver = new SatSolver(new And(fixClauses), 2000);
 
 		for (Literal literal : solver.knownValues(SatSolver.ValueType.TRUE)) {
 			int id = projectSignatures.getFeatureID(literal.var.toString());
 			if (id > -1) {
-				selcetedFeatures[id] = true;
+				selectedFeatures[id] = true;
 			}
 		}
 	}
@@ -80,7 +80,7 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 		Node[] negativeLiterals = new Node[ids.length];
 		for (int i = 0; i < ids.length; ++i) {
 			int id = ids[i].getID();
-			if (selcetedFeatures[id]) {
+			if (selectedFeatures[id]) {
 				return true;
 			}
 			negativeLiterals[i] = new Literal(projectSignatures.getFeatureName(id), false);

@@ -21,18 +21,18 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.formula;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.explanations.LTMS;
+import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Creates an empty {@link CNF}.
  * 
  * @author Sebastian Krieter
  */
-public class LTMSCreator extends ACreator<LTMS> {
+public class LTMSCreator extends ACreator<Ltms> {
 
 	@Override
-	protected LTMS create() {
-		return new LTMS(formula.getElement(new CNFNodeCreator()));
+	protected Ltms create() {
+		return new Ltms(formula.getElement(new CNFNodeCreator()));
 	}
 
 }

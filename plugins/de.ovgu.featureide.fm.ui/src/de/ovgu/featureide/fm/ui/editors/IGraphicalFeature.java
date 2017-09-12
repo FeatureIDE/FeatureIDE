@@ -57,8 +57,6 @@ public interface IGraphicalFeature extends IGraphicalElement {
 	
 	boolean hasCollapsedParent();
 
-	List<IGraphicalFeature> getGraphicalChildren();
-	
-	
+	List<IGraphicalFeature> getGraphicalChildren(boolean showHidden);
 
 }

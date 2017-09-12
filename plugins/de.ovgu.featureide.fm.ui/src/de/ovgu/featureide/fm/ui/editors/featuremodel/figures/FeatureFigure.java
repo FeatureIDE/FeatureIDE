@@ -30,12 +30,15 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.GridLayout;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.ToolbarLayout;
@@ -57,6 +60,9 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -82,6 +88,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private final ConnectionAnchor targetAnchor;
 
 	private IGraphicalFeature feature;
+	private Figure toolTipFigure = null;
 	private static GridLayout gl = new GridLayout();
 
 	private static String ABSTRACT = " Abstract";
@@ -92,6 +99,8 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private static String FALSE_OPTIONAL = IS_FALSE_OPTIONAL;
 	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
 	private static String VOID = FEATURE_MODEL_IS_VOID;
+	
+	private final Set<FeatureModelReason> activeReasons = new LinkedHashSet<>();
 
 	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
 		super();
@@ -135,8 +144,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	}
 
 	public void setProperties() {
-		final StringBuilder toolTip = new StringBuilder();
-
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
@@ -147,45 +154,32 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		if (feature.getStructure().isRoot() && !analyser.isValid()) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-			toolTip.append(VOID);
-		} else if (feature.getStructure().isConcrete()) {
-			toolTip.append(CONCRETE);
-		} else {
+		} else if (!feature.getStructure().isConcrete()) {
 			setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-			toolTip.append(ABSTRACT);
 		}
 
 		if (feature.getStructure().hasHiddenParent()) {
 			setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
 			label.setForegroundColor(HIDDEN_FOREGROUND);
-			toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
 		}
-
-		toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
 
 		final FeatureProperties featureProperties = FeatureUtils.getFeatureProperties(feature);
 		if (featureProperties != null) {
 			if (featureProperties.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-				toolTip.append(DEAD);
 			} else if (featureProperties.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
 				setBackgroundColor(FMPropertyManager.getWarningColor());
 				setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-				toolTip.append(FALSE_OPTIONAL);
 			} else if (featureProperties.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
 				setBackgroundColor(FMPropertyManager.getWarningColor());
 				setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
-				toolTip.append(INDETERMINATE_HIDDEN);
 			}
 		}
 
 		if (!analyser.isValid()) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-			toolTip.setLength(0);
-			toolTip.trimToSize();
-			toolTip.append(VOID);
 		}
 
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
@@ -216,38 +210,97 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
 
-		final String description = feature.getProperty().getDescription();
-		if (description != null && !description.trim().isEmpty()) {
-			toolTip.append("\n\nDescription:\n");
-			toolTip.append(description);
-		}
-
-		final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
-		if (!contraints.isEmpty()) {
-			String c = "\n\nConstraints:\n";
-			toolTip.append(c);
-			toolTip.append(contraints + "\n");
-		}
-
-		Figure toolTipContent = new Figure();
-		toolTipContent.setLayoutManager(gl);
-
-		Label featureName = new Label(feature.getName());
-		featureName.setFont(DEFAULT_FONT_BOLD);
-		toolTipContent.add(featureName);
-		Label furtherInfos = new Label(toolTip.toString());
-		furtherInfos.setFont(DEFAULT_FONT);
-		toolTipContent.add(furtherInfos);
-		appendCustomProperties(toolTipContent);
-
-		// call of the FeatureDiagramExtensions
-		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
-			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
-		}
 		Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 
-		setToolTip(toolTipContent);
+		toolTipFigure = null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Lazy implementation.
+	 */
+	@Override
+	public IFigure getToolTip() {
+		if (toolTipFigure == null) {
+			final StringBuilder toolTip = new StringBuilder();
+
+			IFeature feature = this.feature.getObject();
+			final FeatureModelAnalyzer analyser = FeatureModelManager.getAnalyzer(feature.getFeatureModel());
+
+			//First draw custom color
+			if (FeatureColorManager.getColor(feature) == FeatureColor.NO_COLOR) {
+				if (feature.getStructure().isConcrete()) {
+					toolTip.append(CONCRETE);
+				} else {
+					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
+					toolTip.append(ABSTRACT);
+				}
+			}
+
+			if (feature.getStructure().hasHiddenParent()) {
+				toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
+			}
+
+			toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
+
+			final FeatureProperties featureProperties = analyser.getFeatureProperties(feature);
+			if (featureProperties != null) {
+				if (featureProperties.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
+					toolTip.append(DEAD);
+				} else if (featureProperties.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
+					toolTip.append(FALSE_OPTIONAL);
+				} else if (featureProperties.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
+					toolTip.append(INDETERMINATE_HIDDEN);
+				}
+			}
+			
+			if (!analyser.isValid()) {
+				toolTip.setLength(0);
+				toolTip.trimToSize();
+				toolTip.append(VOID);
+			}
+
+			final String description = feature.getProperty().getDescription();
+			if (description != null && !description.trim().isEmpty()) {
+				toolTip.append("\n\nDescription:\n");
+				toolTip.append(description);
+			}
+
+			final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
+			if (!contraints.isEmpty()) {
+				toolTip.append("\n\nConstraints:\n");
+				toolTip.append(contraints);
+			}
+
+			if (getActiveReason() != null) {
+				final ExplanationWriter w = getActiveReason().getExplanation().getWriter();
+				toolTip.append("\n\nThis feature is involved in the selected defect:");
+				for (final FeatureModelReason activeReason : activeReasons) {
+					toolTip.append("\n\u2022 ");
+					toolTip.append(w.getReasonString(activeReason));
+				}
+			}
+
+			Figure toolTipContent = new Figure();
+			toolTipContent.setLayoutManager(gl);
+
+			Label featureName = new Label(feature.getName());
+			featureName.setFont(DEFAULT_FONT_BOLD);
+			toolTipContent.add(featureName);
+			Label furtherInfos = new Label(toolTip.toString());
+			furtherInfos.setFont(DEFAULT_FONT);
+			toolTipContent.add(furtherInfos);
+			appendCustomProperties(toolTipContent);
+
+			// call of the FeatureDiagramExtensions
+			for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+				toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
+			}
+			toolTipFigure = toolTipContent;
+		}
+		return toolTipFigure;
 	}
 
 	private void appendCustomProperties(Figure toolTipContent) {
@@ -331,5 +384,39 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	@Override
 	public void setLocation(Point p) {
 		super.setLocation(p);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Only does so in any of the following cases:
+	 * <ul>
+	 * <li>
+	 * The new active reason is null.
+	 * This makes it possible to reset the active reason.
+	 * </li>
+	 * <li>
+	 * The old active reason is null.
+	 * After resetting, any new active reason is accepted.
+	 * </li>
+	 * <li>
+	 * The new active reason has a greater {@link Reason#getConfidence() confidence} than the old one.
+	 * This means that, in case of graphically overlapping reasons, the greatest confidence is displayed.
+	 * </li>
+	 * </ul>
+	 * </p>
+	 * @param activeReason the new active reason; null to reset
+	 */
+	public void setActiveReason(FeatureModelReason activeReason) {
+		if (activeReason == null) {
+			activeReasons.clear();
+			super.setActiveReason(activeReason);
+		} else {
+			if (getActiveReason() == null || activeReason.getConfidence() >= getActiveReason().getConfidence()) {
+				super.setActiveReason(activeReason);
+			}
+			activeReasons.add(activeReason);
+		}
 	}
 }

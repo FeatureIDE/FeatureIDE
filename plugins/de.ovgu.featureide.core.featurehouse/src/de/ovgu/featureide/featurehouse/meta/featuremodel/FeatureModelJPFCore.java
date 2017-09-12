@@ -32,12 +32,12 @@ import java.util.Locale;
 import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
-import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
@@ -117,17 +117,8 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 		stringBuilder.append("\t\tboolean "
 				+ root.toString().toLowerCase(Locale.ENGLISH) + " = true;\r\n");
 
-		Node formula = getFormulaJPF(featureModel);
-		ArrayList<Node> c = new ArrayList<Node>();
-		// remove base feature and the (true && !false) statements
-		for (Node child : formula.getChildren()) {
-			if (child instanceof Or) {
-				c.add(child);
-			}
-		}
-		formula.setChildren(c.toArray());
 		addedFeatures.add(root.toString().toLowerCase(Locale.ENGLISH));
-		addFeature(root, formula);
+		addFeature(root, getFormulaJPF(featureModel));
 		stringBuilder.append("\t\tVerify.incrementCounter(0);\r\n\t\treturn true;\r\n\t}\r\n\r\n\tprivate static boolean random() {\r\n\t\treturn Verify.getBoolean(false);\r\n\t}\r\n\r\n");
 		return stringBuilder.toString();
 	}
@@ -135,7 +126,10 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private LinkedList<String> addedFeatures = new LinkedList<String>();
 
 	private Node getFormulaJPF(IFeatureModel model) {
-		return AdvancedNodeCreator.createCNF(model);
+		final AdvancedNodeCreator c = new AdvancedNodeCreator(model);
+		c.setCnfType(CNFType.Compact);
+		c.setOptionalRoot(true);
+		return c.createNodes();
 	}
 	
 	/**

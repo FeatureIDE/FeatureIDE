@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
@@ -78,13 +79,11 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	}
 	
 	private String createdValidClause() {
-		final Node nodes = AdvancedNodeCreator.createNodes(featureModel).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(featureModel);
+		nc.setCnfType(CNFType.Compact);
+		nc.setIncludeBooleanValues(false);
+		final Node nodes = nc.createNodes().eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
 		String formula = " " + nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
-		
-		final String truefalse = "  &&  true  &&  ! false";
-		if (formula.contains(truefalse)) {
-			formula = formula.substring(0, formula.indexOf(truefalse));
-		}
 		
 		for (CharSequence feature : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
 			formula = formula.replaceAll("([\\s,\\(])" + feature.toString().toLowerCase(Locale.ENGLISH), "$1FM.FeatureModel." + feature.toString().toLowerCase(Locale.ENGLISH));

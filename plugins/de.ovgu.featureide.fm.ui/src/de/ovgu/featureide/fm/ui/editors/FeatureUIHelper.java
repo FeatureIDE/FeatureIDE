@@ -25,11 +25,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
-import javax.annotation.CheckForNull;
-
-import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPartViewer;
@@ -42,7 +38,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
  * this is a hack to quickly associate features with dimension and size (which
@@ -52,10 +47,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * @author Christian Kaestner
  */
 public class FeatureUIHelper {
-	
-	private static final Map<IGraphicalFeatureModel, Dimension> legendSize = new WeakHashMap<>();
-	private static final Map<IGraphicalFeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
-	
+		
 	public static boolean isAncestorOf(IGraphicalFeature feature, IGraphicalFeature parent) {
 		return FeatureUtils.isAncestorOf(feature.getObject(), parent.getObject());
 	}
@@ -168,10 +160,6 @@ public class FeatureUIHelper {
 		return zoomManager;
 	}
 
-	public static Dimension getLegendSize(IGraphicalFeatureModel featureModel) {
-		return legendSize.get(featureModel);
-	}
-
 	public static boolean showHiddenFeatures(IGraphicalFeatureModel featureModel) {
 		return featureModel.getLayout().showHiddenFeatures();
 	}
@@ -182,10 +170,6 @@ public class FeatureUIHelper {
 
 	public static void showCollapsedConstraints(boolean show, IGraphicalFeatureModel featureModel) {
 		featureModel.getLayout().showCollapsedConstraints(show);
-	}
-
-	public static void setLegendSize(IGraphicalFeatureModel featureModel, Dimension dim) {
-		legendSize.put(featureModel, dim);
 	}
 
 	public static Rectangle getBounds(IGraphicalFeature feature) {
@@ -259,15 +243,6 @@ public class FeatureUIHelper {
 
 	public static boolean hasVerticalLayout(IGraphicalFeatureModel featureModel) {
 		return featureModel.getLayout().verticalLayout();
-	}
-
-	public static void setLegendFigure(IGraphicalFeatureModel featureModel, LegendFigure figure) {
-		legendFigure.put(featureModel, figure);
-	}
-
-	@CheckForNull
-	public static LegendFigure getLegendFigure(IGraphicalFeatureModel featureModel) {
-		return legendFigure.get(featureModel);
 	}
 
 }

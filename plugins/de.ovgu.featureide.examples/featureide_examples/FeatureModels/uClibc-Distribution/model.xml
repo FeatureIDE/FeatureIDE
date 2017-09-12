@@ -1,0 +1,4926 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="root">
+				<feature name="USER_NETPERF_NETPERF"/>
+				<feature name="USER_NET_TOOLS_RARP"/>
+				<feature name="USER_MICROWIN_CLEOVGA"/>
+				<and name="USER_NETFLASH_NETFLASH">
+					<and name="USER_NETFLASH_DECOMPRESS">
+						<feature name="USER_NETFLASH_AUTODECOMPRESS"/>
+					</and>
+					<feature name="USER_NETFLASH_WITH_FILE"/>
+					<feature name="USER_NETFLASH_WITH_CGI"/>
+					<feature name="USER_NETFLASH_WITH_FTP"/>
+					<and name="USER_NETFLASH_HMACMD5">
+						<feature mandatory="true" name="USER_NETFLASH_HMACMD5_KEY"/>
+					</and>
+					<feature name="USER_NETFLASH_SHA256"/>
+					<and name="USER_NETFLASH_VERSION">
+						<feature name="USER_NETFLASH_VERSION_ALLOW_CURRENT"/>
+						<feature name="USER_NETFLASH_VERSION_ALLOW_OLDER"/>
+					</and>
+					<feature name="USER_NETFLASH_CRYPTO_V2"/>
+					<feature name="USER_RECOVER_BIOS"/>
+					<feature name="USER_NETFLASH_CRYPTO"/>
+				</and>
+				<feature name="USER_NESSUS"/>
+				<feature name="USER_PPTPD_PPTPD"/>
+				<feature name="USER_MICROWIN_ERASEMOVE"/>
+				<feature name="USER_MICROWIN_HAVE_XPM_SUPPORT"/>
+				<feature name="USER_SASH_SHUTDOWN"/>
+				<feature name="USER_FILEUTILS_CMP"/>
+				<feature name="USER_MICROWIN_BIN_MTERM"/>
+				<feature name="USER_MICROWIN_MICROWIN"/>
+				<feature name="USER_SQUID_SQUID"/>
+				<and name="USER_MYSQL">
+					<feature name="USER_MYSQL_CLIB"/>
+				</and>
+				<and name="MCF_QSPI">
+					<feature name="USER_QSPITEST_RX"/>
+					<feature name="USER_QSPITEST_TEST"/>
+				</and>
+				<feature name="USER_SSLWRAP_SSLWRAP"/>
+				<feature name="USER_FTP_FTP_FTP"/>
+				<feature name="USER_GAMES_ADVENT4"/>
+				<feature name="USER_TRUSTEDSOURCE"/>
+				<feature name="USER_USBHUBCTRL_USBHUBCTRL"/>
+				<feature name="USER_SHUTILS_UNAME"/>
+				<feature name="USER_DOSFSTOOLS_DOSFSLABEL"/>
+				<feature name="USER_LOGROTATE_LOGROTATE"/>
+				<feature name="USER_GETTYD_GETTYD"/>
+				<feature name="USER_TINYLOGIN_TRIVIAL_HELP"/>
+				<feature name="USER_SENDIP_SENDIP"/>
+				<feature name="USER_CLAMAV_CLAMSMTP"/>
+				<feature name="USER_PPTP_CLIENT_PPTP_CALLMGR"/>
+				<feature name="USER_VERSION_VERSION"/>
+				<feature name="USER_CRYPTO_TOOLS_CMACTEST"/>
+				<feature name="USER_HASERL_HASERL"/>
+				<feature name="USER_MICROWIN_UCTSMOUSE"/>
+				<feature name="USER_FILEUTILS_CHOWN"/>
+				<feature name="USER_MICROWIN_BIN_NXEV"/>
+				<feature name="USER_KISMET"/>
+				<and name="USER_CRAMFS_CRAMFSCK">
+					<feature name="USER_CRAMFS_TEST"/>
+				</and>
+				<and name="USER_PPPD_PPPD_PPPD">
+					<feature name="USER_PPPD_WITH_PPPOA"/>
+					<feature name="USER_PPPD_WITH_PPPOE"/>
+					<feature name="USER_PPPD_WITH_PAM"/>
+					<feature name="USER_PPPD_WITH_RADIUS"/>
+					<feature name="USER_PPPD_WITH_IPV6"/>
+					<feature name="USER_PPPD_WITH_DYNAMIC_PLUGINS"/>
+					<feature name="USER_PPPD_WITH_MPPE"/>
+					<feature name="USER_PPPD_WITH_TACACS"/>
+				</and>
+				<alt abstract="true" mandatory="true" name="USER_RAMIMAGE_RAMFS64_alt">
+					<feature mandatory="true" name="USER_RAMIMAGE_NONE"/>
+					<feature mandatory="true" name="USER_RAMIMAGE_RAMFS64"/>
+					<feature mandatory="true" name="USER_RAMIMAGE_RAMFS128"/>
+					<feature mandatory="true" name="USER_RAMIMAGE_RAMFS256"/>
+					<feature mandatory="true" name="USER_RAMIMAGE_RAMFS512"/>
+					<feature mandatory="true" name="USER_RAMIMAGE_RAMFS1024"/>
+					<feature mandatory="true" name="USER_RAMIMAGE_RAMFS2048"/>
+					<feature mandatory="true" name="USER_RAMIMAGE_RAMFS8192"/>
+				</alt>
+				<feature name="USER_MICROWIN_HAVE_JPEG_SUPPORT"/>
+				<feature name="USER_TINYLOGIN_SHADOWPASSWDS"/>
+				<feature name="USER_IPREDIR_IPREDIR"/>
+				<feature name="USER_PROCPS_KILL"/>
+				<feature name="USER_FILEUTILS_RM"/>
+				<feature name="USER_CAL_CAL"/>
+				<feature name="USER_DROPBEAR_DROPBEAR"/>
+				<and name="USER_RECOVER_RECOVER">
+					<feature mandatory="true" name="USER_RECOVER_ETHERNET_INTERFACE"/>
+				</and>
+				<feature name="USER_FLASHW_FLASHW"/>
+				<feature name="USER_UDEV"/>
+				<feature name="USER_CAMSERV"/>
+				<feature name="USER_RADAUTH_RADAUTH"/>
+				<feature name="USER_MICROWIN_CLEOKBD"/>
+				<feature name="USER_BOOTTOOLS_SETBENV"/>
+				<feature name="USER_TINYLOGIN_TINYLOGIN"/>
+				<alt abstract="true" mandatory="true" name="USER_MICROWIN_MWPF_TRUECOLOR888_alt">
+					<feature mandatory="true" name="USER_MICROWIN_MWPF_PALETTE"/>
+					<feature mandatory="true" name="USER_MICROWIN_MWPF_TRUECOLOR0888"/>
+					<feature mandatory="true" name="USER_MICROWIN_MWPF_TRUECOLOR888"/>
+					<feature mandatory="true" name="USER_MICROWIN_MWPF_TRUECOLOR565"/>
+					<feature mandatory="true" name="USER_MICROWIN_MWPF_TRUECOLOR555"/>
+					<feature mandatory="true" name="USER_MICROWIN_MWPF_TRUECOLOR332"/>
+				</alt>
+				<feature name="USER_FILEUTILS_L"/>
+				<feature name="USER_NET_TOOLS_IFCONFIG"/>
+				<feature name="USER_RADVD_RADVD"/>
+				<feature name="USER_GAMES_DUNGEON"/>
+				<feature name="LIB_LIBKRB5"/>
+				<feature name="USER_CGIHTML"/>
+				<feature name="USER_P7ZIP_7ZA"/>
+				<feature name="USER_PLAY_TONE"/>
+				<feature name="USER_MICROWIN_BIN_SLIDER"/>
+				<feature name="USER_BRCFG_BRCFG"/>
+				<and name="USER_TCPWRAP_TCPD">
+					<feature name="USER_TCPWRAP_FINGER"/>
+					<feature name="USER_TCPWRAP_TCPDCHK"/>
+					<feature name="USER_TCPWRAP_TCPDMATCH"/>
+					<feature name="USER_TCPWRAP_MISCD"/>
+					<feature name="USER_TCPWRAP_TRYFROM"/>
+				</and>
+				<feature name="USER_LCD_LCD"/>
+				<and name="USER_IPROUTE2">
+					<feature name="USER_IPROUTE2_IP_IP"/>
+					<feature name="USER_IPROUTE2_TC_TC"/>
+					<feature name="USER_IPROUTE2_IP_IFCFG"/>
+					<feature name="USER_IPROUTE2_IP_ROUTEF"/>
+					<feature name="USER_IPROUTE2_IP_RTMON"/>
+					<feature name="USER_IPROUTE2_IP_ROUTEL"/>
+					<feature name="USER_IPROUTE2_IP_GENL"/>
+					<feature name="USER_IPROUTE2_IP_RTACCT"/>
+				</and>
+				<feature name="USER_REISERFSPROGS_REISERFSCK"/>
+				<feature name="USER_ULOGD2_ULOGD"/>
+				<and name="USER_SASH_REBOOT">
+					<feature name="USER_SASH_REBOOT_SNAPGEAR"/>
+				</and>
+				<feature name="USER_LPR"/>
+				<feature name="USER_SSH_SSH_KEYSIGN"/>
+				<feature name="LIB_LIBLDAP"/>
+				<feature name="USER_TRIPWIRE_SIGGEN"/>
+				<feature name="USER_RDATE_RDATE"/>
+				<feature name="USER_PROCPS_PS"/>
+				<feature name="USER_SSH_SFTP"/>
+				<feature name="USER_PLAY_PLAY"/>
+				<feature name="USER_MICROWIN_NOKBD"/>
+				<feature name="USER_HTTPD_HTTPD"/>
+				<feature name="USER_MICROWIN_BIN_NXLSCLIENTS"/>
+				<feature name="USER_MICROWIN_HAVE_HZK_SUPPORT"/>
+				<feature name="USER_AT_ATRUN"/>
+				<feature name="USER_UNZOO_UNZOO"/>
+				<feature name="USER_PROCPS_PGREP"/>
+				<feature name="USER_OPENSSL_APPS"/>
+				<feature name="USER_MICROWIN_VGALIB"/>
+				<feature name="USER_MICROWIN_CLEOMOUSE"/>
+				<feature name="USER_TRACEROUTE_TRACEROUTE"/>
+				<feature name="USER_MICROWIN_BIN_VNC"/>
+				<feature name="USER_LOGIN_LOGIN"/>
+				<and name="LIB_LIBNL">
+					<and name="LIB_LIBNL_COMPONENTS">
+						<and name="LIB_LIBNL_NETFILTER">
+							<feature name="LIB_LIBNL_NETFILTER_QUEUE"/>
+							<feature name="LIB_LIBNL_NETFILTER_LOG"/>
+							<feature name="LIB_LIBNL_NETFILTER_CT"/>
+						</and>
+						<feature name="LIB_LIBNL_FIB"/>
+						<feature name="LIB_LIBNL_GENERIC"/>
+						<and name="LIB_LIBNL_RTNL">
+							<feature name="LIB_LIBNL_ROUTE_NEIGH"/>
+							<feature name="LIB_LIBNL_ROUTE_LINK"/>
+							<feature name="LIB_LIBNL_ROUTE_RULE"/>
+							<feature name="LIB_LIBNL_ROUTE_ADDR"/>
+							<feature name="LIB_LIBNL_ROUTE_ROUTE"/>
+							<feature name="LIB_LIBNL_ROUTE_TC"/>
+						</and>
+					</and>
+				</and>
+				<feature name="USER_ETHATTACH_ETHATTACH"/>
+				<feature name="USER_MICROWIN_HAVE_FILEIO"/>
+				<feature name="USER_DHCP_ISC_RELAY_DHCRELAY"/>
+				<feature name="USER_PROCPS_W"/>
+				<feature name="USER_E2FSPROGS_MISC_DUMPE2FS"/>
+				<feature name="LIB_LIBATM"/>
+				<and name="USER_SHADOW_UTILS">
+					<feature name="USER_SHADOW_NEWUSERS"/>
+					<feature name="USER_SHADOW_GROUPDEL"/>
+					<feature name="USER_SHADOW_LOGOUTD"/>
+					<feature name="USER_SHADOW_PWUNCONV"/>
+					<feature name="USER_SHADOW_GROUPMOD"/>
+					<feature name="USER_SHADOW_CHFN"/>
+					<feature name="USER_SHADOW_USERDEL"/>
+					<feature name="USER_SHADOW_PAM"/>
+					<feature name="USER_SHADOW_ID"/>
+					<feature name="USER_SHADOW_PASSWD"/>
+					<feature name="USER_SHADOW_GRPCONV"/>
+					<feature name="USER_SHADOW_SHAREDLIB"/>
+					<feature name="USER_SHADOW_LOGIN"/>
+					<feature name="USER_SHADOW_USERMOD"/>
+					<feature name="USER_SHADOW_CHSH"/>
+					<feature name="USER_SHADOW_CHAGE"/>
+					<feature name="USER_SHADOW_GROUPS"/>
+					<feature name="USER_SHADOW_EXPIRY"/>
+					<feature name="USER_SHADOW_CHPASSWD"/>
+					<feature name="USER_SHADOW_NEWGRP"/>
+					<feature name="USER_SHADOW_PWCK"/>
+					<feature name="USER_SHADOW_GRPCK"/>
+					<feature name="USER_SHADOW_VIPW"/>
+					<feature name="USER_SHADOW_FAILLOG"/>
+					<feature name="USER_SHADOW_USERADD"/>
+					<feature name="USER_SHADOW_SU"/>
+					<feature name="USER_SHADOW_GROUPADD"/>
+					<feature name="USER_SHADOW_GPASSWD"/>
+					<feature name="USER_SHADOW_NOLOGIN"/>
+					<feature name="USER_SHADOW_SULOGIN"/>
+					<feature name="USER_SHADOW_PWCONV"/>
+					<feature name="USER_SHADOW_LASTLOG"/>
+					<feature name="USER_SHADOW_GRPUNCONV"/>
+				</and>
+				<feature name="USER_MICROWIN_BIN_MTEST"/>
+				<feature name="USER_MICROWIN_DE2TSMOUSE"/>
+				<feature name="LIB_LIBCRYPT_OLD"/>
+				<and name="USER_LIRC">
+					<feature name="USER_LIRC_IRRECORD"/>
+					<feature name="USER_LIRC_IRW"/>
+					<feature name="USER_LIRC_LIRCMD"/>
+					<feature name="USER_LIRC_IREXEC"/>
+					<feature name="USER_LIRC_LIRCD"/>
+					<feature name="USER_LIRC_MODE2"/>
+				</and>
+				<feature name="USER_PPPD_WITH_MINCONN"/>
+				<feature name="USER_IPERF_IPERF"/>
+				<feature name="USER_FILEUTILS_MORE"/>
+				<feature name="USER_LOGIN_PASSWD"/>
+				<feature name="USER_IPSENTINEL_IPSENTINEL"/>
+				<feature name="USER_MICROWIN_GRAYPALETTE"/>
+				<feature name="USER_REISERFSPROGS"/>
+				<feature name="USER_RSYNC_RSYNC"/>
+				<feature name="USER_READPROFILE_READPROFILE"/>
+				<feature name="USER_TINYTCL_TCLSH"/>
+				<feature name="USER_KENDIN_CONFIG"/>
+				<feature name="USER_MICROWIN_IPAQMOUSE"/>
+				<feature name="USER_SHUTILS_PWD"/>
+				<feature name="USER_SYSUTILS_HOSTNAME"/>
+				<feature name="USER_TCSH_TCSH"/>
+				<feature name="USER_MICROWIN_BIN_LANDMINE"/>
+				<feature name="LIB_LIBXML2"/>
+				<feature name="USER_OGGPLAY_EXAMPLE"/>
+				<feature name="USER_STP_STP"/>
+				<feature name="USER_TINYLOGIN_DELGROUP"/>
+				<feature name="USER_SETHDLC_SETHDLC"/>
+				<feature name="USER_TINYLOGIN_SULOGIN"/>
+				<feature name="USER_PROCPS_FREE"/>
+				<feature name="LIB_LIBPCAP"/>
+				<feature name="USER_TINYLOGIN_ADDGROUP"/>
+				<and name="USER_LRZSZ_LRZSZ">
+					<feature name="USER_LRZSZ_LRZ"/>
+					<feature name="USER_LRZSZ_LSZ"/>
+				</and>
+				<feature name="USER_AT_ATD"/>
+				<feature name="LIB_POPT"/>
+				<feature name="LIB_ZLIB"/>
+				<feature name="USER_MAWK_AWK"/>
+				<feature name="USER_MUSICBOX_MUSICBOX"/>
+				<and name="USER_NETSNMP_SNMPD">
+					<and name="USER_NETSNMP_MIBS">
+						<feature name="USER_NETSNMP_MIBLOADING"/>
+					</and>
+					<and name="USER_NETSNMP_OVRDEFAULTS">
+						<feature mandatory="true" name="USER_NETSNMP_DEFVERSION"/>
+						<feature mandatory="true" name="USER_NETSNMP_DEFPERSISDIR"/>
+						<feature mandatory="true" name="USER_NETSNMP_DEFENTERPRISEOID"/>
+						<feature mandatory="true" name="USER_NETSNMP_DEFLOGFILE"/>
+						<feature mandatory="true" name="USER_NETSNMP_DEFSYSCONTACT"/>
+						<feature mandatory="true" name="USER_NETSNMP_DEFSYSLOCATION"/>
+					</and>
+					<feature name="USER_NETSNMP_NOV1"/>
+					<feature name="USER_NETSNMP_NOV2C"/>
+					<and name="USER_NETSNMP_APPS">
+						<feature name="USER_NETSNMP_APPS_DELTA"/>
+						<feature name="USER_NETSNMP_APPS_NETSTAT"/>
+						<feature name="USER_NETSNMP_APPS_TRAP"/>
+						<feature name="USER_NETSNMP_APPS_VACM"/>
+						<feature name="USER_NETSNMP_APPS_WALK"/>
+						<feature name="USER_NETSNMP_APPS_BULKWALK"/>
+						<feature name="USER_NETSNMP_APPS_BULKGET"/>
+						<feature name="USER_NETSNMP_APPS_TRAPD"/>
+						<feature name="USER_NETSNMP_APPS_TEST"/>
+						<feature name="USER_NETSNMP_APPS_TRANSLATE"/>
+						<feature name="USER_NETSNMP_APPS_TABLE"/>
+						<feature name="USER_NETSNMP_APPS_DF"/>
+						<feature name="USER_NETSNMP_APPS_GETNEXT"/>
+						<feature name="USER_NETSNMP_APPS_GET"/>
+						<feature name="USER_NETSNMP_APPS_USM"/>
+						<feature name="USER_NETSNMP_APPS_SET"/>
+						<feature name="USER_NETSNMP_APPS_STATUS"/>
+					</and>
+					<and name="USER_NETSNMP_ADDMIBS">
+						<feature mandatory="true" name="USER_NETSNMP_ADDITIONALMIBS"/>
+					</and>
+					<feature name="USER_NETSNMP_BUILDSTATIC"/>
+					<feature name="USER_NETSNMP_IPV6"/>
+					<feature name="USER_NETSNMP_MANUALS"/>
+					<feature name="USER_NETSNMP_SNMPD_MINI"/>
+					<feature name="USER_NETSNMP_OPENSSL"/>
+					<feature name="USER_NETSNMP_SCRIPTS"/>
+					<and name="USER_NETSNMP_NOTRANSPORTS">
+						<feature mandatory="true" name="USER_NETSNMP_EXTRANSPORTS"/>
+					</and>
+				</and>
+				<feature name="USER_SYSUTILS_PS"/>
+				<feature name="USER_FLTHDR_FLTHDR"/>
+				<feature name="USER_VIXIECRON_CRONTAB"/>
+				<feature name="USER_IFATTACH_IFATTACH"/>
+				<feature name="USER_TINYLOGIN_SU"/>
+				<feature name="USER_FILEUTILS_MKFIFO"/>
+				<feature name="USER_FERRET_FERRET"/>
+				<feature name="USER_SQUASHFS_MKSQUASHFS7Z"/>
+				<feature name="USER_MICROWIN_BIN_NPANEL"/>
+				<feature name="USER_SIPROXD_SIPROXD"/>
+				<alt abstract="true" mandatory="true" name="USER_NWSH_SH_alt">
+					<feature mandatory="true" name="USER_SASH_SH"/>
+					<feature mandatory="true" name="USER_SH_SH"/>
+					<feature mandatory="true" name="USER_NWSH_SH"/>
+					<feature mandatory="true" name="USER_BASH_BASH"/>
+					<feature mandatory="true" name="USER_MSH_SH"/>
+					<feature mandatory="true" name="USER_OTHER_SH"/>
+				</alt>
+				<feature name="LIB_ADNS"/>
+				<feature name="USER_NESSUS_CORE"/>
+				<and name="USER_UNZIP_UNZIP">
+					<feature name="USER_UNZIP_FUNZIP"/>
+				</and>
+				<feature name="USER_PPPD_WITH_PASSWORDFD"/>
+				<feature name="USER_TINYLOGIN_SHA1_PASSWORDS"/>
+				<feature name="USER_SMBMOUNT_SMBUMOUNT"/>
+				<feature name="USER_FILEUTILS_CHMOD"/>
+				<feature name="USER_LHA_LHA"/>
+				<feature name="USER_VPLAY_VPLAY"/>
+				<feature name="USER_MICROWIN_SCANKBD"/>
+				<feature name="USER_PPTPD_PPTPCTRL"/>
+				<feature name="USER_MICROWIN_GPMMOUSE"/>
+				<feature name="USER_E2FSPROGS_MISC_MKLOST_FOUND"/>
+				<feature name="USER_NET_TOOLS_NAMEIF"/>
+				<and name="USER_LUA">
+					<and name="USER_LUA_LUAROCKS">
+						<feature name="USER_LUA_COSMO"/>
+						<feature name="USER_LUA_WSAPI"/>
+						<feature name="USER_LUA_WSAPI_XAVANTE"/>
+						<feature name="USER_LUA_LUASQL_SQLITE3"/>
+						<feature name="USER_LUA_ORBIT"/>
+						<feature name="USER_LUA_XAVANTE"/>
+					</and>
+				</and>
+				<feature name="USER_FNORD_404_REDIR"/>
+				<feature name="USER_BR2684CTL_BR2684CTL"/>
+				<feature name="USER_SYSUTILS_FREE"/>
+				<feature name="USER_CONNTRACK_CONNTRACK"/>
+				<feature name="USER_TELNET_TELNET"/>
+				<feature name="USER_MICROWIN_NOMOUSE"/>
+				<feature name="USER_NESSUS_NASL"/>
+				<feature name="USER_NULL_NULL"/>
+				<feature mandatory="true" name="USER_PPPD_PPPOE_RETRIES"/>
+				<feature name="USER_BPALOGIN_BPALOGIN"/>
+				<feature name="USER_TINYLOGIN_PASSWD"/>
+				<feature name="LIB_CYRUSSASL"/>
+				<feature name="USER_SYSUTILS_DF"/>
+				<feature name="USER_MICROWIN_HAVE_PNG_SUPPORT"/>
+				<feature name="USER_MICROWIN_OBJFRAMEWORK"/>
+				<feature name="USER_IPSET_IPSET"/>
+				<feature name="USER_MICROWIN_BIN_NXTERM"/>
+				<feature name="USER_OGGPLAY_OGGPLAY"/>
+				<feature name="USER_ONLY_ROOT"/>
+				<feature name="USER_SGUTOOL_SGUTOOL"/>
+				<feature name="USER_MARADNS_MARADNS"/>
+				<feature name="LIB_OSIP2"/>
+				<feature name="USER_NTPCLIENT_NTPCLIENT"/>
+				<feature name="USER_DDNS3_CLIENT_DDNS3"/>
+				<feature name="USER_PPPD_WITH_PASSPROMPT"/>
+				<feature name="USER_GDB_GDBSERVER"/>
+				<feature name="USER_EZIPUPDATE_EZIPUPDATE"/>
+				<feature name="USER_MICROWIN_BIN_LAUNCHER"/>
+				<feature name="LIB_LIBPNG"/>
+				<feature name="USER_OLD_PASSWORDS"/>
+				<feature name="USER_RSYSLOGD_RSYSLOGD"/>
+				<feature name="USER_MICROWIN_BIN_NXVIEW"/>
+				<feature name="USER_CKSUM_CKSUM"/>
+				<and name="USER_NOOOM_NOOOM">
+					<feature mandatory="true" name="USER_NOOOM_BINARIES"/>
+				</and>
+				<feature name="LIB_NETFILTER_LOG"/>
+				<feature name="USER_SHUTILS_LOGNAME"/>
+				<feature name="USER_RECOVER_PRESERVE_CONFIG_FS"/>
+				<feature name="LIB_LIBCCMALLOC"/>
+				<feature name="USER_NET_TOOLS_MII_TOOL_FEC"/>
+				<feature name="USER_WGET"/>
+				<and name="USER_BUSYBOX_BUSYBOX">
+					<feature name="USER_BUSYBOX_IPCRM"/>
+					<feature name="USER_BUSYBOX_WATCH"/>
+					<feature name="USER_BUSYBOX_IPADDR"/>
+					<and name="USER_BUSYBOX_AR">
+						<feature name="USER_BUSYBOX_FEATURE_AR_LONG_FILENAMES"/>
+					</and>
+					<and name="USER_BUSYBOX_GUNZIP">
+						<feature name="USER_BUSYBOX_FEATURE_GUNZIP_UNCOMPRESS"/>
+					</and>
+					<feature name="USER_BUSYBOX_VCONFIG"/>
+					<feature name="USER_BUSYBOX_CP"/>
+					<and name="USER_BUSYBOX_PS">
+						<and name="USER_BUSYBOX_FEATURE_PS_TIME">
+							<feature name="USER_BUSYBOX_FEATURE_PS_UNUSUAL_SYSTEMS"/>
+						</and>
+						<feature name="USER_BUSYBOX_FEATURE_PS_WIDE"/>
+					</and>
+					<feature name="USER_BUSYBOX_SV"/>
+					<feature name="USER_BUSYBOX_DIRNAME"/>
+					<feature name="USER_BUSYBOX_MESG"/>
+					<feature name="USER_BUSYBOX_CRONTAB"/>
+					<and name="USER_BUSYBOX_CHAT">
+						<feature name="USER_BUSYBOX_FEATURE_CHAT_VAR_ABORT_LEN"/>
+						<feature name="USER_BUSYBOX_FEATURE_CHAT_TTY_HIFI"/>
+						<feature name="USER_BUSYBOX_FEATURE_CHAT_IMPLICIT_CR"/>
+						<feature name="USER_BUSYBOX_FEATURE_CHAT_NOFAIL"/>
+						<feature name="USER_BUSYBOX_FEATURE_CHAT_SWALLOW_OPTS"/>
+						<feature name="USER_BUSYBOX_FEATURE_CHAT_CLR_ABORT"/>
+						<feature name="USER_BUSYBOX_FEATURE_CHAT_SEND_ESCAPES"/>
+					</and>
+					<feature name="USER_BUSYBOX_RM"/>
+					<and name="USER_BUSYBOX_FEATURE_IPV6">
+						<feature name="USER_BUSYBOX_FEATURE_PREFER_IPV4_ADDRESS"/>
+					</and>
+					<and name="USER_BUSYBOX_TEE">
+						<feature name="USER_BUSYBOX_FEATURE_TEE_USE_BLOCK_IO"/>
+					</and>
+					<feature name="USER_BUSYBOX_SETENFORCE"/>
+					<feature name="USER_BUSYBOX_KBD_MODE"/>
+					<feature name="USER_BUSYBOX_NMETER"/>
+					<and name="USER_BUSYBOX_DIFF">
+						<feature name="USER_BUSYBOX_FEATURE_DIFF_BINARY"/>
+						<feature name="USER_BUSYBOX_FEATURE_DIFF_MINIMAL"/>
+						<feature name="USER_BUSYBOX_FEATURE_DIFF_DIR"/>
+					</and>
+					<and name="USER_BUSYBOX_TOP">
+						<and name="USER_BUSYBOX_FEATURE_TOP_CPU_USAGE_PERCENTAGE">
+							<feature name="USER_BUSYBOX_FEATURE_TOP_DECIMALS"/>
+							<feature name="USER_BUSYBOX_FEATURE_TOP_CPU_GLOBAL_PERCENTS"/>
+						</and>
+						<feature name="USER_BUSYBOX_FEATURE_TOPMEM"/>
+					</and>
+					<feature name="USER_BUSYBOX_USE_BB_PWD_GRP"/>
+					<and name="USER_BUSYBOX_MODPROBE">
+						<feature name="USER_BUSYBOX_FEATURE_MODPROBE_FANCY_ALIAS"/>
+						<feature name="USER_BUSYBOX_FEATURE_MODPROBE_MULTIPLE_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_INSTALLER"/>
+					<feature name="USER_BUSYBOX_FAKEIDENTD"/>
+					<and name="USER_BUSYBOX_UMOUNT">
+						<feature name="USER_BUSYBOX_FEATURE_UMOUNT_ALL"/>
+						<feature name="USER_BUSYBOX_FEATURE_MTAB_SUPPORT"/>
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_LOOP"/>
+					</and>
+					<feature name="USER_BUSYBOX_WHO"/>
+					<feature name="USER_BUSYBOX_NOHUP"/>
+					<and name="USER_BUSYBOX_FIND">
+						<feature name="USER_BUSYBOX_FEATURE_FIND_DELETE"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_MTIME"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_NEWER"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_PRINT0"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_XDEV"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_PATH"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_INUM"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_PERM"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_CONTEXT"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_TYPE"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_DEPTH"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_REGEX"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_NOT"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_USER"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_PAREN"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_SIZE"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_PRUNE"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_EXEC"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_MMIN"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_GROUP"/>
+						<feature name="USER_BUSYBOX_FEATURE_FIND_MAXDEPTH"/>
+					</and>
+					<and name="USER_BUSYBOX_MKFS_MINIX">
+						<feature name="USER_BUSYBOX_FEATURE_MINIX2"/>
+					</and>
+					<and name="USER_BUSYBOX_ADDGROUP">
+						<feature name="USER_BUSYBOX_FEATURE_ADDUSER_TO_GROUP"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_TAR_FROM"/>
+					<feature name="USER_BUSYBOX_TFTP"/>
+					<feature name="USER_BUSYBOX_RMMOD"/>
+					<and name="USER_BUSYBOX_FBSET">
+						<feature name="USER_BUSYBOX_FEATURE_FBSET_FANCY"/>
+						<feature name="USER_BUSYBOX_FEATURE_FBSET_READMODE"/>
+					</and>
+					<and name="USER_BUSYBOX_DPKG_DEB">
+						<feature name="USER_BUSYBOX_FEATURE_DPKG_DEB_EXTRACT_ONLY"/>
+					</and>
+					<and name="USER_BUSYBOX_RMDIR">
+						<feature name="USER_BUSYBOX_FEATURE_RMDIR_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_2_6_MODULES"/>
+					<and name="USER_BUSYBOX_HUSH">
+						<feature name="USER_BUSYBOX_HUSH_IF"/>
+						<and name="USER_BUSYBOX_HUSH_INTERACTIVE">
+							<feature name="USER_BUSYBOX_HUSH_JOB"/>
+						</and>
+						<feature name="USER_BUSYBOX_HUSH_HELP"/>
+						<feature name="USER_BUSYBOX_HUSH_TICK"/>
+						<feature name="USER_BUSYBOX_HUSH_LOOPS"/>
+					</and>
+					<feature name="USER_BUSYBOX_CHVT"/>
+					<feature name="USER_BUSYBOX_LOGGER"/>
+					<feature name="USER_BUSYBOX_DNSD"/>
+					<feature name="USER_BUSYBOX_CHRT"/>
+					<feature name="USER_BUSYBOX_CHROOT"/>
+					<feature name="USER_BUSYBOX_GETSEBOOL"/>
+					<and name="USER_BUSYBOX_INSMOD">
+						<feature name="USER_BUSYBOX_FEATURE_INSMOD_KSYMOOPS_SYMBOLS"/>
+						<and name="USER_BUSYBOX_FEATURE_INSMOD_LOAD_MAP">
+							<feature name="USER_BUSYBOX_FEATURE_INSMOD_LOAD_MAP_FULL"/>
+						</and>
+						<feature name="USER_BUSYBOX_FEATURE_INSMOD_LOADINKMEM"/>
+						<feature name="USER_BUSYBOX_FEATURE_INSMOD_VERSION_CHECKING"/>
+					</and>
+					<feature name="USER_BUSYBOX_FREE"/>
+					<feature name="USER_BUSYBOX_ROUTE"/>
+					<feature name="USER_BUSYBOX_FEATURE_PIDFILE"/>
+					<feature name="USER_BUSYBOX_SVLOGD"/>
+					<feature name="USER_BUSYBOX_LPQ"/>
+					<feature name="USER_BUSYBOX_IPCS"/>
+					<alt abstract="true" mandatory="true" name="USER_BUSYBOX_INSTALL_APPLET_SYMLINKS_alt">
+						<feature mandatory="true" name="USER_BUSYBOX_INSTALL_APPLET_SYMLINKS"/>
+						<feature mandatory="true" name="USER_BUSYBOX_INSTALL_APPLET_HARDLINKS"/>
+						<feature mandatory="true" name="USER_BUSYBOX_INSTALL_APPLET_SCRIPT_WRAPPERS"/>
+						<feature mandatory="true" name="USER_BUSYBOX_INSTALL_APPLET_DONT"/>
+					</alt>
+					<feature name="USER_BUSYBOX_FOLD"/>
+					<and name="USER_BUSYBOX_MORE">
+						<feature name="USER_BUSYBOX_FEATURE_USE_TERMIOS"/>
+					</and>
+					<feature name="USER_BUSYBOX_TOUCH"/>
+					<and name="USER_BUSYBOX_PIDOF">
+						<feature name="USER_BUSYBOX_FEATURE_PIDOF_OMIT"/>
+						<feature name="USER_BUSYBOX_FEATURE_PIDOF_SINGLE"/>
+					</and>
+					<feature name="USER_BUSYBOX_HAVE_DOT_CONFIG"/>
+					<feature name="USER_BUSYBOX_NOMMU"/>
+					<and name="USER_BUSYBOX_RUN_PARTS">
+						<feature name="USER_BUSYBOX_FEATURE_RUN_PARTS_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_SHA1SUM"/>
+					<alt abstract="true" mandatory="true" name="USER_BUSYBOX_INSTALL_SH_APPLET_HARDLINK_alt">
+						<feature mandatory="true" name="USER_BUSYBOX_INSTALL_SH_APPLET_SYMLINK"/>
+						<feature mandatory="true" name="USER_BUSYBOX_INSTALL_SH_APPLET_HARDLINK"/>
+						<feature mandatory="true" name="USER_BUSYBOX_INSTALL_SH_APPLET_SCRIPT_WRAPPER"/>
+					</alt>
+					<feature name="USER_BUSYBOX_IPTUNNEL"/>
+					<and name="USER_BUSYBOX_TELNETD">
+						<feature name="USER_BUSYBOX_FEATURE_TELNETD_STANDALONE"/>
+					</and>
+					<and name="USER_BUSYBOX_CROND">
+						<feature name="USER_BUSYBOX_DEBUG_CROND_OPTION"/>
+						<feature name="USER_BUSYBOX_FEATURE_CROND_CALL_SENDMAIL"/>
+					</and>
+					<feature name="USER_BUSYBOX_IPROUTE"/>
+					<feature name="USER_BUSYBOX_YES"/>
+					<feature name="USER_BUSYBOX_FEATURE_DEVFS"/>
+					<feature name="USER_BUSYBOX_FEATURE_TAR_UNAME_GNAME"/>
+					<alt abstract="true" mandatory="true" name="USER_BUSYBOX_DMALLOC_alt">
+						<feature mandatory="true" name="USER_BUSYBOX_NO_DEBUG_LIB"/>
+						<feature mandatory="true" name="USER_BUSYBOX_DMALLOC"/>
+						<feature mandatory="true" name="USER_BUSYBOX_EFENCE"/>
+					</alt>
+					<and name="USER_BUSYBOX_GREP">
+						<feature name="USER_BUSYBOX_FEATURE_GREP_FGREP_ALIAS"/>
+						<feature name="USER_BUSYBOX_FEATURE_GREP_CONTEXT"/>
+						<feature name="USER_BUSYBOX_FEATURE_GREP_EGREP_ALIAS"/>
+					</and>
+					<and name="USER_BUSYBOX_DATE">
+						<feature name="USER_BUSYBOX_FEATURE_DATE_ISOFMT"/>
+					</and>
+					<feature name="USER_BUSYBOX_UNCOMPRESS"/>
+					<feature name="USER_BUSYBOX_FSCK"/>
+					<and name="USER_BUSYBOX_BRCTL">
+						<feature name="USER_BUSYBOX_FEATURE_BRCTL_FANCY"/>
+					</and>
+					<and name="USER_BUSYBOX_VI">
+						<feature name="USER_BUSYBOX_FEATURE_VI_COLON"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_READONLY"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_8BIT"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_YANKMARK"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_WIN_RESIZE"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_SET"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_SETOPTS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_DOT_CMD"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_USE_SIGNALS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_OPTIMIZE_CURSOR"/>
+						<feature name="USER_BUSYBOX_FEATURE_VI_SEARCH"/>
+						<feature name="USER_BUSYBOX_FEATURE_ALLOW_EXEC"/>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_VI_MAX_LEN"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_PREFER_APPLETS"/>
+					<and name="USER_BUSYBOX_SU">
+						<feature name="USER_BUSYBOX_FEATURE_SU_SYSLOG"/>
+						<feature name="USER_BUSYBOX_FEATURE_SU_CHECKS_SHELLS"/>
+					</and>
+					<and name="USER_BUSYBOX_ENV">
+						<feature name="USER_BUSYBOX_FEATURE_ENV_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_SOFTLIMIT"/>
+					<feature name="USER_BUSYBOX_ENVUIDGID"/>
+					<feature name="USER_BUSYBOX_FEATURE_TAR_OLDGNU_COMPATIBILITY"/>
+					<feature name="USER_BUSYBOX_UUENCODE"/>
+					<feature name="USER_BUSYBOX_KLOGD"/>
+					<feature name="USER_BUSYBOX_MOUNTPOINT"/>
+					<and name="USER_BUSYBOX_LS">
+						<feature name="USER_BUSYBOX_FEATURE_LS_USERNAME"/>
+						<feature name="USER_BUSYBOX_FEATURE_LS_RECURSIVE"/>
+						<feature name="USER_BUSYBOX_FEATURE_LS_TIMESTAMPS"/>
+						<feature name="USER_BUSYBOX_FEATURE_LS_FOLLOWLINKS"/>
+						<feature name="USER_BUSYBOX_FEATURE_LS_FILETYPES"/>
+						<feature name="USER_BUSYBOX_FEATURE_LS_SORTFILES"/>
+						<and name="USER_BUSYBOX_FEATURE_LS_COLOR">
+							<feature name="USER_BUSYBOX_FEATURE_LS_COLOR_IS_DEFAULT"/>
+						</and>
+					</and>
+					<feature name="USER_BUSYBOX_RTCWAKE"/>
+					<and name="USER_BUSYBOX_APP_UDHCPC">
+						<feature mandatory="true" name="USER_BUSYBOX_UDHCPC_SLACK_FOR_BUGGY_SERVERS"/>
+						<feature name="USER_BUSYBOX_FEATURE_UDHCP_PORT"/>
+						<feature name="USER_BUSYBOX_FEATURE_UDHCP_DEBUG"/>
+						<feature name="USER_BUSYBOX_FEATURE_UDHCPC_ARPING"/>
+						<feature mandatory="true" name="USER_BUSYBOX_DHCPC_DEFAULT_SCRIPT"/>
+						<feature name="USER_BUSYBOX_FEATURE_RFC3397"/>
+					</and>
+					<and name="USER_BUSYBOX_WC">
+						<feature name="USER_BUSYBOX_FEATURE_WC_LARGE"/>
+					</and>
+					<feature name="USER_BUSYBOX_LOGNAME"/>
+					<feature name="USER_BUSYBOX_CAT"/>
+					<feature name="USER_BUSYBOX_SULOGIN"/>
+					<feature name="USER_BUSYBOX_GETOPT"/>
+					<and name="USER_BUSYBOX_INIT">
+						<and name="USER_BUSYBOX_FEATURE_USE_INITTAB">
+							<and name="USER_BUSYBOX_FEATURE_KILL_REMOVED">
+								<feature mandatory="true" name="USER_BUSYBOX_FEATURE_KILL_DELAY"/>
+							</and>
+						</and>
+						<feature name="USER_BUSYBOX_FEATURE_EXTRA_QUIET"/>
+						<feature name="USER_BUSYBOX_FEATURE_INIT_COREDUMPS"/>
+						<feature name="USER_BUSYBOX_FEATURE_INIT_SCTTY"/>
+						<feature name="USER_BUSYBOX_DEBUG_INIT"/>
+						<feature name="USER_BUSYBOX_FEATURE_INITRD"/>
+						<feature name="USER_BUSYBOX_FEATURE_INIT_SYSLOG"/>
+					</and>
+					<and name="USER_BUSYBOX_UNEXPAND">
+						<feature name="USER_BUSYBOX_FEATURE_UNEXPAND_LONG_OPTIONS"/>
+					</and>
+					<and name="USER_BUSYBOX_ASH">
+						<feature name="USER_BUSYBOX_ASH_RANDOM_SUPPORT"/>
+						<feature name="USER_BUSYBOX_ASH_JOB_CONTROL"/>
+						<feature name="USER_BUSYBOX_ASH_READ_NCHARS"/>
+						<feature name="USER_BUSYBOX_ASH_BUILTIN_TEST"/>
+						<feature name="USER_BUSYBOX_ASH_EXPAND_PRMT"/>
+						<feature name="USER_BUSYBOX_ASH_CMDCMD"/>
+						<feature name="USER_BUSYBOX_ASH_ALIAS"/>
+						<and name="USER_BUSYBOX_ASH_MATH_SUPPORT">
+							<feature name="USER_BUSYBOX_ASH_MATH_SUPPORT_64"/>
+						</and>
+						<feature name="USER_BUSYBOX_ASH_OPTIMIZE_FOR_SIZE"/>
+						<feature name="USER_BUSYBOX_ASH_READ_TIMEOUT"/>
+						<feature name="USER_BUSYBOX_ASH_GETOPTS"/>
+						<feature name="USER_BUSYBOX_ASH_MAIL"/>
+						<feature name="USER_BUSYBOX_ASH_BUILTIN_ECHO"/>
+					</and>
+					<and name="USER_BUSYBOX_TR">
+						<feature name="USER_BUSYBOX_FEATURE_TR_EQUIV"/>
+						<feature name="USER_BUSYBOX_FEATURE_TR_CLASSES"/>
+					</and>
+					<and name="USER_BUSYBOX_DELGROUP">
+						<feature name="USER_BUSYBOX_FEATURE_DEL_USER_FROM_GROUP"/>
+					</and>
+					<feature name="USER_BUSYBOX_UUDECODE"/>
+					<feature name="USER_BUSYBOX_PGREP"/>
+					<feature name="USER_BUSYBOX_MT"/>
+					<feature name="USER_BUSYBOX_DEBUG_TFTP"/>
+					<feature name="USER_BUSYBOX_CHOWN"/>
+					<and name="USER_BUSYBOX_FEATURE_SUID">
+						<and name="USER_BUSYBOX_FEATURE_SUID_CONFIG">
+							<feature name="USER_BUSYBOX_FEATURE_SUID_CONFIG_QUIET"/>
+						</and>
+					</and>
+					<feature mandatory="true" name="USER_BUSYBOX_BUSYBOX_EXEC_PATH"/>
+					<feature name="USER_BUSYBOX_FEATURE_HUMAN_READABLE"/>
+					<and name="USER_BUSYBOX_IPCALC">
+						<feature name="USER_BUSYBOX_FEATURE_IPCALC_LONG_OPTIONS"/>
+						<feature name="USER_BUSYBOX_FEATURE_IPCALC_FANCY"/>
+					</and>
+					<feature name="USER_BUSYBOX_TTY"/>
+					<feature name="USER_BUSYBOX_UDPSVD"/>
+					<feature name="USER_BUSYBOX_LOCALE_SUPPORT"/>
+					<feature name="USER_BUSYBOX_MICROCOM"/>
+					<feature name="USER_BUSYBOX_VLOCK"/>
+					<and name="USER_BUSYBOX_NAMEIF">
+						<feature name="USER_BUSYBOX_FEATURE_NAMEIF_EXTENDED"/>
+					</and>
+					<feature name="USER_BUSYBOX_LPR"/>
+					<feature name="USER_BUSYBOX_FEATURE_SYSLOG"/>
+					<feature name="USER_BUSYBOX_TCPSVD"/>
+					<feature name="USER_BUSYBOX_RX"/>
+					<feature name="USER_BUSYBOX_SELINUXENABLED"/>
+					<feature name="USER_BUSYBOX_FUSER"/>
+					<and name="USER_BUSYBOX_IP">
+						<feature name="USER_BUSYBOX_FEATURE_IP_TUNNEL"/>
+						<feature name="USER_BUSYBOX_FEATURE_IP_ROUTE"/>
+						<feature name="USER_BUSYBOX_FEATURE_IP_ADDRESS"/>
+						<feature name="USER_BUSYBOX_FEATURE_IP_RARE_PROTOCOLS"/>
+						<feature name="USER_BUSYBOX_FEATURE_IP_RULE"/>
+						<feature name="USER_BUSYBOX_FEATURE_IP_LINK"/>
+						<feature name="USER_BUSYBOX_FEATURE_IP_SHORT_FORMS"/>
+					</and>
+					<feature name="USER_BUSYBOX_SUM"/>
+					<feature name="USER_BUSYBOX_LN"/>
+					<feature name="USER_BUSYBOX_ADJTIMEX"/>
+					<feature name="USER_BUSYBOX_PRINTF"/>
+					<and name="USER_BUSYBOX_DOS2UNIX">
+						<feature name="USER_BUSYBOX_UNIX2DOS"/>
+					</and>
+					<feature name="USER_BUSYBOX_TRUE"/>
+					<feature name="USER_BUSYBOX_READPROFILE"/>
+					<and name="USER_BUSYBOX_INSTALL">
+						<feature name="USER_BUSYBOX_FEATURE_INSTALL_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_DEBUG"/>
+					<feature name="USER_BUSYBOX_SETKEYCODES"/>
+					<and name="USER_BUSYBOX_SYSLOGD">
+						<and name="USER_BUSYBOX_FEATURE_IPC_SYSLOG">
+							<feature mandatory="true" name="USER_BUSYBOX_FEATURE_IPC_SYSLOG_BUFFER_SIZE"/>
+							<and name="USER_BUSYBOX_LOGREAD">
+								<feature name="USER_BUSYBOX_FEATURE_LOGREAD_REDUCED_LOCKING"/>
+							</and>
+						</and>
+						<feature name="USER_BUSYBOX_FEATURE_ROTATE_LOGFILE"/>
+						<feature name="USER_BUSYBOX_FEATURE_REMOTE_LOG"/>
+						<feature name="USER_BUSYBOX_FEATURE_SYSLOGD_DUP"/>
+					</and>
+					<feature name="USER_BUSYBOX_DEALLOCVT"/>
+					<feature name="USER_BUSYBOX_WHOAMI"/>
+					<feature name="USER_BUSYBOX_CATV"/>
+					<and name="USER_BUSYBOX_HEAD">
+						<feature name="USER_BUSYBOX_FEATURE_FANCY_HEAD"/>
+					</and>
+					<and name="USER_BUSYBOX_MKSWAP">
+						<feature name="USER_BUSYBOX_FEATURE_MKSWAP_V0"/>
+					</and>
+					<and name="USER_BUSYBOX_DMESG">
+						<feature name="USER_BUSYBOX_FEATURE_DMESG_PRETTY"/>
+					</and>
+					<and name="USER_BUSYBOX_TFTPD">
+						<feature name="USER_BUSYBOX_FEATURE_TFTP_GET"/>
+						<feature name="USER_BUSYBOX_FEATURE_TFTP_BLOCKSIZE"/>
+						<feature name="USER_BUSYBOX_FEATURE_TFTP_PUT"/>
+					</and>
+					<feature name="USER_BUSYBOX_FALSE"/>
+					<feature name="USER_BUSYBOX_WATCHDOGD"/>
+					<feature name="USER_BUSYBOX_FEATURE_QUERY_MODULE_INTERFACE"/>
+					<feature name="USER_BUSYBOX_LOAD_POLICY"/>
+					<feature name="USER_BUSYBOX_ARP"/>
+					<and name="USER_BUSYBOX_LSMOD">
+						<feature name="USER_BUSYBOX_FEATURE_LSMOD_PRETTY_2_6_OUTPUT"/>
+					</and>
+					<alt abstract="true" mandatory="true" name="USER_BUSYBOX_FEATURE_BUFFERS_USE_MALLOC_alt">
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_BUFFERS_USE_MALLOC"/>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_BUFFERS_GO_ON_STACK"/>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_BUFFERS_GO_IN_BSS"/>
+					</alt>
+					<feature name="USER_BUSYBOX_SYNC"/>
+					<feature name="USER_BUSYBOX_FTPGET"/>
+					<feature name="USER_BUSYBOX_FINDFS"/>
+					<feature name="USER_BUSYBOX_TTYSIZE"/>
+					<feature name="USER_BUSYBOX_HD"/>
+					<feature mandatory="true" name="USER_BUSYBOX_FEATURE_COPYBUF_KB"/>
+					<feature name="USER_BUSYBOX_RESET"/>
+					<and name="USER_BUSYBOX_TAIL">
+						<feature name="USER_BUSYBOX_FEATURE_FANCY_TAIL"/>
+					</and>
+					<and name="USER_BUSYBOX_RPM">
+						<feature name="USER_BUSYBOX_FEATURE_RPM_BZ2"/>
+					</and>
+					<and name="USER_BUSYBOX_HTTPD">
+						<and name="USER_BUSYBOX_FEATURE_HTTPD_CGI">
+							<feature name="USER_BUSYBOX_FEATURE_HTTPD_SET_REMOTE_PORT_TO_ENV"/>
+							<feature name="USER_BUSYBOX_FEATURE_HTTPD_CONFIG_WITH_SCRIPT_INTERPR"/>
+						</and>
+						<feature name="USER_BUSYBOX_FEATURE_HTTPD_ERROR_PAGES"/>
+						<feature name="USER_BUSYBOX_FEATURE_HTTPD_RELOAD_CONFIG_SIGHUP"/>
+						<feature name="USER_BUSYBOX_FEATURE_HTTPD_ENCODE_URL_STR"/>
+						<and name="USER_BUSYBOX_FEATURE_HTTPD_BASIC_AUTH">
+							<feature name="USER_BUSYBOX_FEATURE_HTTPD_AUTH_MD5"/>
+						</and>
+						<feature name="USER_BUSYBOX_FEATURE_HTTPD_PROXY"/>
+						<feature name="USER_BUSYBOX_FEATURE_HTTPD_SETUID"/>
+						<feature name="USER_BUSYBOX_FEATURE_HTTPD_RANGES"/>
+						<feature name="USER_BUSYBOX_FEATURE_HTTPD_USE_SENDFILE"/>
+						<feature name="USER_BUSYBOX_FEATURE_HTTPD_CONFIG_WITH_MIME_TYPES"/>
+					</and>
+					<feature name="USER_BUSYBOX_VERBOSE_RESOLUTION_ERRORS"/>
+					<and name="USER_BUSYBOX_FTPPUT">
+						<feature name="USER_BUSYBOX_FEATURE_FTPGETPUT_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_DEB_TAR_LZMA"/>
+					<feature name="USER_BUSYBOX_FDFLUSH"/>
+					<and name="USER_BUSYBOX_TEST">
+						<feature name="USER_BUSYBOX_FEATURE_TEST_64"/>
+					</and>
+					<and name="USER_BUSYBOX_EXPAND">
+						<feature name="USER_BUSYBOX_FEATURE_EXPAND_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_DELUSER"/>
+					<feature name="USER_BUSYBOX_SETSID"/>
+					<feature name="USER_BUSYBOX_REALPATH"/>
+					<and name="USER_BUSYBOX_DD">
+						<feature name="USER_BUSYBOX_FEATURE_DD_SIGNAL_HANDLING"/>
+						<feature name="USER_BUSYBOX_FEATURE_DD_IBS_OBS"/>
+					</and>
+					<feature name="USER_BUSYBOX_RUNSVDIR"/>
+					<and name="USER_BUSYBOX_DEVFSD">
+						<feature name="USER_BUSYBOX_DEVFSD_MODLOAD"/>
+						<feature name="USER_BUSYBOX_DEVFSD_FG_NP"/>
+						<feature name="USER_BUSYBOX_DEVFSD_VERBOSE"/>
+					</and>
+					<and name="USER_BUSYBOX_MSH">
+						<feature name="USER_BUSYBOX_FEATURE_SH_EXTRA_QUIET"/>
+						<feature name="USER_BUSYBOX_FEATURE_SH_STANDALONE"/>
+					</and>
+					<and name="USER_BUSYBOX_FDISK">
+						<and name="USER_BUSYBOX_FEATURE_FDISK_WRITABLE">
+							<feature name="USER_BUSYBOX_FEATURE_SUN_LABEL"/>
+							<feature name="USER_BUSYBOX_FEATURE_OSF_LABEL"/>
+							<feature name="USER_BUSYBOX_FEATURE_SGI_LABEL"/>
+							<feature name="USER_BUSYBOX_FEATURE_FDISK_ADVANCED"/>
+							<feature name="USER_BUSYBOX_FEATURE_AIX_LABEL"/>
+						</and>
+						<feature name="USER_BUSYBOX_FDISK_SUPPORT_LARGE_DISKS"/>
+					</and>
+					<alt abstract="true" mandatory="true" name="USER_BUSYBOX_FEATURE_SH_IS_NONE_alt">
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_SH_IS_ASH"/>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_SH_IS_HUSH"/>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_SH_IS_MSH"/>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_SH_IS_NONE"/>
+					</alt>
+					<feature name="USER_BUSYBOX_ARPING"/>
+					<feature name="USER_BUSYBOX_TIME"/>
+					<feature name="USER_BUSYBOX_NSLOOKUP"/>
+					<feature name="USER_BUSYBOX_ETHER_WAKE"/>
+					<and name="USER_BUSYBOX_TASKSET">
+						<feature name="USER_BUSYBOX_FEATURE_TASKSET_FANCY"/>
+					</and>
+					<and name="USER_BUSYBOX_CHCON">
+						<feature name="USER_BUSYBOX_FEATURE_CHCON_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_ENVDIR"/>
+					<feature name="USER_BUSYBOX_FEATURE_MD5_SHA1_SUM_CHECK"/>
+					<and name="USER_BUSYBOX_SORT">
+						<feature name="USER_BUSYBOX_FEATURE_SORT_BIG"/>
+					</and>
+					<and name="USER_BUSYBOX_IFUPDOWN">
+						<feature name="USER_BUSYBOX_FEATURE_IFUPDOWN_IPV4"/>
+						<feature name="USER_BUSYBOX_FEATURE_IFUPDOWN_MAPPING"/>
+						<feature name="USER_BUSYBOX_FEATURE_IFUPDOWN_IPV6"/>
+						<and name="USER_BUSYBOX_FEATURE_IFUPDOWN_IP">
+							<feature name="USER_BUSYBOX_FEATURE_IFUPDOWN_IP_BUILTIN"/>
+							<feature name="USER_BUSYBOX_FEATURE_IFUPDOWN_IFCONFIG_BUILTIN"/>
+						</and>
+						<feature mandatory="true" name="USER_BUSYBOX_IFUPDOWN_IFSTATE_PATH"/>
+						<feature name="USER_BUSYBOX_FEATURE_IFUPDOWN_EXTERNAL_DHCP"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_VERBOSE_CP_MESSAGE"/>
+					<feature name="USER_BUSYBOX_LOSETUP"/>
+					<and name="USER_BUSYBOX_KILL">
+						<feature name="USER_BUSYBOX_KILLALL5"/>
+						<feature name="USER_BUSYBOX_KILLALL"/>
+					</and>
+					<feature name="USER_BUSYBOX_RUNLEVEL"/>
+					<feature name="USER_BUSYBOX_LOADKMAP"/>
+					<and name="USER_BUSYBOX_TAR">
+						<feature name="USER_BUSYBOX_FEATURE_TAR_COMPRESS"/>
+						<feature name="USER_BUSYBOX_FEATURE_TAR_GZIP"/>
+						<feature name="USER_BUSYBOX_FEATURE_TAR_BZIP2"/>
+						<feature name="USER_BUSYBOX_FEATURE_TAR_CREATE"/>
+						<feature name="USER_BUSYBOX_FEATURE_TAR_LZMA"/>
+					</and>
+					<and name="USER_BUSYBOX_MAKEDEVS">
+						<alt abstract="true" mandatory="true" name="USER_BUSYBOX_FEATURE_MAKEDEVS_LEAF_alt">
+							<feature mandatory="true" name="USER_BUSYBOX_FEATURE_MAKEDEVS_LEAF"/>
+							<feature mandatory="true" name="USER_BUSYBOX_FEATURE_MAKEDEVS_TABLE"/>
+						</alt>
+					</and>
+					<and name="USER_BUSYBOX_MDEV">
+						<and name="USER_BUSYBOX_FEATURE_MDEV_CONF">
+							<feature name="USER_BUSYBOX_FEATURE_MDEV_EXEC"/>
+							<feature name="USER_BUSYBOX_FEATURE_MDEV_RENAME"/>
+						</and>
+						<feature name="USER_BUSYBOX_FEATURE_MDEV_LOAD_FIRMWARE"/>
+					</and>
+					<and name="USER_BUSYBOX_FEATURE_EDITING">
+						<feature name="USER_BUSYBOX_FEATURE_EDITING_SAVEHISTORY"/>
+						<and name="USER_BUSYBOX_FEATURE_TAB_COMPLETION">
+							<feature name="USER_BUSYBOX_FEATURE_USERNAME_COMPLETION"/>
+						</and>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_EDITING_MAX_LEN"/>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_EDITING_HISTORY"/>
+						<feature name="USER_BUSYBOX_FEATURE_EDITING_VI"/>
+						<feature name="USER_BUSYBOX_FEATURE_EDITING_FANCY_PROMPT"/>
+					</and>
+					<and name="USER_BUSYBOX_BUILD_LIBBUSYBOX">
+						<feature name="USER_BUSYBOX_FEATURE_SHARED_BUSYBOX"/>
+						<feature name="USER_BUSYBOX_FEATURE_INDIVIDUAL"/>
+					</and>
+					<feature name="USER_BUSYBOX_ID"/>
+					<feature name="USER_BUSYBOX_LASH"/>
+					<and name="USER_BUSYBOX_HEXDUMP">
+						<feature name="USER_BUSYBOX_FEATURE_HEXDUMP_REVERSE"/>
+					</and>
+					<feature name="USER_BUSYBOX_BB_SYSCTL"/>
+					<and name="USER_BUSYBOX_PASSWD">
+						<feature name="USER_BUSYBOX_FEATURE_PASSWD_WEAK_CHECK"/>
+					</and>
+					<feature name="USER_BUSYBOX_NITPICK"/>
+					<feature name="USER_BUSYBOX_ZCIP"/>
+					<feature name="USER_BUSYBOX_IPLINK"/>
+					<feature name="USER_BUSYBOX_PWD"/>
+					<feature name="USER_BUSYBOX_CRYPTPW"/>
+					<feature name="USER_BUSYBOX_STRINGS"/>
+					<feature name="USER_BUSYBOX_FEATURE_CHECK_NAMES"/>
+					<feature name="USER_BUSYBOX_FEATURE_CHECK_TAINTED_MODULE"/>
+					<feature name="USER_BUSYBOX_DESKTOP"/>
+					<and name="USER_BUSYBOX_PING">
+						<feature name="USER_BUSYBOX_FEATURE_FANCY_PING"/>
+						<feature name="USER_BUSYBOX_PING6"/>
+					</and>
+					<feature name="USER_BUSYBOX_HOSTID"/>
+					<and name="USER_BUSYBOX_LOGIN">
+						<feature name="USER_BUSYBOX_FEATURE_NOLOGIN"/>
+						<feature name="USER_BUSYBOX_LOGIN_SCRIPTS"/>
+						<feature name="USER_BUSYBOX_FEATURE_SECURETTY"/>
+						<feature name="USER_BUSYBOX_PAM"/>
+					</and>
+					<and name="USER_BUSYBOX_INETD">
+						<feature name="USER_BUSYBOX_FEATURE_INETD_SUPPORT_BUILTIN_TIME"/>
+						<feature name="USER_BUSYBOX_FEATURE_INETD_RPC"/>
+						<feature name="USER_BUSYBOX_FEATURE_INETD_SUPPORT_BUILTIN_DISCARD"/>
+						<feature name="USER_BUSYBOX_FEATURE_INETD_SUPPORT_BUILTIN_DAYTIME"/>
+						<feature name="USER_BUSYBOX_FEATURE_INETD_SUPPORT_BUILTIN_ECHO"/>
+						<feature name="USER_BUSYBOX_FEATURE_INETD_SUPPORT_BUILTIN_CHARGEN"/>
+					</and>
+					<feature name="USER_BUSYBOX_SETLOGCONS"/>
+					<feature name="USER_BUSYBOX_WHICH"/>
+					<feature name="USER_BUSYBOX_OPENVT"/>
+					<and name="USER_BUSYBOX_EJECT">
+						<feature name="USER_BUSYBOX_FEATURE_EJECT_SCSI"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_CLEAN_UP"/>
+					<feature name="USER_BUSYBOX_INCLUDE_SUSv2"/>
+					<and name="USER_BUSYBOX_LESS">
+						<feature name="USER_BUSYBOX_FEATURE_LESS_BRACKETS"/>
+						<feature name="USER_BUSYBOX_FEATURE_LESS_FLAGCS"/>
+						<feature name="USER_BUSYBOX_FEATURE_LESS_FLAGS"/>
+						<feature name="USER_BUSYBOX_FEATURE_LESS_MARKS"/>
+						<feature mandatory="true" name="USER_BUSYBOX_FEATURE_LESS_MAXLINES"/>
+						<feature name="USER_BUSYBOX_FEATURE_LESS_REGEXP"/>
+					</and>
+					<feature name="USER_BUSYBOX_INSTALL_NO_USR"/>
+					<feature name="USER_BUSYBOX_LFS"/>
+					<feature name="USER_BUSYBOX_BASENAME"/>
+					<feature name="USER_BUSYBOX_FEATURE_DEVPTS"/>
+					<feature name="USER_BUSYBOX_FETCHMAIL"/>
+					<feature name="USER_BUSYBOX_HOSTNAME"/>
+					<and name="USER_BUSYBOX_ADDUSER">
+						<feature name="USER_BUSYBOX_FEATURE_ADDUSER_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_HAVE_RPC"/>
+					<feature name="USER_BUSYBOX_LENGTH"/>
+					<and name="USER_BUSYBOX_HDPARM">
+						<feature name="USER_BUSYBOX_FEATURE_HDPARM_HDIO_SCAN_HWIF"/>
+						<feature name="USER_BUSYBOX_FEATURE_HDPARM_GET_IDENTITY"/>
+						<feature name="USER_BUSYBOX_FEATURE_HDPARM_HDIO_GETSET_DMA"/>
+						<feature name="USER_BUSYBOX_FEATURE_HDPARM_HDIO_UNREGISTER_HWIF"/>
+						<feature name="USER_BUSYBOX_FEATURE_HDPARM_HDIO_TRISTATE_HWIF"/>
+						<feature name="USER_BUSYBOX_FEATURE_HDPARM_HDIO_DRIVE_RESET"/>
+					</and>
+					<feature name="USER_BUSYBOX_SEQ"/>
+					<feature name="USER_BUSYBOX_FEATURE_PRESERVE_HARDLINKS"/>
+					<feature name="USER_BUSYBOX_DPKG"/>
+					<feature name="USER_BUSYBOX_UNIQ"/>
+					<and name="USER_BUSYBOX_APP_UDHCPD">
+						<feature name="USER_BUSYBOX_APP_DHCPRELAY"/>
+						<feature mandatory="true" name="USER_BUSYBOX_DHCPD_LEASES_FILE"/>
+						<feature name="USER_BUSYBOX_FEATURE_UDHCPD_WRITE_LEASES_EARLY"/>
+						<feature name="USER_BUSYBOX_APP_DUMPLEASES"/>
+					</and>
+					<feature name="USER_BUSYBOX_READAHEAD"/>
+					<and name="USER_BUSYBOX_SETFILES">
+						<feature name="USER_BUSYBOX_FEATURE_SETFILES_CHECK_OPTION"/>
+					</and>
+					<feature name="USER_BUSYBOX_UPTIME"/>
+					<feature name="USER_BUSYBOX_UNAME"/>
+					<feature name="USER_BUSYBOX_CAL"/>
+					<feature name="USER_BUSYBOX_UNZIP"/>
+					<feature name="USER_BUSYBOX_SWAPONOFF"/>
+					<feature name="USER_BUSYBOX_SESTATUS"/>
+					<feature name="USER_BUSYBOX_FEATURE_TAR_GNU_EXTENSIONS"/>
+					<feature name="USER_BUSYBOX_BUNZIP2"/>
+					<feature name="USER_BUSYBOX_FEATURE_VERBOSE_USAGE"/>
+					<feature name="USER_BUSYBOX_SETARCH"/>
+					<feature name="USER_BUSYBOX_SETSEBOOL"/>
+					<feature name="USER_BUSYBOX_FEATURE_DEB_TAR_GZ"/>
+					<feature name="USER_BUSYBOX_CHATTR"/>
+					<feature name="USER_BUSYBOX_RESTORECON"/>
+					<feature name="USER_BUSYBOX_SCRIPT"/>
+					<feature name="USER_BUSYBOX_SETUIDGID"/>
+					<feature name="USER_BUSYBOX_TAC"/>
+					<feature name="USER_BUSYBOX_LPD"/>
+					<and name="USER_BUSYBOX_MV">
+						<feature name="USER_BUSYBOX_FEATURE_MV_LONG_OPTIONS"/>
+					</and>
+					<and name="USER_BUSYBOX_SLEEP">
+						<feature name="USER_BUSYBOX_FEATURE_FANCY_SLEEP"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_UNARCHIVE_TAPE"/>
+					<feature name="USER_BUSYBOX_FEATURE_TAR_OLDSUN_COMPATIBILITY"/>
+					<feature name="USER_BUSYBOX_CHGRP"/>
+					<feature name="USER_BUSYBOX_FDFORMAT"/>
+					<feature name="USER_BUSYBOX_SLATTACH"/>
+					<feature name="USER_BUSYBOX_SED"/>
+					<feature name="USER_BUSYBOX_MATCHPATHCON"/>
+					<feature name="USER_BUSYBOX_FREERAMDISK"/>
+					<and name="USER_BUSYBOX_READLINK">
+						<feature name="USER_BUSYBOX_FEATURE_READLINK_FOLLOW"/>
+					</and>
+					<feature name="USER_BUSYBOX_FSCK_MINIX"/>
+					<and name="USER_BUSYBOX_IFCONFIG">
+						<feature name="USER_BUSYBOX_FEATURE_IFCONFIG_HW"/>
+						<feature name="USER_BUSYBOX_FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ"/>
+						<feature name="USER_BUSYBOX_FEATURE_IFCONFIG_SLIP"/>
+						<feature name="USER_BUSYBOX_FEATURE_IFCONFIG_STATUS"/>
+						<feature name="USER_BUSYBOX_FEATURE_IFCONFIG_BROADCAST_PLUS"/>
+					</and>
+					<and name="USER_BUSYBOX_ECHO">
+						<feature name="USER_BUSYBOX_FEATURE_FANCY_ECHO"/>
+					</and>
+					<feature name="USER_BUSYBOX_STATIC"/>
+					<and name="USER_BUSYBOX_GETTY">
+						<feature name="USER_BUSYBOX_FEATURE_WTMP"/>
+						<feature name="USER_BUSYBOX_FEATURE_UTMP"/>
+					</and>
+					<feature name="USER_BUSYBOX_SHOW_USAGE"/>
+					<feature name="USER_BUSYBOX_CLEAR"/>
+					<feature name="USER_BUSYBOX_SELINUX"/>
+					<feature name="USER_BUSYBOX_CPIO"/>
+					<feature name="USER_BUSYBOX_CHPST"/>
+					<feature name="USER_BUSYBOX_GETENFORCE"/>
+					<feature name="USER_BUSYBOX_DC"/>
+					<feature name="USER_BUSYBOX_MKFIFO"/>
+					<and name="USER_BUSYBOX_EXPR">
+						<feature name="USER_BUSYBOX_EXPR_MATH_SUPPORT_64"/>
+					</and>
+					<feature name="USER_BUSYBOX_RENICE"/>
+					<and name="USER_BUSYBOX_RESIZE">
+						<feature name="USER_BUSYBOX_FEATURE_RESIZE_PRINT"/>
+					</and>
+					<feature name="USER_BUSYBOX_ED"/>
+					<feature mandatory="true" name="USER_BUSYBOX_PASSWORD_MINLEN"/>
+					<feature name="USER_BUSYBOX_MONOTONIC_SYSCALL"/>
+					<and name="USER_BUSYBOX_MOUNT">
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_VERBOSE"/>
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_FSTAB"/>
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_CIFS"/>
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_NFS"/>
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_FAKE"/>
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_LABEL"/>
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_HELPERS"/>
+						<feature name="USER_BUSYBOX_FEATURE_MOUNT_FLAGS"/>
+					</and>
+					<feature name="USER_BUSYBOX_IFENSLAVE"/>
+					<feature name="USER_BUSYBOX_MKTEMP"/>
+					<and name="USER_BUSYBOX_SPLIT">
+						<feature name="USER_BUSYBOX_FEATURE_SPLIT_FANCY"/>
+					</and>
+					<and name="USER_BUSYBOX_TRACEROUTE">
+						<feature name="USER_BUSYBOX_FEATURE_TRACEROUTE_USE_ICMP"/>
+						<feature name="USER_BUSYBOX_FEATURE_TRACEROUTE_SOURCE_ROUTE"/>
+						<feature name="USER_BUSYBOX_FEATURE_TRACEROUTE_VERBOSE"/>
+					</and>
+					<feature name="USER_BUSYBOX_IOCTL_HEX2STR_ERROR"/>
+					<feature name="USER_BUSYBOX_GZIP"/>
+					<and name="USER_BUSYBOX_VOLUMEID">
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_LINUXSWAP"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_EXT"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_REISERFS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_UDF"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_LINUXRAID"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_JFS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_ISO9660"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_LUKS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_SYSV"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_OCFS2"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_ROMFS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_FAT"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_CRAMFS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_NTFS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_XFS"/>
+						<feature name="USER_BUSYBOX_FEATURE_VOLUMEID_HFS"/>
+					</and>
+					<and name="USER_BUSYBOX_START_STOP_DAEMON">
+						<feature name="USER_BUSYBOX_FEATURE_START_STOP_DAEMON_FANCY"/>
+						<feature name="USER_BUSYBOX_FEATURE_START_STOP_DAEMON_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_USLEEP"/>
+					<and name="USER_BUSYBOX_UNLZMA">
+						<feature name="USER_BUSYBOX_FEATURE_LZMA_FAST"/>
+					</and>
+					<feature name="USER_BUSYBOX_STTY"/>
+					<feature name="USER_BUSYBOX_OD"/>
+					<feature name="USER_BUSYBOX_MKNOD"/>
+					<and name="USER_BUSYBOX_HWCLOCK">
+						<feature name="USER_BUSYBOX_FEATURE_HWCLOCK_ADJTIME_FHS"/>
+						<feature name="USER_BUSYBOX_FEATURE_HWCLOCK_LONG_OPTIONS"/>
+					</and>
+					<and name="USER_BUSYBOX_FEATURE_SHADOWPASSWDS">
+						<feature name="USER_BUSYBOX_USE_BB_SHADOW"/>
+					</and>
+					<feature name="USER_BUSYBOX_RUNSV"/>
+					<feature name="USER_BUSYBOX_DUMPKMAP"/>
+					<feature name="USER_BUSYBOX_CUT"/>
+					<feature name="USER_BUSYBOX_PIVOT_ROOT"/>
+					<and name="USER_BUSYBOX_NETSTAT">
+						<feature name="USER_BUSYBOX_FEATURE_NETSTAT_WIDE"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_TAR_AUTODETECT"/>
+					<and name="USER_BUSYBOX_AWK">
+						<feature name="USER_BUSYBOX_FEATURE_AWK_MATH"/>
+					</and>
+					<feature name="USER_BUSYBOX_WERROR"/>
+					<feature name="USER_BUSYBOX_PATCH"/>
+					<feature name="USER_BUSYBOX_FEATURE_FAST_TOP"/>
+					<feature name="USER_BUSYBOX_LAST"/>
+					<feature name="USER_BUSYBOX_CTTYHACK"/>
+					<and name="USER_BUSYBOX_WGET">
+						<feature name="USER_BUSYBOX_FEATURE_WGET_LONG_OPTIONS"/>
+						<feature name="USER_BUSYBOX_FEATURE_WGET_STATUSBAR"/>
+						<feature name="USER_BUSYBOX_FEATURE_WGET_AUTHENTICATION"/>
+					</and>
+					<and name="USER_BUSYBOX_MKDIR">
+						<feature name="USER_BUSYBOX_FEATURE_MKDIR_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_COMM"/>
+					<feature name="USER_BUSYBOX_SENDMAIL"/>
+					<and name="USER_BUSYBOX_SETCONSOLE">
+						<feature name="USER_BUSYBOX_FEATURE_SETCONSOLE_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_2_4_MODULES"/>
+					<feature name="USER_BUSYBOX_NICE"/>
+					<feature name="USER_BUSYBOX_CMP"/>
+					<feature name="USER_BUSYBOX_HALT"/>
+					<feature name="USER_BUSYBOX_PIPE_PROGRESS"/>
+					<feature name="USER_BUSYBOX_PKILL"/>
+					<feature name="USER_BUSYBOX_CKSUM"/>
+					<feature name="USER_BUSYBOX_PRINTENV"/>
+					<feature name="USER_BUSYBOX_FEATURE_TAR_LONG_OPTIONS"/>
+					<feature name="USER_BUSYBOX_PSCAN"/>
+					<and name="USER_BUSYBOX_NC">
+						<feature name="USER_BUSYBOX_NC_EXTRA"/>
+						<feature name="USER_BUSYBOX_NC_SERVER"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_ETC_NETWORKS"/>
+					<feature name="USER_BUSYBOX_CHMOD"/>
+					<feature name="USER_BUSYBOX_MD5SUM"/>
+					<and name="USER_BUSYBOX_STAT">
+						<feature name="USER_BUSYBOX_FEATURE_STAT_FORMAT"/>
+					</and>
+					<feature name="USER_BUSYBOX_GETOPT_LONG"/>
+					<feature mandatory="true" name="USER_BUSYBOX_MD5_SIZE_VS_SPEED"/>
+					<feature name="USER_BUSYBOX_FEATURE_COMPRESS_USAGE"/>
+					<feature name="FEATURE_RUN_PARTS_FANCY"/>
+					<feature name="USER_BUSYBOX_SWITCH_ROOT"/>
+					<feature name="USER_BUSYBOX_RDATE"/>
+					<feature name="USER_BUSYBOX_BBCONFIG"/>
+					<and name="USER_BUSYBOX_RUNCON">
+						<feature name="USER_BUSYBOX_FEATURE_RUNCON_LONG_OPTIONS"/>
+					</and>
+					<feature name="USER_BUSYBOX_FEATURE_AUTOWIDTH"/>
+					<feature name="USER_BUSYBOX_FEATURE_DEB_TAR_BZ2"/>
+					<feature name="USER_BUSYBOX_LOADFONT"/>
+					<feature name="USER_BUSYBOX_CHPASSWD"/>
+					<feature name="USER_BUSYBOX_IPRULE"/>
+					<and name="USER_BUSYBOX_DU">
+						<feature name="USER_BUSYBOX_FEATURE_DU_DEFAULT_BLOCKSIZE_1K"/>
+					</and>
+					<and name="USER_BUSYBOX_XARGS">
+						<feature name="USER_BUSYBOX_FEATURE_XARGS_SUPPORT_TERMOPT"/>
+						<feature name="USER_BUSYBOX_FEATURE_XARGS_SUPPORT_ZERO_TERM"/>
+						<feature name="USER_BUSYBOX_FEATURE_XARGS_SUPPORT_QUOTES"/>
+						<feature name="USER_BUSYBOX_FEATURE_XARGS_SUPPORT_CONFIRMATION"/>
+					</and>
+					<feature name="USER_BUSYBOX_RAIDAUTORUN"/>
+					<feature mandatory="true" name="USER_BUSYBOX_PREFIX"/>
+					<and name="USER_BUSYBOX_TELNET">
+						<feature name="USER_BUSYBOX_FEATURE_TELNET_AUTOLOGIN"/>
+						<feature name="USER_BUSYBOX_FEATURE_TELNET_TTYPE"/>
+					</and>
+					<feature name="USER_BUSYBOX_BZIP2"/>
+					<feature name="USER_BUSYBOX_LSATTR"/>
+					<feature name="USER_BUSYBOX_RPM2CPIO"/>
+					<and name="USER_BUSYBOX_DF">
+						<feature name="USER_BUSYBOX_FEATURE_DF_INODE"/>
+					</and>
+				</and>
+				<feature name="LIB_LIBLZMA"/>
+				<feature name="USER_SQUASHFS_MKSQUASHFS"/>
+				<feature name="USER_SSH_SFTP_SERVER"/>
+				<feature name="USER_STTY_STTY"/>
+				<feature name="USER_NET_TOOLS_SLATTACH"/>
+				<and name="USER_DHCPCD_DHCPCD">
+					<feature name="USER_DHCPCD_LLIP"/>
+				</and>
+				<feature name="USER_PPTP_CLIENT_PPTP"/>
+				<feature name="USER_TINYLOGIN_DELUSER"/>
+				<and name="USER_LANG_A60">
+					<feature name="USER_LANG_A60_EGS"/>
+					<feature name="USER_LANG_A60_TEST"/>
+				</and>
+				<feature name="USER_INIT_INIT"/>
+				<feature name="USER_SETMAC_SETMAC"/>
+				<feature name="USER_GDB_HOST"/>
+				<feature name="USER_BZIP2_BZIP2"/>
+				<feature name="USER_DHCPD_DHCPD"/>
+				<feature name="USER_FILEUTILS_MV"/>
+				<feature name="USER_BRCTL_BRCTL"/>
+				<feature name="USER_DEBUG_DEBUG"/>
+				<feature name="USER_PROCPS_PWDX"/>
+				<feature name="USER_HTTPTUNNEL_CLIENT"/>
+				<feature name="USER_MOUNT_UMOUNT"/>
+				<feature name="USER_PYTHON"/>
+				<feature name="USER_MICROWIN_HAVE_BMP_SUPPORT"/>
+				<feature name="USER_SHUTILS_PRINTENV"/>
+				<feature name="LIB_NFNETLINK"/>
+				<feature name="USER_E2FSPROGS_MISC_BADBLOCKS"/>
+				<feature name="LIB_LIBEFENCE"/>
+				<feature name="USER_FROB_LED_FROB_LED"/>
+				<feature name="USER_FILEUTILS_TOUCH"/>
+				<feature name="USER_DIALD_DIALD"/>
+				<feature name="USER_RECOVER_STATIC_TFTP"/>
+				<feature name="USER_IPCHAINS_IPCHAINS"/>
+				<feature name="USER_VPNLED_VPNLED"/>
+				<feature name="USER_SHUTILS_DIRNAME"/>
+				<feature name="USER_RRDTOOL_RRDTOOL"/>
+				<feature name="USER_FILEUTILS_MKNOD"/>
+				<feature name="USER_PROCPS_SYSCTL"/>
+				<feature name="USER_MICROWIN_HAVE_SHAREDMEM_SUPPORT"/>
+				<and name="LIB_UC_LIBC_TIMEZONE">
+					<feature name="LIB_UC_LIBC_TZ_FROM_FILE"/>
+				</and>
+				<and name="USER_INIT_EXPAND">
+					<feature name="USER_INIT_EXPAND_NOZEROES"/>
+				</and>
+				<feature name="USER_MINIUPNPD"/>
+				<feature name="USER_W3CAM_VIDCAT"/>
+				<feature name="USER_PERL_PERL"/>
+				<feature name="USER_NBENCH_NBENCH"/>
+				<feature name="USER_MICROWIN_HAVE_GIF_SUPPORT"/>
+				<feature name="USER_MICROWIN_FRAMEBUFFER"/>
+				<feature name="USER_SMTP_SMTPCLIENT"/>
+				<feature name="USER_SMBMOUNT_SMBMOUNT"/>
+				<feature name="LIB_LIBBZ2"/>
+				<feature name="USER_L2TPD_L2TPD"/>
+				<feature name="USER_E2FSPROGS_MISC_UUIDGEN"/>
+				<feature name="USER_RTC_M41T11"/>
+				<feature name="USER_ARJ_ARJ"/>
+				<feature name="USER_E2FSPROGS_MISC_CHATTR"/>
+				<feature name="USER_OPROFILE"/>
+				<feature name="USER_DEBUG"/>
+				<feature name="USER_FILEUTILS_SYNC"/>
+				<feature name="USER_SSH_SSH"/>
+				<feature name="USER_PROCPS_SNICE"/>
+				<feature name="LIB_LIBLZO"/>
+				<feature name="USER_MICROWIN_HARRIERMOUSE"/>
+				<feature name="USER_DEMO_MORSE"/>
+				<feature name="USER_OPENVPN_OPENVPN"/>
+				<feature name="USER_SHUTILS_WHOAMI"/>
+				<and name="USER_RECOVER_USE_STATIC_SERVER">
+					<feature mandatory="true" name="USER_RECOVER_STATIC_SERVER"/>
+				</and>
+				<feature name="USER_FILEUTILS_CP"/>
+				<feature name="USER_FNORD_PAM"/>
+				<feature name="USER_DEMO_BUTTON"/>
+				<feature name="USER_FAKEIDENTD_IDENTD"/>
+				<feature name="USER_MICROWIN_HAVE_PNM_SUPPORT"/>
+				<feature name="USER_MICROWIN_BIN_NTETRIS"/>
+				<feature name="USER_MICROWIN_BIN_MOVE"/>
+				<feature name="USER_TINYLOGIN_GETTY"/>
+				<feature name="USER_AT_AT"/>
+				<feature name="USER_ULOGD_ULOGD"/>
+				<feature name="USER_NESSUS_PLUGINS"/>
+				<feature name="USER_MICROWIN_PSIONMOUSE"/>
+				<feature name="USER_CRAMFS_MKCRAMFS"/>
+				<feature name="USER_NETSTAT_NAT_NETSTAT_NAT"/>
+				<feature name="USER_PPTP_PPTP"/>
+				<and name="USER_RP_PPPOE_PPPOE">
+					<feature name="USER_RP_PPPOE_PPPOE_SERVER"/>
+				</and>
+				<feature name="LIB_NCURSES"/>
+				<feature name="USER_PROCPS_VMSTAT"/>
+				<and name="USER_DISCARD_DISCARD">
+					<feature name="USER_DISCARD_NO_INSTALL"/>
+				</and>
+				<feature name="USER_PROCPS_PKILL"/>
+				<feature name="USER_DOSFSTOOLS_DOSFSCK"/>
+				<feature name="USER_ROOTLOADER_ROOTLOADER"/>
+				<feature name="LIB_LIBSSL"/>
+				<and name="LIB_LIBPAM">
+					<feature name="USER_PAM_SMB"/>
+					<feature name="USER_PAM_RADIUS"/>
+					<feature name="USER_PAM_KRB5"/>
+					<feature name="USER_PAM_LDAP"/>
+					<feature name="USER_PAM_TACACS"/>
+				</and>
+				<feature name="LIB_LIBIDN"/>
+				<feature name="USER_CAN_EXAMPLES"/>
+				<and name="USER_SAMBA">
+					<feature name="USER_SAMBA_SMBUMOUNT"/>
+					<feature name="USER_SAMBA_NMBD"/>
+					<feature name="USER_SAMBA_SMBMOUNT"/>
+					<feature name="USER_SAMBA_SMBD"/>
+					<feature name="USER_SAMBA_SHARED"/>
+					<feature name="USER_SAMBA_UMOUNT_CIFS"/>
+					<feature name="USER_SAMBA_MOUNT_CIFS"/>
+				</and>
+				<feature name="USER_LEDCON_LEDCON"/>
+				<feature name="USER_NET_TOOLS_MII_TOOL"/>
+				<and name="USER_MP3PLAY_MP3PLAY">
+					<feature name="USER_MP3PLAY_SWAP_WD"/>
+				</and>
+				<feature name="USER_BOOTTOOLS_MD5SUM"/>
+				<feature name="USER_VCONFIG_VCONFIG"/>
+				<feature name="USER_SSCEP"/>
+				<feature name="USER_REISERFSPROGS_DEBUGRESIERFS"/>
+				<feature name="USER_BOOTTOOLS_HIMEMLOADER"/>
+				<feature name="USER_FILEUTILS_DD"/>
+				<feature name="USER_HWCLOCK_HWCLOCK"/>
+				<feature name="USER_CAN_HORCH"/>
+				<feature name="USER_RTC_DS1302"/>
+				<feature name="USER_SHUTILS_FALSE"/>
+				<feature name="USER_MICROWIN_VERBOSE"/>
+				<feature name="POOR_ENTROPY"/>
+				<feature name="USER_IPFWADM_IPFWADM"/>
+				<feature name="USER_PCIUTILS_LSPCI"/>
+				<feature name="USER_FILEUTILS_GREP"/>
+				<and name="USER_BOA_SRC_BOA">
+					<feature name="USER_BOA_WITH_SSL"/>
+					<feature name="USER_BOA_EMERG"/>
+					<feature name="USER_BOA_LOGGING"/>
+				</and>
+				<feature name="USER_MICROWIN_BIN_NXKBD"/>
+				<feature name="USER_BOOTTOOLS_PRINTBENV"/>
+				<and name="USER_QUAGGA_ZEBRA_ZEBRA">
+					<feature name="USER_QUAGGA_RIPNGD_RIPNGD"/>
+					<feature name="USER_QUAGGA_OSPF6D_OSPF6D"/>
+					<feature name="USER_QUAGGA_RIPD_RIPD"/>
+					<feature name="USER_QUAGGA_BGPD_BGPD"/>
+					<feature name="USER_QUAGGA_OSPFD_OSPFD"/>
+					<feature name="USER_QUAGGA_WATCHQUAGGA_WATCHQUAGGA"/>
+				</and>
+				<feature name="USER_SYSUTILS_REBOOT"/>
+				<feature name="USER_MICROWIN_VTSWITCH"/>
+				<feature name="USER_FILEUTILS_LN"/>
+				<feature name="USER_RSYSLOG_RSYSLOGD"/>
+				<feature name="USER_MICROWIN_HAVE_GB2312_SUPPORT"/>
+				<feature name="LIB_LIBNET"/>
+				<feature name="USER_VIXIECRON_CRON"/>
+				<feature name="USER_SHUTILS_TRUE"/>
+				<feature name="USER_INETD_INETD"/>
+				<feature name="USER_PYTHON_PYTHON"/>
+				<feature name="USER_GAMES_RUBIK"/>
+				<feature name="USER_DHCP_ISC_CLIENT_DHCLIENT"/>
+				<feature name="USER_JAMVM_JAMVM"/>
+				<and name="USER_ZEBRA_ZEBRA_ZEBRA">
+					<feature name="USER_ZEBRA_OSPFD_OSPFD"/>
+					<feature name="USER_ZEBRA_RIPD_RIPD"/>
+					<feature name="USER_ZEBRA_BGPD_BGPD"/>
+				</and>
+				<feature name="USER_SPEEDTOUCH_MODEM_RUN"/>
+				<feature name="USER_SHUTILS_YES"/>
+				<feature name="LIB_ARES"/>
+				<feature name="USER_MICROWIN_PORTRAIT_MODE"/>
+				<feature name="USER_POTRACE_POTRACE"/>
+				<feature name="USER_MICROWIN_SHAREDLIBS"/>
+				<feature name="LIB_LIBPCRE"/>
+				<feature name="USER_PROCPS_TLOAD"/>
+				<feature name="LIB_LIBBSC"/>
+				<feature name="USER_PROFTPD_PROFTPD"/>
+				<feature name="USER_MGETTY_MGETTY"/>
+				<feature name="USER_SHUTILS_WHICH"/>
+				<feature name="USER_LSOF_LSOF"/>
+				<feature name="USER_FCONFIG_FCONFIG"/>
+				<feature name="USER_GREP_GREP"/>
+				<feature name="USER_CRYPTO_TOOLS_CRYPTOTEST"/>
+				<feature name="USER_PPPD_WITH_WINBIND"/>
+				<feature name="USER_MICROWIN"/>
+				<feature name="USER_MOUNT_MOUNT"/>
+				<feature name="USER_FILEUTILS_MKDIR"/>
+				<feature name="USER_KEXEC_KEXEC"/>
+				<feature name="USER_REISERFSPROGS_MKREISERFS"/>
+				<feature name="USER_TRIPWIRE_TRIPWIRE"/>
+				<feature name="USER_SNORT_SNORT"/>
+				<feature name="USER_BIND_BIND"/>
+				<feature name="LIB_BOOST"/>
+				<feature name="USER_DEMO_LATCH"/>
+				<feature name="USER_MICROWIN_BIN_NANOWM"/>
+				<feature name="USER_DE2TSCAL_DE2TSCAL"/>
+				<feature name="USER_MICROWIN_NWIDGET"/>
+				<and name="USER_TELNETD_TELNETD">
+					<feature name="USER_TELNETD_DOES_NOT_USE_OPENPTY"/>
+				</and>
+				<feature name="USER_DHCPCD_NEW_DHCPCD"/>
+				<feature name="USER_CTORRENT_CTORRENT"/>
+				<feature name="USER_MICROWIN_NANOX"/>
+				<feature name="USER_STRACE_STRACE"/>
+				<feature name="USER_SSH_SCP"/>
+				<feature name="USER_LOATTACH_LOATTACH"/>
+				<feature name="USER_SHUTILS_ECHO"/>
+				<feature name="USER_E2FSPROGS_E2FSCK_E2FSCK"/>
+				<feature name="LIB_LIBFFI"/>
+				<feature name="USER_ETHTOOL_ETHTOOL"/>
+				<feature name="LIB_PWLIB"/>
+				<feature name="USER_NETPIPE_NETPIPE"/>
+				<feature name="USER_SYSUTILS_SHUTDOWN"/>
+				<feature name="USER_TFTP_TFTP"/>
+				<feature name="USER_VPLAY_VREC"/>
+				<and name="USER_DISCARD_INETD_ECHO">
+					<feature name="USER_DISCARD_ECHO_NO_INSTALL"/>
+				</and>
+				<feature name="USER_E2FSPROGS_MISC_MKE2FS"/>
+				<feature name="USER_NETFLASH_CRYPTO_OPTIONAL"/>
+				<feature name="USER_PROCPS_SLABTOP"/>
+				<feature name="USER_DEMO_R2100"/>
+				<and name="USER_WIRELESS_TOOLS">
+					<feature name="USER_WIRELESS_TOOLS_IWLIST"/>
+					<feature name="USER_WIRELESS_TOOLS_IWGETID"/>
+					<feature name="USER_WIRELESS_TOOLS_IWPRIV"/>
+					<feature name="USER_WIRELESS_TOOLS_IWCONFIG"/>
+					<feature name="USER_WIRELESS_TOOLS_IWSPY"/>
+				</and>
+				<feature name="USER_FREERADIUS"/>
+				<feature name="USER_MICROWIN_HAVE_T1LIB_SUPPORT"/>
+				<feature name="USER_MATH_TEST"/>
+				<feature name="USER_FILEUTILS_RMDIR"/>
+				<and name="LIB_STLPORT">
+					<feature name="LIB_STLPORT_SHARED"/>
+				</and>
+				<feature name="USER_USBISO_USBISO"/>
+				<feature name="USER_AGETTY_AGETTY"/>
+				<feature name="LIB_LIBGMP"/>
+				<and name="USER_APPWEB_APPWEB">
+					<feature name="USER_APPWEB_SSL"/>
+					<feature name="USER_APPWEB_CGI"/>
+					<feature name="USER_APPWEB_MULTITHREAD"/>
+					<feature name="USER_APPWEB_DYNAMIC"/>
+				</and>
+				<and name="USER_IPUTILS_IPUTILS">
+					<feature name="USER_IPUTILS_RARPD"/>
+					<feature name="USER_IPUTILS_CLOCKDIFF"/>
+					<feature name="USER_IPUTILS_TRACEROUTE6"/>
+					<feature name="USER_IPUTILS_TRACEPATH6"/>
+					<feature name="USER_IPUTILS_PING6"/>
+					<feature name="USER_IPUTILS_TFTPD"/>
+					<feature name="USER_IPUTILS_RDISC"/>
+					<feature name="USER_IPUTILS_TRACEPATH"/>
+					<feature name="USER_IPUTILS_ARPING"/>
+					<feature name="USER_IPUTILS_PING"/>
+				</and>
+				<feature name="USER_NET_TOOLS_PLIPCONFIG"/>
+				<feature name="LIB_EXPAT"/>
+				<feature name="USER_GNUGK_GNUGK"/>
+				<feature name="USER_JQUERY_UI"/>
+				<feature name="USER_XL2TPD_XL2TPD"/>
+				<feature name="USER_NTPD_NTPDATE"/>
+				<feature name="USER_PROCPS_TOP"/>
+				<feature name="USER_MICROWIN_DEBUG"/>
+				<feature name="USER_CGI_GENERIC"/>
+				<feature name="USER_MICROWIN_NANOXDEMO"/>
+				<feature name="LIB_BFD"/>
+				<feature name="USER_BOOTTOOLS_RESET"/>
+				<feature name="USER_MICROWIN_TTYKBD"/>
+				<feature name="USER_SSH_ONLY_RSA_V2_KEYGEN"/>
+				<feature name="USER_SSH_SSHKEYGEN"/>
+				<feature name="USER_INIT_CONSOLE_SH"/>
+				<feature name="USER_GDB_TARGET"/>
+				<feature name="USER_CRON_CRON"/>
+				<and name="USER_THTTPD_THTTPD">
+					<feature name="READ_TIMEOUT"/>
+				</and>
+				<feature name="USER_DHRYSTONE_DHRYSTONE"/>
+				<feature name="LIB_NETFILTER_CONNTRACK"/>
+				<feature name="USER_FTPD_FTPD"/>
+				<feature name="USER_MICROWIN_MICROWINDEMO"/>
+				<feature name="USER_FROX_FROX"/>
+				<feature name="USER_POP3PROXY_POP3PROXY"/>
+				<feature name="USER_CLOCK_CLOCK"/>
+				<feature name="USER_MICROWIN_BIN_NTEST"/>
+				<feature name="USER_SYSUTILS_KILL"/>
+				<feature name="USER_CRYPTO_TOOLS_CRYPTOKEYTEST"/>
+				<feature name="LIB_LIBG"/>
+				<feature name="USER_NESSUS_LIBRARIES"/>
+				<feature name="LIB_LIBSYSFS"/>
+				<feature name="USER_REISERFSPROGS_UNPACK"/>
+				<feature name="USER_GAMES_TAMA"/>
+				<feature name="USER_INIT_CONF"/>
+				<feature name="USER_MICROWIN_BIN_NANO_X"/>
+				<feature name="USER_PCMCIA_CS"/>
+				<and name="USER_MTDUTILS">
+					<feature name="USER_MTDUTILS_FTL_CHECK"/>
+					<feature name="USER_MTDUTILS_MKFSJFFS2"/>
+					<feature name="USER_MTDUTILS_NANDWRITE"/>
+					<feature name="USER_MTDUTILS_NANDDUMP"/>
+					<feature name="USER_MTDUTILS_NFTLDUMP"/>
+					<feature name="USER_MTDUTILS_ERASE"/>
+					<feature name="USER_MTDUTILS_UNLOCK"/>
+					<feature name="USER_MTDUTILS_DOC_LOADIPL"/>
+					<feature name="USER_MTDUTILS_LOCK"/>
+					<feature name="USER_MTDUTILS_MKFSJFFS"/>
+					<feature name="USER_MTDUTILS_NFTL_FORMAT"/>
+					<feature name="USER_MTDUTILS_NANDTEST"/>
+					<feature name="USER_MTDUTILS_FTL_FORMAT"/>
+					<feature name="USER_MTDUTILS_ERASEALL"/>
+					<feature name="USER_MTDUTILS_DOC_LOADBIOS"/>
+				</and>
+				<feature name="USER_TCPDUMP_TCPDUMP"/>
+				<feature name="USER_IPMASQADM_IPMASQADM"/>
+				<feature name="LIB_LIBUPNP"/>
+				<and name="USER_CHAT_CHAT">
+					<feature name="USER_CHAT_CHAT_NETWORK"/>
+				</and>
+				<feature name="USER_HD_HD"/>
+				<feature name="USER_NET_TOOLS_NETSTAT"/>
+				<feature name="USER_DOSFSTOOLS_MKDOSFS"/>
+				<feature name="USER_USBCBI_USBCBI"/>
+				<feature name="USER_SSH_SSHD"/>
+				<feature name="USER_LILO_LILO"/>
+				<feature name="USER_EXPAT_EXAMPLES"/>
+				<feature name="USER_MICROWIN_BIN_NXCLOCK"/>
+				<feature name="USER_SNORT_BARNYARD"/>
+				<feature name="USER_DHCP_ISC_SERVER_DHCPD"/>
+				<feature name="USER_PCIUTILS_SETPCI"/>
+				<feature name="USER_NTPD_NTPQ"/>
+				<and name="LIB_LIBJUDY">
+					<feature name="LIB_LIBJUDY_TESTS"/>
+				</and>
+				<and name="USER_FREESWAN">
+					<feature name="USER_FREESWAN_KLIPS_KLIPSDEBUG"/>
+					<feature name="USER_FREESWAN_PLUTO_PLUTO"/>
+					<feature name="USER_IPSEC_KEEPALIVE"/>
+					<feature name="USER_FSWCERT_FSWCERT"/>
+					<feature name="USER_FREESWAN_KLIPS_EROUTE"/>
+					<feature name="USER_FREESWAN_KLIPS_TNCFG"/>
+					<feature name="USER_FREESWAN_PLUTO_WHACK"/>
+					<feature name="USER_FREESWAN_KLIPS_SPIGRP"/>
+					<feature name="USER_FREESWAN_UTILS_RSASIGKEY"/>
+					<feature name="USER_FREESWAN_KLIPS_SPI"/>
+					<feature name="USER_FREESWAN_UTILS_RANBITS"/>
+				</and>
+				<feature name="USER_MICROWIN_HWVGA"/>
+				<feature name="USER_E2FSPROGS_MISC_E2LABEL"/>
+				<feature name="USER_ETHERWAKE"/>
+				<feature name="LIB_LIBOPENH323"/>
+				<feature name="USER_NETPERF_NETSERVER"/>
+				<feature name="USER_PALMBOT_PALMBOT"/>
+				<feature name="USER_LEVEE_VI"/>
+				<feature name="LIB_BITVECTOR"/>
+				<feature name="USER_TINYPROXY_TINYPROXY"/>
+				<feature name="USER_MICROWIN_TPHELIO"/>
+				<feature name="USER_NTPCLIENT_ADJTIMEX"/>
+				<feature name="USER_REISERFSPROGS_RESIZE_REISERFS"/>
+				<feature name="USER_TINYLOGIN_MD5_PASSWORDS"/>
+				<feature name="LIB_LIBIBERTY"/>
+				<feature name="USER_NET_TOOLS_ARP"/>
+				<feature name="USER_FILEUTILS_LS"/>
+				<feature name="USER_E2FSPROGS_MISC_FSCK"/>
+				<and name="USER_DNSMASQ_DNSMASQ">
+					<and name="USER_DNSMASQ2_DNSMASQ2">
+						<feature name="USER_DNSMASQ2_RESOLVE_AS_SERVER"/>
+					</and>
+				</and>
+				<feature name="USER_MICROWIN_BIN_MUSERFD"/>
+				<feature name="USER_SASH_PS"/>
+				<feature name="USER_FILEUTILS_CHGRP"/>
+				<feature name="USER_SETSERIAL_SETSERIAL"/>
+				<and name="USER_IPTABLES_IPTABLES">
+					<feature name="USER_LAYER7_PROTOCOLS"/>
+				</and>
+				<and name="USER_TINYLOGIN_LOGIN">
+					<feature name="USER_TINYLOGIN_SECURETTY"/>
+				</and>
+				<feature name="USER_SHUTILS_DATE"/>
+				<and name="USER_LINUXIGD_LINUXIGD">
+					<feature name="USER_LINUXIGD_DEFAULT"/>
+				</and>
+				<feature name="USER_GDBSERVER_GDBSERVER"/>
+				<feature name="USER_W3CAM_W3CAMD"/>
+				<feature name="USER_TCL_LIBTCL"/>
+				<feature name="USER_LEDCMD_LEDCMD"/>
+				<feature name="USER_MICROWIN_ADSMOUSE"/>
+				<feature name="USER_HTTPTUNNEL_SERVER"/>
+				<feature name="LIB_LIBCURL"/>
+				<feature name="USER_MICROWIN_SERMOUSE"/>
+				<feature name="USER_CXXTEST_CXXTEST"/>
+				<feature name="USER_WHETSTONE_WHETSTONE"/>
+				<feature name="USER_IPPORTFW_IPPORTFW"/>
+				<and name="USER_MINI_HTTPD_MINI_HTTPD">
+					<feature name="USER_MINI_HTTPD_WITH_SSL"/>
+				</and>
+				<feature name="USER_NET_TOOLS_ROUTE"/>
+				<feature name="USER_MARADNS_ZONESERVER"/>
+				<feature name="USER_E2FSPROGS_MISC_TUNE2FS"/>
+				<feature name="USER_ROUTED_ROUTED"/>
+				<and name="USER_FNORD_HTTPD">
+					<feature name="USER_FNORD_NOAUTH"/>
+				</and>
+				<feature name="USER_TIMEPEG_TPT"/>
+				<feature name="USER_FDISK_SFDISK"/>
+				<feature name="USER_MICROWIN_FBREVERSE"/>
+				<feature name="USER_MICROWIN_OPTIMIZE"/>
+				<feature name="USER_PPPD_NO_AT_REDIRECTION"/>
+				<feature name="USER_MICROWIN_BIN_WORLD"/>
+				<feature name="USER_PROCPS_PMAP"/>
+				<feature name="USER_MICROWIN_HAVE_BIG5_SUPPORT"/>
+				<and name="USER_OPENSWAN">
+					<feature name="USER_OPENSWAN_KLIPS_SPI"/>
+					<feature name="USER_OPENSWAN_PLUTO_WHACK"/>
+					<feature name="USER_OPENSWAN_UTILS_RANBITS"/>
+					<and name="IPSEC_CONNECTION_LIMIT_BOOL">
+						<feature mandatory="true" name="IPSEC_CONNECTION_LIMIT"/>
+					</and>
+					<feature name="USER_OPENSWAN_PLUTO_PLUTO"/>
+					<feature name="USER_OPENSWAN_KLIPS_TNCFG"/>
+					<feature name="USER_OPENSWAN_KLIPS_KLIPSDEBUG"/>
+					<feature name="USER_OPENSWAN_KLIPS_SPIGRP"/>
+					<feature name="USER_OPENSWAN_KLIPS_EROUTE"/>
+					<feature name="USER_OPENSWAN_PROGRAMS_LWDNSQ"/>
+					<feature name="USER_OPENSWAN_UTILS_RSASIGKEY"/>
+				</and>
+				<and name="USER_CLAMAV_CLAMAV">
+					<feature name="USER_CLAMAV_CLAMDSCAN"/>
+					<feature name="USER_CLAMAV_SIGTOOL"/>
+					<feature name="USER_CLAMAV_TESTS"/>
+					<feature name="USER_CLAMAV_CLAMSCAN"/>
+					<feature name="USER_CLAMAV_CLAMD"/>
+					<and name="USER_CLAMAV_FRESHCLAM">
+						<feature name="USER_CLAMAV_NODB"/>
+					</and>
+				</and>
+				<feature name="USER_NMAP_NMAP"/>
+				<feature name="USER_INIT_RUN_FIREWALL"/>
+				<feature name="USER_SASH_HISTORY"/>
+				<feature name="USER_VPLAY_MIXER"/>
+				<feature name="USER_CPU_CPU"/>
+				<feature name="LIB_LIBNETOLD"/>
+				<feature name="USER_TINYLOGIN_ADDUSER"/>
+				<and name="USER_KLAXON_KLAXON">
+					<feature name="USER_KLAXON_ECHO"/>
+					<feature name="USER_KLAXON_CHARGEN"/>
+					<feature name="USER_KLAXON_DISCARD"/>
+					<feature name="USER_KLAXON_FTP"/>
+					<feature name="USER_KLAXON_HTTP"/>
+					<feature name="USER_KLAXON_SNMP"/>
+					<feature name="USER_KLAXON_TFTP"/>
+					<feature name="USER_KLAXON_TELNET"/>
+					<feature name="USER_KLAXON_SMTP"/>
+					<feature name="USER_KLAXON_SSH"/>
+					<feature name="USER_KLAXON_RFC931"/>
+				</and>
+				<feature name="USER_FDISK_FDISK"/>
+				<feature name="USER_HDPARM_HDPARM"/>
+				<feature name="USER_MICROWIN_LINK_APP_INTO_SERVER"/>
+				<feature name="USER_ELVISTINY_VI"/>
+				<feature name="USER_MSNTP_MSNTP"/>
+				<feature name="USER_PING_PING"/>
+				<and name="USER_ASTERISK">
+					<feature name="USER_ASTERISK_MYSQL"/>
+				</and>
+				<feature name="USER_MICROWIN_HAVEMSFONTS"/>
+				<feature name="USER_SHUTILS_BASENAME"/>
+				<feature name="USER_LANBYPASS_LANBYPASS"/>
+				<feature name="USER_JPEGVIEW_JPEGVIEW"/>
+				<feature name="USER_THREADDEMOS_THREADDEMOS"/>
+				<feature name="USER_NET_TOOLS_HOSTNAME"/>
+				<feature name="USER_IPTABLES_IP6TABLES"/>
+				<feature name="USER_SNMPD_SNMPD"/>
+				<feature name="USER_WATCHDOGD"/>
+				<feature name="LIB_LIBJPEG"/>
+				<and name="LIB_TINYTCL">
+					<feature name="LIB_TINYTCL_STATIC"/>
+				</and>
+				<feature name="LIB_FLEX"/>
+				<feature name="USER_NETCAT_NETCAT"/>
+				<feature name="USER_MICROWIN_X11"/>
+				<and name="USER_HOSTAP_HOSTAP">
+					<feature name="USER_HOSTAP_CS"/>
+					<feature name="USER_HOSTAP_HOSTAPD"/>
+					<feature name="USER_HOSTAP_PCI"/>
+				</and>
+				<feature name="USER_BOOTTOOLS_LOADER"/>
+				<feature name="USER_TIP_TIP"/>
+				<feature name="USER_HPING_HPING"/>
+				<feature mandatory="true" name="DISTVERSION"/>
+				<feature name="LIB_TERMCAP"/>
+				<feature name="USER_GDB_GDBREPLAY"/>
+				<feature name="USER_PLUG_PLUG"/>
+				<feature name="USER_GDBSERVER_GDBREPLAY"/>
+				<feature name="USER_LOAD_LOAD"/>
+				<feature name="LIB_CLASSPATH"/>
+				<feature name="USER_PLAYRT_PLAYRT"/>
+				<feature name="USER_EXPECT_EXPECT"/>
+				<feature name="LIB_DEBUG"/>
+				<and name="USER_NTPD_NTPD">
+					<feature name="USER_NTPD_NTPDC"/>
+				</and>
+				<feature name="USER_PROCPS_UPTIME"/>
+				<feature name="USER_STUNNEL_STUNNEL"/>
+				<feature name="USER_MICROWIN_NOFONTSORCLIPPING"/>
+				<feature name="USER_IPROUTE2_IP_RTPR"/>
+				<and name="USER_FLATFSD_FLATFSD">
+					<alt abstract="true" mandatory="true" name="USER_FLATFSD_DISKLIKE_alt">
+						<feature mandatory="true" name="USER_FLATFSD_AUTO"/>
+						<feature mandatory="true" name="USER_FLATFSD_USE_FLASH_FS"/>
+						<feature mandatory="true" name="USER_FLATFSD_DISKLIKE"/>
+						<feature mandatory="true" name="USER_FLATFSD_CONFIG_BLOBS"/>
+					</alt>
+					<feature name="USER_FLATFSD_EXTERNAL_INIT"/>
+					<feature name="USER_FLATFSD_COMPRESSED"/>
+					<feature name="USER_FLATFSD_ENCRYPTED"/>
+					<feature name="USER_FLATFSD_HAS_RTC"/>
+				</and>
+				<feature name="USER_MICROWIN_NANOWM"/>
+				<feature name="USER_MICROWIN_BIN_NTERM"/>
+				<and name="USER_TFTPD_TFTPD">
+					<feature name="USER_TFTPD_TFTPD_LOW_SEC"/>
+				</and>
+				<feature name="USER_LRPSTAT_LRPSTAT"/>
+				<feature name="USER_LISSA_LISSA"/>
+				<and name="USER_LM_SENSORS">
+					<feature name="USER_LM_SENSORS_SENSORS"/>
+				</and>
+				<feature name="USER_MICROWIN_BIN_MTEST2"/>
+				<and name="USER_WLAN_NG">
+					<feature name="USER_WLAN_NG_PCI"/>
+					<feature name="USER_WLAN_NG_WLAND"/>
+					<feature name="USER_WLAN_NG_PLX"/>
+					<feature name="USER_WLAN_NG_PCMCIA"/>
+					<feature name="USER_WLAN_NG_USB"/>
+					<feature name="USER_WLAN_NG_WLANCTL"/>
+					<feature name="USER_WLAN_NG_WLANCFG"/>
+				</and>
+				<feature name="USER_MICROWIN_UPDATEREGIONS"/>
+				<feature name="USER_E2FSPROGS_MISC_LSATTR"/>
+				<feature name="USER_MICROWIN_TPMOUSE"/>
+				<feature name="USER_CAL_DATE"/>
+				<feature name="USER_TCPBLAST_TCPBLAST"/>
+				<feature name="USER_FILEUTILS_CAT"/>
+				<feature name="USER_MICROWIN_PIPEKBD"/>
+				<feature name="USER_SLATTACH_SLATTACH"/>
+				<feature name="USER_EBTABLES_EBTABLES"/>
+				<feature name="USER_UNRAR_UNRAR"/>
+				<and name="USER_SER_SER">
+					<feature name="USER_SER_RTPPROXY"/>
+				</and>
+				<feature name="USER_MAIL_MAIL_IP"/>
+				<feature name="USER_MICROWIN_HAVE_FREETYPE_SUPPORT"/>
+				<and name="USER_PORTMAP_PORTMAP">
+					<feature name="USER_PORTMAP_PMAP_SET"/>
+					<feature name="USER_PORTMAP_PMAP_DUMP"/>
+				</and>
+				<feature name="USER_PROCPS_WATCH"/>
+				<feature name="USER_MICROWIN_FBVGA"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<var>LIB_STLPORT</var>
+					<conj>
+						<disj>
+							<not>
+								<var>USER_ASTERISK</var>
+							</not>
+							<var>LIB_STLPORT_SHARED</var>
+						</disj>
+						<disj>
+							<not>
+								<var>LIB_STLPORT_SHARED</var>
+							</not>
+							<var>USER_ASTERISK</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_SASH_SH</var>
+					<disj>
+						<not>
+							<var>USER_SASH_HISTORY</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_SASH_SH</var>
+					<conj>
+						<disj>
+							<not>
+								<var>USER_SASH_SH</var>
+							</not>
+							<var>USER_SASH_PS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_SASH_PS</var>
+							</not>
+							<var>USER_SASH_SH</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_SASH_REBOOT</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_SASH_REBOOT_SNAPGEAR</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_NETFLASH_NETFLASH</var>
+						<not>
+							<var>USER_NETFLASH_CRYPTO_V2</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_NETFLASH_SHA256</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_NETFLASH_CRYPTO</var>
+					<disj>
+						<not>
+							<var>USER_NETFLASH_CRYPTO_OPTIONAL</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>USER_RECOVER_STATIC_TFTP</var>
+					</not>
+					<disj>
+						<not>
+							<var>USER_RECOVER_USE_STATIC_SERVER</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_RECOVER_RECOVER</var>
+					<disj>
+						<not>
+							<var>USER_RECOVER_PRESERVE_CONFIG_FS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>USER_FNORD_NOAUTH</var>
+					</not>
+					<disj>
+						<not>
+							<var>USER_FNORD_PAM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_FNORD_HTTPD</var>
+					<disj>
+						<not>
+							<var>USER_FNORD_404_REDIR</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_INETD_INETD</var>
+					<disj>
+						<not>
+							<var>USER_DROPBEAR_DROPBEAR</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_TR</var>
+						<var>USER_BASH_BASH</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_IPROUTE2_IP_RTPR</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<not>
+							<var>USER_NESSUS</var>
+						</not>
+						<var>USER_NESSUS_CORE</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_NESSUS_CORE</var>
+						</not>
+						<var>USER_NESSUS</var>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<not>
+							<var>USER_NESSUS</var>
+						</not>
+						<var>USER_NESSUS_PLUGINS</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_NESSUS_PLUGINS</var>
+						</not>
+						<var>USER_NESSUS</var>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<not>
+							<var>USER_NESSUS_NASL</var>
+						</not>
+						<var>USER_NESSUS_LIBRARIES</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_NESSUS_LIBRARIES</var>
+						</not>
+						<var>USER_NESSUS_NASL</var>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_PPPD_WITH_PPPOE</var>
+					<conj>
+						<disj>
+							<not>
+								<var>USER_PPPD_WITH_PPPOE</var>
+							</not>
+							<var>USER_PPPD_PPPOE_RETRIES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_PPPD_PPPOE_RETRIES</var>
+							</not>
+							<var>USER_PPPD_WITH_PPPOE</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_SSH_SSH</var>
+					<disj>
+						<not>
+							<var>USER_SSH_SCP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_SSH_SSH</var>
+					<disj>
+						<not>
+							<var>USER_SSH_SFTP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_SSH_SSH</var>
+					<disj>
+						<not>
+							<var>USER_SSH_SFTP_SERVER</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_SSH_SSH</var>
+					<disj>
+						<not>
+							<var>USER_SSH_SSH_KEYSIGN</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_SSH_SSH</var>
+					<disj>
+						<not>
+							<var>USER_SSH_ONLY_RSA_V2_KEYGEN</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<not>
+							<var>USER_EXPECT_EXPECT</var>
+						</not>
+						<var>USER_TCL_LIBTCL</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_TCL_LIBTCL</var>
+						</not>
+						<var>USER_EXPECT_EXPECT</var>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MYSQL</var>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_ASTERISK_MYSQL</var>
+								</not>
+								<not>
+									<var>USER_ASTERISK</var>
+								</not>
+							</disj>
+							<var>USER_MYSQL_CLIB</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_MYSQL_CLIB</var>
+							</not>
+							<conj>
+								<var>USER_ASTERISK_MYSQL</var>
+								<var>USER_ASTERISK</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_BUSYBOX</var>
+						</not>
+						<var>USER_BUSYBOX_HAVE_DOT_CONFIG</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_HAVE_DOT_CONFIG</var>
+						</not>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SHOW_USAGE</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_SHOW_USAGE</var>
+								</not>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_COMPRESS_USAGE</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_COMPRESS_USAGE</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<var>USER_BUSYBOX_SHOW_USAGE</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_NITPICK</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_CLEAN_UP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_PREFER_APPLETS</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_BUILD_LIBBUSYBOX</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<not>
+								<var>USER_BUSYBOX_STATIC</var>
+							</not>
+							<var>USER_BUSYBOX_BUILD_LIBBUSYBOX</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<disj>
+									<var>USER_BUSYBOX_STATIC</var>
+									<not>
+										<var>USER_BUSYBOX_BUILD_LIBBUSYBOX</var>
+									</not>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_INDIVIDUAL</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_INDIVIDUAL</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<conj>
+									<not>
+										<var>USER_BUSYBOX_STATIC</var>
+									</not>
+									<var>USER_BUSYBOX_BUILD_LIBBUSYBOX</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<not>
+								<var>USER_BUSYBOX_STATIC</var>
+							</not>
+							<var>USER_BUSYBOX_BUILD_LIBBUSYBOX</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<disj>
+									<var>USER_BUSYBOX_STATIC</var>
+									<not>
+										<var>USER_BUSYBOX_BUILD_LIBBUSYBOX</var>
+									</not>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_SHARED_BUSYBOX</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_SHARED_BUSYBOX</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<conj>
+									<not>
+										<var>USER_BUSYBOX_STATIC</var>
+									</not>
+									<var>USER_BUSYBOX_BUILD_LIBBUSYBOX</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>USER_BUSYBOX_FEATURE_INSTALLER</var>
+						<disj>
+							<var>USER_BUSYBOX_FEATURE_SH_STANDALONE</var>
+							<var>USER_BUSYBOX_FEATURE_PREFER_APPLETS</var>
+						</disj>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_INSTALL_APPLET_DONT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_ASH</var>
+							<var>USER_BUSYBOX_FEATURE_EDITING</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_EDITING_SAVEHISTORY</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_FEATURE_TAR_GZIP</var>
+							<var>USER_BUSYBOX_FEATURE_TAR_BZIP2</var>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_TAR_AUTODETECT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_TAR</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_TAR_FROM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_TAR</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_TAR_OLDGNU_COMPATIBILITY</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_TAR</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_TAR_OLDSUN_COMPATIBILITY</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_TAR</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_TAR</var>
+								</not>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_TAR_GNU_EXTENSIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_TAR_GNU_EXTENSIONS</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<var>USER_BUSYBOX_TAR</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_TAR</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_TAR_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_TAR</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_TAR_UNAME_GNAME</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_CPIO</var>
+							<var>USER_BUSYBOX_TAR</var>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_UNARCHIVE_TAPE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_DPKG</var>
+							<var>USER_BUSYBOX_DPKG_DEB</var>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_DEB_TAR_BZ2</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_DPKG</var>
+							<var>USER_BUSYBOX_DPKG_DEB</var>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_DEB_TAR_LZMA</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+							</not>
+							<not>
+								<var>USER_BUSYBOX_DOS2UNIX</var>
+							</not>
+						</disj>
+						<var>USER_BUSYBOX_UNIX2DOS</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_UNIX2DOS</var>
+						</not>
+						<conj>
+							<var>USER_BUSYBOX_BUSYBOX</var>
+							<var>USER_BUSYBOX_DOS2UNIX</var>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_ENV</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_ENV_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_EXPAND</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_EXPAND_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_INSTALL</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_INSTALL_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_LS</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_LS</var>
+									</not>
+									<not>
+										<var>USER_BUSYBOX_GETOPT_LONG</var>
+									</not>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_LS_COLOR</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_LS_COLOR</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<conj>
+									<var>USER_BUSYBOX_LS</var>
+									<var>USER_BUSYBOX_GETOPT_LONG</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_MKDIR</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_MKDIR_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_MV</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_MV_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_RMDIR</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_RMDIR_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_UNEXPAND</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_UNEXPAND_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_CP</var>
+							<var>USER_BUSYBOX_MV</var>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_PRESERVE_HARDLINKS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_LS</var>
+							<disj>
+								<var>USER_BUSYBOX_MORE</var>
+								<var>USER_BUSYBOX_TELNET</var>
+							</disj>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<conj>
+									<not>
+										<var>USER_BUSYBOX_LS</var>
+									</not>
+									<conj>
+										<not>
+											<var>USER_BUSYBOX_MORE</var>
+										</not>
+										<not>
+											<var>USER_BUSYBOX_TELNET</var>
+										</not>
+									</conj>
+								</conj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_AUTOWIDTH</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_AUTOWIDTH</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<disj>
+									<var>USER_BUSYBOX_LS</var>
+									<disj>
+										<var>USER_BUSYBOX_MORE</var>
+										<var>USER_BUSYBOX_TELNET</var>
+									</disj>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_DF</var>
+							<disj>
+								<var>USER_BUSYBOX_DU</var>
+								<var>USER_BUSYBOX_LS</var>
+							</disj>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_HUMAN_READABLE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_MD5SUM</var>
+							<var>USER_BUSYBOX_SHA1SUM</var>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_MD5_SHA1_SUM_CHECK</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_SETCONSOLE</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_SETCONSOLE_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_RUN_PARTS</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_RUN_PARTS_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_START_STOP_DAEMON</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_START_STOP_DAEMON_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_FIND</var>
+							<var>USER_BUSYBOX_FEATURE_FIND_DEPTH</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_FIND_DELETE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_FIND</var>
+							<var>USER_BUSYBOX_SELINUX</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_FIND_CONTEXT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_INIT</var>
+							<var>USER_BUSYBOX_FEATURE_KILL_REMOVED</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_INIT</var>
+								</not>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_KILL_DELAY</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_KILL_DELAY</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<var>USER_BUSYBOX_INIT</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_USE_BB_PWD_GRP</var>
+							<var>USER_BUSYBOX_FEATURE_SHADOWPASSWDS</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_USE_BB_PWD_GRP</var>
+									</not>
+									<not>
+										<var>USER_BUSYBOX_FEATURE_SHADOWPASSWDS</var>
+									</not>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_USE_BB_SHADOW</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_USE_BB_SHADOW</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<conj>
+									<var>USER_BUSYBOX_USE_BB_PWD_GRP</var>
+									<var>USER_BUSYBOX_FEATURE_SHADOWPASSWDS</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_ADDUSER</var>
+							<var>USER_BUSYBOX_ADDGROUP</var>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_CHECK_NAMES</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_ADDUSER</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_ADDUSER_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_INSMOD</var>
+							<var>USER_BUSYBOX_FEATURE_2_4_MODULES</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_INSMOD_VERSION_CHECKING</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_INSMOD</var>
+							<var>USER_BUSYBOX_FEATURE_2_4_MODULES</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_INSMOD_KSYMOOPS_SYMBOLS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_INSMOD</var>
+							<var>USER_BUSYBOX_FEATURE_2_4_MODULES</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_INSMOD_LOADINKMEM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_INSMOD</var>
+							<disj>
+								<var>USER_BUSYBOX_FEATURE_2_4_MODULES</var>
+								<var>USER_BUSYBOX_FEATURE_2_6_MODULES</var>
+							</disj>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_INSMOD_LOAD_MAP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_MODPROBE</var>
+							<var>USER_BUSYBOX_NITPICK</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_MODPROBE</var>
+								</not>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_MODPROBE_MULTIPLE_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_MODPROBE_MULTIPLE_OPTIONS</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<var>USER_BUSYBOX_MODPROBE</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_MODPROBE</var>
+							<conj>
+								<var>USER_BUSYBOX_FEATURE_2_6_MODULES</var>
+								<var>USER_BUSYBOX_NITPICK</var>
+							</conj>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_MODPROBE</var>
+									</not>
+									<not>
+										<var>USER_BUSYBOX_FEATURE_2_6_MODULES</var>
+									</not>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_MODPROBE_FANCY_ALIAS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_MODPROBE_FANCY_ALIAS</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<conj>
+									<var>USER_BUSYBOX_MODPROBE</var>
+									<var>USER_BUSYBOX_FEATURE_2_6_MODULES</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_INSMOD</var>
+							<var>USER_BUSYBOX_LSMOD</var>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<conj>
+									<not>
+										<var>USER_BUSYBOX_INSMOD</var>
+									</not>
+									<not>
+										<var>USER_BUSYBOX_LSMOD</var>
+									</not>
+								</conj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_CHECK_TAINTED_MODULE</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_CHECK_TAINTED_MODULE</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<disj>
+									<var>USER_BUSYBOX_INSMOD</var>
+									<var>USER_BUSYBOX_LSMOD</var>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_INSMOD</var>
+							<disj>
+								<var>USER_BUSYBOX_RMMOD</var>
+								<var>USER_BUSYBOX_MODPROBE</var>
+							</disj>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<conj>
+									<not>
+										<var>USER_BUSYBOX_INSMOD</var>
+									</not>
+									<conj>
+										<not>
+											<var>USER_BUSYBOX_RMMOD</var>
+										</not>
+										<not>
+											<var>USER_BUSYBOX_MODPROBE</var>
+										</not>
+									</conj>
+								</conj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_2_4_MODULES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_2_4_MODULES</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<disj>
+									<var>USER_BUSYBOX_INSMOD</var>
+									<disj>
+										<var>USER_BUSYBOX_RMMOD</var>
+										<var>USER_BUSYBOX_MODPROBE</var>
+									</disj>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<disj>
+							<var>USER_BUSYBOX_INSMOD</var>
+							<disj>
+								<var>USER_BUSYBOX_RMMOD</var>
+								<var>USER_BUSYBOX_MODPROBE</var>
+							</disj>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<conj>
+									<not>
+										<var>USER_BUSYBOX_INSMOD</var>
+									</not>
+									<conj>
+										<not>
+											<var>USER_BUSYBOX_RMMOD</var>
+										</not>
+										<not>
+											<var>USER_BUSYBOX_MODPROBE</var>
+										</not>
+									</conj>
+								</conj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_2_6_MODULES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_2_6_MODULES</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<disj>
+									<var>USER_BUSYBOX_INSMOD</var>
+									<disj>
+										<var>USER_BUSYBOX_RMMOD</var>
+										<var>USER_BUSYBOX_MODPROBE</var>
+									</disj>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+							</not>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_2_4_MODULES</var>
+								</not>
+								<var>USER_BUSYBOX_FEATURE_2_6_MODULES</var>
+							</disj>
+						</disj>
+						<var>USER_BUSYBOX_FEATURE_QUERY_MODULE_INTERFACE</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_QUERY_MODULE_INTERFACE</var>
+						</not>
+						<conj>
+							<var>USER_BUSYBOX_BUSYBOX</var>
+							<conj>
+								<var>USER_BUSYBOX_FEATURE_2_4_MODULES</var>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_2_6_MODULES</var>
+								</not>
+							</conj>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_FDISK</var>
+					</conj>
+					<conj>
+						<disj>
+							<conj>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_LFS</var>
+									</not>
+									<not>
+										<var>USER_BUSYBOX_BUSYBOX</var>
+									</not>
+								</disj>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_BUSYBOX</var>
+									</not>
+									<not>
+										<var>USER_BUSYBOX_FDISK</var>
+									</not>
+								</disj>
+							</conj>
+							<var>USER_BUSYBOX_FDISK_SUPPORT_LARGE_DISKS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FDISK_SUPPORT_LARGE_DISKS</var>
+							</not>
+							<disj>
+								<conj>
+									<var>USER_BUSYBOX_LFS</var>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</conj>
+								<conj>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+									<var>USER_BUSYBOX_FDISK</var>
+								</conj>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_HWCLOCK</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_HWCLOCK_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_MOUNT</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_MTAB_SUPPORT</var>
+								</not>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_BUSYBOX</var>
+									</not>
+									<conj>
+										<not>
+											<var>USER_BUSYBOX_MOUNT</var>
+										</not>
+										<not>
+											<var>USER_BUSYBOX_UMOUNT</var>
+										</not>
+									</conj>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_MOUNT_FAKE</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_MOUNT_FAKE</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_FEATURE_MTAB_SUPPORT</var>
+								<conj>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+									<disj>
+										<var>USER_BUSYBOX_MOUNT</var>
+										<var>USER_BUSYBOX_UMOUNT</var>
+									</disj>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_LFS</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_READAHEAD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+							<disj>
+								<var>USER_BUSYBOX_FTPGET</var>
+								<var>USER_BUSYBOX_FTPPUT</var>
+							</disj>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_FTPGETPUT_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_IFUPDOWN</var>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_IFUPDOWN_IP</var>
+							</not>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_IFUPDOWN</var>
+									</not>
+									<var>USER_BUSYBOX_FEATURE_IFUPDOWN_IP</var>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_IFUPDOWN_IFCONFIG_BUILTIN</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_IFUPDOWN_IFCONFIG_BUILTIN</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<conj>
+									<var>USER_BUSYBOX_IFUPDOWN</var>
+									<not>
+										<var>USER_BUSYBOX_FEATURE_IFUPDOWN_IP</var>
+									</not>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_IFUPDOWN</var>
+							<var>USER_BUSYBOX_FEATURE_IPV6</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_IFUPDOWN_IPV6</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+							</not>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_ADDRESS</var>
+								</not>
+							</disj>
+						</disj>
+						<var>USER_BUSYBOX_IPADDR</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_IPADDR</var>
+						</not>
+						<conj>
+							<var>USER_BUSYBOX_BUSYBOX</var>
+							<conj>
+								<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								<var>USER_BUSYBOX_FEATURE_IP_ADDRESS</var>
+							</conj>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+							</not>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_LINK</var>
+								</not>
+							</disj>
+						</disj>
+						<var>USER_BUSYBOX_IPLINK</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_IPLINK</var>
+						</not>
+						<conj>
+							<var>USER_BUSYBOX_BUSYBOX</var>
+							<conj>
+								<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								<var>USER_BUSYBOX_FEATURE_IP_LINK</var>
+							</conj>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+							</not>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_ROUTE</var>
+								</not>
+							</disj>
+						</disj>
+						<var>USER_BUSYBOX_IPROUTE</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_IPROUTE</var>
+						</not>
+						<conj>
+							<var>USER_BUSYBOX_BUSYBOX</var>
+							<conj>
+								<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								<var>USER_BUSYBOX_FEATURE_IP_ROUTE</var>
+							</conj>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+							</not>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_TUNNEL</var>
+								</not>
+							</disj>
+						</disj>
+						<var>USER_BUSYBOX_IPTUNNEL</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_IPTUNNEL</var>
+						</not>
+						<conj>
+							<var>USER_BUSYBOX_BUSYBOX</var>
+							<conj>
+								<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								<var>USER_BUSYBOX_FEATURE_IP_TUNNEL</var>
+							</conj>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+							</not>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								</not>
+								<not>
+									<var>USER_BUSYBOX_FEATURE_IP_RULE</var>
+								</not>
+							</disj>
+						</disj>
+						<var>USER_BUSYBOX_IPRULE</var>
+					</disj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_IPRULE</var>
+						</not>
+						<conj>
+							<var>USER_BUSYBOX_BUSYBOX</var>
+							<conj>
+								<var>USER_BUSYBOX_FEATURE_IP_SHORT_FORMS</var>
+								<var>USER_BUSYBOX_FEATURE_IP_RULE</var>
+							</conj>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_IPCALC</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_IPCALC_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_FEATURE_IPV6</var>
+							<var>USER_BUSYBOX_PING</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_PING6</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_TFTP</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_DEBUG_TFTP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_WGET</var>
+							<var>USER_BUSYBOX_GETOPT_LONG</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_WGET_LONG_OPTIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_KILL</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_SASH_REBOOT_SNAPGEAR</var>
+								</not>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_BUSYBOX</var>
+									</not>
+									<not>
+										<var>USER_SASH_REBOOT</var>
+									</not>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_KILLALL</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_KILLALL</var>
+							</not>
+							<conj>
+								<var>USER_SASH_REBOOT_SNAPGEAR</var>
+								<conj>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+									<var>USER_SASH_REBOOT</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_PS</var>
+							<var>USER_BUSYBOX_DESKTOP</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_PS_TIME</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<disj>
+								<var>USER_BUSYBOX_MSH</var>
+								<disj>
+									<var>USER_BUSYBOX_LASH</var>
+									<disj>
+										<var>USER_BUSYBOX_HUSH</var>
+										<var>USER_BUSYBOX_ASH</var>
+									</disj>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_PREFER_APPLETS</var>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_FEATURE_SH_STANDALONE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_CHCON</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_SELINUX</var>
+							<conj>
+								<var>USER_BUSYBOX_CHCON</var>
+								<var>USER_BUSYBOX_GETOPT_LONG</var>
+							</conj>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_SELINUX</var>
+									</not>
+									<disj>
+										<not>
+											<var>USER_BUSYBOX_CHCON</var>
+										</not>
+										<not>
+											<var>USER_BUSYBOX_GETOPT_LONG</var>
+										</not>
+									</disj>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_CHCON_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_CHCON_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<conj>
+									<var>USER_BUSYBOX_SELINUX</var>
+									<conj>
+										<var>USER_BUSYBOX_CHCON</var>
+										<var>USER_BUSYBOX_GETOPT_LONG</var>
+									</conj>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_GETENFORCE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_GETSEBOOL</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_LOAD_POLICY</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_MATCHPATHCON</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_RESTORECON</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_RUNCON</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<conj>
+							<var>USER_BUSYBOX_SELINUX</var>
+							<conj>
+								<var>USER_BUSYBOX_RUNCON</var>
+								<var>USER_BUSYBOX_GETOPT_LONG</var>
+							</conj>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>USER_BUSYBOX_BUSYBOX</var>
+								</not>
+								<disj>
+									<not>
+										<var>USER_BUSYBOX_SELINUX</var>
+									</not>
+									<disj>
+										<not>
+											<var>USER_BUSYBOX_RUNCON</var>
+										</not>
+										<not>
+											<var>USER_BUSYBOX_GETOPT_LONG</var>
+										</not>
+									</disj>
+								</disj>
+							</disj>
+							<var>USER_BUSYBOX_FEATURE_RUNCON_LONG_OPTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USER_BUSYBOX_FEATURE_RUNCON_LONG_OPTIONS</var>
+							</not>
+							<conj>
+								<var>USER_BUSYBOX_BUSYBOX</var>
+								<conj>
+									<var>USER_BUSYBOX_SELINUX</var>
+									<conj>
+										<var>USER_BUSYBOX_RUNCON</var>
+										<var>USER_BUSYBOX_GETOPT_LONG</var>
+									</conj>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_SELINUXENABLED</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_SETENFORCE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_SETFILES</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_SETSEBOOL</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>USER_BUSYBOX_BUSYBOX</var>
+						<var>USER_BUSYBOX_SELINUX</var>
+					</conj>
+					<disj>
+						<not>
+							<var>USER_BUSYBOX_SESTATUS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_ADDUSER</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_ADDGROUP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_DELUSER</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_DELGROUP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_LOGIN</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_SU</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_SULOGIN</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_PASSWD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_GETTY</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_SHADOWPASSWDS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_MD5_PASSWORDS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_SHA1_PASSWORDS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_TINYLOGIN_TINYLOGIN</var>
+					<disj>
+						<not>
+							<var>USER_TINYLOGIN_TRIVIAL_HELP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_OPTIMIZE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_DEBUG</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_VERBOSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_MICROWIN</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_NANOX</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_SHAREDLIBS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_NWIDGET</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_OBJFRAMEWORK</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_MICROWINDEMO</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_NANOXDEMO</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_NANOWM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_LINK_APP_INTO_SERVER</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_FILEIO</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_BMP_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_GIF_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_PNM_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_XPM_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_JPEG_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_PNG_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_T1LIB_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_FREETYPE_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_SHAREDMEM_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_HZK_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_BIG5_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVE_GB2312_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HAVEMSFONTS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_NOFONTSORCLIPPING</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_ERASEMOVE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_UPDATEREGIONS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_GRAYPALETTE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_X11</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_FRAMEBUFFER</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_FBVGA</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_VTSWITCH</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_PORTRAIT_MODE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_FBREVERSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_VGALIB</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HWVGA</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_CLEOVGA</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_GPMMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_SERMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_TPMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_TPHELIO</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_ADSMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_IPAQMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_HARRIERMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_PSIONMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_UCTSMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_DE2TSMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_CLEOMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_NOMOUSE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_TTYKBD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_SCANKBD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_PIPEKBD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_CLEOKBD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_NOKBD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_LANDMINE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_LAUNCHER</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_MOVE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_MTERM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_MTEST</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_MTEST2</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_MUSERFD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NANO_X</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NANOWM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NPANEL</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NTERM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NTEST</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NTETRIS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NXCLOCK</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NXEV</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NXKBD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NXLSCLIENTS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NXTERM</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_NXVIEW</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_SLIDER</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_VNC</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>USER_MICROWIN</var>
+					<disj>
+						<not>
+							<var>USER_MICROWIN_BIN_WORLD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="false" Constraints="false" Features="false" Redundant="false" Tautology="false"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

@@ -3,15 +3,15 @@
 		<properties/>
 		<struct>
 			<and abstract="true" mandatory="true" name="Root">
-				<and mandatory="false" name="And">
+				<and mandatory="true" name="ANode">
 					<feature name="AndFalseOptional"/>
 					<feature name="OtherAnd"/>
 				</and>
-				<or mandatory="false" name="Or">
+				<or mandatory="true" name="OrNode">
 					<feature name="OrFalseOptional"/>
 					<feature name="OtherOr"/>
 				</or>
-				<alt mandatory="false" name="Alternative">
+				<alt mandatory="true" name="AlternativeNode">
 					<feature name="AlternativeFalseOptional"/>
 					<feature name="OtherAlternative"/>
 				</alt>
@@ -20,19 +20,19 @@
 		<constraints>
 			<rule>
 				<imp>
-					<var>And</var>
+					<var>ANode</var>
 					<var>AndFalseOptional</var>
 				</imp>
 			</rule>
 			<rule>
 				<imp>
-					<var>Or</var>
+					<var>OrNode</var>
 					<var>OrFalseOptional</var>
 				</imp>
 			</rule>
 			<rule>
 				<imp>
-					<var>Alternative</var>
+					<var>AlternativeNode</var>
 					<var>AlternativeFalseOptional</var>
 				</imp>
 			</rule>

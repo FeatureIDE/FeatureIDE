@@ -81,7 +81,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void layoutLevelInX(List<IGraphicalFeature> level) {
 		for (IGraphicalFeature feature : level)
-			if (!feature.isCollapsed() && feature.getGraphicalChildren().size() > 0) {
+			if (!feature.isCollapsed() && getChildren(feature).size() > 0) {
 				centerAboveChildren(feature);
 			}
 
@@ -97,9 +97,9 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
 
-		if (feature.getGraphicalChildren().size() == 0)
+		if (getChildren(feature).size() == 0) {
 			nextToLeftSibling(feature, lastFeature);
-		else {
+		} else {
 			if (lastFeature != null)
 				moveWidth = Math.max(moveWidth, getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX() - getLocation(feature).x);
 			if (moveWidth > 0)
@@ -109,7 +109,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				firstCompound = false;
 				boolean compoundSibling = false;
 				for (int k = j - 1; k >= 0; k--)
-					if (level.get(k).getGraphicalChildren().size() > 0)
+					if (getChildren(level.get(k)).size() > 0)
 						compoundSibling = true;
 				if (!compoundSibling)
 					for (int k = j - 1; k >= 0; k--)
@@ -130,7 +130,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				l = k + 1;
 				break;
 			}
-			if (sibling.getGraphicalChildren().size() > 0) {
+			if (getChildren(sibling).size() > 0) {
 				l = k + 1;
 				right = false;
 				space = getBounds(feature).x - getBounds(sibling).right() - width;
@@ -158,7 +158,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 			levels.add(level);
 			List<IGraphicalFeature> newLevel = new ArrayList<>(0);
 			for (IGraphicalFeature feature : level) {
-				newLevel.addAll(feature.getGraphicalChildren());
+				newLevel.addAll(getChildren(feature));
 			}
 			level = newLevel;
 		} while (!level.isEmpty());

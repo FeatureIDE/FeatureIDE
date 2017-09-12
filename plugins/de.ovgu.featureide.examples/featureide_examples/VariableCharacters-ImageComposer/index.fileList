@@ -1,5 +1,4 @@
 .classpath
-.featureide/model.xml/model.xml.xml
 .project
 configs/default.config
 features/Ball/character.png

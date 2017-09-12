@@ -30,10 +30,13 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -47,8 +50,10 @@ abstract public class FeatureDiagramLayoutManager {
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden, showCollapsedConstraints;
+	protected FeatureDiagramEditor editor;
 
-	public final void layout(IGraphicalFeatureModel featureModel) {
+	public final void layout(IGraphicalFeatureModel featureModel, FeatureDiagramEditor editor) {
+		this.editor = editor;
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		showCollapsedConstraints = featureModel.getLayout().showCollapsedConstraints();
@@ -57,7 +62,7 @@ abstract public class FeatureDiagramLayoutManager {
 		for (Entry<IGraphicalFeature, Point> entry : newLocations.entrySet()) {
 			entry.getKey().setLocation(entry.getValue());
 		}
-		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
+		if (!featureModel.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
 			layoutLegend(featureModel, showHidden);
 		}
 		newLocations.clear();
@@ -105,9 +110,9 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	void layout(int yoffset, List<IGraphicalConstraint> constraints) {
-		//Added offset to avoid colliding with the collapse decorator
-		int y = yoffset + FMPropertyManager.getConstraintSpace() + 20;
-		boolean depthFirst = this instanceof DepthFirstLayout;
+		//added 2 times getConstraintSpace to prevent intersecting with the collapsed decorator
+		int y = yoffset + FMPropertyManager.getConstraintSpace() * 2;
+		boolean depthFirst = this instanceof DepthFirstLayout || this instanceof VerticalLayout;
 		for (IGraphicalConstraint constraint : constraints) {
 			Dimension size = constraint.getSize();
 			int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
@@ -119,7 +124,7 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * sets the position of the legend
 	 */
-	private static void layoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
+	public void layoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
 		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
@@ -155,11 +160,19 @@ abstract public class FeatureDiagramLayoutManager {
 			if (position.y + position.height > max.y)
 				max.y = position.bottom();
 		}
-
-		final Dimension legendSize = FeatureUIHelper.getLegendSize(featureModel);
-		if (legendSize == null) {
+		if (editor == null)
 			return;
+		Dimension legendSize = null;
+		LegendFigure legendFigure = null;
+		//Find Legend Figure
+		for (Object obj : editor.getEditPartRegistry().values()) {
+			if (obj instanceof LegendEditPart) {
+				legendFigure = ((LegendEditPart) obj).getFigure();
+				legendSize = legendFigure.getSize();
+			}
 		}
+		if (legendSize == null && legendFigure == null)
+			return;
 
 		boolean topRight = true;
 		boolean topLeft = true;
@@ -230,6 +243,155 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	/**
+	 * sets the position of the legend only when intersecting
+	 */
+	public Point layoutLegendOnIntersect(IGraphicalFeatureModel featureModel) {
+		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
+		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
+
+		/*
+		 * update lowest, highest, most left, most right coordinates
+		 * for features
+		 */
+		Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();
+		for (IGraphicalFeature feature : nonHidden) {
+			Rectangle position = FeatureUIHelper.getBounds(feature);
+			if (position.x < min.x)
+				min.x = position.x;
+			if (position.y < min.y)
+				min.y = position.y;
+			if ((position.x + position.width) > max.x)
+				max.x = position.right();
+			if (position.y + position.height > max.y)
+				max.y = position.bottom();
+		}
+
+		/*
+		 * update lowest, highest, most left, most right coordinates
+		 * for constraints
+		 */
+		for (IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
+			Rectangle position = FeatureUIHelper.getBounds(constraint);
+			if (position.x < min.x)
+				min.x = position.x;
+			if (position.y < min.y)
+				min.y = position.y;
+			if ((position.x + position.width) > max.x)
+				max.x = position.right();
+			if (position.y + position.height > max.y)
+				max.y = position.bottom();
+		}
+		if (editor == null)
+			return null;
+		Dimension legendSize = null;
+		LegendFigure legendFigure = null;
+		//Find Legend Figure
+		for (Object obj : editor.getEditPartRegistry().values()) {
+			if (obj instanceof LegendEditPart) {
+				legendFigure = ((LegendEditPart) obj).getFigure();
+				legendSize = legendFigure.getSize();
+			}
+		}
+		if (legendSize == null && legendFigure == null)
+			return null;
+
+		boolean topRight = true;
+		boolean topLeft = true;
+		boolean botLeft = true;
+		boolean botRight = true;
+
+		boolean intersects = false;
+
+		Rectangle legend = legendFigure.getBounds();
+
+		for (IGraphicalFeature feature : nonHidden) {
+			final Point tempLocation = feature.getLocation();
+			if (null != tempLocation) {
+				final Rectangle featureRect = new Rectangle(tempLocation, feature.getSize());
+				if (legend.intersects(featureRect)) {
+					intersects = true;
+				}
+			}
+		}
+		for (IGraphicalConstraint consts : featureModel.getVisibleConstraints()) {
+			final Point tempLocation = consts.getLocation();
+			if (null != tempLocation) {
+				final Rectangle featureRect = new Rectangle(tempLocation, consts.getSize());
+				if (legend.intersects(featureRect)) {
+					intersects = true;
+				}
+			}
+		}
+
+		if (intersects) {
+			/*
+			 * check if features would intersect with the legend on the edges
+			 */
+			for (IGraphicalFeature feature : nonHidden) {
+				final Point tempLocation = feature.getLocation();
+				if (null != tempLocation) {
+					final Dimension tempSize = feature.getSize();
+					if (tempSize != null) {
+						if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
+								&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
+							topRight = false;
+						if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
+								&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
+							topLeft = false;
+						if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
+								&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
+							botLeft = false;
+						if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
+								&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
+							botRight = false;
+					}
+				}
+			}
+			/*
+			 * check if constraints would intersect with the legend on the edges
+			 */
+			if (topRight || topLeft || botLeft || botRight) {
+				for (IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
+					Point tempLocation = constraint.getLocation();
+					if (null == tempLocation)
+						continue;
+					Dimension tempSize = constraint.getSize();
+					if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
+							&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
+						topRight = false;
+					if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
+							&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
+						topLeft = false;
+					if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
+							&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
+						botLeft = false;
+					if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
+							&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
+						botRight = false;
+				}
+			}
+
+			/*
+			 * set the legend position
+			 */
+			if (topRight) {
+				featureModel.getLayout().setLegendPos(max.x - legendSize.width, min.y);
+			} else if (topLeft) {
+				featureModel.getLayout().setLegendPos(min.x, min.y);
+			} else if (botLeft) {
+				featureModel.getLayout().setLegendPos(min.x, max.y - legendSize.height);
+			} else if (botRight) {
+				featureModel.getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
+			} else {
+				featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
+			}
+			return featureModel.getLayout().getLegendPos();
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Stores locations separately to {@link IGraphicalFeature}.
 	 */
 	protected Map<IGraphicalFeature, Point> newLocations = new HashMap<>();
@@ -255,6 +417,6 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
-		return Functional.toList(feature.getGraphicalChildren());
+		return Functional.toList(feature.getGraphicalChildren(showHidden));
 	}
 }

@@ -243,7 +243,6 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	private void readCurrentConfiguration(IFeatureProject featureProject) {
 		final Configuration config = new Configuration(featureProject.getFeatureModel());
 		final IFile currentConfig = featureProject.getCurrentConfiguration();
-		FileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigFormatManager.getInstance());
 		if (currentConfig != null) {
 			FileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigFormatManager.getInstance());
 		}

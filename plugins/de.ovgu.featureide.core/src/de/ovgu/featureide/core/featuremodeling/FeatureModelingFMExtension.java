@@ -66,4 +66,6 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	public boolean hasFeatureOrder() {
 		return false;
 	}
+	
+	
 }

@@ -67,8 +67,9 @@ public class TypeChef {
 				+ System.getProperty("file.separator") + "cnf.fm");
 		final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath());
 		try (BufferedWriter print = new BufferedWriter(new FileWriter(outputFile))) {
-			print.write(NodeWriter.nodeToString(Nodes.convert(CNFCreator.createNodes(fm)),
-					NodeWriter.javaSymbols));
+			final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(fm)));
+			nodeWriter.setSymbols(NodeWriter.javaSymbols);
+			print.write(nodeWriter.nodeToString());
 		} catch (IOException e) {
 			Colligens.getDefault().logError(e);
 		}

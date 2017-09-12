@@ -60,5 +60,4 @@ public class Legend implements IGraphicItem {
 	public GraphicItem getItemType() {
 		return GraphicItem.Legend;
 	}
-
 }

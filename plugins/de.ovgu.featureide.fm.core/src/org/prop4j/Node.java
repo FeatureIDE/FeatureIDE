@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,6 +68,22 @@ public abstract class Node {
 	public Node[] getChildren() {
 		return children;
 	}
+
+	/**
+	 * <p>
+	 * Returns true iff this node evaluates to true under the given truth value assignment.
+	 * The result of the evaluation is the same as if each positive literal in the expression were replaced by the corresponding boolean value in the given map.
+	 * </p>
+	 * 
+	 * <p>
+	 * For example, for the {@link And conjunction} operation, this operations returns true iff the following formula is satisfied:
+	 * <pre><i>c<sub>1</sub></i> &and; &hellip; &and; <i>c<sub>n</sub></i></pre>
+	 * Where <i>c<sub>i</sub></i> is the <i>i</i>-th of the <i>n</i> children of the node.
+	 * </p>
+	 * @param assignment truth value assignment from variable to true or false
+	 * @return the result of evaluation of this node
+	 */
+	public abstract boolean getValue(Map<Object, Boolean> assignment);
 
 	/**
 	 * Returns true iff this is in conjunctive normal form.
@@ -119,10 +136,6 @@ public abstract class Node {
 			regularCNFNode = new And(new Or(regularCNFNode));
 		}
 		return regularCNFNode;
-	}
-
-	public boolean getValue(Map<Object, Boolean> map) {
-		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
 	public static Node buildCNF(Node node) {
@@ -331,24 +344,6 @@ public abstract class Node {
 		return node;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Node toCNFprintln() {
-		Node node = this;
-		System.out.println(node);
-		node = node.eliminate(Choose.class, Equals.class, Implies.class);
-		System.out.println(node);
-		node = node.eliminate(Not.class);
-		System.out.println(node);
-		node = node.eliminate(AtMost.class, AtLeast.class);
-		System.out.println(node);
-		node = node.eliminate(Not.class);
-		System.out.println(node);
-		node = node.clausifyCNF();
-		System.out.println(node);
-		System.out.println();
-		return node;
-	}
-
 	public void simplify() {
 		for (int i = 0; i < children.length; i++) {
 			children[i].simplify();
@@ -385,7 +380,7 @@ public abstract class Node {
 
 	@Override
 	public String toString() {
-		return NodeWriter.nodeToString(this);
+		return new NodeWriter(this).nodeToString();
 	}
 
 	/**
@@ -401,7 +396,10 @@ public abstract class Node {
 	 * @return a string representing this node
 	 */
 	public String toString(String[] symbols) {
-		return NodeWriter.nodeToString(this, symbols, false, true);
+		final NodeWriter nw = new NodeWriter(this);
+		nw.setSymbols(symbols);
+		nw.setEnquoteWhitespace(true);
+		return nw.nodeToString();
 	}
 
 	public static Node[] clone(Node[] array) {
@@ -441,16 +439,9 @@ public abstract class Node {
 		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());
 	}
 
-	public List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
-		if (this instanceof Literal) {
-			if (((Literal) this).var.equals(feature.getName())) {
-				((Literal) this).var = replaceWithFeature.getName();
-				list.add(this);
-			}
-		} else {
-			for (Node child : this.children) {
-				child.replaceFeature(feature, replaceWithFeature, list);
-			}
+	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
+		for (Node child : this.children) {
+			child.replaceFeature(feature, replaceWithFeature, list);
 		}
 		return list;
 	}
@@ -543,38 +534,152 @@ public abstract class Node {
 			nodes[i] = new Not(nodes[i]);
 	}
 
+	/**
+	 * Returns all features contained in this node and its children.
+	 * Duplicates are kept.
+	 * @return all features contained in this node and its children; not null
+	 */
 	public List<String> getContainedFeatures() {
-		List<String> ret = new ArrayList<>();
-		getContainedFeatures(this, ret);
-		return ret;
+		return new ArrayList<>(getContainedFeatures(new LinkedList<String>()));
 	}
 
-	private void getContainedFeatures(Node actNode, List<String> featureList) {
-		if (actNode instanceof Literal) {
-			featureList.add(((Literal) actNode).var.toString());
-		} else {
-			for (Node child : actNode.getChildren()) {
-				getContainedFeatures(child, featureList);
-			}
+	/**
+	 * Returns all features contained in this node and its children.
+	 * Duplicates are removed.
+	 * @return all features contained in this node and its children; not null
+	 */
+	public Set<String> getUniqueContainedFeatures() {
+		return (Set<String>) getContainedFeatures(new LinkedHashSet<String>());
+	}
+
+	/**
+	 * Returns all features contained in this node and its children.
+	 * Uses the given collection as out variable.
+	 * @param containedFeatures collection of previously found features to add to; not null
+	 * @return all features contained in this node and its children; not null
+	 */
+	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
+		for (final Node child : children) {
+			child.getContainedFeatures(containedFeatures);
 		}
+		return containedFeatures;
 	}
 
 	/**
 	 * Returns all literals contained in this node and its children.
-	 * 
-	 * @return all literals contained in this node and its children
+	 * Duplicates are kept.
+	 * @return all literals contained in this node and its children; not null
 	 */
-	public Set<Literal> getLiterals() {
-		final Set<Literal> literals = new LinkedHashSet<>();
-		if (this instanceof Literal) {
-			literals.add((Literal) this);
-		}
-		if (children == null) {
-			return literals;
-		}
-		for (int i = 0; i < children.length; i++) {
-			literals.addAll(children[i].getLiterals());
+	public List<Literal> getLiterals() {
+		return new ArrayList<>(getLiterals(new LinkedList<Literal>()));
+	}
+
+	/**
+	 * Returns all literals contained in this node and its children.
+	 * Duplicates are removed.
+	 * @return all literals contained in this node and its children; not null
+	 */
+	public Set<Literal> getUniqueLiterals() {
+		return (Set<Literal>) getLiterals(new LinkedHashSet<Literal>());
+	}
+
+	/**
+	 * Returns all literals contained in this node and its children.
+	 * Duplicates are kept.
+	 * Uses the given collection as out variable.
+	 * @param literals collection of previously found literals to add to; not null
+	 * @return all literals contained in this node and its children; not null
+	 */
+	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
+		for (final Node child : children) {
+			child.getLiterals(literals);
 		}
 		return literals;
+	}
+
+	/**
+	 * Returns all variables contained in this node and its children.
+	 * Duplicates are kept.
+	 * @return all variables contained in this node and its children; not null
+	 */
+	public List<Object> getVariables() {
+		return new ArrayList<>(getVariables(new LinkedList<Object>()));
+	}
+
+	/**
+	 * Returns all variables contained in this node and its children.
+	 * Duplicates are removed.
+	 * @return all variables contained in this node and its children; not null
+	 */
+	public Set<Object> getUniqueVariables() {
+		return (Set<Object>) getVariables(new LinkedHashSet<Object>());
+	}
+
+	/**
+	 * Returns all variables contained in this node and its children.
+	 * Uses the given collection as out variable.
+	 * @param variables collection of previously found variables to add to; not null
+	 * @return all variables contained in this node and its children; not null
+	 */
+	protected Collection<Object> getVariables(Collection<Object> variables) {
+		for (final Node child : children) {
+			child.getVariables(variables);
+		}
+		return variables;
+	}
+
+	/**
+	 * <p>
+	 * Returns all possible truth value assignments for {@link #getVariables() all variables} in this node.
+	 * </p>
+	 * 
+	 * <p>
+	 * Let <i>n</i> denote the amount of literals in this node.
+	 * Then this method will return exactly <i>2<sup>n</sup></i> assignments.
+	 * Each assignment in turn contains exactly <i>n</i> entries (1 for each variable).
+	 * </p>
+	 * @return all possible truth value assignments; not null
+	 */
+	public Set<Map<Object, Boolean>> getAssignments() {
+		return getAssignments(null);
+	}
+
+	/**
+	 * Returns all truth value assignments for which this node {@link #getValue(Map) evaluates} to true.
+	 * @return all satisfying truth value assignments; not null
+	 */
+	public Set<Map<Object, Boolean>> getSatisfyingAssignments() {
+		return getAssignments(true);
+	}
+
+	/**
+	 * Returns all truth value assignments for which this node {@link #getValue(Map) evaluates} to false.
+	 * @return all contradicting truth value assignments; not null
+	 */
+	public Set<Map<Object, Boolean>> getContradictingAssignments() {
+		return getAssignments(false);
+	}
+
+	/**
+	 * Returns all truth value assignments for which this node {@link #getValue(Map) evaluates} to the given boolean value.
+	 * Accepts all assignments if the given boolean value is null.
+	 * @param result the expected evaluation result; null to accept every assignment
+	 * @return all accepted truth value assignments; not null
+	 */
+	private Set<Map<Object, Boolean>> getAssignments(Boolean result) {
+		final Set<Object> keys = getUniqueVariables();
+		final Set<Map<Object, Boolean>> assignments = new LinkedHashSet<>();
+		for (int assignment = 0; assignment < 1 << keys.size(); assignment++) {
+			final Map<Object, Boolean> map = new LinkedHashMap<Object, Boolean>();
+			int i = 0;
+			for (final Object key : keys) {
+				map.put(key, (assignment & (1 << i)) != 0);
+				i++;
+			}
+			if (result == null || getValue(map) == result) {
+				assignments.add(map);
+			}
+		}
+		return assignments;
 	}
 }

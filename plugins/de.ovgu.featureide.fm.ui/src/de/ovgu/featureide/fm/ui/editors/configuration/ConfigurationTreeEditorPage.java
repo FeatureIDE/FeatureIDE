@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +42,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ArmEvent;
@@ -84,6 +87,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -99,10 +103,19 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
@@ -155,6 +168,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<>();
+
+	/** Generates explanations for automatic selections. */
+	private final AutomaticSelectionExplanationCreator automaticSelectionExplanationCreator = ConfigurationExplanationCreatorFactory.getDefault()
+			.getAutomaticSelectionExplanationCreator();
+	/** Generates explanations for dead features. */
+	private final DeadFeatureExplanationCreator deadFeatureExplanationCreator = FeatureModelExplanationCreatorFactory.getDefault()
+			.getDeadFeatureExplanationCreator();
+	/** Generates explanations for false-optional features. */
+	private final FalseOptionalFeatureExplanationCreator falseOptionalFeatureExplanationCreator = FeatureModelExplanationCreatorFactory.getDefault()
+			.getFalseOptionalFeatureExplanationCreator();
 
 	protected IConfigurationEditor configurationEditor = null;
 
@@ -1043,9 +1066,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (!configurationEditor.isAutoSelectFeatures()) {
 			return null;
 		}
-		if (configurationEditor.getConfiguration().getSelectedFeatures().size()==0) {
-			setDirty();
-		}
 		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
 		final LongRunningMethod<Boolean> update = propagator.update(redundantManual, Arrays.asList(feature));
@@ -1072,6 +1092,75 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return job;
 	}
 
+	/**
+	 * Returns an explanation for the given feature selection.
+	 * Generates it first if necessary.
+	 * 
+	 * @param featureSelection a feature selection; not null
+	 * @return an explanation for the given feature selection; null if none could be found
+	 */
+	public Explanation getExplanation(SelectableFeature featureSelection) {
+		switch (featureSelection.getAutomatic()) {
+		case SELECTED:
+		case UNSELECTED:
+			return getAutomaticSelectionExplanation(featureSelection);
+		case UNDEFINED:
+			break;
+		default:
+			throw new IllegalStateException("Unknown feature selection state");
+		}
+		return null;
+	}
+
+	/**
+	 * Returns an explanation why the given feature is automatically selected or unselected.
+	 * Generates it first if necessary.
+	 * 
+	 * @param automaticSelection an automatically selected feature; not null
+	 * @return an explanation why the given feature is automatically selected or unselected; null if none could be found
+	 */
+	public Explanation getAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
+		//TODO Remember previously generated explanations.
+		return createAutomaticSelectionExplanation(automaticSelection);
+	}
+
+	/**
+	 * Returns a new explanation for the given automatic selection.
+	 * 
+	 * @param automaticSelection the automatic selection
+	 * @return a new explanation for the given automatic selection; null if none could be generated
+	 */
+	protected Explanation createAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
+		final Configuration config = configurationEditor.getConfiguration();
+		if (config == null) {
+			return null;
+		}
+		final IFeatureModel fm = config.getFeatureModel();
+		if (fm == null) {
+			return null;
+		}
+		final FeatureProperties featureProperties = FeatureModelManager.getAnalyzer(fm).getFeatureProperties(automaticSelection.getFeature());
+		switch (featureProperties.getFeatureSelectionStatus()) {
+		case DEAD:
+			deadFeatureExplanationCreator.setFeatureModel(fm);
+			deadFeatureExplanationCreator.setDeadFeature(automaticSelection.getFeature());
+			return deadFeatureExplanationCreator.getExplanation();
+		default:
+			break;
+		}
+		switch (featureProperties.getFeatureParentStatus()) {
+		case FALSE_OPTIONAL:
+			falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
+			falseOptionalFeatureExplanationCreator.setFalseOptionalFeature(automaticSelection.getFeature());
+			return falseOptionalFeatureExplanationCreator.getExplanation();
+		default:
+			break;
+		}
+		automaticSelectionExplanationCreator.setConfiguration(config);
+		automaticSelectionExplanationCreator.setAutomaticSelection(automaticSelection);
+		return automaticSelectionExplanationCreator.getExplanation();
+	}
+
 	protected void lockItem(TreeItem item) {
 		item.setGrayed(true);
 		item.setChecked(true);
@@ -1095,6 +1184,26 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
 						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
+						if (configurationEditor instanceof ConfigurationEditor) {
+							ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
+							//Get current configuration 
+							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
+							//Cast is necessary, don't remove 
+							final IFile document = (IFile) getEditorInput().getAdapter(IFile.class);
+
+							byte[] content;
+							try {
+								content = new byte[document.getContents().available()];
+								document.getContents().read(content);
+								if (!source.equals(new String(content))) {
+									setDirty();
+								}
+							} catch (IOException e) {
+								FMUIPlugin.getDefault().logError(e);
+							} catch (CoreException e) {
+								FMUIPlugin.getDefault().logError(e);
+							}
+						}
 					}
 				}
 			});
@@ -1188,7 +1297,24 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 				sb.append("Open Clauses:\n");
 				for (LiteralSet clause : openClauses) {
-					sb.append(NodeWriter.nodeToString(Nodes.convert(feature.getVariables(), clause), NodeWriter.logicalSymbols)).append('\n');
+					final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(feature.getVariables(), clause));
+					nodeWriter.setSymbols(NodeWriter.logicalSymbols);
+					sb.append(nodeWriter.nodeToString()).append('\n');
+				}
+			}
+
+			//Print the explanation.
+			final Explanation explanation = getExplanation(feature);
+			if (explanation != null && explanation.getReasons() != null && !explanation.getReasons().isEmpty()) {
+				if (sb.length() > 0) {
+					sb.append("\n\n");
+				}
+				final ExplanationWriter wr = explanation.getWriter();
+				sb.append(wr.getHeaderString());
+				for (final Reason reason : explanation.getReasons()) {
+					sb.append(System.lineSeparator());
+					sb.append("\u2022 ");
+					sb.append(wr.getReasonString(reason));
 				}
 			}
 

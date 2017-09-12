@@ -125,8 +125,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			cleaned = true;
 		}
 		if (!hasOtherNature) {
-			for (IResource member : binFolder.members())
-				member.delete(true, monitor);
+			if (binFolder != null && binFolder.exists())
+				for (IResource member : binFolder.members())
+					member.delete(true, monitor);
 		}
 		for (IResource member : buildFolder.members()) {
 			member.delete(true, monitor);
@@ -134,7 +135,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 		buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		if (!hasOtherNature) {
-			binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+			if (binFolder != null && binFolder.exists())
+				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
 		cleanBuild = false;
 	}

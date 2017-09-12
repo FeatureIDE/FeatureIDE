@@ -50,7 +50,6 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 	protected void endAction() {
 		for (final IFeatureProject project : projectList) {
 			final Path path = Paths.get(project.getProject().getFile("model.fg").getLocationURI());
-
 			final IRunner<ModalImplicationGraph> runner = LongRunningWrapper.getRunner(new LongRunningMethod<ModalImplicationGraph>() {
 				@Override
 				public ModalImplicationGraph execute(IMonitor monitor) throws Exception {

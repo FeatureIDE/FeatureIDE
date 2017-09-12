@@ -63,6 +63,8 @@ import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -366,8 +368,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		extensionPages = allPages.subList(internalPages.size(), allPages.size());
 
 		if (containsError()) {
-			setActivePage(internalPages.get(internalPages.size() - 1).getIndex());
+			setActivePage(textEditorPage.getIndex());
+		} else if (requiresAdvancedConfigurationPage()) {
+			setActivePage(internalPages.get(1).getIndex());
 		}
+	}
+
+	private boolean requiresAdvancedConfigurationPage() {
+		for (SelectableFeature feature : configurationManager.editObject().getFeatures()) {
+			if (feature.getManual() == Selection.UNSELECTED) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private IConfigurationEditorPage initPage(IConfigurationEditorPage page) {

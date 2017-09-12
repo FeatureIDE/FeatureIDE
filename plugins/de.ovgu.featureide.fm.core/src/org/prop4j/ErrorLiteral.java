@@ -29,7 +29,6 @@ public class ErrorLiteral extends Literal {
 
 	public ErrorLiteral(Object var) {
 		super(var, true);
-		this.origin = -1 * FeatureAttribute.values().length + FeatureAttribute.UNDEFINED.ordinal();
 	}
 
 	public ErrorLiteral(ErrorLiteral oldLiteral) {

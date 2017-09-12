@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="root">
+				<alt abstract="true" mandatory="true" name="CONFIG_VISUAL_STUDIO_8_0_alt">
+					<feature mandatory="true" name="CONFIG_VISUAL_STUDIO_7_0"/>
+					<feature mandatory="true" name="CONFIG_VISUAL_STUDIO_8_0"/>
+				</alt>
+				<feature name="CONFIG_AXTLSWRAP"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_BIGINT_MONTGOMERY_alt">
+					<feature mandatory="true" name="CONFIG_BIGINT_CLASSICAL"/>
+					<feature mandatory="true" name="CONFIG_BIGINT_MONTGOMERY"/>
+					<feature mandatory="true" name="CONFIG_BIGINT_BARRETT"/>
+				</alt>
+				<feature name="CONFIG_WIN32_USE_CRYPTO_LIB"/>
+				<and name="CONFIG_JAVA_BINDINGS">
+					<feature mandatory="true" name="CONFIG_JAVA_HOME"/>
+				</and>
+				<feature name="CONFIG_SSL_TEST"/>
+				<and name="CONFIG_DEBUG">
+					<feature name="CONFIG_STRIP_UNWANTED_SECTIONS"/>
+				</and>
+				<feature name="CONFIG_BIGINT_SQUARE"/>
+				<feature name="CONFIG_OPENSSL_COMPATIBLE"/>
+				<and name="CONFIG_BIGINT_KARATSUBA">
+					<feature mandatory="true" name="SQU_KARATSUBA_THRESH"/>
+					<feature mandatory="true" name="MUL_KARATSUBA_THRESH"/>
+				</and>
+				<feature mandatory="true" name="CONFIG_VISUAL_STUDIO_8_0_BASE"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_PLATFORM_LINUX_alt">
+					<feature mandatory="true" name="CONFIG_PLATFORM_LINUX"/>
+					<feature mandatory="true" name="CONFIG_PLATFORM_CYGWIN"/>
+					<feature mandatory="true" name="CONFIG_PLATFORM_WIN32"/>
+				</alt>
+				<feature name="CONFIG_PERFORMANCE_TESTING"/>
+				<feature name="CONFIG_HTTP_DIRECTORIES"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_SSL_PROT_HIGH_alt">
+					<feature mandatory="true" name="CONFIG_SSL_PROT_LOW"/>
+					<feature mandatory="true" name="CONFIG_SSL_PROT_MEDIUM"/>
+					<feature mandatory="true" name="CONFIG_SSL_PROT_HIGH"/>
+				</alt>
+				<feature mandatory="true" name="CONFIG_VISUAL_STUDIO_7_0_BASE"/>
+				<and name="CONFIG_LUA_BINDINGS">
+					<feature mandatory="true" name="CONFIG_LUA_CORE"/>
+				</and>
+				<alt abstract="true" mandatory="true" name="CONFIG_SSL_CERT_VERIFICATION_alt">
+					<feature mandatory="true" name="CONFIG_SSL_SERVER_ONLY"/>
+					<feature mandatory="true" name="CONFIG_SSL_CERT_VERIFICATION"/>
+					<feature mandatory="true" name="CONFIG_SSL_ENABLE_CLIENT"/>
+					<feature mandatory="true" name="CONFIG_SSL_FULL_MODE"/>
+					<feature mandatory="true" name="CONFIG_SSL_SKELETON_MODE"/>
+				</alt>
+				<feature mandatory="true" name="CONFIG_HTTP_HTTPS_PORT"/>
+				<feature mandatory="true" name="CONFIG_SSL_EXPIRY_TIME"/>
+				<feature name="CONFIG_HTTP_VERBOSE"/>
+				<and name="CONFIG_HTTP_ENABLE_DIFFERENT_USER">
+					<feature mandatory="true" name="CONFIG_HTTP_USER"/>
+				</and>
+				<feature name="CONFIG_BIGINT_CHECK_ON"/>
+				<feature mandatory="true" name="CONFIG_HTTP_SESSION_CACHE_SIZE"/>
+				<feature name="HAVE_DOT_CONFIG"/>
+				<feature name="CONFIG_BIGINT_SLIDING_WINDOW"/>
+				<feature name="CONFIG_USE_DEV_URANDOM"/>
+				<feature name="CONFIG_HTTP_HAS_IPV6"/>
+				<feature mandatory="true" name="CONFIG_X509_MAX_CA_CERTS"/>
+				<feature mandatory="true" name="CONFIG_SSL_PRIVATE_KEY_PASSWORD"/>
+				<feature name="CONFIG_SSL_ENABLE_V23_HANDSHAKE"/>
+				<feature mandatory="true" name="CONFIG_SSL_X509_CERT_LOCATION"/>
+				<feature name="CONFIG_HTTP_STATIC_BUILD"/>
+				<and name="CONFIG_SSL_GENERATE_X509_CERT">
+					<feature mandatory="true" name="CONFIG_SSL_X509_ORGANIZATION_UNIT_NAME"/>
+					<feature mandatory="true" name="CONFIG_SSL_X509_ORGANIZATION_NAME"/>
+					<feature mandatory="true" name="CONFIG_SSL_X509_COMMON_NAME"/>
+				</and>
+				<feature mandatory="true" name="CONFIG_HTTP_PORT"/>
+				<feature name="CONFIG_SSL_HAS_PEM"/>
+				<feature mandatory="true" name="CONFIG_DOT_NET_FRAMEWORK_BASE"/>
+				<feature name="CONFIG_SSL_USE_PKCS12"/>
+				<feature name="CONFIG_HTTP_IS_DAEMON"/>
+				<and name="CONFIG_BINDINGS">
+					<feature name="CONFIG_CSHARP_BINDINGS"/>
+					<feature name="CONFIG_VBNET_BINDINGS"/>
+				</and>
+				<and name="CONFIG_HTTP_HAS_CGI">
+					<feature mandatory="true" name="CONFIG_HTTP_CGI_EXTENSIONS"/>
+					<and name="CONFIG_HTTP_ENABLE_LUA">
+						<feature mandatory="true" name="CONFIG_HTTP_LUA_CGI_LAUNCHER"/>
+						<feature name="CONFIG_HTTP_BUILD_LUA"/>
+						<feature mandatory="true" name="CONFIG_HTTP_LUA_PREFIX"/>
+					</and>
+				</and>
+				<feature mandatory="true" name="CONFIG_SSL_MAX_CERTS"/>
+				<feature name="CONFIG_BIGINT_CRT"/>
+				<and name="CONFIG_PERL_BINDINGS">
+					<feature mandatory="true" name="CONFIG_PERL_LIB"/>
+					<feature mandatory="true" name="CONFIG_PERL_CORE"/>
+				</and>
+				<and name="CONFIG_SAMPLES">
+					<feature name="CONFIG_JAVA_SAMPLES"/>
+					<feature name="CONFIG_VBNET_SAMPLES"/>
+					<feature name="CONFIG_PERL_SAMPLES"/>
+					<feature name="CONFIG_CSHARP_SAMPLES"/>
+					<feature name="CONFIG_LUA_SAMPLES"/>
+					<feature name="CONFIG_C_SAMPLES"/>
+				</and>
+				<feature mandatory="true" name="CONFIG_EXTRA_CFLAGS_OPTIONS"/>
+				<feature name="CONFIG_HTTP_HAS_AUTHORIZATION"/>
+				<feature mandatory="true" name="CONFIG_HTTP_TIMEOUT"/>
+				<feature name="CONFIG_SSL_CTX_MUTEXING"/>
+				<feature name="CONFIG_AXHTTPD"/>
+				<feature mandatory="true" name="CONFIG_HTTP_WEBROOT"/>
+				<feature mandatory="true" name="CONFIG_EXTRA_LDFLAGS_OPTIONS"/>
+				<feature mandatory="true" name="PREFIX"/>
+				<and name="CONFIG_SSL_USE_DEFAULT_KEY">
+					<feature mandatory="true" name="CONFIG_SSL_PRIVATE_KEY_LOCATION"/>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<not>
+						<var>CONFIG_PLATFORM_WIN32</var>
+					</not>
+					<conj>
+						<disj>
+							<var>CONFIG_PLATFORM_WIN32</var>
+							<var>PREFIX</var>
+						</disj>
+						<disj>
+							<not>
+								<var>PREFIX</var>
+							</not>
+							<not>
+								<var>CONFIG_PLATFORM_WIN32</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<not>
+							<var>CONFIG_PLATFORM_WIN32</var>
+						</not>
+						<not>
+							<var>CONFIG_DEBUG</var>
+						</not>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<var>CONFIG_PLATFORM_WIN32</var>
+								<var>CONFIG_DEBUG</var>
+							</disj>
+							<var>CONFIG_STRIP_UNWANTED_SECTIONS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>CONFIG_STRIP_UNWANTED_SECTIONS</var>
+							</not>
+							<conj>
+								<not>
+									<var>CONFIG_PLATFORM_WIN32</var>
+								</not>
+								<not>
+									<var>CONFIG_DEBUG</var>
+								</not>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<not>
+							<var>CONFIG_SSL_USE_DEFAULT_KEY</var>
+						</not>
+						<var>CONFIG_SSL_HAS_PEM</var>
+					</conj>
+					<disj>
+						<not>
+							<var>CONFIG_SSL_PRIVATE_KEY_PASSWORD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<not>
+							<var>CONFIG_SSL_GENERATE_X509_CERT</var>
+						</not>
+						<conj>
+							<not>
+								<var>CONFIG_SSL_USE_DEFAULT_KEY</var>
+							</not>
+							<not>
+								<var>CONFIG_SSL_SKELETON_MODE</var>
+							</not>
+						</conj>
+					</conj>
+					<disj>
+						<not>
+							<var>CONFIG_SSL_X509_CERT_LOCATION</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<not>
+							<var>CONFIG_SSL_SERVER_ONLY</var>
+						</not>
+						<not>
+							<var>CONFIG_SSL_SKELETON_MODE</var>
+						</not>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<var>CONFIG_SSL_SERVER_ONLY</var>
+								<var>CONFIG_SSL_SKELETON_MODE</var>
+							</disj>
+							<var>CONFIG_X509_MAX_CA_CERTS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>CONFIG_X509_MAX_CA_CERTS</var>
+							</not>
+							<conj>
+								<not>
+									<var>CONFIG_SSL_SERVER_ONLY</var>
+								</not>
+								<not>
+									<var>CONFIG_SSL_SKELETON_MODE</var>
+								</not>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>CONFIG_PLATFORM_WIN32</var>
+					<disj>
+						<not>
+							<var>CONFIG_WIN32_USE_CRYPTO_LIB</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>CONFIG_SSL_FULL_MODE</var>
+						<not>
+							<var>CONFIG_SSL_GENERATE_X509_CERT</var>
+						</not>
+					</conj>
+					<disj>
+						<not>
+							<var>CONFIG_SSL_TEST</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>CONFIG_CSHARP_BINDINGS</var>
+						<var>CONFIG_VBNET_BINDINGS</var>
+					</disj>
+					<conj>
+						<disj>
+							<conj>
+								<not>
+									<var>CONFIG_CSHARP_BINDINGS</var>
+								</not>
+								<not>
+									<var>CONFIG_VBNET_BINDINGS</var>
+								</not>
+							</conj>
+							<var>CONFIG_DOT_NET_FRAMEWORK_BASE</var>
+						</disj>
+						<disj>
+							<not>
+								<var>CONFIG_DOT_NET_FRAMEWORK_BASE</var>
+							</not>
+							<disj>
+								<var>CONFIG_CSHARP_BINDINGS</var>
+								<var>CONFIG_VBNET_BINDINGS</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>CONFIG_SAMPLES</var>
+						<var>CONFIG_CSHARP_BINDINGS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>CONFIG_SAMPLES</var>
+								</not>
+								<not>
+									<var>CONFIG_CSHARP_BINDINGS</var>
+								</not>
+							</disj>
+							<var>CONFIG_CSHARP_SAMPLES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>CONFIG_CSHARP_SAMPLES</var>
+							</not>
+							<conj>
+								<var>CONFIG_SAMPLES</var>
+								<var>CONFIG_CSHARP_BINDINGS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>CONFIG_SAMPLES</var>
+						<var>CONFIG_VBNET_BINDINGS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>CONFIG_SAMPLES</var>
+								</not>
+								<not>
+									<var>CONFIG_VBNET_BINDINGS</var>
+								</not>
+							</disj>
+							<var>CONFIG_VBNET_SAMPLES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>CONFIG_VBNET_SAMPLES</var>
+							</not>
+							<conj>
+								<var>CONFIG_SAMPLES</var>
+								<var>CONFIG_VBNET_BINDINGS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>CONFIG_SAMPLES</var>
+						<var>CONFIG_JAVA_BINDINGS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>CONFIG_SAMPLES</var>
+								</not>
+								<not>
+									<var>CONFIG_JAVA_BINDINGS</var>
+								</not>
+							</disj>
+							<var>CONFIG_JAVA_SAMPLES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>CONFIG_JAVA_SAMPLES</var>
+							</not>
+							<conj>
+								<var>CONFIG_SAMPLES</var>
+								<var>CONFIG_JAVA_BINDINGS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>CONFIG_SAMPLES</var>
+						<var>CONFIG_PERL_BINDINGS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>CONFIG_SAMPLES</var>
+								</not>
+								<not>
+									<var>CONFIG_PERL_BINDINGS</var>
+								</not>
+							</disj>
+							<var>CONFIG_PERL_SAMPLES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>CONFIG_PERL_SAMPLES</var>
+							</not>
+							<conj>
+								<var>CONFIG_SAMPLES</var>
+								<var>CONFIG_PERL_BINDINGS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>CONFIG_SAMPLES</var>
+						<var>CONFIG_LUA_BINDINGS</var>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>CONFIG_SAMPLES</var>
+								</not>
+								<not>
+									<var>CONFIG_LUA_BINDINGS</var>
+								</not>
+							</disj>
+							<var>CONFIG_LUA_SAMPLES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>CONFIG_LUA_SAMPLES</var>
+							</not>
+							<conj>
+								<var>CONFIG_SAMPLES</var>
+								<var>CONFIG_LUA_BINDINGS</var>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<not>
+							<var>CONFIG_SSL_SKELETON_MODE</var>
+						</not>
+						<conj>
+							<var>CONFIG_BIGINT_KARATSUBA</var>
+							<var>CONFIG_BIGINT_SQUARE</var>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<var>CONFIG_SSL_SKELETON_MODE</var>
+								<disj>
+									<not>
+										<var>CONFIG_BIGINT_KARATSUBA</var>
+									</not>
+									<not>
+										<var>CONFIG_BIGINT_SQUARE</var>
+									</not>
+								</disj>
+							</disj>
+							<var>SQU_KARATSUBA_THRESH</var>
+						</disj>
+						<disj>
+							<not>
+								<var>SQU_KARATSUBA_THRESH</var>
+							</not>
+							<conj>
+								<not>
+									<var>CONFIG_SSL_SKELETON_MODE</var>
+								</not>
+								<conj>
+									<var>CONFIG_BIGINT_KARATSUBA</var>
+									<var>CONFIG_BIGINT_SQUARE</var>
+								</conj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="false" Constraints="false" Features="false" Redundant="false" Tautology="false"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

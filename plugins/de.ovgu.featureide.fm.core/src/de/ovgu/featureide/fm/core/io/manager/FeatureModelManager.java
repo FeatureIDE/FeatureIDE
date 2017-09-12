@@ -84,17 +84,33 @@ public class FeatureModelManager extends FileManager<IFeatureModel> {
 		}
 
 	}
-
+	
+	/**
+	 * Listens to feature model changes.
+	 * Resets its formula if necessary.
+	 */
 	private class FeatureModelChangeListner implements IEventListener {
 
 		public void propertyChange(FeatureIDEEvent evt) {
 			final EventType eventType = evt.getEventType();
 			switch (eventType) {
-			case FEATURE_NAME_CHANGED:
-				// TODO !!! react on name change! and maybe other changes?
-				//				String oldName = (String) evt.getOldValue();
-				//				String newName = (String) evt.getNewValue();
-				//				FeatureModelManager.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
+			case ALL_FEATURES_CHANGED_NAME_TYPE: //Required because feature names are used as variable names.
+			case CHILDREN_CHANGED:
+			case CONSTRAINT_ADD:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_MODIFY:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case FEATURE_MODIFY: //TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
+			case FEATURE_NAME_CHANGED: //Required because feature names are used as variable names.
+			case GROUP_TYPE_CHANGED:
+			case HIDDEN_CHANGED: //TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
+			case MANDATORY_CHANGED:
+			case MODEL_DATA_CHANGED:
+			case MODEL_DATA_OVERRIDDEN:
+			case PARENT_CHANGED:
+			case STRUCTURE_CHANGED:
 				break;
 			default:
 				break;

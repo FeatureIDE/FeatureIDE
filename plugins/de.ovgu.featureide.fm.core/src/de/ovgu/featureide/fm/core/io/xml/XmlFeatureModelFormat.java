@@ -106,9 +106,10 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			final XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
 			customProperties.addAll(propertyLoader.parseProperties());
 		}
+				
 		if (object.getStructure().getRoot() == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
-		}
+		}	
 
 		importCustomProperties(customProperties, object);
 	}
@@ -128,7 +129,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		createXmlPropertiesPart(doc, properties, object);
 
 		root.appendChild(struct);
-		createXmlDocRec(doc, struct, object.getStructure().getRoot().getFeature());
+		createXmlDocRec(doc, struct, FeatureUtils.getRoot(object));
 
 		root.appendChild(constraints);
 		for (int i = 0; i < object.getConstraints().size(); i++) {
@@ -552,6 +553,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			}
 			if (e.hasChildNodes()) {
 				parseFeatures(e.getChildNodes(), f);
+			}
+		}
+		
+		//Check that there are only OR connections when the parent has more than one feature
+		for (IFeature f : object.getFeatures()) {
+			if(f.getStructure().isOr() && f.getStructure().getChildrenCount() <= 1) {
+				f.getStructure().setAnd();
 			}
 		}
 	}

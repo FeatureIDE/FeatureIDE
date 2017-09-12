@@ -29,7 +29,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
+import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
@@ -41,6 +43,7 @@ import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
@@ -58,14 +61,9 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	public final static String VOID_MODEL = CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
 	public final static String UNSATISFIABLE = CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
 	public final static String TAUTOLOGY = CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_;
-	public final static String DEAD_FEATURE = " Constraint makes following features dead: ";
-	public final static String FALSE_OPTIONAL = " Constraint makes following features false optional: ";
+	public final static String DEAD_FEATURE = "Constraint makes following features dead:";
+	public final static String FALSE_OPTIONAL = "Constraint makes following features false-optional:";
 	public final static String REDUNDANCE = CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_;
-
-	private static final IFigure VOID_LABEL = new Label(VOID_MODEL);
-	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);
-	private static final IFigure TAUTOLOGY_LABEL = new Label(TAUTOLOGY);
-	private static final IFigure REDUNDANCE_LABEL = new Label(REDUNDANCE);
 
 	private static final String[] symbols;
 	static {
@@ -119,56 +117,17 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		final ConstraintProperties constraintProperties = FeatureUtils.getConstraintProperties(this.graphicalConstraint.getObject());
 		final StringBuilder toolTip = new StringBuilder();
 
+		final IFigure toolTipContent = new Figure();
+		toolTipContent.setLayoutManager(new GridLayout());
+
 		switch (constraintProperties.getConstraintSatisfiabilityStatus()) {
 		case SATISFIABLE:
 			break;
 		case VOID_MODEL:
-			toolTip.append(VOID_LABEL);
+			toolTipContent.add(new Label(VOID_MODEL));
 			break;
 		case UNSATISFIABLE:
-			toolTip.append(UNSATISFIABLE_LABEL);
-			break;
-		default:
-			break;
-		}
-
-		switch (constraintProperties.getConstraintDeadStatus()) {
-		case NORMAL:
-			break;
-		case DEAD:
-			if (!constraintProperties.getDeadFeatures().isEmpty()) {
-				toolTip.append(DEAD_FEATURE);
-				final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
-				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
-
-				for (String dead : deadFeatures) {
-					toolTip.append("\n   ");
-					toolTip.append(dead);
-				}
-			}
-			break;
-		default:
-			break;
-		}
-
-		switch (constraintProperties.getConstraintFalseOptionalStatus()) {
-		case NORMAL:
-			break;
-		case FALSE_OPTIONAL:
-			if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
-				if (!constraintProperties.getDeadFeatures().isEmpty()) {
-					toolTip.append("\n\n");
-				}
-				final List<String> falseOptionalFeatures = Functional.mapToList(constraintProperties.getFalseOptionalFeatures(),
-						new Functional.ToStringFunction<IFeature>());
-				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
-
-				toolTip.append(FALSE_OPTIONAL);
-				for (String feature : falseOptionalFeatures) {
-					toolTip.append("\n   ");
-					toolTip.append(feature);
-				}
-			}
+			toolTipContent.add(new Label(UNSATISFIABLE));
 			break;
 		default:
 			break;
@@ -179,21 +138,62 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			break;
 		case TAUTOLOGY:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			toolTip.append(TAUTOLOGY_LABEL);
+			toolTipContent.add(new Label(TAUTOLOGY));
 			break;
 		case REDUNDANT:
 		case IMPLICIT:
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			toolTip.append(REDUNDANCE_LABEL);
+			toolTipContent.add(new Label(REDUNDANCE));
 			break;
 		default:
 			break;
 		}
 
-		setToolTip(new Label(toolTip.toString()));
+		switch (constraintProperties.getConstraintDeadStatus()) {
+		case DEAD:
+			if (!constraintProperties.getDeadFeatures().isEmpty()) {
+				toolTip.append(DEAD_FEATURE);
+				final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
+				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
+
+				String s = DEAD_FEATURE;
+				for (String dead : deadFeatures) {
+					s += "\n\u2022 " + dead;
+				}
+				toolTipContent.add(new Label(s));
+			}
+		default:
+			break;
+		}
+
+		switch (constraintProperties.getConstraintFalseOptionalStatus()) {
+		case NORMAL:
+			break;
+		case FALSE_OPTIONAL:
+			if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
+				final List<String> falseOptionalFeatures = Functional.mapToList(constraintProperties.getFalseOptionalFeatures(),
+						new Functional.ToStringFunction<IFeature>());
+				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
+
+				String s = FALSE_OPTIONAL;
+				for (String feature : falseOptionalFeatures) {
+					s += "\n\u2022 " + feature;
+				}
+				toolTipContent.add(new Label(s));
+			}
+			break;
+		default:
+			break;
+		}
 
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
+			final ExplanationWriter w = getActiveReason().getExplanation().getWriter();
+			toolTipContent.add(new Label("This constraint is involved in the selected defect:\n\u2022 " + w.getReasonString(getActiveReason())));
+		}
+
+		if (!toolTipContent.getChildren().isEmpty()) {
+			setToolTip(toolTipContent);
 		}
 	}
 

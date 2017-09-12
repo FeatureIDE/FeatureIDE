@@ -37,14 +37,20 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
-import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.AbstractGraphicalFeatureFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.AlternativeGroupFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.ConcreteGraphicalFeatureFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.HiddenGraphicalFeatureFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.MandatoryGraphicalFeatureFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.OptionalGraphicalFeatureFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.OrGroupFilter;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 
@@ -167,18 +173,25 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		createRows();
 		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
 		setBackgroundColor(FMPropertyManager.getLegendBackgroundColor());
-		FeatureUIHelper.setLegendSize(graphicalFeatureModel, this.getSize());
-		FeatureUIHelper.setLegendFigure(graphicalFeatureModel, this);
 		this.setOpaque(true);
 	}
 	
 	private void refreshProperties(IFeatureModel featureModel)
 	{
+		// TODO get variable analyzer
 		final FeatureModelAnalyzer analyser = FeatureModelManager.getAnalyzer(featureModel);
 		
 		final IFeatureModelStructure fmStructure = featureModel.getStructure();
 		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
 		fmStructure.setShowHiddenFeatures(showHidden);
+		
+		mandatory = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new MandatoryGraphicalFeatureFilter())).size() > 0;
+		optional = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new OptionalGraphicalFeatureFilter())).size() > 0;
+		alternative = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new AlternativeGroupFilter())).size() > 0;
+		or = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new OrGroupFilter())).size() > 0;
+		_abstract = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new AbstractGraphicalFeatureFilter())).size() > 0;
+		concrete = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new ConcreteGraphicalFeatureFilter())).size() > 0;
+		hidden = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new HiddenGraphicalFeatureFilter())).size() > 0;
 
 		mandatory = fmStructure.hasMandatoryFeatures();
 		optional = fmStructure.hasOptionalFeatures();
@@ -196,7 +209,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		tautologyConst = analyser.isCalculateTautologyConstraints() && FeatureUtils.hasTautologyConst(featureModel);
 		redundantConst = analyser.isCalculateRedundantConstraints() && FeatureUtils.hasRedundantConst(featureModel);
 		implicitConst = isImplicit(graphicalFeatureModel);
-
 		
 		explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
 
@@ -231,10 +243,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAlternative());
 		}
-		if (_abstract && concrete) {
-			height = height + ROW_HEIGHT;
+		if (_abstract) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAbstract());
+		}
+		if (concrete) {
+			height = height + ROW_HEIGHT;
 			setWidth(language.getConcrete());
 		}
 		if (imported) {
@@ -317,8 +331,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (alternative) {
 			createRowAlternative(row++);
 		}
-		if (_abstract && concrete) {
+		if (_abstract) {
 			createRowAbstract(row++);
+		}
+		if (concrete) {
 			createRowConcrete(row++);
 		}
 		if (imported) {
@@ -652,6 +668,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	public void recreateLegend() {
 		this.removeAll();
+		this.setLocation(graphicalFeatureModel.getLayout().getLegendPos());
 		refreshProperties(graphicalFeatureModel.getFeatureModel());
 		setLegendSize();
 		createRows();
@@ -673,33 +690,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		//Label left
 		Label labelExplanation = new Label();
-
-		if (!FeatureModelManager.getAnalyzer(graphicalFeatureModel.getFeatureModel()).isValid()) {
-			labelExplanation.setText("Feature model is void because of highlighted dependencies:");
-			explanationFigure.setToolTip(createToolTipContent("Feature model is void because of highlighted dependencies"));
-		} else {
-			switch (explanation.getMode()) {
-			case DEAD_FEATURE:
-				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " is dead because of highlighted dependencies:");
-				explanationFigure.setToolTip(createToolTipContent(
-						"The feature\n" + explanation.getDefectElement().getName() + "\nis dead because of the highligthed dependencies."));
-				break;
-			case FALSE_OPTIONAL_FEATURE:
-				labelExplanation.setText("Feature " + explanation.getDefectElement().getName() + " is false-optional because of highlighted dependencies:");
-				explanationFigure.setToolTip(createToolTipContent(
-						"The feature\n" + explanation.getDefectElement().getName() + "\nis false optional because of the highligthed dependencies."));
-				break;
-			case REDUNDANT_CONSTRAINT:
-				Constraint constraint = (Constraint) explanation.getDefectElement();
-				labelExplanation.setText("The selected constraint is redundant because of highlighted dependencies:");
-				explanationFigure.setToolTip(
-						createToolTipContent("The constraint\n" + constraint.getDisplayName() + "\nis redundant because of the highligthed dependencies."));
-				break;
-
-			default:
-				break;
-			}
-		}
+		final String circumstanceString = explanation.getWriter().getCircumstanceString();
+		labelExplanation.setText(String.format("%s because of the highlighted dependencies:", circumstanceString));
+		explanationFigure.setToolTip(createToolTipContent(String.format("%s%nbecause of the highlighted dependencies.", circumstanceString)));
 		int widthInPixels = createLabel(1, labelExplanation.getText(), FMPropertyManager.getFeatureForgroundColor(), "").getPreferredSize().width + 25;
 
 		//SetWidth depending of string

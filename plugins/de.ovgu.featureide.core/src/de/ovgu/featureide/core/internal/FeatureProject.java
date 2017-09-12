@@ -84,6 +84,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
+import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.job.ModelScheduleRule;
@@ -96,7 +97,6 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -137,7 +137,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 		 * listens to changed feature names
 		 */
 		public void propertyChange(FeatureIDEEvent evt) {
-			switch(evt.getEventType()){
+			switch (evt.getEventType()) {
 			case FEATURE_NAME_CHANGED:
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
@@ -220,6 +220,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 				public Boolean execute(IMonitor workMonitor) throws Exception {
 					try {
 						final IFolder folder = sourceFolder;
+						featureModelManager.read();
 						final IFeatureModel model = featureModelManager.getObject();
 						// prevent warnings, if the user has just created a project
 						// without any source files
@@ -346,11 +347,22 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 
 		String projectBuildPath = getProjectBuildPath();
 
-		libFolder = project.getFolder("lib");
-		binFolder = FMCorePlugin.getFolder(project, "bin");
+		try {
+			// just create the bin folder if project hat only the FeatureIDE
+			// Nature
+			if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
+				if (projectBuildPath.isEmpty() && getProjectSourcePath().isEmpty()) {
+					binFolder = FMCorePlugin.getFolder(project, "bin");
+				}
+			}
+		} catch (CoreException e) {
+			LOGGER.logError(e);
+		}
+		libFolder = FMCorePlugin.getFolder(project, "lib");
 		buildFolder = FMCorePlugin.getFolder(project, projectBuildPath);
 		configFolder = FMCorePlugin.getFolder(project, getProjectConfigurationPath());
 		sourceFolder = FMCorePlugin.getFolder(project, getProjectSourcePath());
+
 		fstModel = null;
 		// loading model data and listen to changes in the model file
 		addModelListener();
@@ -367,10 +379,10 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
-		setPaths(getProjectSourcePath(), projectBuildPath, getProjectConfigurationPath());
+		setPaths(getProjectSourcePath(), getProjectBuildPath(), getProjectConfigurationPath());
 
-		// adds the compiler to the feature project if it is an older project
 		IComposerExtensionClass composer = getComposer();
+		// adds the compiler to the feature project if it is an older project
 		if (composer != null) {
 			if (sourceFolder != null) {
 				composer.addCompiler(getProject(), sourceFolder.getProjectRelativePath().toOSString(), configFolder.getProjectRelativePath().toOSString(),
@@ -858,6 +870,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 
 		IPath modelPath = modelFile.getModelFile().getFullPath();
 		if (checkModelChange(event.getDelta().findMember(modelPath))) {
+			setAllFeatureModuleMarkers();
 			return;
 		}
 
