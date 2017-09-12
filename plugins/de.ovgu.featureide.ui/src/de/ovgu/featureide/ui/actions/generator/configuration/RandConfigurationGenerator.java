@@ -20,9 +20,14 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
+import java.util.List;
+
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.PairWiseConfigurationGenerator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.RandomConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.RandomConfigurationGenerator;
+import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
@@ -32,15 +37,50 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * 
  * @author Jens Meinicke
  */
-public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
+public class RandConfigurationGenerator extends AConfigurationGenerator {
 
 	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
 		super(builder, featureProject);
 	}
 
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator() {
-		return new RandomConfigurationGenerator(cnf, (int) builder.configurationNumber);
+	public Void execute(IMonitor monitor) throws Exception {
+		exec(cnf, new RandomConfigurationGenerator(cnf, (int) builder.configurationNumber, true), monitor);
+		return null;
+	}
+	
+	protected void exec(final CNF satInstance, final RandomConfigurationGenerator as, IMonitor monitor) {
+		final Thread consumer = new Thread() {
+			@Override
+			public void run() {
+				int foundConfigurations = 0;
+				while (true) {
+					try {
+						generateConfiguration(satInstance.getVariables().convertToString(as.getResultQueue().take()));
+						foundConfigurations++;
+					} catch (InterruptedException e) {
+						break;
+					}
+				}
+				foundConfigurations += as.getResultQueue().size();
+				builder.configurationNumber = foundConfigurations;
+				for (int[] c : as.getResultQueue()) {
+					generateConfiguration(satInstance.getVariables().convertToString(c));
+				}
+			}
+
+			private void generateConfiguration(List<String> solution) {
+				configuration.resetValues();
+				for (final String selection : solution) {
+					configuration.setManual(selection, Selection.SELECTED);
+				}
+				addConfiguration(configuration);
+			}
+		};
+		consumer.start();
+		LongRunningWrapper.runMethod(as, monitor);
+		consumer.interrupt();
 	}
 
 }
+

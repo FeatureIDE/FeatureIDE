@@ -25,6 +25,7 @@ import java.util.List;
 import org.sat4j.specs.IConstr;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.IInternalVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
@@ -56,6 +57,8 @@ public interface ISimpleSatSolver extends Cloneable {
 	 */
 	IConstr addClause(LiteralSet mainClause) throws RuntimeContradictionException;
 
+	IConstr addInternalClause(LiteralSet mainClause) throws RuntimeContradictionException;
+
 	/**
 	 * Adds multiple clauses.
 	 * 
@@ -67,6 +70,8 @@ public interface ISimpleSatSolver extends Cloneable {
 	 * @see #addClause(LiteralSet)
 	 */
 	List<IConstr> addClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException;
+
+	List<IConstr> addInternalClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException;
 
 	/**
 	 * Removes a certain clause. If possible, instead of using this method consider using {@link #removeLastClause()} as it runs faster.<br/>
@@ -87,7 +92,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	 * @see #addClause(LiteralSet)
 	 */
 	void removeLastClause();
-	
+
 	/**
 	 * Removes the last clauses added to the solver. This method should be preferred over {@link #removeClause(IConstr)}, if possible.<br/>
 	 * <b>Note:</b> This method may not be supported by all solvers.
@@ -135,6 +140,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	 * @see #hasSolution(int...)
 	 */
 	int[] getSolution();
+	int[] getInternalSolution();
 
 	/**
 	 * @return The {@link CNF sat instance} given to the solver.
@@ -147,5 +153,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	void reset();
 
 	void setTimeout(int timeout);
+
+	IInternalVariables getInternalMapping();
 
 }

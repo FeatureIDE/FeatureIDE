@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
@@ -170,7 +171,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 		return clauses;
 	}
 
-	public static void getClauseFromNode(IVariables s, final List<LiteralSet> clauses, final Node node) {
+	public static void getClauseFromNode(IVariables s, final Collection<LiteralSet> clauses, final Node node) {
 		final Node cnfNode = Node.buildCNF(node);
 		// final Node cnfNode = node.toCNF();
 		if (cnfNode instanceof And) {

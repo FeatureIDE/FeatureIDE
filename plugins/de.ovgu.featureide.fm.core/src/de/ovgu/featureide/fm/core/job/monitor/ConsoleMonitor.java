@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job.monitor;
 
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
@@ -45,11 +44,10 @@ public class ConsoleMonitor extends ATaskMonitor {
 		this.output = output;
 	}
 
-	private ConsoleMonitor(boolean output, boolean canceled, IConsumer<Object> intermediateFunction, IMonitor parent) {
+	private ConsoleMonitor(boolean output, boolean canceled, AMonitor parent) {
 		super(parent);
 		this.output = output;
 		this.canceled = canceled;
-		setIntermediateFunction(intermediateFunction);
 	}
 
 	@Override
@@ -69,14 +67,16 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public final void setRemainingWork(int work) {
+	public synchronized final void setRemainingWork(int work) {
 		this.work = work;
 	}
 
 	@Override
-	public void worked() {
-		work--;
-		print("\t" + work);
+	public synchronized void worked(int work) {
+		if (work > 0) {
+			this.work -= work;
+			print("\t" + this.work);
+		}
 	}
 
 	public boolean isOutput() {
@@ -88,7 +88,7 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public void setTaskName(String name) {
+	public synchronized void setTaskName(String name) {
 		super.setTaskName(name);
 		print(getTaskName());
 	}
@@ -100,11 +100,9 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public IMonitor subTask(int size) {
-		final ConsoleMonitor consoleMonitor = new ConsoleMonitor(output, canceled, intermediateFunction, this);
-		consoleMonitor.setRemainingWork(size);
-		work -= size;
-		return consoleMonitor;
+	public synchronized IMonitor subTask(int size) {
+		worked(size);
+		return new ConsoleMonitor(output, canceled, this);
 	}
 
 }

@@ -45,11 +45,12 @@ import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.Traverser;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IModalImplicationGraph;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
@@ -163,11 +164,11 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 				final IVariables variables = formula.getVariables();
 				final int variable = variables.getVariable(feature.getName());
 
-				final IModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
+				final ModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
 				modalImplicationGraph.complete(variable);
 				
 				final List<IFeature> equivalent = new ArrayList<>();
-				for (int strongylConnectedVar : modalImplicationGraph.getTraverser().getStronglyConnected(variable).getLiterals()) {
+				for (int strongylConnectedVar : new Traverser(modalImplicationGraph).getStronglyConnected(variable).getLiterals()) {
 					modalImplicationGraph.complete(strongylConnectedVar);
 					if (modalImplicationGraph.isStrongPath(variable, strongylConnectedVar)) {
 						equivalent.add(featureModel.getFeature(variables.getName(strongylConnectedVar)));

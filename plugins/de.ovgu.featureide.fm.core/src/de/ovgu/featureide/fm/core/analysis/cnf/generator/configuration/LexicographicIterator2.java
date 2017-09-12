@@ -16,57 +16,61 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://www.fosd.de/featureide/ for further information.
+ * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job.monitor;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import de.ovgu.featureide.fm.core.job.IJob;
+import java.util.Iterator;
 
 /**
- * Control object for {@link IJob}s.
- * Can be used to check for cancel request, display job progress, and calling intermediate functions.
+ * NOTE: 1-based
  * 
  * @author Sebastian Krieter
  */
-public final class NullMonitor extends AMonitor {
+public class LexicographicIterator2 implements Iterator<int[]> {
 
-	private boolean cancel = false;
+	private final int t, length;
+	private boolean hasNext = true;
 
-	@Override
-	public void cancel() {
-		cancel = true;
-	}
+	private int[] c;
 
-	@Override
-	public void done() {
-	}
-
-	@Override
-	public void checkCancel() throws MethodCancelException {
-		if (cancel) {
-			throw new MethodCancelException();
+	public LexicographicIterator2(int t, int length) {
+		this.t = t;
+		this.length = length;
+		c = new int[t];
+		for (int i = 0; i < c.length - 1; i++) {
+			c[i] = i + 1;
 		}
+		c[t - 1] = t - 1;
 	}
 
 	@Override
-	public IMonitor subTask(int size) {
-		return this;
+	public boolean hasNext() {
+		return hasNext;
 	}
 
 	@Override
-	public void worked(int work) {
-	}
+	public int[] next() {
+		int i = t;
+		for (; i > 0; i--) {
+			int ci = ++c[i - 1];
+			if (ci < (length - t) + i + 1) {
+				break;
+			}
+		}
+		if (i == 0 && c[i] == (length - t) + 2) {
+			hasNext = false;
+			return null;
+		}
 
-	@Override
-	public void setRemainingWork(int work) {
-	}
+		for (; i < t; i++) {
+			if (i == 0) {
+				c[i] = 1;
+			} else {
+				c[i] = c[i - 1] + 1;
+			}
+		}
 
-	@Override
-	public void setTaskName(String name) {
+		return c;
 	}
-
-	public String getTaskName() {
-		return "";
-	}
-
 }

@@ -28,14 +28,13 @@ import org.sat4j.specs.IteratorInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph.Vertex;
-import de.ovgu.featureide.fm.core.base.IModalImplicationGraph.ITraverser;
 
 /**
  * Adjacency list implementation for a feature graph.
  * 
  * @author Sebastian Krieter
  */
-public class Traverser implements ITraverser {
+public class Traverser {
 
 	private static final byte MARK_CALC_SELECT = 8;
 	private static final byte MARK_CALC_DESELECT = 4;
@@ -55,30 +54,85 @@ public class Traverser implements ITraverser {
 		this.computationMark = new byte[graph.adjList.size()];
 	}
 
-	@Override
-	public LiteralSet getStronglyConnected(int startVar) {
-		final Vertex vertex = graph.adjList.get(Math.abs(startVar) - 1);
-		return new LiteralSet((startVar > 0) ? vertex.posStrongEdges : vertex.negStrongEdges);
+	public LiteralSet getStronglyConnected(int... model) {
+		ArrayDeque<Integer> changed = pureStronglyConnected(model);
+
+		while (!changed.isEmpty()) {
+			traverseWeakNonRec(changed.pop(), changed);
+		}
+
+		final VecInt variablesMarkedForSelection = new VecInt();
+		for (int i = 0; i < computationMark.length; i++) {
+			final byte mark = computationMark[i];
+			if ((mark & MARK_AUTO_SELECT) != 0) {
+				variablesMarkedForSelection.push((i + 1));
+			}
+			if ((mark & MARK_AUTO_DESELECT) != 0) {
+				variablesMarkedForSelection.push(-(i + 1));
+			}
+		}
+		return new LiteralSet(Arrays.copyOf(variablesMarkedForSelection.toArray(), variablesMarkedForSelection.size()));
 	}
 
-	@Override
-	public LiteralSet getWeaklyConnected(int startVar) {
-		Arrays.fill(computationMark, (byte) 0);
-		computationMark[Math.abs(startVar) - 1] |= startVar > 0 ? MARK_AUTO_SELECT : MARK_AUTO_DESELECT;
-
-		ArrayDeque<Integer> changed = new ArrayDeque<>();
-		changed.push(startVar);
-		traverseStrong(startVar, changed);
+	public LiteralSet getWeaklyConnected(int... model) {
+		ArrayDeque<Integer> changed = pureStronglyConnected(model);
 
 		while (!changed.isEmpty()) {
 			traverseWeak(changed.pop(), changed);
 		}
 
-		final VecInt variablesMarkedForSelection = getVariablesMarkedForSelection();
+		final VecInt variablesMarkedForSelection = new VecInt();
+		for (int i = 0; i < computationMark.length; i++) {
+			final byte mark = computationMark[i];
+			if ((mark & MARK_CALC_SELECT) != 0) {
+				variablesMarkedForSelection.push((i + 1));
+			}
+			if ((mark & MARK_CALC_DESELECT) != 0) {
+				variablesMarkedForSelection.push(-(i + 1));
+			}
+		}
 		return new LiteralSet(Arrays.copyOf(variablesMarkedForSelection.toArray(), variablesMarkedForSelection.size()));
 	}
 
-	@Override
+	public LiteralSet getConnected(int... model) {
+		ArrayDeque<Integer> changed = pureStronglyConnected(model);
+
+		while (!changed.isEmpty()) {
+			traverseWeak(changed.pop(), changed);
+		}
+
+		final VecInt variablesMarkedForSelection = new VecInt();
+		for (int i = 0; i < computationMark.length; i++) {
+			final byte mark = computationMark[i];
+			if ((mark & (MARK_CALC_SELECT | MARK_AUTO_SELECT)) != 0) {
+				variablesMarkedForSelection.push((i + 1));
+			}
+			if ((mark & (MARK_CALC_DESELECT | MARK_AUTO_DESELECT)) != 0) {
+				variablesMarkedForSelection.push(-(i + 1));
+			}
+		}
+		return new LiteralSet(Arrays.copyOf(variablesMarkedForSelection.toArray(), variablesMarkedForSelection.size()));
+	}
+
+	protected ArrayDeque<Integer> pureStronglyConnected(int... model) {
+		Arrays.fill(computationMark, (byte) 0);
+		ArrayDeque<Integer> changed = new ArrayDeque<>();
+		for (int i = 0; i < model.length; i++) {
+			final int var = model[i];
+			if (var != 0) {
+				computationMark[Math.abs(var) - 1] |= var > 0 ? MARK_AUTO_SELECT : MARK_AUTO_DESELECT;
+				changed.push(var);
+			}
+		}
+		for (int i = 0; i < model.length; i++) {
+			final int var = model[i];
+			if (var != 0) {
+				traverseStrong(var, changed);
+			}
+		}
+		return changed;
+	}
+
 	public VecInt getVariablesMarkedForSelection() {
 		final VecInt vecInt = new VecInt();
 		for (int i = 0; i < computationMark.length; i++) {
@@ -92,7 +146,6 @@ public class Traverser implements ITraverser {
 		return vecInt;
 	}
 
-	@Override
 	public VecInt getVariablesMarkedForCalculation() {
 		final VecInt vecInt = new VecInt();
 		for (int i = 0; i < computationMark.length; i++) {
@@ -109,64 +162,93 @@ public class Traverser implements ITraverser {
 		return vecInt;
 	}
 
-	@Override
-	public void markDefined(LiteralSet definedVars) {
+	public void markFeatures(LiteralSet definedVars, LiteralSet undefinedVars) {
 		Arrays.fill(computationMark, (byte) 0);
 
-		for (int i = 0; i < definedVars.size(); i++) {
-			final int var = definedVars.getLiterals()[i];
-			computationMark[Math.abs(var) - 1] |= var > 0 ? MARK_AUTO_SELECT : MARK_AUTO_DESELECT;
+		if (definedVars != null) {
+			for (int i = 0; i < definedVars.size(); i++) {
+				final int var = definedVars.getLiterals()[i];
+				computationMark[Math.abs(var) - 1] |= var > 0 ? MARK_AUTO_SELECT : MARK_AUTO_DESELECT;
+			}
+
+			ArrayDeque<Integer> changed = new ArrayDeque<>();
+			for (int var : definedVars.getLiterals()) {
+				changed.push(var);
+			}
+			for (int var : definedVars.getLiterals()) {
+				traverseStrong(var, changed);
+			}
+
+			while (!changed.isEmpty()) {
+				traverseWeak(changed.pop(), changed);
+			}
 		}
 
-		ArrayDeque<Integer> changed = new ArrayDeque<>();
-		for (int var : definedVars.getLiterals()) {
-			changed.push(var);
-		}
-		for (int var : definedVars.getLiterals()) {
-			traverseStrong(var, changed);
-		}
-
-		while (!changed.isEmpty()) {
-			traverseWeak(changed.pop(), changed);
-		}
-	}
-
-	@Override
-	public void markUndefined(LiteralSet undefinedVars) {
-		Arrays.fill(computationMark, (byte) 0);
-
-		for (int var : undefinedVars.getLiterals()) {
-			traverseWeakRec(var);
-		}
-	}
-
-	@Override
-	public void markDefinedAndUndefined(LiteralSet definedVars, LiteralSet undefinedVars) {
-		Arrays.fill(computationMark, (byte) 0);
-
-		for (int i = 0; i < definedVars.size(); i++) {
-			final int var = definedVars.getLiterals()[i];
-			computationMark[Math.abs(var) - 1] |= var > 0 ? MARK_AUTO_SELECT : MARK_AUTO_DESELECT;
-		}
-
-		ArrayDeque<Integer> changed = new ArrayDeque<>();
-		for (int var : definedVars.getLiterals()) {
-			changed.push(var);
-		}
-		for (int var : definedVars.getLiterals()) {
-			traverseStrong(var, changed);
-		}
-
-		while (!changed.isEmpty()) {
-			traverseWeak(changed.pop(), changed);
-		}
-
-		for (int var : undefinedVars.getLiterals()) {
-			traverseWeakRec(var);
+		if (undefinedVars != null) {
+			for (int var : undefinedVars.getLiterals()) {
+				traverseWeakRec(var);
+			}
 		}
 	}
 
 	private void traverseWeak(int curVar, ArrayDeque<Integer> changed) {
+		final int curIndex = Math.abs(curVar) - 1;
+
+		final Vertex vertex = graph.adjList.get(curIndex);
+		final int[] complexClauses = (curVar > 0) ? vertex.posComplexClauses : vertex.negComplexClauses;
+
+		// Weak Edges
+		final VecInt v = new VecInt();
+		outerLoop: for (int i = 0; i < complexClauses.length; i++) {
+			final LiteralSet clause = graph.complexClauses.get(complexClauses[i]);
+
+			v.clear();
+			final int[] literals = clause.getLiterals();
+			for (int j = 0; j < literals.length; j++) {
+				final int literal = literals[j];
+				final int index = Math.abs(literal) - 1;
+				if (index == curIndex) {
+					continue;
+				}
+				final byte value = (byte) (computationMark[index] & MARK_AUTO_SELECTION);
+
+				switch (value) {
+				case 0:
+					// add literal to list
+					v.push(literal);
+					break;
+				case MARK_AUTO_SELECT:
+					if (literal > 0) {
+						// Clause is satisfied
+						continue outerLoop;
+					}
+					break;
+				case MARK_AUTO_DESELECT:
+					if (literal < 0) {
+						// Clause is satisfied
+						continue outerLoop;
+					}
+					break;
+				default:
+					// Do nothing
+					break;
+				}
+			}
+
+			// if list size == 1 -> strong edge
+			if (v.size() == 1) {
+				final int literal = v.get(0);
+				markStrong(literal, changed);
+				traverseStrong(literal, changed);
+			} else {
+				for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
+					traverseWeakRec(iterator.next());
+				}
+			}
+		}
+	}
+
+	private void traverseWeakNonRec(int curVar, ArrayDeque<Integer> changed) {
 		final int curIndex = Math.abs(curVar) - 1;
 
 		final Vertex vertex = graph.adjList.get(curIndex);
@@ -215,10 +297,6 @@ public class Traverser implements ITraverser {
 				final int literal = v.get(0);
 				markStrong(literal, changed);
 				traverseStrong(literal, changed);
-			} else {
-				for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
-					traverseWeakRec(iterator.next());
-				}
 			}
 		}
 	}
@@ -246,9 +324,9 @@ public class Traverser implements ITraverser {
 
 	private void traverseWeakRec(int curVar) {
 		final int curIndex = Math.abs(curVar) - 1;
-		if ((computationMark[curIndex] & MARK_AUTO_SELECTION) != 0) {
-			return;
-		}
+//		if ((computationMark[curIndex] & MARK_AUTO_SELECTION) != 0) {
+//			return;
+//		}
 
 		final int[] strongEdges;
 		final int[] complexClauses;

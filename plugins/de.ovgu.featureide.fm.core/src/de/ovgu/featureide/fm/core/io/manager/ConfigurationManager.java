@@ -88,7 +88,7 @@ public class ConfigurationManager extends FileManager<Configuration> {
 			final EventType eventType = evt.getEventType();
 			switch (eventType) {
 			case FEATURE_ORDER_CHANGED:
-				// TODO !!! react on feature order
+				// TODO !!! react on feature order - should be superfluous with temp configuration file
 				break;
 			case FEATURE_NAME_CHANGED:
 				// TODO !!! react on feature name change

@@ -38,7 +38,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph.Vertex;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.base.IModalImplicationGraph;
@@ -76,8 +75,6 @@ public class ModalImplicationGraphBuilder extends AbstractAnalysis<ModalImplicat
 	private final int numberOfVariables;
 	private final boolean detectStrong;
 	private final CNF emptyCNF;
-
-	private ISatSolver solver;
 
 	public ModalImplicationGraphBuilder(CNF cnf, boolean detectStrong) {
 		super(cnf);

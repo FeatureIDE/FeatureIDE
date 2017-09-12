@@ -164,18 +164,20 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
 
 		final FeatureProperties featureProperties = FeatureUtils.getFeatureProperties(feature);
-		if (featureProperties.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-			toolTip.append(DEAD);
-		} else if (featureProperties.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-			toolTip.append(FALSE_OPTIONAL);
-		} else if (featureProperties.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
-			toolTip.append(INDETERMINATE_HIDDEN);
+		if (featureProperties != null) {
+			if (featureProperties.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
+				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+				toolTip.append(DEAD);
+			} else if (featureProperties.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
+				setBackgroundColor(FMPropertyManager.getWarningColor());
+				setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
+				toolTip.append(FALSE_OPTIONAL);
+			} else if (featureProperties.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
+				setBackgroundColor(FMPropertyManager.getWarningColor());
+				setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
+				toolTip.append(INDETERMINATE_HIDDEN);
+			}
 		}
 
 		if (!analyser.isValid()) {

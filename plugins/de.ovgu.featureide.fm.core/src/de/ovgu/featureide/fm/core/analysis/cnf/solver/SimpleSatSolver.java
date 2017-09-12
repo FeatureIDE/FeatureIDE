@@ -63,36 +63,45 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 
 	@Override
 	public IConstr addClause(LiteralSet mainClause) throws RuntimeContradictionException {
-		return addClauseInternal(solver, mainClause.getLiterals(), 0, mainClause.size());
-	}
-	
-	protected IConstr addClauseInternal(Solver<?> solver, int[] mainClause, int start, int end) throws RuntimeContradictionException {
-		try {
-			final int[] literals = internalMapping.convertToInternal(mainClause);
-			assert checkClauseValidity(literals);
-			return solver.addClause(new VecInt(Arrays.copyOfRange(literals, start, end)));
-		} catch (ContradictionException e) {
-			throw new RuntimeContradictionException(e);
-		}
-	}
-
-	protected IConstr addClauseInternal(Solver<?> solver, VecInt vec) throws RuntimeContradictionException {
-		try {
-			return solver.addClause(vec);
-		} catch (ContradictionException e) {
-			throw new RuntimeContradictionException(e);
-		}
+		return addClause(solver, internalMapping.convertToInternal(mainClause.getLiterals()));
 	}
 
 	@Override
-	public List<IConstr> addClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException {
-		return addClauses(solver, clauses);
+	public IConstr addInternalClause(LiteralSet mainClause) throws RuntimeContradictionException {
+		return addClause(solver, mainClause.getLiterals());
 	}
 
-	protected List<IConstr> addClauses(Solver<?> solver, Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException {
+	protected IConstr addClause(Solver<?> solver, int[] literals) throws RuntimeContradictionException {
+		try {
+			assert checkClauseValidity(literals);
+			return solver.addClause(new VecInt(Arrays.copyOfRange(literals, 0, literals.length)));
+		} catch (ContradictionException e) {
+			throw new RuntimeContradictionException(e);
+		}
+	}
+
+	//	protected IConstr addClauseInternal(Solver<?> solver, VecInt vec) throws RuntimeContradictionException {
+	//		try {
+	//			return solver.addClause(vec);
+	//		} catch (ContradictionException e) {
+	//			throw new RuntimeContradictionException(e);
+	//		}
+	//	}
+
+	@Override
+	public List<IConstr> addClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException {
+		return addClauses(solver, clauses, false);
+	}
+
+	@Override
+	public List<IConstr> addInternalClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException {
+		return addClauses(solver, clauses, true);
+	}
+
+	protected List<IConstr> addClauses(Solver<?> solver, Iterable<? extends LiteralSet> clauses, boolean internal) throws RuntimeContradictionException {
 		final ArrayList<IConstr> constrList = new ArrayList<>();
 		for (LiteralSet clause : clauses) {
-			constrList.add(addClauseInternal(solver, clause.getLiterals(), 0, clause.size()));
+			constrList.add(addClause(solver, internal ? clause.getLiterals() : internalMapping.convertToInternal(clause.getLiterals())));
 		}
 		return constrList;
 	}
@@ -114,6 +123,11 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	@Override
 	public int[] getSolution() {
 		return internalMapping.convertToOriginal(solver.model());
+	}
+
+	@Override
+	public int[] getInternalSolution() {
+		return solver.model();
 	}
 
 	@Override
@@ -195,7 +209,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	 * Set several options for the Sat4J solver instance.
 	 */
 	protected void configureSolver(Solver<?> solver) {
-		solver.setTimeoutMs(1000);
+		solver.setTimeoutMs(10_000);
 		solver.setDBSimplificationAllowed(true);
 		solver.setVerbose(false);
 	}
@@ -209,7 +223,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 		final List<LiteralSet> clauses = satInstance.getClauses();
 		if (!clauses.isEmpty()) {
 			solver.setExpectedNumberOfClauses(clauses.size() + 1);
-			addClauses(solver, clauses);
+			addClauses(solver, clauses, false);
 		}
 		if (size > 0) {
 			final VecInt pseudoClause = new VecInt(size + 1);
@@ -226,8 +240,14 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 		solver.getOrder().init();
 	}
 
+	@Override
 	public void setTimeout(int timeout) {
 		solver.setTimeout(timeout);
+	}
+
+	@Override
+	public IInternalVariables getInternalMapping() {
+		return internalMapping;
 	}
 
 }

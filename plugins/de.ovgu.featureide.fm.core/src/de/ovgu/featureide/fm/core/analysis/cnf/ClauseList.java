@@ -36,6 +36,10 @@ public class ClauseList extends ArrayList<LiteralSet> implements Cloneable {
 		super();
 	}
 
+	public ClauseList(int size) {
+		super(size);
+	}
+
 	public ClauseList(Collection<? extends LiteralSet> c) {
 		super(c);
 	}

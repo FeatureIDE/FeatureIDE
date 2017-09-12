@@ -27,7 +27,8 @@ import java.util.TreeSet;
 import javax.annotation.CheckForNull;
 
 /**
- * Clause of a CNF.
+ * A sorted list of literals.
+ * Can be used as a clause of a CNF or DNF.
  * 
  * @author Sebastian Krieter
  */
@@ -38,12 +39,50 @@ public class LiteralSet implements Cloneable, Serializable {
 	protected final int[] literals;
 
 	private final int hashCode;
-
+	
+	/**
+	 * Constructs a new clause from the given literals.
+	 * Negates the given literals.
+	 * <br/>
+	 * <b>Does not modify the given literal array.</b>
+	 * 
+	 * @param literals literals of the clause
+	 * @return A newly constructed clause from the given literals (negated).
+	 */
+	public static LiteralSet getBlockingClause(int... literals) {
+		return new LiteralSet(SatUtils.negateSolution(literals));
+	}
+	
+	/**
+	 * Constructs a new clause from the given literals.
+	 * <br/>
+	 * <b>Does not modify the given literal array.</b>
+	 * 
+	 * @param literals literals of the clause
+	 * @return A newly constructed clause from the given literals.
+	 */
+	public static LiteralSet getClause(int... literals) {
+		return new LiteralSet(SatUtils.negateSolution(literals));
+	}
+	
+	/**
+	 * Constructs a deep copy of the given clause.
+	 * 
+	 * @param clause the old clause
+	 */
 	public LiteralSet(LiteralSet clause) {
 		this.literals = Arrays.copyOf(clause.literals, clause.literals.length);
 		hashCode = clause.hashCode;
 	}
-
+	
+	/**
+	 * Constructs a new clause from the given literals.
+	 * <br/>
+	 * <b>The resulting clause is backed by the given literal array.
+	 * The array will be sorted.</b>
+	 * 
+	 * @param literals literals of the clause
+	 */
 	public LiteralSet(int... literals) {
 		this.literals = literals;
 		Arrays.sort(this.literals);
@@ -160,6 +199,34 @@ public class LiteralSet implements Cloneable, Serializable {
 				if (literals[j] == otherLiteral) {
 					count++;
 					removeMarker[j] = true;
+				}
+			}
+		}
+		return count;
+	}
+	
+	public int countDuplicates(LiteralSet variables) {
+		final int[] otherLiterals = variables.getLiterals();
+		int count = 0;
+		for (int i = 0; i < otherLiterals.length; i++) {
+			final int otherLiteral = otherLiterals[i];
+			for (int j = 0; j < literals.length; j++) {
+				if (literals[j] == otherLiteral) {
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+	public int countConflicts(LiteralSet variables) {
+		final int[] otherLiterals = variables.getLiterals();
+		int count = 0;
+		for (int i = 0; i < otherLiterals.length; i++) {
+			final int otherLiteral = -otherLiterals[i];
+			for (int j = 0; j < literals.length; j++) {
+				if (literals[j] == otherLiteral) {
+					count++;
+					break;
 				}
 			}
 		}

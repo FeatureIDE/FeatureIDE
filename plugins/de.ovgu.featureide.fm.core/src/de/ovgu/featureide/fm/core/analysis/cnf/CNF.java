@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis.cnf;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -84,6 +85,41 @@ public class CNF implements Serializable {
 	public IInternalVariables getInternalVariables() {
 		return variables;
 	}
+	
+	/**
+	 * @return whether this CNF was sliced by an instance of {@code CNFSlicer}.
+	 */
+	public boolean isSliced() {
+		return variables instanceof SlicedVariables;
+	}
+	
+	/**
+	 * If the CNF was sliced, the old variable IDs are kept for compatibility reasons.
+	 * This method changes the the variable IDs in the variables object and the clause list, as if the CNF was not sliced.
+	 * 
+	 * @return A new instance with a proper clause list and variables object, is this CNF was sliced.
+	 * Returns {@code this}, otherwise.
+	 * 
+	 * @see #isSliced()
+	 */
+	public CNF normalize() {
+		if (isSliced()) {
+			final SlicedVariables slicedVariables = (SlicedVariables) variables;
+			final ClauseList newClauses = new ClauseList(clauses.size());
+			for (LiteralSet literalSet : clauses) {
+				newClauses.add(variables.convertToInternal(literalSet));
+			}
+			final ArrayList<String> names = new ArrayList<>(variables.size());
+			for (int i = 0; i < variables.intToVar.length; i++) {
+				if (slicedVariables.orgToInternal[i] != 0) {
+					names.add(variables.intToVar[i]);
+				}
+			}
+			return new CNF(new Variables(names), newClauses);
+		} else {
+			return this;
+		}
+	}
 
 	public List<LiteralSet> getClauses() {
 		return Collections.unmodifiableList(clauses);
@@ -121,6 +157,11 @@ public class CNF implements Serializable {
 		} else if (!variables.equals(other.variables))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "CNF\n\tvariables=" + variables + "\n\tclauses=" + clauses;
 	}
 
 }

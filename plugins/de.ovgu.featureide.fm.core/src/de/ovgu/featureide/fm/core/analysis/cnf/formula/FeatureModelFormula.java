@@ -93,7 +93,7 @@ public class FeatureModelFormula {
 		return getElement(new CNFNodeCreator());
 	}
 
-	public void resetCNF() {
+	public void resetFormula() {
 		synchronized (map) {
 			map.clear();
 		}

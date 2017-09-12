@@ -188,6 +188,8 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 		System.arraycopy(internalMapping.convertToInternal(assignment), 0, unitClauses, 0, unitClauses.length);
 
 		try {
+			//TODO why is this necessary?
+			solver.setKeepSolverHot(true);
 			if (solver.isSatisfiable(new VecInt(unitClauses), globalTimeout)) {
 //				solutionList.add(solver.model());
 				return SatResult.TRUE;
@@ -221,7 +223,11 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	@Override
 	public void shuffleOrder() {
-		final Random rnd = new Random();
+		shuffleOrder(new Random());
+	}
+
+	@Override
+	public void shuffleOrder(Random rnd) {
 		for (int i = order.length - 1; i >= 0; i--) {
 			final int index = rnd.nextInt(i + 1);
 			final int a = order[index];

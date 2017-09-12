@@ -31,11 +31,11 @@ import de.ovgu.featureide.fm.core.job.IJob;
  */
 public abstract class AMonitor implements IMonitor {
 
-	protected final IMonitor parent;
+	protected final AMonitor parent;
 
 	protected IConsumer<Object> intermediateFunction = null;
 
-	public AMonitor(IMonitor parent) {
+	public AMonitor(AMonitor parent) {
 		this.parent = parent;
 	}
 
@@ -51,13 +51,28 @@ public abstract class AMonitor implements IMonitor {
 	}
 
 	@Override
+	public void worked() {
+		worked(1);
+	}
+
+	@Override
 	public final void step() throws MethodCancelException {
-		step(null);
+		step(1, null);
+	}
+
+	@Override
+	public final void step(int work) throws MethodCancelException {
+		step(work, null);
 	}
 
 	@Override
 	public final void step(Object t) throws MethodCancelException {
-		worked();
+		step(1, t);
+	}
+
+	@Override
+	public final void step(int work, Object t) throws MethodCancelException {
+		worked(work);
 		invoke(t);
 		checkCancel();
 	}

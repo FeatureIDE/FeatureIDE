@@ -28,10 +28,10 @@ import org.sat4j.specs.IteratorInt;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.Traverser;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
-import de.ovgu.featureide.fm.core.base.IModalImplicationGraph;
-import de.ovgu.featureide.fm.core.base.IModalImplicationGraph.ITraverser;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -41,23 +41,23 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet> {
 
-	private final ITraverser traverser;
+	private final Traverser traverser;
 
 	private int[] changedVars;
 
-	public DecisionPropagationAnalysisMIG(ISatSolver solver, IModalImplicationGraph featureGraph) {
+	public DecisionPropagationAnalysisMIG(ISatSolver solver, ModalImplicationGraph featureGraph) {
 		super(solver);
-		this.traverser = featureGraph.getTraverser();
+		this.traverser = new Traverser(featureGraph);
 	}
 
-	public DecisionPropagationAnalysisMIG(CNF satInstance, IModalImplicationGraph featureGraph) {
+	public DecisionPropagationAnalysisMIG(CNF satInstance, ModalImplicationGraph featureGraph) {
 		super(satInstance);
-		this.traverser = featureGraph.getTraverser();
+		this.traverser = new Traverser(featureGraph);
 	}
 
 	public LiteralSet analyze(IMonitor monitor) throws Exception {
 		if (changedVars == null) {
-			traverser.markDefined(assumptions);
+			traverser.markFeatures(assumptions, null);
 		} else {
 			VecInt defined = new VecInt();
 			VecInt undefined = new VecInt();
@@ -71,7 +71,7 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 				}
 				undefined.push(changedVar);
 			}
-			traverser.markDefinedAndUndefined(new LiteralSet(Arrays.copyOf(defined.toArray(), defined.size())),
+			traverser.markFeatures(new LiteralSet(Arrays.copyOf(defined.toArray(), defined.size())),
 					new LiteralSet(Arrays.copyOf(undefined.toArray(), undefined.size())));
 		}
 		final VecInt selectedVars = traverser.getVariablesMarkedForSelection();

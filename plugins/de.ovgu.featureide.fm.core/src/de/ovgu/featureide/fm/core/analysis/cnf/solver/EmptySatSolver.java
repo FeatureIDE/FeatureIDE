@@ -22,11 +22,13 @@ package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IConstr;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.IInternalVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 
@@ -173,6 +175,10 @@ public class EmptySatSolver implements ISatSolver {
 	}
 
 	@Override
+	public void shuffleOrder(Random rnd) {
+	}
+
+	@Override
 	public void setSelectionStrategy(SelectionStrategy strategy) {
 	}
 
@@ -199,7 +205,17 @@ public class EmptySatSolver implements ISatSolver {
 	}
 
 	@Override
+	public IConstr addInternalClause(LiteralSet mainClause) throws RuntimeContradictionException {
+		return null;
+	}
+
+	@Override
 	public List<IConstr> addClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException {
+		return null;
+	}
+
+	@Override
+	public List<IConstr> addInternalClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException {
 		return null;
 	}
 
@@ -232,6 +248,16 @@ public class EmptySatSolver implements ISatSolver {
 	@Override
 	public void setTimeout(int timeout) {
 
+	}
+
+	@Override
+	public int[] getInternalSolution() {
+		return null;
+	}
+
+	@Override
+	public IInternalVariables getInternalMapping() {
+		return null;
 	}
 
 }

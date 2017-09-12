@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -545,8 +545,8 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
-			core = new byte[allYesSolution.length];
-			recArray = new byte[allYesSolution.length];
+			core = new byte[solver.getSatInstance().getVariables().maxVariableID()];
+			recArray = new byte[solver.getSatInstance().getVariables().maxVariableID()];
 			final int[] model1Copy = Arrays.copyOf(allYesSolution, allYesSolution.length);
 			SatUtils.updateSolution(model1Copy, allNoSolution);
 			for (int i = 0; i < model1Copy.length; i++) {

@@ -36,7 +36,7 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * 
  * @author Jens Meinicke
  */
-public abstract class AConfigurationGenerator implements LongRunningMethod<Void>{
+public abstract class AConfigurationGenerator implements LongRunningMethod<Void> {
 	protected IFeatureModel featureModel;
 	
 	protected ConfigurationBuilder builder;

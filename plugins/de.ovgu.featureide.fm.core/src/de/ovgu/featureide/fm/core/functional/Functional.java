@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
@@ -764,16 +765,31 @@ public abstract class Functional {
 	}
 
 	public static <T> Integer[] getSortedIndex(final List<T> list, final Comparator<T> comparator) {
-		Integer[] index = new Integer[list.size()];
-		for (int i = 0; i < index.length; i++) {
-			index[i] = i;
-		}
+		final Integer[] index = getIndex(list.size());
 		Arrays.sort(index, new Comparator<Integer>() {
 			@Override
 			public int compare(Integer o1, Integer o2) {
 				return comparator.compare(list.get(o1), list.get(o2));
 			}
 		});
+		return index;
+	}
+	
+	public static Integer[] getRandomizedIndex(int size) {
+		return getRandomizedIndex(size, new Random());
+	}
+	
+	public static Integer[] getRandomizedIndex(int size, Random random) {
+		final Integer[] index = getIndex(size);
+		Collections.shuffle(Arrays.asList(index), random);
+		return index;
+	}
+
+	public static Integer[] getIndex(int size) {
+		final Integer[] index = new Integer[size];
+		for (int i = 0; i < index.length; i++) {
+			index[i] = i;
+		}
 		return index;
 	}
 

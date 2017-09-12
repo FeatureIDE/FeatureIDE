@@ -36,8 +36,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoAbstractCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoAbstractNoHiddenCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoHiddenCNFCreator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.OneWiseConfigurationGenerator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.SolutionGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AllConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.OneWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
@@ -275,8 +275,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (solver == null) {
 				return resultList;
 			}
-			final List<LiteralSet> result = new SolutionGenerator(solver, max).analyze(monitor);
-			for (LiteralSet is : result) {
+			final List<int[]> result = new AllConfigurationGenerator(solver, max, false).analyze(monitor);
+			for (int[] is : result) {
 				resultList.add(solver.getSatInstance().getVariables().convertToString(is));
 			}
 

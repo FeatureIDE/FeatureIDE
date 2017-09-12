@@ -29,9 +29,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.DecisionPropagationAnalysisMIG;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
-import de.ovgu.featureide.fm.core.base.IModalImplicationGraph;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -144,9 +144,9 @@ public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
 
 	}
 
-	private final IModalImplicationGraph graph;
+	private final ModalImplicationGraph graph;
 
-	public ConfigurationPropagatorMIG(FeatureModelFormula formula, IModalImplicationGraph graph, Configuration configuration, boolean includeAbstractFeatures) {
+	public ConfigurationPropagatorMIG(FeatureModelFormula formula, ModalImplicationGraph graph, Configuration configuration, boolean includeAbstractFeatures) {
 		super(formula, configuration, includeAbstractFeatures);
 		this.graph = graph;
 	}
@@ -161,7 +161,7 @@ public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
 		this.graph = oldPropagator.graph;
 	}
 
-	public ConfigurationPropagatorMIG(FeatureModelFormula formula, IModalImplicationGraph graph, Configuration configuration) {
+	public ConfigurationPropagatorMIG(FeatureModelFormula formula, ModalImplicationGraph graph, Configuration configuration) {
 		this(formula, graph, configuration, true);
 	}
 

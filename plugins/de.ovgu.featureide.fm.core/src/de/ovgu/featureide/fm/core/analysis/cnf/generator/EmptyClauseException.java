@@ -16,50 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://www.fosd.de/featureide/ for further information.
+ * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job.monitor;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator;
 
 /**
  * 
- * @author Sebastian Krieter
+ * @author skrieter
  */
-abstract class ATaskMonitor extends AMonitor {
+public class EmptyClauseException extends Exception {
 
-	protected String name = null;
-	protected String taskName = null;
-
-	public ATaskMonitor() {
-		super();
-	}
-
-	public ATaskMonitor(AMonitor parent) {
-		super(parent);
-	}
-
-	@Override
-	public void setTaskName(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String getTaskName() {
-		if (taskName == null) {
-			taskName = constructTaskName();
-		}
-		return taskName;
-	}
-
-	protected String constructTaskName() {
-		StringBuilder sb = new StringBuilder();
-		AMonitor p = parent;
-		while (p != null) {
-			sb.append(p.getTaskName());
-			sb.append(" - ");
-			p = p.parent;
-		}
-		sb.append(name != null ? name : "...");
-		return sb.toString();
-	}
+	private static final long serialVersionUID = -218852721987522485L;
 
 }

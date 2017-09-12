@@ -37,10 +37,11 @@ public interface IMonitor {
 
 	}
 
-	void checkCancel() throws MethodCancelException;
-
-	void invoke(Object t);
-
+	/**
+	 * Set the amount of work to be done.
+	 * 
+	 * @param work Absolute amount (must be positive).
+	 */
 	void setRemainingWork(int work);
 
 	/**
@@ -49,20 +50,62 @@ public interface IMonitor {
 	void step() throws MethodCancelException;
 
 	/**
+	 * Increases the monitor's progress, invokes the intermediate function (with {@code null}), and checks for cancel.
+	 * 
+	 * @param work the amount of work done
+	 */
+	void step(int work) throws MethodCancelException;
+
+	/**
 	 * Increases the monitor's progress, invokes the intermediate function, and checks for cancel.
+	 * 
+	 * @param t the parameter for the intermediate function
 	 */
 	void step(Object t) throws MethodCancelException;
+
+	/**
+	 * Increases the monitor's progress, invokes the intermediate function, and checks for cancel.
+	 * 
+	 * @param t the parameter for the intermediate function
+	 * @param work the amount of work done
+	 */
+	void step(int work, Object t) throws MethodCancelException;
 
 	IMonitor subTask(int size);
 
 	void setTaskName(String name);
-	
+
 	String getTaskName();
-	
+
 	/**
+	 * <b>Use {@link #step()} or {@link #step(Object)}.</b><br/>
 	 * Increases the monitor's progress.
 	 */
 	void worked();
+
+	/**
+	 * <b>Use {@link #step(int)} or {@link #step(int, Object)}.</b><br/>
+	 * Increases the monitor's progress.
+	 * 
+	 * @param work the amount of work done
+	 */
+	void worked(int work);
+
+	/**
+	 * <b>Use {@link #step()} or {@link #step(Object)}.</b><br/>
+	 * Throws a {@link MethodCancelException} if the monitor's {@link #cancel()} method was called.
+	 * 
+	 * @throws MethodCancelException
+	 */
+	void checkCancel() throws MethodCancelException;
+
+	/**
+	 * <b>Use {@link #step(Object)}.</b><br/>
+	 * Calls the intermediate function.
+	 * 
+	 * @param t the parameter for the intermediate function
+	 */
+	void invoke(Object t);
 
 	void setIntermediateFunction(IConsumer<Object> intermediateFunction);
 

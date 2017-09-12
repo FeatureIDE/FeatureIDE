@@ -69,19 +69,33 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	}
 
 	@Override
+	public List<String> convertToString(int[] literals) {
+		return convertToString(literals, true, false);
+	}
+
+	@Override
+	public List<String> convertToString(int[] literals, boolean includePositive, boolean includeNegative) {
+		return convertToString(literals, includePositive, includeNegative, true);
+	}
+	@Override
 	public List<String> convertToString(LiteralSet model) {
 		return convertToString(model, true, false);
 	}
 
 	@Override
-	public List<String> convertToString(LiteralSet model, boolean includePositive, boolean includeNegative) {
-		return convertToString(model, includePositive, includeNegative, true);
+	public List<String> convertToString(LiteralSet literals, boolean includePositive, boolean includeNegative) {
+		return convertToString(literals, includePositive, includeNegative, true);
 	}
 
 	@Override
-	public List<String> convertToString(LiteralSet model, boolean includePositive, boolean includeNegative, boolean markNegative) {
+	public List<String> convertToString(LiteralSet literals, boolean includePositive, boolean includeNegative, boolean markNegative) {
+		return convertToString(literals.getLiterals(), includePositive, includeNegative, markNegative);
+	}
+	
+	@Override
+	public List<String> convertToString(int[] literals, boolean includePositive, boolean includeNegative, boolean markNegative) {
 		final List<String> resultList = new ArrayList<>();
-		for (int var : model.getLiterals()) {
+		for (int var : literals) {
 			if (var > 0) {
 				if (includePositive) {
 					resultList.add(intToVar[Math.abs(var)]);
@@ -198,6 +212,11 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 
 	public int convertToOriginal(int internalLiteral) {
 		return internalLiteral;
+	}
+
+	@Override
+	public String toString() {
+		return "Variables [" + Arrays.toString(intToVar) + "]";
 	}
 
 }

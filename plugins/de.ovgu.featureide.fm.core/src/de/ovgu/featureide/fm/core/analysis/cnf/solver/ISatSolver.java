@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
+import java.util.Random;
+
 import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
@@ -50,6 +52,8 @@ public interface ISatSolver extends ISimpleSatSolver {
 	void setOrderFix();
 
 	void shuffleOrder();
+
+	void shuffleOrder(Random rnd);
 
 	SelectionStrategy getSelectionStrategy();
 

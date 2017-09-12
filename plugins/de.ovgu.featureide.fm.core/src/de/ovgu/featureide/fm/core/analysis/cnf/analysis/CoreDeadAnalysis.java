@@ -127,7 +127,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 			break;
 		default:
 			try {
-				solver.addClause(new LiteralSet(Arrays.copyOf(vars.toArray(), vars.size())));
+				solver.addInternalClause(new LiteralSet(Arrays.copyOf(vars.toArray(), vars.size())));
 				switch (solver.hasSolution()) {
 				case FALSE:
 					foundVariables(model, vars);

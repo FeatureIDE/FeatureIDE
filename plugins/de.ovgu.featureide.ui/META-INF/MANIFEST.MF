@@ -16,10 +16,11 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.core,
  org.eclipse.core.expressions
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: lib/SPLACAT.jar,
- lib/commons-math-2.2.jar,
+Bundle-ClassPath: lib/commons-math-2.2.jar,
  lib/FeatureIDEAnnotations.jar,
- .
+ .,
+ lib/SPLCAT.jar,
+ lib/splar.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Export-Package: 

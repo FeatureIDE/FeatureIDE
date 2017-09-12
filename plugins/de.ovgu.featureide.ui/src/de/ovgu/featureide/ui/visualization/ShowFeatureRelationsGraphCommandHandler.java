@@ -39,11 +39,11 @@ import org.eclipse.swt.widgets.Shell;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
-import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.Traverser;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IModalImplicationGraph;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -133,10 +133,10 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		final IVariables variables = formula.getVariables();
 		final int variable = variables.getVariable(fc.getName());
 
-		final IModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
+		final ModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
 		modalImplicationGraph.complete(variable);
 
-		for (int strongylConnectedVar : modalImplicationGraph.getTraverser().getStronglyConnected(variable).getLiterals()) {
+		for (int strongylConnectedVar : new Traverser(modalImplicationGraph).getStronglyConnected(variable).getLiterals()) {
 			modalImplicationGraph.complete(strongylConnectedVar);
 			if (modalImplicationGraph.isStrongPath(variable, strongylConnectedVar)) {
 				if (strongylConnectedVar > 0) {

@@ -31,11 +31,17 @@ import java.util.List;
  */
 public interface IVariables extends Cloneable {
 
-	List<String> convertToString(LiteralSet model);
+	List<String> convertToString(int[] literals);
 
-	List<String> convertToString(LiteralSet model, boolean includePositive, boolean includeNegative);
+	List<String> convertToString(LiteralSet literals);
 
-	List<String> convertToString(LiteralSet model, boolean includePositive, boolean includeNegative, boolean markNegative);
+	List<String> convertToString(int[] literals, boolean includePositive, boolean includeNegative);
+
+	List<String> convertToString(LiteralSet literals, boolean includePositive, boolean includeNegative);
+
+	List<String> convertToString(int[] literals, boolean includePositive, boolean includeNegative, boolean markNegative);
+
+	List<String> convertToString(LiteralSet literals, boolean includePositive, boolean includeNegative, boolean markNegative);
 
 	LiteralSet convertToVariables(List<String> variableNames);
 

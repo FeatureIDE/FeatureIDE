@@ -16,39 +16,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://www.fosd.de/featureide/ for further information.
+ * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job;
-
-import de.ovgu.featureide.fm.core.job.monitor.SyncMonitor;
+package de.ovgu.featureide.fm.core.analysis.cnf;
 
 /**
- * Control object for {@link IJob}s.
- * Can be used to check for cancel request, display job progress, and calling intermediate functions.
- * 
- * @deprecated Use {@link SyncMonitor} instead.
+ * Represents an instance of a satisfiability problem in CNF.<br/>
+ * Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()}
+ * method to get a {@link BasicSolver solver} for this problem.
  * 
  * @author Sebastian Krieter
  */
-@Deprecated
-public final class SyncWorkMonitor extends AWorkMonitor {
-	
-	public SyncWorkMonitor(AWorkMonitor oldMonitor) {
-		super(oldMonitor);
+public class NormalizedVariables extends Variables {
+
+	private static final long serialVersionUID = 3034547724030374119L;
+
+	protected final Variables orgVariables;
+
+	public NormalizedVariables(Variables orgVariables) {
+		super(orgVariables);
+		this.orgVariables = orgVariables;
 	}
 
-	public synchronized void worked() {
-		internalWorked();
-	}
-
-	@Override
-	public synchronized boolean checkCancel() {
-		return internalCheckCancel();
-	}
-
-	@Override
-	public synchronized void invoke(Object t) {
-		internalInvoke(t);
+	public NormalizedVariables(NormalizedVariables oldNormalizedVaribles) {
+		super(oldNormalizedVaribles);
+		this.orgVariables = oldNormalizedVaribles.orgVariables;
 	}
 
 }

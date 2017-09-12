@@ -34,8 +34,8 @@ public class SlicedVariables extends Variables {
 
 	private static final long serialVersionUID = 2162112716200473939L;
 
-	private final int[] orgToInternal;
-	private final int[] internalToOrg;
+	protected final int[] orgToInternal;
+	protected final int[] internalToOrg;
 
 	public SlicedVariables(Variables orgVariables, Collection<String> varNameList) {
 		super(orgVariables);
@@ -123,6 +123,11 @@ public class SlicedVariables extends Variables {
 	public int getVariable(String varName) {
 		final Integer var = varToInt.get(varName);
 		return var == null ? 0 : orgToInternal[var] == 0 ? 0 : var;
+	}
+
+	@Override
+	public String toString() {
+		return "SlicedVariables\n\tremainingVariables=" + Arrays.toString(internalToOrg) + "\n\torgNames=" + Arrays.toString(intToVar);
 	}
 
 }

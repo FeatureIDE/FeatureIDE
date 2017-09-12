@@ -33,39 +33,47 @@ public class SatUtils {
 
 	public static int[] negateSolution(int[] solution) {
 		int[] negSolution = Arrays.copyOf(solution, solution.length);
-		for (int i = 0; i < negSolution.length; i++) {
-			negSolution[i] = -negSolution[i];
+		for (int i = 0; i < solution.length; i++) {
+			negSolution[i] = -solution[i];
 		}
 		return negSolution;
 	}
 
-	public static void updateSolution(final int[] model1, int[] model2) {
-		for (int i = 0; i < model1.length; i++) {
-			final int x = model1[i];
-			final int y = model2[i];
+	public static void updateSolution(final int[] solution1, int[] solution2) {
+		for (int i = 0; i < solution1.length; i++) {
+			final int x = solution1[i];
+			final int y = solution2[i];
 			if (x != y) {
-				model1[i] = 0;
+				solution1[i] = 0;
 			}
 		}
 	}
 
-	public static void updateSolution(final int[] model1, Iterable<int[]> models) {
-		for (int i = 0; i < model1.length; i++) {
-			final int x = model1[i];
-			for (int[] model2 : models) {
-				final int y = model2[i];
+	public static void updateSolution(final int[] solution1, Iterable<int[]> solutions) {
+		for (int i = 0; i < solution1.length; i++) {
+			final int x = solution1[i];
+			for (int[] solution2 : solutions) {
+				final int y = solution2[i];
 				if (x != y) {
-					model1[i] = 0;
+					solution1[i] = 0;
 					break;
 				}
 			}
 		}
 	}
 
-	public static int countNegative(int[] model) {
+	public static String toBinaryString(int[] solution) {
+		final StringBuilder sb = new StringBuilder(solution.length);
+		for (int literal : solution) {
+			sb.append(literal == 0 ? '?' : literal < 0 ? '0' : '1');
+		}
+		return sb.toString();
+	}
+
+	public static int countNegative(int[] solution) {
 		int count = 0;
-		for (int i = 0; i < model.length; i++) {
-			count += model[i] >>> (Integer.SIZE - 1);
+		for (int i = 0; i < solution.length; i++) {
+			count += solution[i] >>> (Integer.SIZE - 1);
 		}
 		return count;
 	}

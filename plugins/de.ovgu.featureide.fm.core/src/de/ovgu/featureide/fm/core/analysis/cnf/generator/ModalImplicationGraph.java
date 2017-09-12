@@ -110,11 +110,6 @@ public class ModalImplicationGraph implements IModalImplicationGraph {
 		complete = Arrays.copyOf(other.complete, other.complete.length);
 	}
 
-	@Override
-	public ITraverser getTraverser() {
-		return new Traverser(this);
-	}
-
 	public boolean isStrongPath(int startLiteral, int endLiteral) {
 		if (startLiteral != endLiteral) {
 			final Vertex vertex = adjList.get(Math.abs(startLiteral) - 1);
@@ -136,7 +131,7 @@ public class ModalImplicationGraph implements IModalImplicationGraph {
 		final int startIndex = Math.abs(startLiteral) - 1;
 		synchronized (complete) {
 			if (!complete[startIndex]) {
-				final LiteralSet weaklyConnected = getTraverser().getWeaklyConnected(startLiteral);
+				final LiteralSet weaklyConnected = new Traverser(this).getWeaklyConnected(startLiteral);
 				final CoreDeadAnalysis analysis = new CoreDeadAnalysis(new CNF(complexClauses), weaklyConnected);
 				analysis.setAssumptions(new LiteralSet(startLiteral));
 				final LiteralSet stronglyConnected = LongRunningWrapper.runMethod(analysis);
@@ -157,7 +152,7 @@ public class ModalImplicationGraph implements IModalImplicationGraph {
 	}
 
 	public List<LiteralSet> getComplexClauses() {
-		return Collections.unmodifiableList(complexClauses);
+		return complexClauses;
 	}
 
 }

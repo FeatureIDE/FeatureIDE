@@ -16,57 +16,47 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://www.fosd.de/featureide/ for further information.
+ * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job.monitor;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
- * Control object for {@link IJob}s.
- * Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
  */
-public final class NullMonitor extends AMonitor {
+public class Condition implements Comparable<Condition> {
 
-	private boolean cancel = false;
+	private final LiteralSet[] positiveExpressions, negativeExpressions;
+	
+	private int outgoingEdge = 0;
 
-	@Override
-	public void cancel() {
-		cancel = true;
+	public Condition(LiteralSet[] positiveExpressions, LiteralSet[] negativeExpressions) {
+		super();
+		this.positiveExpressions = positiveExpressions;
+		this.negativeExpressions = negativeExpressions;
+	}
+
+	public LiteralSet[] getPositiveExpressions() {
+		return positiveExpressions;
+	}
+
+	public LiteralSet[] getNegativeExpressions() {
+		return negativeExpressions;
+	}
+
+	public int getOutgoingEdge() {
+		return outgoingEdge;
+	}
+
+	public void setOutgoingEdge(int outgoingEdge) {
+		this.outgoingEdge = outgoingEdge;
 	}
 
 	@Override
-	public void done() {
-	}
-
-	@Override
-	public void checkCancel() throws MethodCancelException {
-		if (cancel) {
-			throw new MethodCancelException();
-		}
-	}
-
-	@Override
-	public IMonitor subTask(int size) {
-		return this;
-	}
-
-	@Override
-	public void worked(int work) {
-	}
-
-	@Override
-	public void setRemainingWork(int work) {
-	}
-
-	@Override
-	public void setTaskName(String name) {
-	}
-
-	public String getTaskName() {
-		return "";
+	public int compareTo(Condition o) {
+		return outgoingEdge - o.outgoingEdge;
 	}
 
 }

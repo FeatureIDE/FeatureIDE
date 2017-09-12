@@ -22,29 +22,7 @@ package de.ovgu.featureide.fm.core.base;
 
 import java.io.Serializable;
 
-import org.sat4j.core.VecInt;
-
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-
 public interface IModalImplicationGraph extends Serializable {
-
-	public interface ITraverser {
-
-		LiteralSet getStronglyConnected(int startVar);
-
-		LiteralSet getWeaklyConnected(int startVar);
-
-		void markDefined(LiteralSet definedVars);
-
-		void markUndefined(LiteralSet undefinedVars);
-		
-		void markDefinedAndUndefined(LiteralSet definedVars, LiteralSet undefinedVars);
-
-		VecInt getVariablesMarkedForSelection();
-
-		VecInt getVariablesMarkedForCalculation();
-
-	}
 
 	public static final byte EDGE_NONE = 0b00000000, //0x00;
 			EDGE_00Q = 0b00000001, //0x01,
@@ -69,8 +47,6 @@ public interface IModalImplicationGraph extends Serializable {
 	public static final byte EDGE_WEAK_NEGATIVE = EDGE_NEGATIVE & EDGE_WEAK;
 	public static final byte EDGE_WEAK_POSITIVE = EDGE_POSITIVE & EDGE_WEAK;
 
-	ITraverser getTraverser();
-	
 	boolean isStrongPath(int startLiteral, int endLiteral);
 
 	boolean isComplete(int startLiteral);
