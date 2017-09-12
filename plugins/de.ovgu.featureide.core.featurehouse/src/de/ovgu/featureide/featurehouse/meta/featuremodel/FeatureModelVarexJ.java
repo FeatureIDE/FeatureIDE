@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -85,17 +86,15 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 		}
 		return fields.toString();
 	}
-	
-	private final static String TRUE_FALSE = "  &&  True  &&  !False";
 
 	@Override
 	public String getFormula() {
-		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
-		String formula = nodes.toString(NodeWriter.javaSymbols);
-		if (formula.contains(TRUE_FALSE)) {
-			formula = formula.substring(0, formula.indexOf(TRUE_FALSE));
-		}
-		return VALID + "return " + formula.toLowerCase(Locale.ENGLISH) + ";\r\n\t}\r\n\r\n";
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(featureModel);
+		nc.setCnfType(CNFType.Compact);
+		nc.setIncludeBooleanValues(false);
+		final Node node = nc.createNodes();
+		final String formula = node.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
+		return VALID + "return " + formula + ";\r\n\t}\r\n\r\n";
 	}
 
 	@Override
