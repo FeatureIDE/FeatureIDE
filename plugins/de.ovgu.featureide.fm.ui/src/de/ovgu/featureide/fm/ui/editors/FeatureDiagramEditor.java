@@ -822,12 +822,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		if (getContents() == null)
 			return;
 
-		// TODO is this necessary?
-		FmOutlinePage outline = featureModelEditor.getOutlinePage();
-		if (outline != null) {
-			outline.setInput(getFeatureModel());
-		}
-
 		// refresh size of all feature figures
 		if (!onlyLayout)
 			getContents().refresh();

@@ -37,7 +37,8 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
- * Label provider for displaying a not available message in the outline
+ * This class is part of the outline. It maps the items provided by the
+ * ContentProvider to visible items that can be displayed inside a TreeView.
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume

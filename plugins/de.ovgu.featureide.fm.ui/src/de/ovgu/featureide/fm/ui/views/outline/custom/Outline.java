@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.ui.views.outline.custom;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_OUTLINE_VIEW;
 
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.resources.IFile;
@@ -84,11 +83,6 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.providers.NotAvailableOutli
  * @author Dominic Labsch
  * @author Daniel Psche
  * @author Christopher Sontag
- */
-/*
- * TODO #404 fix bug: do not close the tree if a corresponding file was opened
- * with an other way e.g. via collaboration diagram
- * 
  */
 public class Outline extends ViewPart implements ISelectionChangedListener, ITreeViewerListener, IPropertyListener {
 	private static final String OUTLINE_ID = "de.ovgu.featureide.fm.ui.Outline";
@@ -207,8 +201,6 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 			}
 		}
 	}
-
-	//private TreeViewerListenerImpl treeListener;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -430,7 +422,6 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 									viewer.setLabelProvider(provider.getLabelProvider());
 									if (iFile != null) {
 										viewer.setInput(iFile);
-										((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 										provider.handleUpdate(viewer, iFile);
 										fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
 										fillContextMenu();

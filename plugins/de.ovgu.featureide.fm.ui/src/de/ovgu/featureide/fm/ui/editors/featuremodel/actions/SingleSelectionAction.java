@@ -48,7 +48,7 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			SingleSelectionAction.this.selectionChanged(isValidSelection(selection));
+			selectionElementChanged(isValidSelection(selection));
 		}
 	};
 
@@ -111,7 +111,7 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 		return ((FeatureEditPart) part).getModel().getObject();
 	}
 
-	private void selectionChanged(boolean oneSelected) {
+	private void selectionElementChanged(boolean oneSelected) {
 		if (feature != null)
 			feature.removeListener(this);
 		if (oneSelected) {
