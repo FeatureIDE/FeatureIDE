@@ -213,49 +213,65 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	/**
-	 * checks whether A implies B for the current feature model.
+	 * <p>
+	 * Returns whether the conjunction of A always implies the disjunction of B in the current feature model.
+	 * </p>
 	 * 
-	 * in detail the following condition should be checked whether
+	 * <p>
+	 * In other words, the following satisfiability query is checked:
+	 * <pre>TAUT(FM &rArr; ((&and;<sub>a&in;A</sub> a) &rArr; (&or;<sub>b&in;B</sub> b)))</pre>
+	 * </p>
 	 * 
-	 * FM => ((A1 and A2 and ... and An) => (B1 or B2 or ... or Bn))
+	 * <p>
+	 * Note that this formula is always true if B is empty.
+	 * </p>
 	 * 
-	 * is true for all values
-	 * 
-	 * @param A
-	 *            set of features that form a conjunction
-	 * @param B
-	 *            set of features that form a conjunction
-	 * @return
+	 * @param a set of features that form a conjunction
+	 * @param b set of features that form a disjunction
+	 * @return whether the conjunction of A always implies the disjunction of B in the current feature model
 	 * @throws TimeoutException
 	 */
 	public boolean checkImplies(Collection<IFeature> a, Collection<IFeature> b) throws TimeoutException {
-		if (b.isEmpty())
+		if (b.isEmpty()) {
 			return true;
+		}
 
-		Node featureModel = getCnf();
-
-		// B1 or B2 or ... Bn
-		Node condition = disjunct(b);
-		// (A1 and ... An) => (B1 or ... Bn)
-		if (!a.isEmpty())
-			condition = new Implies(conjunct(a), condition);
-		// FM => (A => B)
-		Implies finalFormula = new Implies(featureModel, condition);
-		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+		/*
+		 *   TAUT(FM => (A => B))
+		 * = TAUT(-FM | -A | B)
+		 * = -SAT(-(-FM | -A | B))
+		 * = -SAT(FM & A & -B)
+		 * = -SAT(FM & A1 & ... & An & -(B1 | ... | Bm))
+		 * = -SAT(FM & A1 & ... & An & -B1 & ... & -Bm)
+		 */
+		final Node[] literals = new Node[a.size() + b.size()];
+		int i = 0;
+		for (final IFeature f : a) {
+			literals[i++] = new Literal(NodeCreator.getVariable(f, fm));
+		}
+		for (final IFeature f : b) {
+			literals[i++] = new Literal(NodeCreator.getVariable(f, fm), false);
+		}
+		return !new SatSolver(getCnf(), 1000).isSatisfiable(new And(literals));
 	}
 
 	public boolean checkIfFeatureCombinationNotPossible(IFeature a, Collection<IFeature> b) throws TimeoutException {
 		if (b.isEmpty())
 			return true;
 
-		Node featureModel = getCnf();
-		boolean notValid = true;
+		/*
+		 * -SAT(FM & A & B1) | ... | -SAT(FM & A & Bn)
+		 */
+		final SatSolver solver = new SatSolver(getCnf(), 1000);
 		for (IFeature f : b) {
-			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone(null)))),
-					new Literal(NodeCreator.getVariable(a, fm.clone(null))));
-			notValid &= !new SatSolver(node, 1000).isSatisfiable();
+			final Node featureCombination = new And(
+					NodeCreator.getVariable(a, fm),
+					NodeCreator.getVariable(f, fm));
+			if (!solver.isSatisfiable(featureCombination)) {
+				return true;
+			}
 		}
-		return notValid;
+		return false;
 	}
 
 	/**
@@ -266,15 +282,35 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @throws TimeoutException
 	 */
 	public boolean checkCondition(Node condition) {
-		Node featureModel = getCnf();
-		// FM => (condition)
-		Implies finalFormula = new Implies(featureModel, condition.clone());
 		try {
-			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+			return isImpliedTautology(condition);
 		} catch (TimeoutException e) {
 			Logger.logError(e);
 			return false;
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns whether the given condition is always implied by the feature model.
+	 * </p>
+	 * 
+	 * <p>
+	 * In other words, the following satisfiability query is checked:
+	 * <pre>TAUT(FM &rArr; C)</pre>
+	 * </p>
+	 * @param condition implied condition
+	 * @return whether the given condition is always implied by the feature model
+	 * @throws TimeoutException
+	 */
+	private boolean isImpliedTautology(Node condition) throws TimeoutException {
+		/*
+		 *   TAUT(FM => C)
+		 * = TAUT(-FM | C)
+		 * = -SAT(-(-FM | C))
+		 * = -SAT(FM & -C)
+		 */
+		return !new SatSolver(getCnf(), 1000).isSatisfiable(new Not(condition));
 	}
 
 	/**
@@ -309,8 +345,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 		if ((featureSets == null) || (featureSets.size() < 2))
 			return true;
 
-		Node featureModel = getCnf();
-
 		ArrayList<Node> conjunctions = new ArrayList<Node>(featureSets.size());
 		for (Collection<IFeature> features : featureSets) {
 			if ((features != null) && !features.isEmpty())
@@ -343,8 +377,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		if ((context != null) && !context.isEmpty())
 			condition = new Implies(conjunct(context), condition);
 
-		Implies finalFormula = new Implies(featureModel, condition);
-		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+		return isImpliedTautology(condition);
 	}
 
 	/**
@@ -373,7 +406,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 		if ((featureSets == null) || featureSets.isEmpty())
 			return false;
 
-		Node featureModel = getCnf();
 		Collection<Object> forAnd = new LinkedList<Object>();
 
 		for (Collection<IFeature> features : featureSets) {
@@ -387,8 +419,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		if ((context != null) && !context.isEmpty())
 			condition = new And(conjunct(context), condition);
 
-		Node finalFormula = new And(featureModel, condition);
-		return new SatSolver(finalFormula, 1000).isSatisfiable();
+		return new SatSolver(getCnf(), 1000).isSatisfiable(condition);
 	}
 
 	/**
@@ -405,12 +436,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 */
 	@Deprecated
 	public boolean exists(Collection<IFeature> features) throws TimeoutException {
-		if ((features == null) || (features.isEmpty()))
+		if (features == null || features.isEmpty())
 			return true;
-
-		Node featureModel = getCnf();
-		Node finalFormula = new And(featureModel, conjunct(features));
-		return new SatSolver(finalFormula, 1000).isSatisfiable();
+		return new SatSolver(getCnf(), 1000).isSatisfiable(conjunct(features));
 	}
 
 	@Deprecated
