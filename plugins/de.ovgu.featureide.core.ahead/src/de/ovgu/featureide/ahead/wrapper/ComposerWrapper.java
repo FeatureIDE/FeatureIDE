@@ -29,6 +29,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNEXPECTED_ERR
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -168,7 +169,7 @@ public class ComposerWrapper {
 
 		configFile = (configFile == null) ? featureProject.getCurrentConfiguration() : configFile;
 		if (configFile != null) {
-			final List<String> lines = Files.readAllLines(Paths.get(configFile.getLocationURI()));
+			final List<String> lines = Files.readAllLines(Paths.get(configFile.getLocationURI()), Charset.forName("UTF-8"));
 			for (String line : lines) {
 				if (!line.startsWith("#")) {
 					final IFolder f = featureProject.getSourceFolder().getFolder(line);

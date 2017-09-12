@@ -25,10 +25,14 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 
 import org.prop4j.analyses.FGBuilder;
+import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
@@ -50,7 +54,11 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 	protected void endAction() {
 		for (IFeatureProject project : projectList) {
 			final Path path = Paths.get(project.getProject().getFile("model.fg").getLocationURI());
-			final IRunner<IFeatureGraph> runner = LongRunningWrapper.getRunner(new FGBuilder(AdvancedNodeCreator.createSatInstance(project.getFeatureModel())));
+			final IFeatureModel fm = project.getFeatureModel();
+			final SatInstance sat = new SatInstance(
+					AdvancedNodeCreator.createRegularCNF(fm),
+					Functional.mapToList(fm.getFeatures(), FeatureUtils.GET_FEATURE_NAME));
+			final IRunner<IFeatureGraph> runner = LongRunningWrapper.getRunner(new FGBuilder(sat));
 			runner.addJobFinishedListener(new JobFinishListener<IFeatureGraph>() {
 				@Override
 				public void jobFinished(IJob<IFeatureGraph> finishedJob) {

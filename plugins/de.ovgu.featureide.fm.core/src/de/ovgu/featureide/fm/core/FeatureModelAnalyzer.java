@@ -54,6 +54,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -77,7 +79,7 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
  * @author Stefan Krueger
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class FeatureModelAnalyzer {
+public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * Remembers explanations for dead features.
 	 */
@@ -114,9 +116,8 @@ public class FeatureModelAnalyzer {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
 	}
 
-	private static final String TRUE = "True";
-
-	private static final String FALSE = "False";
+	private static final String TRUE = NodeCreator.varTrue.toString();
+	private static final String FALSE = NodeCreator.varFalse.toString();
 
 	private List<IFeature> cachedDeadFeatures = Collections.emptyList();
 	private List<IFeature> cachedCoreFeatures = Collections.emptyList();
@@ -125,6 +126,12 @@ public class FeatureModelAnalyzer {
 	private boolean cachedValidity = true;
 
 	private final IFeatureModel fm;
+	/**
+	 * The feature model as a formula in conjunctive normal form.
+	 * Created lazily.
+	 * Resets when the feature model changes.
+	 */
+	private Node cnf;
 
 	/**
 	 * Defines whether features should be included into calculations.
@@ -173,6 +180,7 @@ public class FeatureModelAnalyzer {
 
 	public FeatureModelAnalyzer(IFeatureModel fm) {
 		this.fm = fm;
+		fm.addListener(this);
 		clearExplanations();
 	}
 
@@ -200,53 +208,69 @@ public class FeatureModelAnalyzer {
 	}
 
 	public boolean isValid() throws TimeoutException {
-		return new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000, false).isSatisfiable();
+		return new SatSolver(getCnf(), 1000, false).isSatisfiable();
 	}
 
 	/**
-	 * checks whether A implies B for the current feature model.
+	 * <p>
+	 * Returns whether the conjunction of A always implies the disjunction of B in the current feature model.
+	 * </p>
 	 * 
-	 * in detail the following condition should be checked whether
+	 * <p>
+	 * In other words, the following satisfiability query is checked:
+	 * <pre>TAUT(FM &rArr; ((&and;<sub>a&in;A</sub> a) &rArr; (&or;<sub>b&in;B</sub> b)))</pre>
+	 * </p>
 	 * 
-	 * FM => ((A1 and A2 and ... and An) => (B1 or B2 or ... or Bn))
+	 * <p>
+	 * Note that this formula is always true if B is empty.
+	 * </p>
 	 * 
-	 * is true for all values
-	 * 
-	 * @param A
-	 *            set of features that form a conjunction
-	 * @param B
-	 *            set of features that form a conjunction
-	 * @return
+	 * @param a set of features that form a conjunction
+	 * @param b set of features that form a disjunction
+	 * @return whether the conjunction of A always implies the disjunction of B in the current feature model
 	 * @throws TimeoutException
 	 */
 	public boolean checkImplies(Collection<IFeature> a, Collection<IFeature> b) throws TimeoutException {
-		if (b.isEmpty())
+		if (b.isEmpty()) {
 			return true;
+		}
 
-		Node featureModel = NodeCreator.createNodes(fm.clone(null));
-
-		// B1 or B2 or ... Bn
-		Node condition = disjunct(b);
-		// (A1 and ... An) => (B1 or ... Bn)
-		if (!a.isEmpty())
-			condition = new Implies(conjunct(a), condition);
-		// FM => (A => B)
-		Implies finalFormula = new Implies(featureModel, condition);
-		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+		/*
+		 *   TAUT(FM => (A => B))
+		 * = TAUT(-FM | -A | B)
+		 * = -SAT(-(-FM | -A | B))
+		 * = -SAT(FM & A & -B)
+		 * = -SAT(FM & A1 & ... & An & -(B1 | ... | Bm))
+		 * = -SAT(FM & A1 & ... & An & -B1 & ... & -Bm)
+		 */
+		final Node[] literals = new Node[a.size() + b.size()];
+		int i = 0;
+		for (final IFeature f : a) {
+			literals[i++] = new Literal(NodeCreator.getVariable(f, fm));
+		}
+		for (final IFeature f : b) {
+			literals[i++] = new Literal(NodeCreator.getVariable(f, fm), false);
+		}
+		return !new SatSolver(getCnf(), 1000).isSatisfiable(new And(literals));
 	}
 
 	public boolean checkIfFeatureCombinationNotPossible(IFeature a, Collection<IFeature> b) throws TimeoutException {
 		if (b.isEmpty())
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm.clone(null));
-		boolean notValid = true;
+		/*
+		 * -SAT(FM & A & B1) | ... | -SAT(FM & A & Bn)
+		 */
+		final SatSolver solver = new SatSolver(getCnf(), 1000);
 		for (IFeature f : b) {
-			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone(null)))),
-					new Literal(NodeCreator.getVariable(a, fm.clone(null))));
-			notValid &= !new SatSolver(node, 1000).isSatisfiable();
+			final Node featureCombination = new And(
+					NodeCreator.getVariable(a, fm),
+					NodeCreator.getVariable(f, fm));
+			if (!solver.isSatisfiable(featureCombination)) {
+				return true;
+			}
 		}
-		return notValid;
+		return false;
 	}
 
 	/**
@@ -257,15 +281,35 @@ public class FeatureModelAnalyzer {
 	 * @throws TimeoutException
 	 */
 	public boolean checkCondition(Node condition) {
-		Node featureModel = AdvancedNodeCreator.createNodes(fm);
-		// FM => (condition)
-		Implies finalFormula = new Implies(featureModel, condition.clone());
 		try {
-			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+			return isImpliedTautology(condition);
 		} catch (TimeoutException e) {
 			Logger.logError(e);
 			return false;
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns whether the given condition is always implied by the feature model.
+	 * </p>
+	 * 
+	 * <p>
+	 * In other words, the following satisfiability query is checked:
+	 * <pre>TAUT(FM &rArr; C)</pre>
+	 * </p>
+	 * @param condition implied condition
+	 * @return whether the given condition is always implied by the feature model
+	 * @throws TimeoutException
+	 */
+	private boolean isImpliedTautology(Node condition) throws TimeoutException {
+		/*
+		 *   TAUT(FM => C)
+		 * = TAUT(-FM | C)
+		 * = -SAT(-(-FM | C))
+		 * = -SAT(FM & -C)
+		 */
+		return !new SatSolver(getCnf(), 1000).isSatisfiable(new Not(condition));
 	}
 
 	/**
@@ -300,8 +344,6 @@ public class FeatureModelAnalyzer {
 		if ((featureSets == null) || (featureSets.size() < 2))
 			return true;
 
-		Node featureModel = AdvancedNodeCreator.createNodes(fm);
-
 		ArrayList<Node> conjunctions = new ArrayList<Node>(featureSets.size());
 		for (Collection<IFeature> features : featureSets) {
 			if ((features != null) && !features.isEmpty())
@@ -334,8 +376,7 @@ public class FeatureModelAnalyzer {
 		if ((context != null) && !context.isEmpty())
 			condition = new Implies(conjunct(context), condition);
 
-		Implies finalFormula = new Implies(featureModel, condition);
-		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+		return isImpliedTautology(condition);
 	}
 
 	/**
@@ -364,7 +405,6 @@ public class FeatureModelAnalyzer {
 		if ((featureSets == null) || featureSets.isEmpty())
 			return false;
 
-		Node featureModel = NodeCreator.createNodes(fm);
 		Collection<Object> forAnd = new LinkedList<Object>();
 
 		for (Collection<IFeature> features : featureSets) {
@@ -378,8 +418,7 @@ public class FeatureModelAnalyzer {
 		if ((context != null) && !context.isEmpty())
 			condition = new And(conjunct(context), condition);
 
-		Node finalFormula = new And(featureModel, condition);
-		return new SatSolver(finalFormula, 1000).isSatisfiable();
+		return new SatSolver(getCnf(), 1000).isSatisfiable(condition);
 	}
 
 	/**
@@ -396,12 +435,9 @@ public class FeatureModelAnalyzer {
 	 */
 	@Deprecated
 	public boolean exists(Collection<IFeature> features) throws TimeoutException {
-		if ((features == null) || (features.isEmpty()))
+		if (features == null || features.isEmpty())
 			return true;
-
-		Node featureModel = NodeCreator.createNodes(fm);
-		Node finalFormula = new And(featureModel, conjunct(features));
-		return new SatSolver(finalFormula, 1000).isSatisfiable();
+		return new SatSolver(getCnf(), 1000).isSatisfiable(conjunct(features));
 	}
 
 	@Deprecated
@@ -440,7 +476,7 @@ public class FeatureModelAnalyzer {
 	 */
 	@Deprecated
 	public Collection<String> commonFeatures(long timeout, Object... selectedFeatures) {
-		Node formula = NodeCreator.createNodes(fm);
+		Node formula = getCnf();
 		if (selectedFeatures.length > 0) {
 			formula = new And(formula, new Or(selectedFeatures));
 		}
@@ -502,11 +538,11 @@ public class FeatureModelAnalyzer {
 		final ArrayList<IFeature> coreFeatures = new ArrayList<>();
 		final ArrayList<IFeature> deadFeatures = new ArrayList<>();
 
-		Node formula = AdvancedNodeCreator.createCNF(fm);
+		Node formula = getCnf();
 		if (selectedFeatures.length > 0) {
 			final Node[] extendedChildren = Arrays.copyOf(formula.getChildren(), formula.getChildren().length + 1);
 			extendedChildren[formula.getChildren().length] = new Or(selectedFeatures);
-			formula.setChildren(extendedChildren);
+			formula = new And(extendedChildren);
 		}
 		final SatSolver solver = new SatSolver(formula, timeout, false);
 
@@ -537,7 +573,7 @@ public class FeatureModelAnalyzer {
 	public List<List<IFeature>> getAtomicSets() {
 		final ArrayList<List<IFeature>> result = new ArrayList<>();
 
-		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000, false);
+		final SatSolver solver = new SatSolver(getCnf(), 1000, false);
 
 		for (List<Literal> literalList : solver.atomicSets()) {
 			final List<IFeature> setList = new ArrayList<>();
@@ -728,7 +764,7 @@ public class FeatureModelAnalyzer {
 	public List<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
 		final List<IFeature> falseOptionalFeatures = new ArrayList<>();
 
-		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000);
+		final SatSolver solver = new SatSolver(getCnf(), 1000);
 		for (IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure = feature.getStructure();
 			if (!FeatureUtils.getRoot(fm).getName().equals(feature.getName())) { // this might be indeed the case within the analysis for subtree dependencies
@@ -786,6 +822,66 @@ public class FeatureModelAnalyzer {
 
 	public Collection<IFeature> getCachedFalseOptionalFeatures() {
 		return Collections.unmodifiableList(cachedFalseOptionalFeatures);
+	}
+
+	/**
+	 * Listens to feature model changes.
+	 * Resets its formula if necessary.
+	 */
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		switch (event.getEventType()) {
+			case ALL_FEATURES_CHANGED_NAME_TYPE: //Required because feature names are used as variable names.
+			case CHILDREN_CHANGED:
+			case CONSTRAINT_ADD:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_MODIFY:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case FEATURE_MODIFY: //TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
+			case FEATURE_NAME_CHANGED: //Required because feature names are used as variable names.
+			case GROUP_TYPE_CHANGED:
+			case HIDDEN_CHANGED: //TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
+			case MANDATORY_CHANGED:
+			case MODEL_DATA_CHANGED:
+			case MODEL_DATA_LOADED:
+			case MODEL_DATA_OVERRIDDEN:
+			case PARENT_CHANGED:
+			case STRUCTURE_CHANGED:
+				cnf = null;
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the feature model as a formula in conjunctive normal form.
+	 * Creates it first if necessary.
+	 * </p>
+	 * 
+	 * <p>
+	 * As this is a cached mutable object, care must be taken not to modify the returned object or any of its children.
+	 * If changes are necessary, the returned object must be cloned first.
+	 * </p>
+	 * @return the feature model as a formula in conjunctive normal form; not null
+	 * @see {@link #getNode()} if the formula does not have to be in conjunctive normal form
+	 */
+	public Node getCnf() {
+		if (cnf == null) {
+			cnf = createCnf();
+		}
+		return cnf;
+	}
+
+	/**
+	 * Creates the feature model as a formula in conjunctive normal form.
+	 * @return the feature model as a formula in conjunctive normal form; not null
+	 */
+	private Node createCnf() {
+		return AdvancedNodeCreator.createRegularCNF(fm);
 	}
 
 	/**
