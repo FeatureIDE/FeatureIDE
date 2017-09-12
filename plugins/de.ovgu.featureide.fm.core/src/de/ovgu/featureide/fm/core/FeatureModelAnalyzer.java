@@ -116,9 +116,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 		Mandatory, Optional, Alternative, Or, Abstract, Concrete, Hidden, Dead, FalseOptional, IndetHidden, UnsatisfiableConst, TautologyConst, VoidModelConst, RedundantConst
 	}
 
-	private static final String TRUE = "True";
-
-	private static final String FALSE = "False";
+	private static final String TRUE = NodeCreator.varTrue.toString();
+	private static final String FALSE = NodeCreator.varFalse.toString();
 
 	private List<IFeature> cachedDeadFeatures = Collections.emptyList();
 	private List<IFeature> cachedCoreFeatures = Collections.emptyList();
