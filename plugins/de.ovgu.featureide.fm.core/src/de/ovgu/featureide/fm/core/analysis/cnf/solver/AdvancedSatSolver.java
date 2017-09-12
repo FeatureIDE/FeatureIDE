@@ -259,12 +259,14 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 				throw new AssertionError(strategy);
 			}
 		}
+		solver.getOrder().init();
 	}
 
 	@Override
 	public void setSelectionStrategy(int[] model, boolean min) {
 		this.strategy = SelectionStrategy.FIXED;
 		solver.setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model, min), order));
+		solver.getOrder().init();
 	}
 
 	@Override
