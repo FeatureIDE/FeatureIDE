@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,15 +18,11 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.viewers.IColorProvider;
-import org.eclipse.jface.viewers.IFontProvider;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 import org.prop4j.NodeWriter;
@@ -36,6 +32,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -44,9 +42,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
- * @author Marcus Pinnecke
+ * @author Reimar Schroeter
+ * @author Dominic Labsch
+ * @author Daniel Psche
+ * @author Christopher Sontag
  */
-public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults, IColorProvider {
+public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults {
 
 	@Override
 	public void addListener(ILabelProviderListener listener) {
@@ -103,16 +104,6 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 		return element.toString();
 	}
 
-	@Override
-	public Font getFont(Object element) {
-		return DEFAULT_FONT;
-	}
-
-	@Override
-	public Color getForeground(Object element) {
-		return null;
-	}
-
 	public Color getBackground(Object element) {
 		Color col = null;
 
@@ -125,5 +116,35 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 		}
 		return col;
 	}
+
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getOutlineType() {
+		return OUTLINE_FEATURE_MODEL;
+	}
+
+	@Override
+	public void setForeground(TreeItem item, IFile file) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getLabelProvName() {
+		return "Feature Model Outline";
+	}
+
+	@Override
+	public boolean refreshContent(IFile oldFile, IFile currentFile) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 }

@@ -7,6 +7,7 @@
 	<extension-point id="de.ovgu.featureide.fm.ui.FeatureDiagram" name="featurediagram" schema="schema/de.ovgu.featureide.fm.ui.FeatureDiagram.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.language" name="language" schema="schema/language.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.ConfigurationEditor" name="ConfigurationEditorExtension" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationPage.exsd"/>
+ <extension-point id="de.ovgu.featureide.fm.ui.Outline" name="FeatureIDE Outline" schema="schema/de.ovgu.featureide.fm.ui.Outline.exsd"/>
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type
@@ -157,6 +158,14 @@
 				icon="icons/FeatureIconSmall.ico"
 				id="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
 				name="Feature Model Edits"/>
+  <view
+        category="FeatureIDE"
+        class="de.ovgu.featureide.fm.ui.views.outline.custom.Outline"
+        icon="icons/FeatureIconSmall.ico"
+        id="de.ovgu.featureide.fm.ui.views.outline.Outline"
+        name="FeatureIDE Outline"
+        restorable="true">
+  </view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.propertyPages">
@@ -684,4 +693,10 @@
         type="java.lang.Object">
   </propertyTester>
 	</extension>
+ <extension
+       point="de.ovgu.featureide.fm.ui.Outline">
+    <Outline
+          OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMOutlineProvider">
+    </Outline>
+ </extension>
 </plugin>

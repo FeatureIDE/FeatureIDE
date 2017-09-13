@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,36 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
-
-import java.util.LinkedList;
-
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
 
 /**
- * Filter to hide methods in the collaboration outline.
+ * Interface to filter the content of the CollaborationOutline.
  * 
-  * @author Dominic Labsch
-  * @author Daniel P�sche
+ * @author Dominic Labsch	
+ * @author Daniel P�sche
  */
-public class HideAllMethods implements ICollaborationOutlineFilter {
+public interface ICollaborationOutlineFilter {
 
-	@Override
-	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
-
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
-			for (int i = 0; i < obj.length; i++) {
-				if (!(obj[i] instanceof FSTMethod)) {
-					resultList.add(obj[i]);
-				}
-			}
-		}else{
-			return obj;
-		}
-		return resultList.toArray();
-
-	}
-
+	public Object[] filter(Object[] obj);
+		
 }

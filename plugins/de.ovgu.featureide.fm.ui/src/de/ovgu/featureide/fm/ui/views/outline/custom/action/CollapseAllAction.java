@@ -18,38 +18,35 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.action;
 
-import java.util.LinkedList;
-
-import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.TreeViewer;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
+ * Action which collapse all elements in a treeviewer
  * 
- * Filter to hide fields in the collaboration outline.
- * 
- * @author Dominic Labsch	
- * @author Daniel P�sche
+ * @author Christopher Sontag
  */
-public class HideAllFields implements ICollaborationOutlineFilter {
+public class CollapseAllAction extends Action {
 
+		private TreeViewer viewer;
 
-	@Override
-	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
-
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
-			for (int i = 0; i < obj.length; i++) {
-				if (!(obj[i] instanceof FSTField)) {
-					resultList.add(obj[i]);
-				}
-			}
-		}else{
-			return obj;
+		/**
+		 * Constructor for CollapseAllAction
+		 * @param viewer
+		 */
+		public CollapseAllAction(TreeViewer viewer) {
+			super();
+			this.viewer = viewer;
+			this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
 		}
-		return resultList.toArray();
 
-	}
-
+		public void run() {
+			viewer.collapseAll();
+			viewer.expandToLevel(2);
+			this.firePropertyChange("COLLAPSE", null, null);
+		}
+	
 }

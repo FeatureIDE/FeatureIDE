@@ -18,16 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.action;
+
+import org.eclipse.jface.action.Action;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 
 /**
- * Interface to filter the content of the CollaborationOutline.
+ * Action which manages a provider for changing when clicked
  * 
- * @author Dominic Labsch	
- * @author Daniel P�sche
+ * @author Christopher Sontag
  */
-public interface ICollaborationOutlineFilter {
+public class RemoveAllFiltersAction extends Action {
 
-	public Object[] filter(Object[] obj);
-		
+		private OutlineProvider provider;
+
+		/**
+		 * Constructor for ChangeOutlineProviderAction
+		 * @param viewer
+		 */
+		public RemoveAllFiltersAction(OutlineProvider provider) {
+			super();
+			this.provider = provider;
+			this.setText("Remove Filters");
+		}
+
+		/**
+		 * Returns the outline provider
+		 * @return
+		 */
+		public OutlineProvider getProvider() {
+			return provider;
+		}
+
 }

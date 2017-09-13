@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,36 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.filters;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.swt.widgets.TreeItem;
+import java.util.LinkedList;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
- * Provides labels and images for Collaboration outline
+ * Filter to hide methods in the collaboration outline.
  * 
- * @author Reimar Schr�ter
+  * @author Dominic Labsch
+  * @author Daniel P�sche
  */
-public class MungeOutlineLabelProvider extends CollaborationOutlineLabelProvider {
-
+public class HideAllMethods implements ICollaborationOutlineFilter {
 
 	@Override
-	public String getText(Object element) {
-		if (element instanceof FSTClass) {
-			FSTClass fstclass = (FSTClass) element;
-			return fstclass.getName();
+	public Object[] filter(Object[] obj) {
+		LinkedList<Object> resultList = new LinkedList<Object>();
+
+		if (obj.length > 0 && obj[0] instanceof RoleElement) {
+			for (int i = 0; i < obj.length; i++) {
+				if (!(obj[i] instanceof FSTMethod)) {
+					resultList.add(obj[i]);
+				}
+			}
 		}else{
-			return super.getText(element);
+			return obj;
 		}
+		return resultList.toArray();
+
 	}
 
-	public String getLabelProvName() {
-		return "Extended Outline";
-	}
-	
-	public void setForeground(TreeItem item, IFile iFile) {
-		return;
-	}
 }

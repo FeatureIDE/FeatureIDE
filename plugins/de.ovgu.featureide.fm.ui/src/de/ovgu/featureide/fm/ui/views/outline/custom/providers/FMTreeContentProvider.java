@@ -18,21 +18,25 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_DATA_TO_DISPLAY_AVAILABLE_;
 
+import java.nio.file.Paths;
 import java.util.List;
 
-import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
  * This class is part of the outline. It provides the content that should be
@@ -43,32 +47,26 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
  */
-public class FmTreeContentProvider implements ITreeContentProvider {
+public class FMTreeContentProvider extends OutlineTreeContentProvider {
 
 	private IFeatureModel fModel;
-	private IGraphicalFeatureModel graphicalFeatureModel;
-
-	@Override
-	public void dispose() {
-	}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput != null && newInput instanceof IFeatureModel)
-			fModel = ((IFeatureModel) newInput);
+		if (newInput != null) {
+			if (newInput instanceof IFeatureModel)
+				fModel = ((IFeatureModel) newInput);
+			else if (newInput instanceof IFile) {
+				FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile)newInput).getLocationURI()));
+				if (fmm != null)
+					fModel = fmm.getObject();
+			}
+		}
 
 	}
 	
 	public IFeatureModel getFeatureModel() {
 		return fModel;
-	}
-	
-	public IGraphicalFeatureModel getGraphicalFeatureModel() {
-		return graphicalFeatureModel;
-	}
-	
-	public void setGraphicalFeatureModel(IGraphicalFeatureModel gfm) {
-		graphicalFeatureModel = gfm;
 	}
 
 	@Override

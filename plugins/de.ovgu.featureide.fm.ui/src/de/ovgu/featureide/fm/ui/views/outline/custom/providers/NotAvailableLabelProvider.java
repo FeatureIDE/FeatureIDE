@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,65 +18,63 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
+package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
+
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY_OUTLINE;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 
 /**
- * Wrapper for the feature-model label provider
- *
+ * Label provider for displaying a not available message in the outline
+ * 
+ * @author Jan Wedding
+ * @author Melanie Pflaume
  * @author Reimar Schroeter
+ * @author Dominic Labsch
+ * @author Daniel Psche
+ * @author Christopher Sontag
  */
-public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implements IColorProvider {
-
-	private final FmLabelProvider prov = new FmLabelProvider();
+public class NotAvailableLabelProvider extends OutlineLabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
-		return prov.getImage(element);
+		return null;
 	}
 
 	@Override
 	public String getText(Object element) {
-		if (element instanceof IFeature) {
-			return prov.getText(((IFeature)element).getName());
-		} else if (element instanceof IConstraint) {
-			return prov.getText(((IConstraint)element).getDisplayName());
-		} else return prov.getText(element);
+		return element.toString();
 	}
 
 	@Override
 	public void addListener(ILabelProviderListener listener) {
-		prov.addListener(listener);
 	}
 
 	@Override
 	public void dispose() {
-		prov.dispose();
 	}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
-		return prov.isLabelProperty(element, property);
+		return false;
 	}
 
 	@Override
 	public void removeListener(ILabelProviderListener listener) {
-		prov.removeListener(listener);
+	}
+
+	@Override
+	public int getOutlineType() {
+		return OutlineLabelProvider.OUTLINE_NOT_AVAILABLE;
 	}
 
 	@Override
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
-		//	prov.colorizeItems(treeItems, file);
 	}
 
 	@Override
@@ -85,12 +83,7 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implemen
 
 	@Override
 	public String getLabelProvName() {
-		return "Feature-Model Outline";
-	}
-
-	@Override
-	public int getOutlineType() {
-		return OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
+		return EMPTY_OUTLINE;
 	}
 
 	@Override
@@ -100,16 +93,7 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implemen
 
 	@Override
 	public void init() {
-	}
 
-	@Override
-	public Color getForeground(Object element) {
-		return null;
-	}
-
-	@Override
-	public Color getBackground(Object element) {
-		return prov.getBackground(element);
 	}
 
 }

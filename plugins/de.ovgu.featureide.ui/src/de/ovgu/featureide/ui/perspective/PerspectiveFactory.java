@@ -29,11 +29,11 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
+import de.ovgu.featureide.fm.ui.views.outline.custom.Outline;
 import de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;

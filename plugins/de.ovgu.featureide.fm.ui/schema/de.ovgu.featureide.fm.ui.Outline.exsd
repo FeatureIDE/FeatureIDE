@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="de.ovgu.featureide.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="de.ovgu.featureide.fm.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="de.ovgu.featureide.ui" id="de.ovgu.featureide.ui.views.outline" name="Outline"/>
+         <meta.schema plugin="de.ovgu.featureide.fm.ui" id="de.ovgu.featureide.fm.ui.Outline" name="FeatureIDE Outline"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]
@@ -17,8 +17,8 @@
          </appInfo>
       </annotation>
       <complexType>
-         <choice minOccurs="1" maxOccurs="unbounded">
-            <element ref="outline"/>
+         <choice>
+            <element ref="Outline" minOccurs="1" maxOccurs="unbounded"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,25 +47,15 @@
       </complexType>
    </element>
 
-   <element name="outline">
+   <element name="Outline">
       <complexType>
-         <attribute name="contentProvider" type="string">
+         <attribute name="OutlineProvider" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.jface.viewers.ITreeContentProvider"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="labelProvider" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appInfo>
-                  <meta.attribute kind="java" basedOn="de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider:"/>
+                  <meta.attribute kind="java" basedOn="de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider:"/>
                </appInfo>
             </annotation>
          </attribute>

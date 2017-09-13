@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
  * A default implementation for actions that only allow one feature to be
@@ -48,7 +48,7 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			SingleSelectionAction.this.selectionChanged(isValidSelection(selection));
+			selectionElementChanged(isValidSelection(selection));
 		}
 	};
 
@@ -111,7 +111,7 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 		return ((FeatureEditPart) part).getModel().getObject();
 	}
 
-	private void selectionChanged(boolean oneSelected) {
+	private void selectionElementChanged(boolean oneSelected) {
 		if (feature != null)
 			feature.removeListener(this);
 		if (oneSelected) {
