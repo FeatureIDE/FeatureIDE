@@ -420,10 +420,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
 					diagramEditor.internRefresh(false);
-					//refresh root and children to prevent manual and another layout algorithm to omit connection
-					if (diagramEditor.getFeatureModel().getStructure().getRoot() != null) {
-						diagramEditor.refreshChildAll(diagramEditor.getFeatureModel().getStructure().getRoot().getFeature());
-					}
 					diagramEditor.analyzeFeatureModel();
 				}
 			});
