@@ -725,10 +725,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
 		}
-		if (graphicalFeatureModel.getVisibleConstraints().size() != graphicalFeatureModel.getConstraints().size()
-				|| graphicalFeatureModel.getLayout().showCollapsedConstraints()) {
-			menu.add(showCollapsedConstraintsAction);
-		}
+		menu.add(showCollapsedConstraintsAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		// call of the FeatureDiagramExtensions (for features only)
