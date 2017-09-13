@@ -54,7 +54,7 @@ import de.ovgu.featureide.examples.ExamplePlugin;
  * 
  * @author Reimar Schroeter
  */
-public class ProjectRecord {
+public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
 	public static final String INDEX_FILENAME = "index.fileList";
@@ -292,6 +292,11 @@ public class ProjectRecord {
 			return false;
 		final ProjectRecord other = (ProjectRecord) obj;
 		return projectDescriptionRelativePath.equals(other.projectDescriptionRelativePath) && projectName.equals(other.projectName);
+	}
+
+	@Override
+	public int compareTo(ProjectRecord o) {
+		return projectDescriptionRelativePath.compareTo(o.projectDescriptionRelativePath);
 	}
 
 	/**

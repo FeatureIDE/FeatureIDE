@@ -32,6 +32,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -187,7 +188,7 @@ public class CreateMetaInformation {
 	}
 
 	private static Path pluginRoot;
-	
+
 	private static boolean force = false;
 
 	public static void main(String[] args) throws IOException {
@@ -197,12 +198,13 @@ public class CreateMetaInformation {
 			}
 		}
 		pluginRoot = Paths.get(".");
-		Path exampleDir = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
-		Path indexFile = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
+		final Path exampleDir = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
+		final Path indexFile = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
 
 		System.out.println("Examining Files...");
 		final ProjectRecordCollection projectFiles = new ProjectRecordCollection();
 		Files.walkFileTree(exampleDir, new ProjectWalker(projectFiles));
+		Collections.sort(projectFiles);
 
 		System.out.println("Updating Index Files...");
 		for (ProjectRecord projectRecord : projectFiles) {
@@ -216,6 +218,7 @@ public class CreateMetaInformation {
 		final ProjectRecordCollection oldProjectFiles = new ProjectRecordCollection();
 		if (Files.exists(indexFile)) {
 			FileHandler.load(indexFile, oldProjectFiles, format);
+			Collections.sort(oldProjectFiles);
 			System.out.println("Updating Project List...");
 		} else {
 			System.out.println("Creating New Project List...");
