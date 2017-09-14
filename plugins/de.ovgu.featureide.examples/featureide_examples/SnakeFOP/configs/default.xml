@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="SnakeFOP"/>
+		<feature automatic="selected" manual="selected" name="Points"/>
+		<feature automatic="undefined" manual="selected" name="Highscore"/>
+		<feature automatic="selected" manual="selected" name="Entities"/>
+		<feature automatic="selected" manual="selected" name="Snake"/>
+		<feature automatic="unselected" manual="undefined" name="Automatic"/>
+		<feature automatic="undefined" manual="selected" name="Manual"/>
+		<feature automatic="selected" manual="selected" name="Enemies"/>
+		<feature automatic="undefined" manual="undefined" name="Bug"/>
+		<feature automatic="undefined" manual="selected" name="Centipede"/>
+		<feature automatic="undefined" manual="undefined" name="Fly"/>
+		<feature automatic="undefined" manual="undefined" name="Mouse"/>
+		<feature automatic="undefined" manual="undefined" name="Slug"/>
+		<feature automatic="selected" manual="undefined" name="Gamefield"/>
+		<feature automatic="unselected" manual="undefined" name="Bordered"/>
+		<feature automatic="undefined" manual="selected" name="Torus"/>
+		<feature automatic="selected" manual="selected" name="Level"/>
+		<feature automatic="undefined" manual="selected" name="L1"/>
+		<feature automatic="undefined" manual="undefined" name="L2"/>
+		<feature automatic="undefined" manual="undefined" name="L3"/>
+		<feature automatic="undefined" manual="undefined" name="L4"/>
+	</configuration>

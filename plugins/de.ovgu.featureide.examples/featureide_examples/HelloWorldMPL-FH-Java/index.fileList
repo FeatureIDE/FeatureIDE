@@ -1,9 +1,7 @@
 .classpath
 .project
-configs/.default.fideconf
 configs/default.config
 features/HelloWorldMPL-FH-Java.Greetings/Main.java
-InterfaceMapping/.default.fideconf
 InterfaceMapping/default.config
 Interfaces/IHelloWorld.velvet
 model.xml
@@ -11,9 +9,9 @@ mpl.velvet
 projects/HelloWorld-FH-Java-MPLDependency/.classpath
 projects/HelloWorld-FH-Java-MPLDependency/.project
 projects/HelloWorld-FH-Java-MPLDependency/.settings/org.eclipse.jdt.core.prefs
-projects/HelloWorld-FH-Java-MPLDependency/configs/BeautifulWorld.config
-projects/HelloWorld-FH-Java-MPLDependency/configs/HelloWorld.config
-projects/HelloWorld-FH-Java-MPLDependency/configs/WonderfulWorld.config
+projects/HelloWorld-FH-Java-MPLDependency/configs/BeautifulWorld.xml
+projects/HelloWorld-FH-Java-MPLDependency/configs/HelloWorld.xml
+projects/HelloWorld-FH-Java-MPLDependency/configs/WonderfulWorld.xml
 projects/HelloWorld-FH-Java-MPLDependency/features/Beautiful/Main.java
 projects/HelloWorld-FH-Java-MPLDependency/features/Hello/Main.java
 projects/HelloWorld-FH-Java-MPLDependency/features/Wonderful/Main.java

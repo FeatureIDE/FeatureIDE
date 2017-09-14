@@ -1,6 +1,6 @@
 .classpath
 .project
-configs/default.config
+configs/default.xml
 features/Addressbook/EmailSystem/Client.java
 features/Addressbook/Test_Actions.java
 features/AutoResponder/EmailSystem/Client.java

@@ -2,7 +2,7 @@
 .project
 .settings/de.ovgu.featureide.core.prefs
 configs/contract.style
-configs/default.config
+configs/default.xml
 features/Blinds/Blind.java
 features/Blinds/Dealer.java
 features/Cards/Card.java

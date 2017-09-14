@@ -1,7 +1,7 @@
 .classpath
 .project
-configs/All.config
-configs/RemAdd.config
+configs/All.xml
+configs/RemAdd.xml
 model.xml
 modules/DAddEval.deltaj
 modules/DLitAddPrint.deltaj

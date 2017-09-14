@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="Arith"/>
+		<feature automatic="selected" manual="selected" name="Base"/>
+		<feature automatic="undefined" manual="selected" name="Bool"/>
+		<feature automatic="undefined" manual="selected" name="BoolBinOp"/>
+		<feature automatic="undefined" manual="selected" name="BinOp"/>
+		<feature automatic="undefined" manual="selected" name="BoolUnOp"/>
+		<feature automatic="undefined" manual="selected" name="UnOp"/>
+		<feature automatic="undefined" manual="selected" name="Let"/>
+		<feature automatic="undefined" manual="selected" name="BinOp_Vars"/>
+		<feature automatic="undefined" manual="selected" name="UnOp_Vars"/>
+		<feature automatic="undefined" manual="selected" name="ITE"/>
+		<feature automatic="undefined" manual="selected" name="ITE_Vars"/>
+		<feature automatic="undefined" manual="selected" name="Lambda"/>
+		<feature automatic="undefined" manual="selected" name="CmdLine"/>
+		<feature automatic="undefined" manual="selected" name="Vars"/>
+	</configuration>

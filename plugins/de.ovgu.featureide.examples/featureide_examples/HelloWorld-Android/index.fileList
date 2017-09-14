@@ -1,7 +1,7 @@
 .classpath
 .project
 AndroidManifest.xml
-configs/HelloWorld.config
+configs/HelloWorld.xml
 ic_launcher-web.png
 libs/android-support-v4.jar
 model.xml

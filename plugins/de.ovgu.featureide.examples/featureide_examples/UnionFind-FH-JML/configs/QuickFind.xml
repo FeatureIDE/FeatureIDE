@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="UnionFindSPL"/>
+		<feature automatic="selected" manual="selected" name="UnionFind"/>
+		<feature automatic="undefined" manual="selected" name="QuickFind"/>
+		<feature automatic="unselected" manual="undefined" name="QuickUnion"/>
+		<feature automatic="unselected" manual="undefined" name="QU_Weighted"/>
+		<feature automatic="unselected" manual="undefined" name="QU_Weighted_Modifications"/>
+		<feature automatic="unselected" manual="undefined" name="WQU_Halfing"/>
+		<feature automatic="unselected" manual="undefined" name="WQU_ByHeight"/>
+		<feature automatic="unselected" manual="undefined" name="WQU_PathCompression"/>
+		<feature automatic="selected" manual="selected" name="Tests"/>
+	</configuration>

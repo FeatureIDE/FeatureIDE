@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="ExamDB"/>
+		<feature automatic="undefined" manual="selected" name="BonusPoints"/>
+		<feature automatic="undefined" manual="selected" name="BackOut"/>
+		<feature automatic="undefined" manual="selected" name="Statistics"/>
+		<feature automatic="selected" manual="undefined" name="Derivatives"/>
+		<feature automatic="selected" manual="undefined" name="BonusPointsBackOut"/>
+		<feature automatic="selected" manual="undefined" name="BonusPointsStatistics"/>
+		<feature automatic="selected" manual="undefined" name="BackOutStatistics"/>
+		<feature automatic="selected" manual="undefined" name="BonusPointsBackOutStatistics"/>
+	</configuration>

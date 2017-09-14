@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="Elevator"/>
+		<feature automatic="selected" manual="selected" name="Base"/>
+		<feature automatic="selected" manual="selected" name="Weight"/>
+		<feature automatic="undefined" manual="selected" name="Empty"/>
+		<feature automatic="undefined" manual="selected" name="ExecutiveFloor"/>
+		<feature automatic="undefined" manual="selected" name="TwoThirdsFull"/>
+		<feature automatic="undefined" manual="selected" name="Overloaded"/>
+	</configuration>

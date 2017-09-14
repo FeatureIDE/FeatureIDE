@@ -2,10 +2,10 @@
 .featureide/model.xml/model.xml.xml
 .profiles/default.profile
 .project
-configs/Enterprise.config
-configs/HomeBasic.config
-configs/HomePremium.config
-configs/Ultimate.config
+configs/Enterprise.xml
+configs/HomeBasic.xml
+configs/HomePremium.xml
+configs/Ultimate.xml
 model.xml
 resource/arrow_down.png
 resource/arrow_down_small.png
