@@ -39,6 +39,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractFeatureModelExplanationCreator implements FeatureModelExplanationCreator {
+	/** The subject with an attribute to be explained. */
+	private Object subject;
 	/** The feature model context. */
 	private IFeatureModel fm;
 	/**
@@ -71,6 +73,16 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 */
 	public AbstractFeatureModelExplanationCreator(IFeatureModel fm) {
 		setFeatureModel(fm);
+	}
+	
+	@Override
+	public Object getSubject() {
+		return subject;
+	}
+	
+	@Override
+	public void setSubject(Object subject) {
+		this.subject = subject;
 	}
 	
 	@Override

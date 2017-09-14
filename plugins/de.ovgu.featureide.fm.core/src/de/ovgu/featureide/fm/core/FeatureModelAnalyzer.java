@@ -882,7 +882,7 @@ public class FeatureModelAnalyzer {
 		final DeadFeatureExplanationCreator creator = fm == this.fm
 				? deadFeatureExplanationCreator
 				: explanationCreatorFactory.getDeadFeatureExplanationCreator(fm);
-		creator.setDeadFeature(feature);
+		creator.setSubject(feature);
 		deadFeatureExplanations.put(feature, creator.getExplanation());
 	}
 	
@@ -917,7 +917,7 @@ public class FeatureModelAnalyzer {
 		final FalseOptionalFeatureExplanationCreator creator = fm == this.fm
 				? falseOptionalFeatureExplanationCreator
 				: explanationCreatorFactory.getFalseOptionalFeatureExplanationCreator(fm);
-		creator.setFalseOptionalFeature(feature);
+		creator.setSubject(feature);
 		falseOptionalFeatureExplanations.put(feature, creator.getExplanation());
 	}
 	
@@ -958,7 +958,7 @@ public class FeatureModelAnalyzer {
 		final RedundantConstraintExplanationCreator creator = fm == this.fm
 				? redundantConstraintExplanationCreator
 				: explanationCreatorFactory.getRedundantConstraintExplanationCreator(fm);
-		creator.setRedundantConstraint(constraint);
+		creator.setSubject(constraint);
 		redundantConstraintExplanations.put(constraint, creator.getExplanation());
 	}
 	

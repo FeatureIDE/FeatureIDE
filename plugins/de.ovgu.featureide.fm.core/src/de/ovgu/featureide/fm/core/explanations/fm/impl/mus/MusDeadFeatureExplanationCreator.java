@@ -35,9 +35,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  * @author Timo G&uuml;nther
  */
 public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
-	/** The dead feature in the feature model. */
-	private IFeature deadFeature;
-	
 	/**
 	 * Constructs a new instance of this class.
 	 */
@@ -60,17 +57,20 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 	 */
 	public MusDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
 		super(fm);
-		setDeadFeature(deadFeature);
+		setSubject(deadFeature);
 	}
 	
 	@Override
-	public IFeature getDeadFeature() {
-		return deadFeature;
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	@Override
-	public void setDeadFeature(IFeature deadFeature) {
-		this.deadFeature = deadFeature;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	@Override
@@ -79,7 +79,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		final DeadFeatureExplanation explanation;
 		oracle.push();
 		try {
-			oracle.addAssumption(getDeadFeature().getName(), true);
+			oracle.addAssumption(getSubject().getName(), true);
 			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
@@ -94,6 +94,6 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 
 	@Override
 	protected DeadFeatureExplanation getConcreteExplanation() {
-		return new DeadFeatureExplanation(getDeadFeature());
+		return new DeadFeatureExplanation(getSubject());
 	}
 }

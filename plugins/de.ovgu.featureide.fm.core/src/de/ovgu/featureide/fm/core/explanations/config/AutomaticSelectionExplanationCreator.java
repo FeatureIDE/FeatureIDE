@@ -33,13 +33,16 @@ public interface AutomaticSelectionExplanationCreator extends ConfigurationExpla
 	 * Returns the automatic selection to explain.
 	 * @return the automatic selection to explain
 	 */
-	public SelectableFeature getAutomaticSelection();
+	@Override
+	public SelectableFeature getSubject();
 	
 	/**
 	 * Sets the automatic selection to explain
-	 * @param automaticSelection the automatic selection to explain
+	 * @param subject the automatic selection to explain
+	 * @throws IllegalArgumentException if the subject is not an instance of {@link SelectableFeature}
 	 */
-	public void setAutomaticSelection(SelectableFeature automaticSelection);
+	@Override
+	public void setSubject(Object subject) throws IllegalArgumentException;
 	
 	/**
 	 * Returns an explanation why the specified automatic selection is necessary.

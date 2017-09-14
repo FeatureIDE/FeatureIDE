@@ -1132,17 +1132,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		switch (automaticSelection.getFeature().getProperty().getFeatureStatus()) {
 			case DEAD:
 				deadFeatureExplanationCreator.setFeatureModel(fm);
-				deadFeatureExplanationCreator.setDeadFeature(automaticSelection.getFeature());
+				deadFeatureExplanationCreator.setSubject(automaticSelection.getFeature());
 				return deadFeatureExplanationCreator.getExplanation();
 			case FALSE_OPTIONAL:
 				falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
-				falseOptionalFeatureExplanationCreator.setFalseOptionalFeature(automaticSelection.getFeature());
+				falseOptionalFeatureExplanationCreator.setSubject(automaticSelection.getFeature());
 				return falseOptionalFeatureExplanationCreator.getExplanation();
 			default:
 				break;
 		}
 		automaticSelectionExplanationCreator.setConfiguration(config);
-		automaticSelectionExplanationCreator.setAutomaticSelection(automaticSelection);
+		automaticSelectionExplanationCreator.setSubject(automaticSelection);
 		return automaticSelectionExplanationCreator.getExplanation();
 	}
 

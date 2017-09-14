@@ -36,9 +36,6 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Timo G&uuml;nther
  */
 public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
-	/** The dead feature in the feature model. */
-	private IFeature deadFeature;
-	
 	/**
 	 * Constructs a new instance of this class.
 	 */
@@ -61,17 +58,20 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	 */
 	public LtmsDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
 		super(fm);
-		setDeadFeature(deadFeature);
+		setSubject(deadFeature);
 	}
 	
 	@Override
-	public IFeature getDeadFeature() {
-		return deadFeature;
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	@Override
-	public void setDeadFeature(IFeature deadFeature) {
-		this.deadFeature = deadFeature;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	/**
@@ -86,7 +86,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
 		final Ltms ltms = getLtms();
 		ltms.clearPremises();
-		ltms.addPremise(getDeadFeature().getName(), true);
+		ltms.addPremise(getSubject().getName(), true);
 		return getExplanation(ltms.getExplanations());
 	}
 	
@@ -97,6 +97,6 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	
 	@Override
 	protected DeadFeatureExplanation getConcreteExplanation() {
-		return new DeadFeatureExplanation(getDeadFeature());
+		return new DeadFeatureExplanation(getSubject());
 	}
 }

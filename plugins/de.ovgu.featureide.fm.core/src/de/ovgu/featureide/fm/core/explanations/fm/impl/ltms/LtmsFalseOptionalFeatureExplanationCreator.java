@@ -37,9 +37,6 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Timo G&uuml;nther
  */
 public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-	/** The false-optional feature in the feature model. */
-	private IFeature falseOptionalFeature;
-	
 	/**
 	 * Constructs a new instance of this class.
 	 */
@@ -62,17 +59,20 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModel
 	 */
 	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
 		super(fm);
-		setFalseOptionalFeature(falseOptionalFeature);
+		setSubject(falseOptionalFeature);
 	}
 	
 	@Override
-	public IFeature getFalseOptionalFeature() {
-		return falseOptionalFeature;
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	@Override
-	public void setFalseOptionalFeature(IFeature falseOptionalFeature) {
-		this.falseOptionalFeature = falseOptionalFeature;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	/**
@@ -87,8 +87,8 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModel
 	public FalseOptionalFeatureExplanation getExplanation() throws IllegalStateException {
 		final Ltms ltms = getLtms();
 		ltms.clearPremises();
-		ltms.addPremise(getFalseOptionalFeature().getName(), false);
-		ltms.addPremise(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);
+		ltms.addPremise(getSubject().getName(), false);
+		ltms.addPremise(FeatureUtils.getParent(getSubject()).getName(), true);
 		return getExplanation(ltms.getExplanations());
 	}
 	
@@ -99,6 +99,6 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModel
 	
 	@Override
 	protected FalseOptionalFeatureExplanation getConcreteExplanation() {
-		return new FalseOptionalFeatureExplanation(getFalseOptionalFeature());
+		return new FalseOptionalFeatureExplanation(getSubject());
 	}
 }

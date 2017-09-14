@@ -36,9 +36,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  * @author Timo G&uuml;nther
  */
 public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-	/** The false-optional feature in the feature model. */
-	private IFeature falseOptionalFeature;
-	
 	/**
 	 * Constructs a new instance of this class.
 	 */
@@ -61,17 +58,20 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 	 */
 	public MusFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
 		super(fm);
-		setFalseOptionalFeature(falseOptionalFeature);
+		setSubject(falseOptionalFeature);
 	}
 	
 	@Override
-	public IFeature getFalseOptionalFeature() {
-		return falseOptionalFeature;
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	@Override
-	public void setFalseOptionalFeature(IFeature falseOptionalFeature) {
-		this.falseOptionalFeature = falseOptionalFeature;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	@Override
@@ -80,8 +80,8 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 		final FalseOptionalFeatureExplanation explanation;
 		oracle.push();
 		try {
-			oracle.addAssumption(getFalseOptionalFeature().getName(), false);
-			oracle.addAssumption(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);
+			oracle.addAssumption(getSubject().getName(), false);
+			oracle.addAssumption(FeatureUtils.getParent(getSubject()).getName(), true);
 			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
@@ -96,6 +96,6 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 
 	@Override
 	protected FalseOptionalFeatureExplanation getConcreteExplanation() {
-		return new FalseOptionalFeatureExplanation(getFalseOptionalFeature());
+		return new FalseOptionalFeatureExplanation(getSubject());
 	}
 }

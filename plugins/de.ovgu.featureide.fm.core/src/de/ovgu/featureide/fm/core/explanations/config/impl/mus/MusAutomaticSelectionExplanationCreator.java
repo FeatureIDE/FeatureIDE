@@ -46,9 +46,6 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	 */
 	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
 	
-	/** The automatic selection to be explained. */
-	private SelectableFeature automaticSelection;
-	
 	/**
 	 * Constructs a new instance of this class.
 	 */
@@ -67,21 +64,24 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	/**
 	 * Constructs a new instance of this class.
 	 * @param fm the feature model context
-	 * @param deadFeature the dead feature in the feature model
+	 * @param automaticSelection the automatically selected or unselected feature
 	 */
 	public MusAutomaticSelectionExplanationCreator(Configuration config, SelectableFeature automaticSelection) {
 		super(config);
-		setAutomaticSelection(automaticSelection);
+		setSubject(automaticSelection);
 	}
 	
 	@Override
-	public SelectableFeature getAutomaticSelection() {
-		return automaticSelection;
+	public SelectableFeature getSubject() {
+		return (SelectableFeature) super.getSubject();
 	}
 	
 	@Override
-	public void setAutomaticSelection(SelectableFeature automaticSelection) {
-		this.automaticSelection = automaticSelection;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof SelectableFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	@Override
@@ -94,7 +94,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
 				final Object var = featureSelection.getFeature().getName();
 				final boolean value;
-				if (featureSelection == getAutomaticSelection()) {
+				if (featureSelection == getSubject()) {
 					switch (featureSelection.getAutomatic()) {
 						case SELECTED:
 							value = false;
@@ -148,6 +148,6 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	
 	@Override
 	protected AutomaticSelectionExplanation getConcreteExplanation() {
-		return new AutomaticSelectionExplanation(getAutomaticSelection());
+		return new AutomaticSelectionExplanation(getSubject());
 	}
 }

@@ -32,13 +32,16 @@ public interface RedundantConstraintExplanationCreator extends FeatureModelExpla
 	 * Returns the redundant constraint in the feature model.
 	 * @return the redundant constraint in the feature model
 	 */
-	public IConstraint getRedundantConstraint();
+	@Override
+	public IConstraint getSubject();
 	
 	/**
 	 * Sets the redundant constraint in the feature model.
-	 * @param redundantConstraint the redundant constraint in the feature model
+	 * @param subject the redundant constraint in the feature model
+	 * @throws IllegalArgumentException if the subject is not an instance of {@link IConstraint}
 	 */
-	public void setRedundantConstraint(IConstraint redundantConstraint);
+	@Override
+	public void setSubject(Object subject) throws IllegalArgumentException;
 	
 	/**
 	 * Returns an explanation why the specified constraint of the specified feature model is redundant.

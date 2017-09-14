@@ -33,13 +33,16 @@ public interface DeadFeatureExplanationCreator extends FeatureModelExplanationCr
 	 * Returns the dead feature in the feature model.
 	 * @return the dead feature in the feature model
 	 */
-	public IFeature getDeadFeature();
+	@Override
+	public IFeature getSubject();
 	
 	/**
 	 * Sets the dead feature in the feature model.
-	 * @param deadFeature the dead feature in the feature model
+	 * @param subject the dead feature in the feature model
+	 * @throws IllegalArgumentException if the subject is not an instance of {@link IFeature}
 	 */
-	public void setDeadFeature(IFeature deadFeature);
+	@Override
+	public void setSubject(Object subject) throws IllegalArgumentException;
 	
 	/**
 	 * Returns an explanation why the specified feature of the specified feature model is dead.

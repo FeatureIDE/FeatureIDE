@@ -39,8 +39,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
  * @author Timo G&uuml;nther
  */
 public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
-	/** The redundant constraint in the feature model. */
-	private IConstraint redundantConstraint;
 	/** The amount of clauses added to the oracle to account for the redundant constraint. */
 	private int redundantConstraintClauseCount;
 	
@@ -66,17 +64,20 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 */
 	public MusRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
 		super(fm);
-		setRedundantConstraint(redundantConstraint);
+		setSubject(redundantConstraint);
 	}
 	
 	@Override
-	public IConstraint getRedundantConstraint() {
-		return redundantConstraint;
+	public IConstraint getSubject() {
+		return (IConstraint) super.getSubject();
 	}
 	
 	@Override
-	public void setRedundantConstraint(IConstraint redundantConstraint) {
-		this.redundantConstraint = redundantConstraint;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IConstraint)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	/**
@@ -105,7 +106,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			//Add each constraint but the redundant one.
 			final AdvancedNodeCreator nc = getNodeCreator();
 			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
-				if (constraint == getRedundantConstraint()) {
+				if (constraint == getSubject()) {
 					continue;
 				}
 				final Node constraintNode = nc.createConstraintNode(constraint);
@@ -114,7 +115,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			}
 			
 			//Add the negated redundant constraint.
-			final Node constraintNode = nc.createConstraintNode(getRedundantConstraint(), false);
+			final Node constraintNode = nc.createConstraintNode(getSubject(), false);
 			redundantConstraintClauseCount = constraintNode.getChildren().length;
 			constraintClauseCount += redundantConstraintClauseCount;
 			oracle.addFormula(constraintNode);
@@ -135,7 +136,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	
 	@Override
 	protected RedundantConstraintExplanation getConcreteExplanation() {
-		return new RedundantConstraintExplanation(getRedundantConstraint());
+		return new RedundantConstraintExplanation(getSubject());
 	}
 	
 	@Override
