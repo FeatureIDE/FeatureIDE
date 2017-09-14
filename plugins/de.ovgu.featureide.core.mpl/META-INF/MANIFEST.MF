@@ -15,8 +15,7 @@ Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.jdt.core.refactoring,
  org.eclipse.jdt.core.refactoring.descriptors,
  org.eclipse.jdt.internal.core
-Export-Package: .,
- de.ovgu.featureide.core.mpl,
+Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.builder,
  de.ovgu.featureide.core.mpl.job,
  de.ovgu.featureide.core.mpl.signature,
