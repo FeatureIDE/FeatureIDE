@@ -143,7 +143,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			}
 			initialize(configFeatureProject);
 		}
-		featureCpp.compose(createTemporaryConfigrationsFile(config));
+		featureCpp.compose(createTemporaryConfigrationFile(config));
 		buildFSTModel();
 	}
 
@@ -274,7 +274,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			} catch (CoreException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
-			featureCppModelWrapper.compose(createTemporaryConfigrationsFile(file));
+			featureCppModelWrapper.compose(createTemporaryConfigrationFile(file));
 			try {
 				tempFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			} catch (CoreException e) {
@@ -291,7 +291,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		try {
 			for (IResource res : folder.members()) {
 				if (res instanceof IFile && getConfigurationExtension().equals(res.getFileExtension())) {
-					featureCpp.compose(createTemporaryConfigrationsFile((IFile)res));
+					featureCpp.compose(createTemporaryConfigrationFile((IFile)res));
 				}
 			}
 		} catch (CoreException e) {

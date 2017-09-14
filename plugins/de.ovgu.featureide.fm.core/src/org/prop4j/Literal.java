@@ -20,9 +20,11 @@
  */
 package org.prop4j;
 
-import java.security.InvalidParameterException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A variable or negated variable.
@@ -36,89 +38,27 @@ public class Literal extends Node implements Cloneable {
 
 	public boolean positive;
 
-	//annotate each literal of a formula with an attribute for explanation. If "Up", explain child relationship
-	// to parent from feature-tree. If "Constraint", explain using cross-tree constraint.
-	public enum FeatureAttribute {
-		UNDEFINED,
-		CHILD,
-		PARENT,
-		ROOT,
-		CONSTRAINT
-	};
+	/**
+	 * Creates a new positive literal.
+	 * @param var contained variable
+	 */
+	public Literal(Object var) {
+		this(var, true);
+	}
 
-	public int origin; // attribute encodes relevant information for generating explanations
-
-
+	/**
+	 * Creates a new literal.
+	 * @param var contained variable
+	 * @param positive whether the variable is positive or negated
+	 */
 	public Literal(Object var, boolean positive) {
 		this.var = var;
 		this.positive = positive;
 	}
 
-	public Literal(Object var) {
-		this.var = var;
-		positive = true;
-	}
-	
-	/**
-	 * Encodes a literal from the tree topology.
-	 * FeatureAttribute must not have the value Constraint.
-	 * Example with root as FeatureAttribute: origin = -1 * 5 + 3 = -2 
-	 * @param var The variable 
-	 * @param FeatureAttribute The Enumeration element  
-	 */
-	public Literal(Object var, FeatureAttribute a) {
-		this(var);
-		if (a == FeatureAttribute.CONSTRAINT) {
-			throw new InvalidParameterException("Parameter Constraint is not allowed");
-		}
-		this.origin = -1 * FeatureAttribute.values().length + a.ordinal();  
-	}																	   
-
-	/**
-	 * Encodes a literal from a constraint.
-	 * @param var The variable
-	 * @param constraintIndex The index of a constraint  
-	 */
-	public Literal(Object var, int constraintIndex) {
-		this(var);
-		setOriginConstraint(constraintIndex);  
-	}										  
-
-	/**
-	 * Decodes a constraint index.    
-	 * Example with origin = 4: origin = 4 / 5 = 0. Returns a constraint with index 0.
-	 * 
-	 * @return The constraint-index
-	 */
-	public int getSourceIndex() {
-		if (getSourceAttribute() != FeatureAttribute.CONSTRAINT) {
-			throw new IllegalStateException("origin is not Constraint");
-		}
-		return origin / FeatureAttribute.values().length;
-	}
-
-	/**
-	 * Decodes a FeatureAttribute. 
-	 * Example with FeatureAttribute root and origin of -2: -2 % 5 + 5 = 3. 
-	 * Returns a FeatureAttribute with value 3 (ordinal).   
-	 * 
-	 * @return FeatureAttribute The Enumeration element  
-	 */
-	public FeatureAttribute getSourceAttribute() {
-		int index = origin % FeatureAttribute.values().length;
-		if (index < 0) {
-			index += FeatureAttribute.values().length;
-		}
-		return FeatureAttribute.values()[index];
-	}
-
-	/**
-	 * Encodes a constraint-index.  
-	 * Example with constraintIndex = 0: origin = 0 * 5 + 4 = 4
-	 * @param constrIndex The index of a constraint
-	 */
-	public void setOriginConstraint(int constrIndex) {
-		this.origin = constrIndex * FeatureAttribute.values().length + FeatureAttribute.CONSTRAINT.ordinal();
+	protected Literal(Literal oldLiteral) {
+		this.var = oldLiteral.var;
+		this.positive = oldLiteral.positive;
 	}
 
 	public void flip() {
@@ -147,7 +87,13 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	protected Node clausify() {
+	protected Node clausifyCNF() {
+		//nothing to do
+		return this;
+	}
+
+	@Override
+	protected Node clausifyDNF() {
 		//nothing to do
 		return this;
 	}
@@ -158,10 +104,17 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
+	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
+		if (this.var.equals(feature.getName())) {
+			this.var = replaceWithFeature.getName();
+			list.add(this);
+		}
+		return list;
+	}
+
+	@Override
 	public Literal clone() {
-		Literal copy = new Literal(var, positive);
-		copy.origin = this.origin;
-		return copy;
+		return new Literal(this);
 	}
 
 	@Override
@@ -185,5 +138,22 @@ public class Literal extends Node implements Cloneable {
 	public boolean getValue(Map<Object, Boolean> map) {
 		return this.positive == map.get(this.var);
 	}
-
+	
+	@Override
+	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
+		containedFeatures.add(String.valueOf(this.var));
+		return containedFeatures;
+	}
+	
+	@Override
+	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
+		literals.add(this);
+		return literals;
+	}
+	
+	@Override
+	protected Collection<Object> getVariables(Collection<Object> variables) {
+		variables.add(this.var);
+		return variables;
+	}
 }

@@ -144,7 +144,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 			featureModel.createDefaultValues("");
 			FMComposerManager.getFMComposerExtension(file.getProject());
 			
-			FeatureModelManager.writeToFile(featureModel, path);
+			FeatureModelManager.save(featureModel, path);
 
 			open(file);
 			return true;

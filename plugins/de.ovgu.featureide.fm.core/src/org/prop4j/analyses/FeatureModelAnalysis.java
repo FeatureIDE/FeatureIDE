@@ -26,11 +26,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
-import org.prop4j.Or;
 import org.prop4j.solver.BasicSolver;
 import org.prop4j.solver.ISatSolver.SatResult;
 import org.prop4j.solver.ModifiableSolver;
@@ -283,7 +281,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		monitor.checkCancel();
 
 		for (IConstraint constraint : constraints) {
-			modSat.addClauses(makeRegular(constraint.getNode()));
+			modSat.addClauses(constraint.getNode().toRegularCNF());
 
 			if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
 				if (calculateDeadConstraints) {
@@ -327,7 +325,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			final List<List<IConstr>> constraintMarkers = new ArrayList<>();
 			final List<Node> cnfNodes = new ArrayList<>();
 			for (IConstraint constraint : constraints) {
-				Node cnf = makeRegular(constraint.getNode());
+				Node cnf = constraint.getNode().toRegularCNF();
 				cnfNodes.add(cnf);
 
 				constraintMarkers.add(redundantSat.addClauses(cnf));
@@ -380,7 +378,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	}
 
 	private boolean checkConstraintTautology(Node constraintNode) {
-		return checkConstraintContradiction(makeRegular(new Not(constraintNode)));
+		return checkConstraintContradiction(new Not(constraintNode).toRegularCNF());
 	}
 
 	private void checkConstraintUnsatisfiable(final List<IConstraint> constraints) throws ContradictionException {
@@ -390,7 +388,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		monitor.checkCancel();
 
 		for (IConstraint constraint : constraints) {
-			Node cnf = makeRegular(constraint.getNode());
+			Node cnf = constraint.getNode().toRegularCNF();
 
 			List<IConstr> constraintMarkers = null;
 			boolean satisfiable;
@@ -528,24 +526,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	private void checkValidity(final SatInstance si) {
 		valid = LongRunningWrapper.runMethod(new ValidAnalysis(si)) != null;
-	}
-
-	private Node makeRegular(Node node) {
-		Node regularCNFNode = node.toCNF();
-		if (regularCNFNode instanceof And) {
-			final Node[] children = regularCNFNode.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				final Node child = children[i];
-				if (child instanceof Literal) {
-					children[i] = new Or(child);
-				}
-			}
-		} else if (regularCNFNode instanceof Or) {
-			regularCNFNode = new And(regularCNFNode);
-		} else if (regularCNFNode instanceof Literal) {
-			regularCNFNode = new And(new Or(regularCNFNode));
-		}
-		return regularCNFNode;
 	}
 
 	private void setFeatureAttribute(IFeature feature, FeatureStatus featureAttribute) {

@@ -50,8 +50,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -97,17 +97,13 @@ public class FrameworkComposer extends ComposerExtensionClass {
 					if (!FrameworkValidator.validate(infoFile)) {
 						return false;
 					}
-					final IFolder jarFeatureFolder = jarFolder.getFolder(res.getName());
-					if (!jarFeatureFolder.exists()) {
-						jarFeatureFolder.create(true, true, null);
-					}
-					final IFile oldJar = jarFeatureFolder.getFile(jarName);
+					final IFile oldJar = jarFolder.getFile(jarName);
 					if (oldJar.exists()) {
 						oldJar.delete(false, null);
 					}
 					/** build jar **/
 					final IFolder bin = ((IFolder) res).getFolder("bin");
-					final String path = jarFolder.getLocation().append(res.getName() + FileSystems.getDefault().getSeparator() + jarName).toString();
+					final String path = jarFolder.getLocation().append(FileSystems.getDefault().getSeparator() + jarName).toString();
 					try (FileOutputStream fileStream = new FileOutputStream(path); JarOutputStream jarStream = new JarOutputStream(fileStream)) {
 						FrameworkJarCreator.addToJar(jarStream, bin);
 						FrameworkJarCreator.addFileToJar(jarStream, infoFile, "");
@@ -145,7 +141,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		final Path configPath = Paths.get(config.getLocationURI());
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
 
-		FileHandler.load(configPath, configuration, ConfigurationManager.getFormat(configPath.getFileName().toString()));
+		FileHandler.load(configPath, configuration, ConfigFormatManager.getInstance());
 
 		selectedFeatures = new LinkedList<String>();
 		for (final IFeature feature : configuration.getSelectedFeatures()) {
@@ -159,7 +155,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		} catch (final CoreException e) {
 			FrameworkCorePlugin.getDefault().logError(e);
 		}
-		createSubprojects();
+		createSubprojects(featureProject.getProjectName());
 		if (!createJARs(project)) {
 			FrameworkCorePlugin.getDefault().logWarning("JARs not build");
 		}
@@ -179,21 +175,21 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	/**
 	 * Creates sub-projects inside feature folder depending on selected features
 	 */
-	private void createSubprojects() {
+	private void createSubprojects(String parentProjectName) {
 
 		for (final String featureName : selectedFeatures) {
 			final IFolder features = featureProject.getSourceFolder();
 			final IFolder subproject = features.getFolder(featureName);
 			if (!subproject.exists()) {
 				try {
-					FrameworkProjectCreator.createSubprojectFolder(featureName, subproject);
+					FrameworkProjectCreator.createSubprojectFolder(parentProjectName+"-"+featureName, subproject);
 				} catch (final CoreException e) {
 					FrameworkCorePlugin.getDefault().logError(e);
 				}
 			} else {
 				if (!subproject.getFile(".project").exists()) {
 					try {
-						FrameworkProjectCreator.createSubprojectFolder(featureName, subproject);
+						FrameworkProjectCreator.createSubprojectFolder(parentProjectName+"-"+featureName, subproject);
 					} catch (final CoreException e) {
 						FrameworkCorePlugin.getDefault().logError(e);
 					}
@@ -223,7 +219,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	 * @return Folder with jars
 	 */
 	private IFolder getJarFolder() {
-		return featureProject.getProject().getFolder("jars");
+		return featureProject.getProject().getFolder("lib");
 	}
 
 	/**
@@ -252,13 +248,10 @@ public class FrameworkComposer extends ComposerExtensionClass {
 			/** add selected features **/
 			try {
 				for (final IResource res : getJarFolder().members()) {
-					final String featureName = res.getName();
+					final String featureName = res.getName().substring(0, res.getName().indexOf("."));
 					if (selectedFeatures.contains(featureName)) {
-						final List<IPath> newEntries = createNewIPath(res);
-						for (final IPath entry : newEntries) {
-							final IClasspathEntry newLibraryEntry = JavaCore.newLibraryEntry(entry, null, null);
-							entries.add(newLibraryEntry);
-						}
+						final IClasspathEntry newLibraryEntry = JavaCore.newLibraryEntry(res.getFullPath(), null, null);
+						entries.add(newLibraryEntry);
 					}
 				}
 			} catch (final CoreException e) {
@@ -349,7 +342,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 			}
 		}
 		/** Create jar folder **/
-		final IFolder jarFolder = project.getProject().getFolder("jars");
+		final IFolder jarFolder = project.getProject().getFolder("lib");
 		if (!jarFolder.exists()) {
 			try {
 				jarFolder.create(true, true, null);

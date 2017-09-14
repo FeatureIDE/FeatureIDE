@@ -101,8 +101,8 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 
 		if (superPolicy.getConstraintCommand() instanceof ConstraintDragAndDropCommand) {
 			ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand) superPolicy.getConstraintCommand();
-
-			if (cmd.canExecute()) {
+			boolean isAutoLayout = editPart.getModel().getGraphicalModel().getLayout().hasFeaturesAutoLayout();
+			if (cmd.canExecute() && isAutoLayout) {
 				c.setForegroundColor(ColorConstants.black);
 				Point l = cmd.getLeftPoint();
 				Point r = cmd.getRightPoint();

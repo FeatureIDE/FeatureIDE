@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 /**
  * Reads / Writes the XML structure that holds the paths for all example projects.
  * 
- * @author skrieter
+ * @author Sebastian Krieter
  */
 public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
@@ -48,7 +48,7 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
 	@Override
 	public String getId() {
-		return null;
+		return ID;
 	}
 
 	@Override
@@ -114,6 +114,11 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 				addProjectRecords(doc, projectElement, projectRecord.getSubProjects());
 			}
 		}
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
 	}
 
 }

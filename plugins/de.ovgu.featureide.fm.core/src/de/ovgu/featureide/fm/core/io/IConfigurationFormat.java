@@ -33,4 +33,6 @@ public interface IConfigurationFormat extends IPersistentFormat<Configuration> {
 
 	public static String extensionID = "configFormat";
 
+	String getName();
+
 }

@@ -515,9 +515,9 @@ public class SatSolver {
 			node = new And(node);
 		}
 
-		ConstrGroup group = new ConstrGroup();
-		IVecInt unit = new VecInt();
+		final ConstrGroup group = new ConstrGroup();
 		try {
+			final IVecInt unit = new VecInt();
 			for (Node child : node.getChildren()) {
 				if (child instanceof Or) {
 					IVecInt clause = new VecInt();
@@ -528,14 +528,12 @@ public class SatSolver {
 					unit.push(getIntOfLiteral(child));
 				}
 			}
+			return solver.isSatisfiable(unit);
 		} catch (ContradictionException e) {
-			group.removeFrom(solver);
 			return false;
+		} finally {
+			group.removeFrom(solver);
 		}
-
-		boolean satisfiable = solver.isSatisfiable(unit);
-		group.removeFrom(solver);
-		return satisfiable;
 	}
 
 	/**

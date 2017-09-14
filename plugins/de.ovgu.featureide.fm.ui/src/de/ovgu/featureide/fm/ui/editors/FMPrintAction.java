@@ -27,8 +27,9 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.ui.IWorkbenchPart;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A PrintAction for the FeatureModelEditor that temporarily moves the
@@ -68,7 +69,8 @@ public class FMPrintAction extends PrintAction {
 		return;
 	}
 
-	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Collection<IGraphicalFeature> features, Iterator<IGraphicalFeature> featureIter, Point minP) {
+	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Collection<IGraphicalFeature> features,
+			Iterator<IGraphicalFeature> featureIter, Point minP) {
 		layout.setLayout(0);
 		while (featureIter.hasNext()) {
 			IGraphicalFeature f = featureIter.next();
@@ -81,7 +83,9 @@ public class FMPrintAction extends PrintAction {
 
 		moveFeatures(features, minP);
 		moveConstraints(featureModel, minP);
-		moveLegend(featureModel, layout, minP);
+		if (!featureModel.isLegendHidden()) {
+			moveLegend(featureModel, layout, minP);
+		}
 	}
 
 	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Collection<IGraphicalFeature> features, Point minP) {
@@ -93,13 +97,21 @@ public class FMPrintAction extends PrintAction {
 	}
 
 	private void moveLegend(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Point minP) {
-		Point legendPos = layout.getLegendPos();
-		Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
-		
-		if (!FMPropertyManager.isLegendHidden()) {
-			FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLegendPos);
+		FeatureModelEditor editor = (FeatureModelEditor) getWorkbenchPart();
+		if(editor.getEditorSite() instanceof FeatureDiagramEditor){
+			FMUIPlugin.getDefault().logInfo("is feature diagramm editor");
+			FeatureDiagramEditor fdEditor = (FeatureDiagramEditor) editor.getEditorSite();
+			for (Object obj : fdEditor.getEditPartRegistry().values()) {
+				FMUIPlugin.getDefault().logInfo("" + obj + " is of type " + obj.getClass());
+				if(obj instanceof LegendEditPart) {
+					FMUIPlugin.getDefault().logInfo(" is legend whohoooo! ");
+					Point legendPos = layout.getLegendPos();
+					Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
+					((LegendEditPart) obj).getFigure().setLocation(newLegendPos);
+					layout.setLegendPos(newLegendPos.x, newLegendPos.y);
+				}
+			}
 		}
-		layout.setLegendPos(newLegendPos.x, newLegendPos.y);
 	}
 
 	private void moveConstraints(IGraphicalFeatureModel featureModel, Point minP) {

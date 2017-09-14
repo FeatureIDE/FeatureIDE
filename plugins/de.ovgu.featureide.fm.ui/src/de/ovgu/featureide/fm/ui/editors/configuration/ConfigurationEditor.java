@@ -64,13 +64,14 @@ import de.ovgu.featureide.fm.core.conf.ConfigurationFG;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -94,7 +95,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			ConfigurationEditor.class.getName() + "#MODEL_PATH");
 
 	private final JobSynchronizer configJobManager = new JobSynchronizer();
-	
+
 	private final List<IConfigurationEditorPage> allPages = new ArrayList<>(5);
 	private List<IConfigurationEditorPage> extensionPages;
 	private List<IConfigurationEditorPage> internalPages;
@@ -139,7 +140,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 		@Override
 		public void partDeactivated(IWorkbenchPart part) {
-			
+
 		}
 
 		@Override
@@ -150,7 +151,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		public void partActivated(IWorkbenchPart part) {
 		}
 	};
-	
+
 	public List<IConfigurationEditorPage> getExtensionPages() {
 		return extensionPages;
 	}
@@ -221,7 +222,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				}
 			}
 		}
-		
 
 		featureModelManager = (res == null) 
 				? FeatureModelManager.getInstance(modelFile.toPath())
@@ -244,12 +244,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				? new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY)
 				: new ConfigurationFG(featureModelManager.getObject(), fg, ConfigurationFG.PARAM_IGNOREABSTRACT | ConfigurationFG.PARAM_LAZY);
 
-		configurationManager = FileManagerMap.<Configuration, ConfigurationManager> getInstance(file.getLocation().toOSString());
+		final Path path = file.getLocation().toFile().toPath();
+		configurationManager = ConfigurationManager.getInstance(path);
 		if (configurationManager != null) {
 //			FileHandler.load(Paths.get(file.getLocationURI()), c, ConfigFormatManager.getInstance().getFormatByFileName(file.getLocation().toOSString()));
 			configurationManager.setConfiguration(c);
 		} else {
-			configurationManager = ConfigurationManager.getInstance(c, file.getLocation().toOSString());
+			configurationManager = ConfigurationManager.getInstance(path, c);
 		}
 		configurationManager.read();
 
@@ -400,7 +401,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		textEditorPage = (TextEditorPage) initPage(new TextEditorPage());
 		allPages.add(textEditorPage);
 		internalPages = allPages.subList(0, allPages.size());
-		
+
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".ConfigurationEditor");
 		try {
 			for (IConfigurationElement e : config) {
@@ -417,8 +418,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		extensionPages = allPages.subList(internalPages.size(), allPages.size());
 
 		if (containsError()) {
-			setActivePage(internalPages.get(internalPages.size() - 1).getIndex());
+			setActivePage(textEditorPage.getIndex());
+		} else if (requiresAdvancedConfigurationPage()) {
+			setActivePage(internalPages.get(1).getIndex());
 		}
+	}
+
+	private boolean requiresAdvancedConfigurationPage() {
+		for (SelectableFeature feature : configurationManager.editObject().getFeatures()) {
+			if (feature.getManual() == Selection.UNSELECTED) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private IConfigurationEditorPage initPage(IConfigurationEditorPage page) {

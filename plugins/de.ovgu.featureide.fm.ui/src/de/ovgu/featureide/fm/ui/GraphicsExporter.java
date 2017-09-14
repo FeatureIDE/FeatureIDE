@@ -76,7 +76,7 @@ public class GraphicsExporter {
 			return false;
 
 		if (filePath.endsWith(".m") || filePath.endsWith(".xml") || filePath.endsWith(".velvet")) {
-			return FeatureModelManager.writeToFile(featureModel, Paths.get(filePath));
+			return FeatureModelManager.save(featureModel, Paths.get(filePath));
 		} else {
 			final File file = new File(filePath);
 			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);

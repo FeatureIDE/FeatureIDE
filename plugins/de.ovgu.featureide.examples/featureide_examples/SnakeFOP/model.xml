@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<and mandatory="true" name="SnakeFOP">
 				<and name="Points">
@@ -7,41 +8,41 @@
 				</and>
 				<and mandatory="true" name="Entities">
 					<alt mandatory="true" name="Snake">
-						<feature mandatory="true" name="Automatic"/>
-						<feature mandatory="true" name="Manual"/>
+						<feature name="Automatic"/>
+						<feature name="Manual"/>
 					</alt>
 					<or mandatory="true" name="Enemies">
-						<feature mandatory="true" name="Bug"/>
-						<feature mandatory="true" name="Centipede"/>
-						<feature mandatory="true" name="Fly"/>
-						<feature mandatory="true" name="Mouse"/>
-						<feature mandatory="true" name="Slug"/>
+						<feature name="Bug"/>
+						<feature name="Centipede"/>
+						<feature name="Fly"/>
+						<feature name="Mouse"/>
+						<feature name="Slug"/>
 					</or>
 				</and>
 				<alt abstract="true" mandatory="true" name="Gamefield">
-					<feature mandatory="true" name="Bordered"/>
-					<feature mandatory="true" name="Torus"/>
+					<feature name="Bordered"/>
+					<feature name="Torus"/>
 				</alt>
 				<or mandatory="true" name="Level">
-					<feature mandatory="true" name="L1"/>
-					<feature mandatory="true" name="L2"/>
-					<feature mandatory="true" name="L3"/>
-					<feature mandatory="true" name="L4"/>
+					<feature name="L1"/>
+					<feature name="L2"/>
+					<feature name="L3"/>
+					<feature name="L4"/>
 				</or>
 			</and>
 		</struct>
 		<constraints/>
-		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="true">
 			<feature name="SnakeFOP"/>
-			<feature name="Entities"/>
 			<feature name="Points"/>
-			<feature name="Level"/>
+			<feature name="Highscore"/>
+			<feature name="Entities"/>
 			<feature name="Snake"/>
-			<feature name="Enemies"/>
 			<feature name="Automatic"/>
 			<feature name="Manual"/>
+			<feature name="Enemies"/>
 			<feature name="Bug"/>
 			<feature name="Centipede"/>
 			<feature name="Fly"/>
@@ -49,10 +50,10 @@
 			<feature name="Slug"/>
 			<feature name="Bordered"/>
 			<feature name="Torus"/>
+			<feature name="Level"/>
 			<feature name="L1"/>
 			<feature name="L2"/>
 			<feature name="L3"/>
 			<feature name="L4"/>
-			<feature name="Highscore"/>
 		</featureOrder>
 	</featureModel>

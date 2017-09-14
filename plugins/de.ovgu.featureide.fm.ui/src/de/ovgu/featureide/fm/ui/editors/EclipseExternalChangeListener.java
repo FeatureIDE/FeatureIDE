@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.nio.file.Paths;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -39,7 +41,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -57,7 +59,7 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 			if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & (IResourceDelta.CONTENT)) != 0) {
 				final IResource resource = delta.getResource();
 				if (resource instanceof IFile) {
-					final AFileManager<Object> instance = FileManagerMap.getInstance(resource.getLocation().toOSString());
+					final IFileManager<?> instance = AFileManager.getInstance(Paths.get(resource.getLocationURI()));
 					if (instance != null) {
 						instance.read();
 					}

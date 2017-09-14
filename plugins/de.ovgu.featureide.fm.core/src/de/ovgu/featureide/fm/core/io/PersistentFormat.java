@@ -62,4 +62,9 @@ public class PersistentFormat<T> implements IPersistentFormat<T> {
 		return false;
 	}
 
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
 }

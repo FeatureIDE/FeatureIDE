@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * All additional properties of an {@link IFeature}.
  * 
  * @author Sebastian Krieter
- * @author Marcus Pinnecke * 
+ * @author Marcus Pinnecke
  */
 public class FeatureProperty implements IFeatureProperty {
 

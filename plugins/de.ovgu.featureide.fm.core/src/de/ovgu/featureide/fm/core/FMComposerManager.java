@@ -181,8 +181,8 @@ public class FMComposerManager implements IFMComposerExtension {
 	}
 
 	@Override
-	public String getErroMessage() {
-		return fmComposerExtension.getErroMessage();
+	public String getErrorMessage() {
+		return fmComposerExtension.getErrorMessage();
 	}
 
 	private static final HashMap<IProject, IFMComposerExtension> map = new HashMap<>();

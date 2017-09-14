@@ -47,23 +47,25 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  */
 public class RuntimeFMComposerExtension extends FMComposerExtension {
 
+	private static String ORDER_PAGE_MESSAGE = "FeatureIDE projects based on runtime variability do not support any order.";
+	
 	public RuntimeFMComposerExtension() {
 
 	}
 
 	@Override
-	public String getErroMessage() {
-		return super.getErroMessage();
+	public String getErrorMessage() {
+		return super.getErrorMessage();
 	}
 
 	@Override
 	public String getOrderPageMessage() {
-		return super.getOrderPageMessage();
+		return ORDER_PAGE_MESSAGE;
 	}
 
 	@Override
 	public boolean hasFeatureOrder() {
-		return true;
+		return false;
 	}
 
 	@Override

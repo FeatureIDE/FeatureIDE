@@ -59,8 +59,8 @@ public interface IFileManager<T> extends IEventManager {
 	 * @return {@code true} if successful write, {@code false} otherwise.
 	 */
 	boolean save();
-
-	boolean externalSave(Runnable runnable);
+	
+	boolean externalSave(Runnable externalSaveMethod);
 
 	/**
 	 * Overrides the variable and persistent object with the local object.

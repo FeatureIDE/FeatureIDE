@@ -22,17 +22,17 @@ package de.ovgu.featureide.fm.core.configuration.io;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.nio.file.DirectoryStream.Filter;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -87,7 +87,6 @@ public class ConfigurationLoader {
 	}
 
 	private List<Configuration> loadConfigurations(IFeatureModel featureModel, Path path, Filter<? super Path> filter) {
-		final FileHandler<Configuration> fileHandler = new FileHandler<>();
 		final List<Configuration> configs = new ArrayList<>();
 
 		if (callback != null)
@@ -97,9 +96,7 @@ public class ConfigurationLoader {
 			for (Path configPath : directoryStream) {
 				Configuration currentConfiguration = new Configuration(featureModel, propagateConfigs);
 				
-				fileHandler.setObject(currentConfiguration);
-				fileHandler.read(configPath, ConfigurationManager.getFormat(configPath.toString()));
-				
+				FileHandler.load(configPath, currentConfiguration, ConfigFormatManager.getInstance());
 				configs.add(currentConfiguration);
 				if (callback != null)
 					callback.onConfigurationLoaded(currentConfiguration, configPath);

@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -120,10 +120,10 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			getFigure().setConstraintProperties();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
+			setActiveReason(null); //reset
 			break;
 		case ACTIVE_REASON_CHANGED:
-			getFigure().setActiveReason((Explanation.Reason) event.getNewValue());
-			getFigure().setConstraintProperties();
+			setActiveReason((FeatureModelReason) event.getNewValue());
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(event + " @ " + getModel() + " not handled.");
@@ -131,4 +131,19 @@ public class ConstraintEditPart extends ModelElementEditPart {
 		}
 	}
 
+	/**
+	 * <p>
+	 * Sets the currently active reason.
+	 * </p>
+	 * 
+	 * <p>
+	 * Propagates into the figure.
+	 * Refreshes accordingly.
+	 * </p>
+	 * @param activeReason the new active reason; null to reset
+	 */
+	protected void setActiveReason(FeatureModelReason activeReason) {
+		getFigure().setActiveReason(activeReason);
+		getFigure().setConstraintProperties();
+	}
 }

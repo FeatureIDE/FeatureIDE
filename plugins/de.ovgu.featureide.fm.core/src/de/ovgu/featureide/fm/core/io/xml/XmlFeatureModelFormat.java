@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.prop4j.And;
 import org.prop4j.AtMost;
@@ -73,6 +74,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + XmlFeatureModelFormat.class.getSimpleName();
 
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
+
 	private IFeatureModelFactory factory;
 
 	@Override
@@ -103,9 +106,10 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			final XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
 			customProperties.addAll(propertyLoader.parseProperties());
 		}
+				
 		if (object.getStructure().getRoot() == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
-		}
+		}	
 
 		importCustomProperties(customProperties, object);
 	}
@@ -125,7 +129,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		createXmlPropertiesPart(doc, properties, object);
 
 		root.appendChild(struct);
-		createXmlDocRec(doc, struct, object.getStructure().getRoot().getFeature());
+		createXmlDocRec(doc, struct, FeatureUtils.getRoot(object));
 
 		root.appendChild(constraints);
 		for (int i = 0; i < object.getConstraints().size(); i++) {
@@ -549,6 +553,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				parseFeatures(e.getChildNodes(), f);
 			}
 		}
+		
+		//Check that there are only OR connections when the parent has more than one feature
+		for (IFeature f : object.getFeatures()) {
+			if(f.getStructure().isOr() && f.getStructure().getChildrenCount() <= 1) {
+				f.getStructure().setAnd();
+			}
+		}
 	}
 
 	/**
@@ -582,7 +593,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod.setAttribute(HIDDEN, TRUE);
 		}
 		if (feat.getStructure().isMandatory()) {
-			fnod.setAttribute(MANDATORY, TRUE);
+			if(feat.getStructure().getParent() != null && feat.getStructure().getParent().isAnd()){
+				fnod.setAttribute(MANDATORY, TRUE);
+			} else if (feat.getStructure().getParent() == null){
+				fnod.setAttribute(MANDATORY, TRUE);
+			}
 		}
 		if (feat.getStructure().isAbstract()) {
 			fnod.setAttribute(ABSTRACT, TRUE);
@@ -599,6 +614,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }

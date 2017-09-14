@@ -83,7 +83,7 @@ public class DynamicProfileMenu extends ContributionItem {
 		if (featureModel == null) {
 			return;
 		}
-		MenuManager man = new MenuManager("Color Scheme", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
+		MenuManager man = new MenuManager("Color Scheme Menu", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
 		man.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager m) {
 				fillContextMenu(m);

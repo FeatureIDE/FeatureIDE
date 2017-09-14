@@ -47,6 +47,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -549,7 +550,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	private void setContentForFiles(Figure contentContainer, Figure tooltipContent) {
 		// TODO open selected file like at method and fields
 		FSTArbitraryRole role = (FSTArbitraryRole) this.role;
-		featureFolder = CorePlugin.getFeatureProject(role.getFiles().get(0)).getSourceFolder().getFolder(role.getFeature().getName());
+		IFeatureProject project = CorePlugin.getFeatureProject(role.getFiles().get(0));
+		if (project == null) return;
+		featureFolder = project.getSourceFolder().getFolder(role.getFeature().getName());
 		contentContainer.add(new Label(role.getFeature() + " ", IMAGE_FEATURE));
 		int fileCount = 0;
 		long size = 0;

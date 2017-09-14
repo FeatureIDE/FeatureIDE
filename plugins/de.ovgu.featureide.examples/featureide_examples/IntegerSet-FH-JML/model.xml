@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel chosenLayoutAlgorithm="1">
+	<featureModel>
+		<properties/>
 		<struct>
 			<alt mandatory="true" name="IntegerSet">
-				<feature mandatory="true" name="Tree"/>
-				<feature mandatory="true" name="HashSet"/>
+				<feature name="Tree"/>
+				<feature name="HashSet"/>
 			</alt>
 		</struct>
 		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

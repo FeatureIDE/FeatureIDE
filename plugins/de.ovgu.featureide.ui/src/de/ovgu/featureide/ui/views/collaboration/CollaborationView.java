@@ -118,6 +118,7 @@ import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
@@ -490,7 +491,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				//					}
 				//				});
 
-				if (CorePlugin.getDefault().getConfigurationExtensions().contains(inputFile.getFileExtension())) {
+				if (ConfigFormatManager.getInstance().hasFormat(inputFile.getName())) {
 					// case: open configuration editor
 					CollaborationModelBuilder.editorFile = null;
 					if (builder.configuration != null && builder.configuration.equals(inputFile) && featureProject.equals(CollaborationModelBuilder.project)) {

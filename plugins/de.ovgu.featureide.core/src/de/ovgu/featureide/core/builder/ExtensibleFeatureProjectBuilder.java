@@ -39,8 +39,8 @@ import org.eclipse.core.runtime.IStatus;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -125,8 +125,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			cleaned = true;
 		}
 		if (!hasOtherNature) {
-			for (IResource member : binFolder.members())
-				member.delete(true, monitor);
+			if (binFolder != null && binFolder.exists())
+				for (IResource member : binFolder.members())
+					member.delete(true, monitor);
 		}
 		for (IResource member : buildFolder.members()) {
 			member.delete(true, monitor);
@@ -134,7 +135,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 		buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		if (!hasOtherNature) {
-			binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+			if (binFolder != null && binFolder.exists())
+				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
 		cleanBuild = false;
 	}
@@ -179,7 +181,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 		Configuration c = new Configuration(featureModel);
-		FileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigurationManager.getFormat(configFile.getName()));
+		FileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigFormatManager.getInstance());
 		composerExtension.copyNotComposedFiles(c, null);
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);

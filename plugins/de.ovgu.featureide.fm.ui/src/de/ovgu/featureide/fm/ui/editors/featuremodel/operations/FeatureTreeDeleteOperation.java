@@ -34,6 +34,8 @@ import org.eclipse.swt.widgets.Shell;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -49,6 +51,10 @@ public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation imple
 	private LinkedList<IFeature> featureList;
 	private LinkedList<IFeature> containedFeatureList;
 
+	private LinkedList<IFeature> andList;
+	private LinkedList<IFeature> orList;
+	private LinkedList<IFeature> alternativeList;
+
 	public FeatureTreeDeleteOperation(IFeatureModel featureModel, IFeature parent) {
 		super(featureModel, DELETE_INCLUDING_SUBFEATURES);
 		this.feature = parent;
@@ -58,21 +64,31 @@ public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation imple
 	protected void createSingleOperations() {
 		featureList = new LinkedList<IFeature>();
 		containedFeatureList = new LinkedList<IFeature>();
+		andList = new LinkedList<IFeature>();
+		alternativeList = new LinkedList<IFeature>();
+		orList = new LinkedList<IFeature>();
 		LinkedList<IFeature> list = new LinkedList<IFeature>();
 		list.add(feature);
 		getFeaturesToDelete(list);
 
 		if (containedFeatureList.isEmpty()) {
 			for (IFeature feat : featureList) {
+				if (feat.getStructure().isAnd()) {
+					andList.add(feat);
+				} else if (feat.getStructure().isOr()) {
+					orList.add(feat);
+				} else if (feat.getStructure().isAlternative()) {
+					alternativeList.add(feat);
+				}
 				AbstractFeatureModelOperation op = new DeleteFeatureOperation(featureModel, feat);
 				operations.add(op);
 			}
 		} else {
 			final String containedFeatures = containedFeatureList.toString();
-			MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL, "The following features are contained in constraints:" + '\n'
-					+ containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
-					+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_, MessageDialog.ERROR,
-					new String[] { IDialogConstants.OK_LABEL }, 0);
+			MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
+					"The following features are contained in constraints:" + '\n' + containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
+							+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_,
+					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 
 			dialog.open();
 		}
@@ -94,6 +110,25 @@ public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation imple
 			}
 			featureList.add(feat);
 		}
+	}
+
+	@Override
+	protected FeatureIDEEvent inverseOperation() {
+		super.inverseOperation();
+		//Set the right group types for the features
+		for (IFeature ifeature : andList) {
+			if(featureModel.getFeature(ifeature.getName()) != null)
+			featureModel.getFeature(ifeature.getName()).getStructure().changeToAnd();
+		}
+		for (IFeature ifeature : alternativeList) {
+			if(featureModel.getFeature(ifeature.getName()) != null)
+			featureModel.getFeature(ifeature.getName()).getStructure().changeToAlternative();
+		}
+		for (IFeature ifeature : orList) {
+			if(featureModel.getFeature(ifeature.getName()) != null)
+			featureModel.getFeature(ifeature.getName()).getStructure().changeToOr();
+		}
+		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
 	}
 
 }

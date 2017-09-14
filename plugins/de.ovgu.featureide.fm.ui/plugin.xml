@@ -65,6 +65,20 @@
      </describer>
   </content-type>
   <content-type
+        base-type="org.eclipse.core.runtime.xml"
+        file-extensions="xml"
+        id="de.ovgu.featureide.fm.ui.featureModel.sxfm"
+        name="SXFM Feature Model"
+        priority="high">
+     <describer
+           class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+        <parameter
+              name="element"
+              value="feature_model">
+        </parameter>
+     </describer>
+  </content-type>
+  <content-type
         base-type="org.eclipse.core.runtime.text"
         file-extensions="velvet"
         id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
@@ -112,6 +126,9 @@
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.fm.ui.extendedfeatureModel">
 			</contentTypeBinding>
+   <contentTypeBinding
+         contentTypeId="de.ovgu.featureide.fm.ui.featureModel.sxfm">
+   </contentTypeBinding>
 		</editor>
 		<editor
         class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
@@ -179,11 +196,17 @@
 						<iterate
 								ifEmpty="false"
 								operator="or">
-							<test
-									args="de.ovgu.featureide.core.featureProjectNature"
-									property="de.ovgu.featureide.fm.ui.properties.nature"
-									value="true">
-							</test>
+       <or>
+          <test
+                args="de.ovgu.featureide.core.featureProjectNature"
+                property="de.ovgu.featureide.fm.ui.properties.nature"
+                value="true">
+          </test>
+          <test
+                property="de.ovgu.featureide.fm.ui.properties.featuremodel"
+                value="true">
+          </test>
+       </or>
 						</iterate>
 					</with>
 				</visibleWhen>
@@ -653,5 +676,12 @@
 				properties="nature"
 				type="java.lang.Object">
 		</propertyTester>
+  <propertyTester
+        class="de.ovgu.featureide.fm.ui.properties.FeatureModelTester"
+        id="de.ovgu.featureide.fm.ui.propertytester.featuremodel"
+        namespace="de.ovgu.featureide.fm.ui.properties"
+        properties="featuremodel"
+        type="java.lang.Object">
+  </propertyTester>
 	</extension>
 </plugin>

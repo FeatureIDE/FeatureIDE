@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ModelElementFigure;
 /**
  * An edit part for feature model elements, meaning features and constraints.
  * 
- * @author Timo Guenther
+ * @author Timo G&uuml;nther
  */
 public abstract class ModelElementEditPart extends AbstractGraphicalEditPart implements IEventListener {
 	@Override

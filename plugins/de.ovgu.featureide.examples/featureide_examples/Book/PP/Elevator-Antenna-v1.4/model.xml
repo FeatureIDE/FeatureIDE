@@ -14,17 +14,17 @@
 						<description>
 							Modes indicate in which order incoming requests are handled.
 						</description>
-						<feature mandatory="true" name="Sabbath">
+						<feature name="Sabbath">
 							<description>
 								The elevator from lowest to highest floor and vice versa. It opens the doors in every floor without any user input.
 							</description>
 						</feature>
-						<feature mandatory="true" name="FIFO">
+						<feature name="FIFO">
 							<description>
 								The elevator proceeds requests based on the first-in-first-out principle. That is, the floor being requested first is the next target floor.
 							</description>
 						</feature>
-						<feature mandatory="true" name="ShortestPath">
+						<feature name="ShortestPath">
 							<description>
 								The elevator always moves to the requested floor that is closest to the current floor.
 							</description>
@@ -39,38 +39,34 @@
 						<description>
 							Priorities specify that certain requests are supposed to be processed faster than others.
 						</description>
-						<feature abstract="true" mandatory="true" name="RushHour">
+						<feature abstract="true" name="RushHour">
 							<description>
 								During rush hours the elevator moves to a particular floor if there are no requests. In the morning, it will move to the lowest floor and, in the afternoon, it will move to a floor in the center of the building.
 							</description>
 						</feature>
-						<feature abstract="true" mandatory="true" name="FloorPriority">
+						<feature abstract="true" name="FloorPriority">
 							<description>
 								Certain floors as specified during initialization will always be handled before all remaining floors.
 							</description>
 						</feature>
-						<feature abstract="true" mandatory="true" name="PersonPriority">
+						<feature abstract="true" name="PersonPriority">
 							<description>
 								With a special key, the request of certain persons are served first.
 							</description>
 						</feature>
 					</or>
 				</and>
-				<feature abstract="true" name="VoiceOutput">
-					<description>
-						
-					</description>
-				</feature>
+				<feature abstract="true" name="VoiceOutput"/>
 				<alt name="CallButtons">
 					<description>
 						Call buttons enable to choose the desired floor in the inside as well as to call the elevator to a certain floor.
 					</description>
-					<feature mandatory="true" name="DirectedCall">
+					<feature name="DirectedCall">
 						<description>
 							On each floor, there are separate buttons to go upwards and downwards. The elevator is supposed to only open the doors if it is moving into the same direction as the call.
 						</description>
 					</feature>
-					<feature mandatory="true" name="UndirectedCall">
+					<feature name="UndirectedCall">
 						<description>
 							Each floor has just one button to request the elevator, but the direction cannot be indicated.
 						</description>
@@ -84,12 +80,12 @@
 						<description>
 							Permissions enable to specify which floors can be reached by everyone or only with privileges.
 						</description>
-						<feature mandatory="true" name="FloorPermission">
+						<feature name="FloorPermission">
 							<description>
 								During initialization, certain floors can be deactivated and cannot be reached by the elevator.
 							</description>
 						</feature>
-						<feature abstract="true" mandatory="true" name="PermissionControl">
+						<feature abstract="true" name="PermissionControl">
 							<description>
 								Permission control enables to reach non-public floors for those that are privileged.
 							</description>

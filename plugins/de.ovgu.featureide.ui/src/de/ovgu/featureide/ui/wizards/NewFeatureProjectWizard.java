@@ -164,7 +164,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			if (wizardExtension.isFinished()) {
 				try {
 					final IProject newProject = getNewProject();
-					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
+					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(),page.getConfigPath(),page.getBuildPath(), page.sourcePath.isEnabled(), page.buildPath.isEnabled());
 					// open editor
 					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, newProject.getFile("model.xml"));
 				} catch (CoreException e) {

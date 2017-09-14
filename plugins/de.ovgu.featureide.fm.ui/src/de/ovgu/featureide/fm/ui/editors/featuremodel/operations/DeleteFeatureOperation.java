@@ -46,6 +46,8 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 	private int oldIndex;
 	private LinkedList<IFeature> oldChildren;
 	private boolean deleted = false;
+	private boolean or = false;
+	private boolean alternative = false;
 	private IFeature replacement;
 
 	public DeleteFeatureOperation(IFeatureModel featureModel, IFeature feature) {
@@ -98,6 +100,15 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				}
 			}
 		}
+		
+		//make sure after delete the group type of the parent is set to and if there is only one child left
+		if(oldParent != null){
+			or = oldParent.getStructure().isOr();
+			alternative = oldParent.getStructure().isAlternative();
+			if(oldParent.getStructure().getChildrenCount() == 1){
+				oldParent.getStructure().changeToAnd();
+			}
+		}
 		return new FeatureIDEEvent(feature, EventType.FEATURE_DELETE, oldParent, null);
 	}
 
@@ -141,6 +152,15 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 					}
 				}
 			}
+			
+			//When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
+			if(oldParent != null && or){
+				oldParent.getStructure().changeToOr();
+			} else if (oldParent != null && alternative){
+				oldParent.getStructure().changeToAlternative();
+			}
+			
+			
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}

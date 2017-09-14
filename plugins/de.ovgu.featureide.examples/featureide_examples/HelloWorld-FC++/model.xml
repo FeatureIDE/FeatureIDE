@@ -5,8 +5,8 @@
 			<and abstract="true" mandatory="true" name="HelloWorld">
 				<feature mandatory="true" name="Hello"/>
 				<alt abstract="true" name="Feature">
-					<feature mandatory="true" name="Wonderful"/>
-					<feature mandatory="true" name="Beautiful"/>
+					<feature name="Wonderful"/>
+					<feature name="Beautiful"/>
 				</alt>
 				<feature name="World"/>
 			</and>

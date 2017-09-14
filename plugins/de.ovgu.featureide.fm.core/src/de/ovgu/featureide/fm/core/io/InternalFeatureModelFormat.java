@@ -130,6 +130,11 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	@Override
+	public boolean supportsContent(CharSequence content) {
+		return true;
+	}
+
+	@Override
 	public String getSuffix() {
 		return "";
 	}
