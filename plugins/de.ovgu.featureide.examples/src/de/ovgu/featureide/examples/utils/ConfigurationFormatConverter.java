@@ -98,7 +98,7 @@ public class ConfigurationFormatConverter {
 			if (!configurationFiles.isEmpty()) {
 				FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(relativePath.resolve("model.xml"));
 				if (!fileHandler.getLastProblems().containsError()) {
-					final Configuration object = new Configuration(fileHandler.getObject(), Configuration.PARAM_PROPAGATE);
+					final Configuration object = new Configuration(fileHandler.getObject(), Configuration.PARAM_PROPAGATE | Configuration.PARAM_IGNOREABSTRACT);
 					for (Path oldFile : configurationFiles) {
 						if (!FileHandler.load(oldFile, object, OLD_FORMAT).containsError()) {
 							final String oldFileName = oldFile.getFileName().toString();
