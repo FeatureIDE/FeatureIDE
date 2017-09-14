@@ -25,7 +25,6 @@ import java.util.Set;
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 
@@ -35,31 +34,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  * @author Timo G&uuml;nther
  */
 public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public MusDeadFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public MusDeadFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param deadFeature the dead feature in the feature model
-	 */
-	public MusDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
-		super(fm);
-		setSubject(deadFeature);
-	}
-	
 	@Override
 	public IFeature getSubject() {
 		return (IFeature) super.getSubject();

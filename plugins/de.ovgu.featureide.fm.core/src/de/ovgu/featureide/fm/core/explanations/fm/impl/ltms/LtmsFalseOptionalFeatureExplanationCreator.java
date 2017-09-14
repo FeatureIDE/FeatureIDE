@@ -25,7 +25,6 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -37,31 +36,6 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Timo G&uuml;nther
  */
 public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public LtmsFalseOptionalFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param falseOptionalFeature the false-optional feature in the feature model
-	 */
-	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
-		super(fm);
-		setSubject(falseOptionalFeature);
-	}
-	
 	@Override
 	public IFeature getSubject() {
 		return (IFeature) super.getSubject();

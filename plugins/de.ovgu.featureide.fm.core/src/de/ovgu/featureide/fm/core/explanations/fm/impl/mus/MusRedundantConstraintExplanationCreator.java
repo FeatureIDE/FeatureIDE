@@ -26,7 +26,6 @@ import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.Reason;
@@ -41,31 +40,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
 public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
 	/** The amount of clauses added to the oracle to account for the redundant constraint. */
 	private int redundantConstraintClauseCount;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public MusRedundantConstraintExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public MusRedundantConstraintExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param redundantConstraint the redundant constraint in the feature model
-	 */
-	public MusRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
-		super(fm);
-		setSubject(redundantConstraint);
-	}
 	
 	@Override
 	public IConstraint getSubject() {

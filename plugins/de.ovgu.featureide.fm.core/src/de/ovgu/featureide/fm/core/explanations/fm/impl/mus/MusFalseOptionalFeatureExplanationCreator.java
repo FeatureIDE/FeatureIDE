@@ -26,7 +26,6 @@ import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 
@@ -36,31 +35,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  * @author Timo G&uuml;nther
  */
 public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public MusFalseOptionalFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public MusFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param falseOptionalFeature the false-optional feature in the feature model
-	 */
-	public MusFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
-		super(fm);
-		setSubject(falseOptionalFeature);
-	}
-	
 	@Override
 	public IFeature getSubject() {
 		return (IFeature) super.getSubject();

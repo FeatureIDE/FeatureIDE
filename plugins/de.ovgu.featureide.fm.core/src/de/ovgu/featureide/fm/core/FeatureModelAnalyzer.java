@@ -879,9 +879,13 @@ public class FeatureModelAnalyzer {
 	 * @param feature potentially dead feature; not null
 	 */
 	private void addDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
-		final DeadFeatureExplanationCreator creator = fm == this.fm
-				? deadFeatureExplanationCreator
-				: explanationCreatorFactory.getDeadFeatureExplanationCreator(fm);
+		final DeadFeatureExplanationCreator creator;
+		if (fm == this.fm) {
+			creator = deadFeatureExplanationCreator;
+		} else {
+			creator = explanationCreatorFactory.getDeadFeatureExplanationCreator();
+			creator.setFeatureModel(fm);
+		}
 		creator.setSubject(feature);
 		deadFeatureExplanations.put(feature, creator.getExplanation());
 	}
@@ -914,9 +918,13 @@ public class FeatureModelAnalyzer {
 	 * @param feature potentially false-optional feature; not null
 	 */
 	private void addFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
-		final FalseOptionalFeatureExplanationCreator creator = fm == this.fm
-				? falseOptionalFeatureExplanationCreator
-				: explanationCreatorFactory.getFalseOptionalFeatureExplanationCreator(fm);
+		final FalseOptionalFeatureExplanationCreator creator;
+		if (fm == this.fm) {
+			creator = falseOptionalFeatureExplanationCreator;
+		} else {
+			creator = explanationCreatorFactory.getFalseOptionalFeatureExplanationCreator();
+			creator.setFeatureModel(fm);
+		}
 		creator.setSubject(feature);
 		falseOptionalFeatureExplanations.put(feature, creator.getExplanation());
 	}
@@ -955,9 +963,13 @@ public class FeatureModelAnalyzer {
 	 * @param constraint potentially redundant constraint; not null
 	 */
 	private void addRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
-		final RedundantConstraintExplanationCreator creator = fm == this.fm
-				? redundantConstraintExplanationCreator
-				: explanationCreatorFactory.getRedundantConstraintExplanationCreator(fm);
+		final RedundantConstraintExplanationCreator creator;
+		if (fm == this.fm) {
+			creator = redundantConstraintExplanationCreator;
+		} else {
+			creator = explanationCreatorFactory.getRedundantConstraintExplanationCreator();
+			creator.setFeatureModel(fm);
+		}
 		creator.setSubject(constraint);
 		redundantConstraintExplanations.put(constraint, creator.getExplanation());
 	}

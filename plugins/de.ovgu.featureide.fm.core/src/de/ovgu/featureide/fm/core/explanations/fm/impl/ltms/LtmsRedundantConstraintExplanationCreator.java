@@ -31,7 +31,6 @@ import org.prop4j.And;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
@@ -50,31 +49,6 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	private Node cnfWithoutRedundantConstraint;
 	/** The amount of clauses added to the CNF that originate from a constraint. */
 	private int constraintClauseCount = 0;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public LtmsRedundantConstraintExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public LtmsRedundantConstraintExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param redundantConstraint the redundant constraint in the feature model
-	 */
-	public LtmsRedundantConstraintExplanationCreator(IFeatureModel fm, IConstraint redundantConstraint) {
-		super(fm);
-		setSubject(redundantConstraint);
-	}
 	
 	@Override
 	public IConstraint getSubject() {

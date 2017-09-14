@@ -27,7 +27,6 @@ import java.util.Set;
 import org.prop4j.Literal;
 import org.prop4j.explain.solvers.MusExtractor;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanation;
@@ -45,31 +44,6 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	 * Stored for performance reasons.
 	 */
 	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public MusAutomaticSelectionExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param config the configuration
-	 */
-	public MusAutomaticSelectionExplanationCreator(Configuration config) {
-		this(config, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param automaticSelection the automatically selected or unselected feature
-	 */
-	public MusAutomaticSelectionExplanationCreator(Configuration config, SelectableFeature automaticSelection) {
-		super(config);
-		setSubject(automaticSelection);
-	}
 	
 	@Override
 	public SelectableFeature getSubject() {

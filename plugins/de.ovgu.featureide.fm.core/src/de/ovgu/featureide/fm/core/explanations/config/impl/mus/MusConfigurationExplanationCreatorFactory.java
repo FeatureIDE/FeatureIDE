@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 
 import org.prop4j.explain.solvers.MusExtractor;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
@@ -36,10 +35,5 @@ public class MusConfigurationExplanationCreatorFactory extends ConfigurationExpl
 	@Override
 	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
 		return new MusAutomaticSelectionExplanationCreator();
-	}
-	
-	@Override
-	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator(Configuration config) {
-		return new MusAutomaticSelectionExplanationCreator(config);
 	}
 }
