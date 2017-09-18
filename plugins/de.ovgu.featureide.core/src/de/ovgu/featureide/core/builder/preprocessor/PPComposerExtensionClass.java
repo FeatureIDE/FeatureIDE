@@ -194,25 +194,19 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Checks the expression for a contradiction or a tautology.
+	 * Checks the expression on top of the expression stack for a contradiction or a tautology.
 	 * Does not set any markers.
 	 * 
-	 * @param includeFeatureModel true to include the feature model
-	 * @param includeNestedExpressions true to include the expressions the expression is nested in
 	 * @return {@link #SAT_CONTRADICTION}, {@link #SAT_TAUTOLOGY}, or {@link #SAT_NONE}
 	 */
-	protected int isContradictionOrTautology(boolean includeFeatureModel, boolean includeNestedExpressions) {
+	protected int isContradictionOrTautology() {
 		final Node expression = expressionStack.peek();
 
-		final Node featureModel = includeFeatureModel ? this.featureModel : null;
-
 		Node nestedExpressions = null;
-		if (includeNestedExpressions) {
+		if (expressionStack.size() > 1) {
 			Node[] children = expressionStack.toArray(new Node[expressionStack.size()]);
 			children = Arrays.copyOfRange(children, 0, children.length - 1); //Exclude the topmost expression because it is examined separately.
-			if (children.length > 0) {
-				nestedExpressions = new And(children);
-			}
+			nestedExpressions = new And(children);
 		}
 
 		try {
@@ -224,10 +218,15 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	private int isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
+		Node context = featureModel;
+		if (nestedExpressions != null) {
+			context = new And(context, nestedExpressions);
+		}
+
 		/*
 		 * -SAT(FM & nestedExpressions & expression)
 		 */
-		if (!isSatisfiable(expression, featureModel, nestedExpressions)) {
+		if (!new SatSolver(new And(context, expression), 1000).isSatisfiable()) {
 			return SAT_CONTRADICTION;
 		}
 
@@ -238,22 +237,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * = -SAT(-(-FM | -nestedExpressions | expression))
 		 * = -SAT(FM & nestedExpressions & -expression)
 		 */
-		if (!isSatisfiable(new Not(expression), featureModel, nestedExpressions)) {
+		if (!new SatSolver(new And(context, new Not(expression)), 1000).isSatisfiable()) {
 			return SAT_TAUTOLOGY;
 		}
 
 		return SAT_NONE;
-	}
-
-	private boolean isSatisfiable(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
-		Node formula = expression;
-		if (nestedExpressions != null) {
-			formula = new And(formula, nestedExpressions);
-		}
-		if (featureModel != null) {
-			formula = new And(formula, featureModel);
-		}
-		return new SatSolver(formula, 1000).isSatisfiable();
 	}
 
 	/**
@@ -275,26 +263,6 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Checks for tautology and contradiction and set build markers.
-	 * 
-	 * @param includeFeatureModel
-	 *            Checking with model if is <code>true</code>.
-	 * @param includeNestedExpressions true to include the expressions the expression is nested in
-	 * @param lineNumber
-	 *            number of line
-	 * @param res
-	 *            file path
-	 * @return {@link #SAT_CONTRADICTION}, {@link #SAT_TAUTOLOGY}, or {@link #SAT_NONE}
-	 */
-	protected int checkContradictionOrTautology(boolean includeFeatureModel, boolean includeNestedExpressions, int lineNumber, IFile res) {
-		int status = isContradictionOrTautology(includeFeatureModel, includeNestedExpressions);
-
-		setMarkersOnContradictionOrTautology(status, lineNumber, res);
-
-		return status;
-	}
-
-	/**
 	 * <p>
 	 * Checks whether the expression in the given line is a tautology or a contradiction.
 	 * If so, a marker is added to the given line.
@@ -303,29 +271,16 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * <p>
 	 * It is assumed that the expression to check is on top of the expression stack.
 	 * </p>
-	 * 
-	 * <p>
-	 * The check is done in the following steps:
-	 * <ol>
-	 * <li>Just the expression</li>
-	 * <li>The expression and the feature model</li>
-	 * <li>The expression, the expressions it is nested in, and the feature model</li>
-	 * </ol>
-	 * </p>
 	 * @param lineNumber line number of the expression
 	 * @param res file containing the expression
 	 */
-	protected void checkExpression(int lineNumber, IFile res) {
-		//Collect all used features.
+	protected void checkContradictionOrTautology(int lineNumber, IFile res) {
+		try {
 		findLiterals(expressionStack.peek());
-
-		//Check for contradictions and tautologies.
-		int result = checkContradictionOrTautology(false, false, lineNumber, res); //expression
-		if (result == SAT_NONE) {
-			result = checkContradictionOrTautology(true, false, lineNumber, res); //expression & FM
-			if (result == SAT_NONE) {
-				result = checkContradictionOrTautology(true, true, lineNumber, res); //expression & FM & nestedExpressions
-			}
+		final int status = isContradictionOrTautology();
+		setMarkersOnContradictionOrTautology(status, lineNumber, res);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

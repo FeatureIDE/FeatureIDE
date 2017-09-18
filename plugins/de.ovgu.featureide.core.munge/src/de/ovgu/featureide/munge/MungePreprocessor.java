@@ -307,8 +307,6 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 							expressionStack.push(lastElement);
 						}
 
-						checkContradictionOrTautology(true, true, lineNumber, res);
-
 					} else {
 						Node ppExpression = nodereader.stringToNode(m.group(4), featureList);
 
@@ -322,8 +320,8 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 						expressionStack.push(ppExpression);
-						checkExpression(lineNumber, res);
 					}
+					checkContradictionOrTautology(lineNumber, res);
 
 				} else if (singleElement.equals("end")) {
 					for (; ifelseCountStack.peek() > 0; ifelseCountStack.push(ifelseCountStack.pop() - 1)) {

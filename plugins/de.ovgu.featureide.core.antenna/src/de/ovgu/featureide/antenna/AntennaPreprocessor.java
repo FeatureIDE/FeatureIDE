@@ -390,7 +390,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber) {
 		if (containsPreprocessorDirective(line, "else")) {
 			if (!expressionStack.isEmpty()) {
-				checkContradictionOrTautology(true, true, lineNumber, res);
+				checkContradictionOrTautology(lineNumber, res);
 			}
 
 			return;
@@ -420,7 +420,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 			expressionStack.push(ppExpression);
 
-			checkExpression(lineNumber, res);
+			checkContradictionOrTautology(lineNumber, res);
 		} else {
 			// if generating of expression failed, generate expression "true"
 			if (!conditionIsSet) {
