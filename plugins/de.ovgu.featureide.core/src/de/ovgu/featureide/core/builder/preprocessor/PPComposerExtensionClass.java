@@ -27,8 +27,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.Vector;
@@ -54,6 +56,9 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanation;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -76,6 +81,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is a tautology and causes a superfluous code block.";
 	protected static final String MESSAGE_ABSTRACT = IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
 	protected static final String MESSAGE_NOT_DEFINED = IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
+
+	/** Creates explanations for expressions that are contradictions or tautologies. */
+	private final InvariantExpressionExplanationCreator invariantExpressionExplanationCreator = PreprocessorExplanationCreatorFactory.getDefault().getInvariantExpressionExplanationCreator();
 
 	/**
 	 * Feature model node generated in {@link #performFullBuild(IFile)} and used
@@ -255,11 +263,30 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 *            file path
 	 */
 	protected void setMarkersOnContradictionOrTautology(int status, int lineNumber, IFile res) {
-		if (status == SAT_CONTRADICTION) {
-			featureProject.createBuilderMarker(res, pluginName + MESSAGE_DEAD_CODE, lineNumber, IMarker.SEVERITY_WARNING);
-		} else if (status == SAT_TAUTOLOGY) {
-			featureProject.createBuilderMarker(res, pluginName + MESSAGE_ALWAYS_TRUE, lineNumber, IMarker.SEVERITY_WARNING);
+		if (status != SAT_CONTRADICTION && status != SAT_TAUTOLOGY) {
+			return;
 		}
+		String message = pluginName;
+		message += status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
+		final InvariantExpressionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
+		if (explanation != null && explanation.getReasons() != null && !explanation.getReasons().isEmpty()) {
+			message += String.format("%n%s", explanation);
+		}
+		featureProject.createBuilderMarker(res, message, lineNumber, IMarker.SEVERITY_WARNING);
+	}
+
+	/**
+	 * Returns an explanation for why the expression currently on top of the expression stack is a contradiction or a tautology.
+	 * @param tautology true if the expression to explain is a tautology; false if it is a contradiction
+	 * @return an explanation
+	 */
+	private InvariantExpressionExplanation getInvariantExpressionExplanation(boolean tautology) {
+		invariantExpressionExplanationCreator.setFeatureModel(featureProject.getFeatureModel());
+		final List<Node> reverseExpressionStack = new ArrayList<>(expressionStack);
+		Collections.reverse(reverseExpressionStack); //Iteration order of Stack is from bottom to top instead of top to bottom.
+		invariantExpressionExplanationCreator.setExpressionStack(reverseExpressionStack);
+		invariantExpressionExplanationCreator.setTautology(tautology);
+		return invariantExpressionExplanationCreator.getExplanation();
 	}
 
 	/**
