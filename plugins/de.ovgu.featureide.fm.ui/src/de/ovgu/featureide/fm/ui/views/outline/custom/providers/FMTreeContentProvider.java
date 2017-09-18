@@ -152,4 +152,11 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 		return false;
 	}
 
+	/*
+	 * FIX for Bug #582
+	 */
+	@Override
+	public void dispose() {
+	}
+
 }
