@@ -162,7 +162,7 @@
         category="FeatureIDE"
         class="de.ovgu.featureide.fm.ui.views.outline.custom.Outline"
         icon="icons/FeatureIconSmall.ico"
-        id="de.ovgu.featureide.fm.ui.views.outline.Outline"
+        id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
         name="FeatureIDE Outline"
         restorable="true">
   </view>
