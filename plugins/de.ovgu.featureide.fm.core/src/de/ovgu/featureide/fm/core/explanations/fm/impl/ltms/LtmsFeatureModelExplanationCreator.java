@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
@@ -45,21 +44,6 @@ public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeature
 	 * The LTMS is created lazily when needed and reset when the CNF changes.
 	 */
 	private Ltms ltms;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected LtmsFeatureModelExplanationCreator() {
-		super();
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	protected LtmsFeatureModelExplanationCreator(IFeatureModel fm) {
-		super(fm);
-	}
 	
 	/**
 	 * Returns the LTMS.

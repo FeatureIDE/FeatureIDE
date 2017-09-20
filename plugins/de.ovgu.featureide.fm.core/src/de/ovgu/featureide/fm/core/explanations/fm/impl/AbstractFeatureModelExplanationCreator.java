@@ -60,21 +60,6 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 */
 	private FeatureModelToNodeTraceModel traceModel;
 	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public AbstractFeatureModelExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model contexts
-	 */
-	public AbstractFeatureModelExplanationCreator(IFeatureModel fm) {
-		setFeatureModel(fm);
-	}
-	
 	@Override
 	public Object getSubject() {
 		return subject;

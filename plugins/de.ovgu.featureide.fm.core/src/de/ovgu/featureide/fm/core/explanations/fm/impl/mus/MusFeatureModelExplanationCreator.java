@@ -24,7 +24,6 @@ import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
 
@@ -39,21 +38,6 @@ public abstract class MusFeatureModelExplanationCreator extends AbstractFeatureM
 	 * The oracle is created lazily when needed and reset when the CNF changes.
 	 */
 	private MusExtractor oracle;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected MusFeatureModelExplanationCreator() {
-		super();
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	protected MusFeatureModelExplanationCreator(IFeatureModel fm) {
-		super(fm);
-	}
 	
 	/**
 	 * Returns the oracle.

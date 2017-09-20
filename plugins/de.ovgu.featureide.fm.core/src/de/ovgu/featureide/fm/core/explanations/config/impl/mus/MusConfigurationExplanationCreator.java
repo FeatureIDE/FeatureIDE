@@ -24,7 +24,6 @@ import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.impl.AbstractConfigurationExplanationCreator;
 
@@ -39,21 +38,6 @@ public abstract class MusConfigurationExplanationCreator extends AbstractConfigu
 	 * The oracle is created lazily when needed and reset when the CNF changes.
 	 */
 	private MusExtractor oracle;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected MusConfigurationExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param config the configuration
-	 */
-	protected MusConfigurationExplanationCreator(Configuration config) {
-		setConfiguration(config);
-	}
 	
 	/**
 	 * Returns the oracle.
