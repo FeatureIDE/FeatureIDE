@@ -88,15 +88,13 @@ public class MusInvariantExpressionExplanationCreator extends MusPreprocessorExp
 				if (first && isTautology()) {
 					expression = new Not(expression);
 				}
-				final Node clauses = expression.toRegularCNF();
-				int expressionClauseCount = clauses.getChildren().length;
+				final int expressionClauseCount = oracle.addFormula(expression);
 				for (int i = 0; i < expressionClauseCount; i++) {
 					addedExpressions.add(expression);
 				}
 				if (first) {
 					invariantExpressionClauseCount = expressionClauseCount;
 				}
-				oracle.addFormula(clauses);
 				first = false;
 			}
 			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());

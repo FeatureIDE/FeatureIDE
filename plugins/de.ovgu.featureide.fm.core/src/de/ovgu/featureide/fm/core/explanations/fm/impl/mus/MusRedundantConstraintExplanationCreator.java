@@ -70,6 +70,30 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 		return nc;
 	}
 	
+	/**
+	 * Adds the given constraint to the oracle.
+	 * Makes sure that the trace model properly ignores clauses that were ignored by the solver for being duplicates.
+	 * @param constraint constraint to add
+	 * @param negated whether the constraint should be negated before being added
+	 * @return amount of clauses added
+	 */
+	private int addConstraint(IConstraint constraint, boolean negated) {
+		final AdvancedNodeCreator nc = getNodeCreator();
+		int i = getTraceModel().getTraceCount();
+		final Node constraintNode = nc.createConstraintNode(constraint, negated);
+		int clauseCount = 0;
+		for (final Node clause : constraintNode.getChildren()) {
+			final int added = getOracle().addFormula(clause);
+			if (added > 0) {
+				clauseCount += added;
+				i++;
+			} else {
+				getTraceModel().removeTrace(i);
+			}
+		}
+		return clauseCount;
+	}
+	
 	@Override
 	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
 		final RedundantConstraintExplanation explanation;
@@ -78,21 +102,16 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 		int constraintClauseCount = 0;
 		try {
 			//Add each constraint but the redundant one.
-			final AdvancedNodeCreator nc = getNodeCreator();
 			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
 				if (constraint == getSubject()) {
 					continue;
 				}
-				final Node constraintNode = nc.createConstraintNode(constraint);
-				constraintClauseCount += constraintNode.getChildren().length;
-				oracle.addFormula(constraintNode);
+				constraintClauseCount += addConstraint(constraint, true);
 			}
 			
 			//Add the negated redundant constraint.
-			final Node constraintNode = nc.createConstraintNode(getSubject(), false);
-			redundantConstraintClauseCount = constraintNode.getChildren().length;
+			redundantConstraintClauseCount = addConstraint(getSubject(), false);
 			constraintClauseCount += redundantConstraintClauseCount;
-			oracle.addFormula(constraintNode);
 			
 			//Get the explanation.
 			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
