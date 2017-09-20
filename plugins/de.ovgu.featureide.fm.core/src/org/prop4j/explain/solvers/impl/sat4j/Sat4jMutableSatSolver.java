@@ -54,9 +54,12 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	protected Sat4jMutableSatSolver() {}
 	
 	@Override
-	public void addClause(Node clause) {
-		super.addClause(clause);
-		scopeClauseCount++;
+	public boolean addClause(Node clause) {
+		final boolean changed = super.addClause(clause);
+		if (changed) {
+			scopeClauseCount++;
+		}
+		return changed;
 	}
 	
 	@Override
@@ -125,7 +128,7 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		
 		final IConstr constraint = clauseConstraints.remove(clause);
 		if (constraint != null) {
-			getOracle().removeConstr(constraint);
+			getOracle().removeSubsumedConstr(constraint);
 		}
 		return clause;
 	}

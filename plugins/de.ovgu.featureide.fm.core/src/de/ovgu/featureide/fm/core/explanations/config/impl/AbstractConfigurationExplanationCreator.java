@@ -33,21 +33,6 @@ public abstract class AbstractConfigurationExplanationCreator extends AbstractFe
 	/** The configuration containing an issue that needs explaining. */
 	private Configuration config;
 	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public AbstractConfigurationExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param config the configuration
-	 */
-	public AbstractConfigurationExplanationCreator(Configuration config) {
-		setConfiguration(config);
-	}
-	
 	@Override
 	public Configuration getConfiguration() {
 		return config;

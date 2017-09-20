@@ -25,9 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.prop4j.Node;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
@@ -40,62 +37,14 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Sofia Ananieva
  */
 public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {
-	/**
-	 * The LTMS with the CNF as input.
-	 * The LTMS is created lazily when needed and reset when the CNF changes.
-	 */
-	private Ltms ltms;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected LtmsFeatureModelExplanationCreator() {
-		super();
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	protected LtmsFeatureModelExplanationCreator(IFeatureModel fm) {
-		super();
-	}
-	
-	/**
-	 * Returns the LTMS.
-	 * Creates it first if necessary.
-	 * @return the LTMS; not null
-	 */
-	protected Ltms getLtms() {
-		if (ltms == null) {
-			setLtms(createLtms());
-		}
-		return ltms;
-	}
-	
-	/**
-	 * Sets the LTMS.
-	 * @param ltms the LTMS
-	 */
-	protected void setLtms(Ltms ltms) {
-		this.ltms = ltms;
-	}
-	
-	/**
-	 * Returns a new LTMS with the CNF.
-	 * @return a new LTMS with the CNF; not null
-	 */
-	protected Ltms createLtms() {
-		return new Ltms(getCnf());
+	@Override
+	protected Ltms getOracle() {
+		return (Ltms) super.getOracle();
 	}
 	
 	@Override
-	protected Node setCnf() {
-		final Node cnf = super.setCnf();
-		if (cnf != null) {
-			setLtms(null);
-		}
-		return cnf;
+	protected Ltms createOracle() {
+		return new Ltms(getCnf());
 	}
 	
 	/**

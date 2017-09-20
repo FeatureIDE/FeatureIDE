@@ -45,7 +45,7 @@ public class ConsoleMonitor extends ATaskMonitor {
 		this.output = output;
 	}
 
-	private ConsoleMonitor(boolean output, boolean canceled, IConsumer<Object> intermediateFunction, IMonitor parent) {
+	private ConsoleMonitor(boolean output, boolean canceled, IConsumer<Object> intermediateFunction, AMonitor parent) {
 		super(parent);
 		this.output = output;
 		this.canceled = canceled;

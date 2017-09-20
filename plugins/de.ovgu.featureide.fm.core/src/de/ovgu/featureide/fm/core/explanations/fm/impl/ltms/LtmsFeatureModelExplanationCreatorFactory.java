@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
@@ -39,27 +38,12 @@ public class LtmsFeatureModelExplanationCreatorFactory extends FeatureModelExpla
 	}
 	
 	@Override
-	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator(IFeatureModel fm) {
-		return new LtmsDeadFeatureExplanationCreator(fm);
-	}
-	
-	@Override
 	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
 		return new LtmsFalseOptionalFeatureExplanationCreator();
 	}
 	
 	@Override
-	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		return new LtmsFalseOptionalFeatureExplanationCreator(fm);
-	}
-	
-	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
 		return new LtmsRedundantConstraintExplanationCreator();
-	}
-	
-	@Override
-	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm) {
-		return new LtmsRedundantConstraintExplanationCreator(fm);
 	}
 }

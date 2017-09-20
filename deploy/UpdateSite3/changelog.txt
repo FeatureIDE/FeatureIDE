@@ -7,6 +7,14 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.4.0 (September 2017)
+* All feature diagram anomalies can be explained now (based on SAT4J's minimal unsatisfiable subset computation) 
+* Visual explanations for feature diagrams improved
+* XML format is used as default for new configurations (storing manual and automatic selection and deselection of concrete and abstract features)
+* Configuration editor restores unchanged selection state when opened if configuration is saved in XML format
+* Outline view for feature models available if only feature modeling is installed
+* Numerous stability and performance improvements
+
 Release 3.3.2 (July 2017)
 * Hotfix containing merely stability improvements over v3.3.1
 * Improvements for FeatureIDE examples, feature-model editor, configuration editor, feature coloring, black-box frameworks, configuration map

@@ -31,11 +31,11 @@ import de.ovgu.featureide.fm.core.job.IJob;
  */
 public abstract class AMonitor implements IMonitor {
 
-	protected final IMonitor parent;
+	protected final AMonitor parent;
 
 	protected IConsumer<Object> intermediateFunction = null;
 
-	public AMonitor(IMonitor parent) {
+	public AMonitor(AMonitor parent) {
 		this.parent = parent;
 	}
 

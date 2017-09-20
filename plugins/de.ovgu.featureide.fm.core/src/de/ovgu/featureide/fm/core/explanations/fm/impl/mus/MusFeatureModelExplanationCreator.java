@@ -20,11 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
 
@@ -34,59 +32,15 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExpla
  * @author Timo G&uuml;nther
  */
 public abstract class MusFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {
-	/**
-	 * The oracle with the CNF as input.
-	 * The oracle is created lazily when needed and reset when the CNF changes.
-	 */
-	private MusExtractor oracle;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected MusFeatureModelExplanationCreator() {
-		super();
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	protected MusFeatureModelExplanationCreator(IFeatureModel fm) {
-		super(fm);
-	}
-	
-	/**
-	 * Returns the oracle.
-	 * Creates it first if necessary.
-	 * @return the oracle; not null
-	 */
+	@Override
 	protected MusExtractor getOracle() {
-		if (oracle == null) {
-			setOracle();
-		}
-		return oracle;
-	}
-	
-	/**
-	 * Sets the oracle.
-	 */
-	protected void setOracle() {
-		final Node cnf = getCnf();
-		if (cnf == null) {
-			this.oracle = null;
-			return;
-		}
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
-		oracle.addFormula(cnf);
-		this.oracle = oracle;
+		return (MusExtractor) super.getOracle();
 	}
 	
 	@Override
-	protected Node setCnf() {
-		final Node cnf = super.setCnf();
-		if (cnf != null) {
-			setOracle();
-		}
-		return cnf;
+	protected MusExtractor createOracle() {
+		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
+		oracle.addFormula(getCnf());
+		return oracle;
 	}
 }

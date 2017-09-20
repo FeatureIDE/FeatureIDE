@@ -36,7 +36,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.Not;
 
@@ -337,13 +336,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 			int lineNumber) {
 		if (line.contains("#else")) {
 			if (!expressionStack.isEmpty()) {
-				Node[] nestedExpressions = new Node[expressionStack.size()];
-				nestedExpressions = expressionStack.toArray(nestedExpressions);
-
-				And nestedExpressionsAnd = new And(nestedExpressions);
-
-				isContradictionOrTautology(nestedExpressionsAnd.clone(), true,
-						lineNumber, res);
+				checkContradictionOrTautology(lineNumber, res);
 			}
 
 			return;
@@ -371,7 +364,9 @@ public class CPPComposer extends PPComposerExtensionClass {
 			if (negative)
 				ppExpression = new Not(ppExpression.clone());
 
-			checkExpressions(ppExpression, lineNumber, res);
+			expressionStack.push(ppExpression);
+
+			checkContradictionOrTautology(lineNumber, res);
 
 		}
 	}

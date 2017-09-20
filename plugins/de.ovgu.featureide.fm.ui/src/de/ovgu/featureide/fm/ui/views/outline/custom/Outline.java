@@ -86,7 +86,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.providers.NotAvailableOutli
  */
 public class Outline extends ViewPart implements ISelectionChangedListener, ITreeViewerListener, IPropertyListener {
 	private static final String OUTLINE_ID = "de.ovgu.featureide.fm.ui.Outline";
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.outline.Outline";
+	public static final String ID = "de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline";
 	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.ui.view.outline.contextmenu";
 
 	private TreeViewer viewer;

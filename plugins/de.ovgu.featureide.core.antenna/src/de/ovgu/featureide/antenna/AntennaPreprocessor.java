@@ -51,7 +51,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
@@ -391,12 +390,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber) {
 		if (containsPreprocessorDirective(line, "else")) {
 			if (!expressionStack.isEmpty()) {
-				Node[] nestedExpressions = new Node[expressionStack.size()];
-				nestedExpressions = expressionStack.toArray(nestedExpressions);
-
-				And nestedExpressionsAnd = new And(nestedExpressions);
-
-				isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+				checkContradictionOrTautology(lineNumber, res);
 			}
 
 			return;
@@ -426,7 +420,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 			expressionStack.push(ppExpression);
 
-			checkExpressions(ppExpression, lineNumber, res);
+			checkContradictionOrTautology(lineNumber, res);
 		} else {
 			// if generating of expression failed, generate expression "true"
 			if (!conditionIsSet) {

@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -36,42 +35,17 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Timo G&uuml;nther
  */
 public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
-	/** The dead feature in the feature model. */
-	private IFeature deadFeature;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public LtmsDeadFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public LtmsDeadFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param deadFeature the dead feature in the feature model
-	 */
-	public LtmsDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
-		super(fm);
-		setDeadFeature(deadFeature);
+	@Override
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	@Override
-	public IFeature getDeadFeature() {
-		return deadFeature;
-	}
-	
-	@Override
-	public void setDeadFeature(IFeature deadFeature) {
-		this.deadFeature = deadFeature;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	/**
@@ -84,9 +58,9 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	 */
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
-		final Ltms ltms = getLtms();
+		final Ltms ltms = getOracle();
 		ltms.clearPremises();
-		ltms.addPremise(getDeadFeature().getName(), true);
+		ltms.addPremise(getSubject().getName(), true);
 		return getExplanation(ltms.getExplanations());
 	}
 	
@@ -97,6 +71,6 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	
 	@Override
 	protected DeadFeatureExplanation getConcreteExplanation() {
-		return new DeadFeatureExplanation(getDeadFeature());
+		return new DeadFeatureExplanation(getSubject());
 	}
 }

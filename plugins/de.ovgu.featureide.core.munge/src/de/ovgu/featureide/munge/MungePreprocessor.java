@@ -50,7 +50,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.sonatype.plugins.munge.Munge;
@@ -308,13 +307,6 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 							expressionStack.push(lastElement);
 						}
 
-						Node[] nestedExpressions = new Node[expressionStack.size()];
-						nestedExpressions = expressionStack.toArray(nestedExpressions);
-
-						And nestedExpressionsAnd = new And(nestedExpressions);
-
-						isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
-
 					} else {
 						Node ppExpression = nodereader.stringToNode(m.group(4), featureList);
 
@@ -328,8 +320,8 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 						expressionStack.push(ppExpression);
-						checkExpressions(ppExpression, lineNumber, res);
 					}
+					checkContradictionOrTautology(lineNumber, res);
 
 				} else if (singleElement.equals("end")) {
 					for (; ifelseCountStack.peek() > 0; ifelseCountStack.push(ifelseCountStack.pop() - 1)) {

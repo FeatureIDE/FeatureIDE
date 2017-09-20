@@ -27,7 +27,6 @@ import java.util.Set;
 import org.prop4j.Literal;
 import org.prop4j.explain.solvers.MusExtractor;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanation;
@@ -46,42 +45,17 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	 */
 	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
 	
-	/** The automatic selection to be explained. */
-	private SelectableFeature automaticSelection;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public MusAutomaticSelectionExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param config the configuration
-	 */
-	public MusAutomaticSelectionExplanationCreator(Configuration config) {
-		this(config, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param deadFeature the dead feature in the feature model
-	 */
-	public MusAutomaticSelectionExplanationCreator(Configuration config, SelectableFeature automaticSelection) {
-		super(config);
-		setAutomaticSelection(automaticSelection);
+	@Override
+	public SelectableFeature getSubject() {
+		return (SelectableFeature) super.getSubject();
 	}
 	
 	@Override
-	public SelectableFeature getAutomaticSelection() {
-		return automaticSelection;
-	}
-	
-	@Override
-	public void setAutomaticSelection(SelectableFeature automaticSelection) {
-		this.automaticSelection = automaticSelection;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof SelectableFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	@Override
@@ -94,7 +68,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
 				final Object var = featureSelection.getFeature().getName();
 				final boolean value;
-				if (featureSelection == getAutomaticSelection()) {
+				if (featureSelection == getSubject()) {
 					switch (featureSelection.getAutomatic()) {
 						case SELECTED:
 							value = false;
@@ -148,6 +122,6 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	
 	@Override
 	protected AutomaticSelectionExplanation getConcreteExplanation() {
-		return new AutomaticSelectionExplanation(getAutomaticSelection());
+		return new AutomaticSelectionExplanation(getSubject());
 	}
 }

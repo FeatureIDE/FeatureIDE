@@ -25,7 +25,6 @@ import java.util.Set;
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 
@@ -35,42 +34,17 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  * @author Timo G&uuml;nther
  */
 public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
-	/** The dead feature in the feature model. */
-	private IFeature deadFeature;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public MusDeadFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public MusDeadFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param deadFeature the dead feature in the feature model
-	 */
-	public MusDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
-		super(fm);
-		setDeadFeature(deadFeature);
+	@Override
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	@Override
-	public IFeature getDeadFeature() {
-		return deadFeature;
-	}
-	
-	@Override
-	public void setDeadFeature(IFeature deadFeature) {
-		this.deadFeature = deadFeature;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	@Override
@@ -79,7 +53,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		final DeadFeatureExplanation explanation;
 		oracle.push();
 		try {
-			oracle.addAssumption(getDeadFeature().getName(), true);
+			oracle.addAssumption(getSubject().getName(), true);
 			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
@@ -94,6 +68,6 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 
 	@Override
 	protected DeadFeatureExplanation getConcreteExplanation() {
-		return new DeadFeatureExplanation(getDeadFeature());
+		return new DeadFeatureExplanation(getSubject());
 	}
 }

@@ -26,7 +26,6 @@ import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 
@@ -36,42 +35,17 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  * @author Timo G&uuml;nther
  */
 public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-	/** The false-optional feature in the feature model. */
-	private IFeature falseOptionalFeature;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public MusFalseOptionalFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public MusFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param falseOptionalFeature the false-optional feature in the feature model
-	 */
-	public MusFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
-		super(fm);
-		setFalseOptionalFeature(falseOptionalFeature);
+	@Override
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	@Override
-	public IFeature getFalseOptionalFeature() {
-		return falseOptionalFeature;
-	}
-	
-	@Override
-	public void setFalseOptionalFeature(IFeature falseOptionalFeature) {
-		this.falseOptionalFeature = falseOptionalFeature;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	@Override
@@ -80,8 +54,8 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 		final FalseOptionalFeatureExplanation explanation;
 		oracle.push();
 		try {
-			oracle.addAssumption(getFalseOptionalFeature().getName(), false);
-			oracle.addAssumption(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);
+			oracle.addAssumption(getSubject().getName(), false);
+			oracle.addAssumption(FeatureUtils.getParent(getSubject()).getName(), true);
 			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
@@ -96,6 +70,6 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 
 	@Override
 	protected FalseOptionalFeatureExplanation getConcreteExplanation() {
-		return new FalseOptionalFeatureExplanation(getFalseOptionalFeature());
+		return new FalseOptionalFeatureExplanation(getSubject());
 	}
 }

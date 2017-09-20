@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.CheckForNull;
@@ -54,13 +55,11 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
@@ -106,7 +105,13 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -139,11 +144,9 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	private LinkedList<ICurrentBuildListener> currentBuildListeners = new LinkedList<>();
 
-	private LinkedList<IProject> projectsToAdd = new LinkedList<>();
+	private ConcurrentLinkedQueue<IProject> projectsToAdd = new ConcurrentLinkedQueue<>();
 
-	private Job job = null;
-
-	private int couterAddProjects = 0;
+	private IRunner<Void> job = null;
 
 	/**
 	 * add ResourceChangeListener to workspace to track project move/rename
@@ -648,51 +651,48 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param project
 	 */
 	public void addProjectToList(IProject project) {
-		if (projectsToAdd.contains(project)) {
-			return;
-		}
-		if (featureProjectMap.containsKey(project) || !project.isOpen()) {
+		if (featureProjectMap.containsKey(project) || !project.isOpen() || projectsToAdd.contains(project)) {
 			return;
 		}
 
-		projectsToAdd.add(project);
-		if (job == null) {
-			job = new Job(ADD_PROJECT) {
-				@Override
-				public IStatus run(IProgressMonitor monitor) {
-					addProjects(monitor);
-					monitor.beginTask("", 1);
-					return Status.OK_STATUS;
-				}
-			};
-			job.setPriority(Job.SHORT);
-			job.schedule();
-		}
+		projectsToAdd.offer(project);
+		scheduleAddJob();
+	}
 
-		if (job.getState() == Job.NONE) {
-			couterAddProjects = 0;
-			job.schedule();
+	private void scheduleAddJob() {
+		synchronized (this) {
+			if (job == null) {
+				job = LongRunningWrapper.getRunner(new AddingProjectsMethod(), ADD_PROJECT);
+				job.addJobFinishedListener(new JobFinishListener<Void>() {
+					@Override
+					public void jobFinished(IJob<Void> finishedJob) {
+						synchronized (CorePlugin.this) {
+							if (!projectsToAdd.isEmpty()) {
+								scheduleAddJob();
+							} else {
+								job = null;
+							}
+						}
+					}
+				});
+				job.schedule();
+			}
 		}
 	}
 
-	protected void addProjects(IProgressMonitor monitor) {
-		if (projectsToAdd.isEmpty()) {
-			monitor.done();
-			return;
+	private class AddingProjectsMethod implements LongRunningMethod<Void> {
+		@Override
+		public Void execute(IMonitor monitor) throws Exception {
+			monitor.setRemainingWork(projectsToAdd.size());
+			while(!projectsToAdd.isEmpty()) {
+				final IProject project = projectsToAdd.poll();
+				final IMonitor subTask = monitor.subTask(1);
+				subTask.setTaskName(project.getName());
+				addProject(project);
+				subTask.step();
+			}
+			return null;
 		}
-
-		while (!projectsToAdd.isEmpty()) {
-			IProject project = projectsToAdd.getFirst();
-			projectsToAdd.remove(project);
-
-			monitor.beginTask("", projectsToAdd.size() + couterAddProjects);
-			monitor.worked(++couterAddProjects);
-			monitor.subTask("Add project " + project.getName());
-
-			addProject(project);
-
-		}
-		addProjects(monitor);
 	}
 
 	public List<CompletionProposal> extendedModules_getCompl(IFeatureProject featureProject, String featureName) {

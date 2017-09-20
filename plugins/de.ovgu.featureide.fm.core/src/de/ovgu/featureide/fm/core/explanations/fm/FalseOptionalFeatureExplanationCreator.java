@@ -32,13 +32,16 @@ public interface FalseOptionalFeatureExplanationCreator extends FeatureModelExpl
 	 * Returns the false-optional feature in the feature model.
 	 * @return the false-optional feature in the feature model
 	 */
-	public IFeature getFalseOptionalFeature();
+	@Override
+	public IFeature getSubject();
 	
 	/**
 	 * Sets the false-optional feature in the feature model.
-	 * @param falseOptionalFeature the false-optional feature in the feature model
+	 * @param subject the false-optional feature in the feature model
+	 * @throws IllegalArgumentException if the subject is not an instance of {@link IFeature}
 	 */
-	public void setFalseOptionalFeature(IFeature falseOptionalFeature);
+	@Override
+	public void setSubject(Object subject) throws IllegalArgumentException;
 	
 	/**
 	 * Returns an explanation why the specified feature of the specified feature model is false-optional.

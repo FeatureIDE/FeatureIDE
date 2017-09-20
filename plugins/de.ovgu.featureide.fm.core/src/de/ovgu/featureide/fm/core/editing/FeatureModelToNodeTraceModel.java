@@ -386,10 +386,18 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 	 * @param amount amount of traces to remove
 	 */
 	public void removeTraces(int amount) {
-		int size = traces.size();
+		int size = getTraceCount();
 		while (--amount >= 0) {
-			traces.remove(--size);
+			removeTrace(--size);
 		}
+	}
+	
+	/**
+	 * Removes the trace for the clause with the given index.
+	 * @param clauseIndex index of the clause to remove
+	 */
+	public void removeTrace(int clauseIndex) {
+		traces.remove(clauseIndex);
 	}
 	
 	/**

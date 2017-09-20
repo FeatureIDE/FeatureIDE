@@ -32,7 +32,12 @@ abstract class ATaskMonitor extends AMonitor {
 		super();
 	}
 
-	public ATaskMonitor(IMonitor parent) {
+	public ATaskMonitor(String name) {
+		super();
+		this.name = name;
+	}
+
+	protected ATaskMonitor(AMonitor parent) {
 		super(parent);
 	}
 
@@ -40,9 +45,22 @@ abstract class ATaskMonitor extends AMonitor {
 	public void setTaskName(String name) {
 		this.name = name;
 	}
-	
+
+	@Override
 	public String getTaskName() {
-		return (parent != null ? parent.getTaskName() + " - " : "") + (name != null ? name : "");
+		return constructTaskName();
+	}
+
+	protected String constructTaskName() {
+		StringBuilder sb = new StringBuilder();
+		AMonitor p = parent;
+		while (p != null) {
+			sb.append(p.getTaskName());
+			sb.append(" - ");
+			p = p.parent;
+		}
+		sb.append(name != null ? name : "...");
+		return sb.toString();
 	}
 
 }

@@ -25,7 +25,6 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -37,42 +36,17 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Timo G&uuml;nther
  */
 public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-	/** The false-optional feature in the feature model. */
-	private IFeature falseOptionalFeature;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public LtmsFalseOptionalFeatureExplanationCreator() {
-		this(null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 */
-	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-	
-	/**
-	 * Constructs a new instance of this class.
-	 * @param fm the feature model context
-	 * @param falseOptionalFeature the false-optional feature in the feature model
-	 */
-	public LtmsFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
-		super(fm);
-		setFalseOptionalFeature(falseOptionalFeature);
+	@Override
+	public IFeature getSubject() {
+		return (IFeature) super.getSubject();
 	}
 	
 	@Override
-	public IFeature getFalseOptionalFeature() {
-		return falseOptionalFeature;
-	}
-	
-	@Override
-	public void setFalseOptionalFeature(IFeature falseOptionalFeature) {
-		this.falseOptionalFeature = falseOptionalFeature;
+	public void setSubject(Object subject) throws IllegalArgumentException {
+		if (subject != null && !(subject instanceof IFeature)) {
+			throw new IllegalArgumentException("Illegal subject type");
+		}
+		super.setSubject(subject);
 	}
 	
 	/**
@@ -85,10 +59,10 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModel
 	 */
 	@Override
 	public FalseOptionalFeatureExplanation getExplanation() throws IllegalStateException {
-		final Ltms ltms = getLtms();
+		final Ltms ltms = getOracle();
 		ltms.clearPremises();
-		ltms.addPremise(getFalseOptionalFeature().getName(), false);
-		ltms.addPremise(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);
+		ltms.addPremise(getSubject().getName(), false);
+		ltms.addPremise(FeatureUtils.getParent(getSubject()).getName(), true);
 		return getExplanation(ltms.getExplanations());
 	}
 	
@@ -99,6 +73,6 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModel
 	
 	@Override
 	protected FalseOptionalFeatureExplanation getConcreteExplanation() {
-		return new FalseOptionalFeatureExplanation(getFalseOptionalFeature());
+		return new FalseOptionalFeatureExplanation(getSubject());
 	}
 }

@@ -25,9 +25,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_DEFINED
 import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.Vector;
@@ -40,7 +43,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
-import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
@@ -54,6 +56,9 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanation;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -76,6 +81,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is a tautology and causes a superfluous code block.";
 	protected static final String MESSAGE_ABSTRACT = IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
 	protected static final String MESSAGE_NOT_DEFINED = IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
+
+	/** Creates explanations for expressions that are contradictions or tautologies. */
+	private final InvariantExpressionExplanationCreator invariantExpressionExplanationCreator = PreprocessorExplanationCreatorFactory.getDefault().getInvariantExpressionExplanationCreator();
 
 	/**
 	 * Feature model node generated in {@link #performFullBuild(IFile)} and used
@@ -194,36 +202,51 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Checks expression for contradiction or tautology.
+	 * Checks the expression on top of the expression stack for a contradiction or a tautology.
+	 * Does not set any markers.
 	 * 
-	 * @param node
-	 *            the expression to prove
-	 * @param withModel
-	 *            Checking with model if is <code>true</code>.
-	 * @return {@link #SAT_CONTRADICTION}, {@link #SAT_TAUTOLOGY} or
-	 *         {@link #SAT_NONE}
+	 * @return {@link #SAT_CONTRADICTION}, {@link #SAT_TAUTOLOGY}, or {@link #SAT_NONE}
 	 */
-	protected int isContradictionOrTautology(Node node, boolean withModel) {
-		// with model: node
-		// without model: feature model && node
-		Node contradictionNode = (withModel && featureModel != null) ? new And(featureModel.clone(), node.clone()) : node.clone();
-		// with model: !node
-		// without model: !(feature model => node)
-		Node tautologyNode = new Not((withModel && featureModel != null) ? new Implies(featureModel.clone(), node.clone()) : node.clone());
+	protected int isContradictionOrTautology() {
+		final Node expression = expressionStack.peek();
 
-		// expression -> contradiction?
-		SatSolver solverContradiction = new SatSolver(contradictionNode, 1000);
-		// expression -> tautology?
-		SatSolver solverTautology = new SatSolver(tautologyNode, 1000);
+		Node nestedExpressions = null;
+		if (expressionStack.size() > 1) {
+			Node[] children = expressionStack.toArray(new Node[expressionStack.size()]);
+			children = Arrays.copyOfRange(children, 0, children.length - 1); //Exclude the topmost expression because it is examined separately.
+			nestedExpressions = new And(children);
+		}
 
 		try {
-			if (!solverContradiction.isSatisfiable()) {
-				return SAT_CONTRADICTION;
-			} else if (!solverTautology.isSatisfiable()) {
-				return SAT_TAUTOLOGY;
-			}
+			return isContradictionOrTautology(expression, featureModel, nestedExpressions);
 		} catch (TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
+			return SAT_NONE;
+		}
+	}
+
+	private int isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
+		Node context = featureModel;
+		if (nestedExpressions != null) {
+			context = new And(context, nestedExpressions);
+		}
+
+		/*
+		 * -SAT(FM & nestedExpressions & expression)
+		 */
+		if (!new SatSolver(new And(context, expression), 1000).isSatisfiable()) {
+			return SAT_CONTRADICTION;
+		}
+
+		/*
+		 *   TAUT(FM & nestedExpressions => expression)
+		 * = -SAT(-(FM & nestedExpressions => expression))
+		 * = -SAT(-(-(FM & nestedExpressions) | expression))
+		 * = -SAT(-(-FM | -nestedExpressions | expression))
+		 * = -SAT(FM & nestedExpressions & -expression)
+		 */
+		if (!new SatSolver(new And(context, new Not(expression)), 1000).isSatisfiable()) {
+			return SAT_TAUTOLOGY;
 		}
 
 		return SAT_NONE;
@@ -240,104 +263,48 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 *            file path
 	 */
 	protected void setMarkersOnContradictionOrTautology(int status, int lineNumber, IFile res) {
-		if (status == SAT_CONTRADICTION) {
-			featureProject.createBuilderMarker(res, pluginName + MESSAGE_DEAD_CODE, lineNumber, IMarker.SEVERITY_WARNING);
-		} else if (status == SAT_TAUTOLOGY) {
-			featureProject.createBuilderMarker(res, pluginName + MESSAGE_ALWAYS_TRUE, lineNumber, IMarker.SEVERITY_WARNING);
-		}
-	}
-
-	/**
-	 * Checks for tautology and contradiction and set build markers.
-	 * 
-	 * @param node
-	 *            expression to check.
-	 * @param withModel
-	 *            Checking with model if is <code>true</code>.
-	 * @param lineNumber
-	 *            number of line
-	 * @param res
-	 *            file path
-	 * @return {@link #SAT_CONTRADICTION}, {@link #SAT_TAUTOLOGY} or
-	 *         {@link #SAT_NONE}
-	 */
-	protected int isContradictionOrTautology(Node node, boolean withModel, int lineNumber, IFile res) {
-		int status = isContradictionOrTautology(node, withModel);
-
-		setMarkersOnContradictionOrTautology(status, lineNumber, res);
-
-		return status;
-	}
-
-	/**
-	 * Checks given line if it contains expressions which are always
-	 * <code>true</code> or <code>false</code>.<br />
-	 * <br />
-	 * 
-	 * Check in steps:
-	 * <ol>
-	 * <li>just the given line</li>
-	 * <li>the given line and the feature model</li>
-	 * <li>the given line, the surrounding lines and the feature model</li>
-	 * </ol>
-	 * 
-	 * @param ppExpression
-	 *            expression in the current line
-	 * @param lineNumber
-	 *            line number
-	 * @param res
-	 *            file containing the given expression
-	 */
-	protected void checkExpressions(Node ppExpression, int lineNumber, IFile res) {
-		if (ppExpression == null) {
+		if (status != SAT_CONTRADICTION && status != SAT_TAUTOLOGY) {
 			return;
 		}
-
-		/** collect all used features **/
-		findLiterals(ppExpression);
-
-		int result = isContradictionOrTautology(ppExpression.clone(), false, lineNumber, res);
-
-		if (result == SAT_NONE) {
-			result = isContradictionOrTautology(ppExpression.clone(), true, lineNumber, res);
-
-			if (result == SAT_NONE && !expressionStack.isEmpty()) {
-				Node[] nestedExpressions = new Node[expressionStack.size()];
-				nestedExpressions = expressionStack.toArray(nestedExpressions);
-
-				And nestedExpressionsAnd = new And(nestedExpressions);
-
-				result = isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
-				if (result == SAT_NONE && expressionStack.size() > 1) {
-					nestedExpressions = new Node[expressionStack.size() - 1];
-					int index = 0;
-					for (Node expression : expressionStack) {
-						if (index == expressionStack.size() - 1) {
-							break;
-						}
-						nestedExpressions[index++] = expression;
-					}
-					nestedExpressionsAnd = new And(nestedExpressions);
-					checkRedundancy(ppExpression, nestedExpressionsAnd, lineNumber, res);
-				}
-			}
+		String message = pluginName;
+		message += status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
+		final InvariantExpressionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
+		if (explanation != null && explanation.getReasons() != null && !explanation.getReasons().isEmpty()) {
+			message += String.format("%n%s", explanation);
 		}
+		featureProject.createBuilderMarker(res, message, lineNumber, IMarker.SEVERITY_WARNING);
 	}
 
 	/**
-	 * Checks whether the expression is superfluous in the given context.
-	 * 
+	 * Returns an explanation for why the expression currently on top of the expression stack is a contradiction or a tautology.
+	 * @param tautology true if the expression to explain is a tautology; false if it is a contradiction
+	 * @return an explanation
 	 */
-	private void checkRedundancy(Node nestedExpression, Node expression, int lineNumber, IFile res) {
-		Node node = new And(new And(featureModel.clone(), expression.clone()), new Not(nestedExpression.clone()));
-		SatSolver solver = new SatSolver(node, 1000);
-		try {
-			if (!solver.isSatisfiable()) {
-				setMarkersOnContradictionOrTautology(SAT_TAUTOLOGY, lineNumber, res);
-			}
-		} catch (TimeoutException e) {
+	private InvariantExpressionExplanation getInvariantExpressionExplanation(boolean tautology) {
+		invariantExpressionExplanationCreator.setFeatureModel(featureProject.getFeatureModel());
+		final List<Node> reverseExpressionStack = new ArrayList<>(expressionStack);
+		Collections.reverse(reverseExpressionStack); //Iteration order of Stack is from bottom to top instead of top to bottom.
+		invariantExpressionExplanationCreator.setExpressionStack(reverseExpressionStack);
+		invariantExpressionExplanationCreator.setTautology(tautology);
+		return invariantExpressionExplanationCreator.getExplanation();
+	}
 
-		}
+	/**
+	 * <p>
+	 * Checks whether the expression in the given line is a tautology or a contradiction.
+	 * If so, a marker is added to the given line.
+	 * </p>
+	 * 
+	 * <p>
+	 * It is assumed that the expression to check is on top of the expression stack.
+	 * </p>
+	 * @param lineNumber line number of the expression
+	 * @param res file containing the expression
+	 */
+	protected void checkContradictionOrTautology(int lineNumber, IFile res) {
+		findLiterals(expressionStack.peek());
+		final int status = isContradictionOrTautology();
+		setMarkersOnContradictionOrTautology(status, lineNumber, res);
 	}
 
 	private void findLiterals(Node ppExpression) {

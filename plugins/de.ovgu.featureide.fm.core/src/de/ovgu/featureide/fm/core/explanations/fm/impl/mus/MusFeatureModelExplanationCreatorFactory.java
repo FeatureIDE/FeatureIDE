@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.explain.solvers.MusExtractor;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
@@ -40,27 +39,12 @@ public class MusFeatureModelExplanationCreatorFactory extends FeatureModelExplan
 		return new MusDeadFeatureExplanationCreator();
 	}
 	
-	@Override
-	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator(IFeatureModel fm) {
-		return new MusDeadFeatureExplanationCreator(fm);
-	}
-	
 	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
 		return new MusFalseOptionalFeatureExplanationCreator();
 	}
 	
 	@Override
-	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		return new MusFalseOptionalFeatureExplanationCreator(fm);
-	}
-	
-	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
 		return new MusRedundantConstraintExplanationCreator();
-	}
-	
-	@Override
-	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm) {
-		return new MusRedundantConstraintExplanationCreator(fm);
 	}
 }
