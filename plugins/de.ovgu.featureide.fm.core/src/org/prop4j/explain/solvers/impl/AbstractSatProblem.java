@@ -112,6 +112,11 @@ public abstract class AbstractSatProblem implements SatProblem {
 	}
 	
 	@Override
+	public boolean containsClause(Node clause) {
+		return clauses.contains(clause);
+	}
+	
+	@Override
 	public void addAssumptions(Map<Object, Boolean> assumptions) {
 		for (final Entry<Object, Boolean> assumption : assumptions.entrySet()) {
 			addAssumption(assumption.getKey(), assumption.getValue());

@@ -79,19 +79,17 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	
 	@Override
 	public boolean addClause(Node clause) {
-		if (clauseConstraints.containsKey(clause)) {
+		if (containsClause(clause)) {
 			return false;
 		}
 		addVariables(clause.getUniqueVariables());
 		try {
 			final IConstr constraint = getOracle().addClause(getVectorFromClause(clause));
-			if (constraint == null) {
-				return false;
+			if (constraint != null) {
+				clauseConstraints.put(clause, constraint);
 			}
-			clauseConstraints.put(clause, constraint);
 		} catch (ContradictionException e) {
 			setContradiction(true);
-			return false;
 		}
 		super.addClause(clause);
 		return true;

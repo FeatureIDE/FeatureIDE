@@ -116,6 +116,14 @@ public interface SatProblem {
 	 * @return the amount of clauses in this problem
 	 */
 	public int getClauseCount();
+	
+	/**
+	 * Returns true if this contains a clause that equals the given clause.
+	 * @param clause clause to search for
+	 * @return true if this contains a clause that equals the given clause
+	 */
+	public boolean containsClause(Node clause);
+	
 	/**
 	 * Adds all given assumptions to the problem.
 	 * @param assumptions assumptions to add; not null
