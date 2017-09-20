@@ -33,16 +33,19 @@ import de.ovgu.featureide.fm.core.job.IJob;
  */
 public class ProgressMonitor extends ATaskMonitor {
 
-	private SubMonitor monitor;
+	private final SubMonitor monitor;
+	private final IProgressMonitor orgMonitor;
 
-	private ProgressMonitor(IProgressMonitor monitor, IMonitor parent) {
+	private ProgressMonitor(SubMonitor monitor, AMonitor parent) {
 		super(parent);
 		this.monitor = SubMonitor.convert(monitor, 1);
+		this.orgMonitor = null;
 	}
 
 	public ProgressMonitor(String taskName, IProgressMonitor monitor) {
-		super();
+		super(taskName);
 		this.monitor = SubMonitor.convert(monitor, taskName, 1);
+		this.orgMonitor = monitor;
 	}
 
 	@Override
@@ -57,6 +60,9 @@ public class ProgressMonitor extends ATaskMonitor {
 	@Override
 	public void done() {
 		monitor.done();
+		if (orgMonitor != null) {
+			orgMonitor.done();
+		}
 	}
 
 	@Override
