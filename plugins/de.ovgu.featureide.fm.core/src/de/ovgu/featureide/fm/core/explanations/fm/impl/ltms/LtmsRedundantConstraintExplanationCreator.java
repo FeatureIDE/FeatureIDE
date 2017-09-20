@@ -100,7 +100,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		final Node cnf;
 		if (getSubject() == null || (cnf = getCnf()) == null) {
 			this.cnfWithoutRedundantConstraint = null;
-			setLtms(null);
+			setOracle(null);
 			return;
 		}
 		
@@ -121,11 +121,11 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		}
 		this.cnfWithoutRedundantConstraint = new And(clauses.toArray(new Node[clauses.size()]));
 		
-		setLtms(null);
+		setOracle(null);
 	}
 	
 	@Override
-	protected Ltms createLtms() {
+	protected Ltms createOracle() {
 		return new Ltms(getCnfWithoutRedundantConstraint());
 	}
 	
@@ -145,7 +145,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
 		final RedundantConstraintExplanation cumulatedExplanation = getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
-		final Ltms ltms = getLtms();
+		final Ltms ltms = getOracle();
 		for (final Map<Object, Boolean> assignment : getSubject().getNode().getContradictingAssignments()) {
 			ltms.setPremises(assignment);
 			final Explanation explanation = getExplanation(ltms.getExplanations());

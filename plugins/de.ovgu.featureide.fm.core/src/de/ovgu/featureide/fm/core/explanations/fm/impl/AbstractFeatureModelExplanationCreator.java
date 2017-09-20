@@ -59,6 +59,12 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * Created and reset together with the CNF.
 	 */
 	private FeatureModelToNodeTraceModel traceModel;
+	/**
+	 * The oracle used to reason over the circumstance to explain.
+	 * Uses the CNF as input.
+	 * Created lazily when needed and reset when the CNF changes.
+	 */
+	private Object oracle;
 	
 	@Override
 	public Object getSubject() {
@@ -145,6 +151,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 		final AdvancedNodeCreator nc = getNodeCreator();
 		this.cnf = nc.createNodes();
 		this.traceModel = nc.getTraceModel();
+		setOracle();
 		return cnf;
 	}
 	
@@ -155,6 +162,39 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	public FeatureModelToNodeTraceModel getTraceModel() {
 		return traceModel;
 	}
+	
+	/**
+	 * Returns the oracle.
+	 * Creates it first if necessary.
+	 * @return the oracle; not null
+	 */
+	protected Object getOracle() {
+		if (oracle == null) {
+			setOracle();
+		}
+		return oracle;
+	}
+	
+	/**
+	 * Sets the oracle.
+	 */
+	protected void setOracle() {
+		setOracle(getCnf() == null ? null : createOracle());
+	}
+	
+	/**
+	 * Sets the oracle.
+	 * @param oracle the oracle
+	 */
+	protected void setOracle(Object oracle) {
+		this.oracle = oracle;
+	}
+	
+	/**
+	 * Returns a new oracle.
+	 * @return a new oracle
+	 */
+	protected abstract Object createOracle();
 	
 	/**
 	 * Returns an explanation for the given clauses.
