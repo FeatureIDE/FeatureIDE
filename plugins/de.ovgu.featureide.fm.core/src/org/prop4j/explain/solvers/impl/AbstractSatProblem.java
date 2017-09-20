@@ -43,46 +43,57 @@ public abstract class AbstractSatProblem implements SatProblem {
 	private final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
 	
 	@Override
-	public void addFormulas(Node... formulas) {
-		addFormulas(Arrays.asList(formulas));
+	public int addFormulas(Node... formulas) {
+		return addFormulas(Arrays.asList(formulas));
 	}
 	
 	@Override
-	public void addFormulas(Collection<Node> formulas) {
+	public int addFormulas(Collection<Node> formulas) {
+		int added = 0;
 		for (final Node formula : formulas) {
-			addFormula(formula);
+			added += addFormula(formula);
 		}
+		return added;
 	}
 	
 	@Override
-	public void addFormula(Node formula) {
+	public int addFormula(Node formula) {
 		formula = formula.toRegularCNF();
 		final List<Node> clauses = Arrays.asList(formula.getChildren());
-		addClauses(clauses);
+		return addClauses(clauses);
 	}
 	
 	/**
 	 * Adds all given CNF clauses to the problem.
 	 * Each one must be a non-empty disjunction of literals.
+	 * Ignores clauses already added.
 	 * @param clauses clauses to add; not null
+	 * @return whether the problem changed as a result of this operation
 	 */
-	protected void addClauses(List<Node> clauses) {
+	protected int addClauses(List<Node> clauses) {
+		int added = 0;
 		for (final Node clause : clauses) {
-			addClause(clause);
+			if (addClause(clause)) {
+				added++;
+			}
 		}
+		return added;
 	}
 	
 	/**
 	 * Adds the given CNF clause to the problem.
 	 * It must be a non-empty disjunction of literals.
+	 * Ignores the clause if it is already added.
 	 * @param clause clause to add; not null
+	 * @return whether the problem changed as a result of this operation
 	 * @throws IllegalArgumentException if the clause is empty
 	 */
-	protected void addClause(Node clause) throws IllegalArgumentException {
+	protected boolean addClause(Node clause) throws IllegalArgumentException {
 		if (clause.getChildren().length == 0) {
 			throw new IllegalArgumentException("Empty clause");
 		}
 		clauses.add(clause);
+		return true;
 	}
 	
 	@Override

@@ -45,6 +45,7 @@ public interface SatProblem {
 	 * Adds all given formulas to the problem.
 	 * First, each given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}.
 	 * Then, each clause of the resulting conjunction is added to the existing conjunction.
+	 * Ignores clauses already added.
 	 * </p>
 	 * 
 	 * <p>
@@ -54,14 +55,16 @@ public interface SatProblem {
 	 * <pre><i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i></pre>
 	 * </p>
 	 * @param formulas formulas to add; not null
+	 * @return the amount of clauses added
 	 */
-	public void addFormulas(Node... formulas);
+	public int addFormulas(Node... formulas);
 	
 	/**
 	 * <p>
 	 * Adds all given formulas to the problem.
 	 * First, each given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}.
 	 * Then, each clause of the resulting conjunction is added to the existing conjunction.
+	 * Ignores clauses already added.
 	 * </p>
 	 * 
 	 * <p>
@@ -71,14 +74,16 @@ public interface SatProblem {
 	 * <pre><i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i></pre>
 	 * </p>
 	 * @param formulas formulas to add; not null
+	 * @return the amount of clauses added
 	 */
-	public void addFormulas(Collection<Node> formulas);
+	public int addFormulas(Collection<Node> formulas);
 
 	/**
 	 * <p>
 	 * Adds the given formula to the problem.
 	 * First, the given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}.
 	 * Then, each clause of the resulting conjunction is added to the existing conjunction.
+	 * Ignores clauses already added.
 	 * </p>
 	 * 
 	 * <p>
@@ -88,8 +93,9 @@ public interface SatProblem {
 	 * <pre><i>f'</i> = <i>f</i> &and; <i>g</i></pre>
 	 * </p>
 	 * @param formula formula to add; not null
+	 * @return the amount of clauses added
 	 */
-	public void addFormula(Node formula);
+	public int addFormula(Node formula);
 	
 	/**
 	 * Returns all clauses in this problem.
