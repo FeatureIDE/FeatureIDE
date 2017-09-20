@@ -84,8 +84,10 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	@Override
 	public void setFeatureModel(IFeatureModel fm) {
 		this.fm = fm;
-		setNodeCreator();
-		setCnf();
+		this.nodeCreator = null;
+		this.cnf = null;
+		this.traceModel = null;
+		this.oracle = null;
 	}
 	
 	/**
@@ -94,23 +96,15 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the node creator
 	 */
 	protected AdvancedNodeCreator getNodeCreator() {
+		if (nodeCreator == null && getFeatureModel() != null) {
+			nodeCreator = createNodeCreator();
+		}
 		return nodeCreator;
 	}
 	
 	/**
-	 * Sets the node creator.
-	 */
-	protected void setNodeCreator() {
-		if (getFeatureModel() == null) {
-			this.nodeCreator = null;
-			return;
-		}
-		this.nodeCreator = createNodeCreator();
-	}
-	
-	/**
 	 * Creates a new node creator.
-	 * @return a new node creator
+	 * @return a new node creator; not null
 	 */
 	protected AdvancedNodeCreator createNodeCreator() {
 		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
@@ -123,36 +117,21 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	/**
 	 * Returns a formula representation of the feature model in CNF (conjunctive normal form).
 	 * Creates it first if necessary.
-	 * @return a formula representation of the feature model in CNF; not null
-	 * @throws IllegalStateException if the CNF could not be created
+	 * @return a formula representation of the feature model in CNF
 	 */
 	protected Node getCnf() throws IllegalStateException {
-		if (cnf == null) {
-			try {
-				setCnf();
-			} catch (IllegalArgumentException e) {
-				throw new IllegalStateException(e);
-			}
+		if (cnf == null && getFeatureModel() != null) {
+			cnf = createCnf();
 		}
 		return cnf;
 	}
 	
 	/**
-	 * Sets the formula representation of the feature model in CNF (conjunctive normal form).
-	 * @return the CNF
+	 * Creates the formula representation of the feature model in CNF (conjunctive normal form).
+	 * @return the CNF; not null
 	 */
-	protected Node setCnf() {
-		final IFeatureModel fm = getFeatureModel();
-		if (fm == null) {
-			this.cnf = null;
-			this.traceModel = null;
-			return cnf;
-		}
-		final AdvancedNodeCreator nc = getNodeCreator();
-		this.cnf = nc.createNodes();
-		this.traceModel = nc.getTraceModel();
-		setOracle();
-		return cnf;
+	protected Node createCnf() {
+		return getNodeCreator().createNodes();
 	}
 	
 	/**
@@ -160,7 +139,18 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the trace model
 	 */
 	public FeatureModelToNodeTraceModel getTraceModel() {
+		if (traceModel == null && getFeatureModel() != null) {
+			traceModel = createTraceModel();
+		}
 		return traceModel;
+	}
+	
+	/**
+	 * Creates the trace model.
+	 * @return the trace model; not null
+	 */
+	protected FeatureModelToNodeTraceModel createTraceModel() {
+		return getNodeCreator().getTraceModel();
 	}
 	
 	/**
@@ -169,30 +159,22 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the oracle; not null
 	 */
 	protected Object getOracle() {
-		if (oracle == null) {
-			setOracle();
+		if (oracle == null && getFeatureModel() != null) {
+			oracle = createOracle();
 		}
 		return oracle;
 	}
 	
 	/**
-	 * Sets the oracle.
+	 * Sets the oracle to null.
 	 */
-	protected void setOracle() {
-		setOracle(getCnf() == null ? null : createOracle());
-	}
-	
-	/**
-	 * Sets the oracle.
-	 * @param oracle the oracle
-	 */
-	protected void setOracle(Object oracle) {
-		this.oracle = oracle;
+	protected void resetOracle() {
+		this.oracle = null;
 	}
 	
 	/**
 	 * Returns a new oracle.
-	 * @return a new oracle
+	 * @return a new oracle; not null
 	 */
 	protected abstract Object createOracle();
 	
@@ -224,7 +206,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	
 	/**
 	 * Returns a new concrete explanation.
-	 * @return a new concrete explanation
+	 * @return a new concrete explanation; not null
 	 */
 	protected abstract Explanation getConcreteExplanation();
 }
