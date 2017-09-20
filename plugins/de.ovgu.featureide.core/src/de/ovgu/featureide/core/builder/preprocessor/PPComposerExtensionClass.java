@@ -302,13 +302,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param res file containing the expression
 	 */
 	protected void checkContradictionOrTautology(int lineNumber, IFile res) {
-		try {
 		findLiterals(expressionStack.peek());
 		final int status = isContradictionOrTautology();
 		setMarkersOnContradictionOrTautology(status, lineNumber, res);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void findLiterals(Node ppExpression) {
