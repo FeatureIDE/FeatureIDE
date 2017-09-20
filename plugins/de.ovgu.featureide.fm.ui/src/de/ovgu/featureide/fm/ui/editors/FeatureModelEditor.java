@@ -93,7 +93,7 @@ import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
 /**
  * A multi page editor to edit feature models. If the model file contains
@@ -420,10 +420,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
 					diagramEditor.internRefresh(false);
-					//refresh root and children to prevent manual and another layout algorithm to omit connection
-					if (diagramEditor.getFeatureModel().getStructure().getRoot() != null) {
-						diagramEditor.refreshChildAll(diagramEditor.getFeatureModel().getStructure().getRoot().getFeature());
-					}
 					diagramEditor.analyzeFeatureModel();
 				}
 			});

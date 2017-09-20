@@ -28,7 +28,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.prop4j.NodeWriter;
@@ -106,7 +105,7 @@ public class FeatureModel implements IFeatureModel {
 		this.factoryID = factoryID;
 
 		id = getNextId();
-		featureOrderList = new LinkedList<String>();
+		featureOrderList = new LinkedList<>();
 		featureOrderUserDefined = false;
 
 		property = createProperty();
@@ -118,7 +117,7 @@ public class FeatureModel implements IFeatureModel {
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
 		factoryID = oldFeatureModel.factoryID;
 		id = oldFeatureModel.id;
-		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
+		featureOrderList = new LinkedList<>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
 		property = oldFeatureModel.getProperty().clone(this);
@@ -425,11 +424,12 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderList(List<String> featureOrderList) {
-		final Set<String> basicSet = Functional.mapToStringSet(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter()));
+		final List<String> basicSet = Functional.mapToList(new FeaturePreOrder(this), new ConcreteFeatureFilter(), FeatureUtils.GET_FEATURE_NAME);
+		// TODO optimize performance
 		basicSet.removeAll(featureOrderList);
-		featureOrderList.clear();
-		featureOrderList.addAll(featureOrderList);
-		featureOrderList.addAll(basicSet);
+		this.featureOrderList.clear();
+		this.featureOrderList.addAll(featureOrderList);
+		this.featureOrderList.addAll(basicSet);
 	}
 
 	@Override

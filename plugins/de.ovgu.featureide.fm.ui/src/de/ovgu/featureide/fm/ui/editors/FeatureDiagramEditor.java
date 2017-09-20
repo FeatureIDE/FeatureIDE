@@ -160,8 +160,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature
@@ -725,10 +725,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
 		}
-		if (graphicalFeatureModel.getVisibleConstraints().size() != graphicalFeatureModel.getConstraints().size()
-				|| graphicalFeatureModel.getLayout().showCollapsedConstraints()) {
-			menu.add(showCollapsedConstraintsAction);
-		}
+		menu.add(showCollapsedConstraintsAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		// call of the FeatureDiagramExtensions (for features only)
@@ -821,12 +818,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void internRefresh(boolean onlyLayout) {
 		if (getContents() == null)
 			return;
-
-		// TODO is this necessary?
-		FmOutlinePage outline = featureModelEditor.getOutlinePage();
-		if (outline != null) {
-			outline.setInput(getFeatureModel());
-		}
 
 		// refresh size of all feature figures
 		if (!onlyLayout)
@@ -1097,6 +1088,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
+			
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;

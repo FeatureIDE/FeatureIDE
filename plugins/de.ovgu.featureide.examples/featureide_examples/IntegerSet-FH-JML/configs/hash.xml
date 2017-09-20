@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="IntegerSet"/>
+		<feature automatic="unselected" manual="undefined" name="Tree"/>
+		<feature automatic="undefined" manual="selected" name="HashSet"/>
+	</configuration>

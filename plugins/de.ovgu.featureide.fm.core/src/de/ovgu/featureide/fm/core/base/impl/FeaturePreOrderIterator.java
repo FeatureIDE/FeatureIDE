@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class FeaturePreOrderIterator implements Iterator<IFeature> {
 
-	private LinkedList<IFeatureStructure> featureStructureList = new LinkedList<>();
+	private final LinkedList<IFeatureStructure> featureStructureList = new LinkedList<>();
 
 	public FeaturePreOrderIterator(IFeatureModel featureModel) {
 		final IFeatureStructure root = featureModel.getStructure().getRoot();

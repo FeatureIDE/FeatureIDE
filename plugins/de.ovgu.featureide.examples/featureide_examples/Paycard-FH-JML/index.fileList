@@ -1,7 +1,7 @@
 .classpath
 .project
 .settings/de.ovgu.featureide.core.prefs
-configs/Paycard.config
+configs/Paycard.xml
 features/LockOut/PayCard.java
 features/Logging/LogFile.java
 features/Logging/LogRecord.java

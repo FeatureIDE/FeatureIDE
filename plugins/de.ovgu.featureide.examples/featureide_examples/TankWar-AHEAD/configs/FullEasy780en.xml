@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="TankWar"/>
+		<feature automatic="selected" manual="undefined" name="Platform"/>
+		<feature automatic="selected" manual="selected" name="PC"/>
+		<feature automatic="unselected" manual="undefined" name="Handy"/>
+		<feature automatic="selected" manual="selected" name="Tools"/>
+		<feature automatic="undefined" manual="selected" name="Beschleunigung"/>
+		<feature automatic="undefined" manual="selected" name="einfrieren"/>
+		<feature automatic="undefined" manual="selected" name="Bombe"/>
+		<feature automatic="undefined" manual="selected" name="Energie"/>
+		<feature automatic="undefined" manual="selected" name="Feuerkraft"/>
+		<feature automatic="undefined" manual="selected" name="Mars"/>
+		<feature automatic="undefined" manual="selected" name="explodieren"/>
+		<feature automatic="selected" manual="undefined" name="GUI"/>
+		<feature automatic="selected" manual="undefined" name="Map"/>
+		<feature automatic="unselected" manual="undefined" name="M_240"/>
+		<feature automatic="unselected" manual="undefined" name="M_600"/>
+		<feature automatic="undefined" manual="selected" name="M_780"/>
+		<feature automatic="selected" manual="selected" name="Image"/>
+		<feature automatic="undefined" manual="selected" name="fuer_PC"/>
+		<feature automatic="unselected" manual="undefined" name="fuer_Handy"/>
+		<feature automatic="selected" manual="selected" name="IMG_tool"/>
+		<feature automatic="undefined" manual="selected" name="Record"/>
+		<feature automatic="selected" manual="selected" name="Re_fuer_PC"/>
+		<feature automatic="unselected" manual="undefined" name="Re_fuer_Handy"/>
+		<feature automatic="undefined" manual="undefined" name="Soundeffekt"/>
+		<feature automatic="undefined" manual="undefined" name="Sound_fuer_pc"/>
+		<feature automatic="unselected" manual="undefined" name="Sound_fuer_Handy"/>
+		<feature automatic="selected" manual="undefined" name="Language"/>
+		<feature automatic="undefined" manual="selected" name="EN"/>
+		<feature automatic="unselected" manual="undefined" name="DE"/>
+		<feature automatic="selected" manual="undefined" name="Tanks"/>
+		<feature automatic="undefined" manual="selected" name="USA_M1Abrams"/>
+		<feature automatic="undefined" manual="selected" name="Germany_Leopard"/>
+		<feature automatic="undefined" manual="selected" name="China_Type99"/>
+		<feature automatic="selected" manual="undefined" name="AI"/>
+		<feature automatic="undefined" manual="selected" name="Easy"/>
+		<feature automatic="unselected" manual="undefined" name="Hard"/>
+	</configuration>

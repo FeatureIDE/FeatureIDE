@@ -1,7 +1,7 @@
 .classpath
 .order
 .project
-configs/Base.config
+configs/Base.xml
 features/Base/About.java
 features/Base/Actions.java
 features/Base/images/about.gif

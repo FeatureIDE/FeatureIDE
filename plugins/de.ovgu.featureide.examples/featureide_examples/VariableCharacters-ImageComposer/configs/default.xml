@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="Character"/>
+		<feature automatic="selected" manual="undefined" name="Clothes"/>
+		<feature automatic="selected" manual="undefined" name="NormalOutfit"/>
+		<feature automatic="selected" manual="undefined" name="TopClothing"/>
+		<feature automatic="undefined" manual="selected" name="RedSweater"/>
+		<feature automatic="unselected" manual="undefined" name="YellowSweater"/>
+		<feature automatic="selected" manual="undefined" name="BottomClothing"/>
+		<feature automatic="undefined" manual="selected" name="Jeans"/>
+		<feature automatic="unselected" manual="undefined" name="BrownPant"/>
+		<feature automatic="unselected" manual="undefined" name="Costume"/>
+		<feature automatic="unselected" manual="undefined" name="Koala"/>
+		<feature automatic="unselected" manual="undefined" name="Frog"/>
+		<feature automatic="undefined" manual="undefined" name="Objects"/>
+		<feature automatic="undefined" manual="undefined" name="Ball"/>
+		<feature automatic="undefined" manual="undefined" name="Balloon"/>
+	</configuration>

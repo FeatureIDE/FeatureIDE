@@ -210,38 +210,37 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private IFile currentConfiguration = null;
 
-	private final LongRunningJob<Boolean> syncModulesJob = new LongRunningJob<>(SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES,
-			new LongRunningMethod<Boolean>() {
-				@Override
-				public Boolean execute(IMonitor workMonitor) throws Exception {
-					try {
-						final IFolder folder = sourceFolder;
-						featureModelManager.read();
-						final IFeatureModel model = featureModelManager.getObject();
-						// prevent warnings, if the user has just created a project
-						// without any source files
-						// TODO This could be removed because the user could use the
-						// modeling extension instead
-						if (allFeatureModulesEmpty(folder)) {
-							folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ONE);
-							return true;
-						}
-						// set marker for each folder
-						if (folder.exists()) {
-							workMonitor.setRemainingWork(folder.members().length);
-							for (IResource res : folder.members()) {
-								if (res.exists() && res instanceof IFolder) {
-									setFeatureModuleMarker(model, (IFolder) res);
-								}
-								workMonitor.step();
-							}
-						}
-					} catch (CoreException e) {
-						LOGGER.logError(e);
-					}
+	private final LongRunningMethod<Boolean> syncModulesJob = new LongRunningMethod<Boolean>() {
+		@Override
+		public Boolean execute(IMonitor workMonitor) throws Exception {
+			try {
+				final IFolder folder = sourceFolder;
+				featureModelManager.read();
+				final IFeatureModel model = featureModelManager.getObject();
+				// prevent warnings, if the user has just created a project
+				// without any source files
+				// TODO This could be removed because the user could use the
+				// modeling extension instead
+				if (allFeatureModulesEmpty(folder)) {
+					folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ONE);
 					return true;
 				}
-			});
+				// set marker for each folder
+				if (folder.exists()) {
+					workMonitor.setRemainingWork(folder.members().length);
+					for (IResource res : folder.members()) {
+						if (res.exists() && res instanceof IFolder) {
+							setFeatureModuleMarker(model, (IFolder) res);
+						}
+						workMonitor.step();
+					}
+				}
+			} catch (CoreException e) {
+				LOGGER.logError(e);
+			}
+			return true;
+		}
+	};
 
 	private final LongRunningJob<Boolean> configurationChecker = new LongRunningJob<>(CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES,
 			new LongRunningMethod<Boolean>() {
@@ -789,7 +788,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	// TODO this should not be called if only markers are changed
 	private synchronized void setAllFeatureModuleMarkers() {
-		syncModulesJob.schedule();
+		LongRunningWrapper.getRunner(syncModulesJob, SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES).schedule();
 	}
 
 	/**

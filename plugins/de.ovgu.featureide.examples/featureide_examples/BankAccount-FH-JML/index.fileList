@@ -2,7 +2,7 @@
 .project
 .settings/de.ovgu.featureide.core.prefs
 .settings/org.eclipse.jdt.core.prefs
-configs/default.config
+configs/default.xml
 features/BankAccount/Account.java
 features/BankAccount/Application.java
 features/CreditWorthiness/Account.java

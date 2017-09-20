@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="Base"/>
+		<feature automatic="selected" manual="undefined" name="tracing"/>
+		<feature automatic="unselected" manual="undefined" name="Lib"/>
+		<feature automatic="unselected" manual="undefined" name="tracing_lib_AbstractTrace"/>
+		<feature automatic="unselected" manual="undefined" name="tracing_lib_TraceMyClasses"/>
+		<feature automatic="unselected" manual="undefined" name="Version1"/>
+		<feature automatic="unselected" manual="undefined" name="tracing_version1_TraceMyClasses"/>
+		<feature automatic="selected" manual="undefined" name="Version2"/>
+		<feature automatic="undefined" manual="selected" name="tracing_version2_TraceMyClasses"/>
+		<feature automatic="selected" manual="selected" name="tracing_version2_Trace"/>
+		<feature automatic="unselected" manual="undefined" name="Version3"/>
+		<feature automatic="unselected" manual="undefined" name="tracing_version3_Trace"/>
+		<feature automatic="unselected" manual="undefined" name="tracing_version3_TraceMyClasses"/>
+	</configuration>

@@ -1,7 +1,7 @@
 .classpath
 .project
 .settings/de.ovgu.featureide.core.prefs
-configs/ExamDB.config
+configs/ExamDB.xml
 features/BackOut/ExamDataBase.java
 features/BackOut/ExamDataBaseImpl.java
 features/BackOut/Student.java

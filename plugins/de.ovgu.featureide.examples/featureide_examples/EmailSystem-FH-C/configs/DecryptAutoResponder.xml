@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="EmailSystem"/>
+		<feature automatic="selected" manual="selected" name="Base"/>
+		<feature automatic="selected" manual="selected" name="SingleLinkedList"/>
+		<feature automatic="undefined" manual="selected" name="Keys"/>
+		<feature automatic="undefined" manual="selected" name="Encrypt"/>
+		<feature automatic="undefined" manual="selected" name="AutoResponder"/>
+		<feature automatic="undefined" manual="undefined" name="AddressBook"/>
+		<feature automatic="undefined" manual="selected" name="Decrypt"/>
+		<feature automatic="undefined" manual="undefined" name="Sign"/>
+		<feature automatic="undefined" manual="undefined" name="Forward"/>
+		<feature automatic="undefined" manual="undefined" name="Verify"/>
+		<feature automatic="undefined" manual="selected" name="MessageID"/>
+		<feature automatic="selected" manual="undefined" name="tests"/>
+		<feature automatic="unselected" manual="undefined" name="DecryptForward"/>
+		<feature automatic="unselected" manual="undefined" name="AddressBookEncrypt"/>
+		<feature automatic="unselected" manual="undefined" name="VerifyForward"/>
+		<feature automatic="undefined" manual="selected" name="DecryptAutoResponder"/>
+		<feature automatic="unselected" manual="undefined" name="SignVerify"/>
+		<feature automatic="unselected" manual="undefined" name="SignForward"/>
+		<feature automatic="unselected" manual="undefined" name="EncryptDecrypt"/>
+		<feature automatic="unselected" manual="undefined" name="EncryptVerify"/>
+		<feature automatic="unselected" manual="undefined" name="EncryptAutoresponder"/>
+		<feature automatic="unselected" manual="undefined" name="EncryptForward"/>
+	</configuration>

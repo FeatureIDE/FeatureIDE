@@ -1,7 +1,7 @@
 .classpath
 .project
 .settings/de.ovgu.featureide.core.prefs
-configs/default.config
+configs/default.xml
 Deviations_from_vonRhein.txt
 Experiences.txt
 features/Base/Actions.java

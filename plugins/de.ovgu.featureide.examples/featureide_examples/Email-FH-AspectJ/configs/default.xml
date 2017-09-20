@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="Email"/>
+		<feature automatic="selected" manual="selected" name="Base"/>
+		<feature automatic="selected" manual="selected" name="Keys"/>
+		<feature automatic="undefined" manual="selected" name="Encrypt"/>
+		<feature automatic="undefined" manual="selected" name="AutoResponder"/>
+		<feature automatic="undefined" manual="selected" name="Addressbook"/>
+		<feature automatic="undefined" manual="selected" name="Sign"/>
+		<feature automatic="undefined" manual="selected" name="Forward"/>
+		<feature automatic="selected" manual="selected" name="Verify"/>
+		<feature automatic="selected" manual="selected" name="Decrypt"/>
+	</configuration>

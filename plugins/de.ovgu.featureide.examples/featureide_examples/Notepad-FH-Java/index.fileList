@@ -1,8 +1,8 @@
 .classpath
 .project
 .settings/org.eclipse.jdt.core.prefs
-configs/Full.config
-configs/Simple.config
+configs/Full.xml
+configs/Simple.xml
 features/Cut/Actions.java
 features/Cut/images/cut.gif
 features/Cut/Notepad.java

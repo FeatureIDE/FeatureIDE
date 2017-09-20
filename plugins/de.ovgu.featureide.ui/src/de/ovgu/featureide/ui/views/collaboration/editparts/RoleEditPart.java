@@ -35,9 +35,13 @@ import org.eclipse.draw2d.Viewport;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
@@ -54,7 +58,6 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigureLabel;
-import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
 
 /**
  * EditPart for Roles.
@@ -169,7 +172,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						if (invariant.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor, invariant.getLine());
+								scrollToLine(editor, invariant.getLine());
 							}
 							return;
 						}
@@ -181,7 +184,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor, fstField.getLine());
+								scrollToLine(editor, fstField.getLine());
 							}
 							return;
 						}
@@ -192,7 +195,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						if (fstInnerClass.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor,fstInnerClass.getLine());
+								scrollToLine(editor,fstInnerClass.getLine());
 							}
 							return;
 						}
@@ -203,7 +206,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor, fstMethod.getLine());
+								scrollToLine(editor, fstMethod.getLine());
 							}
 							return;
 						}
@@ -215,7 +218,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						if (fstDirective.equals(roleElement)) {
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(),
+								scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(),
 										fstDirective.getEndLength());
 							}
 							return;
@@ -246,5 +249,57 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 			y += bounds.height;
 
 		return new Point(x, y);
+	}
+	
+	/**
+	 * Jumps to a line in the given editor
+	 * 
+	 * @param editorPart
+	 * @param lineNumber
+	 */
+	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
+		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
+			return;
+		}
+		ITextEditor editor = (ITextEditor) editorPart;
+		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		if (document != null) {
+			IRegion lineInfo = null;
+			try {
+				lineInfo = document.getLineInformation(lineNumber - 1);
+			} catch (BadLocationException e) {
+			}
+			if (lineInfo != null) {
+				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
+			}
+		}
+	}
+	
+	/**
+	 * Highlights the whole if-Block for a FSTDirective
+	 * 
+	 * @param editorPart
+	 * @param startLine
+	 *            the first line of a directive
+	 * @param endLine
+	 *            the last line of a directive
+	 * @param startOffset
+	 *            characters before the statement starts
+	 * @param endOffset
+	 *            length of the last line
+	 */
+	public static void scrollToLine(IEditorPart editorPart, int startLine, int endLine, int startOffset, int endOffset) {
+		if (!(editorPart instanceof ITextEditor) || startLine < 0 || endLine < 0) {
+			return;
+		}
+		ITextEditor editor = (ITextEditor) editorPart;
+		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		if (document != null) {
+			try {
+				int offset = document.getLineOffset(startLine) + startOffset;
+				editor.selectAndReveal(offset, document.getLineOffset(endLine) - (offset) + endOffset);
+			} catch (BadLocationException e) {
+			}
+		}
 	}
 }

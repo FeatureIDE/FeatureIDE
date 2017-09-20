@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="Root"/>
+		<feature automatic="selected" manual="undefined" name="ContentHandler"/>
+		<feature automatic="undefined" manual="undefined" name="HTML"/>
+		<feature automatic="undefined" manual="selected" name="TXT"/>
+		<feature automatic="undefined" manual="undefined" name="LATEX"/>
+		<feature automatic="selected" manual="selected" name="Base"/>
+		<feature automatic="selected" manual="selected" name="User_Interface"/>
+		<feature automatic="selected" manual="selected" name="GUI"/>
+		<feature automatic="undefined" manual="undefined" name="History"/>
+		<feature automatic="undefined" manual="undefined" name="Query_History"/>
+		<feature automatic="undefined" manual="undefined" name="Index_History"/>
+		<feature automatic="selected" manual="undefined" name="Index"/>
+		<feature automatic="undefined" manual="selected" name="Single_Directory"/>
+		<feature automatic="unselected" manual="undefined" name="Multi_Directory"/>
+		<feature automatic="undefined" manual="undefined" name="Gui_Preferences"/>
+		<feature automatic="selected" manual="undefined" name="View"/>
+		<feature automatic="undefined" manual="selected" name="Tree_View"/>
+		<feature automatic="unselected" manual="undefined" name="Normal_View"/>
+		<feature automatic="unselected" manual="undefined" name="Commandline"/>
+		<feature automatic="selected" manual="undefined" name="OS"/>
+		<feature automatic="undefined" manual="selected" name="Windows"/>
+		<feature automatic="unselected" manual="undefined" name="Linux"/>
+	</configuration>

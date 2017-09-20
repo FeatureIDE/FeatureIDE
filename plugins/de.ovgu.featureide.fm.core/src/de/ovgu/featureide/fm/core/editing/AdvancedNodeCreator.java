@@ -33,7 +33,6 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -42,7 +41,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
-import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -75,26 +73,6 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
 		return nodeCreator.createNodes();
-	}
-
-	public static SatInstance createSatInstance(IFeatureModel featureModel) {
-		return createSatInstance(new AdvancedNodeCreator(featureModel));
-	}
-
-	public static SatInstance createSatInstance(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
-		return createSatInstance(new AdvancedNodeCreator(featureModel, featureFilter), new InverseFilter<>(featureFilter));
-	}
-
-	private static SatInstance createSatInstance(AdvancedNodeCreator nodeCreator) {
-		nodeCreator.setCnfType(CNFType.Regular);
-		nodeCreator.setIncludeBooleanValues(false);
-		return new SatInstance(nodeCreator.createNodes(), Functional.mapToList(nodeCreator.getFeatureModel().getFeatures(), FeatureUtils.GET_FEATURE_NAME));
-	}
-
-	private static SatInstance createSatInstance(AdvancedNodeCreator nodeCreator, IFilter<IFeature> filter) {
-		nodeCreator.setCnfType(CNFType.Regular);
-		nodeCreator.setIncludeBooleanValues(false);
-		return new SatInstance(nodeCreator.createNodes(), Functional.mapToList(nodeCreator.getFeatureModel().getFeatures(), filter, FeatureUtils.GET_FEATURE_NAME));
 	}
 
 	public static Node createNodes(IFeatureModel featureModel) {
