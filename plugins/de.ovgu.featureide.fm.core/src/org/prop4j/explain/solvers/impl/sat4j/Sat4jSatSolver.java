@@ -63,7 +63,9 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	
 	@Override
 	protected ISolver createOracle() {
-		return SolverFactory.newDefault();
+		final ISolver solver = SolverFactory.newDefault();
+		solver.setKeepSolverHot(true);
+		return solver;
 	}
 	
 	@Override
