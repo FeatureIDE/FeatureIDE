@@ -1378,7 +1378,7 @@
 						ifEmpty="false"
 						operator="or">
 					<test
-							args=".config,.equation,.expression"
+							args=".config,.equation,.expression,.xml"
 							property="de.ovgu.featureide.fm.ui.properties.file">
 					</test>
 				</iterate>
