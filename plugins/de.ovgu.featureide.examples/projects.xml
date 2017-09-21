@@ -42,10 +42,6 @@
 		<project name="Automotive02_V2" path="featureide_examples/FeatureModels/Automotive02_V2/.project"/>
 		<project name="Automotive02_V3" path="featureide_examples/FeatureModels/Automotive02_V3/.project"/>
 		<project name="Automotive02_V4" path="featureide_examples/FeatureModels/Automotive02_V4/.project"/>
-		<project name="Automotive2_1" path="featureide_examples/FeatureModels/Automotive2_1/.project"/>
-		<project name="Automotive2_2" path="featureide_examples/FeatureModels/Automotive2_2/.project"/>
-		<project name="Automotive2_3" path="featureide_examples/FeatureModels/Automotive2_3/.project"/>
-		<project name="Automotive2_4" path="featureide_examples/FeatureModels/Automotive2_4/.project"/>
 		<project name="BerkeleyDB" path="featureide_examples/FeatureModels/BerkeleyDB/.project"/>
 		<project name="Busybox_1.18.0" path="featureide_examples/FeatureModels/Busybox_1.18.0/.project"/>
 		<project name="E-Shop" path="featureide_examples/FeatureModels/E-Shop/.project"/>
