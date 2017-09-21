@@ -57,14 +57,16 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 			if (newInput instanceof IFeatureModel)
 				fModel = ((IFeatureModel) newInput);
 			else if (newInput instanceof IFile) {
-				FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile)newInput).getLocationURI()));
-				if (fmm != null)
-					fModel = fmm.getObject();
+				if (((IFile) newInput).exists()) {
+					FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
+					if (fmm != null)
+						fModel = fmm.getObject();
+				}
 			}
 		}
 
 	}
-	
+
 	public IFeatureModel getFeatureModel() {
 		return fModel;
 	}
@@ -100,8 +102,9 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 		// we store the group stage into an extra object in order to be able to
 		// show an own element for GroupStages
 		if (parentElement instanceof FmOutlineGroupStateStorage) {
-			
-			return featureListToArray(FeatureUtils.convertToFeatureList(((FmOutlineGroupStateStorage) parentElement).getFeature().getStructure().getChildren()));
+
+			return featureListToArray(
+					FeatureUtils.convertToFeatureList(((FmOutlineGroupStateStorage) parentElement).getFeature().getStructure().getChildren()));
 		}
 
 		if (!(parentElement instanceof IFeature))

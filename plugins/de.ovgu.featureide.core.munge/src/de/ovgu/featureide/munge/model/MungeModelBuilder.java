@@ -77,7 +77,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 
 		if (MungePreprocessor.COMPOSER_ID.equals(composer.getId())) {
 			mungePreprocessor = (MungePreprocessor) composer;
-			if(mungePreprocessor.getCreateSignature()){
+			if(mungePreprocessor != null && mungePreprocessor.getCreateSignature()){
 				signatures = MungeSignatureBuilder.build(featureProject);
 				signatures.sort(new SignatureComparator());
 				model.setProjectSignatures(signatures);
@@ -153,7 +153,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 		refreshSignature(featureProject);
 		SignatureIterator sigIt = null;
 		ArrayList<Integer> sigLineNumber = null;
-		if(mungePreprocessor.getCreateSignature()){
+		if(mungePreprocessor != null && mungePreprocessor.getCreateSignature()){
 			if(signatures == null){
 				signatures = MungeSignatureBuilder.build(featureProject);
 				signatures.sort(new SignatureComparator());
@@ -216,12 +216,12 @@ public class MungeModelBuilder extends PPModelBuilder {
 							command = (directivesStack.peek().getCommand() == FSTDirectiveCommand.IF)
 									? FSTDirectiveCommand.ELSE
 									: FSTDirectiveCommand.ELSE_NOT;
-							if(mungePreprocessor.getCreateSignature()){
+							if(mungePreprocessor != null && mungePreprocessor.getCreateSignature()){
 								updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
 							}
 							directivesStack.pop();
 						} else if (singleElement.equals("end")) {
-							if(mungePreprocessor.getCreateSignature()){
+							if(mungePreprocessor != null && mungePreprocessor.getCreateSignature()){
 								updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
 							}
 							directivesStack.pop().setEndLine(lineCount, m.end(0)+MungePreprocessor.COMMENT_END.length());
@@ -256,7 +256,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			}
 			lineCount++;
 		}
-		if(mungePreprocessor.getCreateSignature()){
+		if(mungePreprocessor != null && mungePreprocessor.getCreateSignature()){
 			sigIt.reset();
 			updateDirectives(directivesList, sigIt);
 		}

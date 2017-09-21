@@ -64,16 +64,18 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 		IWorkbenchPage page = window.getActivePage();
 		IEditorPart activeEditor = page.getActiveEditor();
-		FeatureModelEditor fTextEditor = (FeatureModelEditor) activeEditor;
-		featureModel = fTextEditor.getFeatureModel();
-		featureModel.addListener(this);
-		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
+		if (activeEditor instanceof FeatureModelEditor) {
+			FeatureModelEditor fTextEditor = (FeatureModelEditor) activeEditor;
+			featureModel = fTextEditor.getFeatureModel();
+			featureModel.addListener(this);
+			graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 
-		this.getTreeProvider().inputChanged(viewer, null, featureModel);
-		setExpandedElements();
+			this.getTreeProvider().inputChanged(viewer, null, featureModel);
+			setExpandedElements();
 
-		if (contextMenu == null || contextMenu.getFeatureModel() != featureModel)
-			contextMenu = new FmOutlinePageContextMenu(fTextEditor.getSite(), fTextEditor, viewer, featureModel, true, false);
+			if (contextMenu == null || contextMenu.getFeatureModel() != featureModel)
+				contextMenu = new FmOutlinePageContextMenu(fTextEditor.getSite(), fTextEditor, viewer, featureModel, true, false);
+		}
 	}
 
 	@Override

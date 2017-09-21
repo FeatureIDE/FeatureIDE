@@ -52,6 +52,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -117,9 +118,8 @@ public class ExtendedOutline extends OutlineProvider {
 		this.viewer = viewer;
 		this.file = iFile;
 
-		if (iFile != null)
-			featureModel = FeatureModelManager.getInstance(Paths.get(file.getProject().getFile("model.xml").getLocationURI())).getObject();
-
+		if (iFile != null && CorePlugin.getFeatureProject(iFile) != null)
+			featureModel = CorePlugin.getFeatureProject(iFile).getFeatureModel();
 	}
 
 	@Override
