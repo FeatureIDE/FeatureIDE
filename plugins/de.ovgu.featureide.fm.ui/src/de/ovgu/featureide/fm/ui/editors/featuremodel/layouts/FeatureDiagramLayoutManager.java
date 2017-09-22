@@ -185,17 +185,11 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 	
 	public void layoutLegendManual(IGraphicalFeatureModel featureModel, boolean showHidden) {
-		/*
-		 * check if the edges between features would intersect with the legend
-		 * ONLY FOR TOP-DOWN-LAYOUT
-		 */
-		
 		final Iterable<IGraphicalFeature> nonHidden =
 				featureModel.getVisibleFeatures();
 
 		Dimension legendSize = null;
 		LegendFigure legendFigure = null;
-		// Find Legend Figure
 		for (final Object obj : editor.getEditPartRegistry().values()) {
 			if (obj instanceof LegendEditPart) {
 				legendFigure = ((LegendEditPart) obj).getFigure();
@@ -230,12 +224,9 @@ abstract public class FeatureDiagramLayoutManager {
 						childSize.width()/2 + childLocation.x, 
 						childLocation.y);
 				
-				//Line segment
 				final Point legend = featureModel.getLayout().getLegendPos();
 				int legendMaxX = legend.x + legendSize.width;
 				int legendMaxY = legend.y + legendSize.height;
-				
-				
 				
 				if ((source.x <= legend.x && target.x <= legend.x) ||
 				    (source.y <= legend.y && target.y <= legend.y) ||
