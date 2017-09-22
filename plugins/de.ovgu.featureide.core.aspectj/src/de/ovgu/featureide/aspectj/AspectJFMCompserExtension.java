@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
 
 /**
  * AspectJ specific feature model extensions.
- * 
+ *
  * @author Jens Meinicke
  */
 public class AspectJFMCompserExtension extends FMComposerExtension {
@@ -80,7 +80,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		if (featureProject == null) {
 			return false;
 		}
-		IFolder buildFolder =
+		final IFolder buildFolder =
 			featureProject.getBuildFolder();
 		try {
 			aspectFile =
@@ -94,7 +94,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 						true, null);
 				buildFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
 		return true;
@@ -102,10 +102,10 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 
 	public void renameAspect(IFolder folder, String oldName, String newName)
 			throws CoreException {
-		for (IResource res : folder.members()) {
+		for (final IResource res : folder.members()) {
 			if (res instanceof IFolder) {
 				renameAspect((IFolder) res, oldName, newName);
-			} else if (res instanceof IFile
+			} else if ((res instanceof IFile)
 				&& AJ.equals(res.getFileExtension())) {
 				renameAspect((IFile) res, oldName, newName);
 			}
@@ -139,7 +139,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 
 	/**
 	 * Sets the content of the given file.
-	 * 
+	 *
 	 * @param res The file.
 	 * @param content The new file content to set.
 	 */
@@ -150,13 +150,13 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 			fw =
 				new FileWriter(res.getRawLocation().toFile());
 			fw.write(content);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		} finally {
 			if (fw != null) {
 				try {
 					fw.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					AspectJCorePlugin.getDefault().logError(e);
 				}
 			}
@@ -165,7 +165,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 
 	/**
 	 * Changes the files content if an aspect is renamed.
-	 * 
+	 *
 	 * @param content The current content.
 	 * @param oldName The old aspect name.
 	 * @param newName The new aspect name.
@@ -173,7 +173,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	 * @return The new file content.
 	 */
 	public String changeFileContent(String content, String oldName, String newName, boolean isAspectFile) {
-		String packageName =
+		final String packageName =
 			getPackege(newName);
 
 		if (isAspectFile
@@ -253,7 +253,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 
 	/**
 	 * Gets the files content.
-	 * 
+	 *
 	 * @param res The file.
 	 * @return The content of the file.
 	 */
@@ -263,14 +263,14 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		try {
 			scanner =
 				new Scanner(res.getRawLocation().toFile(), "UTF-8");
-			StringBuffer buffer =
+			final StringBuffer buffer =
 				new StringBuffer();
 			while (scanner.hasNext()) {
 				buffer.append(scanner.nextLine());
 				buffer.append("\r\n");
 			}
 			return buffer.toString();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		} finally {
 			if (scanner != null) {

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
- * 
+ *
  * @author Sebastian Krieter
  */
 public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments, Boolean> {
@@ -61,23 +61,23 @@ public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments
 	public Boolean execute(IMonitor workMonitor) throws Exception {
 		this.workMonitor =
 			workMonitor;
-		IPath destPath =
+		final IPath destPath =
 			arguments.destFolder.getFullPath();
 
 		try {
-			IResource[] srcMembers =
+			final IResource[] srcMembers =
 				arguments.srcFolder.members();
 			for (int i =
 				0; i < srcMembers.length; i++) {
-				IResource srcMember =
+				final IResource srcMember =
 					srcMembers[i];
-				IPath px =
+				final IPath px =
 					destPath.append(srcMember.getName());
 				if (!px.toFile().exists()) {
 					srcMember.move(px, true, null);
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}

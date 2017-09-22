@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,13 +35,13 @@ import de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
 
 /**
- * 
+ *
  * Holds information for {@link TreeViewer}. Is capable of holding an image, a description and a value.
- * 
+ *
  * @see LazyParent
  * @see FeatureStatisticsView
  * @see TreeLabelProvider
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -114,12 +114,12 @@ public class Parent implements StatisticsIds, GUIDefaults {
 	}
 
 	public void addChild(Parent child) {
-		this.children.add(child);
+		children.add(child);
 		child.setParent(this);
 	}
 
 	public void addChildren(List<Parent> input) {
-		for (Parent stat : input) {
+		for (final Parent stat : input) {
 			children.add(stat);
 		}
 	}
@@ -151,7 +151,7 @@ public class Parent implements StatisticsIds, GUIDefaults {
 
 	@Override
 	public String toString() {
-		StringBuilder buffer =
+		final StringBuilder buffer =
 			new StringBuilder();
 		buffer.append((description == null)
 			? ""
@@ -160,8 +160,8 @@ public class Parent implements StatisticsIds, GUIDefaults {
 			buffer.append(SEPARATOR);
 			buffer.append(IS_CALCULATING);
 		} else {
-			if (description != null
-				&& value != null) {
+			if ((description != null)
+				&& (value != null)) {
 				buffer.append(SEPARATOR);
 			}
 			buffer.append(((value == null)
@@ -186,14 +186,14 @@ public class Parent implements StatisticsIds, GUIDefaults {
 	}
 
 	public Parent getParent() {
-		return this.parent;
+		return parent;
 	}
 
 	public void startCalculating(boolean start) {
 		setImage(start
 			? REFESH_TAB_IMAGE
 			: null);
-		this.isCalculating =
+		isCalculating =
 			start;
 	}
 }

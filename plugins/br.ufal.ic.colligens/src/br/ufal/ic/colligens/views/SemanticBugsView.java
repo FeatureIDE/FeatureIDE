@@ -23,7 +23,7 @@ public class SemanticBugsView extends ViewPart {
 		viewController =
 			SemanticBugsViewController.getInstance();
 		viewController.setView(this);
-		this.setTitleToolTip(SEMANTIC_BUGS___COLLIGENS);
+		setTitleToolTip(SEMANTIC_BUGS___COLLIGENS);
 	}
 
 	@Override

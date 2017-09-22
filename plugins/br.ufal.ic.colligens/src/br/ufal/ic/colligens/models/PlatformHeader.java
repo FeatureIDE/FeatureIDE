@@ -32,10 +32,11 @@ public class PlatformHeader extends AbstractHeader {
 		File platform;
 
 		platform =
-			new File(this.getIncludePath());
+			new File(getIncludePath());
 
-		if (platform.exists())
+		if (platform.exists()) {
 			return;
+		}
 
 		List<String> listFiles;
 
@@ -49,19 +50,19 @@ public class PlatformHeader extends AbstractHeader {
 		try {
 			includes =
 				super.getProject().getIncludeReferences();
-		} catch (CModelException e) {
+		} catch (final CModelException e) {
 
 			e.printStackTrace();
 		}
 
 		List<String> arglist;
-		Collection<String> platformTemp =
+		final Collection<String> platformTemp =
 			new HashSet<String>();
 
-		for (Iterator<String> iterator =
+		for (final Iterator<String> iterator =
 			listFiles.iterator(); iterator
 					.hasNext();) {
-			String filePath =
+			final String filePath =
 				iterator.next();
 			System.out.println(filePath);
 			super.monitorWorked(1);
@@ -93,7 +94,7 @@ public class PlatformHeader extends AbstractHeader {
 
 			arglist.add(filePath);
 
-			ProcessBuilder processBuilder =
+			final ProcessBuilder processBuilder =
 				new ProcessBuilder(arglist);
 
 			BufferedReader input =
@@ -101,7 +102,7 @@ public class PlatformHeader extends AbstractHeader {
 			BufferedReader error =
 				null;
 			try {
-				Process process =
+				final Process process =
 					processBuilder.start();
 				input =
 					new BufferedReader(new InputStreamReader(
@@ -128,7 +129,7 @@ public class PlatformHeader extends AbstractHeader {
 									line.trim();
 								if (!platformTemp.contains(line)) {
 									if (line.contains("#define ")) {
-										String[] temp =
+										final String[] temp =
 											line.trim().split(
 													Pattern.quote(" "));
 										if (super.countDirectives.directives
@@ -159,18 +160,18 @@ public class PlatformHeader extends AbstractHeader {
 								// }
 								System.err.println(line);
 							}
-						} catch (Exception e) {
+						} catch (final Exception e) {
 							e.printStackTrace();
 							Colligens.getDefault().logError(e);
 						}
 
 						try {
 							process.waitFor();
-						} catch (InterruptedException e) {
+						} catch (final InterruptedException e) {
 							System.out.println(e.toString());
 							Colligens.getDefault().logError(e);
 						}
-						int exitValue =
+						final int exitValue =
 							process.exitValue();
 						if (exitValue != 0) {
 							platform.deleteOnExit();
@@ -186,13 +187,13 @@ public class PlatformHeader extends AbstractHeader {
 
 						execute =
 							false;
-					} catch (IllegalThreadStateException e) {
+					} catch (final IllegalThreadStateException e) {
 						System.out.println(e.toString());
 						Colligens.getDefault().logError(e);
 					}
 				}
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				System.out.println(e.toString());
 				Colligens.getDefault().logError(e);
 			} finally {
@@ -201,15 +202,16 @@ public class PlatformHeader extends AbstractHeader {
 						input.close();
 					}
 
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					Colligens.getDefault().logError(e);
 				} finally {
-					if (error != null)
+					if (error != null) {
 						try {
-						error.close();
-						} catch (IOException e) {
-						Colligens.getDefault().logError(e);
+							error.close();
+						} catch (final IOException e) {
+							Colligens.getDefault().logError(e);
 						}
+					}
 				}
 			}
 		}
@@ -218,17 +220,17 @@ public class PlatformHeader extends AbstractHeader {
 		try {
 			fileW =
 				new FileWriter(platform);
-			BufferedWriter buffW =
+			final BufferedWriter buffW =
 				new BufferedWriter(fileW);
 
-			for (String line : platformTemp) {
+			for (final String line : platformTemp) {
 
 				buffW.write(line
 					+ "\n");
 			}
 			buffW.close();
 			fileW.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -251,10 +253,10 @@ public class PlatformHeader extends AbstractHeader {
 
 	@Override
 	public Collection<String> getIncludes() {
-		ArrayList<String> collection =
+		final ArrayList<String> collection =
 			new ArrayList<String>();
 
-		collection.add(this.getIncludePath());
+		collection.add(getIncludePath());
 
 		return collection;
 	}

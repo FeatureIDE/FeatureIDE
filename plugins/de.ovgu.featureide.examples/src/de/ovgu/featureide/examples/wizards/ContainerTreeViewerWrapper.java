@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,12 +42,12 @@ import de.ovgu.featureide.examples.utils.ProjectRecord;
 import de.ovgu.featureide.examples.utils.ProjectRecord.TreeItem;
 
 /**
- * 
+ *
  * @author Reimar Schroeter
  */
 public class ContainerTreeViewerWrapper implements ICheckable {
 
-	private List<ContainerCheckedTreeViewer> listOfTreeViewer =
+	private final List<ContainerCheckedTreeViewer> listOfTreeViewer =
 		new ArrayList<>();
 	private ContainerCheckedTreeViewer selectedViewer;
 
@@ -81,13 +81,13 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 		@Override
 		protected void doCheckStateChanged(Object element) {
 			super.doCheckStateChanged(element);
-			Object[] filteredChildren =
+			final Object[] filteredChildren =
 				super.getFilteredChildren(element);
-			for (Object object : filteredChildren) {
-				ParentCheckStateChangedEvent event =
-					new ParentCheckStateChangedEvent(this, object, this.getChecked(element));
+			for (final Object object : filteredChildren) {
+				final ParentCheckStateChangedEvent event =
+					new ParentCheckStateChangedEvent(this, object, getChecked(element));
 				if (object instanceof ProjectRecord.TreeItem) {
-					ProjectRecord.TreeItem item =
+					final ProjectRecord.TreeItem item =
 						(ProjectRecord.TreeItem) object;
 					event.setOnlyRefresh(!item.getRecord().hasErrors()
 						&& !item.getRecord().hasWarnings());
@@ -100,14 +100,14 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 	}
 
 	public ContainerCheckedTreeViewer getNewContainerViewer(Composite parent, int style) {
-		WrappedContainerCheckedTreeViewer intern =
+		final WrappedContainerCheckedTreeViewer intern =
 			new WrappedContainerCheckedTreeViewer(parent, style);
 		listOfTreeViewer.add(intern);
 		return intern;
 	}
 
 	public void refreshAllViewers() {
-		for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
+		for (final ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
 			containerCheckedTreeViewer.refresh();
 		}
 	}
@@ -117,7 +117,7 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 	}
 
 	public void setSelectedViewer(Control contr) {
-		for (StructuredViewer structuredViewer : listOfTreeViewer) {
+		for (final StructuredViewer structuredViewer : listOfTreeViewer) {
 			if (structuredViewer.getControl().getParent().equals(contr)) {
 				selectedViewer =
 					(ContainerCheckedTreeViewer) structuredViewer;
@@ -125,14 +125,15 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 		}
 	}
 
+	@Override
 	public boolean setChecked(Object element, boolean state) {
 		boolean ret =
 			true;
 		if (element instanceof ProjectRecord.TreeItem) {
-			ProjectRecord.TreeItem treeitem =
+			final ProjectRecord.TreeItem treeitem =
 				(ProjectRecord.TreeItem) element;
-			for (ProjectRecord.TreeItem curr : treeitem.getRecord().getTreeItems()) {
-				for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
+			for (final ProjectRecord.TreeItem curr : treeitem.getRecord().getTreeItems()) {
+				for (final ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
 					if (!containerCheckedTreeViewer.setChecked(curr, state)) {
 						ret =
 							false;
@@ -147,10 +148,10 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 		boolean ret =
 			true;
 		if (element instanceof ProjectRecord.TreeItem) {
-			ProjectRecord.TreeItem treeitem =
+			final ProjectRecord.TreeItem treeitem =
 				(ProjectRecord.TreeItem) element;
-			for (ProjectRecord.TreeItem curr : treeitem.getRecord().getTreeItems()) {
-				for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
+			for (final ProjectRecord.TreeItem curr : treeitem.getRecord().getTreeItems()) {
+				for (final ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
 					if (!containerCheckedTreeViewer.setGrayed(curr, state)) {
 						ret =
 							false;
@@ -162,14 +163,14 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 	}
 
 	public Object[] getCheckedProjects() {
-		Set<ProjectRecord> ret =
+		final Set<ProjectRecord> ret =
 			new HashSet<>();
-		for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
-			ArrayList<Object> list =
+		for (final ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
+			final ArrayList<Object> list =
 				new ArrayList<>(Arrays.asList(containerCheckedTreeViewer.getCheckedElements()));
-			for (Object object : new ArrayList<>(list)) {
+			for (final Object object : new ArrayList<>(list)) {
 				if ((object instanceof ProjectRecord.TreeItem)) {
-					ProjectRecord.TreeItem treeItem =
+					final ProjectRecord.TreeItem treeItem =
 						(ProjectRecord.TreeItem) object;
 					ret.add(treeItem.getRecord());
 				}
@@ -180,10 +181,10 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 
 	// necessary to determine finish
 	public boolean isProjectSelected() {
-		for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
-			Object[] checkedElements =
+		for (final ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
+			final Object[] checkedElements =
 				containerCheckedTreeViewer.getCheckedElements();
-			for (Object object : checkedElements) {
+			for (final Object object : checkedElements) {
 				if ((object instanceof ProjectRecord.TreeItem)) {
 					return true;
 				}
@@ -193,12 +194,12 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 	}
 
 	public Object[] getAllProjectItems(ContainerCheckedTreeViewer containerCheckedTreeViewer) {
-		Set<ProjectRecord.TreeItem> ret =
+		final Set<ProjectRecord.TreeItem> ret =
 			new HashSet<>();
-		Collection<ProjectRecord> projects =
+		final Collection<ProjectRecord> projects =
 			ProjectProvider.getProjects();
-		for (ProjectRecord object : projects) {
-			for (ProjectRecord.TreeItem treeItem : object.getTreeItems()) {
+		for (final ProjectRecord object : projects) {
+			for (final ProjectRecord.TreeItem treeItem : object.getTreeItems()) {
 				if (treeItem.getProvider().equals(containerCheckedTreeViewer.getContentProvider())) {
 					ret.add(treeItem);
 				}
@@ -208,13 +209,13 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 	}
 
 	public Object[] getCheckedProjectItems(ContainerCheckedTreeViewer viewer) {
-		Set<ProjectRecord.TreeItem> ret =
+		final Set<ProjectRecord.TreeItem> ret =
 			new HashSet<>();
-		for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
-			if (viewer == null
-				|| (viewer != null
-					&& containerCheckedTreeViewer == selectedViewer)) {
-				for (Object object : ((CheckboxTreeViewer) containerCheckedTreeViewer).getCheckedElements()) {
+		for (final ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
+			if ((viewer == null)
+				|| ((viewer != null)
+					&& (containerCheckedTreeViewer == selectedViewer))) {
+				for (final Object object : ((CheckboxTreeViewer) containerCheckedTreeViewer).getCheckedElements()) {
 					if ((object instanceof ProjectRecord.TreeItem)) {
 						ret.add((TreeItem) object);
 					}
@@ -225,19 +226,19 @@ public class ContainerTreeViewerWrapper implements ICheckable {
 	}
 
 	public void refreshCheckOfSelectedViewer(Object[] checkedProjects) {
-		ContainerCheckedTreeViewer getselectedViewer =
+		final ContainerCheckedTreeViewer getselectedViewer =
 			getSelectedViewer();
 		getselectedViewer.setCheckedElements(checkedProjects);
 	}
 
 	public void addFilter(ViewerFilter searchFilter) {
-		for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
+		for (final ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
 			containerCheckedTreeViewer.addFilter(searchFilter);
 		}
 	}
 
 	public void removeFilter(ViewerFilter filter) {
-		for (ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
+		for (final ContainerCheckedTreeViewer containerCheckedTreeViewer : listOfTreeViewer) {
 			containerCheckedTreeViewer.removeFilter(filter);
 		}
 	}

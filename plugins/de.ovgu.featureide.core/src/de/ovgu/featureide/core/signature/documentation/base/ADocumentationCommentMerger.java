@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Abstract merger for modul-comment.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class ADocumentationCommentMerger implements Comparator<BlockTag>, Serializable {
@@ -147,12 +147,12 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 
 	public void sortFeatureList(List<BlockTag> tagList) {
 		if (featureIDRanks != null) {
-			for (Iterator<BlockTag> it =
+			for (final Iterator<BlockTag> it =
 				tagList.iterator(); it.hasNext();) {
 				final BlockTag tag =
 					it.next();
-				if (tag.getFeatureID() > -1
-					&& featureIDRanks[tag.getFeatureID()] == -1) {
+				if ((tag.getFeatureID() > -1)
+					&& (featureIDRanks[tag.getFeatureID()] == -1)) {
 					it.remove();
 				}
 			}
@@ -236,8 +236,8 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 
 	@Override
 	public int compare(BlockTag tag1, BlockTag tag2) {
-		if (tag1.getFeatureID() == -1
-			|| tag2.getFeatureID() == -1) {
+		if ((tag1.getFeatureID() == -1)
+			|| (tag2.getFeatureID() == -1)) {
 			return 0;
 		}
 		return featureIDRanks[tag1.getFeatureID()]
@@ -245,7 +245,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 	}
 
 	public void addFilter(IFilter<?> filter) {
-		this.filterList.add(filter);
+		filterList.add(filter);
 	}
 
 }

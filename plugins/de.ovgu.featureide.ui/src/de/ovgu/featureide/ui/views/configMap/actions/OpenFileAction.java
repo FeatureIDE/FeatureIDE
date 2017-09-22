@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -66,24 +66,27 @@ public class OpenFileAction extends Action {
 		super.run();
 		try {
 			openEditor(file);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void openEditor(IFile file) throws CoreException {
-		IWorkbenchPage page =
+		final IWorkbenchPage page =
 			UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		if (page == null) return;
+		if (page == null) {
+			return;
+		}
 
 		String editorId =
 			"org.eclipse.ui.DefaultTextEditor";
 
-		IEditorDescriptor desc =
+		final IEditorDescriptor desc =
 			getDescriptor(file);
-		if (desc != null)
+		if (desc != null) {
 			editorId =
 				desc.getId();
+		}
 
 		page.openEditor(new FileEditorInput(file), editorId);
 	}
@@ -92,11 +95,12 @@ public class OpenFileAction extends Action {
 		IContentType contentType =
 			null;
 
-		IContentDescription description =
+		final IContentDescription description =
 			file.getContentDescription();
-		if (description != null)
+		if (description != null) {
 			contentType =
 				description.getContentType();
+		}
 
 		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
 	}

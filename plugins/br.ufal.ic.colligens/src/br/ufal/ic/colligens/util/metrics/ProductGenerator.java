@@ -22,12 +22,12 @@ public class ProductGenerator {
 
 	public static boolean isValidJavaIdentifier(String s) {
 		// An empty or null string cannot be a valid identifier
-		if (s == null
-			|| s.length() == 0) {
+		if ((s == null)
+			|| (s.length() == 0)) {
 			return false;
 		}
 
-		char[] c =
+		final char[] c =
 			s.toCharArray();
 		if (!Character.isJavaIdentifierStart(c[0])) {
 			return false;
@@ -45,14 +45,14 @@ public class ProductGenerator {
 
 	// It returns a set with all different directives.
 	public Set<String> getDirectives(File file) throws Exception {
-		Set<String> directives =
+		final Set<String> directives =
 			new HashSet<String>();
 
-		FileInputStream fstream =
+		final FileInputStream fstream =
 			new FileInputStream(file);
-		DataInputStream in =
+		final DataInputStream in =
 			new DataInputStream(fstream);
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(new InputStreamReader(in));
 		String strLine;
 
@@ -75,7 +75,7 @@ public class ProductGenerator {
 				directive =
 					directive.replace("||", "").replace("&&", "").replace("!", "").replace("<", "").replace(">", "").replace("=", "");
 
-				String[] directivesStr =
+				final String[] directivesStr =
 					directive.split(" ");
 
 				for (int i =
@@ -93,20 +93,20 @@ public class ProductGenerator {
 
 	// It generates combinatorial for each possible product.
 	public <T> Set<Set<T>> powerSet(Set<T> originalSet) {
-		Set<Set<T>> sets =
+		final Set<Set<T>> sets =
 			new HashSet<Set<T>>();
 		if (originalSet.isEmpty()) {
 			sets.add(new HashSet<T>());
 			return sets;
 		}
-		List<T> list =
+		final List<T> list =
 			new ArrayList<T>(originalSet);
-		T head =
+		final T head =
 			list.get(0);
-		Set<T> rest =
+		final Set<T> rest =
 			new HashSet<T>(list.subList(1, list.size()));
-		for (Set<T> set : powerSet(rest)) {
-			Set<T> newSet =
+		for (final Set<T> set : powerSet(rest)) {
+			final Set<T> newSet =
 				new HashSet<T>();
 			newSet.add(head);
 			newSet.addAll(set);
@@ -121,12 +121,12 @@ public class ProductGenerator {
 		String result =
 			"";
 		try {
-			Runtime rt =
+			final Runtime rt =
 				Runtime.getRuntime();
-			Process pr =
+			final Process pr =
 				rt.exec(cmd);
 
-			BufferedReader input =
+			final BufferedReader input =
 				new BufferedReader(new InputStreamReader(pr.getInputStream()));
 
 			String line =
@@ -139,13 +139,13 @@ public class ProductGenerator {
 						+ "\n";
 			}
 
-			int exitVal =
+			final int exitVal =
 				pr.waitFor();
 			if (exitVal != 0) {
 				System.out.println("Problem running external command!");
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			System.out.println(e.toString());
 			e.printStackTrace();
 		}
@@ -154,44 +154,44 @@ public class ProductGenerator {
 
 	// It saves a String to a file, replacing the file's contents.
 	public void saveToFile(String filePath, String textToSave) {
-		File file =
+		final File file =
 			new File(filePath);
 		if (file.exists()) {
 			file.delete();
 		}
 		try {
-			BufferedWriter out =
+			final BufferedWriter out =
 				new BufferedWriter(new FileWriter(file));
 			out.write(textToSave);
 			out.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	// It generates each possible product.
 	public void generateProducts(String originalFile) throws Exception {
-		Set<String> directives =
-			this.getDirectives(new File(originalFile));
+		final Set<String> directives =
+			getDirectives(new File(originalFile));
 
 		// Generating all possible products.
-		Set<Set<String>> sets =
+		final Set<Set<String>> sets =
 			this.powerSet(directives);
 
 		int count =
 			1;
 
-		for (Iterator<Set<String>> i =
+		for (final Iterator<Set<String>> i =
 			sets.iterator(); i.hasNext();) {
-			Set<String> set =
+			final Set<String> set =
 				i.next();
 
 			String cmd =
 				"gcc -P -E ";
 
-			for (Iterator<String> j =
+			for (final Iterator<String> j =
 				set.iterator(); j.hasNext();) {
-				String directive =
+				final String directive =
 					j.next();
 				cmd +=
 					" -D "
@@ -201,18 +201,18 @@ public class ProductGenerator {
 			cmd +=
 				originalFile;
 
-			String code =
-				this.runCommand(cmd);
-			this.saveToFile(originalFile.replace("original.c", "")
+			final String code =
+				runCommand(cmd);
+			saveToFile(originalFile.replace("original.c", "")
 				+ "test"
 				+ count
 				+ ".c", code);
 			count++;
 
-			if (directives.size() > 5
-				&& directives.size() <= 10) {
+			if ((directives.size() > 5)
+				&& (directives.size() <= 10)) {
 				// Define soundness to set the percentage of product to analyze.
-				if (count >= ((int) sets.size()
+				if (count >= (sets.size()
 					* ProductGenerator.SOUNDNESS)) {
 					break;
 				}

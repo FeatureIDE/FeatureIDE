@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,7 +36,7 @@ import org.prop4j.Or;
 
 /**
  * Transforms DIMACS CNF files into instances of {@link Node}.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class DimacsReader {
@@ -77,7 +77,7 @@ public class DimacsReader {
 
 	/**
 	 * Constructs a new instance of this class with the given string.
-	 * 
+	 *
 	 * @param s input to read from; not null
 	 */
 	public DimacsReader(String s) {
@@ -86,7 +86,7 @@ public class DimacsReader {
 
 	/**
 	 * Constructs a new instance of this class with the given input.
-	 * 
+	 *
 	 * @param in input to read from; not null
 	 */
 	public DimacsReader(Readable in) {
@@ -97,9 +97,9 @@ public class DimacsReader {
 	/**
 	 * <p> Sets the reading variable directory flag. If true, the reader will look for a variable directory in the comments. This contains names for the
 	 * variables which would otherwise just be numbers. </p>
-	 * 
+	 *
 	 * <p> Defaults to false. </p>
-	 * 
+	 *
 	 * @param readingVariableDirectory whether to read the variable directory
 	 */
 	public void setReadingVariableDirectory(boolean readingVariableDirectory) {
@@ -109,7 +109,7 @@ public class DimacsReader {
 
 	/**
 	 * Reads the next non-comment token. Also reads any comments before it.
-	 * 
+	 *
 	 * @return the next token; null if already completely read and empty
 	 * @throws ParseException if there is no token left in the input but the reader is not yet done
 	 */
@@ -135,7 +135,7 @@ public class DimacsReader {
 
 	/**
 	 * Reads the input.
-	 * 
+	 *
 	 * @return a CNF; not null
 	 * @throws IllegalStateException if this method has already been called on this instance before (reading multiple times is disallowed since {@link Readable}
 	 *         cannot be reversed)
@@ -166,7 +166,7 @@ public class DimacsReader {
 
 	/**
 	 * Reads the problem definition.
-	 * 
+	 *
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
 	private void readProblem() throws ParseException {
@@ -181,7 +181,7 @@ public class DimacsReader {
 		try {
 			variableCount =
 				Integer.parseInt(readToken());
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			throw new ParseException("Variable count is not an integer", -1);
 		}
 		if (variableCount <= 0) {
@@ -191,7 +191,7 @@ public class DimacsReader {
 		try {
 			clauseCount =
 				Integer.parseInt(readToken());
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			throw new ParseException("Clause count is not an integer", -1);
 		}
 		if (clauseCount <= 0) {
@@ -201,7 +201,7 @@ public class DimacsReader {
 
 	/**
 	 * Reads all clauses.
-	 * 
+	 *
 	 * @return all clauses; not null
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
@@ -210,8 +210,8 @@ public class DimacsReader {
 			new ArrayList<>(clauseCount);
 		for (int i =
 			0; !lastClause; i++) {
-			if (i
-				+ 1 == clauseCount) {
+			if ((i
+				+ 1) == clauseCount) {
 				lastClause =
 					true;
 			}
@@ -222,12 +222,12 @@ public class DimacsReader {
 
 	/**
 	 * Reads a single clause.
-	 * 
+	 *
 	 * @return a clause; not null
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
 	private Node readClause() throws ParseException {
-		List<Literal> literals =
+		final List<Literal> literals =
 			new LinkedList<>();
 		Literal l =
 			readLiteral();
@@ -244,7 +244,7 @@ public class DimacsReader {
 
 	/**
 	 * Reads a literal.
-	 * 
+	 *
 	 * @return a literal; null if there are no more literals in the clause
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
@@ -258,7 +258,7 @@ public class DimacsReader {
 		try {
 			index =
 				Integer.parseInt(token);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			throw new ParseException("Illegal literal", -1);
 		}
 		return createLiteral(index);
@@ -266,7 +266,7 @@ public class DimacsReader {
 
 	/**
 	 * Creates a literal from the given index.
-	 * 
+	 *
 	 * @param index index of the literal
 	 * @return a literal; null if the index is 0
 	 */
@@ -288,7 +288,7 @@ public class DimacsReader {
 
 	/**
 	 * Called when a comment is read.
-	 * 
+	 *
 	 * @param comment content of the comment; not null
 	 * @return whether the comment was consumed logically
 	 */
@@ -302,7 +302,7 @@ public class DimacsReader {
 
 	/**
 	 * Reads an entry of the variable directory.
-	 * 
+	 *
 	 * @param entry variable directory entry
 	 * @return true if an entry was found
 	 */
@@ -319,7 +319,7 @@ public class DimacsReader {
 			}
 			String variable =
 				sc.nextLine();
-			if (variable.length() >= 2
+			if ((variable.length() >= 2)
 				&& Character.isWhitespace(variable.codePointAt(0))) {
 				variable =
 					variable.substring(1); // remove a single separating whitespace character (but allow variables with whitespace after that)

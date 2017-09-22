@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,11 +33,11 @@ import org.junit.Test;
 public class StatisticProgramSizeNewTest {
 
 	private final static String getContent(final String name) {
-		StringBuilder content =
+		final StringBuilder content =
 			new StringBuilder();
-		File fileFolder =
+		final File fileFolder =
 			getFolder();
-		for (File f : fileFolder.listFiles()) {
+		for (final File f : fileFolder.listFiles()) {
 			if (f.getName().equals(name)) {
 				String s;
 				try (FileReader fr =
@@ -49,7 +49,7 @@ public class StatisticProgramSizeNewTest {
 						content.append(s
 							+ "\n");
 					}
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					e.printStackTrace();
 				}
 
@@ -71,14 +71,14 @@ public class StatisticProgramSizeNewTest {
 
 	@Test
 	public void testGraph() throws Exception {
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(new StringReader(getContent("Graph.jak")));
 		assertEquals(37, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
 	}
 
 	@Test
 	public void testDaily() throws Exception {
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(new StringReader(getContent("Daily.jak")));
 		assertEquals(34, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
 	}

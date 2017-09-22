@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -62,7 +62,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 
 /**
  * A dialog page for creating FeatureIDE projects.
- * 
+ *
  * @author Marcus Leich
  */
 public class NewFeatureProjectPage extends WizardPage {
@@ -92,8 +92,9 @@ public class NewFeatureProjectPage extends WizardPage {
 		setDescription(CREATES_A_FEATUREIDE_PROJECT);
 	}
 
+	@Override
 	public void createControl(Composite parent) {
-		Composite container =
+		final Composite container =
 			new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout =
 			new GridLayout();
@@ -102,11 +103,11 @@ public class NewFeatureProjectPage extends WizardPage {
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		Group toolGroup =
+		final Group toolGroup =
 			new Group(container, SWT.NONE);
 		toolGroup.setText("Composer Selection:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout projGridLayout =
+		final GridLayout projGridLayout =
 			new GridLayout();
 		projGridLayout.numColumns =
 			2;
@@ -114,7 +115,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 		final Label helloLabel =
 			new Label(toolGroup, SWT.NONE);
-		GridData gridData =
+		final GridData gridData =
 			new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan =
 			2;
@@ -131,28 +132,29 @@ public class NewFeatureProjectPage extends WizardPage {
 
 		final Label descriptionLabel =
 			new Label(toolGroup, SWT.NONE);
-		GridData gridData2 =
+		final GridData gridData2 =
 			new GridData(GridData.FILL_BOTH);
 		gridData2.horizontalSpan =
 			2;
 		descriptionLabel.setLayoutData(gridData2);
 
-		StringBuilder descriptionStringBuilder =
+		final StringBuilder descriptionStringBuilder =
 			new StringBuilder();
 		descriptionStringBuilder.append("Possible choices are:\n\n");
-		List<IComposerExtension> composerExtensions =
+		final List<IComposerExtension> composerExtensions =
 			ComposerExtensionManager.getInstance().getComposers();
 		extensions =
 			new IComposerExtensionBase[composerExtensions.size()];
 		composerExtensions.toArray(extensions);
 		Arrays.sort(extensions, new Comparator<IComposerExtensionBase>() {
 
+			@Override
 			public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
 				return arg0.getName().compareTo(arg1.getName());
 			}
 		});
 
-		for (IComposerExtensionBase composerExtension : extensions) {
+		for (final IComposerExtensionBase composerExtension : extensions) {
 			descriptionStringBuilder.append(composerExtension.getName());
 			descriptionStringBuilder.append(": ");
 			descriptionStringBuilder.append(composerExtension.getDescription());
@@ -171,6 +173,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		descriptionLabel.setText(descriptionString);
 		toolCB.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				composerExtension =
 					extensions[toolCB.getSelectionIndex()];
@@ -274,7 +277,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 
 	protected void dialogChanged() {
-		IComposerExtensionBase compositionTool =
+		final IComposerExtensionBase compositionTool =
 			getCompositionTool();
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
@@ -301,18 +304,30 @@ public class NewFeatureProjectPage extends WizardPage {
 			return;
 		}
 		if (isEnabled(sourcePath)
-			&& isPathEmpty(getSourcePath(), SOURCE)) return;
+			&& isPathEmpty(getSourcePath(), SOURCE)) {
+			return;
+		}
 		if (isEnabled(buildPath)
-			&& isPathEmpty(getBuildPath(), BUILD)) return;
+			&& isPathEmpty(getBuildPath(), BUILD)) {
+			return;
+		}
 		if (isEnabled(configsPath)
-			&& isPathEmpty(getConfigPath(), EQUATIONS)) return;
+			&& isPathEmpty(getConfigPath(), EQUATIONS)) {
+			return;
+		}
 
 		if (isEnabled(sourcePath)
-			&& isInvalidPath(getSourcePath(), SOURCE)) return;
+			&& isInvalidPath(getSourcePath(), SOURCE)) {
+			return;
+		}
 		if (isEnabled(buildPath)
-			&& isInvalidPath(getBuildPath(), BUILD)) return;
+			&& isInvalidPath(getBuildPath(), BUILD)) {
+			return;
+		}
 		if (isEnabled(configsPath)
-			&& isInvalidPath(getConfigPath(), EQUATIONS)) return;
+			&& isInvalidPath(getConfigPath(), EQUATIONS)) {
+			return;
+		}
 
 		if (compositionTool.supportsAndroid()) {
 
@@ -410,7 +425,8 @@ public class NewFeatureProjectPage extends WizardPage {
 		return buildPath.getText();
 	}
 
+	@Override
 	public boolean canFlipToNextPage() {
-		return this.canFlipToNextPage;
+		return canFlipToNextPage;
 	}
 }

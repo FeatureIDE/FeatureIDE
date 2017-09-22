@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 /**
  * Checks that the calculation of edit categories works properly. A couple of known refactorings, generalizations and arbitrary edits are performed and the
  * result of the ModelComperator is tested.
- * 
+ *
  * @author Thomas Thuem
  * @author Fabian Benduhn
  * @author Marcus Pinnecke, 01.07.15
@@ -139,13 +139,13 @@ public class TModelComparator {
 	@Test
 	public void testDuplicateConstraintRefactoring2() throws TimeoutException,
 			UnsupportedModelException {
-		NodeReader reader =
+		final NodeReader reader =
 			new NodeReader();
-		Node a =
+		final Node a =
 			reader.stringToNode("A  and  (not A or B or C)  and D ");
-		Node b =
+		final Node b =
 			reader.stringToNode("A  and  (not A or B or C)  and D ");
-		ModelComparator comparator =
+		final ModelComparator comparator =
 			new ModelComparator(TIMEOUT);
 		assertTrue(comparator.implies(a, b, new ExampleCalculator(null, 2500)));
 
@@ -153,7 +153,7 @@ public class TModelComparator {
 
 	/**
 	 * Refactoring: deleting abstract feature
-	 * 
+	 *
 	 */
 	@Test
 	public void testDeleteAbstractFeatureRefactoring() throws TimeoutException,
@@ -166,7 +166,7 @@ public class TModelComparator {
 
 	/**
 	 * Refactoring: adding dead feature
-	 * 
+	 *
 	 */
 	@Test
 	public void testAddDeadFeatureRefactoring() throws TimeoutException,
@@ -318,13 +318,13 @@ public class TModelComparator {
 	@Test
 	public void testImpliesSameVariable() throws TimeoutException,
 			UnsupportedModelException {
-		NodeReader reader =
+		final NodeReader reader =
 			new NodeReader();
-		Node a =
+		final Node a =
 			reader.stringToNode("A");
-		Node b =
+		final Node b =
 			reader.stringToNode("A");
-		ModelComparator comparator =
+		final ModelComparator comparator =
 			new ModelComparator(TIMEOUT);
 		assertTrue(comparator.implies(a, b, new ExampleCalculator(null, 2500)));
 
@@ -333,13 +333,13 @@ public class TModelComparator {
 	@Test
 	public void testImpliesSameVariable2() throws TimeoutException,
 			UnsupportedModelException {
-		NodeReader reader =
+		final NodeReader reader =
 			new NodeReader();
-		Node a =
+		final Node a =
 			reader.stringToNode("A and A ");
-		Node b =
+		final Node b =
 			reader.stringToNode("A and A ");
-		ModelComparator comparator =
+		final ModelComparator comparator =
 			new ModelComparator(TIMEOUT);
 		assertTrue(comparator.implies(a, b, new ExampleCalculator(null, 2500)));
 
@@ -347,14 +347,14 @@ public class TModelComparator {
 
 	private Comparison compare(String fm1, String fm2)
 			throws UnsupportedModelException {
-		ModelComparator comperator =
+		final ModelComparator comperator =
 			new ModelComparator(TIMEOUT);
-		IFeatureModel oldModel =
+		final IFeatureModel oldModel =
 			FMFactoryManager.getDefaultFactory().createFeatureModel();
-		GuidslFormat reader =
+		final GuidslFormat reader =
 			new GuidslFormat();
 		reader.read(oldModel, fm1);
-		IFeatureModel newModel =
+		final IFeatureModel newModel =
 			FMFactoryManager.getDefaultFactory().createFeatureModel();
 		reader.read(newModel, fm2);
 		return comperator.compare(oldModel, newModel);
@@ -363,9 +363,9 @@ public class TModelComparator {
 	@Test
 	/**
 	 * Based on https://github.com/tthuem/FeatureIDE/issues/264
-	 * 
+	 *
 	 * @author Marcus Pinnecke
-	 * 
+	 *
 	 */
 	public void testForFeatureIDEaddedProducts() throws FileNotFoundException, UnsupportedModelException, TimeoutException {
 		final IFeatureModel fm =

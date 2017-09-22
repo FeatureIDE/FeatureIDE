@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,13 +37,13 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * @brief Base interface of all composition tool classes.
- * 
+ *
  *        Every plug-in which extends the de.ovgu.featureide.core.composers needs to provide a class, which implements this interface. Implementing this
  *        interface ensures that a given composition tool meets the requirements for composition tools, which are used by the
  * @c ExtensibleFeatureProjectBuilder. This requirements are: - Specifying a path for the composed files (usually "./build") - Specifying a path for the source
  *    files (usually "./src") if hasFeatureFolder() - Specifying a path to the current configuration file - Performing a full build for the current project with
  *    a given configuration file
- * 
+ *
  * @author Tom Brosch
  */
 public interface IComposerExtensionClass extends IComposerExtensionBase {
@@ -69,7 +69,7 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	/**
 	 * Builds a configuration to the given folder<br> To call a method before the building process of all configurations is started see:
 	 * {@link IComposerExtensionClass#preBuildConfiguration()}
-	 * 
+	 *
 	 * @param folder The destination
 	 * @param configuration The configuration to build
 	 * @param congurationName The name of the configuration
@@ -78,27 +78,27 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	/**
 	 * Called before building all configurations is started.
-	 * 
+	 *
 	 * @return <code>false</code> if the building process should be aborted.
 	 */
 	boolean preBuildConfiguration();
 
 	/**
-	 * 
+	 *
 	 * @return <code>true</code> if clean should be performed before every build
 	 */
 	boolean clean();
 
 	/**
 	 * Copies not composed files to the source folder
-	 * 
+	 *
 	 * @param config The configuration
 	 * @param destination The destination to copy
 	 */
 	void copyNotComposedFiles(Configuration config, IFolder destination);
 
 	/**
-	 * 
+	 *
 	 * @return a list of file extensions witch will be composed
 	 */
 	@Nonnull
@@ -106,7 +106,7 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	/**
 	 * Make some changes after adding the FeatureIDE nature.
-	 * 
+	 *
 	 * @return <code>true</code> if the source files not have to be moved to the feature folder anymore
 	 */
 	boolean postAddNature(IFolder source, IFolder destination);
@@ -123,14 +123,14 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	/**
 	 * Returns the list of templates for the current composer. <br> Format: {FILE_FORMAT_NAME, EXTENSION, TEMPLATE}
-	 * 
+	 *
 	 * @return list of templates for the current composer
 	 */
 	ArrayList<String[]> getTemplates();
 
 	/**
 	 * Replaces all markers in the template.
-	 * 
+	 *
 	 * @param fileContent the file's content where markers shall be replaced
 	 * @param refines defines wheather the refines checkbos is selected.
 	 * @param packageName The package name
@@ -140,21 +140,21 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	/**
 	 * Defines if a refining class differs from a common one and <code>replaceMarker()</code> has to be called.
-	 * 
+	 *
 	 * @return <code>true</code> if the refining class differs.
 	 */
 	boolean refines();
 
 	/**
 	 * Is called after changes at composition folder.
-	 * 
+	 *
 	 * @param delta
 	 * @param buildFile
 	 */
 	void postCompile(IResourceDelta delta, IFile buildFile);
 
 	/**
-	 * 
+	 *
 	 * @return the index of the default template.
 	 */
 	int getDefaultTemplateIndex();
@@ -170,7 +170,7 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	boolean hasCustomFilename();
 
 	/**
-	 * 
+	 *
 	 * @return the default configuration extension.
 	 */
 	@Nonnull
@@ -188,7 +188,7 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	/**
 	 * @return List of all FSTDirectives in the text with parent == null
-	 * 
+	 *
 	 * @param lines of file / document
 	 */
 	LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines);

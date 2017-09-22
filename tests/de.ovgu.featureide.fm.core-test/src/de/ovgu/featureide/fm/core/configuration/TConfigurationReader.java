@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Test class for the {@link ConfigurationReader}.
- * 
+ *
  * @author Stefan Krueger
  * @author Florian Proksch
  */
@@ -60,7 +60,7 @@ public class TConfigurationReader {
 		"";
 	InputStream a; // = new InputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 
-	private IFeatureModel FM_test_1 =
+	private final IFeatureModel FM_test_1 =
 		init("test_5.xml");
 
 	private static File getFolder() {
@@ -76,10 +76,10 @@ public class TConfigurationReader {
 	private final IFeatureModel init(String name) {
 		IFeatureModel fm =
 			null;
-		File[] listFiles =
+		final File[] listFiles =
 			MODEL_FILE_FOLDER.listFiles(filter);
 		assertNotNull(listFiles);
-		for (File f : listFiles) {
+		for (final File f : listFiles) {
 			if (f.getName().equals(name)) {
 				fm =
 					FeatureModelManager.load(f.toPath()).getObject();
@@ -104,7 +104,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration2() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, false);
 		c.setManual("C#", Selection.SELECTED);
 		c.setManual("Python Ruby", Selection.SELECTED);
@@ -115,7 +115,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration3() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, true);
 		c.setManual("C#", Selection.SELECTED);
 		c.setManual("Python Ruby", Selection.SELECTED);
@@ -126,7 +126,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration4() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, false);
 		final DefaultFormat r =
 			new DefaultFormat();
@@ -136,7 +136,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration5() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, false);
 		final DefaultFormat r =
 			new DefaultFormat();
@@ -146,7 +146,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration6() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, false);
 		final DefaultFormat r =
 			new DefaultFormat();
@@ -156,7 +156,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration7() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, false);
 		final DefaultFormat r =
 			new DefaultFormat();
@@ -166,7 +166,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration8() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, false);
 		final DefaultFormat r =
 			new DefaultFormat();
@@ -176,7 +176,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration9() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, false);
 		final DefaultFormat r =
 			new DefaultFormat();
@@ -186,7 +186,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration10() {
-		Configuration c =
+		final Configuration c =
 			new Configuration(FM_test_1, false);
 		final DefaultFormat r =
 			new DefaultFormat();

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -60,7 +60,7 @@ import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 
 /**
  * Composes FeatureC++ files.
- * 
+ *
  * @author Tom Brosch
  * @author Jens Meinicke
  */
@@ -127,12 +127,12 @@ public class FeatureCppWrapper {
 		try {
 			url =
 				FileLocator.toFileURL(url);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
-		Path path =
+		final Path path =
 			new Path(url.getFile());
-		String pathName =
+		final String pathName =
 			path.toOSString();
 		if (!path.isAbsolute()) {
 			FeatureCppCorePlugin.getDefault().logWarning(pathName
@@ -171,12 +171,13 @@ public class FeatureCppWrapper {
 
 	public void compose(java.nio.file.Path config) {
 		try {
-			if (!buildDirectory.exists())
+			if (!buildDirectory.exists()) {
 				buildDirectory.create(false, true, null);
-		} catch (CoreException e) {
+			}
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		LinkedList<String> command =
+		final LinkedList<String> command =
 			new LinkedList<String>();
 		command.add(featureCppExecutableName);
 		if (version == 7) {
@@ -198,14 +199,14 @@ public class FeatureCppWrapper {
 	}
 
 	private void process(AbstractList<String> command) {
-		ProcessBuilder processBuilder =
+		final ProcessBuilder processBuilder =
 			new ProcessBuilder(command);
 		BufferedReader input =
 			null;
 		BufferedReader error =
 			null;
 		try {
-			Process process =
+			final Process process =
 				processBuilder.start();
 			input =
 				new BufferedReader(new InputStreamReader(
@@ -233,14 +234,15 @@ public class FeatureCppWrapper {
 //						}
 					}
 					while ((line =
-						error.readLine()) != null)
+						error.readLine()) != null) {
 						FeatureCppCorePlugin.getDefault().logWarning(line);
+					}
 					try {
 						process.waitFor();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						FeatureCppCorePlugin.getDefault().logError(e);
 					}
-					int exitValue =
+					final int exitValue =
 						process.exitValue();
 					if (exitValue != 0) {
 						throw new IOException(
@@ -249,43 +251,48 @@ public class FeatureCppWrapper {
 									+ ")!");
 					}
 					break;
-				} catch (IllegalThreadStateException e) {
+				} catch (final IllegalThreadStateException e) {
 					FeatureCppCorePlugin.getDefault().logError(e);
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			openMessageBox(e);
 			FeatureCppCorePlugin.getDefault().logError(e);
 		} finally {
 			try {
-				if (input != null) input.close();
-			} catch (IOException e) {
+				if (input != null) {
+					input.close();
+				}
+			} catch (final IOException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			} finally {
-				if (error != null)
+				if (error != null) {
 					try {
-					error.close();
-					} catch (IOException e) {
-					FeatureCppCorePlugin.getDefault().logError(e);
+						error.close();
+					} catch (final IOException e) {
+						FeatureCppCorePlugin.getDefault().logError(e);
 					}
+				}
 			}
 		}
 	}
 
 	/**
 	 * Opens a message box if featureC++ could not be executed.
-	 * 
+	 *
 	 * @deprecated is set automatically at constructor.
 	 */
+	@Deprecated
 	private void openMessageBox(IOException e) {
-		if (e != null
-			&& e.getCause() != null
+		if ((e != null)
+			&& (e.getCause() != null)
 			&& "java.io.IOException: java.io.IOException: error=13, Permission denied".equals(e.getCause().toString())) {
-			UIJob uiJob =
+			final UIJob uiJob =
 				new UIJob("") {
 
+					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
-						MessageBox d =
+						final MessageBox d =
 							new MessageBox(new Shell(), SWT.ICON_ERROR);
 						d.setMessage("FeatureC++ can not be executed. Allow the file to be executed.\n"
 							+
@@ -327,7 +334,7 @@ public class FeatureCppWrapper {
 					return null;
 				}
 			} else {
-				String folderName =
+				final String folderName =
 					fileName.substring(0, fileName.indexOf('\\'));
 				fileName =
 					fileName.substring(fileName.indexOf('\\')
@@ -357,7 +364,7 @@ public class FeatureCppWrapper {
 	}
 
 	private void addMarker(final IFile file, final String message, final int line) {
-		Job job =
+		final Job job =
 			new Job(PROPAGATE_PROBLEM_MARKERS_FOR
 				+ CorePlugin.getFeatureProject(file)) {
 
@@ -365,14 +372,14 @@ public class FeatureCppWrapper {
 				public IStatus run(IProgressMonitor monitor) {
 					try {
 						if (!hasMarker(message, file)) {
-							IMarker newMarker =
+							final IMarker newMarker =
 								file.createMarker(CorePlugin.PLUGIN_ID
 									+ ".builderProblemMarker");
 							newMarker.setAttribute(IMarker.MESSAGE, message);
 							newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 							newMarker.setAttribute(IMarker.LINE_NUMBER, line);
 						}
-					} catch (CoreException e) {
+					} catch (final CoreException e) {
 						FeatureCppCorePlugin.getDefault().logError(e);
 					}
 					return Status.OK_STATUS;
@@ -380,16 +387,16 @@ public class FeatureCppWrapper {
 
 				private boolean hasMarker(String message, IFile sourceFile) {
 					try {
-						IMarker[] marker =
+						final IMarker[] marker =
 							sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
 						if (marker.length > 0) {
-							for (IMarker m : marker) {
+							for (final IMarker m : marker) {
 								if (message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
 									return true;
 								}
 							}
 						}
-					} catch (CoreException e) {
+					} catch (final CoreException e) {
 						FeatureCppCorePlugin.getDefault().logError(e);
 					}
 					return false;

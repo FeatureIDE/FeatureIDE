@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,7 +31,7 @@ import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
 
 /**
  * Action to add an colorscheme
- * 
+ *
  * @author Sebastian Krieter
  */
 public class AddColorSchemeAction extends AbstractColorAction {
@@ -44,10 +44,10 @@ public class AddColorSchemeAction extends AbstractColorAction {
 
 	@Override
 	protected boolean action(IFeatureModel fm, String collName) {
-		NewColorSchemeWizard wizard =
+		final NewColorSchemeWizard wizard =
 			new NewColorSchemeWizard(fm, collaborationView);
 
-		WizardDialog dialog =
+		final WizardDialog dialog =
 			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -58,7 +58,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
 
 /**
  * View to calculate and show the statistics of a feature project.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -103,22 +103,24 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 	private void addButtons() {
 
-		IToolBarManager toolBarManager =
+		final IToolBarManager toolBarManager =
 			getViewSite().getActionBars().getToolBarManager();
 
-		Action checkBoxer =
+		final Action checkBoxer =
 			new Action() {
 
+				@Override
 				public void run() {
-					CheckBoxTreeViewDialog dial =
+					final CheckBoxTreeViewDialog dial =
 						new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
 					dial.open();
 				}
 			};
 
-		Action refresher =
+		final Action refresher =
 			new Action() {
 
+				@Override
 				public void run() {
 					FeatureStatisticsView.this.refresh(true);
 				}
@@ -133,24 +135,30 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		checkBoxer.setToolTipText("Export to *.csv");
 	}
 
-	private IPartListener editorListener =
+	private final IPartListener editorListener =
 		new IPartListener() {
 
+			@Override
 			public void partOpened(IWorkbenchPart part) {}
 
+			@Override
 			public void partDeactivated(IWorkbenchPart part) {}
 
+			@Override
 			public void partClosed(IWorkbenchPart part) {
 				if (part == currentEditor) {
 					setEditor(null);
 				}
 			}
 
+			@Override
 			public void partBroughtToTop(IWorkbenchPart part) {
-				if (part instanceof IEditorPart)
+				if (part instanceof IEditorPart) {
 					setEditor((IEditorPart) part);
+				}
 			}
 
+			@Override
 			public void partActivated(IWorkbenchPart part) {
 				if (part instanceof IEditorPart) {
 					ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
@@ -167,9 +175,10 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 */
-	private IEventListener modelListener =
+	private final IEventListener modelListener =
 		new IEventListener() {
 
+			@Override
 			public void propertyChange(FeatureIDEEvent evt) {
 				if (EventType.MODEL_LAYOUT_CHANGED != evt.getEventType()) {
 					refresh(false);
@@ -192,7 +201,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		/*
 		 * This job waits for the calculation job to finish and starts immediately a new one
 		 */
-		Job waiter =
+		final Job waiter =
 			new Job(UPDATING_FEATURESTATISTICSVIEW) {
 
 				@Override
@@ -206,7 +215,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 							job.join();
 							contentProvider.setCanceled(false);
 						}
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						FMUIPlugin.getDefault().logError(e);
 					}
 
@@ -218,12 +227,12 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 								if (currentEditor == null) {
 									contentProvider.defaultContent();
 								} else {
-									IResource anyFile =
-										ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
+									final IResource anyFile =
+										ResourceUtil.getResource(currentEditor.getEditorInput());
 									// TODO is refresh really necessary? -> true?
 
 									if (force
-										|| currentInput == null
+										|| (currentInput == null)
 										|| !anyFile.getProject().equals(currentInput.getProject())) {
 										contentProvider.calculateContent(anyFile, true);
 										currentInput =
@@ -246,7 +255,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	}
 
 	private void cancelJobs() {
-		JobDoneListener jobListener =
+		final JobDoneListener jobListener =
 			JobDoneListener.getInstance();
 		if (jobListener != null) {
 			jobListener.cancelAllRunningTreeJobs();
@@ -272,17 +281,17 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		}
 		boolean force =
 			true;
-		if (newEditor != null
-			&& currentEditor != null) {
-			IEditorInput newInput =
+		if ((newEditor != null)
+			&& (currentEditor != null)) {
+			final IEditorInput newInput =
 				newEditor.getEditorInput();
 			if (newInput instanceof FileEditorInput) {
-				IEditorInput oldInput =
+				final IEditorInput oldInput =
 					currentEditor.getEditorInput();
 				if (oldInput instanceof FileEditorInput) {
-					IProject newProject =
+					final IProject newProject =
 						((FileEditorInput) newInput).getFile().getProject();
-					IProject oldProject =
+					final IProject oldProject =
 						((FileEditorInput) oldInput).getFile().getProject();
 					if (newProject.equals(oldProject)) {
 						force =

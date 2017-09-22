@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -76,6 +76,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -142,7 +143,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
 
 /**
  * View of the collaboration diagram.
- * 
+ *
  * @author Constanze Adler
  * @author Stephan Besecke
  * @author Jens Meinicke
@@ -214,7 +215,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	private GraphicalViewerImpl viewer;
 
-	private CollaborationModelBuilder builder =
+	private final CollaborationModelBuilder builder =
 		new CollaborationModelBuilder();
 	private IWorkbenchPart currentEditor;
 	private AddRoleAction addRoleAction;
@@ -244,9 +245,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private ShowFieldsMethodsAction showInvariantsButton;
 	private ShowFieldsMethodsAction showNestedClassesButton;
 
-	private SetColorAction[] setColorActions =
+	private final SetColorAction[] setColorActions =
 		new SetColorAction[ColorPalette.COLOR_COUNT];
-	private ShowFieldsMethodsAction[] setFieldsMethodsActions =
+	private final ShowFieldsMethodsAction[] setFieldsMethodsActions =
 		new ShowFieldsMethodsAction[FIELD_METHOD_LABEL_NAMES.length];
 
 	private ShowFieldsMethodsAction showAccessModifiers;
@@ -258,17 +259,18 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private final Job updateGUIJob =
 		new AWaitingJob(UPDATE_COLLABORATION_VIEW) {
 
+			@Override
 			public IStatus execute(IProgressMonitor monitor) {
 				disableToolbarFilterItems();
 				if (configurations.isEmpty()) {
 					refreshButton.setEnabled(true);
 					return Status.OK_STATUS;
 				}
-				IFile configurationFile =
+				final IFile configurationFile =
 					configurations.lastElement();
 				configurations.clear();
-				if (configurationFile != null
-					&& CollaborationModelBuilder.editorFile != null) {
+				if ((configurationFile != null)
+					&& (CollaborationModelBuilder.editorFile != null)) {
 					builder.configuration =
 						configurationFile;
 				}
@@ -282,12 +284,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				if (!configurations.isEmpty()) {
 					return Status.OK_STATUS;
 				}
-				UIJob uiJob =
+				final UIJob uiJob =
 					new UIJob(UPDATE_COLLABORATION_VIEW) {
 
+						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 							viewer.setContents(model);
-							EditPart part =
+							final EditPart part =
 								viewer.getContents();
 							if (part != null) {
 								part.refresh();
@@ -301,14 +304,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				uiJob.schedule();
 				try {
 					uiJob.join();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 				return Status.OK_STATUS;
 			}
 		};
 
-	private IEventListener colorChangeListener =
+	private final IEventListener colorChangeListener =
 		new IEventListener() {
 
 			@Override
@@ -333,9 +336,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				featureProject;
 
 			if (this.featureProject != null) {
-				this.featureModel =
+				featureModel =
 					this.featureProject.getFeatureModel();
-				this.setFeatureColourAction.setFeatureModel(this.featureModel);
+				setFeatureColourAction.setFeatureModel(featureModel);
 			}
 		}
 	}
@@ -349,15 +352,15 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	private void saveCursorPosition() {
-		Display display =
+		final Display display =
 			Display.getDefault();
-		FigureCanvas figureCanvas =
+		final FigureCanvas figureCanvas =
 			(FigureCanvas) viewer.getControl();
-		Point point =
+		final Point point =
 			figureCanvas.toControl(display.getCursorLocation());
-		Viewport viewport =
+		final Viewport viewport =
 			figureCanvas.getViewport();
-		org.eclipse.draw2d.geometry.Point location =
+		final org.eclipse.draw2d.geometry.Point location =
 			viewport.getViewLocation();
 		viewport.setIgnoreScroll(true);
 
@@ -367,36 +370,42 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		int y =
 			point.y
 				+ location.y;
-		Rectangle bounds =
+		final Rectangle bounds =
 			viewport.getBounds();
-		if (point.x < 0)
+		if (point.x < 0) {
 			x +=
 				bounds.width;
-		if (point.y < 0)
+		}
+		if (point.y < 0) {
 			y +=
 				bounds.height;
+		}
 
-		this.cursorPosition =
+		cursorPosition =
 			new Point(x, y);
 	}
 
-	private IPartListener editorListener =
+	private final IPartListener editorListener =
 		new IPartListener() {
 
+			@Override
 			public void partOpened(IWorkbenchPart part) {
 
 		}
 
+			@Override
 			public void partDeactivated(IWorkbenchPart part) {
 
 		}
 
+			@Override
 			public void partClosed(IWorkbenchPart part) {
 				if (part == currentEditor) {
 					setEditorActions(null);
 				}
 			}
 
+			@Override
 			public void partBroughtToTop(IWorkbenchPart part) {
 				if (part instanceof IEditorPart) {
 					setEditorActions(part);
@@ -404,23 +413,25 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 			}
 
+			@Override
 			public void partActivated(IWorkbenchPart part) {
-				if (part instanceof IEditorPart
-					|| part instanceof ViewPart) {
+				if ((part instanceof IEditorPart)
+					|| (part instanceof ViewPart)) {
 					setEditorActions(part);
 				}
 			}
 
 		};
 
+	@Override
 	public void createPartControl(Composite parent) {
-		IWorkbenchWindow editor =
+		final IWorkbenchWindow editor =
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part =
 			null;
 
 		if (editor != null) {
-			IWorkbenchPage page =
+			final IWorkbenchPage page =
 				editor.getActivePage();
 			if (page != null) {
 				part =
@@ -437,7 +448,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
 
 		// required for borders
-		ScalableFreeformRootEditPart rootEditPart =
+		final ScalableFreeformRootEditPart rootEditPart =
 			new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart.getLayer(LayerConstants.CONNECTION_LAYER)).setAntialias(SWT.ON);
 
@@ -452,7 +463,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				ShowFieldsMethodsAction.DESELECT_ALL_METHOD_ACCESS;
 		}
 		showAccessModifiers =
-			new ShowFieldsMethodsAction("", null, this, select, Action.AS_DROP_DOWN_MENU);
+			new ShowFieldsMethodsAction("", null, this, select, IAction.AS_DROP_DOWN_MENU);
 		showAccessModifiers.setToolTipText(CHANGE_FILTER_FOR_ACCESS_MODIFIERS);
 		showAccessModifiers.setMenuCreator(new IMenuCreator() {
 
@@ -470,25 +481,25 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					new Menu(parent);
 				for (int i =
 					ShowFieldsMethodsAction.PUBLIC_FIELDSMETHODS; i <= ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS; i++) {
-					ShowFieldsMethodsAction action =
+					final ShowFieldsMethodsAction action =
 						setFieldsMethodsActions[i];
 					action.setChecked(RoleFigure.getRoleSelections()[i]);
-					ActionContributionItem contributionItem =
+					final ActionContributionItem contributionItem =
 						new ActionContributionItem(action);
 					contributionItem.fill(fMenu, -1);
 				}
 
-				ShowFieldsMethodsAction selectAll =
+				final ShowFieldsMethodsAction selectAll =
 					new ShowFieldsMethodsAction(SELECT_ALL, IMAGE_SELECT_ALL_MODIFIERS, CollaborationView.this,
 							ShowFieldsMethodsAction.SELECT_ALL_METHOD_ACCESS);
-				ActionContributionItem contributionItem =
+				final ActionContributionItem contributionItem =
 					new ActionContributionItem(selectAll);
 				contributionItem.fill(fMenu, -1);
 
-				ShowFieldsMethodsAction deselectAll =
+				final ShowFieldsMethodsAction deselectAll =
 					new ShowFieldsMethodsAction(DESELECT_ALL, IMAGE_MODIFIERS_NONE, CollaborationView.this,
 							ShowFieldsMethodsAction.DESELECT_ALL_METHOD_ACCESS);
-				ActionContributionItem deselectAllConteribution =
+				final ActionContributionItem deselectAllConteribution =
 					new ActionContributionItem(deselectAll);
 				deselectAllConteribution.fill(fMenu, -1);
 
@@ -507,7 +518,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		// Add to color CHange Listener
 		FeatureColorManager.addListener(colorChangeListener);
 
-		CollaborationViewSearch.Builder builder =
+		final CollaborationViewSearch.Builder builder =
 			new CollaborationViewSearch.Builder();
 		search =
 			builder.setAttachedViewerParent(viewer).setSearchBoxText(SEARCH_IN_COLLABORATION_DIAGRAM).setFindResultsColor(ROLE_BACKGROUND_SELECTED)
@@ -516,14 +527,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	private void refreshActionBars() {
-		IActionBars bars =
+		final IActionBars bars =
 			getViewSite().getActionBars();
 		bars.getToolBarManager().update(true);
 		disableToolbarFilterItems();
 	}
 
 	private void contributeToActionBars() {
-		IActionBars bars =
+		final IActionBars bars =
 			getViewSite().getActionBars();
 
 		bars.setGlobalActionHandler(ActionFactory.PRINT.getId(), printAction);
@@ -532,11 +543,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		fillLocalToolBar();
 	}
 
+	@Override
 	public void setFocus() {
-		FigureCanvas figureCanvas =
+		final FigureCanvas figureCanvas =
 			(FigureCanvas) viewer.getControl();
 
-		Viewport model =
+		final Viewport model =
 			figureCanvas.getViewport();
 		model.getVerticalRangeModel().setMinimum(0);
 		model.getHorizontalRangeModel().setMinimum(0);
@@ -545,7 +557,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	/**
 	 * Gets the input of the given part and sets the content of the diagram.
-	 * 
+	 *
 	 * @param activeWorkbenchPart
 	 */
 	private void setEditorActions(IWorkbenchPart activeWorkbenchPart) {
@@ -569,8 +581,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			}
 		}
 
-		if (activeEditor != null
-			&& activeEditor.getEditorInput() instanceof FileEditorInput) {
+		if ((activeEditor != null)
+			&& (activeEditor.getEditorInput() instanceof FileEditorInput)) {
 			// case: open editor
 			final IFile inputFile =
 				((FileEditorInput) activeEditor.getEditorInput()).getFile();
@@ -591,7 +603,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					// case: open configuration editor
 					CollaborationModelBuilder.editorFile =
 						null;
-					if (builder.configuration != null
+					if ((builder.configuration != null)
 						&& builder.configuration.equals(inputFile)
 						&& featureProject.equals(CollaborationModelBuilder.project)) {
 						return;
@@ -601,7 +613,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					}
 				} else {
 					// case: open editor is no configuration editor
-					if (CollaborationModelBuilder.editorFile != null
+					if ((CollaborationModelBuilder.editorFile != null)
 						&& CollaborationModelBuilder.editorFile.getName().equals(inputFile.getName())
 						&& featureProject.getProject().equals(CollaborationModelBuilder.editorFile.getProject())) {
 						return;
@@ -630,19 +642,20 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	public void createContextMenu() {
-		MenuManager menuMgr =
+		final MenuManager menuMgr =
 			new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
 
+			@Override
 			public void menuAboutToShow(IMenuManager m) {
 				fillContextMenu(m);
 			}
 		});
-		Control control =
+		final Control control =
 			viewer.getControl();
-		Menu menu =
+		final Menu menu =
 			menuMgr.createContextMenu(control);
 		control.setMenu(menu);
 		getSite().registerContextMenu(menuMgr, viewer);
@@ -655,9 +668,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			return;
 		}
 
-		ISelection selection =
+		final ISelection selection =
 			viewer.getSelection();
-		boolean isNotEmpty =
+		final boolean isNotEmpty =
 			!selection.isEmpty();
 		addRoleAction.setEnabled(isNotEmpty);
 		filterAction.setEnabled(isNotEmpty);
@@ -673,11 +686,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		// Show Feature Color Menu if necessary
 		if (isNotEmpty
-			&& selection instanceof StructuredSelection) {
-			StructuredSelection selectionAsStructuredSelection =
+			&& (selection instanceof StructuredSelection)) {
+			final StructuredSelection selectionAsStructuredSelection =
 				(StructuredSelection) selection;
 
-			Iterator<?> iterator =
+			final Iterator<?> iterator =
 				selectionAsStructuredSelection.iterator();
 			Object selectedItem =
 				null;
@@ -685,8 +698,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				true;
 
 			while (iterator.hasNext()
-				&& (selectedItem =
-					iterator.next()) != null) {
+				&& ((selectedItem =
+					iterator.next()) != null)) {
 				if (!(selectedItem instanceof CollaborationEditPart)) {
 					onlyCollaborations =
 						false;
@@ -694,12 +707,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				}
 			}
 
-			if (onlyCollaborations)
+			if (onlyCollaborations) {
 				menuMgr.add(setFeatureColourAction);
+			}
 		}
 
 		if (featureProject.getComposer().showContextFieldsAndMethods()) {
-			MenuManager methodsFieldsSubMenu =
+			final MenuManager methodsFieldsSubMenu =
 				new MenuManager(SHOW_FIELDS_AND_METHODS);
 
 			for (int i =
@@ -717,7 +731,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 
 		menuMgr.add(new Separator());
-		MenuManager exportMenu =
+		final MenuManager exportMenu =
 			new MenuManager(EXPORT_AS_LABEL);
 		exportMenu.add(exportAsImage);
 		exportMenu.add(exportAsXML);
@@ -728,7 +742,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		boolean value =
 			false;
 		if (featureProject != null) {
-			IComposerExtensionClass composer =
+			final IComposerExtensionClass composer =
 				featureProject.getComposer();
 			if (composer != null) {
 				value =
@@ -774,7 +788,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	private boolean deselectAll() {
-		boolean[] selectedModifiers =
+		final boolean[] selectedModifiers =
 			RoleFigure.getRoleSelections();
 		if ((selectedModifiers[ShowFieldsMethodsAction.PUBLIC_FIELDSMETHODS])
 			&& (selectedModifiers[ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS])
@@ -786,7 +800,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	private ImageDescriptor getAccessModifiersImage(boolean[] selectedModifiers) {
-		ArrayList<Image> arrayList =
+		final ArrayList<Image> arrayList =
 			new ArrayList<Image>();
 		if (selectedModifiers[ShowFieldsMethodsAction.PUBLIC_FIELDSMETHODS]) {
 			arrayList.add(IMAGE_METHODE_PUBLIC);
@@ -804,7 +818,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			arrayList.add(IMAGE_METHODE_DEFAULT);
 		}
 
-		Image combinedImages =
+		final Image combinedImages =
 			combineImages(arrayList);
 
 		return ImageDescriptor.createFromImage(combinedImages);
@@ -827,9 +841,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		Collections.sort(images, new ImageComarator());
 
-		Image finalImage =
+		final Image finalImage =
 			new Image(images.get(0).getDevice(), images.get(0).getBounds());
-		GC gc =
+		final GC gc =
 			new GC(finalImage);
 		int x =
 			0;
@@ -845,9 +859,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				y =
 					finalImage.getBounds().width
 						/ 4;
-			} else if ((j
+			} else if (((j
 				+ 1)
-				% 2 != 0) {
+				% 2) != 0) {
 				x =
 					0;
 				y =
@@ -859,10 +873,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					8;
 			}
 			gc.drawImage(images.get(j), 4, 4, images.get(j).getBounds().width
-				- 2
-					* 4, images.get(j).getBounds().height
-						- 2
-							* 4,
+				- (2
+					* 4), images.get(j).getBounds().height
+						- (2
+							* 4),
 					x, y,
 					finalImage.getBounds().width
 						/ 2,
@@ -870,7 +884,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						/ 2);
 
 		}
-		ImageData data =
+		final ImageData data =
 			finalImage.getImageData();
 		data.transparentPixel =
 			data.palette.getPixel(new RGB(255, 255, 255));
@@ -881,7 +895,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	public void reloadImage() {
 		// build one image from max 4 images
-		boolean[] selectedAccessModifiers =
+		final boolean[] selectedAccessModifiers =
 			RoleFigure.getRoleSelections();
 		showAccessModifiers.setImageDescriptor(getAccessModifiersImage(selectedAccessModifiers));
 
@@ -913,7 +927,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		showNestedClassesButton =
 			setFieldsMethodsActions[ShowFieldsMethodsAction.SHOW_NESTED_CLASSES];
 
-		boolean[] isChecked =
+		final boolean[] isChecked =
 			RoleFigure.getRoleSelections();
 		for (int i =
 			ShowFieldsMethodsAction.FIELDS_WITH_REFINEMENTS; i <= ShowFieldsMethodsAction.SHOW_NESTED_CLASSES; i++) {
@@ -943,9 +957,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			new ExportAsXmlImpl(EXPORT_AS_XML, viewer);
 		exportAsXML.setImageDescriptor(ImageDescriptor.createFromImage(IMAGE_EXPORT_XML_ICON));
 
-		Action exportAsToolbarIcon =
-			new Action(EXPORT_AS___, Action.AS_DROP_DOWN_MENU) {
+		final Action exportAsToolbarIcon =
+			new Action(EXPORT_AS___, IAction.AS_DROP_DOWN_MENU) {
 
+				@Override
 				public void run() {
 
 			}
@@ -965,10 +980,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				fMenu =
 					new Menu(parent);
 
-				ActionContributionItem exportImageContributionItem =
+				final ActionContributionItem exportImageContributionItem =
 					new ActionContributionItem(exportAsImage);
 				exportImageContributionItem.fill(fMenu, -1);
-				ActionContributionItem exportXMLContributionItem =
+				final ActionContributionItem exportXMLContributionItem =
 					new ActionContributionItem(exportAsXML);
 				exportXMLContributionItem.fill(fMenu, -1);
 
@@ -988,18 +1003,20 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		refreshButton =
 			new Action() {
 
+				@Override
 				public void run() {
 					disableToolbarFilterItems();
-					LongRunningMethod<Boolean> job =
+					final LongRunningMethod<Boolean> job =
 						new LongRunningMethod<Boolean>() {
 
 							@Override
 							public Boolean execute(IMonitor workMonitor) throws Exception {
-								if (!refreshButton.isEnabled())
+								if (!refreshButton.isEnabled()) {
 									return true;
+								}
 								refreshButton.setEnabled(false);
 								if (featureProject != null) {
-									IComposerExtensionClass composer =
+									final IComposerExtensionClass composer =
 										featureProject.getComposer();
 									if (composer != null) {
 										composer.buildFSTModel();
@@ -1009,7 +1026,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 								return true;
 							}
 						};
-					LongRunningJob<Boolean> runner =
+					final LongRunningJob<Boolean> runner =
 						new LongRunningJob<>(REFRESH_COLLABORATION_VIEW, job);
 					runner.setPriority(Job.SHORT);
 					runner.schedule();
@@ -1017,8 +1034,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			};
 	}
 
+	@Override
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
-		if (featureProject != null
+		if ((featureProject != null)
 			&& featureProject.equals(project)) {
 			if (configurationFile == null) {
 				configurations.add(project.getCurrentConfiguration());
@@ -1059,8 +1077,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter)
-			|| ViewPart.class.equals(adapter))
+			|| ViewPart.class.equals(adapter)) {
 			return viewer;
+		}
 		return super.getAdapter(adapter);
 	}
 
@@ -1076,6 +1095,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 		Display.getDefault().syncExec(new Runnable() {
 
+			@Override
 			public void run() {
 				viewer.setContents(model);
 				viewer.getContents().refresh();

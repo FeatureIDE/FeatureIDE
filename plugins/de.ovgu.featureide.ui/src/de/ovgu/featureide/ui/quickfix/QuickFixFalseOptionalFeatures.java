@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
 
 /**
  * Creates configurations where false optional features are unused.
- * 
+ *
  * @author Jens Meinicke
  */
 public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations {
@@ -53,17 +53,18 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		super(marker);
 	}
 
+	@Override
 	public void run(final IMarker marker) {
-		Job job =
+		final Job job =
 			new Job(getLabel()) {
 
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					if (project != null) {
-						IMonitor monitor2 =
+						final IMonitor monitor2 =
 							new ProgressMonitor("Cover unused features", monitor);
 						monitor2.setRemainingWork(2);
-						IMonitor subTask =
+						final IMonitor subTask =
 							monitor2.subTask(1);
 						subTask.setTaskName("Collect unused features");
 						final Collection<String> unusedFeatures =
@@ -89,12 +90,12 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		Configuration configuration =
 			new Configuration(featureModel, false);
 		try {
-			List<List<String>> solutions =
+			final List<List<String>> solutions =
 				configuration.coverFeatures(unusedFeatures, monitor, false);
-			for (List<String> solution : solutions) {
+			for (final List<String> solution : solutions) {
 				configuration =
 					new Configuration(featureModel, false);
-				for (String feature : solution) {
+				for (final String feature : solution) {
 					if (!"True".equals(feature)) {
 						configuration.setManual(feature, Selection.SELECTED);
 					}
@@ -107,7 +108,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 					writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
 				}
 			}
-		} catch (TimeoutException e1) {
+		} catch (final TimeoutException e1) {
 			e1.printStackTrace();
 		}
 
@@ -116,13 +117,13 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 
 	/**
 	 * For testing purpose only.
-	 * 
+	 *
 	 * @param falseOptionalFeatures
 	 * @param fm
 	 * @return
 	 */
 	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
-		this.featureModel =
+		featureModel =
 			fm;
 		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
 	}

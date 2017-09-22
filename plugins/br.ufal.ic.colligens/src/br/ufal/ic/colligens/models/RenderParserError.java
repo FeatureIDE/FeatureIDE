@@ -23,7 +23,7 @@ public class RenderParserError implements
 	@Override
 	public Object apply(FeatureExpr featureExpr, String msg, Position position) {
 		if (position.getFile().contains(fileProxie.getFileToAnalyse())) {
-			Log log =
+			final Log log =
 				new Log(fileProxie, position.getLine(), position.getColumn(),
 						featureExpr.toString(), "", msg);
 			fileProxie.getLogs().add(log);

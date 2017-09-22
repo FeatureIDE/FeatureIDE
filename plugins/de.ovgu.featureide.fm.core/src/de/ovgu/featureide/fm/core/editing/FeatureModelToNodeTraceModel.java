@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,18 +43,18 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureStructure;
 
 /**
  * <p> A trace model for when a {@link IFeatureModel feature model} is transformed into a {@link Node}. </p>
- * 
+ *
  * <p> When a feature model is transformed into a propositional formula, the mapping between the two formats is ambiguous. For instance, depending on the group
  * type and the amount of children, a child relationship may be mapped to fewer or more clauses than source elements. To solve this, a trace model containing
  * instances of this class can be used to remember the mapping. In particular, using a trace model, the corresponding source {@link IFeatureModelElement
  * element} may be looked up from the target {@link Node formula}. </p>
- * 
+ *
  * <p> Note, however, that this is not implemented as map from target formula to source element. After all, two clauses that are equal may occur multiple times
  * in the same formula while originating from different source elements. For example, a feature model containing a parent feature <i>P</i>, a child feature
  * <i>C</i> and a constraint <i>C</i> &rArr; <i>P</i>, the target formula would be: <pre>(<i>C</i> &rArr; <i>P</i>) &and; (<i>C</i> &rArr; <i>P</i>)</pre> Both
  * of these two clauses could stem from either the child relationship or the constraint. To differentiate these cases, the lookup is done using the index of the
  * clause in the formula. </p>
- * 
+ *
  * @author Timo G&uuml;nther
  * @see AdvancedNodeCreator#getTraceModel()
  */
@@ -62,14 +62,14 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Denotes the origin type of the target clause.
-	 * 
+	 *
 	 * @author Sofia Ananieva
 	 * @author Timo G&uuml;nther
 	 */
 	public enum Origin {
 		/**
 		 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} directed upward. </p>
-		 * 
+		 *
 		 * <p> The upward part of the child relationship is that of the following form: <pre><i>Child<sub>1</sub></i> &or; &hellip; &or;
 		 * <i>Child<sub>n</sub></i> &rArr; <i>Parent</i></pre> Every child relationship contains an upward part. In fact, optional child relationships consist
 		 * of nothing but an upward part (with <i>n</i> = 1). </p>
@@ -77,7 +77,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		CHILD_UP,
 		/**
 		 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} directed downward. </p>
-		 * 
+		 *
 		 * <p> The upward part of the child relationship is that of the following form: <pre><i>Parent</i> &rArr; <i>Child<sub>1</sub></i> &or; &hellip; &or;
 		 * <i>Child<sub>n</sub></i></pre> Every non-optional child relationship contains a downward part. </p>
 		 */
@@ -85,7 +85,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		/**
 		 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} not directed {@link CHILD_UP upward} or
 		 * {@link CHILD_DOWN downward}. </p>
-		 * 
+		 *
 		 * <p> This is the case for {@link FeatureStructure#isAlternative() alternative groups}, which (in addition to upward and downward parts) contain the
 		 * following part: <pre>atmost1(<i>Child<sub>1</sub></i>, &hellip;, <i>Child<sub>n</sub></i>)</pre> </p>
 		 */
@@ -98,7 +98,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * A part of a trace model. Remembers the source elements of a single clause.
-	 * 
+	 *
 	 * @author Timo G&uuml;nther
 	 */
 	public static class FeatureModelElementTrace implements Cloneable {
@@ -112,67 +112,67 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		/**
 		 * Creates a trace for a vertical child relationship.
-		 * 
+		 *
 		 * @param parent the parent of the relationship; not null
 		 * @param children the children of the relationship; not null or empty
 		 * @param up true for {@link Origin#CHILD_UP upward child relationship}, false for {@link Origin#CHILD_DOWN downward child relationship}
 		 */
 		protected FeatureModelElementTrace(IFeature parent, Collection<IFeature> children, boolean up) {
-			this.origin =
+			origin =
 				up
 					? Origin.CHILD_UP
 					: Origin.CHILD_DOWN;
-			this.element =
+			element =
 				parent;
-			this.elements =
+			elements =
 				new LinkedHashSet<IFeatureModelElement>(children);
 		}
 
 		/**
 		 * Creates a trace for a horizontal child relationship.
-		 * 
+		 *
 		 * @param children the children of the relationship; not null or empty
 		 */
 		protected FeatureModelElementTrace(Collection<IFeature> children) {
-			this.origin =
+			origin =
 				Origin.CHILD_HORIZONTAL;
-			this.element =
+			element =
 				null;
-			this.elements =
+			elements =
 				new LinkedHashSet<IFeatureModelElement>(children);
 		}
 
 		/**
 		 * Creates a trace for the root feature.
-		 * 
+		 *
 		 * @param root the root feature; not null
 		 */
 		protected FeatureModelElementTrace(IFeature root) {
-			this.origin =
+			origin =
 				Origin.ROOT;
-			this.element =
+			element =
 				root;
-			this.elements =
+			elements =
 				null;
 		}
 
 		/**
 		 * Creates a trace for a constraint.
-		 * 
+		 *
 		 * @param constraint a constraint; not null
 		 */
 		protected FeatureModelElementTrace(IConstraint constraint) {
-			this.origin =
+			origin =
 				Origin.CONSTRAINT;
-			this.element =
+			element =
 				constraint;
-			this.elements =
+			elements =
 				null;
 		}
 
 		/**
 		 * Creates a new trace. Used in cloning.
-		 * 
+		 *
 		 * @param origin the origin type of the formula; not null
 		 * @param element the single source feature model element
 		 * @param elements the multiple source feature model elements
@@ -188,7 +188,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		/**
 		 * Returns the containing trace model.
-		 * 
+		 *
 		 * @return the containing trace model; not null
 		 */
 		public FeatureModelElementTrace getTraceModel() {
@@ -197,7 +197,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		/**
 		 * Returns the origin type.
-		 * 
+		 *
 		 * @return the origin type; not null
 		 */
 		public Origin getOrigin() {
@@ -207,7 +207,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		/**
 		 * Returns the multiple source elements. For a child relationship, this means the children. Otherwise, this means a singleton of the single source
 		 * element.
-		 * 
+		 *
 		 * @return the multiple source elements; not null or empty
 		 */
 		public Set<IFeatureModelElement> getElements() {
@@ -224,7 +224,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		/**
 		 * Returns the single source element. For a child relationship, this means the parent. For the root, this means the root. For a constraint, this means
 		 * the constraint.
-		 * 
+		 *
 		 * @return the single source element; null if the origin is a {@link Origin#CHILD_HORIZONTAL horizontal child relationship}
 		 */
 		public IFeatureModelElement getElement() {
@@ -233,7 +233,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		/**
 		 * Returns a propositional formula that logically equals the source.
-		 * 
+		 *
 		 * @return a propositional formula that logically equals the source; not null
 		 */
 		public Node getNode() {
@@ -255,7 +255,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		/**
 		 * Returns literals for the multiple source elements.
-		 * 
+		 *
 		 * @return literals for the multiple source elements; not null
 		 */
 		private Literal[] getLiterals() {
@@ -274,7 +274,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		/**
 		 * Returns a literal for the single source element.
-		 * 
+		 *
 		 * @return a literal for the single source element; not null
 		 */
 		private Literal getLiteral() {
@@ -283,7 +283,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		/**
 		 * Returns a literal for the given feature.
-		 * 
+		 *
 		 * @param feature feature to transform; not null
 		 * @return a literal for the given feature; not null
 		 */
@@ -303,20 +303,20 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 			int result =
 				1;
 			result =
-				prime
-					* result
+				(prime
+					* result)
 					+ ((origin == null)
 						? 0
 						: origin.hashCode());
 			result =
-				prime
-					* result
+				(prime
+					* result)
 					+ ((element == null)
 						? 0
 						: element.hashCode());
 			result =
-				prime
-					* result
+				(prime
+					* result)
 					+ ((elements == null)
 						? 0
 						: elements.hashCode());
@@ -325,26 +325,34 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
-			FeatureModelElementTrace other =
+			}
+			final FeatureModelElementTrace other =
 				(FeatureModelElementTrace) obj;
-			if (origin != other.origin)
+			if (origin != other.origin) {
 				return false;
+			}
 			if (element == null) {
-				if (other.element != null)
+				if (other.element != null) {
 					return false;
-			} else if (!element.equals(other.element))
+				}
+			} else if (!element.equals(other.element)) {
 				return false;
+			}
 			if (elements == null) {
-				if (other.elements != null)
+				if (other.elements != null) {
 					return false;
-			} else if (!elements.equals(other.elements))
+				}
+			} else if (!elements.equals(other.elements)) {
 				return false;
+			}
 			return true;
 		}
 
@@ -355,7 +363,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		/**
 		 * Returns this trace as a string.
-		 * 
+		 *
 		 * @param symbols symbols to use with {@link NodeWriter}
 		 * @return this trace as a string; not null
 		 */
@@ -373,7 +381,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Adds a trace for an {@link Origin#CHILD_UP upward child relationship}.
-	 * 
+	 *
 	 * @param parent the parent of the relationship; not null
 	 * @param children the children of the relationship; not null or empty
 	 */
@@ -383,7 +391,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Adds a trace for a {@link Origin#CHILD_DOWN downward child relationship}.
-	 * 
+	 *
 	 * @param parent parent of the relationship; not null
 	 * @param children the children of the relationship; not null or empty
 	 */
@@ -393,7 +401,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Adds a trace for a {@link Origin#CHILD_HORIZONTAL horizontal child relationship}.
-	 * 
+	 *
 	 * @param children the children of the relationship; not null or empty
 	 */
 	public void addTraceChildHorizontal(Collection<IFeature> children) {
@@ -402,7 +410,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Adds a trace for the {@link Origin#ROOT root}.
-	 * 
+	 *
 	 * @param root the root; not null
 	 */
 	public void addTraceRoot(IFeature root) {
@@ -411,7 +419,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Adds a trace for a {@link Origin#CONSTRAINT}.
-	 * 
+	 *
 	 * @param constraint a constraint; not null
 	 */
 	public void addTraceConstraint(IConstraint constraint) {
@@ -420,7 +428,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Removes the given amount of traces from the end of this trace model.
-	 * 
+	 *
 	 * @param amount amount of traces to remove
 	 */
 	public void removeTraces(int amount) {
@@ -433,7 +441,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Removes the trace for the clause with the given index.
-	 * 
+	 *
 	 * @param clauseIndex index of the clause to remove
 	 */
 	public void removeTrace(int clauseIndex) {
@@ -442,7 +450,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Returns the trace for the clause with the given index.
-	 * 
+	 *
 	 * @param clauseIndex index of the clause to look up
 	 * @return the trace
 	 */
@@ -452,7 +460,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	/**
 	 * Returns the amount of traces in this trace model.
-	 * 
+	 *
 	 * @return the amount of traces in this trace model
 	 */
 	public int getTraceCount() {
@@ -463,7 +471,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 	protected FeatureModelToNodeTraceModel clone() {
 		final FeatureModelToNodeTraceModel clone =
 			new FeatureModelToNodeTraceModel();
-		clone.traces.addAll(this.traces);
+		clone.traces.addAll(traces);
 		return clone;
 	}
 
@@ -474,8 +482,8 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		int result =
 			1;
 		result =
-			prime
-				* result
+			(prime
+				* result)
 				+ ((traces == null)
 					? 0
 					: traces.hashCode());
@@ -484,19 +492,24 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		FeatureModelToNodeTraceModel other =
+		}
+		final FeatureModelToNodeTraceModel other =
 			(FeatureModelToNodeTraceModel) obj;
 		if (traces == null) {
-			if (other.traces != null)
+			if (other.traces != null) {
 				return false;
-		} else if (!traces.equals(other.traces))
+			}
+		} else if (!traces.equals(other.traces)) {
 			return false;
+		}
 		return true;
 	}
 

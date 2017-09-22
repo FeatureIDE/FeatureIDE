@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -66,13 +66,13 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Generates Feature Stubs
- * 
+ *
  * @author Stefan Krueger
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureStubsGenerator {
 
-	private String PATH;
+	private final String PATH;
 	private IFeatureProject featureProject =
 		null;
 
@@ -82,7 +82,7 @@ public class FeatureStubsGenerator {
 		null;
 
 	public FeatureStubsGenerator(IFeatureProject fProject) {
-		this.featureProject =
+		featureProject =
 			fProject;
 		PATH =
 			featureProject.getProject().getLocation().toOSString()
@@ -99,7 +99,7 @@ public class FeatureStubsGenerator {
 //		String fhc = FeatureHouseComposer.getClassPaths(featureProject);
 //		String[] fujiOptions = new String[] { "-" + fuji.Main.OptionName.CLASSPATH, fhc, "-" + fuji.Main.OptionName.PROG_MODE, "-" + fuji.Main.OptionName.COMPOSTION_STRATEGY,
 //				fuji.Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", featureProject.getSourcePath() };
-		IFeatureModel fm =
+		final IFeatureModel fm =
 			featureProject.getFeatureModel();
 		fm.getAnalyser().setDependencies();
 
@@ -109,7 +109,7 @@ public class FeatureStubsGenerator {
 //			Program ast = composition.composeAST();
 //			// run type check
 //			fuji.typecheckAST(ast);
-//			
+//
 //			if (!fuji.getWarnings().isEmpty()) {
 //				FeatureHouseCorePlugin.getDefault().logError("The SPL " + featureProject.getProjectName() + " contains type errors. Therefore, the verification is aborted.", null);
 //			}
@@ -118,7 +118,7 @@ public class FeatureStubsGenerator {
 //			FeatureHouseCorePlugin.getDefault().logError(e1);
 //		}
 
-		IRunner<ProjectSignatures> efsj =
+		final IRunner<ProjectSignatures> efsj =
 			LongRunningWrapper.getRunner(new ExtendedFujiSignaturesJob(featureProject));
 		efsj.addJobFinishedListener(new JobFinishListener<ProjectSignatures>() {
 
@@ -134,16 +134,17 @@ public class FeatureStubsGenerator {
 	}
 
 	private void createFeatureStub(final FSTFeature feat, final ProjectSignatures signatures) {
-		Thread keyThread =
+		final Thread keyThread =
 			new Thread() {
 
+				@Override
 				public void run() {
 					try {
 						File file =
 							null;
 						String fileText =
 							"";
-						int featureID =
+						final int featureID =
 							signatures.getFeatureID(feat.getName());
 						CorePlugin.createFolder(featureProject.getProject(), featureProject.getFeaturestubPath()
 							+ File.separator
@@ -152,7 +153,7 @@ public class FeatureStubsGenerator {
 							new HashSet<String>();
 						copyRolesToFeatureStubsFolder(feat);
 
-						for (FSTRole role : feat.getRoles()) {
+						for (final FSTRole role : feat.getRoles()) {
 							file =
 								new File(PATH
 									+ File.separator
@@ -173,7 +174,7 @@ public class FeatureStubsGenerator {
 							StringBuilder fileTextSB =
 								new StringBuilder(fileText.substring(0, lastIndexOf));
 
-							for (FSTMethod meth : role.getClassFragment().getMethods()) {
+							for (final FSTMethod meth : role.getClassFragment().getMethods()) {
 								boolean contractChanged =
 									false;
 								final SignatureIterator sigIterator =
@@ -181,13 +182,13 @@ public class FeatureStubsGenerator {
 								sigIterator.addFilter(new MethodFilter());
 
 								while (sigIterator.hasNext()) {
-									AbstractSignature curSig =
+									final AbstractSignature curSig =
 										sigIterator.next();
 									for (int i =
 										0; i < curSig.getFeatureData().length; i++) {
-										if ((curSig.getFeatureData())[i].getID() == featureID
+										if (((curSig.getFeatureData())[i].getID() == featureID)
 											&& curSig.getName().equals(meth.getName())
-											&& curSig.getFeatureData()[i].getStartLineNumber() == meth.getLine()) {
+											&& (curSig.getFeatureData()[i].getStartLineNumber() == meth.getLine())) {
 											if (((FOPFeatureData[]) curSig.getFeatureData())[i].usesExternMethods()) {
 												FeatureHouseCorePlugin.getDefault().logError("The method\n"
 													+ curSig.getFullName()
@@ -208,26 +209,26 @@ public class FeatureStubsGenerator {
 												// fileTextSB = checkForOriginalInContract(fileTextSB, curSig);
 											}
 
-											for (String typeName : ((FOPFeatureData[]) curSig.getFeatureData())[i].getUsedNonPrimitveTypes()) {
+											for (final String typeName : ((FOPFeatureData[]) curSig.getFeatureData())[i].getUsedNonPrimitveTypes()) {
 												checkForMissingTypes(feat, role, typeName);
 											}
 
-											Set<AbstractSignature> calledSignatures =
+											final Set<AbstractSignature> calledSignatures =
 												new HashSet<AbstractSignature>(((FOPFeatureData[]) curSig.getFeatureData())[i].getCalledSignatures());
-											for (AbstractSignature innerAbs : calledSignatures) {
+											for (final AbstractSignature innerAbs : calledSignatures) {
 												if (!isInCurrentFeature(featureID, innerAbs)
 													&& alreadyUsedSigs.add(innerAbs.toString())) {
 													if (innerAbs.getParent().getName().equals(
 															role.getClassFragment().getName().substring(0, role.getClassFragment().getName().indexOf(".")))) {
 														createPrototypes(fileTextSB, innerAbs);
 													} else {
-														File newClassFile =
+														final File newClassFile =
 															new File(PATH
 																+ feat.getName()
 																+ "\\"
 																+ innerAbs.getParent().getName()
 																+ ".java");
-														StringBuilder newClassFileTextSB =
+														final StringBuilder newClassFileTextSB =
 															createClassForPrototype(innerAbs, newClassFile);
 														createPrototypes(newClassFileTextSB, innerAbs);
 														newClassFileTextSB.append("\n}");
@@ -251,7 +252,7 @@ public class FeatureStubsGenerator {
 						if (keyWrapper != null) {
 							keyWrapper.runKeY(file);
 						}
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						FeatureHouseCorePlugin.getDefault().logError(e);
 					}
 				}
@@ -262,13 +263,13 @@ public class FeatureStubsGenerator {
 
 	private void getFeatures(final ProjectSignatures signatures) {
 		final LinkedList<FSTFeature> features =
-			new LinkedList<FSTFeature>(this.featureProject.getFSTModel().getFeatures());
+			new LinkedList<FSTFeature>(featureProject.getFSTModel().getFeatures());
 		featureStubFolder =
 			CorePlugin.createFolder(featureProject.getProject(), featureProject.getFeaturestubPath());
-		for (FSTFeature fstfeat : features) {
+		for (final FSTFeature fstfeat : features) {
 			try {
 				featureStubFolder.getFolder(fstfeat.getName()).delete(true, null);
-			} catch (CoreException e1) {
+			} catch (final CoreException e1) {
 				FeatureHouseCorePlugin.getDefault().logError(e1);
 			}
 		}
@@ -307,7 +308,7 @@ public class FeatureStubsGenerator {
 						+ absStig.getParent().getName()
 						+ "{\n");
 			} else {
-				String newClassFileText =
+				final String newClassFileText =
 					new String(Files.readAllBytes(classFile.toPath()));
 				final int lastIndexInNewClassFile =
 					newClassFileText.lastIndexOf("}");
@@ -317,7 +318,7 @@ public class FeatureStubsGenerator {
 								? lastIndexInNewClassFile
 								: newClassFileText.length()));
 			}
-		} catch (IOException e1) {
+		} catch (final IOException e1) {
 			FeatureHouseCorePlugin.getDefault().logError(e1);
 		}
 		return newClassFileTextSB;
@@ -355,9 +356,10 @@ public class FeatureStubsGenerator {
 
 	private void checkForMissingTypes(final FSTFeature feature, FSTRole role, String className) {
 		if (featureStubFolder.getFolder(role.getFeature().getName()).getFile(className
-			+ ".java").exists())
+			+ ".java").exists()) {
 			return;
-		File missingTypeFile =
+		}
+		final File missingTypeFile =
 			new File(PATH
 				+ feature.getName()
 				+ "\\"
@@ -369,18 +371,18 @@ public class FeatureStubsGenerator {
 					+ className
 					+ "{}");
 			} else {
-				String missingTypeFileText =
+				final String missingTypeFileText =
 					new String(Files.readAllBytes(missingTypeFile.toPath()));
 				final int lastIndexInNewClassFile =
 					missingTypeFileText.lastIndexOf("}");
-				StringBuilder missingTypeFileTextSB =
+				final StringBuilder missingTypeFileTextSB =
 					new StringBuilder(missingTypeFileText.substring(0,
 							lastIndexInNewClassFile > -1
 								? lastIndexInNewClassFile
 								: missingTypeFileText.length()));
 				writeToFile(missingTypeFile, missingTypeFileTextSB.toString());
 			}
-		} catch (IOException e1) {
+		} catch (final IOException e1) {
 			FeatureHouseCorePlugin.getDefault().logError(e1);
 		}
 	}
@@ -392,14 +394,14 @@ public class FeatureStubsGenerator {
 			newClassWriter =
 				new FileWriter(file);
 			newClassWriter.write(text);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		} finally {
 			try {
 				if (newClassWriter != null) {
 					newClassWriter.close();
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				FeatureHouseCorePlugin.getDefault().logError(e);
 			}
 		}
@@ -426,7 +428,7 @@ public class FeatureStubsGenerator {
 					+ curSig.getName()
 					+ "(");
 		}
-		String tmpText =
+		final String tmpText =
 			fileTextSB.substring(0, indexOfBody);
 		int indexOfStartOfContract =
 			tmpText.lastIndexOf("/*@");
@@ -448,17 +450,17 @@ public class FeatureStubsGenerator {
 		}
 		contractBody =
 			contractBody.substring(0, contractBody.indexOf("*/"));
-		StringBuilder ensures =
+		final StringBuilder ensures =
 			new StringBuilder(),
 				requires =
 					new StringBuilder(),
 				assignable =
 					new StringBuilder();
-		String[] contracts =
+		final String[] contracts =
 			contractBody.split("\n");
 		for (int i =
 			0; i < contracts.length; i++) {
-			String line =
+			final String line =
 				contracts[i].replace("@", "").trim();
 			if (line.startsWith(REQUIRES)) {
 				i =
@@ -470,7 +472,7 @@ public class FeatureStubsGenerator {
 				assignable.append(line.replace(ASSIGNABLE, ""));
 			}
 		}
-		String tmpFileText =
+		final String tmpFileText =
 			fileTextSB.substring(0, indexOfStartOfContract)
 				+ "/*@\n"
 				+ "\t@ requires_abs   "
@@ -564,7 +566,7 @@ public class FeatureStubsGenerator {
 		final String methodBody =
 			fileTextSB.substring(indexOfBody
 				+ indexOfOriginal);
-		String tmpFileText =
+		final String tmpFileText =
 			fileTextSB.substring(0, indexOfBody
 				+ indexOfOriginal)
 				+ curSig.getName()
@@ -575,7 +577,7 @@ public class FeatureStubsGenerator {
 	}
 
 	private void copyRolesToFeatureStubsFolder(final FSTFeature feat) {
-		for (FSTRole role : feat.getRoles()) {
+		for (final FSTRole role : feat.getRoles()) {
 			final String pathString =
 				featureProject.getFeaturestubPath()
 					+ File.separator
@@ -583,13 +585,13 @@ public class FeatureStubsGenerator {
 					+ File.separator
 					+ role.getClassFragment().getName();
 
-			IPath path =
+			final IPath path =
 				new Path(pathString);
-			IFile newRole =
+			final IFile newRole =
 				featureProject.getProject().getFile(path);
 			try {
 				role.getFile().copy(newRole.getFullPath(), true, null);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FeatureHouseCorePlugin.getDefault().logError(e);
 			}
 		}
@@ -598,7 +600,7 @@ public class FeatureStubsGenerator {
 	@Override
 	public String toString() {
 		return FEATURE_STUB_GENERATOR_FOR
-			+ this.featureProject.getProjectName()
+			+ featureProject.getProjectName()
 			+ ".";
 	}
 }

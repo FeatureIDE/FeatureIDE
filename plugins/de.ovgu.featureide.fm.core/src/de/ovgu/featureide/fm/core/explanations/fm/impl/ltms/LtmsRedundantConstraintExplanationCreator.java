@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Implementation of {@link RedundantConstraintExplanationCreator} using an {@link Ltms LTMS}.
- * 
+ *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  */
@@ -59,7 +59,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if (subject != null
+		if ((subject != null)
 			&& !(subject instanceof IConstraint)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
@@ -69,7 +69,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * <p> Does not include any of the constraints. The constraints are only added later during explaining. This is faster than creating the complete CNF and
 	 * repeatedly removing the redundant constraints from it. </p>
 	 */
@@ -82,8 +82,8 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	}
 
 	protected Node getCnfWithoutRedundantConstraint() {
-		if (cnfWithoutRedundantConstraint == null
-			&& getFeatureModel() != null) {
+		if ((cnfWithoutRedundantConstraint == null)
+			&& (getFeatureModel() != null)) {
 			cnfWithoutRedundantConstraint =
 				createCnfWithoutRedundantConstraint();
 		}
@@ -92,7 +92,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 
 	protected Node createCnfWithoutRedundantConstraint() {
 		getTraceModel().removeTraces(constraintClauseCount);
-		this.constraintClauseCount =
+		constraintClauseCount =
 			0;
 
 		final List<Node> clauses =
@@ -122,7 +122,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * <p> Uses a representation of the feature model without the redundant constraint. Sets several initial truth value assumptions that lead to a violation of
 	 * the redundant constraint. Then propagates each set of values until a violation in a clause occurs. Since a representation of the feature model without
 	 * the redundant constraint is used, the information of the constraint must already be stored differently in the feature model, making it redundant. Finally

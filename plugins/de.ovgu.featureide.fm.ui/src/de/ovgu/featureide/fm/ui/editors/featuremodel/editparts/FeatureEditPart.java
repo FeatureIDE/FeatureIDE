@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -54,7 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditP
 
 /**
  * An editpart for features. It implements the <code>NodeEditPart</code> that the models of features can provide connection anchors.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -71,7 +71,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	public ModelEditPart getParent() {
-		return (ModelEditPart) super.getParent();
+		return super.getParent();
 	}
 
 	@Override
@@ -119,12 +119,12 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	public void performRequest(Request request) {
-		IFeature feature =
+		final IFeature feature =
 			getModel().getObject();
-		IGraphicalFeatureModel featureModel =
+		final IGraphicalFeatureModel featureModel =
 			getParent().getModel();
 
-		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
+		for (final IGraphicalConstraint constraint : featureModel.getConstraints()) {
 			if (constraint.isFeatureSelected()) {
 				constraint.setFeatureSelected(false);
 			}
@@ -133,16 +133,16 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			SetFeatureToCollapseOperation op =
+			final SetFeatureToCollapseOperation op =
 				new SetFeatureToCollapseOperation(feature, featureModel);
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			} catch (ExecutionException e) {
+			} catch (final ExecutionException e) {
 				FMUIPlugin.getDefault().logError(e);
 
 			}
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			for (IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
+			for (final IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
 				featureModel.getGraphicalConstraint(partOf).setFeatureSelected(true);
 			}
 		}
@@ -150,7 +150,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	/**
 	 * Returns the source connection.
-	 * 
+	 *
 	 * @return the source connection; null if none exists
 	 */
 	protected ConnectionEditPart getSourceConnection() {
@@ -170,22 +170,26 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		return Collections.<FeatureConnection> emptyList();// getModel().getTargetConnections();
 	}
 
+	@Override
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
 		if (getModel().isCollapsed()
-			&& connection.getTarget() == connection.getSource()) {
+			&& (connection.getTarget() == connection.getSource())) {
 			return targetAnchor;
 		}
 		return sourceAnchor;
 	}
 
+	@Override
 	public ConnectionAnchor getSourceConnectionAnchor(Request request) {
 		return sourceAnchor;
 	}
 
+	@Override
 	public ConnectionAnchor getTargetConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
 		return targetAnchor;
 	}
 
+	@Override
 	public ConnectionAnchor getTargetConnectionAnchor(Request request) {
 		return targetAnchor;
 	}
@@ -214,10 +218,10 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		switch (prop) {
 		case CHILDREN_CHANGED:
 			getFigure().setLocation(getModel().getLocation());
-			for (FeatureConnection connection : getModel().getTargetConnections()) {
-				Map<?, ?> registry =
+			for (final FeatureConnection connection : getModel().getTargetConnections()) {
+				final Map<?, ?> registry =
 					getViewer().getEditPartRegistry();
-				ConnectionEditPart connectionEditPart =
+				final ConnectionEditPart connectionEditPart =
 					(ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refresh();
@@ -230,15 +234,15 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			sourceConnection =
 				getModel().getSourceConnection();
 			if (sourceConnection != null) {
-				IGraphicalFeature target =
+				final IGraphicalFeature target =
 					sourceConnection.getTarget();
 				final IGraphicalFeature newTarget =
 					FeatureUIHelper.getGraphicalParent(getModel());
 				if (!equals(newTarget, target)) {
 					sourceConnection.setTarget(newTarget);
-					Map<?, ?> registry =
+					final Map<?, ?> registry =
 						getViewer().getEditPartRegistry();
-					ConnectionEditPart connectionEditPart =
+					final ConnectionEditPart connectionEditPart =
 						(ConnectionEditPart) registry.get(sourceConnection);
 					if (connectionEditPart != null) {
 						refresh();
@@ -246,10 +250,10 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 				}
 			}
 
-			for (FeatureConnection connection : getModel().getTargetConnections()) {
-				Map<?, ?> registry =
+			for (final FeatureConnection connection : getModel().getTargetConnections()) {
+				final Map<?, ?> registry =
 					getViewer().getEditPartRegistry();
-				ConnectionEditPart connectionEditPart =
+				final ConnectionEditPart connectionEditPart =
 					(ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refresh();
@@ -343,15 +347,16 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	/**
 	 * <p> Sets the currently active reason. </p>
-	 * 
+	 *
 	 * <p> Propagates into the figure and the source connection. Refreshes accordingly. </p>
-	 * 
+	 *
 	 * @param activeReason the new active reason; null to reset
 	 */
 	protected void setActiveReason(FeatureModelReason activeReason) {
 		// Update the figure.
-		if (activeReason == null // reset
-			|| activeReason.getTrace().getOrigin() == Origin.CHILD_HORIZONTAL) {
+		if ((activeReason == null // reset
+		)
+			|| (activeReason.getTrace().getOrigin() == Origin.CHILD_HORIZONTAL)) {
 			final FeatureFigure figure =
 				getFigure();
 			figure.setActiveReason(activeReason);
@@ -359,9 +364,10 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		}
 
 		// Update the source connection.
-		if (activeReason == null // reset
-			|| activeReason.getTrace().getOrigin() == Origin.CHILD_UP
-			|| activeReason.getTrace().getOrigin() == Origin.CHILD_DOWN) {
+		if ((activeReason == null // reset
+		)
+			|| (activeReason.getTrace().getOrigin() == Origin.CHILD_UP)
+			|| (activeReason.getTrace().getOrigin() == Origin.CHILD_DOWN)) {
 			final ConnectionEditPart sourceConnection =
 				getSourceConnection();
 			sourceConnection.setActiveReason(activeReason);

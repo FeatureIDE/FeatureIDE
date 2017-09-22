@@ -17,7 +17,7 @@ import br.ufal.ic.colligens.util.Log;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class XMLParserTypeChef {
 
@@ -55,42 +55,43 @@ public class XMLParserTypeChef {
 						.getAbsolutePath()
 					+ System.getProperty("file.separator")
 					+ "output.xml");
-			if (!xmlFile.exists())
+			if (!xmlFile.exists()) {
 				return;
+			}
 		}
 		try {
-			Document document =
+			final Document document =
 				builder.build(xmlFile);
-			Element rootNode =
+			final Element rootNode =
 				document.getRootElement();
 
 			TypeErroProcessFile(rootNode, "typeerror");
 			TypeErroProcessFile(rootNode, "parsererror");
 
-		} catch (IOException io) {
+		} catch (final IOException io) {
 			System.out.println(io.getMessage());
-		} catch (JDOMException jdomex) {
+		} catch (final JDOMException jdomex) {
 			System.out.println(jdomex.getMessage());
 		}
 	}
 
 	private void TypeErroProcessFile(Element rootNode, String type) {
 
-		List<Element> list =
+		final List<Element> list =
 			rootNode.getChildren(type);
 
 		for (int i =
 			0; i < list.size(); i++) {
-			Element node =
+			final Element node =
 				list.get(i);
 
-			String file =
+			final String file =
 				node.getChild(POSITION).getChildText("file").trim();
 
 			// compare with the log file that was analyzed
 			if (file.contains(fileProxie.getFileToAnalyse())) {
 
-				Log log =
+				final Log log =
 					new Log(fileProxie, Integer.parseInt(node
 							.getChild(POSITION).getChildText("line").trim()), Integer.parseInt(
 									node

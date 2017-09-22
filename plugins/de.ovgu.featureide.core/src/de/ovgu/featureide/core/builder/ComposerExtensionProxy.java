@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,7 +32,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 
 /**
  * Handles a composer extension.
- * 
+ *
  * @author Tom Brosch
  */
 public class ComposerExtensionProxy implements IComposerExtension {
@@ -45,7 +45,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	private IComposerExtensionClass defaultComposerExtensionClass;
 
 	public ComposerExtensionProxy(IConfigurationElement configurationElement) throws Exception {
-		this.configElement =
+		configElement =
 			configurationElement;
 		name =
 			configElement.getAttribute("name");
@@ -58,7 +58,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		try {
 			defaultComposerExtensionClass =
 				(IComposerExtensionClass) configElement.createExecutableExtension("class");
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 			throw e;
 		}
@@ -93,13 +93,13 @@ public class ComposerExtensionProxy implements IComposerExtension {
 			projectComposerMap.get(featureProject);
 		if (composer == null) {
 			try {
-				ComposerExtensionClass tmpComposer =
+				final ComposerExtensionClass tmpComposer =
 					(ComposerExtensionClass) configElement.createExecutableExtension("class");
 				tmpComposer.setComposerExtension(this);
 				composer =
 					tmpComposer;
 				projectComposerMap.put(featureProject, composer);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
 		}

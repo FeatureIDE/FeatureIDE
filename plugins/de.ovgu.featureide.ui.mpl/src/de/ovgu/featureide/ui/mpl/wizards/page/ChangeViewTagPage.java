@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,7 +40,7 @@ import de.ovgu.featureide.ui.mpl.wizards.ChangeViewTagWizard;
 
 /**
  * A dialog page for the {@link ChangeViewTagWizard}.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ChangeViewTagPage extends AbstractWizardPage {
@@ -54,8 +54,9 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 		setDescription(CREATES_A_MULTI_FEATUREIDE_PROJECT);
 	}
 
+	@Override
 	public void createControl(Composite parent) {
-		Composite container =
+		final Composite container =
 			new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout =
 			new GridLayout();
@@ -64,15 +65,15 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		GridLayout projGridLayout =
+		final GridLayout projGridLayout =
 			new GridLayout();
 		projGridLayout.numColumns =
 			2;
 
-		Group configGroup =
+		final Group configGroup =
 			new Group(container, SWT.NONE);
 		configGroup.setText(SCALE_UP_VIEW_TAG);
-		GridData gridData =
+		final GridData gridData =
 			new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan =
 			2;
@@ -82,7 +83,7 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
 
-		GridData gridData2 =
+		final GridData gridData2 =
 			new GridData(GridData.FILL_HORIZONTAL);
 		gridData2.horizontalSpan =
 			1;
@@ -126,7 +127,7 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 		}
 		try {
 			Integer.valueOf(viewLevelText.getText());
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return ENTER_A_NUMBER;
 		}
 		return null;

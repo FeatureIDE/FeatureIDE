@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -58,7 +58,7 @@ import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
 
 /**
  * Collects all signatures in a Munge project.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class MungeSignatureBuilder {
@@ -74,14 +74,14 @@ public abstract class MungeSignatureBuilder {
 		try (final InputStreamReader in =
 			new InputStreamReader(file.getContents())) {
 			while (true) {
-				int readChars =
+				final int readChars =
 					in.read(buffer, 0, buffer.length);
 				if (readChars < 0) {
 					break;
 				}
 				contents.append(buffer, 0, readChars);
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		return contents.toString();
@@ -99,13 +99,13 @@ public abstract class MungeSignatureBuilder {
 			(pckgDecl == null)
 				? null
 				: pckgDecl.getName().getFullyQualifiedName();
-		List<?> l =
+		final List<?> l =
 			cu.getCommentList();
-		List<Javadoc> cl =
+		final List<Javadoc> cl =
 			new LinkedList<>();
-		for (Object object : l) {
+		for (final Object object : l) {
 			if (object instanceof Javadoc) {
-				Javadoc comment =
+				final Javadoc comment =
 					(Javadoc) object;
 				cl.add(comment);
 			}
@@ -185,9 +185,9 @@ public abstract class MungeSignatureBuilder {
 
 			@Override
 			public boolean visit(MethodDeclaration node) {
-				int pos =
+				final int pos =
 					unit.getLineNumber(node.getBody().getStartPosition());
-				int end =
+				final int end =
 					unit.getLineNumber(node.getBody().getStartPosition()
 						+ node.getBody().getLength());
 				final MungeMethodSignature methodSignature =
@@ -197,8 +197,8 @@ public abstract class MungeSignatureBuilder {
 
 				attachFeatureData(methodSignature, node);
 
-				if (node.getJavadoc() == null
-					&& lastCommentedMethod != null
+				if ((node.getJavadoc() == null)
+					&& (lastCommentedMethod != null)
 					&& lastCommentedMethod.getName().equals(node.getName())) {
 					curfeatureData.setComment(lastComment);
 				} else {
@@ -220,7 +220,7 @@ public abstract class MungeSignatureBuilder {
 				} else {
 					return null;
 				}
-				AbstractClassSignature uniqueSig =
+				final AbstractClassSignature uniqueSig =
 					(AbstractClassSignature) map.get(sig);
 				if (uniqueSig == null) {
 					visit((TypeDeclaration) astnode);
@@ -230,9 +230,9 @@ public abstract class MungeSignatureBuilder {
 
 			@Override
 			public boolean visit(FieldDeclaration node) {
-				for (Iterator<?> it =
+				for (final Iterator<?> it =
 					node.fragments().iterator(); it.hasNext();) {
-					VariableDeclarationFragment fragment =
+					final VariableDeclarationFragment fragment =
 						(VariableDeclarationFragment) it.next();
 
 					final MungeFieldSignature fieldSignature =
@@ -273,7 +273,7 @@ public abstract class MungeSignatureBuilder {
 		final ASTParser parser =
 			ASTParser.newParser(AST.JLS4);
 
-		IFolder sourceFolder =
+		final IFolder sourceFolder =
 			featureProject.getSourceFolder();
 		try {
 			sourceFolder.accept(new IResourceVisitor() {
@@ -283,7 +283,7 @@ public abstract class MungeSignatureBuilder {
 					if (resource instanceof IFolder) {
 						return true;
 					} else if (resource instanceof IFile) {
-						char[] content =
+						final char[] content =
 							readFile((IFile) resource).toCharArray();
 						if (content.length > 0) {
 							parser.setSource(content);
@@ -294,7 +294,7 @@ public abstract class MungeSignatureBuilder {
 					return false;
 				}
 			});
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 

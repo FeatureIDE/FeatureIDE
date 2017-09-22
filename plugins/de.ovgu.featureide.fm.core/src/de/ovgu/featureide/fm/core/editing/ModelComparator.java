@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,18 +41,18 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * Compares two feature models based on a satisfiability solver. The result is a classification of the edit that transforms one model into the second model.
- * 
+ *
  * @author Thomas Thuem
  */
 public class ModelComparator {
 
-	private long timeout;
+	private final long timeout;
 
 	private enum Strategy {
 		WithoutIdenticalRules, SingleTesting, SingleTestingAborted
 	};
 
-	private Set<Strategy> strategy =
+	private final Set<Strategy> strategy =
 		new HashSet<Strategy>();
 
 	private IFeatureModel oldModel;
@@ -88,12 +88,15 @@ public class ModelComparator {
 	public ModelComparator(long timeout, int strategyIndex) {
 		this.timeout =
 			timeout;
-		if (strategyIndex > 0)
+		if (strategyIndex > 0) {
 			strategy.add(Strategy.WithoutIdenticalRules);
-		if (strategyIndex > 1)
+		}
+		if (strategyIndex > 1) {
 			strategy.add(Strategy.SingleTesting);
-		if (strategyIndex > 2)
+		}
+		if (strategyIndex > 2) {
 			strategy.add(Strategy.SingleTestingAborted);
+		}
 	}
 
 	public Comparison compare(IFeatureModel oldModel, IFeatureModel newModel) {
@@ -107,10 +110,10 @@ public class ModelComparator {
 			deletedFeatures =
 				calculateAddedFeatures(newModel, oldModel);
 
-			Map<Object, Node> oldMap =
+			final Map<Object, Node> oldMap =
 				NodeCreator
 						.calculateReplacingMap(oldModel);
-			Map<Object, Node> newMap =
+			final Map<Object, Node> newMap =
 				NodeCreator
 						.calculateReplacingMap(newModel);
 			optimizeReplacingMaps(oldMap, newMap);
@@ -142,26 +145,28 @@ public class ModelComparator {
 			isImplied =
 				implies(newRoot, oldRootUpdated, addedProducts);
 
-			if (implies)
-				if (isImplied)
+			if (implies) {
+				if (isImplied) {
 					result =
 						Comparison.REFACTORING;
-				else
+				} else {
 					result =
 						Comparison.GENERALIZATION;
-			else if (isImplied)
+				}
+			} else if (isImplied) {
 				result =
 					Comparison.SPECIALIZATION;
-			else
+			} else {
 				result =
 					Comparison.ARBITRARY;
-		} catch (OutOfMemoryError e) {
+			}
+		} catch (final OutOfMemoryError e) {
 			result =
 				Comparison.OUTOFMEMORY;
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			result =
 				Comparison.TIMEOUT;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Logger.logError(e);
 			result =
 				Comparison.ERROR;
@@ -171,39 +176,42 @@ public class ModelComparator {
 
 	private Set<String> calculateAddedFeatures(IFeatureModel oldModel,
 			IFeatureModel newModel) {
-		Set<String> addedFeatures =
+		final Set<String> addedFeatures =
 			new HashSet<String>();
-		for (IFeature feature : newModel.getFeatures())
+		for (final IFeature feature : newModel.getFeatures()) {
 			if (feature.getStructure().isConcrete()) {
-				String name =
+				final String name =
 					newModel.getRenamingsManager().getOldName(feature.getName());
-				IFeature associatedFeature =
+				final IFeature associatedFeature =
 					oldModel.getFeature(oldModel
 							.getRenamingsManager().getNewName(name));
-				if (associatedFeature == null
-					|| associatedFeature.getStructure().isAbstract())
+				if ((associatedFeature == null)
+					|| associatedFeature.getStructure().isAbstract()) {
 					addedFeatures.add(name);
+				}
 			}
+		}
 		return addedFeatures;
 	}
 
 	private void optimizeReplacingMaps(Map<Object, Node> oldMap, Map<Object, Node> newMap) {
-		List<Object> toBeRemoved =
+		final List<Object> toBeRemoved =
 			new LinkedList<Object>();
-		for (Entry<Object, Node> entry : oldMap.entrySet()) {
-			Object var =
+		for (final Entry<Object, Node> entry : oldMap.entrySet()) {
+			final Object var =
 				entry.getKey();
 			if (newMap.containsKey(var)) {
-				Node oldRepl =
+				final Node oldRepl =
 					entry.getValue();
-				Node newRepl =
+				final Node newRepl =
 					newMap.get(var);
-				if (oldRepl != null
-					&& oldRepl.equals(newRepl))
+				if ((oldRepl != null)
+					&& oldRepl.equals(newRepl)) {
 					toBeRemoved.add(var);
+				}
 			}
 		}
-		for (Object var : toBeRemoved) {
+		for (final Object var : toBeRemoved) {
 			oldMap.remove(var);
 			newMap.remove(var);
 		}
@@ -211,30 +219,35 @@ public class ModelComparator {
 
 	private Node createFalseStatementForConcreteVariables(
 			Set<String> addedFeatures, Node node) {
-		if (addedFeatures.isEmpty())
+		if (addedFeatures.isEmpty()) {
 			return node;
-		LinkedList<Node> children =
+		}
+		final LinkedList<Node> children =
 			new LinkedList<Node>();
-		for (Object var : addedFeatures)
+		for (final Object var : addedFeatures) {
 			children.add(new Literal(var, false));
+		}
 		return new And(node, new And(children));
 	}
 
 	/**
 	 * Removes all child nodes that are contained in the reference node.
-	 * 
+	 *
 	 * @param node the node to copy and remove from
 	 * @param referenceNode node that specifies what do remove
 	 * @return a copy of the node where some child nodes are not existent
 	 */
 	private Node removeIdenticalNodes(Node node, Node referenceNode) {
-		if (!strategy.contains(Strategy.WithoutIdenticalRules))
+		if (!strategy.contains(Strategy.WithoutIdenticalRules)) {
 			return node;
-		LinkedList<Node> updatedNodes =
+		}
+		final LinkedList<Node> updatedNodes =
 			new LinkedList<Node>();
-		for (Node child : node.getChildren())
-			if (!containedIn(child, referenceNode.getChildren()))
+		for (final Node child : node.getChildren()) {
+			if (!containedIn(child, referenceNode.getChildren())) {
 				updatedNodes.add(child);
+			}
+		}
 		return updatedNodes.isEmpty()
 			? null
 			: new And(updatedNodes);
@@ -242,13 +255,14 @@ public class ModelComparator {
 
 	public boolean implies(Node a, Node b, ExampleCalculator example)
 			throws TimeoutException {
-		if (b == null)
+		if (b == null) {
 			return true;
+		}
 
 		if (!strategy.contains(Strategy.SingleTesting)) {
-			Node node =
+			final Node node =
 				new And(a.clone(), new Not(b.clone()));
-			SatSolver solver =
+			final SatSolver solver =
 				new SatSolver(node, timeout);
 			return !solver.isSatisfiable();
 		}
@@ -260,9 +274,11 @@ public class ModelComparator {
 	}
 
 	private boolean containedIn(Node node, Node[] nodes) {
-		for (Node child : nodes)
-			if (node.equals(child))
+		for (final Node child : nodes) {
+			if (node.equals(child)) {
 				return true;
+			}
+		}
 		return false;
 	}
 

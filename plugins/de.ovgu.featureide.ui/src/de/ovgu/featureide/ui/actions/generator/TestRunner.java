@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -69,7 +69,7 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.Build
 
 /**
  * Runs test cases of the generated product.
- * 
+ *
  * @author Jens Meinicke
  */
 @SuppressWarnings(RESTRICTION)
@@ -98,13 +98,13 @@ public class TestRunner {
 
 	@SuppressWarnings(RESOURCE)
 	public void runTests(final BuilderConfiguration configuration) {
-		URL[] url =
+		final URL[] url =
 			getURLs();
-		URLClassLoader classLoader =
+		final URLClassLoader classLoader =
 			new URLClassLoader(url, Thread.currentThread().getContextClassLoader());
 		for (final String file : getFiles(tmp)) {
 			try {
-				Class<?> clazz =
+				final Class<?> clazz =
 					classLoader.loadClass(file);
 
 				if (isModuleTest(clazz)) {
@@ -117,7 +117,7 @@ public class TestRunner {
 					}
 				}
 
-				JUnitCore core =
+				final JUnitCore core =
 					new JUnitCore();
 				core.addListener(new RunListener() {
 
@@ -144,7 +144,7 @@ public class TestRunner {
 						testResults.addTest(file,
 								(builder.buildType == BuildType.ALL_CURRENT
 									? ""
-									: ConfigurationBuilder.FOLDER_NAME
+									: IConfigurationBuilderBasics.FOLDER_NAME
 										+ "\\")
 									+ configuration.getName(),
 								new Test(description.toString(), time, file));
@@ -164,7 +164,7 @@ public class TestRunner {
 						testResults.addTest(file,
 								(builder.buildType == BuildType.ALL_CURRENT
 									? ""
-									: ConfigurationBuilder.FOLDER_NAME
+									: IConfigurationBuilderBasics.FOLDER_NAME
 										+ "\\")
 									+ configuration.getName(),
 								new Test(failure.getTestHeader(), time, file, failure));
@@ -178,7 +178,7 @@ public class TestRunner {
 					}
 
 				});
-				SecurityManager originalManager =
+				final SecurityManager originalManager =
 					System.getSecurityManager();
 				try {
 					System.setSecurityManager(NO_EXIT_MANAGER);
@@ -186,15 +186,15 @@ public class TestRunner {
 				} finally {
 					System.setSecurityManager(originalManager);
 				}
-			} catch (ClassNotFoundException e) {
+			} catch (final ClassNotFoundException e) {
 				LOGGER.logError(e);
 			}
 		}
 
-		IFeatureProject project =
+		final IFeatureProject project =
 			CorePlugin.getFeatureProject(tmp);
 		if (project != null) {
-			IFile iResultsXML =
+			final IFile iResultsXML =
 				project.getProject().getFile("test.xml");
 			saveResults(iResultsXML, testResults);
 		}
@@ -202,7 +202,7 @@ public class TestRunner {
 	}
 
 	private URL[] getURLs() {
-		ArrayList<URL> urls =
+		final ArrayList<URL> urls =
 			new ArrayList<>();
 		try {
 			URL url =
@@ -212,19 +212,19 @@ public class TestRunner {
 					+ "/");
 			urls.add(url);
 
-			JavaProject proj =
+			final JavaProject proj =
 				new JavaProject(tmp.getProject(), null);
-			IJavaElement[] elements =
+			final IJavaElement[] elements =
 				proj.getChildren();
-			for (IJavaElement e : elements) {
-				String path =
+			for (final IJavaElement e : elements) {
+				final String path =
 					e.getPath().toOSString();
 				if (path.contains(":")) {
 					continue;
 				}
-				IResource resource =
+				final IResource resource =
 					e.getResource();
-				if (resource != null
+				if ((resource != null)
 					&& "jar".equals(resource.getFileExtension())) {
 					urls.add(resource.getRawLocationURI().toURL());
 				}
@@ -240,7 +240,7 @@ public class TestRunner {
 	 * Checks whether the class is a module test.
 	 */
 	private boolean isModuleTest(Class<?> clazz) {
-		for (Annotation a : clazz.getAnnotations()) {
+		for (final Annotation a : clazz.getAnnotations()) {
 			if ("@de.ovgu.featureide.ModuleTest()".equals(a.toString())) {
 				// somehow clazz.getAnnotation(ModulTest.class) does not work
 				return true;
@@ -283,18 +283,18 @@ public class TestRunner {
 	private List<String> getFiles(IFolder folder) {
 		try {
 			folder.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			LOGGER.logError(e);
 		}
 		return getFiles(folder, null);
 	}
 
 	private List<String> getFiles(IFolder folder, String prefix) {
-		List<String> files =
+		final List<String> files =
 			new LinkedList<>();
 		try {
 
-			for (IResource child : folder.members()) {
+			for (final IResource child : folder.members()) {
 				if (child instanceof IFolder) {
 					files.addAll(getFiles((IFolder) child, (prefix != null
 						? prefix
@@ -311,14 +311,14 @@ public class TestRunner {
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			LOGGER.logError(e);
 		}
 		return files;
 	}
 
 	private static synchronized void saveResults(IFile iResultsXML, TestResults testResults) {
-		File resultsXML =
+		final File resultsXML =
 			new File(iResultsXML.getLocationURI());
 		try {
 			new TestXMLWriter(testResults).writeToFile(resultsXML);
@@ -331,7 +331,7 @@ public class TestRunner {
 
 	/**
 	 * Tries to open the given xml file on the JUnit view.
-	 * 
+	 *
 	 * @param file The xml file to open.
 	 */
 	private static void openJunitView(final IFile file) {
@@ -345,20 +345,21 @@ public class TestRunner {
 
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					IWorkbenchWindow window =
+					final IWorkbenchWindow window =
 						UIPlugin.getDefault().getWorkbench().getWorkbenchWindows()[0];
-					IWorkbenchPage page =
+					final IWorkbenchPage page =
 						window.getActivePage();
-					if (page == null)
+					if (page == null) {
 						return Status.OK_STATUS;
+					}
 
 					try {
-						IEditorDescriptor desc =
+						final IEditorDescriptor desc =
 							getDescriptor(file);
 						if (desc != null) {
 							page.openEditor(new FileEditorInput(file), desc.getId());
 						}
-					} catch (CoreException e) {
+					} catch (final CoreException e) {
 						LOGGER.logError(e);
 					}
 					return Status.OK_STATUS;
@@ -367,7 +368,7 @@ public class TestRunner {
 		job.schedule();
 		try {
 			job.join();
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			LOGGER.logError(e);
 		}
 	}
@@ -375,7 +376,7 @@ public class TestRunner {
 	private static IEditorDescriptor getDescriptor(IFile file) throws CoreException {
 		IContentType contentType =
 			null;
-		IContentDescription description =
+		final IContentDescription description =
 			file.getContentDescription();
 		if (description != null) {
 			contentType =

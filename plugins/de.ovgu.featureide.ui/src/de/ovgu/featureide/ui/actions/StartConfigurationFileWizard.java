@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,18 +36,21 @@ public class StartConfigurationFileWizard implements IWorkbenchWindowActionDeleg
 
 	private IWorkbenchWindow window;
 
+	@Override
 	public void dispose() {}
 
+	@Override
 	public void init(IWorkbenchWindow window) {
 		this.window =
 			window;
 	}
 
+	@Override
 	public void run(IAction action) {
 
-		NewConfigurationFileWizard wizard =
+		final NewConfigurationFileWizard wizard =
 			new NewConfigurationFileWizard();
-		ISelection selection =
+		final ISelection selection =
 			window.getSelectionService().getSelection();
 
 		if (selection instanceof IStructuredSelection) {
@@ -56,11 +59,12 @@ public class StartConfigurationFileWizard implements IWorkbenchWindowActionDeleg
 			wizard.init(window.getWorkbench(), null);
 		}
 
-		WizardDialog dialog =
+		final WizardDialog dialog =
 			new WizardDialog(window.getShell(), wizard);
 		dialog.open();
 	}
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {}
 
 }

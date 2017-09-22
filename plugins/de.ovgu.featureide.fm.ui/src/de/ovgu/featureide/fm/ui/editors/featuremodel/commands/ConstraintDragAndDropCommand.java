@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveConstraintTo
 
 /**
  * Executed command when dragging and dropping constraints
- * 
+ *
  * @author Fabian Benduhn
  * @author David Broneske
  * @author Marcus Pinnecke
@@ -46,10 +46,10 @@ public class ConstraintDragAndDropCommand extends Command {
 	private int maxRight;
 	private int maxUp;
 	private int maxDown;
-	private IGraphicalFeatureModel featureModel;
-	private IGraphicalConstraint constraint;
-	private Point newLocation;
-	private boolean hasAutoLayout;
+	private final IGraphicalFeatureModel featureModel;
+	private final IGraphicalConstraint constraint;
+	private final Point newLocation;
+	private final boolean hasAutoLayout;
 	boolean isLastPos;
 
 	public ConstraintDragAndDropCommand(IGraphicalFeatureModel featureModel, IGraphicalConstraint constraint, Point newLocation) {
@@ -62,39 +62,43 @@ public class ConstraintDragAndDropCommand extends Command {
 			newLocation;
 		isLastPos =
 			false;
-		this.hasAutoLayout =
+		hasAutoLayout =
 			featureModel.getLayout().hasFeaturesAutoLayout();
 	}
 
+	@Override
 	public boolean canExecute() {
 		if (hasAutoLayout) {
 			setMaxValues();
-			if (newLocation.y > (maxDown
-				+ 30)
-				|| newLocation.y < (maxUp
-					- 10)
-				|| newLocation.x > (maxRight
-					+ 5)
-				|| newLocation.x < (maxLeft
-					- 5)) {
+			if ((newLocation.y > (maxDown
+				+ 30))
+				|| (newLocation.y < (maxUp
+					- 10))
+				|| (newLocation.x > (maxRight
+					+ 5))
+				|| (newLocation.x < (maxLeft
+					- 5))) {
 				return false;
 			}
 		}
 		return true;
 	}
 
+	@Override
 	public void execute() {
 
 		int index =
 			calculateNewIndex();
-		int oldIndex =
+		final int oldIndex =
 			featureModel.getConstraints().indexOf(constraint);
-		if (index > oldIndex
-			&& !isLastPos)
+		if ((index > oldIndex)
+			&& !isLastPos) {
 			index--;
+		}
 		if (hasAutoLayout
-			&& (index == oldIndex))
+			&& (index == oldIndex)) {
 			return;
+		}
 
 		AbstractFeatureModelOperation op =
 			null;
@@ -108,17 +112,17 @@ public class ConstraintDragAndDropCommand extends Command {
 		}
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private int calculateNewIndex() {
-		for (IGraphicalConstraint c : featureModel.getConstraints()) {
+		for (final IGraphicalConstraint c : featureModel.getConstraints()) {
 			if ((c.getLocation().y
 				+ 17) > newLocation.y) {
 				isLastPos =
@@ -140,7 +144,7 @@ public class ConstraintDragAndDropCommand extends Command {
 			constraint.getLocation().x;
 		maxUp =
 			constraint.getLocation().y;
-		for (IGraphicalConstraint c : featureModel.getConstraints()) {
+		for (final IGraphicalConstraint c : featureModel.getConstraints()) {
 
 			if (c.getLocation().x < maxLeft) {
 				maxLeft =
@@ -151,8 +155,8 @@ public class ConstraintDragAndDropCommand extends Command {
 					c.getLocation().y;
 
 			}
-			if (c.getLocation().x
-				+ c.getSize().width > maxRight) {
+			if ((c.getLocation().x
+				+ c.getSize().width) > maxRight) {
 				maxRight =
 					c.getLocation().x
 						+ c.getSize().width;
@@ -169,13 +173,13 @@ public class ConstraintDragAndDropCommand extends Command {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public Point getLeftPoint() {
-		int index =
+		final int index =
 			calculateNewIndex();
 
-		Point p =
+		final Point p =
 			new Point(constraint.getLocation().x
 				- 5, featureModel.getConstraints().get(index).getLocation().y);
 		if (isLastPos) {
@@ -190,7 +194,7 @@ public class ConstraintDragAndDropCommand extends Command {
 
 	public Point getRightPoint() {
 
-		Point p =
+		final Point p =
 			new Point(constraint.getLocation().x
 				+ constraint.getSize().width
 				+ 5, featureModel

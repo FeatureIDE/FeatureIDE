@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 /**
  * description
- * 
+ *
  * @author Stefan Krueger
  * @author Florian Proksch
  */
@@ -78,9 +78,10 @@ public class FSTInvariant extends RoleElement<FSTInvariant> {
 			+ getFile()).hashCode();
 	}
 
+	@Override
 	public String getFullName() {
 		if (isAsmetalInvariant) {
-			StringBuilder fullname =
+			final StringBuilder fullname =
 				new StringBuilder();
 			fullname.append(hasProperIdentifier
 				? name
@@ -90,15 +91,16 @@ public class FSTInvariant extends RoleElement<FSTInvariant> {
 			fullname.append(" over ");
 			for (int i =
 				0; i < parameterTypes.size(); i++) {
-				if (i > 0)
+				if (i > 0) {
 					fullname.append(", ");
+				}
 				fullname.append(parameterTypes.get(i));
 			}
 			return fullname.toString();
 
 		} else {
 			// JML Invariant
-			String name =
+			final String name =
 				body.replaceAll("  ", "").replace((char) 10, ' ').replaceFirst("invariant ", "");
 			return ((name.length() > 25
 				? name.substring(0, 25)
@@ -108,11 +110,11 @@ public class FSTInvariant extends RoleElement<FSTInvariant> {
 	}
 
 	public boolean inRefinementGroup() {
-		for (FSTRole role : getRole().getFSTClass().getRoles()) {
+		for (final FSTRole role : getRole().getFSTClass().getRoles()) {
 			if (role.getFeature().equals(getRole().getFeature())) {
 				continue;
 			}
-			for (FSTInvariant invariant : role.getClassFragment().getInvariants()) {
+			for (final FSTInvariant invariant : role.getClassFragment().getInvariants()) {
 				if (invariant.getName().equals(getName())) {
 					return true;
 				}
@@ -121,9 +123,11 @@ public class FSTInvariant extends RoleElement<FSTInvariant> {
 		return false;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof FSTInvariant))
+		if (!(obj instanceof FSTInvariant)) {
 			return false;
+		}
 		return ((FSTInvariant) obj).getUniqueIdentifier() == getUniqueIdentifier();
 	}
 }

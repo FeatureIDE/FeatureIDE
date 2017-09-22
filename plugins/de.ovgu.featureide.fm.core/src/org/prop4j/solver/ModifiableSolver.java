@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 
 /**
  * Finds certain solutions of propositional formulas. Clauses can be removed.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ModifiableSolver extends BasicSolver {
@@ -54,6 +54,7 @@ public class ModifiableSolver extends BasicSolver {
 		super(oldSolver);
 	}
 
+	@Override
 	protected Solver<?> initSolver() {
 		final Solver<?> solver =
 			(Solver<?>) SolverFactory.newDefault();
@@ -71,10 +72,10 @@ public class ModifiableSolver extends BasicSolver {
 		final int oldSize =
 			constrList.size();
 		try {
-			for (Clause clause : cnfChildren) {
+			for (final Clause clause : cnfChildren) {
 				constrList.add(solver.addClause(new VecInt(clause.getLiterals())));
 			}
-		} catch (ContradictionException e) {
+		} catch (final ContradictionException e) {
 			removeLastClauses(constrList.size()
 				- oldSize);
 			throw e;
@@ -82,6 +83,7 @@ public class ModifiableSolver extends BasicSolver {
 		return new ArrayList<>(constrList.subList(oldSize, constrList.size()));
 	}
 
+	@Override
 	protected List<IConstr> addCNF(final Node[] cnfChildren) throws ContradictionException {
 		if (constrList == null) {
 			constrList =
@@ -90,7 +92,7 @@ public class ModifiableSolver extends BasicSolver {
 		final int oldSize =
 			constrList.size();
 		try {
-			for (Node node : cnfChildren) {
+			for (final Node node : cnfChildren) {
 				final Node[] children =
 					node.getChildren();
 				final int[] clause =
@@ -104,7 +106,7 @@ public class ModifiableSolver extends BasicSolver {
 				}
 				constrList.add(solver.addClause(new VecInt(clause)));
 			}
-		} catch (ContradictionException e) {
+		} catch (final ContradictionException e) {
 			removeLastClauses(constrList.size()
 				- oldSize);
 			throw e;
@@ -129,7 +131,7 @@ public class ModifiableSolver extends BasicSolver {
 		}
 		try {
 			return !solver.isSatisfiable(backbone);
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			Logger.logError(e);
 		}
 		return false;

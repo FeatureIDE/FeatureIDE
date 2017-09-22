@@ -25,9 +25,9 @@ public class InvalidProductViewLog {
 	private String relativePath;
 
 	public InvalidProductViewLog(String path) {
-		String pattern =
+		final String pattern =
 			Pattern.quote(System.getProperty("file.separator"));
-		String[] relativePath =
+		final String[] relativePath =
 			path.split(pattern);
 		this.relativePath =
 			relativePath[relativePath.length
@@ -38,26 +38,26 @@ public class InvalidProductViewLog {
 				+ File.separator
 				+ relativePath[relativePath.length
 					- 1];
-		this.productName =
+		productName =
 			relativePath[relativePath.length
 				- 1];
 
 		try {
-			IMarker marker =
+			final IMarker marker =
 				getFolder().createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, INVALID_PRODUCT_VARIANT);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			marker.setAttribute(IMarker.LOCATION, this.relativePath);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public IFolder getFolder() {
-		IWorkspace workspace =
+		final IWorkspace workspace =
 			ResourcesPlugin.getWorkspace();
-		IPath location =
-			Path.fromOSString(this.relativePath);
+		final IPath location =
+			Path.fromOSString(relativePath);
 		return workspace.getRoot().getFolder(location);
 	}
 

@@ -19,7 +19,7 @@ public class InvalidProductView extends ViewPart {
 		controller =
 			InvalidProductsViewController.getInstance();
 		controller.setView(this);
-		this.setTitleToolTip(INVALID_PRODUCTS___COLLIGENS);
+		setTitleToolTip(INVALID_PRODUCTS___COLLIGENS);
 	}
 
 	@Override

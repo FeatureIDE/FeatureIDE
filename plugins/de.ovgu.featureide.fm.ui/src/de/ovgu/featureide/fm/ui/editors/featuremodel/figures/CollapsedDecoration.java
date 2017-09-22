@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A decoration for a feature connection that indicates the mandatory property.
- * 
+ *
  * @author Joshua Sprey
  * @author Enis Belli
  * @author Christopher Sontag
@@ -94,15 +94,16 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 			return;
 		}
 
-		if (graphicalFeature != null)
+		if (graphicalFeature != null) {
 			if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
-			// left to right layout
-			super.setLocation(p.translate(+getBounds().width
-				/ 2
-				+ GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
-					-getBounds().height
-						/ 2));
+				// left to right layout
+				super.setLocation(p.translate((+getBounds().width
+					/ 2)
+					+ GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
+						-getBounds().height
+							/ 2));
 			}
+		}
 		super.setLocation(p.translate(-(getBounds().width
 			/ 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
 	}
@@ -110,7 +111,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 	public int GetAllChildren(IFeatureStructure parent) {
 		int count =
 			0;
-		for (IFeatureStructure iterable_element : parent.getChildren()) {
+		for (final IFeatureStructure iterable_element : parent.getChildren()) {
 			count +=
 				1
 					+ GetAllChildren(iterable_element);
@@ -126,7 +127,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 
 		final Dimension labelSize =
 			childrenCount.getPreferredSize();
-		this.minSize =
+		minSize =
 			labelSize;
 
 		if (!labelSize.equals(childrenCount.getSize())) {
@@ -171,23 +172,23 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 			graphics.drawRoundRectangle(getBounds(), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
 			return;
 		}
-		int x =
+		final int x =
 			getBounds().x
 				+ 1;
-		int y =
+		final int y =
 			getBounds().y
 				+ 1;
 		int width =
 			getBounds().width
 				- 2;
-		if (width
-			% 2 == 1) {
+		if ((width
+			% 2) == 1) {
 			width +=
 				1;
 			setBounds(new Rectangle(getBounds().x, getBounds().y, getBounds().width
 				+ 1, getBounds().height));
 		}
-		int height =
+		final int height =
 			getBounds().height
 				- 2;
 		graphics.setLineWidth(1);

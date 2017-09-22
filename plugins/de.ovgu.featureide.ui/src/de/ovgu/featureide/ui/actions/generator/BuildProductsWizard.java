@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,12 +40,12 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * A Wizard to create configurations with the {@link ConfigurationBuilder}.
- * 
+ *
  * @author Jens Meinicke
  */
 public class BuildProductsWizard extends Wizard implements INewWizard, IConfigurationBuilderBasics {
 
-	private IFeatureProject featureProject;
+	private final IFeatureProject featureProject;
 	private BuildProductsPage page;
 	private boolean toggleState;
 
@@ -56,6 +56,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 			toggleState;
 	}
 
+	@Override
 	public boolean performFinish() {
 		toggleState =
 			page.getToggleState();
@@ -88,12 +89,12 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	}
 
 	private String getAlgorithm() {
-		String tWise =
+		final String tWise =
 			getTWise();
 		if (tWise == null) {
 			return ICPL;
 		}
-		String algorithm =
+		final String algorithm =
 			tWise.split("[|]")[0];
 		if (!(algorithm.equals(ICPL)
 			||
@@ -109,7 +110,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	}
 
 	private int getT() {
-		String tWise =
+		final String tWise =
 			getTWise();
 		if (tWise == null) {
 			return 2;
@@ -123,7 +124,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	protected static String getTWise() {
 		try {
 			return ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(T_WISE);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return null;
@@ -140,7 +141,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 				return 2;
 			}
 			return Integer.parseInt(generate);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return 2;
@@ -154,7 +155,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(T_WISE, algorithm
 				+ "|"
 				+ t);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -167,7 +168,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 				return ALL_VALID_CONFIGURATIONS;
 			}
 			return generate;
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return ALL_VALID_CONFIGURATIONS;
@@ -176,7 +177,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	private static void setGenerate(String generate) {
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(GENERATE, generate);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -189,7 +190,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 				return DEFAULT;
 			}
 			return generate;
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return DEFAULT;
@@ -198,7 +199,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	private static void setOrder(String order) {
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(ORDER, order);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -214,7 +215,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 				return false;
 			}
 			return true;
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return false;
@@ -224,7 +225,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TEST, test
 				+ "");
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -235,7 +236,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		try {
 			returnValue =
 				ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(MAX);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return returnValue != null
@@ -247,7 +248,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(MAX, max
 				+ "");
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -256,7 +257,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(T_INTERACTION, t
 				+ "");
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}

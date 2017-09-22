@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Simple configuration format.<br/> Lists all selected features in the user-defined order (if specified).
- * 
+ *
  * @author Sebastian Krieter
  */
 public class DefaultFormat implements IConfigurationFormat {
@@ -105,7 +105,7 @@ public class DefaultFormat implements IConfigurationFormat {
 									+ name
 									+ IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 							}
-						} catch (RuntimeException e) {
+						} catch (final RuntimeException e) {
 							warnings.add(new Problem(FEATURE_
 								+ name
 								+ IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
@@ -113,33 +113,33 @@ public class DefaultFormat implements IConfigurationFormat {
 					}
 					name =
 						renamingsManager.getNewName(name);
-					IFeature feature =
+					final IFeature feature =
 						configuration.getFeatureModel().getFeature(name);
-					if (feature != null
+					if ((feature != null)
 						&& feature.getStructure().hasHiddenParent()) {
 						hiddenFeatures.add(name);
 					} else {
 						try {
 							configuration.setManual(name, Selection.SELECTED);
-						} catch (FeatureNotFoundException e) {
+						} catch (final FeatureNotFoundException e) {
 							warnings.add(new Problem(FEATURE
 								+ name
 								+ DOES_NOT_EXIST, lineNumber));
-						} catch (SelectionNotPossibleException e) {
+						} catch (final SelectionNotPossibleException e) {
 							warnings.add(new Problem(FEATURE
 								+ name
 								+ CANNOT_BE_SELECTED, lineNumber));
 						}
 					}
 				}
-				for (String name : hiddenFeatures) {
+				for (final String name : hiddenFeatures) {
 					try {
 						configuration.setAutomatic(name, Selection.SELECTED);
-					} catch (FeatureNotFoundException e) {
+					} catch (final FeatureNotFoundException e) {
 						warnings.add(new Problem(FEATURE
 							+ name
 							+ DOES_NOT_EXIST, lineNumber));
-					} catch (SelectionNotPossibleException e) {
+					} catch (final SelectionNotPossibleException e) {
 						warnings.add(new Problem(FEATURE
 							+ name
 							+ CANNOT_BE_SELECTED, lineNumber));
@@ -147,7 +147,7 @@ public class DefaultFormat implements IConfigurationFormat {
 				}
 				lineNumber++;
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			warnings.clear();
 			warnings.add(new Problem(e));
 			configuration.setPropagate(orgPropagate);
@@ -173,7 +173,7 @@ public class DefaultFormat implements IConfigurationFormat {
 				Functional.toList(featureModel.getFeatureOrderList());
 			final Set<String> featureSet =
 				configuration.getSelectedFeatureNames();
-			for (String s : list) {
+			for (final String s : list) {
 				if (featureSet.contains(s)) {
 					if (s.contains(" ")) {
 						buffer.append("\""
@@ -195,7 +195,7 @@ public class DefaultFormat implements IConfigurationFormat {
 
 	private void writeSelectedFeatures(SelectableFeature feature, StringBuilder buffer) {
 		if (feature.getFeature().getStructure().isConcrete()
-			&& feature.getSelection() == Selection.SELECTED) {
+			&& (feature.getSelection() == Selection.SELECTED)) {
 			if (feature.getName().contains(" ")) {
 				buffer.append("\""
 					+ feature.getName()
@@ -206,7 +206,7 @@ public class DefaultFormat implements IConfigurationFormat {
 					+ NEWLINE);
 			}
 		}
-		for (TreeElement child : feature.getChildren()) {
+		for (final TreeElement child : feature.getChildren()) {
 			writeSelectedFeatures((SelectableFeature) child, buffer);
 		}
 	}

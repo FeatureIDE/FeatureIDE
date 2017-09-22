@@ -71,7 +71,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Reads / Writes feature models in the Velvet format.
- * 
+ *
  * @author Sebastian Krieter
  * @author Matthias Strauss
  * @author Reimar Schroeter
@@ -117,7 +117,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 			extFeatureModel =
 				(ExtendedFeatureModel) object;
 		}
-		IFeatureStructure root =
+		final IFeatureStructure root =
 			object.getStructure().getRoot();
 		sb.delete(0, sb.length());
 
@@ -128,11 +128,11 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 		sb.append(NEWLINE);
 
 		if (extFeatureModel != null) {
-			for (IFeatureStructure child : root.getChildren()) {
+			for (final IFeatureStructure child : root.getChildren()) {
 				writeNewDefined(child, 1);
 			}
 
-			for (IConstraint constraint : object.getConstraints()) {
+			for (final IConstraint constraint : object.getConstraints()) {
 				if (((ExtendedConstraint) constraint).getType() == ExtendedFeature.TYPE_INTERN) {
 					sb.append("\tconstraint ");
 					sb.append(constraint.getNode().toString(SYMBOLS));
@@ -143,7 +143,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 		} else {
 			writeFeatureGroup(root, 1);
 
-			for (IConstraint constraint : object.getConstraints()) {
+			for (final IConstraint constraint : object.getConstraints()) {
 				sb.append("\tconstraint ");
 				sb.append(constraint.getNode().toString(SYMBOLS));
 				sb.append(";");
@@ -158,7 +158,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private void writeFeatureGroup(IFeatureStructure root, int depth) {
 		if (root.isAnd()) {
-			for (IFeatureStructure feature : root.getChildren()) {
+			for (final IFeatureStructure feature : root.getChildren()) {
 				writeFeature(feature, depth
 					+ 1);
 			}
@@ -167,7 +167,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 				+ 1);
 			sb.append("someOf {");
 			sb.append(NEWLINE);
-			for (IFeatureStructure feature : root.getChildren()) {
+			for (final IFeatureStructure feature : root.getChildren()) {
 				writeFeature(feature, depth
 					+ 2);
 			}
@@ -180,7 +180,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 				+ 1);
 			sb.append("oneOf {");
 			sb.append(NEWLINE);
-			for (IFeatureStructure f : root.getChildren()) {
+			for (final IFeatureStructure f : root.getChildren()) {
 				writeFeature(f, depth
 					+ 2);
 			}
@@ -197,7 +197,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 			sb.append("abstract ");
 		}
 		if (feature.isMandatory()
-			&& (feature.getParent() == null
+			&& ((feature.getParent() == null)
 				|| feature.getParent().isAnd())) {
 			sb.append("mandatory ");
 		}
@@ -206,10 +206,10 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 		final String description =
 			feature.getFeature().getProperty().getDescription();
 		final boolean hasDescription =
-			description != null
+			(description != null)
 				&& !description.isEmpty();
 
-		if (feature.getChildrenCount() == 0
+		if ((feature.getChildrenCount() == 0)
 			&& !hasDescription) {
 			sb.append(";");
 		} else {
@@ -234,7 +234,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private void writeNewDefined(IFeatureStructure child2, int depth) {
 		writeFeature(child2, 1);
-		for (IFeatureStructure child : child2.getChildren()) {
+		for (final IFeatureStructure child : child2.getChildren()) {
 			writeNewDefined(child, depth);
 		}
 	}
@@ -257,11 +257,11 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 				extFeatureModel.getSourceFile();
 		}
 
-		ByteArrayInputStream inputstr =
+		final ByteArrayInputStream inputstr =
 			new ByteArrayInputStream(source.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
 		try {
 			parseInputStream(inputstr);
-		} catch (UnsupportedModelException e) {
+		} catch (final UnsupportedModelException e) {
 			problemList.add(new Problem(e, e.lineNumber));
 		}
 		return problemList;
@@ -358,7 +358,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 			parseAttributeConstraints();
 		} catch (final RecognitionException e) {
 			Logger.logError(e);
-			UnsupportedModelException unsupportedModelException =
+			final UnsupportedModelException unsupportedModelException =
 				new UnsupportedModelException(e.getMessage(), e.line);
 			unsupportedModelException.addSuppressed(e);
 			throw unsupportedModelException;
@@ -373,10 +373,10 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 		newFeature.getStructure().setAbstract(isAbstract);
 		newFeature.getStructure().setHidden(isHidden);
 
-		IFeature orgFeature =
+		final IFeature orgFeature =
 			extFeatureModel.getFeature(featureName);
-		if (orgFeature != null
-			&& orgFeature instanceof ExtendedFeature) {
+		if ((orgFeature != null)
+			&& (orgFeature instanceof ExtendedFeature)) {
 			return (ExtendedFeature) orgFeature;
 		} else {
 			extFeatureModel.addFeature(newFeature);
@@ -388,16 +388,16 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private String checkNode(Node curNode) {
 		if (curNode instanceof Literal) {
-			Literal literal =
+			final Literal literal =
 				(Literal) curNode;
-			String varString =
+			final String varString =
 				literal.var.toString();
 			if (extFeatureModel.getFeature(varString) == null) {
 				return literal.var.toString();
 			}
 		} else {
-			for (Node child : curNode.getChildren()) {
-				String childRet =
+			for (final Node child : curNode.getChildren()) {
+				final String childRet =
 					checkNode(child);
 				if (childRet != null) {
 					return childRet;
@@ -436,15 +436,15 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 		case VelvetParser.FLOAT:
 			break;
 		case VelvetParser.INT:
-			this.extFeatureModel.addAttribute(parent.getName(), name, Integer.parseInt(valueNode.getText()));
+			extFeatureModel.addAttribute(parent.getName(), name, Integer.parseInt(valueNode.getText()));
 			break;
 		case VelvetParser.BOOLEAN:
-			this.extFeatureModel.addAttribute(parent.getName(), name, Boolean.parseBoolean(valueNode.getText()));
+			extFeatureModel.addAttribute(parent.getName(), name, Boolean.parseBoolean(valueNode.getText()));
 			break;
 		case VelvetParser.STRING:
 			final String valueNodeText =
 				valueNode.getText();
-			this.extFeatureModel.addAttribute(parent.getName(), name, valueNodeText.substring(1, valueNodeText.length()
+			extFeatureModel.addAttribute(parent.getName(), name, valueNodeText.substring(1, valueNodeText.length()
 				- 1));
 			break;
 		default:
@@ -453,9 +453,9 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void parseAttributeConstraints() throws UnsupportedModelException, RecognitionException {
-		while (!this.atrributeConstraintNodes.isEmpty()) {
+		while (!atrributeConstraintNodes.isEmpty()) {
 			final LinkedList<Tree> nodeList =
-				getChildren(this.atrributeConstraintNodes.poll());
+				getChildren(atrributeConstraintNodes.poll());
 
 			final LinkedList<WeightedTerm> weightedTerms =
 				new LinkedList<WeightedTerm>();
@@ -477,7 +477,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 						curNode.getText();
 
 					final Collection<FeatureAttribute<Integer>> attributes =
-						this.extFeatureModel.getIntegerAttributes().getAttributes(attributeName);
+						extFeatureModel.getIntegerAttributes().getAttributes(attributeName);
 
 					if (attributes == null) {
 						throw new UnsupportedModelException(curNode.getLine()
@@ -498,7 +498,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 				case VelvetParser.INT:
 					final int value =
 						Integer.parseInt(curNode.getText());
-					if (relationOperator == null
+					if ((relationOperator == null)
 						^ minus) {
 						degree -=
 							value;
@@ -589,8 +589,8 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 		}
 
-		for (ConstraintNode constraintNode : constraintNodeList) {
-			String nameError =
+		for (final ConstraintNode constraintNode : constraintNodeList) {
+			final String nameError =
 				checkNode(constraintNode.computedNode);
 			if (nameError == null) {
 				extFeatureModel.addConstraint(factory.createConstraint(extFeatureModel, constraintNode.computedNode));
@@ -620,7 +620,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 				constraintNodeList.add(new ConstraintNode(newNode, curNode));
 				break;
 			case VelvetParser.ACONSTR:
-				this.atrributeConstraintNodes.add(curNode);
+				atrributeConstraintNodes.add(curNode);
 				break;
 			default:
 				reportSyntaxError(curNode);

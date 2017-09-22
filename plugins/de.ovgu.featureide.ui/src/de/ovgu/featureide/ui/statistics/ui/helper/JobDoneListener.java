@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,7 +43,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 /**
  * Listener for {@link TreeJob}s. Uses Singleton-Pattern.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -51,7 +51,7 @@ public class JobDoneListener implements IJobChangeListener {
 
 	protected static JobDoneListener instance =
 		new JobDoneListener();
-	private List<IJob<?>> runningJobs =
+	private final List<IJob<?>> runningJobs =
 		new LinkedList<>();
 	protected List<TreeViewer> views =
 		new LinkedList<TreeViewer>();
@@ -60,10 +60,10 @@ public class JobDoneListener implements IJobChangeListener {
 		synchronized (views) {
 			for (int i =
 				0; i < views.size();) {
-				TreeViewer view =
+				final TreeViewer view =
 					views.get(i);
-				if (view == null
-					|| view.getControl() == null
+				if ((view == null)
+					|| (view.getControl() == null)
 					|| view.getControl().isDisposed()) {
 					views.remove(view);
 				} else {
@@ -97,9 +97,9 @@ public class JobDoneListener implements IJobChangeListener {
 	 */
 	@Override
 	public void done(final IJobChangeEvent event) {
-		if (event.getResult() == Status.OK_STATUS
-			|| event.getResult() == Status.CANCEL_STATUS) {
-			UIJob refreshJob =
+		if ((event.getResult() == Status.OK_STATUS)
+			|| (event.getResult() == Status.CANCEL_STATUS)) {
+			final UIJob refreshJob =
 				new UIJob(REFRESH_STATISTICS_VIEW) {
 
 					@Override
@@ -109,7 +109,7 @@ public class JobDoneListener implements IJobChangeListener {
 						if (job instanceof LongRunningJob) {
 							final LongRunningJob<?> treeJob =
 								(LongRunningJob<?>) job;
-							LongRunningMethod<?> method =
+							final LongRunningMethod<?> method =
 								treeJob.getMethod();
 							final boolean expand =
 								(method instanceof StatisticTreeJob)
@@ -120,7 +120,7 @@ public class JobDoneListener implements IJobChangeListener {
 							calc.startCalculating(false);
 							checkViews();
 							synchronized (views) {
-								for (TreeViewer view : views) {
+								for (final TreeViewer view : views) {
 									view.refresh(calc);
 									if (expand) {
 										view.expandToLevel(calc, 1);
@@ -144,7 +144,7 @@ public class JobDoneListener implements IJobChangeListener {
 	 */
 	@Override
 	public void scheduled(final IJobChangeEvent event) {
-		UIJob refreshJob =
+		final UIJob refreshJob =
 			new UIJob(REFRESH_STATISTICS_VIEW) {
 
 				@Override
@@ -155,12 +155,12 @@ public class JobDoneListener implements IJobChangeListener {
 						final LongRunningJob<?> treeJob =
 							(LongRunningJob<?>) job;
 						runningJobs.add(treeJob);
-						Parent calc =
+						final Parent calc =
 							((TreeJob) treeJob.getMethod()).getCalculated();
 						calc.startCalculating(true);
 						checkViews();
 						synchronized (views) {
-							for (TreeViewer view : views) {
+							for (final TreeViewer view : views) {
 								view.refresh(calc);
 							}
 						}
@@ -176,7 +176,7 @@ public class JobDoneListener implements IJobChangeListener {
 	public void sleeping(IJobChangeEvent event) {}
 
 	public void cancelAllRunningTreeJobs() {
-		for (IJob<?> job : runningJobs) {
+		for (final IJob<?> job : runningJobs) {
 			job.cancel();
 		}
 	}

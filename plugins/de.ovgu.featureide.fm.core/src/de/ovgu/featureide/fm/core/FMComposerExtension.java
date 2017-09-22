@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -24,7 +24,7 @@ import org.eclipse.core.resources.IProject;
 
 /**
  * Default feature model extension.
- * 
+ *
  * @author Jens Meinicke
  */
 public class FMComposerExtension implements IFMComposerExtension {
@@ -51,19 +51,22 @@ public class FMComposerExtension implements IFMComposerExtension {
 		return false;
 	}
 
+	@Override
 	public final boolean isValidFeatureName(String s) {
-		if (s == null
+		if ((s == null)
 			|| s.trim().isEmpty()
 			|| s.contains("\"")
 			|| s.contains("(")
-			|| s.contains(")"))
+			|| s.contains(")")) {
 			return false;
-		else {
+		} else {
 			if (hasComposer) {
-				boolean valid =
+				final boolean valid =
 					isValidFeatureNameComposerSpecific(s);
 				return valid;
-			} else return true;
+			} else {
+				return true;
+			}
 		}
 	}
 

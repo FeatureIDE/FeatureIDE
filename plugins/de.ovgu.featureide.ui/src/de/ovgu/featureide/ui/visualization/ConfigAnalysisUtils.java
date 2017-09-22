@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,30 +35,30 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Configurations Analysis utils
- * 
+ *
  * @author Jabier Martinez
  */
 public class ConfigAnalysisUtils {
 
 	/**
 	 * Get a matrix configurations/features
-	 * 
+	 *
 	 * @param featureProject
 	 * @param featureList
 	 * @return boolean[][]
 	 * @throws CoreException
 	 */
 	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, List<String> featureList) throws CoreException {
-		Collection<IFile> configs =
+		final Collection<IFile> configs =
 			new ArrayList<IFile>();
 		// check that they are config files
-		IFolder configsFolder =
+		final IFolder configsFolder =
 			featureProject.getConfigFolder();
-		for (IResource res : configsFolder.members()) {
+		for (final IResource res : configsFolder.members()) {
 			if (res instanceof IFile) {
 				if (((IFile) res).getName().endsWith(".config")) {
 					configs.add((IFile) res);
@@ -66,19 +66,19 @@ public class ConfigAnalysisUtils {
 			}
 		}
 
-		boolean[][] matrix =
+		final boolean[][] matrix =
 			new boolean[configs.size()][featureList.size()];
 		int iconf =
 			0;
-		for (IFile config : configs) {
+		for (final IFile config : configs) {
 			final Configuration configuration =
 				new Configuration(featureProject.getFeatureModel());
-			FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-			Set<String> configFeatures =
+			SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+			final Set<String> configFeatures =
 				configuration.getSelectedFeatureNames();
 			int ifeat =
 				0;
-			for (String f : featureList) {
+			for (final String f : featureList) {
 				matrix[iconf][ifeat] =
 					configFeatures.contains(f);
 				ifeat++;
@@ -91,25 +91,25 @@ public class ConfigAnalysisUtils {
 
 	/**
 	 * No core nor hidden features
-	 * 
+	 *
 	 * @param featureProject
 	 * @return list of feature names
 	 */
 	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {
 		// make a copy because it is unmodifiable
-		List<String> featureList1 =
+		final List<String> featureList1 =
 			featureProject.getFeatureModel().getFeatureOrderList();
-		List<String> featureList =
+		final List<String> featureList =
 			new ArrayList<String>();
 		featureList.addAll(featureList1);
-		List<IFeature> coreFeatures =
+		final List<IFeature> coreFeatures =
 			featureProject.getFeatureModel().getAnalyser().getCoreFeatures();
-		Collection<IFeature> hiddenFeatures =
+		final Collection<IFeature> hiddenFeatures =
 			featureProject.getFeatureModel().getAnalyser().getHiddenFeatures();
-		for (IFeature coref : coreFeatures) {
+		for (final IFeature coref : coreFeatures) {
 			featureList.remove(coref.getName());
 		}
-		for (IFeature hiddenf : hiddenFeatures) {
+		for (final IFeature hiddenf : hiddenFeatures) {
 			featureList.remove(hiddenf.getName());
 		}
 		return featureList;

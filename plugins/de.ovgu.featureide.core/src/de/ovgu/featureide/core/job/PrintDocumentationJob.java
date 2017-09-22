@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -61,14 +62,14 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.FileSystem;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * This job generates Javadoc from the feature-aware comments in a selected location. Subsequently it uses the Javadoc parser to generate the documentation.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments, Boolean> {
@@ -137,8 +138,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			try {
 				final IFile file =
 					featureProject.getCurrentConfiguration();
-				FileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
-			} catch (Exception e) {
+				SimpleFileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
+			} catch (final Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;
 			}
@@ -149,7 +150,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				new int[featureNames.size()];
 			int count =
 				0;
-			for (String featureName : featureNames) {
+			for (final String featureName : featureNames) {
 				final int id =
 					projectSignatures.getFeatureID(featureName);
 				if (id >= 0) {
@@ -165,7 +166,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				0;
 			for (int j =
 				0; j < count; j++) {
-				int curId =
+				final int curId =
 					tempFeatureList[j];
 				for (int k =
 					0; k < featureIDs.length; k++) {
@@ -184,8 +185,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				AdvancedNodeCreator.createCNF(conf.getFeatureModel());
 			int i =
 				1;
-			for (SelectableFeature feature : conf.getFeatures()) {
-				Selection selection =
+			for (final SelectableFeature feature : conf.getFeatures()) {
+				final Selection selection =
 					feature.getSelection();
 				nodes[i++] =
 					selection == Selection.UNDEFINED
@@ -227,7 +228,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 
 					@Override
 					public boolean isValid(BlockTag object) {
-						for (String featureName : object.getConstraint().getContainedFeatures()) {
+						for (final String featureName : object.getConstraint().getContainedFeatures()) {
 							if (featureName.equals(arguments.featureName)) {
 								return true;
 							}
@@ -262,7 +263,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 
 		try {
 			folder.delete(true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 			return false;
 		}
@@ -296,11 +297,11 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		workMonitor.setRemainingWork(structure.getClasses().size()
 			+ 2);
 
-		for (AbstractClassFragment javaClass : structure.getClasses()) {
-			String packagename =
+		for (final AbstractClassFragment javaClass : structure.getClasses()) {
+			final String packagename =
 				javaClass.getSignature().getPackage();
 
-			String path =
+			final String path =
 				extFoldername
 					+ packagename.replace('.', '/');
 
@@ -314,12 +315,12 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 
 			final IFolder folder =
 				CorePlugin.createFolder(arguments.project, path);
-			IFile file =
+			final IFile file =
 				folder.getFile(javaClass.getSignature().getName()
 					+ ".java");
 			try {
 				FileSystem.write(Paths.get(file.getLocationURI()), javaClass.toString().getBytes(Charset.forName("UTF-8")));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				CorePlugin.getDefault().logError(e);
 			}
 			workMonitor.worked();
@@ -359,8 +360,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		}
 
 		final String[] javadocargs;
-		if (arguments.options != null
-			&& arguments.options.length > 0
+		if ((arguments.options != null)
+			&& (arguments.options.length > 0)
 			&& !arguments.options[0].isEmpty()) {
 			javadocargs =
 				new String[numDefaultArguments
@@ -395,8 +396,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		workMonitor.worked();
 
 		try {
-			folder.refreshLocal(IFolder.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+			folder.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		workMonitor.worked();

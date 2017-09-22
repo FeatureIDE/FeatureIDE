@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Classes implementing <code>IPropertyContainer</code> act as objects that can be enriched with arbitrary user-defined values by key-value mappings
  * ("properties").
- * 
+ *
  * @author Marcus Pinencke
  * @since 3.0
  */
@@ -34,7 +34,7 @@ public interface IPropertyContainer {
 
 	/**
 	 * Thrown by <code>IPropertyContainer</code> implementations indicating a request for a unknown property, e.g., by reading from an unknown <code>key</code>
-	 * 
+	 *
 	 * @author Marcus Pinencke
 	 * @since 3.0
 	 */
@@ -82,8 +82,8 @@ public interface IPropertyContainer {
 			int result =
 				1;
 			result =
-				prime
-					* result
+				(prime
+					* result)
 					+ ((key == null)
 						? 0
 						: key.hashCode());
@@ -92,20 +92,25 @@ public interface IPropertyContainer {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			@SuppressWarnings("unchecked")
-			Entry<K, T, V> other =
+			final Entry<K, T, V> other =
 				(Entry<K, T, V>) obj;
 			if (key == null) {
-				if (other.key != null)
+				if (other.key != null) {
 					return false;
-			} else if (!key.equals(other.key))
+				}
+			} else if (!key.equals(other.key)) {
 				return false;
+			}
 			return true;
 		}
 
@@ -133,14 +138,14 @@ public interface IPropertyContainer {
 	 * {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy, ValueProtection)} or temporarily. The latest (maybe volatile) state will
 	 * be taken into account, depending on the call of {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key is unknown</code>),
 	 * the <code>defaultValue</code> will be returned.
-	 * 
+	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
-	 * 
+	 *
 	 * @see IPropertyContainer#get(String, Class)
 	 * @see IPropertyContainer#has(String)
 	 * @see IPropertyContainer#remove(String)
-	 * 
+	 *
 	 * @param key property name (case insensitive)
 	 * @param defaultValue value to return if no property is set
 	 * @return value associated with <code>key</code> if set, <code>defaultValue</code> otherwise
@@ -154,14 +159,14 @@ public interface IPropertyContainer {
 	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long as it was
 	 * not removed by calling {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key is unknown</code>), a
 	 * <code>NoSuchPropertyException</code> will be thrown.
-	 * 
+	 *
 	 * @see IPropertyContainer#getProperty(String, Class, Object)
 	 * @see IPropertyContainer#has(String)
 	 * @see IPropertyContainer#remove(String)
-	 * 
+	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
-	 * 
+	 *
 	 * @param key property name (case insensitive)
 	 * @param type type of returning value
 	 * @param defaultValue value to return if no property is set
@@ -174,10 +179,10 @@ public interface IPropertyContainer {
 	 * {@link IPropertyContainer#set(String, Class, Object)} was called with the corresponding <code>key</code>. Properties are stored persistently such that an
 	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}, and, hence, <code>key</code> will be alive.
 	 * If no property is associated to <code>key</code> the method will return <code>false</code>.
-	 * 
+	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
-	 * 
+	 *
 	 * @param key property name (case insensitive)
 	 * @return <b>true</b> if the object contains a property associated to <code>key</code>, <b>false</b> otherwise.
 	 */
@@ -186,7 +191,7 @@ public interface IPropertyContainer {
 	/**
 	 * Returns a distinct collection of each assigned key for this object in (possible empty) set. Since keys are case-insensitive it depends on the
 	 * implementation if the user-defined strings once passed as keys are changed in some way, e.g., by converting to lower case strings.
-	 * 
+	 *
 	 * @return all keys of properties assigned to this object
 	 */
 	Set<String> keySet();
@@ -196,7 +201,7 @@ public interface IPropertyContainer {
 	/**
 	 * Removes the content of this container and stores the entries <code>entries</code> into this one. The entries are copied, such that <code>entries !=
 	 * this.getPropertyEntries()</code> afterwards, which also holds for any entry inside <code>entries</code>.
-	 * 
+	 *
 	 * @param entries Entries to import
 	 */
 	void setEntrySet(final Set<Entry<String, Type, Object>> entries);
@@ -206,13 +211,13 @@ public interface IPropertyContainer {
 	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long as it
 	 * this method does not remove the property. If this object does not contain any property associated to <code>key</code>, a
 	 * <code>NoSuchPropertyException</code> will be thrown.
-	 * 
+	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
-	 * 
+	 *
 	 * @see IPropertyContainer#has(String)
 	 * @see IPropertyContainer#setProperty(String)
-	 * 
+	 *
 	 * @param key property name (case insensitive)
 	 * @throws NoSuchPropertyException
 	 */
@@ -223,10 +228,10 @@ public interface IPropertyContainer {
 	 * already set, the behavior of this method depends on the <code>KeyConflictPolicy</code>. <br/> <br/> Properties are stored persistently such that an
 	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}. <br/> <br/> To receive the value behind a
 	 * <code>key</code>, call {@link IPropertyContainer#get(String, Class)}.
-	 * 
+	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
-	 * 
+	 *
 	 * @param key property name (case insensitive)
 	 * @param type type of value to be stored
 	 * @param value value to be stored

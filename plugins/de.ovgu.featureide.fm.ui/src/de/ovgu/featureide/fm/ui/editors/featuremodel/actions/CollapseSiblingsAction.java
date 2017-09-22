@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetSiblingsToCol
 
 /**
  * Collapses all siblings of the selected feature if the parent is either an OR or an ALTERNATIVE.
- * 
+ *
  * @author Maximilian Kühl
  */
 public class CollapseSiblingsAction extends SingleSelectionAction {
@@ -45,22 +45,23 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	public static final String ID =
 		"de.ovgu.featureide.collapsefeatures";
 
-	private IGraphicalFeatureModel graphicalFeatureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 
 	/**
 	 * Collapse siblings should not be accessible for root.
 	 */
-	private ISelectionChangedListener listener =
+	private final ISelectionChangedListener listener =
 		new ISelectionChangedListener() {
 
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection =
+				final IStructuredSelection selection =
 					(IStructuredSelection) event.getSelection();
 				setEnabled(isValidSelection(selection));
 				if (isValidSelection(selection)) {
 					if (selection.getFirstElement() instanceof FeatureEditPart) {
 						if (getSelectedFeature().getStructure().isRoot()
-							|| getSelectedFeature().getStructure().getParent().getChildrenCount() == 1) {
+							|| (getSelectedFeature().getStructure().getParent().getChildrenCount() == 1)) {
 							setEnabled(false);
 						} else {
 							setEnabled(true);
@@ -73,7 +74,7 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	/**
 	 * @param label Description of this operation to be used in the menu
 	 * @param feature feature on which this operation will be executed
-	 * 
+	 *
 	 */
 	public CollapseSiblingsAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_SIBLINGS, viewer);
@@ -90,12 +91,12 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		SetSiblingsToCollapsedOperation op =
+		final SetSiblingsToCollapsedOperation op =
 			new SetSiblingsToCollapsedOperation(feature, graphicalFeatureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
 		}

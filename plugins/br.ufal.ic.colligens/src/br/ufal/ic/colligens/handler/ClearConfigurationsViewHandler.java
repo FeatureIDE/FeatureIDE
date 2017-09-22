@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package br.ufal.ic.colligens.handler;
 
@@ -10,7 +10,7 @@ import br.ufal.ic.colligens.controllers.invalidconfigurations.InvalidConfigurati
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class ClearConfigurationsViewHandler extends ColligensAbstractHandler {
 
@@ -20,7 +20,7 @@ public class ClearConfigurationsViewHandler extends ColligensAbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		InvalidConfigurationsViewController analyzerViewController =
+		final InvalidConfigurationsViewController analyzerViewController =
 			InvalidConfigurationsViewController
 					.getInstance();
 
@@ -30,7 +30,7 @@ public class ClearConfigurationsViewHandler extends ColligensAbstractHandler {
 
 	@Override
 	public boolean isEnabled() {
-		InvalidConfigurationsViewController analyzerViewController =
+		final InvalidConfigurationsViewController analyzerViewController =
 			InvalidConfigurationsViewController
 					.getInstance();
 

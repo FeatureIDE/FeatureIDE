@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * The Label Provider for the Configuration Map.
- * 
+ *
  * @author Paul Maximilian Bittner
  */
 public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITableColorProvider {
@@ -47,9 +47,9 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	private final static String imgUnselectedPath =
 		"adeselected.ico";
 
-	private ConfigurationMap configurationMap;
+	private final ConfigurationMap configurationMap;
 
-	private HashMap<String, Image> cachedImages;
+	private final HashMap<String, Image> cachedImages;
 
 	public ConfigurationMapLabelProvider(ConfigurationMap configurationMap) {
 		this.configurationMap =
@@ -57,8 +57,10 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 
 		cachedImages =
 			new HashMap<String, Image>();
-		cachedImages.put(imgSelectedPath, FMUIPlugin.getDefault().getImage(imgSelectedPath));
-		cachedImages.put(imgUnselectedPath, FMUIPlugin.getDefault().getImage(imgUnselectedPath));
+		FMUIPlugin.getDefault();
+		cachedImages.put(imgSelectedPath, FMUIPlugin.getImage(imgSelectedPath));
+		FMUIPlugin.getDefault();
+		cachedImages.put(imgUnselectedPath, FMUIPlugin.getImage(imgUnselectedPath));
 	}
 
 	@Override
@@ -76,9 +78,9 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 		if (columnIndex == configurationMap.getSelectedColumnIndex()) {
 			return configurationMap.getColumnHighlightColor();
 		} else if (element instanceof IFeature) {
-			IFeature feature =
+			final IFeature feature =
 				(IFeature) element;
-			FeatureColor featureColor =
+			final FeatureColor featureColor =
 				FeatureColorManager.getColor(feature);
 			return ColorPalette.toSwtColor(featureColor);
 		}
@@ -88,18 +90,19 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		if (element instanceof IFeature) {
-			IFeature feature =
+			final IFeature feature =
 				(IFeature) element;
 			if (configurationMap.isConfigColumn(columnIndex)) {// && columnIndex < configurationMap.end) {
-				Configuration config =
+				final Configuration config =
 					configurationMap.getConfigurationOfColumn(columnIndex);
 
 				if (!feature.getStructure().isAbstract()) {
 					String imgPath =
 						imgUnselectedPath;
-					if (config.getSelectedFeatures().contains(feature))
+					if (config.getSelectedFeatures().contains(feature)) {
 						imgPath =
 							imgSelectedPath;
+					}
 
 					return cachedImages.get(imgPath);
 				}
@@ -112,8 +115,8 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		if (configurationMap.getConfigColumnsOffset() > columnIndex) {
-			if (element instanceof IFeature
-				|| element instanceof String) {
+			if ((element instanceof IFeature)
+				|| (element instanceof String)) {
 				return element.toString();
 			}
 		}

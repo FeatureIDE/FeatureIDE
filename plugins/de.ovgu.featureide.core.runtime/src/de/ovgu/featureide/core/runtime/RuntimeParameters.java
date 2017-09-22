@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -73,16 +73,16 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
- * 
+ *
  * RuntimeComposer creates .property-file from actual configuration or writes arguments from .config file into the program arguments of Eclipse Run
  * Configuration.
- * 
+ *
  * @author Kai Wolf
  * @author Matthias Quaas
- * 
+ *
  */
 @SuppressWarnings("restriction")
 public class RuntimeParameters extends ComposerExtensionClass {
@@ -221,7 +221,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 
 	/**
 	 * Method to get all call locations of a method.
-	 * 
+	 *
 	 * @param m Method for which the call hierarchy will be evaluated.
 	 * @return All call locations.
 	 */
@@ -271,7 +271,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 
 	/**
 	 * Gets the end of an if-statement by parsing the class' AST.
-	 * 
+	 *
 	 * @param compilationUnit
 	 * @param startLineNum Indicator for which if statement of the code the end is requested.
 	 * @return
@@ -303,7 +303,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 
 	/**
 	 * Looks for parent-child-relations between FeatureLocation-objects. Its main aim is to locate nested if-statements.
-	 * 
+	 *
 	 * @param startIndex Index within {@link featureLocs} indicating the concrete object.
 	 * @return Parent FeatureLocation-object, null if it has not got a parent.
 	 */
@@ -486,7 +486,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 
 	/**
 	 * Reads and returns current feature config.
-	 * 
+	 *
 	 * @return
 	 */
 	private Configuration readConfig() {
@@ -494,7 +494,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			new Configuration(featureProject.getFeatureModel());
 		final Path configPath =
 			Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
-		FileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
+		SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 
 		return featureProjectConfig;
 	}
@@ -502,7 +502,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	/**
 	 * Sets the parent-child-relations within the FSTModel by adding children to parent directives. To determine these relations the parent-child-relations of
 	 * the FeatureLocation-objects will be utilized.
-	 * 
+	 *
 	 * @param directives Map linking FeatureLocation-objects with their FSTDirectives representing them in the FSTModel
 	 */
 	private void setDirectiveChilds(final HashMap<FeatureLocation, FSTDirective> directives) {
@@ -539,19 +539,21 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			IMethod method =
 				null;
 
-			if (itype != null)
+			if (itype != null) {
 				for (final IMethod m : itype.getMethods()) {
-				if (m.getElementName().equals(GET_PROPERTY_METHOD)) {
-				method =
-					m;
+					if (m.getElementName().equals(GET_PROPERTY_METHOD)) {
+						method =
+							m;
+					}
 				}
-				}
+			}
 
 			ArrayList<CallLocation[]> callLocs =
 				new ArrayList<>();
-			if (method != null)
+			if (method != null) {
 				callLocs =
 					getCallersOf(method);
+			}
 
 			String featureName;
 			String className;
@@ -632,7 +634,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 
 	/**
 	 * Creates the directive which will be added to the FSTModel and set its properties.
-	 * 
+	 *
 	 * @param loc FeatureLocation for which the directive needs to be added.
 	 * @param id Internal id of the new directive
 	 * @return Returns created directive.

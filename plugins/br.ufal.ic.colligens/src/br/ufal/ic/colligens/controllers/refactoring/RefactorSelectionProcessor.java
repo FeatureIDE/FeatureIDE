@@ -50,20 +50,20 @@ public class RefactorSelectionProcessor {
 		try {
 			stubsHeader.setProject(file.getProject().getName());
 			stubsHeader.run();
-		} catch (PlatformException e) {
+		} catch (final PlatformException e) {
 			e.printStackTrace();
 			throw new RefactorException();
 		}
 
-		RefactoringFrontend refactoring =
+		final RefactoringFrontend refactoring =
 			new RefactoringFrontend();
 
-		this.sourceOutRefactor =
+		sourceOutRefactor =
 			refactoring.refactorCode(
 					textSelection.getText(), stubsHeader.getIncludePath(),
 					refactoringType);
 
-		this.removeStubs();
+		removeStubs();
 
 		if (sourceOutRefactor == null) {
 			throw new RefactorException();
@@ -73,13 +73,13 @@ public class RefactorSelectionProcessor {
 
 	public List<Change> process(IProgressMonitor monitor) throws IOException {
 
-		MultiTextEdit edit =
+		final MultiTextEdit edit =
 			new MultiTextEdit();
 
 		edit.addChild(new ReplaceEdit(textSelection.getOffset(), textSelection
 				.getLength(), sourceOutRefactor));
 
-		TextFileChange change =
+		final TextFileChange change =
 			new TextFileChange(file.getName(), file);
 
 		change.setTextType("c");
@@ -91,19 +91,19 @@ public class RefactorSelectionProcessor {
 
 	public void removeStubs() throws IOException {
 
-		Collection<String> collection =
+		final Collection<String> collection =
 			stubsHeader.getIncludes();
 
-		for (Iterator<String> iterator =
+		for (final Iterator<String> iterator =
 			collection.iterator(); iterator
 					.hasNext();) {
-			BufferedReader br =
+			final BufferedReader br =
 				new BufferedReader(new FileReader(
 						iterator.next()));
 			try {
 				String line =
 					br.readLine();
-				while (line != null
+				while ((line != null)
 					&& line.contains("typedef")) {
 					sourceOutRefactor =
 						sourceOutRefactor.replace(line

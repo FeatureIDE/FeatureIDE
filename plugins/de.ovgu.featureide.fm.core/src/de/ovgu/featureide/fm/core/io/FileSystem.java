@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
- * 
+ *
  * @author Sebastian Krieter
  */
 public final class FileSystem {

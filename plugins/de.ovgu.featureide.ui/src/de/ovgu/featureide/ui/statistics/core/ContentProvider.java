@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -50,10 +50,10 @@ import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 
 /**
  * Content provider for the {@link TreeViewer}.
- * 
+ *
  * @see ContentProvider#calculateContent(IResource)
  * @see ITreeContentProvider
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -61,7 +61,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 	private static final Parent DEFAULT_TEXT =
 		new Parent(OPEN_FILE, null);
-	private TreeViewer viewer;
+	private final TreeViewer viewer;
 	public Parent godfather =
 		new Parent("godfather", null);
 	private IFeatureProject project;
@@ -84,7 +84,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 	@Override
 	public void dispose() {
-		this.godfather =
+		godfather =
 			null;
 	}
 
@@ -126,17 +126,17 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	/**
 	 * Calculates content to be shown. If the current editor is not editing a file out of a feature project a default message is being displayed. Every node is
 	 * responsible for its own content. So for further information see the classes in "lazyimplementations"-package.
-	 * 
+	 *
 	 * @see Parent
 	 * @see LazyParent
 	 * @param res Any file out of the current feature-project.
 	 */
 	public void calculateContent(IResource res) {
-		IFeatureProject newProject =
+		final IFeatureProject newProject =
 			CorePlugin.getFeatureProject(res);
-		boolean hasChanged =
-			newProject != null
-				&& project != null
+		final boolean hasChanged =
+			(newProject != null)
+				&& (project != null)
 				&& !newProject.equals(project);
 		calculateContent(res, hasChanged);
 	}
@@ -146,36 +146,36 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 			CorePlugin.getFeatureProject(res);
 
 		if (newProject == null) {
-			this.project =
+			project =
 				newProject;
 			defaultContent();
 		} else if (hasChanged
-			|| project == null) {
-			this.project =
+			|| (project == null)) {
+			project =
 				newProject;
 			addNodes();
 		}
 	}
 
 	private synchronized void addNodes() {
-		IComposerExtensionClass composer =
+		final IComposerExtensionClass composer =
 			project.getComposer();
-		FSTModel fstModel =
+		final FSTModel fstModel =
 			getFSTModel(composer);
-		IFeatureModel featModel =
+		final IFeatureModel featModel =
 			project.getFeatureModel();
 		JobDoneListener.getInstance().init(viewer);
 
 		godfather =
 			new Parent("GODFATHER", null);
-		String composerName =
+		final String composerName =
 			composer.getName();
-		Parent composerParent =
+		final Parent composerParent =
 			new Parent(DESC_COMPOSER_NAME, composerName);
 
 		godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
 		godfather.addChild(composerParent);
-		Parent featureModelStatistics =
+		final Parent featureModelStatistics =
 			new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
 		featureModelStatistics.addChild(new StatisticsSyntacticalFeatureModel(SYNTACTICAL_STATISTICS, featModel));
 		featureModelStatistics.addChild(new StatisticsSemanticalFeatureModel(SEMANTICAL_STATISTICS, featModel));
@@ -194,7 +194,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	private FSTModel getFSTModel(IComposerExtensionClass composer) {
 		FSTModel fstModel =
 			project.getFSTModel();
-		if (fstModel == null
+		if ((fstModel == null)
 			|| fstModel.getClasses().isEmpty()
 			|| fstModel.getFeatures().isEmpty()) {
 			composer.buildFSTModel();
@@ -218,7 +218,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 * Refreshes the {@link ContentProvider#view} using a UI-Job with highest priority.
 	 */
 	protected void refresh() {
-		UIJob job_setColor =
+		final UIJob job_setColor =
 			new UIJob(REFRESH_STATISTICS_VIEW) {
 
 				@Override

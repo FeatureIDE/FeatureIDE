@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -54,9 +54,9 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Prints a feature model in XML format.
- * 
+ *
  * @deprecated Use {@link XmlFeatureModelFormat} and {@link FileHandler} instead.
- * 
+ *
  * @author Fabian Wielgorz
  * @author Dariusz Krolikowski
  * @author Maik Lampe
@@ -70,20 +70,21 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 		super(featureModel);
 	}
 
+	@Override
 	protected void createXmlDoc(Document doc) {
-		Element root =
+		final Element root =
 			doc.createElement(FEATURE_MODEL);
-		Element struct =
+		final Element struct =
 			doc.createElement(STRUCT);
-		Element properties =
+		final Element properties =
 			doc.createElement(PROPERTIES);
-		Element constraints =
+		final Element constraints =
 			doc.createElement(CONSTRAINTS);
-		Element calculations =
+		final Element calculations =
 			doc.createElement(CALCULATIONS);
-		Element comments =
+		final Element comments =
 			doc.createElement(COMMENTS);
-		Element order =
+		final Element order =
 			doc.createElement(FEATURE_ORDER);
 		// root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, "" + featureModel.getGraphicRepresenation().getLayout().getLayoutAlgorithm());
 		//
@@ -130,11 +131,11 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 			+ object.getAnalyser().calculateTautologyConstraints);
 
 		root.appendChild(comments);
-		for (String comment : object.getProperty().getComments()) {
-			Element c =
+		for (final String comment : object.getProperty().getComments()) {
+			final Element c =
 				doc.createElement(C);
 			comments.appendChild(c);
-			Text text =
+			final Text text =
 				doc.createTextNode(comment);
 			c.appendChild(text);
 		}
@@ -145,12 +146,13 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 			Collection<String> featureOrderList =
 				object.getFeatureOrderList();
 
-			if (featureOrderList.isEmpty())
+			if (featureOrderList.isEmpty()) {
 				featureOrderList =
 					FeatureUtils.extractConcreteFeaturesAsStringList(object);
+			}
 
-			for (String featureName : featureOrderList) {
-				Element feature =
+			for (final String featureName : featureOrderList) {
+				final Element feature =
 					doc.createElement(FEATURE);
 				feature.setAttribute(NAME, featureName);
 				order.appendChild(feature);
@@ -160,8 +162,10 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 	private void createXmlPropertiesPart(Document doc, Element propertiesNode, IFeatureModel featureModel) {
 
-		if (featureModel == null
-			|| propertiesNode == null) throw new RuntimeException();
+		if ((featureModel == null)
+			|| (propertiesNode == null)) {
+			throw new RuntimeException();
+		}
 
 		// Store per-feature properties
 		for (final IFeature feature : featureModel.getFeatures()) {
@@ -169,8 +173,9 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 				feature.getName();
 			final Set<Entry<String, Type, Object>> propertyEntries =
 				feature.getCustomProperties().entrySet();
-			if (!propertyEntries.isEmpty())
+			if (!propertyEntries.isEmpty()) {
 				propertiesNode.appendChild(createFeaturePropertyContainerNode(doc, featureName, propertyEntries));
+			}
 		}
 
 		// TODO: Add here other property container, e.g., feature model
@@ -198,15 +203,16 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 	/**
 	 * Creates document based on feature model step by step
-	 * 
+	 *
 	 * @param doc document to write
 	 * @param node parent node
 	 * @param feat current feature
 	 */
 	private void createXmlDocRec(Document doc, Element node, IFeature feat) {
 
-		if (feat == null)
+		if (feat == null) {
 			return;
+		}
 
 		Element fnod;
 		List<IFeature> children;
@@ -216,10 +222,10 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 		if (children.isEmpty()) {
 			fnod =
 				doc.createElement(FEATURE);
-			String description =
+			final String description =
 				feat.getProperty().getDescription();
 			if (description != null) {
-				Element descr =
+				final Element descr =
 					doc.createElement(DESCRIPTION);
 				descr.setTextContent("\n"
 					+ description.replace("\r", "")
@@ -241,10 +247,10 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 				fnod =
 					doc.createElement(UNKNOWN);// Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
-			String description =
+			final String description =
 				feat.getProperty().getDescription();
 			if (description != null) {
-				Element descr =
+				final Element descr =
 					doc.createElement(DESCRIPTION);
 				descr.setTextContent("\n"
 					+ description.replace("\r", "")
@@ -254,7 +260,7 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 			writeAttributes(node, fnod, feat);
 
-			Iterator<IFeature> i =
+			final Iterator<IFeature> i =
 				children.iterator();
 			while (i.hasNext()) {
 				createXmlDocRec(doc, fnod, i.next());
@@ -264,12 +270,15 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 	private void writeAttributes(Element node, Element fnod, IFeature feat) {
 		fnod.setAttribute(NAME, feat.getName());
-		if (feat.getStructure().isHidden())
+		if (feat.getStructure().isHidden()) {
 			fnod.setAttribute(HIDDEN, TRUE);
-		if (feat.getStructure().isMandatory())
+		}
+		if (feat.getStructure().isMandatory()) {
 			fnod.setAttribute(MANDATORY, TRUE);
-		if (feat.getStructure().isAbstract())
+		}
+		if (feat.getStructure().isAbstract()) {
 			fnod.setAttribute(ABSTRACT, TRUE);
+		}
 
 		// if (!featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures()
 		// || !featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
@@ -280,7 +289,7 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 	/**
 	 * Inserts the tags concerning propositional constraints into the DOM document representation
-	 * 
+	 *
 	 * @param doc
 	 * @param FeatMod Parent node for the propositional nodes
 	 */
@@ -341,7 +350,7 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 			xmlNode.appendChild(op);
 		}
 
-		org.prop4j.Node[] children =
+		final org.prop4j.Node[] children =
 			node.getChildren();
 
 		for (int i =

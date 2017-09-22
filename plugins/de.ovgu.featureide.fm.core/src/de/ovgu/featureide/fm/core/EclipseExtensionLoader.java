@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.Platform;
 
 /**
  * Handles extensions via Eclipse framework.
- * 
+ *
  * @author Sebastian Krieter
  * @author Tom Brosch
  */
@@ -53,10 +53,10 @@ public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtens
 	public void loadProviders(ExtensionManager<T> extensionManager) {
 		final IExtension[] extensions =
 			Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
-		for (IExtension extension : extensions) {
+		for (final IExtension extension : extensions) {
 			final IConfigurationElement[] configurationElements =
 				extension.getConfigurationElements();
-			for (IConfigurationElement configurationElement : configurationElements) {
+			for (final IConfigurationElement configurationElement : configurationElements) {
 				final T extensionInstance =
 					parseExtension(configurationElement);
 				if (extensionInstance != null) {
@@ -70,7 +70,7 @@ public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtens
 		if (extensionID.equals(configurationElement.getName())) {
 			try {
 				return classObject.cast(configurationElement.createExecutableExtension("class"));
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				Logger.logError(e);
 			}
 		}

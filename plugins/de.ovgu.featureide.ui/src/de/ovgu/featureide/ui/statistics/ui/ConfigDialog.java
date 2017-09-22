@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -56,7 +56,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * This dialog will show up for the calculation of the complexity of a feature model. Here you can set the priority and the timeout.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -72,7 +72,7 @@ public class ConfigDialog extends TitleAreaDialog {
 	private Combo priorityComboBox;
 	private Text converterToMinutes;
 	private Composite container;
-	private String titlePart;
+	private final String titlePart;
 
 	public int getPriority() {
 		return priority;
@@ -84,7 +84,7 @@ public class ConfigDialog extends TitleAreaDialog {
 
 	/**
 	 * Create the dialog.
-	 * 
+	 *
 	 * @param parentShell
 	 */
 	public ConfigDialog(Shell parentShell, String titlePart) {
@@ -102,7 +102,7 @@ public class ConfigDialog extends TitleAreaDialog {
 
 	/**
 	 * Create contents of the dialog.
-	 * 
+	 *
 	 * @param parent
 	 */
 	@Override
@@ -115,18 +115,18 @@ public class ConfigDialog extends TitleAreaDialog {
 			+ titlePart);
 		container =
 			(Composite) super.createDialogArea(parent);
-		GridLayout gl_container =
+		final GridLayout gl_container =
 			new GridLayout(2, false);
 		container.setLayout(gl_container);
 		new Label(container, SWT.NONE);
 
-		Label priorityLabel =
+		final Label priorityLabel =
 			new Label(container, SWT.NONE);
 		priorityLabel.setText(" Choose priority:");
 
 		createPriorityComboBox();
 
-		Label timeOutLabel =
+		final Label timeOutLabel =
 			new Label(container, SWT.NONE);
 		timeOutLabel.setText(" Choose timeout-length:");
 
@@ -142,7 +142,7 @@ public class ConfigDialog extends TitleAreaDialog {
 		converterToMinutes =
 			new Text(container, SWT.BORDER);
 		converterToMinutes.setEditable(false);
-		GridData gd_text_1 =
+		final GridData gd_text_1 =
 			new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
 		gd_text_1.heightHint =
 			20;
@@ -163,6 +163,7 @@ public class ConfigDialog extends TitleAreaDialog {
 		});
 		timeOutComboBox.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				convertToReadable();
 			}
@@ -181,7 +182,7 @@ public class ConfigDialog extends TitleAreaDialog {
 			"1800",
 			"3600" });
 
-		GridData gd_timeOutComboBox =
+		final GridData gd_timeOutComboBox =
 			new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
 		gd_timeOutComboBox.widthHint =
 			160;
@@ -203,7 +204,7 @@ public class ConfigDialog extends TitleAreaDialog {
 			LOW,
 			AVERAGE,
 			HIGH });
-		GridData gd_combo =
+		final GridData gd_combo =
 			new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
 		gd_combo.heightHint =
 			20;
@@ -215,22 +216,22 @@ public class ConfigDialog extends TitleAreaDialog {
 
 	private void convertToReadable() {
 		try {
-			long time =
+			final long time =
 				Long.parseLong(timeOutComboBox.getText());
 			converterToMinutes.setText(String.format("%02d h %02d min %02d sec", TimeUnit.SECONDS.toHours(time), TimeUnit.SECONDS.toMinutes(time)
 				- TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(time)),
 					time
 						- TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(time))));
-		} catch (NumberFormatException ex) {
+		} catch (final NumberFormatException ex) {
 
-		} catch (NullPointerException ex) {
+		} catch (final NullPointerException ex) {
 
 		}
 	}
 
 	/**
 	 * Create contents of the button bar.
-	 * 
+	 *
 	 * @param parent
 	 */
 	@Override
@@ -241,7 +242,7 @@ public class ConfigDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		String p =
+		final String p =
 			priorityComboBox.getText();
 		if (p.equals(LOW)) {
 			priority =
@@ -256,13 +257,13 @@ public class ConfigDialog extends TitleAreaDialog {
 			throw new RuntimeException(INVALID_SELECTION_);
 		}
 
-		String t =
+		final String t =
 			timeOutComboBox.getText();
 		try {
 			timeout =
 				1000
 					* Long.parseLong(t);
-		} catch (NumberFormatException ex) {
+		} catch (final NumberFormatException ex) {
 			MessageDialog.openError(Display.getDefault().getActiveShell(), "Error", "That was not a valid number!\n(integer only)");
 			return;
 		}

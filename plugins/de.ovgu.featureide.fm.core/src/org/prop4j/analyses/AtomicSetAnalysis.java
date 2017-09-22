@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds atomic sets.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
@@ -52,12 +52,12 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 			new ArrayList<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		int[] model1 =
+		final int[] model1 =
 			solver.findModel();
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			int[] model2 =
+			final int[] model2 =
 				solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
@@ -117,8 +117,8 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 							+ 1; j < xModel0.length; j++) {
 						final int my0 =
 							xModel0[j];
-						if (my0 != 0
-							&& done[j] == 0) {
+						if ((my0 != 0)
+							&& (done[j] == 0)) {
 							for (int k =
 								1; k < solutions.size(); k++) {
 								final int[] solution =
@@ -214,8 +214,8 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 	}
 
 	private void updateSolver(int c) {
-		if ((c
-			% 2 == 0)) {
+		if (((c
+			% 2) == 0)) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 		} else {
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);

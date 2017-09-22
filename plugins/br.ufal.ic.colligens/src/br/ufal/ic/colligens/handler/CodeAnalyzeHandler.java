@@ -23,10 +23,10 @@ public class CodeAnalyzeHandler extends ColligensAbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		IWorkbenchWindow window =
+		final IWorkbenchWindow window =
 			HandlerUtil.getActiveWorkbenchWindow(event);
 
-		ISelection selection =
+		final ISelection selection =
 			window.getActivePage().getSelection();
 
 		if (selection != null) {
@@ -39,18 +39,18 @@ public class CodeAnalyzeHandler extends ColligensAbstractHandler {
 			controller.setSelection(selection);
 
 			if (super.saveAll()) {
-				IWorkbenchPage page =
+				final IWorkbenchPage page =
 					window.getActivePage();
 				try {
 
 					page.showView(InvalidConfigurationsView.ID);
-					InvalidConfigurationsViewController analyzerViewController =
+					final InvalidConfigurationsViewController analyzerViewController =
 						InvalidConfigurationsViewController
 								.getInstance();
 
 					analyzerViewController.clear();
 
-				} catch (PartInitException e) {
+				} catch (final PartInitException e) {
 					e.printStackTrace();
 				}
 

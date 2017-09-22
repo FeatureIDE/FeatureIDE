@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * TODO description
- * 
+ *
  * @author Alexander Knueppel
  */
 public class TComplexConstraintConverter {
@@ -58,11 +58,11 @@ public class TComplexConstraintConverter {
 		fm.addFeature(root);
 		fm.getStructure().setRoot(root.getStructure());
 
-		IFeature A =
+		final IFeature A =
 			factory.createFeature(fm, "A");
-		IFeature B =
+		final IFeature B =
 			factory.createFeature(fm, "B");
-		IFeature C =
+		final IFeature C =
 			factory.createFeature(fm, "C");
 		// IFeature D = factory.createFeature(fm, "D");
 
@@ -81,15 +81,15 @@ public class TComplexConstraintConverter {
 		// fm.getStructure().getRoot().addChild(D.getStructure());
 		fm.getStructure().getRoot().setAnd();
 
-		Node n1 =
+		final Node n1 =
 			new Or(A, B);
-		Node n2 =
+		final Node n2 =
 			new Or(B, C);
 		// Node n3 = new Implies(new And(new Or(A,B), D), new Not(C));
 
-		IConstraint c1 =
+		final IConstraint c1 =
 			factory.createConstraint(fm, n1);
-		IConstraint c2 =
+		final IConstraint c2 =
 			factory.createConstraint(fm, n2);
 		// IConstraint c3 = factory.createConstraint(fm, n3);
 		fm.addConstraint(c1);
@@ -102,7 +102,7 @@ public class TComplexConstraintConverter {
 	 */
 	@Test
 	public void testIsSimpleConstraint() throws UnsupportedModelException {
-		Node[] simpleNodes =
+		final Node[] simpleNodes =
 			new Node[] {
 				new Implies("f", "g"),
 				new Or("f", new Not("g")),
@@ -118,7 +118,7 @@ public class TComplexConstraintConverter {
 
 		boolean result =
 			true;
-		for (Node node : simpleNodes) {
+		for (final Node node : simpleNodes) {
 			result &=
 				ComplexConstraintConverter.isSimple(node);
 		}
@@ -131,7 +131,7 @@ public class TComplexConstraintConverter {
 	 */
 	@Test
 	public void testIsComplexConstraint() throws UnsupportedModelException {
-		Node[] complexNodes =
+		final Node[] complexNodes =
 			new Node[] {
 				new Implies(new Not("f"), "g"),
 				new Implies("f", new And("g", "h")),
@@ -141,7 +141,7 @@ public class TComplexConstraintConverter {
 
 		boolean result =
 			true;
-		for (Node node : complexNodes) {
+		for (final Node node : complexNodes) {
 			result &=
 				ComplexConstraintConverter.isComplex(node);
 		}
@@ -156,8 +156,8 @@ public class TComplexConstraintConverter {
 //	public void testNNFConversion() throws UnsupportedModelException {
 //		ComplexConstraintConverter converter = new ComplexConstraintConverter();
 //		IFeatureModel resultFM = converter.convert(fm, new NNFConverter());
-//		
-//		assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));	
+//
+//		assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));
 //	}
 
 	/*
@@ -168,7 +168,7 @@ public class TComplexConstraintConverter {
 //		ComplexConstraintConverter converter = new ComplexConstraintConverter();
 //		IFeatureModel resultFM = converter.convert(fm, new CNFConverter(), Option.COHERENT);
 //		comparator.compare(fm, resultFM);
-//			
+//
 //		System.out.println(fm.getFeatureOrderList());
 //		System.out.println(resultFM.getFeatureOrderList());
 //		System.out.println(comparator.getAddedFeatures());

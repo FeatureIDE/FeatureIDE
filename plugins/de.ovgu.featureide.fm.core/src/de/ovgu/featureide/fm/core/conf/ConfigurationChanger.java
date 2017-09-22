@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Updates a configuration by using a feature graph.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ConfigurationChanger implements IConfigurationChanger, IConfigurationPropagator {
@@ -114,6 +114,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 	}
 
+	@Override
 	public Resolve resolve() {
 		return new Resolve();
 	}
@@ -124,7 +125,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		public Boolean execute(IMonitor monitor) {
 			try {
 				return sat(getCurrentLiterals(true));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				Logger.logError(e);
 				return false;
 			}
@@ -150,7 +151,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 		@Override
 		public LinkedList<List<String>> execute(IMonitor monitor) throws TimeoutException {
-			SatSolver satSolver3 =
+			final SatSolver satSolver3 =
 				new SatSolver(node, 1000, false);
 			return satSolver3.getSolutionFeatures(getCurrentLiterals(true), max);
 		}
@@ -162,7 +163,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		public Boolean execute(IMonitor monitor) {
 			try {
 				return sat(getCurrentLiterals(false));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				Logger.logError(e);
 				return false;
 			}
@@ -186,7 +187,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					new byte[variableConfiguration.size()];
 				int i =
 					0;
-				for (Variable variable : variableConfiguration) {
+				for (final Variable variable : variableConfiguration) {
 					lastComputedValues[i++] =
 						(byte) variable.getAutomaticValue();
 				}
@@ -216,10 +217,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 				satSolver1 =
 					new SatSolver(node, 1000, false);
 			}
-			List<String> featureNames =
+			final List<String> featureNames =
 				satSolver1.getSolution(positive);
-			for (String featureName : featureNames) {
-				int index =
+			for (final String featureName : featureNames) {
+				final int index =
 					featureGraph.getFeatureIndex(featureName);
 				if (index >= 0) {
 					setNewValue(featureGraph.getFeatureIndex(featureName), Variable.TRUE, false);
@@ -297,8 +298,8 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 										3;
 									break;
 								case AFeatureGraph.VALUE_NONE:
-									if (oldValue != Variable.UNDEFINED
-										&& featureGraph.getValue(index, i, oldValue == Variable.TRUE) != AFeatureGraph.VALUE_NONE) {
+									if ((oldValue != Variable.UNDEFINED)
+										&& (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != AFeatureGraph.VALUE_NONE)) {
 										featureToCompute[i] =
 											3;
 									}
@@ -371,7 +372,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					0;
 				if (undefined) {
 					knownLiterals.clear();
-					for (Variable var : variableConfiguration) {
+					for (final Variable var : variableConfiguration) {
 						switch (var.getManualValue()) {
 						case Variable.TRUE:
 							knownLiterals.add(new Literal(features[i], true));
@@ -385,7 +386,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 						i++;
 					}
 				} else {
-					for (Variable var : variableConfiguration) {
+					for (final Variable var : variableConfiguration) {
 						switch (var.getAutomaticValue()) {
 						case Variable.TRUE:
 							knownLiterals.add(new Literal(features[i], true));
@@ -406,7 +407,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			}
 
 			if (c != null) {
-				for (SelectableFeature f : c.getFeatures()) {
+				for (final SelectableFeature f : c.getFeatures()) {
 					final int index =
 						featureGraph.getFeatureIndex(f.getName());
 					if (index >= 0) {
@@ -508,7 +509,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 			int i =
 				0;
-			for (Variable var : variableConfiguration) {
+			for (final Variable var : variableConfiguration) {
 				switch (var.getValue()) {
 				case Variable.TRUE:
 					knownLiterals[i++] =
@@ -539,7 +540,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 						setNewValue(featureID, Variable.FALSE, false);
 					}
 				}
-			} catch (TimeoutException e) {
+			} catch (final TimeoutException e) {
 				Logger.logError(e);
 			}
 
@@ -556,7 +557,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 				if (!sat(knownLiterals)) {
 					setNewValue(featureID, Variable.FALSE, false);
 				}
-			} catch (TimeoutException e) {
+			} catch (final TimeoutException e) {
 				Logger.logError(e);
 			}
 
@@ -573,7 +574,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 				if (!sat(knownLiterals)) {
 					setNewValue(featureID, Variable.TRUE, false);
 				}
-			} catch (TimeoutException e) {
+			} catch (final TimeoutException e) {
 				Logger.logError(e);
 			}
 
@@ -727,6 +728,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
 	}
 
+	@Override
 	public void setNewValue(int index, int value, boolean manual) {
 		variableConfiguration.setVariable(index, value, manual);
 
@@ -740,6 +742,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		return new SimpleAutoCompletionMethod(positive);
 	}
 
+	@Override
 	public UpdateMethod update(boolean redundantManual, List<SelectableFeature> featureOrder) {
 		return new UpdateMethod();
 	}
@@ -763,9 +766,9 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			new Literal[variableConfiguration.size(definedVariablesOnly)];
 		int i =
 			0;
-		for (Variable var : variableConfiguration) {
+		for (final Variable var : variableConfiguration) {
 			if (!definedVariablesOnly
-				|| var.getValue() != Variable.UNDEFINED) {
+				|| (var.getValue() != Variable.UNDEFINED)) {
 				literals[i++] =
 					new Literal(features[var.getId()], var.getValue() == Variable.TRUE);
 			}

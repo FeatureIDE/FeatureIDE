@@ -2,8 +2,8 @@ package br.ufal.ic.colligens.util.metrics;
 
 public class Metrics {
 
-	private String Name;
-	private String value;
+	private final String Name;
+	private final String value;
 
 	public Metrics(String name, String value) {
 		super();

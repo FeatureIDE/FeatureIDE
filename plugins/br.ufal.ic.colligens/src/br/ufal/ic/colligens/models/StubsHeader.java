@@ -65,17 +65,18 @@ public class StubsHeader extends AbstractHeader {
 
 	@Override
 	public void run() throws PlatformException {
-		File stubs =
-			new File(this.getIncludePath());
+		final File stubs =
+			new File(getIncludePath());
 
-		if (stubs.exists())
+		if (stubs.exists()) {
 			return;
+		}
 
 		new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
 			+ System.getProperty("file.separator")
 			+ "projects").mkdirs();
 
-		this.stubsCDT();
+		stubsCDT();
 
 	}
 
@@ -93,22 +94,22 @@ public class StubsHeader extends AbstractHeader {
 
 	@Override
 	public Collection<String> getIncludes() {
-		ArrayList<String> collection =
+		final ArrayList<String> collection =
 			new ArrayList<String>();
 
-		collection.add(this.getIncludePath());
+		collection.add(getIncludePath());
 
-		IPreferenceStore store =
+		final IPreferenceStore store =
 			Colligens.getDefault().getPreferenceStore();
 		if (store.getBoolean("USE_INCLUDES")) {
-			PlatformHeader platformHeader =
+			final PlatformHeader platformHeader =
 				new PlatformHeader();
 			try {
-				platformHeader.setProject(this.getProject().getProject()
+				platformHeader.setProject(getProject().getProject()
 						.getName());
 				platformHeader.run();
 				collection.add(platformHeader.getIncludePath());
-			} catch (PlatformException e) {
+			} catch (final PlatformException e) {
 				e.printStackTrace();
 			}
 		}
@@ -117,16 +118,16 @@ public class StubsHeader extends AbstractHeader {
 	}
 
 	public void stubsCDT() throws PlatformException {
-		Collection<String> files =
+		final Collection<String> files =
 			filesAllProject();
-		for (Iterator<String> iterator =
+		for (final Iterator<String> iterator =
 			files.iterator(); iterator.hasNext();) {
-			this.generateTypes(iterator.next());
+			generateTypes(iterator.next());
 		}
 
-		File fileTemp =
+		final File fileTemp =
 			writeTypesToPlatformHeader();
-		fileTemp.renameTo(new File(this.getIncludePath()));
+		fileTemp.renameTo(new File(getIncludePath()));
 
 	}
 
@@ -187,15 +188,15 @@ public class StubsHeader extends AbstractHeader {
 		// + System.getProperty("file.separator") + "temp.c")
 		// .deleteOnExit();
 
-		IFolder folder =
+		final IFolder folder =
 			super.getProject().getProject().getFolder("/includes");
 
-		ProjectExplorerController explorerController =
+		final ProjectExplorerController explorerController =
 			new ProjectExplorerController();
 
 		explorerController.addResource(folder);
 
-		List<IResource> list =
+		final List<IResource> list =
 			explorerController.getList();
 
 		IIncludeReference iIncludeReference[] =
@@ -203,14 +204,14 @@ public class StubsHeader extends AbstractHeader {
 		try {
 			iIncludeReference =
 				super.getProject().getIncludeReferences();
-		} catch (CModelException e) {
+		} catch (final CModelException e) {
 			e.printStackTrace();
 		}
 
-		List<Type> typesAll =
+		final List<Type> typesAll =
 			new ArrayList<Type>();
 
-		PlatformHeader platformHeader =
+		final PlatformHeader platformHeader =
 			new PlatformHeader();
 
 		platformHeader.setProject(super.getProject().getProject().getName());
@@ -221,9 +222,9 @@ public class StubsHeader extends AbstractHeader {
 
 		monitorbeginTask("Generating stubs (TypeChef)", list.size());
 
-		for (Iterator<IResource> iterator =
+		for (final Iterator<IResource> iterator =
 			list.iterator(); iterator.hasNext();) {
-			IResource iResource =
+			final IResource iResource =
 				iterator.next();
 			// FileProxy fileProxy = new FileProxy(iResource);
 			monitorWorked(1);
@@ -232,7 +233,7 @@ public class StubsHeader extends AbstractHeader {
 			if (monitorIsCanceled()) {
 				return;
 			}
-			ArrayList<String> paramters =
+			final ArrayList<String> paramters =
 				new ArrayList<String>();
 
 			paramters.add("--lexNoStdout");
@@ -253,12 +254,12 @@ public class StubsHeader extends AbstractHeader {
 			paramters.add(iResource.getLocation().toString());
 
 			try {
-				Node myAst =
+				final Node myAst =
 					GeneralFrontend.getAST(paramters);
 
 				myAst.accept(new PresenceConditionVisitor());
 
-				TypeGeneratorVisitor typeGenerator =
+				final TypeGeneratorVisitor typeGenerator =
 					new TypeGeneratorVisitor();
 				myAst.accept(typeGenerator);
 
@@ -266,23 +267,23 @@ public class StubsHeader extends AbstractHeader {
 				//
 				// myAst.toString();
 
-				List<Type> types =
+				final List<Type> types =
 					typeGenerator.getTypes();
-				for (Type type : types) {
+				for (final Type type : types) {
 					typesAll.add(type);
 				}
 
-			} catch (OptionException e) {
+			} catch (final OptionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (NullPointerException e) {
+			} catch (final NullPointerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				throw new PlatformException("");
 			}
 		}
 		System.err.println(typesAll.size());
-		for (Type type : typesAll) {
+		for (final Type type : typesAll) {
 			System.out.println(type.getPresenceCondition().toString());
 			System.out.println(type.getSource());
 		}
@@ -296,23 +297,23 @@ public class StubsHeader extends AbstractHeader {
 		try {
 			// file = activateConfigs(filePath);
 			// System.out.println(file.getAbsolutePath());
-			ITranslationUnit tu =
+			final ITranslationUnit tu =
 				(ITranslationUnit) CoreModel.getDefault()
 						.create(getFile(filePath));
 
 			IASTTranslationUnit ast =
 				null;
 
-			IIndex index =
+			final IIndex index =
 				CCorePlugin.getIndexManager().getIndex(
 						super.getProject());
 			// The AST is ready for use..
 			ast =
 				tu.getAST(index, ITranslationUnit.AST_PARSE_INACTIVE_CODE);
 
-			this.setTypes(ast);
-			this.setMacros(ast);
-		} catch (CoreException e1) {
+			setTypes(ast);
+			setMacros(ast);
+		} catch (final CoreException e1) {
 
 			throw new PlatformException(
 					WAS_NOT_POSSIBLE_TO_GENERATE_THE_STUBS);
@@ -327,14 +328,14 @@ public class StubsHeader extends AbstractHeader {
 
 	// It finds probable macros in the node.
 	private void setMacros(IASTNode node) {
-		IASTPreprocessorMacroDefinition[] definitions =
+		final IASTPreprocessorMacroDefinition[] definitions =
 			node
 					.getTranslationUnit().getMacroDefinitions();
-		for (IASTPreprocessorMacroDefinition definition : definitions) {
-			String macro =
+		for (final IASTPreprocessorMacroDefinition definition : definitions) {
+			final String macro =
 				definition.getRawSignature();
-			if (!this.macros.contains(macro)) {
-				this.macros.add(macro);
+			if (!macros.contains(macro)) {
+				macros.add(macro);
 			}
 
 		}
@@ -342,32 +343,32 @@ public class StubsHeader extends AbstractHeader {
 
 	// It finds probable types in the node.
 	private void setTypes(IASTNode node) {
-		IASTNode[] nodes =
+		final IASTNode[] nodes =
 			node.getChildren();
 		if (node.getClass()
 				.getCanonicalName()
 				.equals("org.eclipse.cdt.internal.core.dom.parser.c.CASTTypedefNameSpecifier")) {
 
-			CASTTypedefNameSpecifier s =
+			final CASTTypedefNameSpecifier s =
 				(CASTTypedefNameSpecifier) node;
 			String type =
 				s.getRawSignature().replace("extern", "")
 						.replace("static", "").replace("const", "").trim();
-			String type2 =
+			final String type2 =
 				type;
 			type =
 				"typedef struct "
 					+ type
 					+ ";";
-			if (!this.types.contains(type)
-				&& this.isValidJavaIdentifier(type2)) {
-				this.types.add(type);
+			if (!types.contains(type)
+				&& isValidJavaIdentifier(type2)) {
+				types.add(type);
 			}
 		}
 
 		for (int i =
 			0; i < nodes.length; i++) {
-			this.setTypes(nodes[i]);
+			setTypes(nodes[i]);
 		}
 
 	}
@@ -375,18 +376,18 @@ public class StubsHeader extends AbstractHeader {
 	// All types found are defined in the platform.h header file.
 	private File writeTypesToPlatformHeader() throws PlatformException {
 
-		File platformTemp =
+		final File platformTemp =
 			new File(super.getProject().getProject()
 					.getLocation().toOSString()
 				+ System.getProperty("file.separator")
 				+ "sutbs_temp.h");
 
 		try {
-			FileWriter writer =
+			final FileWriter writer =
 				new FileWriter(platformTemp);
-			for (Iterator<String> i =
-				this.types.iterator(); i.hasNext();) {
-				String type =
+			for (final Iterator<String> i =
+				types.iterator(); i.hasNext();) {
+				final String type =
 					i.next();
 				if (!countDirectives.directives.contains(type)) {
 					// writer.write("typedef struct {} " + type + ";\n");
@@ -395,12 +396,12 @@ public class StubsHeader extends AbstractHeader {
 				}
 			}
 
-			for (Iterator<String> i =
-				this.macros.iterator(); i.hasNext();) {
-				String next =
+			for (final Iterator<String> i =
+				macros.iterator(); i.hasNext();) {
+				final String next =
 					i.next();
 				if (next.contains("#define ")) {
-					String[] temp =
+					final String[] temp =
 						next.trim().split(Pattern.quote(" "));
 					if (!(countDirectives.directives.contains(temp[1])
 						|| temp[1].endsWith("_H_")
@@ -417,7 +418,7 @@ public class StubsHeader extends AbstractHeader {
 
 			writer.flush();
 			writer.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new PlatformException(
 					"was not possible to generate the stubs");
 		}
@@ -429,12 +430,12 @@ public class StubsHeader extends AbstractHeader {
 
 	private boolean isValidJavaIdentifier(String s) {
 		// An empty or null string cannot be a valid identifier
-		if (s == null
-			|| s.length() == 0) {
+		if ((s == null)
+			|| (s.length() == 0)) {
 			return false;
 		}
 
-		char[] c =
+		final char[] c =
 			s.toCharArray();
 		if (!Character.isJavaIdentifierStart(c[0])) {
 			return false;
@@ -471,14 +472,14 @@ public class StubsHeader extends AbstractHeader {
 
 		List<String> list;
 
-		List<String> listFiles =
+		final List<String> listFiles =
 			filesAllProject();
 
 		list =
 			new ArrayList<String>(listFiles);
 
 		try {
-			IIncludeReference includes[] =
+			final IIncludeReference includes[] =
 				super.getProject()
 						.getIncludeReferences();
 			for (int i =
@@ -487,7 +488,7 @@ public class StubsHeader extends AbstractHeader {
 				list.add(0, "-I"
 					+ includes[i].getElementName());
 			}
-		} catch (CModelException e) {
+		} catch (final CModelException e) {
 
 			e.printStackTrace();
 		}
@@ -504,7 +505,7 @@ public class StubsHeader extends AbstractHeader {
 		list.add(0, Colligens.getDefault().getPreferenceStore()
 				.getString("GCC"));
 
-		ProcessBuilder processBuilder =
+		final ProcessBuilder processBuilder =
 			new ProcessBuilder(list);
 
 		BufferedReader input =
@@ -516,7 +517,7 @@ public class StubsHeader extends AbstractHeader {
 			new String();
 
 		try {
-			Process process =
+			final Process process =
 				processBuilder.start();
 			input =
 				new BufferedReader(new InputStreamReader(
@@ -553,18 +554,18 @@ public class StubsHeader extends AbstractHeader {
 							}
 							System.err.println(line);
 						}
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						Colligens.getDefault().logError(e);
 					}
 
 					try {
 						process.waitFor();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						System.out.println(e.toString());
 						Colligens.getDefault().logError(e);
 					}
-					int exitValue =
+					final int exitValue =
 						process.exitValue();
 					if (exitValue != 0) {
 
@@ -579,13 +580,13 @@ public class StubsHeader extends AbstractHeader {
 
 					execute =
 						false;
-				} catch (IllegalThreadStateException e) {
+				} catch (final IllegalThreadStateException e) {
 					System.out.println(e.toString());
 					Colligens.getDefault().logError(e);
 				}
 			}
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			System.out.println(e.toString());
 			Colligens.getDefault().logError(e);
 		} finally {
@@ -594,30 +595,31 @@ public class StubsHeader extends AbstractHeader {
 					input.close();
 				}
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				Colligens.getDefault().logError(e);
 			} finally {
-				if (error != null)
+				if (error != null) {
 					try {
-					error.close();
-					} catch (IOException e) {
-					Colligens.getDefault().logError(e);
+						error.close();
+					} catch (final IOException e) {
+						Colligens.getDefault().logError(e);
 					}
+				}
 			}
 		}
 
-		Collection<String> listTemp =
+		final Collection<String> listTemp =
 			new HashSet<String>(Arrays.asList(output
 					.split(" ")));
 
-		Collection<String> includesTemp =
+		final Collection<String> includesTemp =
 			new HashSet<String>();
 
-		String projectPath =
+		final String projectPath =
 			super.getProject().getProject().getLocation()
 					.toOSString();
 
-		for (Iterator<String> iterator =
+		for (final Iterator<String> iterator =
 			listTemp.iterator(); iterator
 					.hasNext();) {
 			String string =
@@ -642,28 +644,28 @@ public class StubsHeader extends AbstractHeader {
 		try {
 			includesPath =
 				super.getProject().getIncludeReferences();
-		} catch (CModelException e) {
+		} catch (final CModelException e) {
 			e.printStackTrace();
 		}
 
 		includes =
 			new HashSet<String>();
 
-		for (Iterator<String> iterator =
+		for (final Iterator<String> iterator =
 			includesTemp.iterator(); iterator
 					.hasNext();) {
-			String string =
+			final String string =
 				iterator.next();
 
 			for (int i =
 				0; i < includesPath.length; i++) {
 				if (string.contains(includesPath[i].getElementName())) {
 					System.err.println(string);
-					String temp =
+					final String temp =
 						string.substring(includesPath[i]
 								.getElementName().length());
 
-					File file =
+					final File file =
 						new File(projectPath
 							+ "/includes"
 							+ temp);
@@ -679,10 +681,10 @@ public class StubsHeader extends AbstractHeader {
 
 					includes.add(file.getAbsolutePath());
 					try {
-						FileWriter fstreamout =
+						final FileWriter fstreamout =
 							new FileWriter(
 									file.getAbsolutePath());
-						BufferedWriter out =
+						final BufferedWriter out =
 							new BufferedWriter(fstreamout);
 
 						FileInputStream fstream;
@@ -691,9 +693,9 @@ public class StubsHeader extends AbstractHeader {
 							new FileInputStream(string);
 
 						// Get the object of DataInputStream
-						DataInputStream in =
+						final DataInputStream in =
 							new DataInputStream(fstream);
-						BufferedReader br =
+						final BufferedReader br =
 							new BufferedReader(
 									new InputStreamReader(in));
 						String strLine;
@@ -714,10 +716,10 @@ public class StubsHeader extends AbstractHeader {
 
 						in.close();
 						out.close();
-					} catch (FileNotFoundException e) {
+					} catch (final FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -732,29 +734,29 @@ public class StubsHeader extends AbstractHeader {
 
 	public File activateConfigs(String path) throws IOException,
 			PlatformException {
-		File file =
+		final File file =
 			new File(path);
 		if (file.getName().endsWith(".c")
 			|| file.getName().endsWith(".h")) {
 
-			File temp =
+			final File temp =
 				new File(super.getProject().getProject().getLocation()
 						.toOSString()
 					+ System.getProperty("file.separator")
 					+ "temp.c");
-			FileWriter fw =
+			final FileWriter fw =
 				new FileWriter(temp);
-			BufferedWriter bw =
+			final BufferedWriter bw =
 				new BufferedWriter(fw);
 
 			bw.write("#define COLLIGENS\n");
 
-			FileInputStream fstream =
+			final FileInputStream fstream =
 				new FileInputStream(
 						file.getAbsoluteFile());
-			DataInputStream in =
+			final DataInputStream in =
 				new DataInputStream(fstream);
-			BufferedReader br =
+			final BufferedReader br =
 				new BufferedReader(new InputStreamReader(in));
 			String strLine;
 			while ((strLine =

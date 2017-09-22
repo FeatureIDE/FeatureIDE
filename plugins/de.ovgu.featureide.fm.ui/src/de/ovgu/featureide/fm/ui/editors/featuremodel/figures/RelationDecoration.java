@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A decoration for a feature connection that indicates its group type.
- * 
+ *
  * @author Thomas Thuem
  */
 public class RelationDecoration extends ConnectionDecoration implements GUIDefaults {
@@ -137,8 +137,8 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 			minAngle =
 				calculateAngle(center, referencePoint);
 		} else {
-			if (children != null
-				&& children.size() > 1) {
+			if ((children != null)
+				&& (children.size() > 1)) {
 				for (final IGraphicalFeature curChild : children) {
 					lastChild =
 						curChild;
@@ -177,15 +177,15 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 	}
 
 	private double calculateAngle(final Point point, final Point referencePoint) {
-		int dx =
+		final int dx =
 			referencePoint.x
 				- point.x;
-		int dy =
+		final int dy =
 			referencePoint.y
 				- point.y;
 		return 360
-			- Math.round(Math.atan2(dy, dx)
-				/ Math.PI
+			- Math.round((Math.atan2(dy, dx)
+				/ Math.PI)
 				* 180);
 	}
 }

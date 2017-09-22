@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard.ConversionMet
 
 /**
  * TODO description
- * 
+ *
  * @author Alexander Knueppel
  */
 public class EliminateConstraintsPage extends AbstractWizardPage {
@@ -70,11 +70,11 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		"Whether to remove redundant and tautological constraints. Requires SAT-analysis and "
 			+ "and can therefore be time consuming.";
 
-	private IFile inputModelFile;
+	private final IFile inputModelFile;
 	private Combo methodCombo;
 
-	private boolean trivial;
-	private String fileExtension;
+	private final boolean trivial;
+	private final String fileExtension;
 
 	protected Text fileName;
 	protected String path;
@@ -106,15 +106,15 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		Composite composite =
+		final Composite composite =
 			new Composite(parent, SWT.NULL);
-		GridLayout layout =
+		final GridLayout layout =
 			new GridLayout(2, false);
 		layout.verticalSpacing =
 			9;
 		composite.setLayout(layout);
 
-		Label labelGenerate =
+		final Label labelGenerate =
 			new Label(composite, SWT.NULL);
 		labelGenerate.setText(METHOD_LABEL);
 		labelGenerate.setToolTipText(METHOD_TOOLTIP);
@@ -131,14 +131,15 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		selectedMethod =
 			ConversionMethod.COMBINED;
 
-		if (trivial)
+		if (trivial) {
 			methodCombo.setEnabled(false);
+		}
 
-		Label fileNameLabel =
+		final Label fileNameLabel =
 			new Label(composite, SWT.NULL);
 		fileNameLabel.setText("File name:");
 
-		Composite fileComposite =
+		final Composite fileComposite =
 			new Composite(composite, SWT.NULL);
 		fileComposite.setLayout(new GridLayout(2, false));
 		fileComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -147,7 +148,7 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 			fileName =
 				new Text(fileComposite, SWT.BORDER
 					| SWT.SINGLE);
-			String modelName =
+			final String modelName =
 				inputModelFile.getLocation().removeFileExtension().toOSString();
 			fileName.setText(modelName
 				+ "-simple-constraints."
@@ -155,18 +156,19 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 			path =
 				fileName.getText();
 			fileName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-			Button browseButton =
+			final Button browseButton =
 				new Button(fileComposite, SWT.NONE);
 			browseButton.setText("Browse...");
 
 			browseButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 
+				@Override
 				public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-					String selectedPath =
+					final String selectedPath =
 						openFileDialog();
 					if (selectedPath != null) {
 						fileName.setText(selectedPath);
-						IPath path =
+						final IPath path =
 							new Path(selectedPath);
 						if (path.getFileExtension() == null) {
 							fileName.setText(selectedPath
@@ -196,23 +198,25 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		redundantButton.setToolTipText(REDUNDANT_TOOLTIP);
 		redundantButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		if (trivial)
+		if (trivial) {
 			preserveConfigsButton.setEnabled(false);
+		}
 
 		// Add listeners
 		methodCombo.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
-				ConversionMethod[] methods =
+				final ConversionMethod[] methods =
 					new ConversionMethod[] {
 						ConversionMethod.COMBINED,
 						ConversionMethod.NNF,
 						ConversionMethod.CNF };
-				int selection =
+				final int selection =
 					methodCombo.getSelectionIndex();
 				selectedMethod =
 					methods[selection];
-				boolean useCNF =
+				final boolean useCNF =
 					selection < 2;
 				preserveConfigsButton.setEnabled(true);
 				preserveConfigsLabel.setEnabled(true);
@@ -221,10 +225,12 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 
 		fileName.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
-				if (checkFileName())
+				if (checkFileName()) {
 					path =
 						fileName.getText();
+				}
 			}
 		});
 
@@ -259,9 +265,9 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 	}
 
 	protected boolean checkFileName() {
-		String text =
+		final String text =
 			fileName.getText();
-		IPath path =
+		final IPath path =
 			new Path(text);
 		if (path.isEmpty()) {
 			updateErrorMessage("File name must be specified.");
@@ -272,9 +278,9 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 				+ " is no valid path.");
 			return false;
 		}
-		String fileExtension =
+		final String fileExtension =
 			path.getFileExtension();
-		if (fileExtension == null
+		if ((fileExtension == null)
 			|| !fileExtension.equals(fileExtension)) {
 			updateErrorMessage("Exported model file must have "
 				+ fileExtension
@@ -302,7 +308,7 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 //	}
 
 	private String openFileDialog() {
-		FileDialog fileDialog =
+		final FileDialog fileDialog =
 			new FileDialog(PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getShell(), SWT.MULTI);
 

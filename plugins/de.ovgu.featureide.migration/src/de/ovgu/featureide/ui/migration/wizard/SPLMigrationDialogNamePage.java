@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -54,7 +54,7 @@ public class SPLMigrationDialogNamePage extends WizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite container =
+		final Composite container =
 			new Composite(parent, SWT.NONE);
 		final GridLayout gridLayout =
 			new GridLayout();
@@ -67,15 +67,15 @@ public class SPLMigrationDialogNamePage extends WizardPage {
 		gridLayout.numColumns =
 			2;
 
-		Group nameGroup =
+		final Group nameGroup =
 			new Group(container, SWT.NONE);
 		nameGroup.setLayout(gridLayout);
 		nameGroup.setLayoutData(gridDataFill);
 
-		String tooltip =
+		final String tooltip =
 			GIVE_A_NAME_FOR_THE_NEW_SOFTWARE_PRODUCT_LINE;
 
-		Label newProductNameLabel =
+		final Label newProductNameLabel =
 			new Label(nameGroup, SWT.NULL);
 		newProductNameLabel.setText("&Project Name:");
 		newProductNameLabel.setToolTipText(tooltip);
@@ -102,10 +102,11 @@ public class SPLMigrationDialogNamePage extends WizardPage {
 	}
 
 	protected void onNameChange() {
-		if (ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName()).exists())
+		if (ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName()).exists()) {
 			setErrorMessage(A_PROJECT_WITH_THIS_NAME_ALREADY_EXISTS_IN_THE_WORKSPACE__PLEASE_CHANGE_THE_NAME_);
-		else
+		} else {
 			setErrorMessage(null);
+		}
 	}
 
 	public String getProjectName() {
@@ -114,15 +115,16 @@ public class SPLMigrationDialogNamePage extends WizardPage {
 
 	@Override
 	public boolean isPageComplete() {
-		if (isCurrentPage())
+		if (isCurrentPage()) {
 			return getErrorMessage() == null;
-		else
+		} else {
 			return true;
+		}
 	}
 
 	@Override
 	public boolean canFlipToNextPage() {
-		return !(getProjectName() == null
+		return !((getProjectName() == null)
 			|| getProjectName().isEmpty())
 			&& isPageComplete();
 	}

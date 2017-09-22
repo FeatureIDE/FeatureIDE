@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -103,7 +103,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -115,7 +115,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * The activator class controls the plug-in life cycle.
- * 
+ *
  * @author Constanze Adler
  * @author Marcus Leich
  * @author Tom Brosch
@@ -138,22 +138,22 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	private HashMap<IProject, IFeatureProject> featureProjectMap;
 
-	private LinkedList<IProjectListener> projectListeners =
+	private final LinkedList<IProjectListener> projectListeners =
 		new LinkedList<IProjectListener>();
 
-	private LinkedList<ICurrentConfigurationListener> currentConfigurationListeners =
+	private final LinkedList<ICurrentConfigurationListener> currentConfigurationListeners =
 		new LinkedList<>();
 
-	private LinkedList<IConfigurationChangedListener> configurationChangedListeners =
+	private final LinkedList<IConfigurationChangedListener> configurationChangedListeners =
 		new LinkedList<>();
 
-	private LinkedList<IFeatureFolderListener> featureFolderListeners =
+	private final LinkedList<IFeatureFolderListener> featureFolderListeners =
 		new LinkedList<>();
 
-	private LinkedList<ICurrentBuildListener> currentBuildListeners =
+	private final LinkedList<ICurrentBuildListener> currentBuildListeners =
 		new LinkedList<>();
 
-	private ConcurrentLinkedQueue<IProject> projectsToAdd =
+	private final ConcurrentLinkedQueue<IProject> projectsToAdd =
 		new ConcurrentLinkedQueue<>();
 
 	private IRunner<Void> job =
@@ -169,6 +169,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		return PLUGIN_ID;
 	}
 
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin =
@@ -180,9 +181,9 @@ public class CorePlugin extends AbstractCorePlugin {
 			try {
 				if (project.isOpen()) {
 					// conversion for old projects
-					IConfigurationElement[] config =
+					final IConfigurationElement[] config =
 						Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
-					for (IConfigurationElement e : config) {
+					for (final IConfigurationElement e : config) {
 						if (project.hasNature(e.getAttribute("nature"))) {
 							changeOldNature(project, e.getAttribute("ID"));
 						}
@@ -191,7 +192,7 @@ public class CorePlugin extends AbstractCorePlugin {
 						addProject(project);
 					}
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				CorePlugin.getDefault().logError(e);
 			}
 		}
@@ -203,7 +204,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	/**
 	 * If the given project has the old FeatureIDE nature, it will be replaced with the actual one. Also sets the composition tool to the given ID.
-	 * 
+	 *
 	 * @param project The project
 	 * @param composerID The new composer ID
 	 * @throws CoreException
@@ -217,27 +218,31 @@ public class CorePlugin extends AbstractCorePlugin {
 					+ IN_PROJECT_
 					+ project.getName()
 					+ "'");
-		IProjectDescription description =
+		final IProjectDescription description =
 			project.getDescription();
-		String[] natures =
+		final String[] natures =
 			description.getNatureIds();
 		for (int i =
-			0; i < natures.length; i++)
-			if (natures[i].startsWith("FeatureIDE_Core."))
+			0; i < natures.length; i++) {
+			if (natures[i].startsWith("FeatureIDE_Core.")) {
 				natures[i] =
 					FeatureProjectNature.NATURE_ID;
+			}
+		}
 		description.setNatureIds(natures);
 		project.setDescription(description, null);
 		project.setPersistentProperty(IFeatureProject.composerConfigID, composerID);
 	}
 
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
 
 		listener =
 			null;
-		for (IFeatureProject data : featureProjectMap.values())
+		for (final IFeatureProject data : featureProjectMap.values()) {
 			data.dispose();
+		}
 		featureProjectMap =
 			null;
 
@@ -248,24 +253,26 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public void addProject(IProject project) {
 		if (featureProjectMap.containsKey(project)
-			|| !project.isOpen())
+			|| !project.isOpen()) {
 			return;
+		}
 
-		IFeatureProject data =
+		final IFeatureProject data =
 			new FeatureProject(project);
 		featureProjectMap.put(project, data);
 		logInfo("Feature project "
 			+ project.getName()
 			+ " added");
 
-		for (IProjectListener listener : projectListeners)
+		for (final IProjectListener listener : projectListeners) {
 			listener.projectAdded(data);
+		}
 
 		final IStatus status =
 			isComposable(project);
 
-		if (status.getCode() != Status.OK) {
-			for (IStatus child : status.getChildren()) {
+		if (status.getCode() != IStatus.OK) {
+			for (final IStatus child : status.getChildren()) {
 				data.createBuilderMarker(data.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
 			}
 			data.createBuilderMarker(data.getProject(), status.getMessage(), -1, IMarker.SEVERITY_ERROR);
@@ -278,7 +285,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		try {
 			description =
 				project.getDescription();
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			logError(e);
 		}
 		return isComposable(description);
@@ -294,20 +301,20 @@ public class CorePlugin extends AbstractCorePlugin {
 				if (composer != null) {
 					return composer.isComposable();
 				} else {
-					return new Status(Status.ERROR, PLUGIN_ID, "No Composer Found for ID "
+					return new Status(IStatus.ERROR, PLUGIN_ID, "No Composer Found for ID "
 						+ composerID);
 				}
 			} else {
-				return new Status(Status.ERROR, PLUGIN_ID, NO_COMPOSER_FOUND_IN_DESCRIPTION_);
+				return new Status(IStatus.ERROR, PLUGIN_ID, NO_COMPOSER_FOUND_IN_DESCRIPTION_);
 			}
 		} else {
-			return new Status(Status.ERROR, PLUGIN_ID, NO_PROJECT_DESCRIPTION_FOUND_);
+			return new Status(IStatus.ERROR, PLUGIN_ID, NO_PROJECT_DESCRIPTION_FOUND_);
 		}
 	}
 
 	@CheckForNull
 	public String getComposerID(IProjectDescription description) {
-		for (ICommand command : description.getBuildSpec()) {
+		for (final ICommand command : description.getBuildSpec()) {
 			// TODO Make Extension Point for additional Builders
 			if (ExtensibleFeatureProjectBuilder.BUILDER_ID.equals(command.getBuilderName())
 				|| "de.ovgu.featureide.core.mpl.MSPLBuilder".equals(command.getBuilderName())) {
@@ -318,10 +325,11 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void removeProject(IProject project) {
-		if (!featureProjectMap.containsKey(project))
+		if (!featureProjectMap.containsKey(project)) {
 			return;
+		}
 
-		IFeatureProject featureProject =
+		final IFeatureProject featureProject =
 			featureProjectMap.remove(project);
 		// Quick fix #402
 		featureProject.dispose();
@@ -329,13 +337,15 @@ public class CorePlugin extends AbstractCorePlugin {
 		logInfo(project.getName()
 			+ REMOVED);
 
-		for (IProjectListener listener : projectListeners)
+		for (final IProjectListener listener : projectListeners) {
 			listener.projectRemoved(featureProject);
+		}
 	}
 
 	public void addCurrentBuildListener(ICurrentBuildListener listener) {
-		if (!currentBuildListeners.contains(listener))
+		if (!currentBuildListeners.contains(listener)) {
 			currentBuildListeners.add(listener);
+		}
 	}
 
 	public void removeCurrentBuildListener(ICurrentBuildListener listener) {
@@ -343,13 +353,15 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void fireBuildUpdated(IFeatureProject featureProject) {
-		for (ICurrentBuildListener listener : currentBuildListeners)
+		for (final ICurrentBuildListener listener : currentBuildListeners) {
 			listener.updateGuiAfterBuild(featureProject, featureProject.getCurrentConfiguration());
+		}
 	}
 
 	public void addProjectListener(IProjectListener listener) {
-		if (!projectListeners.contains(listener))
+		if (!projectListeners.contains(listener)) {
 			projectListeners.add(listener);
+		}
 	}
 
 	public void removeProjectListener(IProjectListener listener) {
@@ -357,13 +369,15 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void addCurrentConfigurationListener(ICurrentConfigurationListener listener) {
-		if (!currentConfigurationListeners.contains(listener))
+		if (!currentConfigurationListeners.contains(listener)) {
 			currentConfigurationListeners.add(listener);
+		}
 	}
 
 	public void addConfigurationChangedListener(IConfigurationChangedListener listener) {
-		if (!configurationChangedListeners.contains(listener))
+		if (!configurationChangedListeners.contains(listener)) {
 			configurationChangedListeners.add(listener);
+		}
 	}
 
 	public void removeCurrentConfigurationListener(ICurrentConfigurationListener listener) {
@@ -371,18 +385,21 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void fireCurrentConfigurationChanged(IFeatureProject featureProject) {
-		for (ICurrentConfigurationListener listener : currentConfigurationListeners)
+		for (final ICurrentConfigurationListener listener : currentConfigurationListeners) {
 			listener.currentConfigurationChanged(featureProject);
+		}
 	}
 
 	public void fireConfigurationChanged(IFeatureProject featureProject) {
-		for (IConfigurationChangedListener listener : configurationChangedListeners)
+		for (final IConfigurationChangedListener listener : configurationChangedListeners) {
 			listener.configurationChanged(featureProject);
+		}
 	}
 
 	public void addFeatureFolderListener(IFeatureFolderListener listener) {
-		if (!featureFolderListeners.contains(listener))
+		if (!featureFolderListeners.contains(listener)) {
 			featureFolderListeners.add(listener);
+		}
 	}
 
 	public void removeFeatureFolderListener(IFeatureFolderListener listener) {
@@ -390,8 +407,9 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void fireFeatureFolderChanged(IFolder folder) {
-		for (IFeatureFolderListener listener : featureFolderListeners)
+		for (final IFeatureFolderListener listener : featureFolderListeners) {
 			listener.featureFolderChanged(folder);
+		}
 	}
 
 	/**
@@ -403,19 +421,21 @@ public class CorePlugin extends AbstractCorePlugin {
 			getComposer(compositionToolID);
 		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		IFeatureModel featureModel =
+		final IFeatureModel featureModel =
 			createFeatureModelFile(project);
 		createConfigFile(project, configPath, featureModel, project.getName().split("[-]")[0]
 			+ ".");
 
 		if (composer != null) {
-			ISafeRunnable runnable =
+			final ISafeRunnable runnable =
 				new ISafeRunnable() {
 
+					@Override
 					public void handleException(Throwable e) {
 						getDefault().logError(e);
 					}
 
+					@Override
 					public void run() throws Exception {
 						runProjectConversion(project, sourcePath, configPath, buildPath, composer);
 						addFeatureNatureToProject(project);
@@ -437,7 +457,7 @@ public class CorePlugin extends AbstractCorePlugin {
 				|| composer.hasFeatureFolder()) {
 				project.getFolder(buildPath).deleteMarkers(null, true, IResource.DEPTH_INFINITE);
 
-				IFolder source =
+				final IFolder source =
 					project.getFolder(buildPath);
 				IFolder destination =
 					!"".equals(sourcePath)
@@ -454,19 +474,19 @@ public class CorePlugin extends AbstractCorePlugin {
 						destination.create(false, true, null);
 					}
 					/** moves all files of the old source folder to the destination **/
-					for (IResource res : source.members()) {
+					for (final IResource res : source.members()) {
 						res.move(destination.getFile(res.getName()).getFullPath(), true, null);
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
 	 * Setups the project.<br> Creates folders<br> Adds the compiler(if necessary)<br> Adds the FeatureIDE nature<br> Creates the feature model
-	 * 
+	 *
 	 * @param addCompiler <code>false</code> if the project already has a compiler
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
@@ -475,19 +495,21 @@ public class CorePlugin extends AbstractCorePlugin {
 			getComposer(compositionToolID);
 		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		IFeatureModel featureModel =
+		final IFeatureModel featureModel =
 			createFeatureModelFile(project);
 		createConfigFile(project, configPath, featureModel, "default.");
 
-		if (composer != null
+		if ((composer != null)
 			&& addCompiler) {
-			ISafeRunnable runnable =
+			final ISafeRunnable runnable =
 				new ISafeRunnable() {
 
+					@Override
 					public void handleException(Throwable e) {
 						getDefault().logError(e);
 					}
 
+					@Override
 					public void run() throws Exception {
 						composer.addCompiler(project, sourcePath, configPath, buildPath);
 					}
@@ -504,7 +526,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
 			project.setPersistentProperty(IFeatureProject.configFolderConfigID, configPath);
 			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, sourcePath);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
 		}
 		if (addNature) {
@@ -515,7 +537,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	private static IComposerExtensionClass getComposer(String compositionToolID) {
 		IComposerExtensionClass composer =
 			null;
-		for (IConfigurationElement element : Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID)) {
+		for (final IConfigurationElement element : Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID)) {
 			if (element.getAttribute("id").equals(compositionToolID)) {
 				try {
 					final Object o =
@@ -524,7 +546,7 @@ public class CorePlugin extends AbstractCorePlugin {
 						composer =
 							(IComposerExtensionClass) o;
 					}
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					getDefault().logError(e);
 				}
 				break;
@@ -546,11 +568,11 @@ public class CorePlugin extends AbstractCorePlugin {
 				+ FeatureProjectNature.NATURE_ID
 				+ ") to "
 				+ project.getName());
-			IProjectDescription description =
+			final IProjectDescription description =
 				project.getDescription();
-			String[] natures =
+			final String[] natures =
 				description.getNatureIds();
-			String[] newNatures =
+			final String[] newNatures =
 				new String[natures.length
 					+ 1];
 			System.arraycopy(natures, 0, newNatures, 0, natures.length);
@@ -558,7 +580,7 @@ public class CorePlugin extends AbstractCorePlugin {
 				FeatureProjectNature.NATURE_ID;
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
@@ -567,11 +589,11 @@ public class CorePlugin extends AbstractCorePlugin {
 		if ("".equals(name)) {
 			return null;
 		}
-		String[] names =
+		final String[] names =
 			name.split("[/]");
 		IFolder folder =
 			null;
-		for (String folderName : names) {
+		for (final String folderName : names) {
 			if (folder == null) {
 				folder =
 					project.getFolder(folderName);
@@ -583,7 +605,7 @@ public class CorePlugin extends AbstractCorePlugin {
 				if (!folder.exists()) {
 					folder.create(false, true, null);
 				}
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
 		}
@@ -594,11 +616,11 @@ public class CorePlugin extends AbstractCorePlugin {
 		if ("".equals(name)) {
 			return null;
 		}
-		String[] names =
+		final String[] names =
 			name.split("[/]");
 		IFolder folder =
 			null;
-		for (String folderName : names) {
+		for (final String folderName : names) {
 			if (folder == null) {
 				folder =
 					project.getFolder(folderName);
@@ -617,7 +639,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
 		try {
 			/** just create the bin folder if project has only the FeatureIDE Nature **/
-			if (project.getDescription().getNatureIds().length == 1
+			if ((project.getDescription().getNatureIds().length == 1)
 				&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				if (!("".equals(buildPath)
 					&& "".equals(sourcePath))
@@ -626,7 +648,7 @@ public class CorePlugin extends AbstractCorePlugin {
 					createFolder(project, "bin");
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			getDefault().logError(e);
 		}
 		if (composer.hasSource()) {
@@ -651,17 +673,17 @@ public class CorePlugin extends AbstractCorePlugin {
 			try {
 				factory =
 					FMFactoryManager.getFactory(modelPath.toString(), format);
-			} catch (NoSuchExtensionException e) {
+			} catch (final NoSuchExtensionException e) {
 				Logger.logError(e);
 				factory =
 					FMFactoryManager.getDefaultFactory();
 			}
-			IFeatureModel featureModel =
+			final IFeatureModel featureModel =
 				factory.createFeatureModel();
 			FMComposerManager.getFMComposerExtension(project);
 			featureModel.createDefaultValues(project.getName());
 
-			FileHandler.save(modelPath, featureModel, format);
+			SimpleFileHandler.save(modelPath, featureModel, format);
 			return featureModel;
 		}
 		return null;
@@ -675,13 +697,13 @@ public class CorePlugin extends AbstractCorePlugin {
 				+ configFormat.getSuffix());
 		final Configuration config =
 			new Configuration(featureModel);
-		FileHandler.save(Paths.get(file.getLocationURI()), config, configFormat);
+		SimpleFileHandler.save(Paths.get(file.getLocationURI()), config, configFormat);
 		return config;
 	}
 
 	/**
 	 * Returns the shared instance
-	 * 
+	 *
 	 * @return the shared instance
 	 */
 	public static CorePlugin getDefault() {
@@ -690,18 +712,19 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	/**
 	 * returns an unmodifiable Collection of all ProjectData items, or <code>null</code> if plugin is not loaded
-	 * 
+	 *
 	 * @return
 	 */
 	public static Collection<IFeatureProject> getFeatureProjects() {
-		if (getDefault() == null)
+		if (getDefault() == null) {
 			return null;
+		}
 		return Collections.unmodifiableCollection(getDefault().featureProjectMap.values());
 	}
 
 	/**
 	 * returns the ProjectData object associated with the given resource
-	 * 
+	 *
 	 * @param res
 	 * @return <code>null</code> if there is no associated project, no active instance of this plug-in or resource is the workspace root
 	 */
@@ -711,7 +734,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			getDefault().logWarning(NO_RESOURCE_GIVEN_WHILE_GETTING_THE_PROJECT_DATA);
 			return null;
 		}
-		IProject prj =
+		final IProject prj =
 			res.getProject();
 		if (prj == null) {
 			return null;
@@ -725,7 +748,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	/**
 	 * A linear job to add a project. This is necessary if many projects will be add at the same time.
-	 * 
+	 *
 	 * @param project
 	 */
 	public void addProjectToList(IProject project) {
@@ -788,9 +811,9 @@ public class CorePlugin extends AbstractCorePlugin {
 			featureProject.getProjectSignatures();
 
 		if (signatures != null) {
-			SignatureIterator it =
+			final SignatureIterator it =
 				signatures.iterator();
-			int featureID =
+			final int featureID =
 				signatures.getFeatureID(featureName);
 			if (featureID == -1) {
 				return Collections.emptyList();
@@ -798,7 +821,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			it.addFilter(new ContextFilter(featureName, signatures));
 
 			while (it.hasNext()) {
-				AbstractSignature curMember =
+				final AbstractSignature curMember =
 					it.next();
 				CompletionProposal pr =
 					null;
@@ -820,8 +843,8 @@ public class CorePlugin extends AbstractCorePlugin {
 							new char[sig.size()][];
 						int i =
 							0;
-						for (String parameterType : sig) {
-							String parameterTypeToChar =
+						for (final String parameterType : sig) {
+							final String parameterTypeToChar =
 								"L"
 									+ parameterType
 									+ ";";
@@ -830,12 +853,12 @@ public class CorePlugin extends AbstractCorePlugin {
 						}
 					}
 
-					String returnType =
+					final String returnType =
 						"L"
 							+ methSig.getReturnType()
 							+ ";";
 					pr.setSignature(Signature.createMethodSignature(c, returnType.toCharArray()));
-					String declType =
+					final String declType =
 						"L"
 							+ methSig.getFullName().replaceAll("."
 								+ methSig.getName(), "")
@@ -893,9 +916,9 @@ public class CorePlugin extends AbstractCorePlugin {
 	public ProjectStructure extendedModules_getStruct(final IFeatureProject project, final String featureName) {
 		final ProjectSignatures signatures =
 			project.getProjectSignatures();
-		if (signatures != null
-			&& signatures.getFeatureID(featureName) != -1) {
-			SignatureIterator it =
+		if ((signatures != null)
+			&& (signatures.getFeatureID(featureName) != -1)) {
+			final SignatureIterator it =
 				signatures.iterator();
 			// TODO check
 			if (featureName != null) {
@@ -909,7 +932,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void buildContextDocumentation(List<IProject> pl, String options, String featureName) {
 		final ArrayList<JobArguments> arguments =
 			new ArrayList<>(pl.size());
-		for (IProject iProject : pl) {
+		for (final IProject iProject : pl) {
 			arguments
 					.add(new PrintDocumentationJob.Arguments("Docu_Context_"
 						+ featureName, options.split("\\s+"), new ContextMerger(), featureName, iProject));
@@ -920,7 +943,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void buildVariantDocumentation(List<IProject> pl, String options) {
 		final ArrayList<JobArguments> arguments =
 			new ArrayList<>(pl.size());
-		for (IProject iProject : pl) {
+		for (final IProject iProject : pl) {
 			arguments.add(new PrintDocumentationJob.Arguments("Docu_Variant", options.split("\\s+"), new VariantMerger(), null, iProject));
 		}
 		FMCorePlugin.getDefault().startJobs(arguments, true);
@@ -929,7 +952,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void buildFeatureDocumentation(List<IProject> pl, String options, String featureName) {
 		final ArrayList<JobArguments> arguments =
 			new ArrayList<>(pl.size());
-		for (IProject iProject : pl) {
+		for (final IProject iProject : pl) {
 			arguments.add(new PrintDocumentationJob.Arguments("Docu_Feature_"
 				+ featureName, options.split("\\s+"), new FeatureModuleMerger(), featureName,
 					iProject));
@@ -940,7 +963,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void buildSPLDocumentation(List<IProject> pl, String options) {
 		final ArrayList<JobArguments> arguments =
 			new ArrayList<>(pl.size());
-		for (IProject iProject : pl) {
+		for (final IProject iProject : pl) {
 			arguments.add(new PrintDocumentationJob.Arguments("Docu_SPL", options.split("\\s+"), new SPLMerger(), null, iProject));
 		}
 		FMCorePlugin.getDefault().startJobs(arguments, true);

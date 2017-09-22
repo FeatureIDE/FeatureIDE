@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPar
 /**
  * this is a hack to quickly associate features with dimension and size (which is not available in the model). luckily these informations do not need to be
  * stored persistently.
- * 
+ *
  * @author Christian Kaestner
  */
 public class FeatureUIHelper {
@@ -106,12 +106,13 @@ public class FeatureUIHelper {
 		final List<IGraphicalFeature> graphicalChildren =
 			new ArrayList<>(children.size());
 		for (final IFeatureStructure child : children) {
-			IGraphicalFeature graphicChild =
+			final IGraphicalFeature graphicChild =
 				getGraphicalFeature(child, model);
 			if (!graphicChild.hasCollapsedParent()
 				&& (!child.hasHiddenParent()
-					|| model.getLayout().showHiddenFeatures()))
+					|| model.getLayout().showHiddenFeatures())) {
 				graphicalChildren.add(graphicChild);
+			}
 		}
 		return graphicalChildren;
 	}
@@ -186,8 +187,8 @@ public class FeatureUIHelper {
 	}
 
 	public static Rectangle getBounds(IGraphicalFeature feature) {
-		if (feature.getLocation() == null
-			|| feature.getSize() == null) {
+		if ((feature.getLocation() == null)
+			|| (feature.getSize() == null)) {
 			// UIHelper not set up correctly, refresh the feature model
 			feature.getObject().getFeatureModel().handleModelDataChanged();
 		}
@@ -195,8 +196,8 @@ public class FeatureUIHelper {
 	}
 
 	public static Rectangle getBounds(IGraphicalConstraint constraint) {
-		if (constraint.getLocation() == null
-			|| constraint.getSize() == null) {
+		if ((constraint.getLocation() == null)
+			|| (constraint.getSize() == null)) {
 			// UIHelper not set up correctly, refresh the feature model
 			constraint.getObject().getFeatureModel().handleModelDataChanged();
 		}
@@ -212,7 +213,7 @@ public class FeatureUIHelper {
 			new LinkedList<ConnectionEditPart>();
 		final Map<?, ?> registry =
 			viewer.getEditPartRegistry();
-		for (FeatureConnection connection : feature.getTargetConnections()) {
+		for (final FeatureConnection connection : feature.getTargetConnections()) {
 			final Object connectionEditPart =
 				registry.get(connection);
 			if (connectionEditPart instanceof ConnectionEditPart) {

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -49,14 +49,14 @@ import org.eclipse.core.runtime.Path;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
 
 /**
  * This class implements methods that might be useful in Migrating a Set of Projects into a FeatureIDE Project. Currently this is only implemented for the
  * FeatureHouse composer in {@link VariantsToFeatureHouseSPLMigrator}.
- * 
+ *
  * @author Konstantin Tonscheidt
  * @author Marcus Pinnecke
  */
@@ -64,7 +64,7 @@ public class SPLMigrationUtils {
 
 	/**
 	 * Copies all folders and files from {@code source} to {@code destination}.
-	 * 
+	 *
 	 * @param source
 	 * @param destination
 	 * @throws CoreException
@@ -89,25 +89,28 @@ public class SPLMigrationUtils {
 			} else if (member instanceof IFile) {
 				final IFile copyFile =
 					destination.getFile(currentPath);
-				if (!copyFile.exists())
+				if (!copyFile.exists()) {
 					member.copy(copyFile.getFullPath(), true, null);
-			} else
+				}
+			} else {
 				assert false : ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY;
+			}
 		}
 	}
 
 	/**
 	 * creates a new Folder in {@code project} at the given {@code path}.
-	 * 
+	 *
 	 * @param project the project, the folder is going to be created in.
 	 * @param path a path relative to the project root.
 	 */
 	public static void createFolderInProject(IProject project, IPath path) {
-		if (path == null
-			|| path.isEmpty())
+		if ((path == null)
+			|| path.isEmpty()) {
 			return;
+		}
 
-		IFolder newFolder =
+		final IFolder newFolder =
 			project.getFolder(path);
 		if (newFolder.exists()) {
 			assert false : "Trying to create an already existing folder: "
@@ -119,34 +122,35 @@ public class SPLMigrationUtils {
 		}
 		try {
 			newFolder.create(true, true, null);
-			project.refreshLocal(IProject.DEPTH_INFINITE, null);
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 			System.out.println(CREATION_OF_FOLDER
 				+ path
 				+ SUCCESSFUL);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			System.out.println(CREATION_OF_FOLDER
 				+ path
 				+ " lead to CoreException:"
 				+ e.getMessage());
 			e.printStackTrace();
 		}
-		if (!newFolder.exists())
+		if (!newFolder.exists()) {
 			System.out.println(FOLDER
 				+ path
 				+ DOES_NOT_EXIST_AFTER_CREATION);
+		}
 
 	}
 
 	/**
 	 * convenience method for creating folders from a path saved in a {@link String}.
-	 * 
+	 *
 	 * @param project the project, the folder is going to be created in.
 	 * @param path a path relative to the project root.
-	 * 
+	 *
 	 * @see {@link #createFolderInProject(IProject, IPath)}
 	 */
 	public static void createFolderInProject(IProject project, String path) {
-		IPath newPath =
+		final IPath newPath =
 			new Path(path);
 		System.out.println(CREATING_FOLDER_AT
 			+ path
@@ -157,21 +161,22 @@ public class SPLMigrationUtils {
 
 	/**
 	 * Tries to create a new Project in the Workspace and returns it.
-	 * 
+	 *
 	 * @param projectName
 	 * @return the new {@link IProject} if successful, null if not.
 	 */
 	public static IProject createProject(String projectName) {
-		IProject newProject =
+		final IProject newProject =
 			ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (newProject.exists())
+		if (newProject.exists()) {
 			throw new IllegalArgumentException(CANNOT_CREATE_PROJECT
 				+ projectName
 				+ BECAUSE_IT_ALREADY_EXISTS_);
+		}
 
 		try {
 			newProject.create(null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -182,7 +187,7 @@ public class SPLMigrationUtils {
 
 	/**
 	 * Creates a {@code projectName}.config file containing {@code projectName} in the projects config folder.
-	 * 
+	 *
 	 * @param project
 	 * @param configPath
 	 * @param projectName
@@ -196,7 +201,7 @@ public class SPLMigrationUtils {
 		final IFile configFile =
 			configFolder.getFile(projectName
 				+ ".config");
-		InputStream defaultContent =
+		final InputStream defaultContent =
 			new ByteArrayInputStream(projectName.getBytes("UTF-8"));
 
 		configFile.create(defaultContent, true, null);
@@ -205,7 +210,7 @@ public class SPLMigrationUtils {
 
 	/**
 	 * Writes the {@code featureModel} to the default location ( {@code /model.xml}) in {@code featureProject}
-	 * 
+	 *
 	 * @param featureProject
 	 * @param featureModel
 	 */
@@ -213,7 +218,7 @@ public class SPLMigrationUtils {
 		final IFeatureModelFormat format =
 			new XmlFeatureModelFormat();
 		final ProblemList problems =
-			FileHandler.save(Paths.get(featureProject.getFile("model.xml").getLocationURI()),
+			SimpleFileHandler.save(Paths.get(featureProject.getFile("model.xml").getLocationURI()),
 					featureModel, format);
 		if (problems.containsError()) {
 			final ProblemList errors =
@@ -224,17 +229,18 @@ public class SPLMigrationUtils {
 
 	/**
 	 * Creates the Folder empty. If it exists, it will be deleted and created new.
-	 * 
+	 *
 	 * @param folder the folder to be created.
 	 * @return the created {@link IFolder}s {@link IPath}, or null if creation was not successful
 	 */
 	public static IPath setupFolder(IFolder folder) {
 		try {
-			if (folder.exists())
+			if (folder.exists()) {
 				folder.delete(true, null);
+			}
 
 			folder.create(true, true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 

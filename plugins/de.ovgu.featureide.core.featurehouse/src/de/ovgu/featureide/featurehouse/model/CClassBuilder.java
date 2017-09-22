@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,13 +27,13 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 
 /**
  * Builds Classes for the FSTModel for <code>FeatureHouse</code> C files.
- * 
+ *
  * @see ClassBuilder
  * @author Jens Meinicke
  */
 public class CClassBuilder extends ClassBuilder {
 
-	private String[] modifier =
+	private final String[] modifier =
 		{
 			"static" };
 
@@ -48,30 +48,30 @@ public class CClassBuilder extends ClassBuilder {
 
 	@Override
 	void caseFieldDeclaration(FSTTerminal terminal) {
-		LinkedList<String> fields =
+		final LinkedList<String> fields =
 			getFields(terminal.getBody());
 		for (int i =
 			2; i < fields.size(); i++) {
 			// add field
-			FSTField field =
+			final FSTField field =
 				new FSTField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
 			modelBuilder.getCurrentClassFragment().add(field);
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @param terminal body
 	 * @return list(0) field modifiers list(1) field type ... field names
 	 */
 	public LinkedList<String> getFields(String body) {
-		LinkedList<String> fields =
+		final LinkedList<String> fields =
 			new LinkedList<String>();
 		String modifiers =
 			"";
 		String type =
 			"";
-		StringBuilder nameBuilder =
+		final StringBuilder nameBuilder =
 			new StringBuilder();
 		while (body.contains(" ,")) {
 			body =
@@ -87,7 +87,7 @@ public class CClassBuilder extends ClassBuilder {
 		}
 		boolean mod =
 			false;
-		for (String s : body.split("[ ]")) {
+		for (final String s : body.split("[ ]")) {
 			if (!mod
 				&& isModifier(s)) {
 				if (modifiers.equals("")) {
@@ -117,16 +117,16 @@ public class CClassBuilder extends ClassBuilder {
 		}
 		fields.add(modifiers);
 		fields.add(type);
-		String names =
+		final String names =
 			nameBuilder.toString().replaceAll(";", "");
-		for (String name : names.split("[,]")) {
+		for (final String name : names.split("[,]")) {
 			fields.add(name);
 		}
 		return fields;
 	}
 
 	private boolean isModifier(String ss) {
-		for (String modifier : this.modifier) {
+		for (final String modifier : this.modifier) {
 			if (modifier.equals(ss)) {
 				return true;
 			}
@@ -136,9 +136,9 @@ public class CClassBuilder extends ClassBuilder {
 
 	@Override
 	void caseMethodDeclaration(FSTTerminal terminal) {
-		LinkedList<String> method =
+		final LinkedList<String> method =
 			getMethod(terminal.getBody());
-		LinkedList<String> parameterTypes =
+		final LinkedList<String> parameterTypes =
 			new LinkedList<String>();
 		for (int i =
 			3; i < method.size(); i++) {
@@ -153,7 +153,7 @@ public class CClassBuilder extends ClassBuilder {
 	 *
 	 */
 	public LinkedList<String> getMethod(String body) {
-		LinkedList<String> method =
+		final LinkedList<String> method =
 			new LinkedList<String>();
 
 		String name =
@@ -174,9 +174,9 @@ public class CClassBuilder extends ClassBuilder {
 			body.substring(0, body.indexOf(name));
 		returnType =
 			returnType.replaceAll("\n", "");
-		StringBuilder modifiers =
+		final StringBuilder modifiers =
 			new StringBuilder();
-		for (String m : modifier) {
+		for (final String m : modifier) {
 			if (returnType.contains(m)) {
 				returnType =
 					returnType.replaceAll(m
@@ -197,10 +197,10 @@ public class CClassBuilder extends ClassBuilder {
 		method.add(returnType);
 		method.add(modifiers.toString());
 
-		String parameter =
+		final String parameter =
 			body.substring(body.indexOf('(')
 				+ 1, body.indexOf(')'));
-		String[] params =
+		final String[] params =
 			parameter.split(",");
 		for (String p : params) {
 			while (p.startsWith(" ")) {

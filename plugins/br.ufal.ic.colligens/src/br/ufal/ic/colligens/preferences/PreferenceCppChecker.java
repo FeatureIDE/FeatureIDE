@@ -50,17 +50,17 @@ public class PreferenceCppChecker extends FieldEditorPreferencePage implements
 			// field for which validation is required
 			if (event.getSource() == fieldCppChecker) {
 				// validation is successful
-				String value =
+				final String value =
 					fieldCppChecker.getStringValue();
 				if (value != null) {
 					try {
-						Runtime rt =
+						final Runtime rt =
 							Runtime.getRuntime();
-						Process pr =
+						final Process pr =
 							rt.exec(value
 								+ H);
 
-						BufferedReader input =
+						final BufferedReader input =
 							new BufferedReader(
 									new InputStreamReader(pr.getInputStream()));
 						String line =
@@ -77,7 +77,7 @@ public class PreferenceCppChecker extends FieldEditorPreferencePage implements
 							}
 						}
 
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						// e.printStackTrace();
 					}
 				}

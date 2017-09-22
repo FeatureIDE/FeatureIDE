@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,16 +32,16 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
  * Prints feature models in the FaMa format.
- * 
+ *
  * @deprecated Use {@link FAMAFormat} instead.
- * 
+ *
  * @author Alexander Knueppel
  */
 @Deprecated
 public class FAMAWriter extends AbstractFeatureModelWriter {
 
 	/**
-	 * 
+	 *
 	 * @param feature
 	 * @return
 	 */
@@ -49,7 +49,7 @@ public class FAMAWriter extends AbstractFeatureModelWriter {
 		String prefix =
 			"", suffix =
 				"";
-		boolean isAnd =
+		final boolean isAnd =
 			feature.getStructure().isAnd();
 
 		if (!isAnd) {
@@ -62,22 +62,25 @@ public class FAMAWriter extends AbstractFeatureModelWriter {
 				prefix +=
 					"[1,1]{";
 			}
-			if (!feature.getStructure().getChildren().isEmpty()) suffix =
-				"}";
+			if (!feature.getStructure().getChildren().isEmpty()) {
+				suffix =
+					"}";
+			}
 		}
 
-		StringBuilder out =
+		final StringBuilder out =
 			new StringBuilder();
 		out.append(prefix);
 
-		for (IFeatureStructure child : feature.getStructure().getChildren()) {
+		for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 			if (isAnd
-				&& !child.isMandatory())
+				&& !child.isMandatory()) {
 				out.append("["
 					+ child.getFeature().getName()
 					+ "]");
-			else
+			} else {
 				out.append(child.getFeature().getName());
+			}
 			out.append(" ");
 		}
 		out.delete(out.length()
@@ -88,7 +91,7 @@ public class FAMAWriter extends AbstractFeatureModelWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param constraint
 	 * @return
 	 */
@@ -101,18 +104,18 @@ public class FAMAWriter extends AbstractFeatureModelWriter {
 				node.getChildren()[0];
 		}
 
-		org.prop4j.Node[] features =
+		final org.prop4j.Node[] features =
 			node.getChildren();
-		String f1 =
+		final String f1 =
 			features[0].getContainedFeatures().get(0);
-		String f2 =
+		final String f2 =
 			features[1].getContainedFeatures().get(0);
 
-		if (features[0] instanceof Not
-			|| (features[0] instanceof Literal
+		if ((features[0] instanceof Not)
+			|| ((features[0] instanceof Literal)
 				&& !((Literal) features[0]).positive)) {
-			if (features[1] instanceof Not
-				|| (features[1] instanceof Literal
+			if ((features[1] instanceof Not)
+				|| ((features[1] instanceof Literal)
 					&& !((Literal) features[1]).positive)) {
 				return f1
 					+ " EXCLUDES "
@@ -139,11 +142,11 @@ public class FAMAWriter extends AbstractFeatureModelWriter {
 	@Override
 	public String writeToString() {
 		// TODO Auto-generated method stub
-		StringBuilder out =
+		final StringBuilder out =
 			new StringBuilder();
 
 		out.append("%Relationships\n");
-		for (IFeature f : object.getFeatures()) {
+		for (final IFeature f : object.getFeatures()) {
 			if (f.getStructure().hasChildren()) {
 				out.append(f.getName()
 					+ ": ");
@@ -154,10 +157,11 @@ public class FAMAWriter extends AbstractFeatureModelWriter {
 
 		out.append("\n%Constraints\n");
 
-		for (IConstraint c : object.getConstraints()) {
-			if (ComplexConstraintConverter.isSimple(c.getNode()))
+		for (final IConstraint c : object.getConstraints()) {
+			if (ComplexConstraintConverter.isSimple(c.getNode())) {
 				out.append(processConstraint(c)
 					+ "\n");
+			}
 		}
 
 		return out.toString();

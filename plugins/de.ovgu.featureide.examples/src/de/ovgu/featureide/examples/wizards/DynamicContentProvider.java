@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,19 +40,20 @@ import org.w3c.dom.NodeList;
 import de.ovgu.featureide.examples.utils.ProjectRecord;
 
 /**
- * 
+ *
  * @author Reimar Schroeter
  */
 public class DynamicContentProvider implements ITreeContentProvider {
 
 	private HashMap<IPath, Set<Object>> pathToRecord;
-	private String contentProviderName;
+	private final String contentProviderName;
 
 	public DynamicContentProvider(String contentProviderName) {
 		this.contentProviderName =
 			contentProviderName;
 	}
 
+	@Override
 	public Object[] getElements(Object inputElement) {
 		if (pathToRecord == null) {
 			computeHashtable();
@@ -65,6 +66,7 @@ public class DynamicContentProvider implements ITreeContentProvider {
 		}
 	}
 
+	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IPath) {
 			return pathToRecord.get(parentElement).toArray();
@@ -76,15 +78,16 @@ public class DynamicContentProvider implements ITreeContentProvider {
 		}
 	}
 
+	@Override
 	public Object getParent(Object element) {
 		if (element instanceof ProjectRecord.TreeItem) {
-			for (Entry<IPath, Set<Object>> entries : pathToRecord.entrySet()) {
+			for (final Entry<IPath, Set<Object>> entries : pathToRecord.entrySet()) {
 				if (entries.getValue().contains(element)) {
 					return entries.getKey();
 				}
 			}
 		} else if (element instanceof IPath) {
-			IPath returnPath =
+			final IPath returnPath =
 				((IPath) element).removeLastSegments(1);
 			if (returnPath.isEmpty()) {
 				return null;
@@ -94,24 +97,27 @@ public class DynamicContentProvider implements ITreeContentProvider {
 		return null;
 	}
 
+	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof IPath) {
-			return pathToRecord.containsKey((IPath) element)
-				&& !pathToRecord.get((IPath) element).isEmpty();
+			return pathToRecord.containsKey(element)
+				&& !pathToRecord.get(element).isEmpty();
 		} else {
 			return false;
 		}
 	}
 
+	@Override
 	public void dispose() {}
 
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
 	// TODO read XML only once
 	private void computeHashtable() {
 		pathToRecord =
 			new HashMap<>();
-		for (ProjectRecord projectRecord : ProjectProvider.getProjects()) {
+		for (final ProjectRecord projectRecord : ProjectProvider.getProjects()) {
 			final Document doc =
 				projectRecord.getInformationDocument();
 			if (doc != null) {
@@ -125,7 +131,7 @@ public class DynamicContentProvider implements ITreeContentProvider {
 						final Element el =
 							((Element) item1);
 						if (el.getAttribute("name").equals(contentProviderName)) {
-							NodeList pathNode =
+							final NodeList pathNode =
 								el.getElementsByTagName("path");
 							for (int j =
 								0; j < pathNode.getLength(); j++) {
@@ -165,13 +171,13 @@ public class DynamicContentProvider implements ITreeContentProvider {
 					length =
 						parent.segmentCount();
 				}
-				Set<Object> parentRecord =
+				final Set<Object> parentRecord =
 					pathToRecord.get(parent);
 				if (parentRecord != null) {
 					parentRecord.add(path);
 					break;
 				} else {
-					Set<Object> children =
+					final Set<Object> children =
 						new HashSet<>();
 					children.add(path);
 					pathToRecord.put(parent, children);

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -58,7 +58,7 @@ import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
 
 /**
  * Dialog page to add the featureIDE nature to an existing Android project.
- * 
+ *
  * @author Lars-Christian Schulz
  * @author Eric Guimatsia
  */
@@ -71,7 +71,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite container =
+		final Composite container =
 			new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout =
 			new GridLayout();
@@ -80,11 +80,11 @@ public class ConversionPage extends NewFeatureProjectPage {
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		Group toolGroup =
+		final Group toolGroup =
 			new Group(container, SWT.NONE);
 		toolGroup.setText("Composer Selection:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout projGridLayout =
+		final GridLayout projGridLayout =
 			new GridLayout();
 		projGridLayout.numColumns =
 			2;
@@ -92,7 +92,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 
 		final Label helloLabel =
 			new Label(toolGroup, SWT.NONE);
-		GridData gridData =
+		final GridData gridData =
 			new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan =
 			2;
@@ -109,22 +109,22 @@ public class ConversionPage extends NewFeatureProjectPage {
 
 		final Label descriptionLabel =
 			new Label(toolGroup, SWT.NONE);
-		GridData gridData2 =
+		final GridData gridData2 =
 			new GridData(GridData.FILL_BOTH);
 		gridData2.horizontalSpan =
 			2;
 		descriptionLabel.setLayoutData(gridData2);
 
-		StringBuilder descriptionStringBuilder =
+		final StringBuilder descriptionStringBuilder =
 			new StringBuilder();
 		descriptionStringBuilder.append("Possible choices are:\n\n");
-		List<IComposerExtension> composerExtensions =
+		final List<IComposerExtension> composerExtensions =
 			ComposerExtensionManager.getInstance().getComposers();
 
 		// Filter for Android compatible composers
-		List<IComposerExtension> androidCompatibleComposers =
+		final List<IComposerExtension> androidCompatibleComposers =
 			new ArrayList<IComposerExtension>();
-		for (IComposerExtension composer : composerExtensions) {
+		for (final IComposerExtension composer : composerExtensions) {
 			if (composer.supportsAndroid()) {
 				androidCompatibleComposers.add(composer);
 			}
@@ -135,12 +135,13 @@ public class ConversionPage extends NewFeatureProjectPage {
 		androidCompatibleComposers.toArray(extensions);
 		Arrays.sort(extensions, new Comparator<IComposerExtensionBase>() {
 
+			@Override
 			public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
 				return arg0.getName().compareTo(arg1.getName());
 			}
 		});
 
-		for (IComposerExtensionBase composerExtension : extensions) {
+		for (final IComposerExtensionBase composerExtension : extensions) {
 			descriptionStringBuilder.append(composerExtension.getName());
 			descriptionStringBuilder.append(": ");
 			descriptionStringBuilder.append(composerExtension.getDescription());
@@ -159,6 +160,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		descriptionLabel.setText(descriptionString);
 		toolCB.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				composerExtension =
 					extensions[toolCB.getSelectionIndex()];
@@ -183,7 +185,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 			new Label(pathGroup, SWT.NULL);
 		label.setText("Android Source Path:");
 		label.setToolTipText(tooltip);
-		Text androidSrcPath =
+		final Text androidSrcPath =
 			new Text(pathGroup, SWT.BORDER
 				| SWT.SINGLE
 				| SWT.READ_ONLY);
@@ -197,7 +199,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 			new Label(pathGroup, SWT.NULL);
 		label.setText("Android Resource Files Path:");
 		label.setToolTipText(tooltip);
-		Text androidResPath =
+		final Text androidResPath =
 			new Text(pathGroup, SWT.BORDER
 				| SWT.SINGLE
 				| SWT.READ_ONLY);
@@ -249,7 +251,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 
 	@Override
 	protected void dialogChanged() {
-		IComposerExtensionBase compositionTool =
+		final IComposerExtensionBase compositionTool =
 			getCompositionTool();
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());

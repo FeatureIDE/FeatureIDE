@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,24 +42,24 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 /**
  * This class is designated for search functionalities inside of the collaborations diagram It takes care of tasks like: creating the searchbox, catching the
  * key events, firing the search and so on.
- * 
+ *
  * @author Christopher Kruczek
  */
 public class CollaborationViewSearch {
 
-	private GraphicalViewerImpl attachedViewerParent;
+	private final GraphicalViewerImpl attachedViewerParent;
 	private SearchDialog searchDialog;
-	private String searchBoxText;
-	private Color findResultsColor;
-	private Color noSearchResultsColor;
+	private final String searchBoxText;
+	private final Color findResultsColor;
+	private final Color noSearchResultsColor;
 	private List<Label> extractedLabels;
-	private List<Label> matchedLabels;
+	private final List<Label> matchedLabels;
 
 	private class SearchDialog extends org.eclipse.jface.dialogs.Dialog {
 
 		private Text searchTextBox;
 		private String searchText;
-		private String title;
+		private final String title;
 
 		public SearchDialog(Shell parent, String title) {
 			super(parent);
@@ -76,32 +76,32 @@ public class CollaborationViewSearch {
 		@Override
 		protected void configureShell(Shell newShell) {
 			super.configureShell(newShell);
-			newShell.setText(this.title);
+			newShell.setText(title);
 		}
 
 		@Override
 		protected Control createDialogArea(Composite parent) {
-			Composite container =
+			final Composite container =
 				(Composite) super.createDialogArea(parent);
 			container.setLayout(new FillLayout());
-			this.searchTextBox =
+			searchTextBox =
 				new Text(container, SWT.SEARCH
 					| SWT.SINGLE
 					| SWT.ICON_SEARCH);
-			this.searchTextBox.setBounds(500, 500, 200, 50);
-			this.searchTextBox.setSelection(searchText.length());
+			searchTextBox.setBounds(500, 500, 200, 50);
+			searchTextBox.setSelection(searchText.length());
 			return container;
 		}
 
 		@Override
 		protected void buttonPressed(int buttonId) {
 			searchText =
-				this.searchTextBox.getText();
+				searchTextBox.getText();
 			super.buttonPressed(buttonId);
 		}
 
 		public String getSearchText() {
-			return this.searchText;
+			return searchText;
 		}
 
 	}
@@ -160,17 +160,17 @@ public class CollaborationViewSearch {
 	}
 
 	private CollaborationViewSearch(Builder searchBuilder) {
-		this.extractedLabels =
+		extractedLabels =
 			new ArrayList<Label>();
-		this.matchedLabels =
+		matchedLabels =
 			new ArrayList<Label>();
-		this.attachedViewerParent =
+		attachedViewerParent =
 			searchBuilder.getAttachedViewerParent();
-		this.searchBoxText =
+		searchBoxText =
 			searchBuilder.getSearchBoxText();
-		this.findResultsColor =
+		findResultsColor =
 			searchBuilder.getFindResultsColor();
-		this.noSearchResultsColor =
+		noSearchResultsColor =
 			searchBuilder.getNoSearchResultsColor();
 		createControls();
 	}
@@ -193,13 +193,13 @@ public class CollaborationViewSearch {
 					searchDialog.searchText =
 						Character.toString(event.character);
 					searchDialog.open();
-					String searchText =
+					final String searchText =
 						searchDialog.getSearchText();
 					if (!searchText.isEmpty()) {
 						uncolorOldLabels();
 						matchedLabels.clear();
-						for (Label label : extractedLabels) {
-							String labelText =
+						for (final Label label : extractedLabels) {
+							final String labelText =
 								label.getText().toLowerCase();
 							if (labelText.contains(searchText)) {
 								label.setBackgroundColor(findResultsColor);
@@ -218,21 +218,21 @@ public class CollaborationViewSearch {
 	 * This function refreshes the labels which are designated for searching. It uses the given GraphicalViewerImpl and looks for labels.
 	 */
 	public void refreshSearchContent() {
-		ModelEditPart editPart =
+		final ModelEditPart editPart =
 			(ModelEditPart) attachedViewerParent.getContents();
 		gatherLabels(editPart.getFigure());
 	}
 
 	private void uncolorOldLabels() {
 		if (matchedLabels.size() != 0) {
-			for (Label l : matchedLabels) {
+			for (final Label l : matchedLabels) {
 				l.setBackgroundColor(noSearchResultsColor);
 			}
 		}
 	}
 
 	private void gatherLabels(IFigure rootFigure) {
-		List<Label> labels =
+		final List<Label> labels =
 			new ArrayList<Label>();
 		gatherLabels(rootFigure, labels);
 		extractedLabels =
@@ -241,10 +241,10 @@ public class CollaborationViewSearch {
 
 	private void gatherLabels(IFigure rootFigure, List<Label> alreadyGatheredLabels) {
 
-		IFigure tempRootFigure =
+		final IFigure tempRootFigure =
 			rootFigure;
-		for (Object objFigure : tempRootFigure.getChildren()) {
-			IFigure figure =
+		for (final Object objFigure : tempRootFigure.getChildren()) {
+			final IFigure figure =
 				(IFigure) objFigure;
 			if (!(figure instanceof Label)) {
 				gatherLabels(figure, alreadyGatheredLabels);

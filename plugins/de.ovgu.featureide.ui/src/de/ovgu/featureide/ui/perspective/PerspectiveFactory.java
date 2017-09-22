@@ -52,9 +52,10 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		UIPlugin.PLUGIN_ID
 			+ ".FeatureIDEperspective";
 
+	@Override
 	@SuppressWarnings(DEPRECATION)
 	public void createInitialLayout(IPageLayout layout) {
-		String editorArea =
+		final String editorArea =
 			layout.getEditorArea();
 
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
@@ -64,11 +65,11 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder");
 
-		IFolderLayout left =
+		final IFolderLayout left =
 			layout.createFolder(LEFT, IPageLayout.LEFT, (float) 0.23, editorArea);
-		IFolderLayout down =
+		final IFolderLayout down =
 			layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea);
-		IFolderLayout right =
+		final IFolderLayout right =
 			layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
 
 		down.addView(CollaborationView.ID);

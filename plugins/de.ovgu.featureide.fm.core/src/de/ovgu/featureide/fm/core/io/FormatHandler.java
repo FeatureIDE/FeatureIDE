@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Handler to properly write / read objects.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FormatHandler<T> {

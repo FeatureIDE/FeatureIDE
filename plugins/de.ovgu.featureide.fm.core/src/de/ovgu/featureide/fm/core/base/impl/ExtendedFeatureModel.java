@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyz
 
 /**
  * Adds attributes and attribute constraints to a feature model.
- * 
+ *
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
@@ -60,12 +60,12 @@ public class ExtendedFeatureModel extends FeatureModel {
 		private String prefix;
 
 		public UsedModel(UsedModel usedModel, String parentName) {
-			this.modelName =
+			modelName =
 				usedModel.modelName;
-			this.varName =
+			varName =
 				parentName
 					+ usedModel.varName;
-			this.type =
+			type =
 				usedModel.type;
 		}
 
@@ -124,53 +124,53 @@ public class ExtendedFeatureModel extends FeatureModel {
 	public ExtendedFeatureModel(String factoryID) {
 		super(factoryID);
 
-		this.integerAttributes =
+		integerAttributes =
 			new FeatureAttributeMap<>();
-		this.booleanAttributes =
+		booleanAttributes =
 			new FeatureAttributeMap<>();
-		this.stringAttributes =
+		stringAttributes =
 			new FeatureAttributeMap<>();
 
-		this.usedModels =
+		usedModels =
 			new HashMap<>();
 
-		this.attributeConstraints =
+		attributeConstraints =
 			new LinkedList<>();
-		this.imports =
+		imports =
 			new LinkedList<>();
-		this.ownConstraints =
+		ownConstraints =
 			new LinkedList<>();
 
-		this.mappingModel =
+		mappingModel =
 			null;
-		this.isInterface =
+		isInterface =
 			false;
 	}
 
 	protected ExtendedFeatureModel(ExtendedFeatureModel extendedFeatureModel, IFeature newRoot) {
 		super(extendedFeatureModel, newRoot);
 
-		this.integerAttributes =
+		integerAttributes =
 			new FeatureAttributeMap<>(extendedFeatureModel.integerAttributes);
-		this.booleanAttributes =
+		booleanAttributes =
 			new FeatureAttributeMap<>(extendedFeatureModel.booleanAttributes);
-		this.stringAttributes =
+		stringAttributes =
 			new FeatureAttributeMap<>(extendedFeatureModel.stringAttributes);
 
-		this.usedModels =
+		usedModels =
 			new HashMap<>(extendedFeatureModel.usedModels);
 
-		this.attributeConstraints =
+		attributeConstraints =
 			new LinkedList<>(extendedFeatureModel.attributeConstraints);
-		this.imports =
+		imports =
 			new LinkedList<>(extendedFeatureModel.imports);
-		this.ownConstraints =
+		ownConstraints =
 			new LinkedList<>(extendedFeatureModel.ownConstraints);
 
-		this.mappingModel =
+		mappingModel =
 			extendedFeatureModel.mappingModel;
 
-		this.isInterface =
+		isInterface =
 			extendedFeatureModel.isInterface;
 	}
 
@@ -188,24 +188,24 @@ public class ExtendedFeatureModel extends FeatureModel {
 	}
 
 	public void addAttribute(final String featureName, final String attributeName, final Boolean value) {
-		this.booleanAttributes.setAttribute(featureName, attributeName, value);
+		booleanAttributes.setAttribute(featureName, attributeName, value);
 	}
 
 	public void addAttribute(final String featureName, final String attributeName, final Integer value) {
-		this.integerAttributes.setAttribute(featureName, attributeName, value);
+		integerAttributes.setAttribute(featureName, attributeName, value);
 	}
 
 	public void addAttribute(final String featureName, final String attributeName, final String value) {
-		this.stringAttributes.setAttribute(featureName, attributeName, value);
+		stringAttributes.setAttribute(featureName, attributeName, value);
 	}
 
 	public void addAttributeConstraint(final Equation constraint) {
-		this.attributeConstraints.add(constraint);
+		attributeConstraints.add(constraint);
 	}
 
 	/**
 	 * Adds a parameter to the available parameters of the model
-	 * 
+	 *
 	 * @param varType the name of the interface that shall be bound to the variable
 	 * @param varName the name of the variable an interface shall be bound to
 	 * @return true if the parameter could be added to the parameters. False if the variable name was already bound to another interface.
@@ -245,19 +245,19 @@ public class ExtendedFeatureModel extends FeatureModel {
 	}
 
 	public List<Equation> getAttributConstraints() {
-		return this.attributeConstraints;
+		return attributeConstraints;
 	}
 
 	public FeatureAttributeMap<Boolean> getBooleanAttributes() {
-		return this.booleanAttributes;
+		return booleanAttributes;
 	}
 
 	public FeatureAttributeMap<Integer> getIntegerAttributes() {
-		return this.integerAttributes;
+		return integerAttributes;
 	}
 
 	public FeatureAttributeMap<String> getStringAttributes() {
-		return this.stringAttributes;
+		return stringAttributes;
 	}
 
 	public boolean isMultiProductLineModel() {
@@ -266,12 +266,12 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	/**
 	 * Check if the feature model contains instance features.
-	 * 
+	 *
 	 * @return true if imported features exists
 	 */
 	public boolean hasInstance() {
-		for (IFeature feature : featureTable.values()) {
-			if (feature instanceof ExtendedFeature
+		for (final IFeature feature : featureTable.values()) {
+			if ((feature instanceof ExtendedFeature)
 				&& ((ExtendedFeature) feature).isInstance()) {
 				return true;
 			}
@@ -281,12 +281,12 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	/**
 	 * Check if the feature model contains inherited features.
-	 * 
+	 *
 	 * @return true if inherited features exists
 	 */
 	public boolean hasInherited() {
-		for (IFeature feature : featureTable.values()) {
-			if (feature instanceof ExtendedFeature
+		for (final IFeature feature : featureTable.values()) {
+			if ((feature instanceof ExtendedFeature)
 				&& ((ExtendedFeature) feature).isInherited()) {
 				return true;
 			}
@@ -295,8 +295,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	}
 
 	public boolean hasInterface() {
-		for (IFeature feature : featureTable.values()) {
-			if (feature instanceof ExtendedFeature
+		for (final IFeature feature : featureTable.values()) {
+			if ((feature instanceof ExtendedFeature)
 				&& ((ExtendedFeature) feature).isInterface()) {
 				return true;
 			}
@@ -339,16 +339,16 @@ public class ExtendedFeatureModel extends FeatureModel {
 			Logger.logInfo(analyzer.isValid()
 				? VALID
 				: INVALID);
-			StringBuilder sb =
+			final StringBuilder sb =
 				new StringBuilder("Dead Features: ");
-			for (IFeature deadFeature : analyzer.getDeadFeatures()) {
+			for (final IFeature deadFeature : analyzer.getDeadFeatures()) {
 				sb.append(deadFeature.getName()
 					+ ", ");
 			}
 			Logger.logInfo(sb.toString());
 			sb.delete(0, sb.length());
 			sb.append("FO Features: ");
-			for (IFeature deadFeature : analyzer.getFalseOptionalFeatures()) {
+			for (final IFeature deadFeature : analyzer.getFalseOptionalFeatures()) {
 				sb.append(deadFeature.getName()
 					+ ", ");
 			}
@@ -361,14 +361,14 @@ public class ExtendedFeatureModel extends FeatureModel {
 	@Override
 	@CheckForNull
 	public IFeature getFeature(CharSequence name) {
-		IFeature feature =
+		final IFeature feature =
 			super.getFeature(name);
 		if (feature != null) {
 			return feature;
 		}
 
 		if (name.toString().contains(".")) {
-			return super.getFeature(this.getStructure().getRoot().getFeature().getName()
+			return super.getFeature(getStructure().getRoot().getFeature().getName()
 				+ "."
 				+ name);
 		} else {
@@ -385,6 +385,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 			isInterface;
 	}
 
+	@Override
 	public FeatureModel clone() {
 		return new ExtendedFeatureModel(this, null);
 	}

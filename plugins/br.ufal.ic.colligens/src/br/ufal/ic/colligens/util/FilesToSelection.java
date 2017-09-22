@@ -17,10 +17,10 @@ public class FilesToSelection implements IStructuredSelection {
 
 	public FilesToSelection(ICProject project, String filePath) {
 
-		IFolder folder =
+		final IFolder folder =
 			project.getProject().getFolder(filePath);
 
-		ProjectExplorerController explorerController =
+		final ProjectExplorerController explorerController =
 			new ProjectExplorerController();
 
 		explorerController.addResource(folder);

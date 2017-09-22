@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,19 +42,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraint
 
 /**
  * Expands up to the level of the features of this constraint and collapses all other features.
- * 
+ *
  * @author Maximilian Kühl
  * @author Christopher Sontag
  */
 public class ExpandConstraintAction extends Action {
 
-	private IGraphicalFeatureModel graphcialFeatureModel;
+	private final IGraphicalFeatureModel graphcialFeatureModel;
 	private IConstraint constraint;
-	private ISelectionChangedListener listener =
+	private final ISelectionChangedListener listener =
 		new ISelectionChangedListener() {
 
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection =
+				final IStructuredSelection selection =
 					(IStructuredSelection) event.getSelection();
 				setEnabled(isValidSelection(selection));
 			}
@@ -78,24 +79,25 @@ public class ExpandConstraintAction extends Action {
 
 	@Override
 	public void run() {
-		ExpandConstraintOperation op =
+		final ExpandConstraintOperation op =
 			new ExpandConstraintOperation(graphcialFeatureModel, constraint);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if (selection.size() == 1
-			&& selection.getFirstElement() instanceof ModelEditPart)
+		if ((selection.size() == 1)
+			&& (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
+		}
 
-		Iterator<?> iter =
+		final Iterator<?> iter =
 			selection.iterator();
 		while (iter.hasNext()) {
-			Object editPart =
+			final Object editPart =
 				iter.next();
 			if (editPart instanceof ConstraintEditPart) {
 				constraint =

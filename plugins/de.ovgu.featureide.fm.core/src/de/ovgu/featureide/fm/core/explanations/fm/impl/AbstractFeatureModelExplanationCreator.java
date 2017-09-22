@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator}.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractFeatureModelExplanationCreator implements FeatureModelExplanationCreator {
@@ -82,24 +82,24 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	public void setFeatureModel(IFeatureModel fm) {
 		this.fm =
 			fm;
-		this.nodeCreator =
+		nodeCreator =
 			null;
-		this.cnf =
+		cnf =
 			null;
-		this.traceModel =
+		traceModel =
 			null;
-		this.oracle =
+		oracle =
 			null;
 	}
 
 	/**
 	 * Returns the node creator. Creates it first if necessary.
-	 * 
+	 *
 	 * @return the node creator
 	 */
 	protected AdvancedNodeCreator getNodeCreator() {
-		if (nodeCreator == null
-			&& getFeatureModel() != null) {
+		if ((nodeCreator == null)
+			&& (getFeatureModel() != null)) {
 			nodeCreator =
 				createNodeCreator();
 		}
@@ -108,7 +108,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	/**
 	 * Creates a new node creator.
-	 * 
+	 *
 	 * @return a new node creator; not null
 	 */
 	protected AdvancedNodeCreator createNodeCreator() {
@@ -122,12 +122,12 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	/**
 	 * Returns a formula representation of the feature model in CNF (conjunctive normal form). Creates it first if necessary.
-	 * 
+	 *
 	 * @return a formula representation of the feature model in CNF
 	 */
 	protected Node getCnf() throws IllegalStateException {
-		if (cnf == null
-			&& getFeatureModel() != null) {
+		if ((cnf == null)
+			&& (getFeatureModel() != null)) {
 			cnf =
 				createCnf();
 		}
@@ -136,7 +136,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	/**
 	 * Creates the formula representation of the feature model in CNF (conjunctive normal form).
-	 * 
+	 *
 	 * @return the CNF; not null
 	 */
 	protected Node createCnf() {
@@ -145,12 +145,12 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	/**
 	 * Returns the trace model.
-	 * 
+	 *
 	 * @return the trace model
 	 */
 	public FeatureModelToNodeTraceModel getTraceModel() {
-		if (traceModel == null
-			&& getFeatureModel() != null) {
+		if ((traceModel == null)
+			&& (getFeatureModel() != null)) {
 			traceModel =
 				createTraceModel();
 		}
@@ -159,7 +159,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	/**
 	 * Creates the trace model.
-	 * 
+	 *
 	 * @return the trace model; not null
 	 */
 	protected FeatureModelToNodeTraceModel createTraceModel() {
@@ -168,12 +168,12 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	/**
 	 * Returns the oracle. Creates it first if necessary.
-	 * 
+	 *
 	 * @return the oracle; not null
 	 */
 	protected Object getOracle() {
-		if (oracle == null
-			&& getFeatureModel() != null) {
+		if ((oracle == null)
+			&& (getFeatureModel() != null)) {
 			oracle =
 				createOracle();
 		}
@@ -184,20 +184,20 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * Sets the oracle to null.
 	 */
 	protected void resetOracle() {
-		this.oracle =
+		oracle =
 			null;
 	}
 
 	/**
 	 * Returns a new oracle.
-	 * 
+	 *
 	 * @return a new oracle; not null
 	 */
 	protected abstract Object createOracle();
 
 	/**
 	 * Returns an explanation for the given clauses.
-	 * 
+	 *
 	 * @param clauseIndexes indexes of clauses that serve as an explanation
 	 * @return an explanation
 	 */
@@ -217,7 +217,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	/**
 	 * Returns the reason for the given clause index.
-	 * 
+	 *
 	 * @param clauseIndex index of the clause
 	 * @return the reason for the given clause index
 	 */
@@ -227,7 +227,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	/**
 	 * Returns a new concrete explanation.
-	 * 
+	 *
 	 * @return a new concrete explanation; not null
 	 */
 	protected abstract Explanation getConcreteExplanation();

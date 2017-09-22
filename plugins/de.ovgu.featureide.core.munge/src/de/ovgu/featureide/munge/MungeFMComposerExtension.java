@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * Munge specific feature model extensions.
- * 
+ *
  * @author Jens Meinicke
  */
 public class MungeFMComposerExtension extends FMComposerExtension {
@@ -66,32 +66,33 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
-		IFeatureProject featureProject =
+		final IFeatureProject featureProject =
 			CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			return false;
 		}
 
-		IFolder sourceFolder =
+		final IFolder sourceFolder =
 			featureProject.getSourceFolder();
-		if (!sourceFolder.exists())
+		if (!sourceFolder.exists()) {
 			return true;
+		}
 
 		try {
 			performRenamings(oldName, newName, sourceFolder);
 			sourceFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return true;
 	}
 
 	private void performRenamings(String oldName, String newName, IFolder folder) throws CoreException {
-		for (IResource res : folder.members()) {
+		for (final IResource res : folder.members()) {
 			if (res instanceof IFolder) {
 				performRenamings(oldName, newName, (IFolder) res);
 			} else if (res instanceof IFile) {
-				IFile file =
+				final IFile file =
 					(IFile) res;
 				performRenamings(oldName, newName, file);
 			}
@@ -120,7 +121,7 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 		if (filecontent == null) {
 			return;
 		}
-		File file =
+		final File file =
 			iFile.getRawLocation().toFile();
 		FileWriter fw =
 			null;
@@ -128,15 +129,15 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 			fw =
 				new FileWriter(file);
 			fw.write(filecontent);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			MungeCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		} finally {
 			if (fw != null) {
 				try {
 					fw.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					MungeCorePlugin.getDefault().logError(e);
 				}
 			}
@@ -146,7 +147,7 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 	private String getFileContent(IFile iFile) {
 		Scanner scanner =
 			null;
-		StringBuilder fileText =
+		final StringBuilder fileText =
 			new StringBuilder();
 		try {
 			scanner =
@@ -155,7 +156,7 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 				fileText.append(scanner.nextLine());
 				fileText.append("\r\n");
 			}
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		} finally {
 			if (scanner != null) {

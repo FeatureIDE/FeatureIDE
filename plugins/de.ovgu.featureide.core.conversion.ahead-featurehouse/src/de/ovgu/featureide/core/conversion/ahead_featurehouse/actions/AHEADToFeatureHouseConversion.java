@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,14 +39,14 @@ import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 
 /**
  * Changes the composer of an AHEAD project to FeatureHouse.
- * 
+ *
  * @author Jens Meinicke
  */
 public class AHEADToFeatureHouseConversion extends ComposerConversion {
 
 	/**
 	 * Changes the composer of the given feature project to <code>FeatureHouse</code>.
-	 * 
+	 *
 	 * @param featureProject
 	 */
 	public AHEADToFeatureHouseConversion(final IFeatureProject featureProject) {
@@ -57,9 +57,10 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 			+ featureProject.getProjectName()
 			+
 			FROM_AHEAD_TO_FEATUREHOUSE_);
-		Job job =
+		final Job job =
 			new Job(CHANGE_COMPOSER_) {
 
+				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					startProjectConversion(featureProject);
 					return Status.OK_STATUS;
@@ -72,7 +73,7 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 
 	/**
 	 * Replaces the composer of the given feature project by <code>FeatureHouse</code>.
-	 * 
+	 *
 	 * @param project
 	 */
 	@Override
@@ -95,14 +96,14 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 
 	/**
 	 * Replaces the file extension <code>.jak</code> by <code>.java</code> of the given file
-	 * 
+	 *
 	 * @param file
 	 */
 	@Override
 	void replaceFileExtension(IFile file) {
 		try {
 			file.move(((IFolder) file.getParent()).getFile(file.getName().replace(JAK, ".java")).getFullPath(), true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}

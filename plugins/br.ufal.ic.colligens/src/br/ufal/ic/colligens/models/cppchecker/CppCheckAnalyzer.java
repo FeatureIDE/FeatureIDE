@@ -25,20 +25,20 @@ public class CppCheckAnalyzer {
 	}
 
 	public void processFile(IFile iFile) {
-		CppChecker checker =
+		final CppChecker checker =
 			new CppChecker();
 
 		checker.checkFile(iFile.getLocation().toFile(), iFile.getProject()
 				.getName());
 
-		String xml =
+		final String xml =
 			checker.getXmlFile();
 
 		// System.err.println(xml);
 
-		SAXBuilder builder =
+		final SAXBuilder builder =
 			new SAXBuilder();
-		Reader in =
+		final Reader in =
 			new StringReader(xml);
 		Document doc =
 			null;
@@ -64,24 +64,24 @@ public class CppCheckAnalyzer {
 			// code = _code.getText();
 			// description = _description.getText();
 
-		} catch (JDOMException e) {
+		} catch (final JDOMException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
-		Element rootNode =
+		final Element rootNode =
 			doc.getRootElement();
 
-		List<Element> list =
+		final List<Element> list =
 			rootNode.getChildren();
 
-		for (Iterator<Element> i =
+		for (final Iterator<Element> i =
 			list.iterator(); i.hasNext();) {
 
-			Element element =
+			final Element element =
 				i.next();
 
 			String file =
@@ -102,7 +102,7 @@ public class CppCheckAnalyzer {
 				hashMap.put(file, fileLogs);
 			}
 
-			CppCheckerLog log =
+			final CppCheckerLog log =
 				new CppCheckerLog(fileLogs,
 						element.getAttributeValue("line"),
 						element.getAttributeValue("id"),
@@ -117,16 +117,16 @@ public class CppCheckAnalyzer {
 	}
 
 	public List<CppCheckerFileLogs> getFiles() {
-		List<CppCheckerFileLogs> list =
+		final List<CppCheckerFileLogs> list =
 			new LinkedList<CppCheckerFileLogs>();
 
-		Collection<CppCheckerFileLogs> collection =
+		final Collection<CppCheckerFileLogs> collection =
 			hashMap.values();
 
-		for (Iterator<CppCheckerFileLogs> iterator =
+		for (final Iterator<CppCheckerFileLogs> iterator =
 			collection.iterator(); iterator
 					.hasNext();) {
-			CppCheckerFileLogs fileLogs =
+			final CppCheckerFileLogs fileLogs =
 				iterator.next();
 			list.add(fileLogs);
 		}

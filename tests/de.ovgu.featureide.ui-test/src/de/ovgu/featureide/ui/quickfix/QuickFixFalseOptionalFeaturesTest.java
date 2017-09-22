@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,11 +43,11 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Creates configurations where false optional features are unused.
- * 
+ *
  * @author Jens Meinicke
  */
 @RunWith(Parameterized.class)
@@ -66,7 +66,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 	public QuickFixFalseOptionalFeaturesTest(IFeatureModel fm, String s) throws UnsupportedModelException {
 		this.fm =
 			fm;
-		this.failureMessage =
+		failureMessage =
 			"("
 				+ s
 				+ ")";
@@ -80,15 +80,15 @@ public class QuickFixFalseOptionalFeaturesTest {
 			MODEL_FILE_FOLDER =
 				new File(ClassLoader.getSystemResource("models").getPath());
 		}
-		Collection<Object[]> params =
+		final Collection<Object[]> params =
 			new ArrayList<>();
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
-			Object[] models =
+			final Object[] models =
 				new Object[2];
 
 			final IFeatureModel fm =
 				DefaultFeatureModelFactory.getInstance().createFeatureModel();
-			FileHandler.load(f.toPath(), fm, FMFormatManager.getInstance());
+			SimpleFileHandler.load(f.toPath(), fm, FMFormatManager.getInstance());
 			models[0] =
 				fm;
 			models[1] =
@@ -100,7 +100,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 	}
 
 	private final static FileFilter getFileFilter(final String s) {
-		FileFilter filter =
+		final FileFilter filter =
 			new FileFilter() {
 
 				@Override
@@ -120,7 +120,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		final Collection<String> falseOptionalFeatures =
 			new LinkedList<String>();
 
-		for (IFeature feature : concrete) {
+		for (final IFeature feature : concrete) {
 			if (!core.contains(feature)) {
 				falseOptionalFeatures.add(feature.getName());
 			}
@@ -132,8 +132,8 @@ public class QuickFixFalseOptionalFeaturesTest {
 			quickFix.createConfigurations(falseOptionalFeatures, fm);
 		for (final Configuration conf : confs) {
 			for (final SelectableFeature feature : conf.getFeatures()) {
-				if (feature.getSelection() == Selection.UNDEFINED
-					|| feature.getSelection() == Selection.UNSELECTED) {
+				if ((feature.getSelection() == Selection.UNDEFINED)
+					|| (feature.getSelection() == Selection.UNSELECTED)) {
 					falseOptionalFeaturesTest.remove(feature.getName());
 				}
 			}

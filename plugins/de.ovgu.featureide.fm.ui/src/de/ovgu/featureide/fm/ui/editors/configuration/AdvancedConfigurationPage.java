@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * Displays the tree for advanced configuration selection at the configuration editor.
- * 
+ *
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  * @author Marcus Pinnecke
@@ -151,6 +151,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		}
 	}
 
+	@Override
 	protected void createUITree(Composite parent) {
 		tree =
 			new Tree(parent, SWT.NONE);
@@ -158,9 +159,9 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 
 			@Override
 			public void mouseUp(MouseEvent e) {
-				if (e.button == 1
-					|| e.button == 3) {
-					TreeItem item =
+				if ((e.button == 1)
+					|| (e.button == 3)) {
+					final TreeItem item =
 						tree.getItem(new Point(e.x, e.y));
 					if (item != null) {
 						final Object data =
@@ -187,6 +188,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		});
 		tree.addKeyListener(new KeyListener() {
 
+			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.character == ' ') {
 					final TreeItem[] selection =
@@ -210,10 +212,12 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 				}
 			}
 
+			@Override
 			public void keyReleased(KeyEvent e) {}
 		});
 	}
 
+	@Override
 	protected void refreshItem(TreeItem item) {
 		final Object data =
 			item.getData();

@@ -8,7 +8,7 @@ import java.util.List;
 public class ProjectConfigurationErrorLogger {
 
 	private static ProjectConfigurationErrorLogger INSTANCE;
-	private List<String> projectsName;
+	private final List<String> projectsName;
 
 	private ProjectConfigurationErrorLogger() {
 		projectsName =

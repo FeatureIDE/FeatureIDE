@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistributecolorSchemeNameText/or modify
  * it under the terms of the GNU LcolorSchemeNameTexteneral PucolorSchemeNameTextcense as published by
  * the FrecolorSchemeNameTextare Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * Page for {@link ColorSchemeWizard}.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ColorSchemePage extends WizardPage {
@@ -70,7 +70,7 @@ public class ColorSchemePage extends WizardPage {
 			new ArrayList<>(colorSchemes.size()
 				+ 1);
 
-		for (ColorScheme colorScheme : colorSchemes) {
+		for (final ColorScheme colorScheme : colorSchemes) {
 			if (!colorScheme.isDefault()) {
 				colorSchemeNames.add(colorScheme.getName());
 			}
@@ -246,7 +246,7 @@ public class ColorSchemePage extends WizardPage {
 				selection[0];
 			final String newSchemeName =
 				newColorSchemeText.getText();
-			if (oldSchemeName != null
+			if ((oldSchemeName != null)
 				&& !oldSchemeName.isEmpty()
 				&& FeatureColorManager.hasColorScheme(featureModel, oldSchemeName)
 				&& !FeatureColorManager.hasColorScheme(featureModel, newSchemeName)) {
@@ -301,7 +301,7 @@ public class ColorSchemePage extends WizardPage {
 	private void createNewColorScheme() {
 		final String newSchemeName =
 			newColorSchemeText.getText();
-		if (newSchemeName != null
+		if ((newSchemeName != null)
 			&& !newSchemeName.isEmpty()
 			&& !FeatureColorManager.hasColorScheme(featureModel, newSchemeName)) {
 			FeatureColorManager.newColorScheme(featureModel, newSchemeName);

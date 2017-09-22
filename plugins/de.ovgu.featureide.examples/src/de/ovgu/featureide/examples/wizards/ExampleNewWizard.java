@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -69,7 +69,7 @@ import de.ovgu.featureide.examples.utils.SimpleStructureProvider;
 
 /**
  * Class implements the Wizard for the examples.
- * 
+ *
  * @author Christian Becker
  * @author Reimar Schroeter
  */
@@ -100,27 +100,31 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	/**
 	 * Adding the page to the wizard.
 	 */
+	@Override
 	public void addPages() {
 		mainPage =
 			new ExampleNewWizardPage();
 		addPage(mainPage);
 	}
 
+	@Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		setWindowTitle(FEATUREIDE_EXAMPLE_IMPORT);
 	}
 
+	@Override
 	public boolean performCancel() {
 		return true;
 	}
 
+	@Override
 	public boolean performFinish() {
 		return createProjects();
 	}
 
 	/**
 	 * Create the selected projects
-	 * 
+	 *
 	 * @return boolean <code>true</code> if all project creations were successful.
 	 */
 	public boolean createProjects() {
@@ -129,15 +133,16 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 		final WorkspaceModifyOperation op =
 			new WorkspaceModifyOperation() {
 
+				@Override
 				protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
 						monitor.beginTask("", selected.length); //$NON-NLS-1$
 						if (monitor.isCanceled()) {
 							throw new OperationCanceledException();
 						}
-						for (Object selectedObject : selected) {
+						for (final Object selectedObject : selected) {
 							if (selectedObject instanceof ProjectRecord) {
-								ProjectRecord projectRecord =
+								final ProjectRecord projectRecord =
 									(ProjectRecord) selectedObject;
 								createExistingProject(projectRecord, new SubProgressMonitor(monitor, 1));
 							} else if (selectedObject instanceof String) {
@@ -152,13 +157,13 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 		// run the new project creation operation
 		try {
 			getContainer().run(true, true, op);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			return false;
-		} catch (InvocationTargetException e) {
+		} catch (final InvocationTargetException e) {
 			// one of the steps resulted in a core exception
-			Throwable t =
+			final Throwable t =
 				e.getTargetException();
-			String message =
+			final String message =
 				CREATION_PROBLEMS;
 			IStatus status;
 			if (t instanceof CoreException) {
@@ -178,7 +183,7 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	/**
 	 *
 	 * Create the project described in record. If it is successful return true.
-	 * 
+	 *
 	 * @param record
 	 * @return boolean <code>true</code> if successful
 	 * @throws InvocationTargetException
@@ -186,7 +191,7 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	 * @throws IOException
 	 */
 	private boolean createExistingProject(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-		String projectName =
+		final String projectName =
 			record.getProjectName();
 		final IWorkspace workspace =
 			ResourcesPlugin.getWorkspace();
@@ -195,17 +200,17 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 
 		final InputStream inputStream;
 		try {
-			URL url =
+			final URL url =
 				new URL("platform:/plugin/de.ovgu.featureide.examples/"
 					+ record.getIndexDocumentPath());
 			inputStream =
 				url.openConnection().getInputStream();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 			return false;
 		}
 
-		List<String> res =
+		final List<String> res =
 			new ArrayList<>();
 		try (BufferedReader br =
 			new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
@@ -216,11 +221,11 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 			}
 			new ImportOperation(project.getFullPath(), null, new SimpleStructureProvider(record.getRelativePath()), this, res).run(monitor);
 			if (record.hasSubProjects()) {
-				for (ProjectRecord sub : record.getSubProjects()) {
+				for (final ProjectRecord sub : record.getSubProjects()) {
 					importSubProjects(sub, monitor);
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 			return false;
 		}
@@ -236,14 +241,14 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	 * @throws InvocationTargetException
 	 */
 	private void importSubProjects(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException {
-		String projectName =
+		final String projectName =
 			record.getProjectName();
 		final IWorkspace workspace =
 			ResourcesPlugin.getWorkspace();
 		final IProject project =
 			workspace.getRoot().getProject(projectName);
 
-		IProjectDescription desc =
+		final IProjectDescription desc =
 			workspace.newProjectDescription(projectName);
 		desc.setBuildSpec(record.getProjectDescription().getBuildSpec());
 		desc.setComment(record.getProjectDescription().getComment());
@@ -259,19 +264,19 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 			location.append(projectPath);
 		desc.setLocation(location);
 
-		SubMonitor subMonitor =
+		final SubMonitor subMonitor =
 			SubMonitor.convert(monitor);
 		try {
 			subMonitor.beginTask(CREATING_PROJECTS, 100);
 			project.create(desc, subMonitor.newChild(30));
 			project.open(IResource.BACKGROUND_REFRESH, subMonitor.newChild(70));
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			throw new InvocationTargetException(e);
 		} finally {
 			monitor.done();
 		}
 		if (record.hasSubProjects()) {
-			for (ProjectRecord sub : record.getSubProjects()) {
+			for (final ProjectRecord sub : record.getSubProjects()) {
 				importSubProjects(sub, new NullProgressMonitor());
 			}
 		}
@@ -280,19 +285,20 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	/**
 	 * The <code>WizardDataTransfer</code> implementation of this <code>IOverwriteQuery</code> method asks the user whether the existing resource at the given
 	 * path should be overwritten.
-	 * 
+	 *
 	 * @param pathString
 	 * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>, <code>"ALL"</code>, or <code>"CANCEL"</code>
 	 */
+	@Override
 	public String queryOverwrite(String pathString) {
-		Path path =
+		final Path path =
 			new Path(pathString);
 
 		String messageString;
 		// Break the message up if there is a file name and a directory
 		// and there are at least 2 segments.
-		if (path.getFileExtension() == null
-			|| path.segmentCount() < 2) {
+		if ((path.getFileExtension() == null)
+			|| (path.segmentCount() < 2)) {
 			messageString =
 				pathString
 					+ " already exists. Would you like to overwrite it?";
@@ -319,6 +325,7 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 		// which is probably not running in the UI thread.
 		mainPage.getControl().getDisplay().syncExec(new Runnable() {
 
+			@Override
 			public void run() {
 				dialog.open();
 			}

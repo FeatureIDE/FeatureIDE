@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -46,7 +46,7 @@ public class MungeStringBuilder {
 			}
 
 			if (!cls.getSignature().getImportList().isEmpty()) {
-				for (String importClass : cls.getSignature().getImportList()) {
+				for (final String importClass : cls.getSignature().getImportList()) {
 					sb.append(importClass);
 					sb.append(LINE_SEPARATOR);
 				}
@@ -63,7 +63,7 @@ public class MungeStringBuilder {
 			} else {
 				sb.append(EXTENDS);
 			}
-			for (String ext : cls.getSignature().getExtendList()) {
+			for (final String ext : cls.getSignature().getExtendList()) {
 				sb.append(ext);
 				sb.append(", ");
 			}
@@ -78,7 +78,7 @@ public class MungeStringBuilder {
 			} else {
 				sb.append(IMPLEMENTS);
 			}
-			for (String impl : cls.getSignature().getImplementList()) {
+			for (final String impl : cls.getSignature().getImplementList()) {
 				sb.append(impl);
 				sb.append(", ");
 			}
@@ -90,7 +90,7 @@ public class MungeStringBuilder {
 		sb.append(LINE_SEPARATOR);
 
 		if (!cls.getInnerClasses().isEmpty()) {
-			for (AbstractClassFragment innerClass : cls.getInnerClasses().values()) {
+			for (final AbstractClassFragment innerClass : cls.getInnerClasses().values()) {
 				sb.append('\t');
 				String innerClassString;
 				if (shortString) {
@@ -108,12 +108,12 @@ public class MungeStringBuilder {
 		}
 
 		if (!cls.getMembers().isEmpty()) {
-			for (AbstractSignature member : cls.getMembers()) {
+			for (final AbstractSignature member : cls.getMembers()) {
 				sb.append("\t");
 				sb.append(member.toString().replace(LINE_SEPARATOR, LINE_SEPARATOR
 					+ '\t'));
 				if (member instanceof AbstractFieldSignature) {
-					AbstractFieldSignature field =
+					final AbstractFieldSignature field =
 						(AbstractFieldSignature) member;
 					if (shortString
 						|| !field.isFinal()) {
@@ -122,7 +122,7 @@ public class MungeStringBuilder {
 						sb.append(getFinalFieldInit(field));
 					}
 				} else if (member instanceof AbstractMethodSignature) {
-					AbstractMethodSignature method =
+					final AbstractMethodSignature method =
 						(AbstractMethodSignature) member;
 					if (shortString
 						|| !"class".equals(cls.getSignature().getType())) {
@@ -165,7 +165,7 @@ public class MungeStringBuilder {
 	}
 
 	private static String getTypeDefaultValue(AbstractSignature element) {
-		String type =
+		final String type =
 			element.getType();
 		if (type.equals("void")) {
 			return ";";

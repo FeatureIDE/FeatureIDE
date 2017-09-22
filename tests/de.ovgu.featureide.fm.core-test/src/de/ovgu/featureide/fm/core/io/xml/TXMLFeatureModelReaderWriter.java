@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 
 /**
  * Class to test the collapse feature of XmlFeatureModelFormat.java
- * 
+ *
  * @author Christopher Sontag
  * @author Maximilian Kühl
  */
@@ -43,34 +43,34 @@ public class TXMLFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureCollapsed() throws FileNotFoundException, UnsupportedModelException {
-		IFeatureModel fmOrig =
+		final IFeatureModel fmOrig =
 			Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
 					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		IFeatureModel fmCollapsed =
+		final IFeatureModel fmCollapsed =
 			Commons.loadFeatureModelFromFile("basic_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
 					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		IFeatureModel fmNotCollapsed =
+		final IFeatureModel fmNotCollapsed =
 			Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
 					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
 
-		IGraphicalFeatureModel gFM =
+		final IGraphicalFeatureModel gFM =
 			new GraphicalFeatureModel(fmOrig);
 		gFM.init();
 
-		IGraphicalFeatureModel gfmCollapsed =
+		final IGraphicalFeatureModel gfmCollapsed =
 			new GraphicalFeatureModel(fmCollapsed);
 		gfmCollapsed.init();
-		for (IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
+		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
 			if (feature.getObject().getName().equals("Root")) {
 				feature.setCollapsed(true);
 			}
 		}
 
-		IGraphicalFeatureModel gfmNotCollapsed =
+		final IGraphicalFeatureModel gfmNotCollapsed =
 			new GraphicalFeatureModel(fmNotCollapsed);
 		gfmNotCollapsed.init();
 		gfmCollapsed.init();
-		for (IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
+		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
 			feature.setCollapsed(false);
 		}
 
@@ -78,7 +78,7 @@ public class TXMLFeatureModelReaderWriter {
 
 		int notVisible =
 			0;
-		for (IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
+		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
 			if (feature.hasCollapsedParent()) {
 				notVisible++;
 			}

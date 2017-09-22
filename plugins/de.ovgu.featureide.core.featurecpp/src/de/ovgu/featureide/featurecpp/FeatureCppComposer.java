@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * A FeatureIDE extension to compose FeatureC++ files.
- * 
+ *
  * @author Tom Brosch
  * @author Jens Meinicke
  */
@@ -111,6 +111,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	private FeatureCppModelBuilder featureCppModelBuilder;
 
+	@Override
 	public boolean initialize(IFeatureProject project) {
 		super.initialize(project);
 		featureCpp.initialize(project.getSourceFolder(), project.getBuildFolder());
@@ -135,7 +136,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			try {
 				parentFolder.create(true, true, null);
 				parentFolder.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
 		}
@@ -146,12 +147,13 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			try {
 				tempFolder.create(true, true, null);
 				tempFolder.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
 		}
 	}
 
+	@Override
 	public void performFullBuild(IFile config) {
 		if (!isPluginInstalled(PLUGIN_ID)) {
 			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
@@ -172,7 +174,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		createExtensions();
 
 	private static LinkedHashSet<String> createExtensions() {
-		LinkedHashSet<String> extensions =
+		final LinkedHashSet<String> extensions =
 			new LinkedHashSet<String>();
 		extensions.add("h");
 		return extensions;
@@ -191,8 +193,9 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	private void addNature(IProject project) {
 		try {
-			if (!project.isAccessible())
+			if (!project.isAccessible()) {
 				return;
+			}
 
 			int i =
 				2;
@@ -205,11 +208,11 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			if (i == 0) {
 				return;
 			}
-			IProjectDescription description =
+			final IProjectDescription description =
 				project.getDescription();
-			String[] natures =
+			final String[] natures =
 				description.getNatureIds();
-			String[] newNatures =
+			final String[] newNatures =
 				new String[natures.length
 					+ i];
 			System.arraycopy(natures, 0, newNatures, 0, natures.length);
@@ -228,7 +231,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			}
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
@@ -240,13 +243,14 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	@Override
 	public String replaceSourceContentMarker(String text, boolean refines, String packageName) {
-		if (refines)
+		if (refines) {
 			text =
 				text.replace(REFINES_PATTERN, "refines");
-		else
+		} else {
 			text =
 				text.replace(REFINES_PATTERN
 					+ " ", "");
+		}
 		return super.replaceSourceContentMarker(text, refines, packageName);
 	}
 
@@ -264,7 +268,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		super.postCompile(delta, file);
 		try {
 			file.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -280,17 +284,17 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			createTempFolder();
 		} else {
 			try {
-				for (IResource res : tempFolder.members()) {
+				for (final IResource res : tempFolder.members()) {
 					res.delete(true, null);
 				}
 				tempFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
 		}
 
-		if (featureProject != null
-			&& featureProject.getProject() != null) {
+		if ((featureProject != null)
+			&& (featureProject.getProject() != null)) {
 			featureCppModelBuilder.resetModel();
 			final StringBuilder stringBuilder =
 				new StringBuilder();
@@ -299,11 +303,11 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 				stringBuilder.append("\r\n");
 			}
 
-			InputStream source =
+			final InputStream source =
 				new ByteArrayInputStream(stringBuilder.toString()
 						.getBytes(Charset.availableCharsets().get("UTF-8")));
 
-			IFile file =
+			final IFile file =
 				parentFolder.getFile("temp."
 					+ getConfigurationExtension());
 			try {
@@ -312,13 +316,13 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 				} else {
 					file.create(source, true, null);
 				}
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
 			featureCppModelWrapper.compose(createTemporaryConfigrationFile(file));
 			try {
 				tempFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
 			featureCppModelBuilder.buildModel();
@@ -330,13 +334,13 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		super.buildConfiguration(folder, configuration, configurationName);
 		featureCpp.initialize(null, folder);
 		try {
-			for (IResource res : folder.members()) {
-				if (res instanceof IFile
+			for (final IResource res : folder.members()) {
+				if ((res instanceof IFile)
 					&& getConfigurationExtension().equals(res.getFileExtension())) {
 					featureCpp.compose(createTemporaryConfigrationFile((IFile) res));
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
 	}

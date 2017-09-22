@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,10 +32,10 @@ import de.ovgu.featureide.core.CorePlugin;
 
 /**
  * Tests the class {@link AheadBuildErrorEvent}<br><br>
- * 
+ *
  * To generate test cases copy the files into "testcases.<code>projectname</code>"<br> java files need to be renamed into <code>filename</code>.javaX<br>
  * feature files need to be renamed into <code>feature</code>_filename.jak
- * 
+ *
  * @author Jens Meinicke
  */
 /*
@@ -71,7 +71,7 @@ public class TAheadErrorPropagation {
 				new File(ClassLoader.getSystemResource(
 						"testcases").getPath());
 		}
-		File folder =
+		final File folder =
 			FILE_FOLDER.listFiles(getFileFilter(project))[0];
 		return folder.listFiles(getFileFilter(name))[0];
 	}
@@ -88,7 +88,7 @@ public class TAheadErrorPropagation {
 
 	/**
 	 * Main test function. Calls all necessary methods to generate the markers.
-	 * 
+	 *
 	 * @param className The name of the class.
 	 * @param feature The feature containing the error
 	 * @param javaLine The line at the generated java file
@@ -96,7 +96,7 @@ public class TAheadErrorPropagation {
 	 * @param jakLine The line at the source file
 	 */
 	private void test(String className, String feature, int javaLine, int composedLine, int jakLine) {
-		int composedJakLine =
+		final int composedJakLine =
 			calculateComposedJakLine(javaLine, className
 				+ ".javaX");
 		if (composedLine != composedJakLine) {
@@ -110,10 +110,10 @@ public class TAheadErrorPropagation {
 				+ ")");
 		}
 
-		String content =
+		final String content =
 			readFile(getFile(className
 				+ ".jak"));
-		int line =
+		final int line =
 			event.setSourceFile(content, composedJakLine);
 
 		if (!event.fileName.equals("../features/"
@@ -135,7 +135,7 @@ public class TAheadErrorPropagation {
 				+ ")");
 		}
 
-		int sourceLine =
+		final int sourceLine =
 			event.setSourceLine(composedJakLine, line, readFile(getFile(feature
 				+ "_"
 				+ className
@@ -161,7 +161,7 @@ public class TAheadErrorPropagation {
 	private String readFile(File file) {
 		Scanner scanner =
 			null;
-		StringBuilder builder =
+		final StringBuilder builder =
 			new StringBuilder();
 		try {
 			scanner =
@@ -170,10 +170,12 @@ public class TAheadErrorPropagation {
 				builder.append(scanner.nextLine());
 				builder.append("\r\n");
 			}
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			CorePlugin.getDefault().logError(e);
 		} finally {
-			if (scanner != null) scanner.close();
+			if (scanner != null) {
+				scanner.close();
+			}
 		}
 		return builder.toString();
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,13 +28,13 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
 /**
  * A graphical element which holds a {@link CollaborationFigure}.
- * 
+ *
  * @author Sebastian Krieter
  * @author Steffen Schulze
  */
 public class UnderlayerFigure extends Figure implements GUIDefaults {
 
-	private CollaborationFigure collaborationFigure;
+	private final CollaborationFigure collaborationFigure;
 
 	public UnderlayerFigure(FSTFeature coll) {
 		super();
@@ -46,10 +46,10 @@ public class UnderlayerFigure extends Figure implements GUIDefaults {
 		this.setSize(0, DEFAULT_UNDERLAYER_HEIGHT);
 
 		if (coll.getColor() != -1) {
-			this.setBackgroundColor(ColorPalette.getColor(coll.getColor(), 0.4f));
+			setBackgroundColor(ColorPalette.getColor(coll.getColor(), 0.4f));
 		}
 
-		this.setOpaque(true);
+		setOpaque(true);
 	}
 
 	public void setCollaborationFigureWidth(int width) {
@@ -68,6 +68,7 @@ public class UnderlayerFigure extends Figure implements GUIDefaults {
 		return collaborationFigure;
 	}
 
+	@Override
 	public String toString() {
 		return collaborationFigure.toString();
 	}

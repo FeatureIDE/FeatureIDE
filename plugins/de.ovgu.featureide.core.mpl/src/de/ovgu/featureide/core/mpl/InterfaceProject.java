@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,11 +37,11 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Holds all relevant information about the interface project.
- * 
+ *
  * @author Sebastian Krieter
  * @author Reimar Schroeter
  * @author Marcus Pinnecke (Feature Interface)
@@ -90,7 +90,7 @@ public class InterfaceProject {
 
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
-			EventType prop =
+			final EventType prop =
 				event.getEventType();
 			if (EventType.LOCATION_CHANGED == prop) {
 
@@ -133,7 +133,7 @@ public class InterfaceProject {
 			int count =
 				0;
 
-			for (IFeature feature : featureModel.getFeatures()) {
+			for (final IFeature feature : featureModel.getFeatures()) {
 				if (feature.getStructure().isConcrete()) {
 					feature.addListener(new FeaturePropertyChangeListener(count));
 					tempFeatureNames[count++] =
@@ -155,11 +155,11 @@ public class InterfaceProject {
 	}
 
 	public int[] getFeatureIDs(Collection<String> featureNames) {
-		int[] ids =
+		final int[] ids =
 			new int[featureNames.size()];
 		int i =
 			-1;
-		for (String featureName : featureNames) {
+		for (final String featureName : featureNames) {
 			ids[++i] =
 				getFeatureID(featureName);
 		}
@@ -221,7 +221,7 @@ public class InterfaceProject {
 				featureProject.getCurrentConfiguration();
 			configuration =
 				new Configuration(featureModel);
-			FileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+			SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		}
 		return configuration;
 	}
@@ -265,13 +265,13 @@ public class InterfaceProject {
 
 	public void setFilterViewTag(String viewName, int viewLevel) {
 		if (viewName != null) {
-			this.filterViewTag =
+			filterViewTag =
 				new ViewTag(viewName, viewLevel);
 		}
 	}
 
 	public void clearFilterViewTag() {
-		this.filterViewTag =
+		filterViewTag =
 			null;
 	}
 

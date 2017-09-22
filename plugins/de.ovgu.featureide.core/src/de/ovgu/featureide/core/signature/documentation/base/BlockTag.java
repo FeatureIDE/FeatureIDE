@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -58,11 +58,11 @@ public class BlockTag implements Comparable<BlockTag>, IConstrainedObject {
 	private String desc;
 
 	BlockTag(String type, String desc, int tagtype, int priority, int featureID, Node featureNode) {
-		this.tagTypeString =
+		tagTypeString =
 			type;
 		this.desc =
 			desc;
-		this.tagType =
+		tagType =
 			tagtype;
 		this.priority =
 			priority;
@@ -74,7 +74,7 @@ public class BlockTag implements Comparable<BlockTag>, IConstrainedObject {
 
 	@Override
 	public int compareTo(BlockTag o) {
-		int result =
+		final int result =
 			tagType
 				- o.tagType;
 		if (result != 0) {
@@ -91,7 +91,7 @@ public class BlockTag implements Comparable<BlockTag>, IConstrainedObject {
 		}
 		final BlockTag otherTag =
 			(BlockTag) obj;
-		return tagType == otherTag.tagType
+		return (tagType == otherTag.tagType)
 			&& tagTypeString.equals((otherTag).tagTypeString);
 	}
 
@@ -139,6 +139,7 @@ public class BlockTag implements Comparable<BlockTag>, IConstrainedObject {
 		return !isFeatureSpecific();
 	}
 
+	@Override
 	public Node getConstraint() {
 		return featureNode;
 	}

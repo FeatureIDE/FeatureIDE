@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -29,7 +29,7 @@ import java.util.TreeSet;
 
 /**
  * Representation of all test runs.
- * 
+ *
  * @author Jens Meinicke
  */
 public class TestResults {
@@ -70,13 +70,13 @@ public class TestResults {
 			testResults.put(klass, new TreeMap<String, Set<Test>>());
 		}
 
-		Map<String, Set<Test>> klassTest =
+		final Map<String, Set<Test>> klassTest =
 			testResults.get(klass);
 		if (!klassTest.containsKey(configuration)) {
 			klassTest.put(configuration, new TreeSet<Test>());
 		}
 
-		Set<Test> configurationTests =
+		final Set<Test> configurationTests =
 			klassTest.get(configuration);
 		configurationTests.add(test);
 	}

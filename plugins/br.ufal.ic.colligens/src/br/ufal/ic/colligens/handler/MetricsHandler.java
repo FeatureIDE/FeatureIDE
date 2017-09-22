@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package br.ufal.ic.colligens.handler;
 
@@ -20,7 +20,7 @@ import br.ufal.ic.colligens.views.MetricsView;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class MetricsHandler extends ColligensAbstractHandler {
 
@@ -32,10 +32,10 @@ public class MetricsHandler extends ColligensAbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window =
+		final IWorkbenchWindow window =
 			HandlerUtil.getActiveWorkbenchWindow(event);
 
-		ISelection selection =
+		final ISelection selection =
 			window.getActivePage().getSelection();
 
 		if (controller == null) {
@@ -48,11 +48,11 @@ public class MetricsHandler extends ColligensAbstractHandler {
 
 		if (super.saveAll()) {
 			// Open and active the Analyzer view
-			IWorkbenchPage page =
+			final IWorkbenchPage page =
 				window.getActivePage();
 			try {
 				page.showView(MetricsView.ID);
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 
 				e.printStackTrace();
 			}

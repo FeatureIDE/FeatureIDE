@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 /**
  * Provides functionality for lazy calculating its children for the {@link TreeViewer}. {@link LazyParent#initChildren()} has to be overridden using the
  * LazyParent#addChild(Parent)-method to initialize.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -87,7 +87,7 @@ public abstract class LazyParent extends Parent {
 		if (lazy) {
 			final TreeJob job =
 				new StatisticTreeJob(this, expand);
-			LongRunningJob<Boolean> runner =
+			final LongRunningJob<Boolean> runner =
 				new LongRunningJob<>(CALCULATE
 					+ this.getClass().getName(), job);
 			runner.setPriority(Job.SHORT);
@@ -105,7 +105,7 @@ public abstract class LazyParent extends Parent {
 
 	/**
 	 * May be overridden in order to change the priority. Should be used especially for lengthy calculations.
-	 * 
+	 *
 	 * @param job
 	 */
 	protected void setPriority(Job job) {
@@ -145,7 +145,7 @@ public abstract class LazyParent extends Parent {
 	}
 
 	public void recalculate() {
-		this.children =
+		children =
 			new LinkedList<Parent>();
 		initChildren();
 	}

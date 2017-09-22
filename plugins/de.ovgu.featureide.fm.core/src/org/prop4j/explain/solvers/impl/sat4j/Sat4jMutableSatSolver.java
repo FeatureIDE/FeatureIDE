@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import org.sat4j.specs.IConstr;
 
 /**
  * A mutable SAT solver using a Sat4J oracle.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatSolver {
@@ -118,7 +118,7 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 
 	/**
 	 * Removes the newest clause and returns it.
-	 * 
+	 *
 	 * @return the newest clause
 	 */
 	protected Node removeClause() {
@@ -177,8 +177,8 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		int i =
 			0;
 		for (final Node clause : super.getClauses()) {
-			if (clause != null
-				&& i++ == index) {
+			if ((clause != null)
+				&& (i++ == index)) {
 				return clause;
 			}
 		}

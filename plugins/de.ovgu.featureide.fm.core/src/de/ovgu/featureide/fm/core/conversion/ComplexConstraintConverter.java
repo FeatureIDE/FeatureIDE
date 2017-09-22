@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
  * TODO description
- * 
+ *
  * @author Alexander
  */
 public class ComplexConstraintConverter {
@@ -54,29 +54,30 @@ public class ComplexConstraintConverter {
 
 	/**
 	 * Checks whether a given node is either a requires- or an excludes-constraint.
-	 * 
+	 *
 	 * @param node
 	 * @return true if node is a simple constraint. False otherwise.
 	 */
 	public static boolean isSimple(Node node) {
-		if (node.getContainedFeatures().size() == 1)
+		if (node.getContainedFeatures().size() == 1) {
 			return false;
+		}
 
-		Node cnf =
+		final Node cnf =
 			node.toCNF();
-		if (cnf.getChildren().length == 1
-			&& cnf.getContainedFeatures().size() == 2) {
-			Node clause =
+		if ((cnf.getChildren().length == 1)
+			&& (cnf.getContainedFeatures().size() == 2)) {
+			final Node clause =
 				cnf.getChildren()[0];
 			if (clause instanceof Or) {
-				Node f1 =
+				final Node f1 =
 					clause.getChildren()[0];
-				Node f2 =
+				final Node f2 =
 					clause.getChildren()[1];
 
-				return (f1 instanceof Literal
+				return ((f1 instanceof Literal)
 					&& !((Literal) f1).positive)
-					|| (f2 instanceof Literal
+					|| ((f2 instanceof Literal)
 						&& !((Literal) f2).positive);
 			}
 		}
@@ -85,7 +86,7 @@ public class ComplexConstraintConverter {
 
 	/**
 	 * Checks whether a given node is neither a requires- nor an excludes-constraint.
-	 * 
+	 *
 	 * @param node
 	 * @return true if node is a complex constraint. False otherwise.
 	 */
@@ -95,21 +96,22 @@ public class ComplexConstraintConverter {
 
 	/**
 	 * Checks whether a given node is a (hidden) composition of requires- and excludes-constraints.
-	 * 
+	 *
 	 * @param node
 	 * @return true if node consists of a number of simple constraints. False otherwise.
 	 */
 	public static boolean isPseudoComplex(Node node) {
-		Node cnf =
+		final Node cnf =
 			node.toCNF();
 
-		if (cnf instanceof Or
-			|| cnf instanceof Literal)
+		if ((cnf instanceof Or)
+			|| (cnf instanceof Literal)) {
 			return isSimple(node);
+		}
 
 		boolean result =
 			true;
-		for (Node child : cnf.getChildren()) {
+		for (final Node child : cnf.getChildren()) {
 			result &=
 				isSimple(child);
 		}
@@ -119,28 +121,29 @@ public class ComplexConstraintConverter {
 
 	/**
 	 * Checks whether there exist only constraints that can be refactored trivially.
-	 * 
+	 *
 	 * @param node
 	 * @return true if no construction of an abstract subtree is necessary. False otherwise.
 	 */
 	public static boolean trivialRefactoring(List<Node> nodes) {
-		for (Node node : nodes) {
-			if (!isPseudoComplex(node))
+		for (final Node node : nodes) {
+			if (!isPseudoComplex(node)) {
 				return false;
+			}
 		}
 		return true;
 	}
 
 	/**
 	 * Checks whether there exist only constraints that can be refactored trivially.
-	 * 
+	 *
 	 * @param fm
 	 * @return true if no construction of an abstract subtree is necessary. False otherwise.
 	 */
 	public static boolean trivialRefactoring(final IFeatureModel fm) {
-		List<Node> nodes =
+		final List<Node> nodes =
 			new LinkedList<Node>();
-		for (IConstraint c : fm.getConstraints()) {
+		for (final IConstraint c : fm.getConstraints()) {
 			nodes.add(c.getNode());
 		}
 		return ComplexConstraintConverter.trivialRefactoring(nodes);
@@ -148,7 +151,7 @@ public class ComplexConstraintConverter {
 
 	/**
 	 * Eliminates complex constraints according to a given strategy.
-	 * 
+	 *
 	 * @param fm
 	 * @return
 	 */
@@ -167,13 +170,15 @@ public class ComplexConstraintConverter {
 		boolean removeRedundncy =
 			false;
 
-		for (Option o : options) {
-			if (o.equals(Option.COHERENT))
+		for (final Option o : options) {
+			if (o.equals(Option.COHERENT)) {
 				coherent =
 					true;
-			if (o.equals(Option.REMOVE_RDUNDANCY))
+			}
+			if (o.equals(Option.REMOVE_RDUNDANCY)) {
 				removeRedundncy =
 					true;
+			}
 		}
 
 		// Work with a clone
@@ -184,33 +189,34 @@ public class ComplexConstraintConverter {
 
 		// Basic cleaning
 		if (removeRedundncy
-			&& !prepare())
+			&& !prepare()) {
 			return fm;
+		}
 
 		// Identify trivial refactorings
 		refactorPseudoComplexConstraints();
 
 		// Get list of complex clauses and remove them from the model
-		List<IConstraint> complexConstraints =
+		final List<IConstraint> complexConstraints =
 			pruneComplexConstraints();
 
 		// Minimize constraints
-		List<Node> minComplexNodes =
+		final List<Node> minComplexNodes =
 			new ArrayList<Node>();
-		for (IConstraint c : complexConstraints) {
-			List<Node> nodes =
+		for (final IConstraint c : complexConstraints) {
+			final List<Node> nodes =
 				converter.preprocess(c);
 
-			for (Node node : nodes) {
-				Node minNode =
+			for (final Node node : nodes) {
+				final Node minNode =
 					minimize(node);
 
 				if (ComplexConstraintConverter.isSimple(minNode)) {
 					fm.addConstraint(factory.createConstraint(fm, minNode));
 				} else if (minNode instanceof And) {
-					List<Node> conj =
+					final List<Node> conj =
 						new LinkedList<Node>();
-					for (Node sub : minNode.getChildren()) {
+					for (final Node sub : minNode.getChildren()) {
 						if (ComplexConstraintConverter.isSimple(sub)) {
 							fm.addConstraint(factory.createConstraint(fm, sub));
 						} else {
@@ -228,13 +234,13 @@ public class ComplexConstraintConverter {
 			return fm;
 		}
 
-		IFeatureModel res =
+		final IFeatureModel res =
 			converter.convert(fm, minComplexNodes, coherent);
 		return res;
 	}
 
 	/**
-	 * 
+	 *
 	 * @param clause
 	 * @return
 	 */
@@ -248,7 +254,7 @@ public class ComplexConstraintConverter {
 	 * created.
 	 */
 	protected boolean prepare() {
-		FeatureModelAnalyzer analyzer =
+		final FeatureModelAnalyzer analyzer =
 			fm.getAnalyser();
 
 		analyzer.calculateFeatures =
@@ -261,20 +267,20 @@ public class ComplexConstraintConverter {
 			true;
 
 		analyzer.analyzeFeatureModel(null);
-		List<IConstraint> toRemove =
+		final List<IConstraint> toRemove =
 			new LinkedList<IConstraint>();
 
-		for (IConstraint c : fm.getConstraints()) {
-			ConstraintAttribute attribute =
+		for (final IConstraint c : fm.getConstraints()) {
+			final ConstraintAttribute attribute =
 				c.getConstraintAttribute();
 
-			if (attribute == ConstraintAttribute.REDUNDANT
-				|| attribute == ConstraintAttribute.TAUTOLOGY) {
+			if ((attribute == ConstraintAttribute.REDUNDANT)
+				|| (attribute == ConstraintAttribute.TAUTOLOGY)) {
 				toRemove.add(c);
 			}
 		}
 
-		for (IConstraint c : toRemove) {
+		for (final IConstraint c : toRemove) {
 			fm.removeConstraint(c);
 		}
 		return true;
@@ -284,19 +290,19 @@ public class ComplexConstraintConverter {
 	 * Splits up a complex constraint into simple constraints if possible.
 	 */
 	protected void refactorPseudoComplexConstraints() {
-		List<IConstraint> pseudoComplexConstraints =
+		final List<IConstraint> pseudoComplexConstraints =
 			new LinkedList<IConstraint>();
-		for (IConstraint c : fm.getConstraints()) {
+		for (final IConstraint c : fm.getConstraints()) {
 			if (ComplexConstraintConverter.isPseudoComplex(c.getNode().clone())) {
 				pseudoComplexConstraints.add(c);
 			}
 		}
 
-		for (IConstraint c : pseudoComplexConstraints) {
-			Node cnf =
+		for (final IConstraint c : pseudoComplexConstraints) {
+			final Node cnf =
 				c.getNode().toCNF();
 			if (cnf instanceof And) {
-				for (Node clause : cnf.getChildren()) {
+				for (final Node clause : cnf.getChildren()) {
 					fm.addConstraint(factory.createConstraint(fm, clause));
 				}
 			} else {
@@ -308,20 +314,20 @@ public class ComplexConstraintConverter {
 
 	/**
 	 * Collects and removes all complex constraints from the feature model.
-	 * 
+	 *
 	 * @return List of complex constraints
 	 */
 	protected List<IConstraint> pruneComplexConstraints() {
-		List<IConstraint> complexConstraints =
+		final List<IConstraint> complexConstraints =
 			new LinkedList<IConstraint>();
 
-		for (IConstraint c : fm.getConstraints()) {
+		for (final IConstraint c : fm.getConstraints()) {
 			if (ComplexConstraintConverter.isComplex(c.getNode())) {
 				complexConstraints.add(c);
 			}
 		}
 
-		for (IConstraint c : complexConstraints) {
+		for (final IConstraint c : complexConstraints) {
 			fm.removeConstraint(c);
 		}
 

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import org.eclipse.jface.text.source.Annotation;
 
 /**
  * One class for all color annotations
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ColorAnnotation extends Annotation {
@@ -54,9 +54,9 @@ public class ColorAnnotation extends Annotation {
 	private static final String[] ANNOTATIONTYPE_ID =
 		new String[31];
 	static {
-		String PREFIX =
+		final String PREFIX =
 			"de.ovgu.featureide.ui.editors.annotations.";
-		String[] COLORS =
+		final String[] COLORS =
 			{
 				RED,
 				ORANGE,
@@ -73,8 +73,8 @@ public class ColorAnnotation extends Annotation {
 				+ "image";
 
 		for (int i =
-			0; i < ANNOTATIONTYPE_ID.length
-				- 1; i++) {
+			0; i < (ANNOTATIONTYPE_ID.length
+				- 1); i++) {
 			ANNOTATIONTYPE_ID[i
 				+ 1] =
 					PREFIX
@@ -86,17 +86,17 @@ public class ColorAnnotation extends Annotation {
 		}
 	}
 
-	private Position position;
+	private final Position position;
 	private final int id;
 	private final int type;
 
 	public ColorAnnotation(int id, Position posistion, int annotationtype) {
 		super(getTypeString(id, annotationtype), false, COLOR_ANNOTATION);
-		this.position =
+		position =
 			posistion;
 		this.id =
 			id;
-		this.type =
+		type =
 			annotationtype;
 	}
 
@@ -140,7 +140,7 @@ public class ColorAnnotation extends Annotation {
 	}
 
 	public boolean isImageAnnotation() {
-		return type == TYPE_IMAGE
-			&& id != -1;
+		return (type == TYPE_IMAGE)
+			&& (id != -1);
 	}
 }

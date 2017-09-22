@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
 
 /**
  * Filters the collaboration model
- * 
+ *
  * @author Jens Meinicke
  */
 public class FilterAction extends Action {
@@ -56,12 +56,13 @@ public class FilterAction extends Action {
 			view;
 	}
 
+	@Override
 	public void setEnabled(boolean enabled) {
-		IStructuredSelection selection =
+		final IStructuredSelection selection =
 			(IStructuredSelection) viewer.getSelection();
 		super.setEnabled(false);
 
-		for (Object part : selection.toList()) {
+		for (final Object part : selection.toList()) {
 			if (part instanceof RoleEditPart) {
 				classFilter.add(((RoleEditPart) part).getRoleModel().getClassFragment().getName());
 				super.setEnabled(true);
@@ -73,7 +74,7 @@ public class FilterAction extends Action {
 				super.setEnabled(true);
 			}
 		}
-		boolean filterDefined =
+		final boolean filterDefined =
 			CollaborationModelBuilder.isFilterDefined();
 		setChecked(filterDefined);
 		if (filterDefined) {
@@ -81,6 +82,7 @@ public class FilterAction extends Action {
 		}
 	}
 
+	@Override
 	public void run() {
 		if ((!classFilter.isEmpty()
 			|| !featureFilter.isEmpty())

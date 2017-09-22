@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -61,7 +61,7 @@ import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigureLabel;
 
 /**
  * EditPart for Roles.
- * 
+ *
  * @author Constanze Adler
  */
 public class RoleEditPart extends AbstractGraphicalEditPart {
@@ -92,26 +92,29 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	/**
 	 * opens the fields/methods/file of the role with its default editor.
 	 */
+	@Override
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			IFile file =
-				this.getRoleModel().getFile();
-			if (file == null)
+			final IFile file =
+				getRoleModel().getFile();
+			if (file == null) {
 				return;
+			}
 
-			IWorkbenchPage page =
+			final IWorkbenchPage page =
 				getActivePage();
 			if (page != null) {
 				try {
 
-					RoleFigure roleFigure =
-						(RoleFigure) this.getFigure();
+					final RoleFigure roleFigure =
+						(RoleFigure) getFigure();
 					if (roleFigure.isFieldMethodFilterActive()
 						|| !CorePlugin.getFeatureProject(file).getComposer().showContextFieldsAndMethods()) {
 						openElement(roleFigure, file);
-					} else
+					} else {
 						openEditor(file);
-				} catch (CoreException e) {
+					}
+				} catch (final CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 			}
@@ -126,7 +129,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
 		IContentType contentType =
 			null;
-		IContentDescription description =
+		final IContentDescription description =
 			file.getContentDescription();
 		if (description != null) {
 			contentType =
@@ -140,12 +143,13 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	}
 
 	private ITextEditor openEditor(IFile file) throws CoreException {
-		IWorkbenchPage page =
+		final IWorkbenchPage page =
 			getActivePage();
-		if (page == null)
+		if (page == null) {
 			return null;
+		}
 
-		IEditorDescriptor desc =
+		final IEditorDescriptor desc =
 			getDescriptor(file);
 
 		if (desc != null) {
@@ -160,32 +164,32 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	 * search clicked element of current cursor position and open element in editor
 	 */
 	private void openElement(RoleFigure roleFigure, IFile file) throws CoreException {
-		Point point =
+		final Point point =
 			getCursorPosition();
-		List<?> panelList =
+		final List<?> panelList =
 			roleFigure.getChildren();
 		ITextEditor editor;
 
-		for (Object o : panelList) {
-			Panel panel =
+		for (final Object o : panelList) {
+			final Panel panel =
 				(Panel) o;
-			List<?> labelList =
+			final List<?> labelList =
 				panel.getChildren();
 
-			for (Object child : labelList) {
-				RoleFigureLabel label =
+			for (final Object child : labelList) {
+				final RoleFigureLabel label =
 					(RoleFigureLabel) child;
-				Rectangle rect =
+				final Rectangle rect =
 					label.getBounds();
-				int y =
+				final int y =
 					rect.y;
-				if (point.y >= y
-					&& point.y <= (y
-						+ rect.height)) {
+				if ((point.y >= y)
+					&& (point.y <= (y
+						+ rect.height))) {
 
-					TreeSet<FSTInvariant> invariants =
-						this.getRoleModel().getClassFragment().getInvariants();
-					for (FSTInvariant invariant : invariants) {
+					final TreeSet<FSTInvariant> invariants =
+						getRoleModel().getClassFragment().getInvariants();
+					for (final FSTInvariant invariant : invariants) {
 						if (invariant.getFullName().equals(label.getElementName())) {
 							editor =
 								openEditor(file);
@@ -196,10 +200,10 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 
 					}
-					Collection<FSTField> fields =
-						this.getRoleModel().getAllFields();
+					final Collection<FSTField> fields =
+						getRoleModel().getAllFields();
 
-					for (FSTField fstField : fields) {
+					for (final FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor =
 								openEditor(file);
@@ -210,9 +214,9 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 
-					Collection<FSTClassFragment> innerClasses =
-						this.getRoleModel().getAllInnerClasses();
-					for (FSTClassFragment fstInnerClass : innerClasses) {
+					final Collection<FSTClassFragment> innerClasses =
+						getRoleModel().getAllInnerClasses();
+					for (final FSTClassFragment fstInnerClass : innerClasses) {
 						if (fstInnerClass.getFullName().equals(label.getElementName())) {
 							editor =
 								openEditor(file);
@@ -222,10 +226,10 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 							return;
 						}
 					}
-					Collection<FSTMethod> methods =
-						this.getRoleModel().getAllMethods();
+					final Collection<FSTMethod> methods =
+						getRoleModel().getAllMethods();
 
-					for (FSTMethod fstMethod : methods) {
+					for (final FSTMethod fstMethod : methods) {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor =
 								openEditor(file);
@@ -236,10 +240,10 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 
-					TreeSet<FSTDirective> directives =
-						this.getRoleModel().getDirectives();
-					for (FSTDirective fstDirective : directives) {
-						RoleElement<?> roleElement =
+					final TreeSet<FSTDirective> directives =
+						getRoleModel().getDirectives();
+					for (final FSTDirective fstDirective : directives) {
+						final RoleElement<?> roleElement =
 							label.getRoleElement();
 						if (fstDirective.equals(roleElement)) {
 							editor =
@@ -260,16 +264,16 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	}
 
 	private Point getCursorPosition() {
-		Display display =
+		final Display display =
 			Display.getDefault();
-		FigureCanvas figureCanvas =
-			(FigureCanvas) this.getViewer().getControl();
-		Point point =
+		final FigureCanvas figureCanvas =
+			(FigureCanvas) getViewer().getControl();
+		final Point point =
 			figureCanvas.toControl(display.getCursorLocation());
 
-		Viewport viewport =
+		final Viewport viewport =
 			figureCanvas.getViewport();
-		org.eclipse.draw2d.geometry.Point location =
+		final org.eclipse.draw2d.geometry.Point location =
 			viewport.getViewLocation();
 
 		int x =
@@ -278,32 +282,34 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 		int y =
 			point.y
 				+ location.y;
-		Rectangle bounds =
+		final Rectangle bounds =
 			viewport.getBounds();
-		if (point.x < 0)
+		if (point.x < 0) {
 			x +=
 				bounds.width;
-		if (point.y < 0)
+		}
+		if (point.y < 0) {
 			y +=
 				bounds.height;
+		}
 
 		return new Point(x, y);
 	}
 
 	/**
 	 * Jumps to a line in the given editor
-	 * 
+	 *
 	 * @param editorPart
 	 * @param lineNumber
 	 */
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
 		if (!(editorPart instanceof ITextEditor)
-			|| lineNumber <= 0) {
+			|| (lineNumber <= 0)) {
 			return;
 		}
-		ITextEditor editor =
+		final ITextEditor editor =
 			(ITextEditor) editorPart;
-		IDocument document =
+		final IDocument document =
 			editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		if (document != null) {
 			IRegion lineInfo =
@@ -312,7 +318,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				lineInfo =
 					document.getLineInformation(lineNumber
 						- 1);
-			} catch (BadLocationException e) {}
+			} catch (final BadLocationException e) {}
 			if (lineInfo != null) {
 				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
 			}
@@ -321,7 +327,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 
 	/**
 	 * Highlights the whole if-Block for a FSTDirective
-	 * 
+	 *
 	 * @param editorPart
 	 * @param startLine the first line of a directive
 	 * @param endLine the last line of a directive
@@ -330,23 +336,23 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	 */
 	public static void scrollToLine(IEditorPart editorPart, int startLine, int endLine, int startOffset, int endOffset) {
 		if (!(editorPart instanceof ITextEditor)
-			|| startLine < 0
-			|| endLine < 0) {
+			|| (startLine < 0)
+			|| (endLine < 0)) {
 			return;
 		}
-		ITextEditor editor =
+		final ITextEditor editor =
 			(ITextEditor) editorPart;
-		IDocument document =
+		final IDocument document =
 			editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		if (document != null) {
 			try {
-				int offset =
+				final int offset =
 					document.getLineOffset(startLine)
 						+ startOffset;
-				editor.selectAndReveal(offset, document.getLineOffset(endLine)
-					- (offset)
+				editor.selectAndReveal(offset, (document.getLineOffset(endLine)
+					- (offset))
 					+ endOffset);
-			} catch (BadLocationException e) {}
+			} catch (final BadLocationException e) {}
 		}
 	}
 }

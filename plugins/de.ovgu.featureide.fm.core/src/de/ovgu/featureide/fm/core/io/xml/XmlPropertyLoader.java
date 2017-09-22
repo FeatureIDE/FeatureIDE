@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -71,7 +71,7 @@ public class XmlPropertyLoader {
 
 	class FeaturePropertiesParser implements PropertiesParser {
 
-		private Map<String, Set<IPropertyContainer.Entry<String, IPropertyContainer.Type, Object>>> featureProperties =
+		private final Map<String, Set<IPropertyContainer.Entry<String, IPropertyContainer.Type, Object>>> featureProperties =
 			new HashMap<>();
 
 		public FeaturePropertiesParser(Element e) {
@@ -79,9 +79,9 @@ public class XmlPropertyLoader {
 		}
 
 		private void parsePropertiesOfFeature(Element featureNode) {
-			if (!featureNode.hasAttribute(NAME))
+			if (!featureNode.hasAttribute(NAME)) {
 				throw new UnsupportedOperationException("Property container of type feature is missing required name attribute");
-			else {
+			} else {
 				final String featureName =
 					featureNode.getAttribute(NAME);
 				final Set<IPropertyContainer.Entry<String, IPropertyContainer.Type, Object>> propertyEntries =
@@ -108,7 +108,7 @@ public class XmlPropertyLoader {
 
 	}
 
-	private NodeList propertiesNode;
+	private final NodeList propertiesNode;
 
 	public XmlPropertyLoader(NodeList propertiesNode) throws UnsupportedModelException {
 		this.propertiesNode =
@@ -116,7 +116,7 @@ public class XmlPropertyLoader {
 	}
 
 	public Collection<PropertiesParser> parseProperties() throws UnsupportedModelException {
-		Collection<PropertiesParser> result =
+		final Collection<PropertiesParser> result =
 			new ArrayList<>();
 
 		for (final Element domainNode : getElements(propertiesNode)) {
@@ -127,14 +127,14 @@ public class XmlPropertyLoader {
 	}
 
 	private ArrayList<Element> getElements(NodeList nodeList) {
-		ArrayList<Element> elements =
+		final ArrayList<Element> elements =
 			new ArrayList<Element>(nodeList.getLength());
 		for (int temp =
 			0; temp < nodeList.getLength(); temp++) {
-			org.w3c.dom.Node nNode =
+			final org.w3c.dom.Node nNode =
 				nodeList.item(temp);
 			if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-				Element eElement =
+				final Element eElement =
 					(Element) nNode;
 				elements.add(eElement);
 			}
@@ -143,7 +143,7 @@ public class XmlPropertyLoader {
 	}
 
 	private Collection<PropertiesParser> parsePropertiesOfDomain(NodeList domainNode) {
-		List<PropertiesParser> parsers =
+		final List<PropertiesParser> parsers =
 			new ArrayList<>();
 
 		for (final Element e : getElements(domainNode)) {
@@ -168,7 +168,7 @@ public class XmlPropertyLoader {
 		for (final Element property : getElements(properties)) {
 			if (!(property.hasAttribute(KEY)
 				&& property.hasAttribute(VALUE)
-				&& property.hasAttribute(TYPE)))
+				&& property.hasAttribute(TYPE))) {
 				throw new UnsupportedOperationException("One property of container "
 					+ propertyContainerNode.getAttribute(NAME)
 					+ " is missing one of the required attributes: "
@@ -177,7 +177,7 @@ public class XmlPropertyLoader {
 					+ VALUE
 					+ ","
 					+ TYPE);
-			else {
+			} else {
 				final String key =
 					property.getAttribute(KEY);
 				final Type type =
@@ -187,23 +187,27 @@ public class XmlPropertyLoader {
 				final Entry<String, Type, Object> entry =
 					new Entry<String, IPropertyContainer.Type, Object>(key, type, value);
 				if (result.contains(entry)) {
-					for (Entry<String, Type, Object> e : result) {
+					for (final Entry<String, Type, Object> e : result) {
 						if (e.equals(entry)
 							&& (!(e.getValue().equals(entry.getValue())
-								&& (e.getType().equals(entry.getType())))))
+								&& (e.getType().equals(entry.getType()))))) {
 							throw new IllegalStateException("Ambigous property definition for key: "
 								+ key);
+						}
 					}
-				} else result.add(entry);
+				} else {
+					result.add(entry);
+				}
 			}
 		}
 		return result;
 	}
 
 	private Object castValue(Type type, String value) {
-		if (value == null
-			|| value.trim().isEmpty())
+		if ((value == null)
+			|| value.trim().isEmpty()) {
 			throw new RuntimeException("Property value is not allowed to be empty");
+		}
 		switch (type) {
 		case BOOLEAN:
 			return Boolean.valueOf(value);

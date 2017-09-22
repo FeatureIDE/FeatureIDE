@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,8 +26,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.internal.ui.packageview.PackageFragmentRootContainer;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -51,7 +51,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Class to add the profilemenu to the contextmenu of the project (projectonly)
- * 
+ *
  * @author Jonas Weigt
  * @author Christian Harnisch
  * @author Marcus Pinnecke
@@ -66,14 +66,14 @@ public class DynamicProfileMenu extends ContributionItem {
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
 	private final IFeatureModel featureModel;
 	{
-		IFeatureProject curFeatureProject =
+		final IFeatureProject curFeatureProject =
 			getCurrentFeatureProject();
 		featureModel =
 			curFeatureProject == null
 				? FMFactoryManager.getEmptyFeatureModel()
 				: curFeatureProject.getFeatureModel();
 	}
-	private boolean multipleSelected =
+	private final boolean multipleSelected =
 		isMultipleSelection();
 
 	public DynamicProfileMenu() {}
@@ -90,10 +90,11 @@ public class DynamicProfileMenu extends ContributionItem {
 		if (featureModel == null) {
 			return;
 		}
-		MenuManager man =
+		final MenuManager man =
 			new MenuManager("Color Scheme Menu", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
 		man.addMenuListener(new IMenuListener() {
 
+			@Override
 			public void menuAboutToShow(IMenuManager m) {
 				fillContextMenu(m);
 			}
@@ -111,12 +112,12 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * Fills the {@link IMenuManager} with action-buttons.
 	 */
 	private void fillContextMenu(IMenuManager menuMgr) {
-		for (ColorScheme cs : FeatureColorManager.getColorSchemes(featureModel)) {
+		for (final ColorScheme cs : FeatureColorManager.getColorSchemes(featureModel)) {
 			if (cs.isDefault()) {
 				continue;
 			}
-			SetProfileColorSchemeAction setCSAction =
-				new SetProfileColorSchemeAction(cs.getName(), Action.AS_CHECK_BOX, featureModel);
+			final SetProfileColorSchemeAction setCSAction =
+				new SetProfileColorSchemeAction(cs.getName(), IAction.AS_CHECK_BOX, featureModel);
 			if (cs.isCurrent()) {
 				setCSAction.setChecked(true);
 			}
@@ -155,10 +156,10 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * Returns selection of type IStructuredSelection
 	 */
 	private static IStructuredSelection getIStructuredCurrentSelection() {
-		ISelectionService selectionService =
+		final ISelectionService selectionService =
 			Workbench.getInstance().getActiveWorkbenchWindow().getSelectionService();
 
-		ISelection selection =
+		final ISelection selection =
 			selectionService.getSelection();
 		return (IStructuredSelection) selection;
 	}
@@ -167,13 +168,13 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * Disables the profilemenu, if more than one project is selected
 	 */
 	private static boolean isMultipleSelection() {
-		IStructuredSelection myselection =
+		final IStructuredSelection myselection =
 			getIStructuredCurrentSelection();
 
 		if (myselection instanceof ITreeSelection) {
-			TreeSelection treeSelection =
+			final TreeSelection treeSelection =
 				(TreeSelection) myselection;
-			TreePath[] treePaths =
+			final TreePath[] treePaths =
 				treeSelection.getPaths();
 			if (treePaths.length > 1) {
 				return true;
@@ -194,14 +195,14 @@ public class DynamicProfileMenu extends ContributionItem {
 			if (element instanceof IResource) {
 				return CorePlugin.getFeatureProject((IResource) element);
 			} else if (element instanceof PackageFragmentRootContainer) {
-				IJavaProject jProject =
+				final IJavaProject jProject =
 					((PackageFragmentRootContainer) element).getJavaProject();
 				return CorePlugin.getFeatureProject(jProject.getProject());
 			} else if (element instanceof IJavaElement) {
 				return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
 			} else if (element instanceof IAdaptable) {
 				final IProject project =
-					(IProject) ((IAdaptable) element).getAdapter(IProject.class);
+					((IAdaptable) element).getAdapter(IProject.class);
 				if (project != null) {
 					return CorePlugin.getFeatureProject(project);
 				}

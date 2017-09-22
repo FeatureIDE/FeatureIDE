@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -126,7 +126,7 @@ import de.ovgu.featureide.fm.ui.utils.UITreeIterator;
 
 /**
  * Basic class with some default methods for configuration editor pages.
- * 
+ *
  * @author Jens Meinicke
  */
 public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage, ISearchable<TreeItem> {
@@ -483,9 +483,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Rectangle bounds =
+				final Rectangle bounds =
 					dropDownMenu.getBounds();
-				Point point =
+				final Point point =
 					toolbar.toDisplay(bounds.x, bounds.y
 						+ bounds.height);
 				menu.setLocation(point);
@@ -571,14 +571,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			@Override
 			public void handleEvent(Event event) {
 				if (event.item instanceof TreeItem) {
-					TreeItem item =
+					final TreeItem item =
 						(TreeItem) event.item;
 					if (item.getData() instanceof SelectableFeature) {
-						SelectableFeature selectableFeature =
+						final SelectableFeature selectableFeature =
 							(SelectableFeature) item.getData();
-						IFeature feature =
+						final IFeature feature =
 							selectableFeature.getFeature();
-						FeatureColor color =
+						final FeatureColor color =
 							FeatureColorManager.getColor(feature);
 						if (color != FeatureColor.NO_COLOR) {
 							item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
@@ -595,8 +595,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					tree.getItem(new Point(e.x, e.y));
 				boolean changed =
 					false;
-				if (item == null
-					|| item != tipItem) {
+				if ((item == null)
+					|| (item != tipItem)) {
 					tipItem =
 						item;
 					changed =
@@ -703,7 +703,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					}
 					sb.append(POSSIBLE_CONFIGURATIONS);
 
-					if (number == 0
+					if ((number == 0)
 						&& !configurationEditor.isAutoSelectFeatures()) {
 						sb.append(" - Autoselect not possible!");
 					}
@@ -758,7 +758,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 							THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
 					return false;
 				}
-			} catch (TimeoutException e) {
+			} catch (final TimeoutException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
@@ -767,7 +767,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private void displayError(String message) {
 		tree.removeAll();
-		TreeItem item =
+		final TreeItem item =
 			new TreeItem(tree, 1);
 		item.setText(message);
 		item.setImage(0, FMUIPlugin.getDefault().getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
@@ -839,7 +839,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	private void expandSingleChildren(TreeItem item) {
-		SelectableFeature feature =
+		final SelectableFeature feature =
 			(SelectableFeature) item.getData();
 		if (feature.getSelection() != Selection.UNSELECTED) {
 			item.setExpanded(true);
@@ -943,7 +943,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				if (collapse) {
 					collapseRec(root);
 				}
-				for (TreeItem treeItem : groupItems) {
+				for (final TreeItem treeItem : groupItems) {
 					TreeItem parent =
 						treeItem.getParentItem();
 					while (parent != null) {
@@ -975,7 +975,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		final TreeItem[] items =
 			root.getItems();
-		for (TreeItem treeItem : items) {
+		for (final TreeItem treeItem : items) {
 			searchGroupRec(treeItem, groupItems);
 		}
 	}
@@ -985,7 +985,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		final TreeItem[] items =
 			root.getItems();
-		for (TreeItem treeItem : items) {
+		for (final TreeItem treeItem : items) {
 			collapseRec(treeItem);
 		}
 	}
@@ -1000,16 +1000,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	private void expandRec(TreeItem root) {
-		TreeItem[] items =
+		final TreeItem[] items =
 			root.getItems();
-		for (TreeItem treeItem : items) {
+		for (final TreeItem treeItem : items) {
 			final Object data =
 				treeItem.getData();
 			if (data instanceof SelectableFeature) {
 				final SelectableFeature feature =
 					(SelectableFeature) data;
-				if (feature.getSelection() == Selection.UNDEFINED
-					|| feature.getSelection() == Selection.UNSELECTED) {
+				if ((feature.getSelection() == Selection.UNDEFINED)
+					|| (feature.getSelection() == Selection.UNSELECTED)) {
 					treeItem.setExpanded(false);
 				} else {
 					treeItem.setExpanded(true);
@@ -1058,12 +1058,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected LongRunningJob<List<Node>> computeColoring(final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures()
 			|| configurationEditor.getConfiguration().isValid()) {
-			for (SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
+			for (final SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
 				selectableFeature.setRecommendationValue(-1);
 				selectableFeature.clearOpenClauses();
 			}
-			if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.OPEN_CLAUSE
-				|| configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.PARENT_CLAUSE) {
+			if ((configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.OPEN_CLAUSE)
+				|| (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.PARENT_CLAUSE)) {
 				autoExpand(currentDisplay);
 			}
 			return null;
@@ -1073,9 +1073,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			new LinkedList<>();
 		final List<SelectableFeature> manualFeatureList =
 			new LinkedList<>();
-		for (SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
+		for (final SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
 			if (!selectableFeature.getFeature().getStructure().hasHiddenParent()) {
-				if (selectableFeature.getAutomatic() == Selection.UNDEFINED
+				if ((selectableFeature.getAutomatic() == Selection.UNDEFINED)
 					&& !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 					manualFeatureList.add(selectableFeature);
 				} else {
@@ -1088,7 +1088,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 			@Override
 			public void run() {
-				for (SelectableFeature selectableFeature : automaticFeatureList) {
+				for (final SelectableFeature selectableFeature : automaticFeatureList) {
 					selectableFeature.setRecommendationValue(-1);
 					selectableFeature.clearOpenClauses();
 					final TreeItem item =
@@ -1113,7 +1113,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			if (rec != null) {
 				int i =
 					0;
-				for (SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
+				for (final SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
 					selectableFeature.setRecommendationValue((int) Math.floor(rec[i++]
 						* 100));
 				}
@@ -1122,7 +1122,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		final LongRunningMethod<List<Node>> jobs =
 			configurationEditor.getConfiguration().getPropagator().findOpenClauses(manualFeatureList);
-		LongRunningJob<List<Node>> job =
+		final LongRunningJob<List<Node>> job =
 			new LongRunningJob<List<Node>>("FindClauses", jobs);
 		job.schedule();
 
@@ -1219,8 +1219,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 		});
-		if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.OPEN_CLAUSE
-			|| configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.PARENT_CLAUSE) {
+		if ((configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.OPEN_CLAUSE)
+			|| (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.PARENT_CLAUSE)) {
 			job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
 
 				@Override
@@ -1246,7 +1246,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		final TreeItem topItem =
 			tree.getTopItem();
-		SelectableFeature feature =
+		final SelectableFeature feature =
 			(SelectableFeature) (topItem.getData());
 		final LongRunningMethod<Void> update =
 			configurationEditor.getConfiguration().getPropagator().update(redundantManual, Arrays.asList(feature));
@@ -1280,7 +1280,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	/**
 	 * Returns an explanation for the given feature selection. Generates it first if necessary.
-	 * 
+	 *
 	 * @param featureSelection a feature selection; not null
 	 * @return an explanation for the given feature selection; null if none could be found
 	 */
@@ -1299,7 +1299,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	/**
 	 * Returns an explanation why the given feature is automatically selected or unselected. Generates it first if necessary.
-	 * 
+	 *
 	 * @param automaticSelection an automatically selected feature; not null
 	 * @return an explanation why the given feature is automatically selected or unselected; null if none could be found
 	 */
@@ -1310,7 +1310,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	/**
 	 * Returns a new explanation for the given automatic selection.
-	 * 
+	 *
 	 * @param automaticSelection the automatic selection
 	 * @return a new explanation for the given automatic selection; null if none could be generated
 	 */
@@ -1369,14 +1369,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						autoExpand(currentDisplay);
 						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
 						if (configurationEditor instanceof ConfigurationEditor) {
-							ConfigurationManager manager =
+							final ConfigurationManager manager =
 								((ConfigurationEditor) configurationEditor).getConfigurationManager();
 							// Get current configuration
 							final String source =
 								manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
 							// Cast is necessary, don't remove
 							final IFile document =
-								(IFile) getEditorInput().getAdapter(IFile.class);
+								getEditorInput().getAdapter(IFile.class);
 
 							byte[] content;
 							try {
@@ -1386,9 +1386,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 								if (!source.equals(new String(content))) {
 									setDirty();
 								}
-							} catch (IOException e) {
+							} catch (final IOException e) {
 								FMUIPlugin.getDefault().logError(e);
-							} catch (CoreException e) {
+							} catch (final CoreException e) {
 								FMUIPlugin.getDefault().logError(e);
 							}
 						}
@@ -1418,7 +1418,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	/**
 	 * Applies the given functions to the tree.
-	 * 
+	 *
 	 * @param perNodeFunction The function that is applied to all nodes of the tree.
 	 * @param callbackIfDone A functions that executed once after the tree is completely traversed has finished.
 	 */
@@ -1494,7 +1494,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					sb.append("\n\n");
 				}
 				sb.append("Open Clauses:\n");
-				for (Node clause : openClauses) {
+				for (final Node clause : openClauses) {
 					sb.append(clause.toString(NodeWriter.logicalSymbols)).append('\n');
 				}
 			}
@@ -1502,8 +1502,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			// Print the explanation.
 			final Explanation explanation =
 				getExplanation(feature);
-			if (explanation != null
-				&& explanation.getReasons() != null
+			if ((explanation != null)
+				&& (explanation.getReasons() != null)
 				&& !explanation.getReasons().isEmpty()) {
 				if (sb.length() > 0) {
 					sb.append("\n\n");

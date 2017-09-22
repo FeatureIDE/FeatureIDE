@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,7 +41,7 @@ import org.sat4j.specs.TimeoutException;
 
 /**
  * SAT solver using a Sat4J oracle.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class Sat4jSatSolver extends AbstractSatSolver {
@@ -94,7 +94,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 			if (constraint != null) {
 				clauseConstraints.put(clause, constraint);
 			}
-		} catch (ContradictionException e) {
+		} catch (final ContradictionException e) {
 			setContradiction(true);
 		}
 		super.addClause(clause);
@@ -103,7 +103,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Adds the given variables to the solver and oracle. Ignores any that have already been added.
-	 * 
+	 *
 	 * @param variables variables to add
 	 */
 	protected void addVariables(Set<Object> variables) {
@@ -114,7 +114,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Adds the given variable to the solver and oracle if it has not already been added.
-	 * 
+	 *
 	 * @param variable variable to add
 	 */
 	protected void addVariable(Object variable) {
@@ -130,7 +130,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		}
 		try {
 			return getOracle().isSatisfiable(getVectorFromAssumptions());
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			return false;
 		}
 	}
@@ -154,7 +154,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns true if an immediate contradiction occurred while adding the clauses.
-	 * 
+	 *
 	 * @return true if an immediate contradiction occurred while adding the clauses
 	 */
 	public boolean isContradiction() {
@@ -163,7 +163,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Sets the contradiction flag.
-	 * 
+	 *
 	 * @param contradiction contradiction flag
 	 */
 	protected void setContradiction(boolean contradiction) {
@@ -173,7 +173,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Constructs a Sat4J vector from the given clauses. Does not add any variables or clauses.
-	 * 
+	 *
 	 * @param clauses clauses to transform; not null
 	 * @return a Sat4J vector; contains a 0 in case of an unknown variable; not null
 	 */
@@ -188,7 +188,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Constructs a Sat4J vector from the given clause. Does not add any variables or clauses.
-	 * 
+	 *
 	 * @param clause clause to transform; not null
 	 * @return a Sat4J vector; contains a 0 in case of an unknown variable; not null
 	 */
@@ -207,7 +207,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns the Sat4J index corresponding to the given literal. Does not add any variables or clauses.
-	 * 
+	 *
 	 * @param l literal to transform; not null
 	 * @return a Sat4J index; 0 in case of an unknown variable
 	 */
@@ -217,7 +217,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns the Sat4J index corresponding to the given literal. Does not add any variables or clauses.
-	 * 
+	 *
 	 * @param variable variable of the literal; not null
 	 * @param positive whether the literal is positive
 	 * @return a Sat4J index; 0 in case of an unknown variable
@@ -234,7 +234,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns the Sat4J index corresponding to the given variable. Does not add any variables or clauses.
-	 * 
+	 *
 	 * @param variable variable to transform; not null
 	 * @return a Sat4J index; 0 in case of an unknown variable
 	 */
@@ -248,7 +248,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Adds a new Sat4J index for the given variable.
-	 * 
+	 *
 	 * @param variable variable to transform; not null
 	 * @return a Sat4J index
 	 */
@@ -265,7 +265,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns a literal corresponding to the given Sat4J index. Does not add any variables or clauses.
-	 * 
+	 *
 	 * @param index Sat4J index to transform; not 0
 	 * @return a literal; null in case of an unknown index
 	 */
@@ -280,7 +280,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns a variable corresponding to the given Sat4J index. Does not add any variables or clauses.
-	 * 
+	 *
 	 * @param index Sat4J index to transform; not 0
 	 * @return a variable; null in caseof an unknown index
 	 * @throws IllegalArgumentException if the index is 0
@@ -294,7 +294,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns the amount of contained variables.
-	 * 
+	 *
 	 * @return the amount of contained variables
 	 */
 	public int getVariableCount() {
@@ -303,7 +303,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns a vector encompassing the assumptions. Does not add any clauses or variables.
-	 * 
+	 *
 	 * @return a Sat4J vector; contains 0 in case of an unknown variable; not null
 	 */
 	public IVecInt getVectorFromAssumptions() {
@@ -317,7 +317,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/**
 	 * Returns the internal clause index for the given Sat4J clause index. Sat4J clause indexes start at 1 instead of 0.
-	 * 
+	 *
 	 * @param index Sat4J clause index
 	 * @return internal clause index
 	 */

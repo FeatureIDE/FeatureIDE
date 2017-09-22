@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,18 +47,19 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 /**
  * Implementation of {@link ExternalChangeListener} for an Eclipse UI environment.<br/> When there is an open editor with the changed file, this class asks the
  * user, whether they want to override their file. Calls the override function of the corresponding file manager, unless the user decides to keep their changes.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class EclipseExternalChangeListener extends ExternalChangeListener implements IResourceChangeListener {
 
 	private static final class FileManagerVisitor implements IResourceDeltaVisitor {
 
+		@Override
 		public boolean visit(IResourceDelta delta) {
 			// only interested in removal changes
-			if (delta.getKind() == IResourceDelta.CHANGED
-				&& (delta.getFlags()
-					& (IResourceDelta.CONTENT)) != 0) {
+			if ((delta.getKind() == IResourceDelta.CHANGED)
+				&& ((delta.getFlags()
+					& (IResourceDelta.CONTENT)) != 0)) {
 				final IResource resource =
 					delta.getResource();
 				if (resource instanceof IFile) {
@@ -79,6 +80,7 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 			new FileEditorInput((IFile) EclipseFileSystem.getResource(fileManager.getPath()));
 		Display.getDefault().syncExec(new Runnable() {
 
+			@Override
 			public void run() {
 				final IWorkbench workbench =
 					PlatformUI.getWorkbench();
@@ -91,7 +93,7 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 				boolean dirtyEditor =
 					false;
 				if (editors != null) {
-					for (IEditorReference editorRef : editors) {
+					for (final IEditorReference editorRef : editors) {
 						if (editorRef.isDirty()) {
 							dirtyEditor =
 								true;
@@ -100,7 +102,7 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 					}
 				}
 				if (dirtyEditor) {
-					MessageDialog dialog =
+					final MessageDialog dialog =
 						new MessageDialog(null, "Feature model file changed.", null,
 								"The feature model file was modified in another editor. Do you like to load the new file and override your local changes?",
 								MessageDialog.QUESTION, new String[] {
@@ -117,12 +119,13 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 		});
 	}
 
+	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getDelta() != null
-			&& event.getType() == IResourceChangeEvent.POST_CHANGE) {
+		if ((event.getDelta() != null)
+			&& (event.getType() == IResourceChangeEvent.POST_CHANGE)) {
 			try {
 				event.getDelta().accept(new FileManagerVisitor());
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}

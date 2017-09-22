@@ -20,8 +20,9 @@ class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof List)
+		if (parentElement instanceof List) {
 			return ((List<?>) parentElement).toArray();
+		}
 		return new Object[0];
 	}
 
@@ -32,8 +33,9 @@ class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof List)
+		if (element instanceof List) {
 			return ((List<?>) element).size() > 0;
+		}
 		return false;
 	}
 }

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -75,7 +75,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Prints a feature model in SPLConqueror format.
- * 
+ *
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  * @author Thomas Thuem
@@ -94,11 +94,11 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 
 	/**
 	 * Creates XML-Document
-	 * 
+	 *
 	 * @param doc document to write
 	 */
 	private void createXmlDoc(Document doc) {
-		Element plm =
+		final Element plm =
 			doc.createElement("plm");
 		doc.appendChild(plm);
 		plm.setAttribute("name", featureModel.getStructure().getRoot().getFeature().getName());
@@ -112,19 +112,20 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 			new LinkedList<Node>();
 		final List<Node> nodes =
 			Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
-		Node[] nodeArray =
+		final Node[] nodeArray =
 			nodes.toArray(new Node[nodes.size()]);
 		Node node =
 			new And(nodeArray);
 		if (node.getChildren().length > 0) {
 			node =
 				node.toCNF();
-			if (!(node instanceof And))
+			if (!(node instanceof And)) {
 				node =
 					new And(node);
-			for (Node child : node.getChildren()) {
-				if (child instanceof Or
-					&& child.getChildren().length == 2) {
+			}
+			for (final Node child : node.getChildren()) {
+				if ((child instanceof Or)
+					&& (child.getChildren().length == 2)) {
 					Literal literalA =
 						(Literal) child.getChildren()[0];
 					Literal literalB =
@@ -132,7 +133,7 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 					if (!literalA.positive
 						|| !literalB.positive) {
 						if (literalA.positive) {
-							Literal temp =
+							final Literal temp =
 								literalA;
 							literalA =
 								literalB;
@@ -158,10 +159,12 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 							}
 							set.add(literalB.var.toString());
 						}
-					} else
+					} else {
 						furtherNodes.add(child);
-				} else
+					}
+				} else {
 					furtherNodes.add(child);
+				}
 			}
 		}
 
@@ -170,11 +173,11 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 
 		plm.appendChild(doc.createElement("properties"));
 
-		Element furtherConstraints =
+		final Element furtherConstraints =
 			doc.createElement("furtherConstraints");
 		plm.appendChild(furtherConstraints);
-		for (Node child : furtherNodes) {
-			Element clause =
+		for (final Node child : furtherNodes) {
+			final Element clause =
 				doc.createElement(CLAUSE);
 			furtherConstraints.appendChild(clause);
 			clause.appendChild(doc.createTextNode(child.toString()));
@@ -182,15 +185,17 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 	}
 
 	private void generateSubtree(Document doc, Element node, IFeature feature) {
-		if (!feature.getStructure().isRoot())
+		if (!feature.getStructure().isRoot()) {
 			generateElement(doc, node, feature);
+		}
 
-		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
+		for (final IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
 			generateSubtree(doc, node, child);
+		}
 	}
 
 	private void generateElement(Document doc, Element node, IFeature feature) {
-		Element element =
+		final Element element =
 			doc.createElement(ELEMENT);
 		node.appendChild(element);
 		element.setAttribute("id", getID(feature.getName()));
@@ -205,116 +210,120 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 		element.appendChild(doc.createElement("path_relativ"));
 
 		if (!feature.getStructure().getParent().isRoot()) {
-			Element parentElement =
+			final Element parentElement =
 				doc.createElement("parentElement");
 			element.appendChild(parentElement);
-			Element id =
+			final Element id =
 				doc.createElement("id");
 			parentElement.appendChild(id);
 			id.appendChild(doc.createTextNode(getID(FeatureUtils.getParent(feature).getName())));
 		}
 
-		Element constraints =
+		final Element constraints =
 			doc.createElement("constraints");
 		element.appendChild(constraints);
 
-		Element alternative =
+		final Element alternative =
 			doc.createElement("constraint");
 		constraints.appendChild(alternative);
 		alternative.setAttribute(TYPE, "alternative");
 		if (!feature.getStructure().isRoot()
 			&& feature.getStructure().getParent().isAlternative()) {
-			for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getParent().getChildren()))
+			for (final IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getParent().getChildren())) {
 				if (childFeature != feature) {
-					Element constraint_element =
+					final Element constraint_element =
 						doc.createElement("constraint_element");
 					alternative.appendChild(constraint_element);
-					Element id =
+					final Element id =
 						doc.createElement("id");
 					constraint_element.appendChild(id);
 					id.appendChild(doc.createTextNode(getID(childFeature.getName())));
-					Element name =
+					final Element name =
 						doc.createElement("name");
 					constraint_element.appendChild(name);
 					name.appendChild(doc.createTextNode(childFeature.getName()));
 				}
+			}
 		}
 
-		Element commulative =
+		final Element commulative =
 			doc.createElement("constraint");
 		constraints.appendChild(commulative);
 		commulative.setAttribute(TYPE, COMMULATIVE);
 		if (!feature.getStructure().isRoot()
 			&& feature.getStructure().getParent().isOr()) {
-			for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getParent().getChildren()))
+			for (final IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getParent().getChildren())) {
 				if (childFeature != feature) {
-					Element constraint_element =
+					final Element constraint_element =
 						doc.createElement("constraint_element");
 					commulative.appendChild(constraint_element);
-					Element id =
+					final Element id =
 						doc.createElement("id");
 					constraint_element.appendChild(id);
 					id.appendChild(doc.createTextNode(getID(childFeature.getName())));
-					Element name =
+					final Element name =
 						doc.createElement("name");
 					constraint_element.appendChild(name);
 					name.appendChild(doc.createTextNode(childFeature.getName()));
 				}
+			}
 		}
 
-		Element requires =
+		final Element requires =
 			doc.createElement("constraint");
 		constraints.appendChild(requires);
 		requires.setAttribute(TYPE, REQUIRES);
-		Set<String> requireFeature =
+		final Set<String> requireFeature =
 			require.get(feature.getName());
-		if (requireFeature != null)
-			for (String childFeature : requireFeature) {
-			Element constraint_element =
-				doc.createElement("constraint_element");
-			requires.appendChild(constraint_element);
-			Element id =
-				doc.createElement("id");
-			constraint_element.appendChild(id);
-			id.appendChild(doc.createTextNode(getID(childFeature)));
-			Element name =
-				doc.createElement("name");
-			constraint_element.appendChild(name);
-			name.appendChild(doc.createTextNode(childFeature));
+		if (requireFeature != null) {
+			for (final String childFeature : requireFeature) {
+				final Element constraint_element =
+					doc.createElement("constraint_element");
+				requires.appendChild(constraint_element);
+				final Element id =
+					doc.createElement("id");
+				constraint_element.appendChild(id);
+				id.appendChild(doc.createTextNode(getID(childFeature)));
+				final Element name =
+					doc.createElement("name");
+				constraint_element.appendChild(name);
+				name.appendChild(doc.createTextNode(childFeature));
 			}
+		}
 
-		Element excludes =
+		final Element excludes =
 			doc.createElement("constraint");
 		constraints.appendChild(excludes);
 		excludes.setAttribute(TYPE, EXCLUDES);
-		Set<String> excludeFeature =
+		final Set<String> excludeFeature =
 			exclude.get(feature.getName());
-		if (excludeFeature != null)
-			for (String childFeature : excludeFeature) {
-			Element constraint_element =
-				doc.createElement("constraint_element");
-			excludes.appendChild(constraint_element);
-			Element id =
-				doc.createElement("id");
-			constraint_element.appendChild(id);
-			id.appendChild(doc.createTextNode(getID(childFeature)));
-			Element name =
-				doc.createElement("name");
-			constraint_element.appendChild(name);
-			name.appendChild(doc.createTextNode(childFeature));
+		if (excludeFeature != null) {
+			for (final String childFeature : excludeFeature) {
+				final Element constraint_element =
+					doc.createElement("constraint_element");
+				excludes.appendChild(constraint_element);
+				final Element id =
+					doc.createElement("id");
+				constraint_element.appendChild(id);
+				id.appendChild(doc.createTextNode(getID(childFeature)));
+				final Element name =
+					doc.createElement("name");
+				constraint_element.appendChild(name);
+				name.appendChild(doc.createTextNode(childFeature));
 			}
+		}
 
-		Element childElements =
+		final Element childElements =
 			doc.createElement("childElements");
 		element.appendChild(childElements);
-		for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
-			Element child =
+		for (final IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
+			final Element child =
 				doc.createElement(CHILD);
 			childElements.appendChild(child);
 			child.setAttribute(OPTIONAL, childFeature.getStructure().isMandatory()
 				? "false"
 				: "true");
-			Element id =
+			final Element id =
 				doc.createElement("id");
 			child.appendChild(id);
 			id.appendChild(doc.createTextNode(getID(childFeature.getName())));
@@ -326,17 +335,17 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 
 	/**
 	 * Inserts indentations into the text
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
 	private String prettyPrint(String text) {
-		StringBuilder result =
+		final StringBuilder result =
 			new StringBuilder();
 		String line;
 		int indentLevel =
 			0;
-		BufferedReader reader =
+		final BufferedReader reader =
 			new BufferedReader(new StringReader(text));
 		try {
 			reader.readLine(); // hack to remove first line
@@ -373,7 +382,7 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 				line =
 					reader.readLine();
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Logger.logError(e);
 		}
 		return result.toString();
@@ -383,7 +392,7 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 		this.featureModel =
 			featureModel;
 		// Create Empty DOM Document
-		DocumentBuilderFactory dbf =
+		final DocumentBuilderFactory dbf =
 			DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
@@ -395,10 +404,10 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 		try {
 			db =
 				dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException pce) {
+		} catch (final ParserConfigurationException pce) {
 			Logger.logError(pce);
 		}
-		Document doc =
+		final Document doc =
 			db.newDocument();
 		// Create the Xml Representation
 		createXmlDoc(doc);
@@ -409,21 +418,21 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 		try {
 			transfo =
 				TransformerFactory.newInstance().newTransformer();
-		} catch (TransformerConfigurationException e) {
+		} catch (final TransformerConfigurationException e) {
 			Logger.logError(e);
-		} catch (TransformerFactoryConfigurationError e) {
+		} catch (final TransformerFactoryConfigurationError e) {
 			Logger.logError(e);
 		}
 
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		StreamResult result =
+		final StreamResult result =
 			new StreamResult(new StringWriter());
-		DOMSource source =
+		final DOMSource source =
 			new DOMSource(doc);
 		try {
 			transfo.transform(source, result);
-		} catch (TransformerException e) {
+		} catch (final TransformerException e) {
 			Logger.logError(e);
 		}
 
@@ -440,15 +449,17 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 
 	private void initializeIDs(IFeature feature) {
 		getID(feature.getName());
-		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
+		for (final IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
 			initializeIDs(child);
+		}
 	}
 
 	private String getID(String feature) {
 		Integer id =
 			ids.get(feature);
-		if (id != null)
+		if (id != null) {
 			return id.toString();
+		}
 		id =
 			ids.size()
 				+ 1;

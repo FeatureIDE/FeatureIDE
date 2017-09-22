@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Responsible to load and save all information from / to a file.<br/> To get an instance use the {@link FileManagerMap}.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class AFileManager<T> implements IFileManager<T>, IEventManager {
@@ -79,11 +79,11 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	/**
 	 * Constructs a path for a given file to store additional information.
-	 * 
+	 *
 	 * @param path The path pointing to the file.
 	 * @param format The format for the extra information file.
 	 * @return The path to the extra information file.
-	 * 
+	 *
 	 * @throws IllegalArgumentException If path is empty.
 	 */
 	public static final Path constructExtraPath(Path path, IPersistentFormat<?> format) throws IllegalArgumentException {
@@ -99,15 +99,15 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 					- 1);
 			final Path root =
 				mainPath.getRoot();
-			if (subpath != null
-				&& root != null) {
+			if ((subpath != null)
+				&& (root != null)) {
 				final Path extraFolder =
 					root.resolve(subpath.resolve(".featureide").resolve(mainFileNameString));
 
 				if (!FileSystem.exists(extraFolder)) {
 					try {
 						FileSystem.mkDir(extraFolder);
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						Logger.logError(e);
 					}
 				}
@@ -124,11 +124,11 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	/**
 	 * Returns and casts an instance of a {@link IFileManager} for a certain file.
-	 * 
+	 *
 	 * @param path The path pointing to the file.
-	 * 
+	 *
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
-	 * 
+	 *
 	 * @throws ClassCastException When the found instance is no subclass of R.
 	 */
 	@SuppressWarnings("unchecked")
@@ -139,7 +139,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	/**
 	 * Checks whether there is already an instance.
-	 * 
+	 *
 	 * @param path The path pointing to the file.
 	 * @return {@code true} if there is an instance, {@code false} otherwise
 	 */
@@ -149,11 +149,11 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	/**
 	 * Removes and returns an instance of a {@link IFileManager} for a certain file.
-	 * 
+	 *
 	 * @param path The path pointing to the file.
-	 * 
+	 *
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
-	 * 
+	 *
 	 * @throws ClassCastException When the found instance is no subclass of R.
 	 */
 	@SuppressWarnings("unchecked")
@@ -192,7 +192,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 					fileHandler.setObject(featureModel);
 					fileHandler.setFormat(format);
 					fileHandler.parse(content);
-				} catch (NoSuchExtensionException e) {
+				} catch (final NoSuchExtensionException e) {
 					fileHandler.getLastProblems().add(new Problem(e));
 				}
 			}
@@ -281,7 +281,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				if (problems != null) {
 					lastProblems.addAll(problems);
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				handleException(e);
 			}
 		}
@@ -296,10 +296,12 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	protected abstract T copyObject(T oldObject);
 
+	@Override
 	public T getObject() {
 		return persistentObject;
 	}
 
+	@Override
 	public T editObject() {
 		return variableObject;
 	}
@@ -316,10 +318,12 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		eventManager.fireEvent(event);
 	}
 
+	@Override
 	public IPersistentFormat<T> getFormat() {
 		return format;
 	}
 
+	@Override
 	public ProblemList getLastProblems() {
 		return lastProblems;
 	}
@@ -328,6 +332,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		lastProblems.add(new Problem(e));
 	}
 
+	@Override
 	public boolean read() {
 		if (!FileSystem.exists(path)) {
 			return false;
@@ -350,7 +355,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				}
 				changed =
 					!compareObjects(tempObject, persistentObject);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				handleException(e);
 				return false;
 			}
@@ -368,6 +373,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	}
 
 	// TODO Quickfix for #501. Should be implemented by overriding the current instance pointer.
+	@Override
 	public void override() {
 		synchronized (syncObject) {
 			if (modifying) {
@@ -389,7 +395,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	/**
 	 * Compares two object for equality.<br/> Subclasses should override (implement) this method.
-	 * 
+	 *
 	 * @param o1 First object.
 	 * @param o2 Second object.
 	 * @return {@code true} if objects are considered equal, {@code false} otherwise.
@@ -402,6 +408,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return s1.equals(s2);
 	}
 
+	@Override
 	public boolean save() {
 		final boolean success;
 		synchronized (syncObject) {
@@ -419,7 +426,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				FileSystem.write(path, content);
 				persistentObject =
 					copyObject(tempObject);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				handleException(e);
 				return false;
 			} finally {
@@ -433,6 +440,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return success;
 	}
 
+	@Override
 	public boolean externalSave(Runnable externalSaveMethod) {
 		final boolean success;
 		synchronized (syncObject) {
@@ -448,7 +456,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				externalSaveMethod.run();
 				persistentObject =
 					copyObject(tempObject);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				handleException(e);
 				return false;
 			} finally {
@@ -478,6 +486,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return absolutePath;
 	}
 
+	@Override
 	public Path getPath() {
 		return path;
 	}

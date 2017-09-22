@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Test class of the {@link GuidslReader}.
- * 
+ *
  * @author Fabian Benduhn
  */
 public class TGuidslReader {
@@ -56,9 +56,9 @@ public class TGuidslReader {
 	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
 		final IFeatureModel model =
 			load(AND_GROUP_ALL_OPTIONAL);
-		IFeature a =
+		final IFeature a =
 			model.getFeature("A");
-		IFeature base =
+		final IFeature base =
 			model.getFeature("Base");
 		assertTrue(base.getStructure().isAnd());
 		assertFalse(a.getStructure().isMandatory());
@@ -69,9 +69,9 @@ public class TGuidslReader {
 		final IFeatureModel model =
 			load(AND_GROUP_A_MANDATORY);
 
-		IFeature a =
+		final IFeature a =
 			model.getFeature("A");
-		IFeature base =
+		final IFeature base =
 			model.getFeature("Base");
 		assertTrue(base.getStructure().isAnd());
 		assertTrue(a.getStructure().isMandatory());
@@ -82,7 +82,7 @@ public class TGuidslReader {
 		final IFeatureModel model =
 			load(OR_GROUP);
 
-		IFeature base =
+		final IFeature base =
 			model.getFeature("Base");
 		assertTrue(base.getStructure().isOr());
 	}
@@ -92,7 +92,7 @@ public class TGuidslReader {
 		final IFeatureModel model =
 			load(ALTERNATIVE_GROUP);
 
-		IFeature base =
+		final IFeature base =
 			model.getFeature("Base");
 		assertTrue(base.getStructure().isAlternative());
 	}
@@ -101,13 +101,13 @@ public class TGuidslReader {
 		try {
 			final IFeatureModelFormat format =
 				new GuidslFormat();
-			IFeatureModel model =
+			final IFeatureModel model =
 				FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
 			if (format.read(model, input).containsError()) {
 				fail();
 			}
 			return model;
-		} catch (NoSuchExtensionException e) {
+		} catch (final NoSuchExtensionException e) {
 			fail();
 		}
 		return null;

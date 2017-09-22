@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,9 +44,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
  * Graphical representation of an {@link IFeatureModel} instance.
- * 
+ *
  * @author Sebastian Krieter
- * 
+ *
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
@@ -77,7 +77,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 * Copy constructor
 	 */
 	protected GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
-		this.correspondingFeatureModel =
+		correspondingFeatureModel =
 			oldModel.correspondingFeatureModel;
 
 		layout =
@@ -85,13 +85,13 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		features =
 			new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures()
 				* 1.5));
-		for (IGraphicalFeature feature : oldModel.features.values()) {
+		for (final IGraphicalFeature feature : oldModel.features.values()) {
 			features.put(feature.getObject(), feature.clone());
 		}
 		constraints =
 			new HashMap<>((int) (correspondingFeatureModel.getConstraintCount()
 				* 1.5));
-		for (Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
+		for (final Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
 			constraints.put(constraint.getKey(), constraint.getValue().clone());
 		}
 	}
@@ -177,7 +177,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	public Collection<IGraphicalFeature> getFeatures() {
 		final ArrayList<IGraphicalFeature> featureList =
 			new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (IFeature f : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -187,7 +187,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	public Collection<IGraphicalFeature> getAllFeatures() {
 		final ArrayList<IGraphicalFeature> featureList =
 			new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (IFeature f : correspondingFeatureModel.getFeatures()) {
+		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -209,7 +209,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	public List<IGraphicalConstraint> getConstraints() {
 		final ArrayList<IGraphicalConstraint> constraintList =
 			new ArrayList<>(correspondingFeatureModel.getConstraintCount());
-		for (IConstraint c : correspondingFeatureModel.getConstraints()) {
+		for (final IConstraint c : correspondingFeatureModel.getConstraints()) {
 			constraintList.add(getGraphicalConstraint(c));
 		}
 		return constraintList;
@@ -217,11 +217,12 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalConstraint> getVisibleConstraints() {
-		if (getLayout().showCollapsedConstraints())
+		if (getLayout().showCollapsedConstraints()) {
 			return getConstraints();
-		List<IGraphicalConstraint> constraints =
+		}
+		final List<IGraphicalConstraint> constraints =
 			new ArrayList<IGraphicalConstraint>();
-		for (IGraphicalConstraint c : getConstraints()) {
+		for (final IGraphicalConstraint c : getConstraints()) {
 			if (!c.isCollapsed()) {
 				constraints.add(c);
 			}
@@ -265,14 +266,14 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			constraints =
 				new HashMap<>((int) (correspondingFeatureModel.getConstraintCount()
 					* 1.5));
-			for (IConstraint constraint : correspondingFeatureModel.getConstraints()) {
+			for (final IConstraint constraint : correspondingFeatureModel.getConstraints()) {
 				constraints.put(constraint, new GraphicalConstraint(constraint, this));
 			}
 
 			features =
 				new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures()
 					* 1.5));
-			for (IFeature feature : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+			for (final IFeature feature : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 				features.put(feature, new GraphicalFeature(feature, this));
 			}
 		} else {
@@ -285,9 +286,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalFeature> getVisibleFeatures() {
-		List<IGraphicalFeature> features =
+		final List<IGraphicalFeature> features =
 			new ArrayList<IGraphicalFeature>();
-		for (IGraphicalFeature f : getFeatures()) {
+		for (final IGraphicalFeature f : getFeatures()) {
 			if (!f.hasCollapsedParent()) {
 				features.add(f);
 			}
@@ -301,14 +302,14 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 */
 	@Override
 	public int getConstraintIndex(Constraint constraint) {
-		IGraphicalConstraint gConstarint =
+		final IGraphicalConstraint gConstarint =
 			getGraphicalConstraint(constraint);
 
 		int index =
 			0;
 		for (int i =
 			0; i < constraints.size(); i++) {
-			IGraphicalConstraint gTemp =
+			final IGraphicalConstraint gTemp =
 				getGraphicalConstraint(getFeatureModel().getConstraints().get(i));
 			if (gTemp == gConstarint) {
 				return index;

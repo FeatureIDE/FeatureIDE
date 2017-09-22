@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package br.ufal.ic.colligens.handler;
 
@@ -34,7 +34,7 @@ import de.fosd.typechef.options.OptionException;
 
 /**
  * @author thiago
- * 
+ *
  */
 public class PresenceConditionHandler extends ColligensAbstractHandler {
 
@@ -44,40 +44,40 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window =
+		final IWorkbenchWindow window =
 			HandlerUtil.getActiveWorkbenchWindow(event);
-		IWorkbenchPage page =
+		final IWorkbenchPage page =
 			window.getActivePage();
-		IEditorPart editor =
+		final IEditorPart editor =
 			page.getActiveEditor();
 
 		if (editor instanceof ITextEditor) {
 
-			ISelectionProvider selectionProvider =
+			final ISelectionProvider selectionProvider =
 				((ITextEditor) editor)
 						.getSelectionProvider();
-			ISelection selection =
+			final ISelection selection =
 				selectionProvider.getSelection();
 
 			if (selection instanceof ITextSelection) {
 
-				TextSelection textSelection =
+				final TextSelection textSelection =
 					(TextSelection) selection;
 
-				IDocumentProvider provider =
+				final IDocumentProvider provider =
 					((ITextEditor) editor)
 							.getDocumentProvider();
-				IDocument document =
+				final IDocument document =
 					provider.getDocument(editor
 							.getEditorInput());
-				int line =
+				final int line =
 					textSelection.getStartLine();
 
-				FileEditorInput fileEditorInput =
+				final FileEditorInput fileEditorInput =
 					(FileEditorInput) window
 							.getActivePage().getActiveEditor().getEditorInput();
 
-				IFile file =
+				final IFile file =
 					fileEditorInput.getFile();
 				String code =
 					null;
@@ -85,12 +85,12 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 					code =
 						document.get(document.getLineOffset(line),
 								document.getLineLength(line));
-				} catch (BadLocationException e1) {
+				} catch (final BadLocationException e1) {
 
 					e1.printStackTrace();
 				}
 
-				PresenceConditionController conditionController =
+				final PresenceConditionController conditionController =
 					new PresenceConditionController(
 							file, line
 								+ 1,
@@ -101,34 +101,34 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 
 					// show erros
 
-					if (conditionController.getFileProxy() != null
+					if ((conditionController.getFileProxy() != null)
 						&& !conditionController.getFileProxy().getLogs()
 								.isEmpty()) {
 						try {
 							page.showView(InvalidConfigurationsView.ID);
-							InvalidConfigurationsViewController analyzerViewController =
+							final InvalidConfigurationsViewController analyzerViewController =
 								InvalidConfigurationsViewController
 										.getInstance();
 
 							analyzerViewController.clear();
 
-							List<FileProxy> list =
+							final List<FileProxy> list =
 								new LinkedList<FileProxy>();
 
 							list.add(conditionController.getFileProxy());
 
 							analyzerViewController.setInput(list);
 
-						} catch (PartInitException e) {
+						} catch (final PartInitException e) {
 							e.printStackTrace();
 						}
 					}
 					// ---
-				} catch (PluginException e) {
+				} catch (final PluginException e) {
 					e.printStackTrace();
-				} catch (OptionException e) {
+				} catch (final OptionException e) {
 					e.printStackTrace();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					e.printStackTrace();
 				}
 

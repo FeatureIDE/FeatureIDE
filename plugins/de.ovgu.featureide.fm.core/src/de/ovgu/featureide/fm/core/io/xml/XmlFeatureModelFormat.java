@@ -65,7 +65,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 
 /**
  * Reads / Writes a feature model in the FeatureIDE XML format
- * 
+ *
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
@@ -219,7 +219,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	/**
 	 * Inserts the tags concerning propositional constraints into the DOM document representation
-	 * 
+	 *
 	 * @param doc
 	 * @param FeatMod Parent node for the propositional nodes
 	 */
@@ -291,7 +291,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	/**
 	 * Creates document based on feature model step by step
-	 * 
+	 *
 	 * @param doc document to write
 	 * @param node parent node
 	 * @param feat current feature
@@ -328,7 +328,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 
-			for (IFeature feature : children) {
+			for (final IFeature feature : children) {
 				createXmlDocRec(doc, fnod, feature);
 			}
 
@@ -339,7 +339,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	protected void addDescription(Document doc, IFeature feat, Element fnod) {
 		final String description =
 			feat.getProperty().getDescription();
-		if (description != null
+		if ((description != null)
 			&& !description.trim().isEmpty()) {
 			final Element descr =
 				doc.createElement(DESCRIPTION);
@@ -581,7 +581,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				/* case: description */
 				String nodeValue =
 					e.getFirstChild().getNodeValue();
-				if (nodeValue != null
+				if ((nodeValue != null)
 					&& !nodeValue.isEmpty()) {
 					nodeValue =
 						nodeValue.replace("\t", "");
@@ -675,9 +675,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		// Check that there are only OR connections when the parent has more than one feature
-		for (IFeature f : object.getFeatures()) {
+		for (final IFeature f : object.getFeatures()) {
 			if (f.getStructure().isOr()
-				&& f.getStructure().getChildrenCount() <= 1) {
+				&& (f.getStructure().getChildrenCount() <= 1)) {
 				f.getStructure().setAnd();
 			}
 		}
@@ -694,7 +694,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	/**
 	 * Throws an error that will be used for error markers
-	 * 
+	 *
 	 * @param message The error message
 	 * @param tempNode The node that causes the error. this node is used for positioning.
 	 */
@@ -714,7 +714,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod.setAttribute(HIDDEN, TRUE);
 		}
 		if (feat.getStructure().isMandatory()) {
-			if (feat.getStructure().getParent() != null
+			if ((feat.getStructure().getParent() != null)
 				&& feat.getStructure().getParent().isAnd()) {
 				fnod.setAttribute(MANDATORY, TRUE);
 			} else if (feat.getStructure().getParent() == null) {

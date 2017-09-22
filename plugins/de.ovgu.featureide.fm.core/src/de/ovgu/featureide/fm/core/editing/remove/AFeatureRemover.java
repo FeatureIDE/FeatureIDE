@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class AFeatureRemover implements LongRunningMethod<List<? extends Clause>> {
@@ -112,7 +112,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	}
 
 	public AFeatureRemover(Node cnf, Collection<String> features, boolean includeBooleanValues, boolean regularCNF) {
-		this.fmNode =
+		fmNode =
 			cnf;
 		this.features =
 			features;
@@ -137,7 +137,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 					+ 1];
 			int i =
 				0;
-			for (String featureName : retainedFeatures) {
+			for (final String featureName : retainedFeatures) {
 				allLiterals[i++] =
 					new Literal(featureName);
 			}
@@ -167,7 +167,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 		}
 		int j =
 			0;
-		for (Clause newClause : clauses) {
+		for (final Clause newClause : clauses) {
 			final int[] newClauseLiterals =
 				newClause.getLiterals();
 			final Literal[] literals =
@@ -187,6 +187,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 		return new And(newClauses);
 	}
 
+	@Override
 	public final List<? extends Clause> execute(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		// Collect all features in the prop node and remove TRUE and FALSE
 		init();
@@ -232,9 +233,9 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 	private void collectFeatures() {
 		if (fmNode instanceof And) {
-			for (Node andChild : fmNode.getChildren()) {
+			for (final Node andChild : fmNode.getChildren()) {
 				if (andChild instanceof Or) {
-					for (Node orChild : andChild.getChildren()) {
+					for (final Node orChild : andChild.getChildren()) {
 						addLiteral(retainedFeatures, orChild);
 					}
 				} else {
@@ -242,7 +243,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 				}
 			}
 		} else if (fmNode instanceof Or) {
-			for (Node orChild : fmNode.getChildren()) {
+			for (final Node orChild : fmNode.getChildren()) {
 				addLiteral(retainedFeatures, orChild);
 			}
 		} else {
@@ -297,7 +298,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 			final List<DeprecatedClause> subList =
 				relevantClauseList.subList(relevantPosIndex, relevantClauseList.size());
 			relevantClauseSet.removeAll(subList);
-			for (DeprecatedClause deprecatedClause : subList) {
+			for (final DeprecatedClause deprecatedClause : subList) {
 				deleteClause(deprecatedClause);
 			}
 			subList.clear();
@@ -309,7 +310,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 			final List<DeprecatedClause> subList =
 				newRelevantClauseList.subList(newRelevantDelIndex, newRelevantClauseList.size());
 			relevantClauseSet.removeAll(subList);
-			for (DeprecatedClause deprecatedClause : subList) {
+			for (final DeprecatedClause deprecatedClause : subList) {
 				deleteClause(deprecatedClause);
 			}
 		}
@@ -356,7 +357,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 					if (children.length == absoluteValueCount) {
 						throw new RuntimeException("Model is void!");
 					}
-					Literal[] newChildren =
+					final Literal[] newChildren =
 						new Literal[children.length
 							- absoluteValueCount];
 					int k =
@@ -401,7 +402,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 		map =
 			new DeprecatedFeature[idMap.size()
 				+ 1];
-		for (String curFeature : features) {
+		for (final String curFeature : features) {
 			final Integer id =
 				idMap.get(curFeature);
 			map[id] =
@@ -426,8 +427,8 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 			preRedundancyCheck(nextFeature);
 
 			final boolean outputSwitch =
-				heuristic.size() < 20
-					|| nextFeature.getClauseCount() > 0;
+				(heuristic.size() < 20)
+					|| (nextFeature.getClauseCount() > 0);
 			if (outputSwitch) {
 				final String s =
 					heuristic.size()
@@ -457,11 +458,11 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 						+ newNewClauseList.size();
 				System.err.print(s);
 			}
-			int newCount =
+			final int newCount =
 				newClauseList.size();
 
-			if (newNewClauseList.size() > 0
-				|| heuristic.size() == 0) {
+			if ((newNewClauseList.size() > 0)
+				|| (heuristic.size() == 0)) {
 				addNewClauses(nextFeature);
 			}
 
@@ -503,7 +504,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	}
 
 	private List<? extends Clause> handleSingleClause(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		for (Node clauseChildren : fmNode.getChildren()) {
+		for (final Node clauseChildren : fmNode.getChildren()) {
 			final Literal literal =
 				(Literal) clauseChildren;
 			if (features.contains(literal.var)) {
@@ -533,7 +534,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 		int id =
 			1;
-		for (String name : features) {
+		for (final String name : features) {
 			idMap.put(name, id);
 			featureNameArray[id] =
 				name;
@@ -542,7 +543,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 		retainedFeatures.removeAll(features);
 
-		for (String name : retainedFeatures) {
+		for (final String name : retainedFeatures) {
 			idMap.put(name, id);
 			featureNameArray[id] =
 				name;
@@ -582,7 +583,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 			0; i < relevantNegIndex; i++) {
 			final Clause clause =
 				relevantClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
+			for (final int literal : clause.getLiterals()) {
 				if (literal == -curFeatureID) {
 					Collections.swap(relevantClauseList, i--, --relevantNegIndex);
 					break;
@@ -595,7 +596,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 			0; i < relevantPosIndex; i++) {
 			final Clause clause =
 				relevantClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
+			for (final int literal : clause.getLiterals()) {
 				if (literal == curFeatureID) {
 					Collections.swap(relevantClauseList, i--, --relevantPosIndex);
 					break;
@@ -645,7 +646,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 		try {
 			remove =
 				!solver.isSatisfiable(literals2);
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 		}
 		return remove;

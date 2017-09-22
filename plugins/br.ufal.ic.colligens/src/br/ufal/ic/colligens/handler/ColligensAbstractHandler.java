@@ -40,20 +40,20 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 						.getActivePage().getSelection();
 
-			if (ColligensAbstractHandler.selection != null
+			if ((ColligensAbstractHandler.selection != null)
 				&& ColligensAbstractHandler.selection.equals(selection)) {
 				return enabled;
 			}
 			if (selection instanceof TextSelection) {
 				ColligensAbstractHandler.selection =
 					selection;
-				FileEditorInput fileEditorInput =
+				final FileEditorInput fileEditorInput =
 					(FileEditorInput) PlatformUI
 							.getWorkbench().getActiveWorkbenchWindow()
 							.getActivePage().getActiveEditor().getEditorInput();
 
 				enabled =
-					(fileEditorInput != null
+					((fileEditorInput != null)
 						&& (fileEditorInput.getFile().getFileExtension()
 								.equals("h")
 							|| fileEditorInput.getFile()
@@ -69,12 +69,12 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 			} else if (selection instanceof IStructuredSelection) {
 				ColligensAbstractHandler.selection =
 					selection;
-				IStructuredSelection extended =
+				final IStructuredSelection extended =
 					(IStructuredSelection) selection;
-				for (Iterator<?> iterator =
+				for (final Iterator<?> iterator =
 					extended.iterator(); iterator
 							.hasNext();) {
-					Object object =
+					final Object object =
 						iterator.next();
 					if (isValid(object)) {
 						enabled =
@@ -84,7 +84,7 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 				}
 
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			enabled =
 				false;
 			return enabled;
@@ -112,12 +112,12 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 		} else if (object instanceof CContainer) {
 			project =
 				((CContainer) object).getCProject().getProject();
-			IResource resource =
+			final IResource resource =
 				((CContainer) object).getResource();
 			isvalid =
 				isResource(resource);
 		} else if (object instanceof ITranslationUnit) {
-			ITranslationUnit iTranslationUnit =
+			final ITranslationUnit iTranslationUnit =
 				(ITranslationUnit) object;
 			project =
 				iTranslationUnit.getCProject().getProject();
@@ -142,11 +142,11 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 			}
 		} else if (iResource instanceof IFolder) {
 			try {
-				for (IResource res : ((IFolder) iResource).members()) {
+				for (final IResource res : ((IFolder) iResource).members()) {
 					return isResource(res);
 
 				}
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				return false;
 			}
 		}
@@ -154,7 +154,7 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 	}
 
 	protected static final boolean saveAll() {
-		IWorkspaceRoot workspaceRoot =
+		final IWorkspaceRoot workspaceRoot =
 			ResourcesPlugin.getWorkspace().getRoot();
 		return IDE.saveAllEditors(new IResource[] {
 			workspaceRoot }, true);

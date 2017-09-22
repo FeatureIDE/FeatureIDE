@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,11 +45,11 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * The model representation of the feature tree that notifies listeners of changes in the tree.
- * 
+ *
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
- * 
+ *
  */
 @Deprecated
 public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem, Cloneable {
@@ -66,7 +66,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
-		this.model =
+		model =
 			oldFeatureModel.model.clone();
 	}
 
@@ -77,6 +77,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	/**
 	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation on the {@link FeatureModel}.
 	 */
+	@Override
 	public FeatureModelAnalyzer getAnalyser() {
 		return model.getAnalyser();
 	}
@@ -116,7 +117,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 
 	/**
 	 * Creates a default {@link FeatureModel} with a root feature named as the project and a child feature named base.
-	 * 
+	 *
 	 * @param projectName The name of the project
 	 */
 	public void createDefaultValues(String projectName) {
@@ -132,10 +133,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void setFeatureTable(final Hashtable<String, Feature> featureTable) {
-		Hashtable<String, IFeature> iFeatureTable =
+		final Hashtable<String, IFeature> iFeatureTable =
 			new Hashtable<>();
-		for (String key : Functional.toIterator(featureTable.keys()))
+		for (final String key : Functional.toIterator(featureTable.keys())) {
 			iFeatureTable.put(key, convert(featureTable.get(key)));
+		}
 		FeatureUtils.setFeatureTable(model, iFeatureTable);
 	}
 
@@ -156,7 +158,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	/**
-	 * 
+	 *
 	 * @return A list of all concrete features. This list is in preorder of the tree.
 	 */
 	@Nonnull
@@ -165,7 +167,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	/**
-	 * 
+	 *
 	 * @return A list of all concrete feature names. This list is in preorder of the tree.
 	 */
 	@Nonnull
@@ -194,12 +196,13 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	 * @return the featureTable
 	 */
 	protected Map<String, Feature> getFeatureTable() {
-		Map<String, Feature> result =
+		final Map<String, Feature> result =
 			new HashMap<>();
 		final Map<String, IFeature> map =
 			FeatureUtils.getFeatureTable(model);
-		for (String key : map.keySet())
+		for (final String key : map.keySet()) {
 			result.put(key, convert(map.get(key)));
+		}
 		return result;
 	}
 
@@ -337,9 +340,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 
 	/**
 	 * Will return the value of clone(true).
-	 * 
+	 *
 	 * @return a deep copy from the feature model
-	 * 
+	 *
 	 * @see #clone(boolean)
 	 */
 	public FeatureModel deepClone() {
@@ -349,10 +352,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	/**
 	 * Clones the feature model. Makes a deep copy from all fields in the model.</br> Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)}
 	 * are {@code false} in every case.
-	 * 
+	 *
 	 * @param complete If {@code false} the fields annotations, comments, colorschemeTable and layout are set to {@code null} for a faster cloning process.
 	 * @return a deep copy from the feature model
-	 * 
+	 *
 	 * @see #clone()
 	 */
 	public FeatureModel deepClone(boolean complete) {
@@ -402,7 +405,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>true</code> if the feature model contains a hidden feature
 	 */
 	public boolean hasHidden() {

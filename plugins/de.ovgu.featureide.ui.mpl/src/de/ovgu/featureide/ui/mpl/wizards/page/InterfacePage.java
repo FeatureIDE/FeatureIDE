@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 
 /**
  * A dialog page to specify parameters for the build interfaces actions.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class InterfacePage extends AbstractWizardPage {
@@ -54,8 +54,9 @@ public class InterfacePage extends AbstractWizardPage {
 		setDescription(CREATES_A_MULTI_FEATUREIDE_PROJECT);
 	}
 
+	@Override
 	public void createControl(Composite parent) {
-		Composite container =
+		final Composite container =
 			new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout =
 			new GridLayout();
@@ -64,15 +65,15 @@ public class InterfacePage extends AbstractWizardPage {
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		GridLayout projGridLayout =
+		final GridLayout projGridLayout =
 			new GridLayout();
 		projGridLayout.numColumns =
 			2;
 
-		Group configGroup =
+		final Group configGroup =
 			new Group(container, SWT.NONE);
 		configGroup.setText("");
-		GridData gridData =
+		final GridData gridData =
 			new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan =
 			2;
@@ -82,14 +83,14 @@ public class InterfacePage extends AbstractWizardPage {
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
 
-		GridData gridData2 =
+		final GridData gridData2 =
 			new GridData(GridData.FILL_HORIZONTAL);
 		gridData2.horizontalSpan =
 			1;
 		gridData2.verticalSpan =
 			1;
 
-		Label confiLimitLabel =
+		final Label confiLimitLabel =
 			new Label(configGroup, 0);
 		confiLimitLabel.setText("Config Limit: ");
 		configLimitText =
@@ -98,7 +99,7 @@ public class InterfacePage extends AbstractWizardPage {
 		configLimitText.setText("1000");
 		configLimitText.setLayoutData(gridData2);
 
-		Label viewNameLabel =
+		final Label viewNameLabel =
 			new Label(configGroup, 0);
 		viewNameLabel.setText("View Name: ");
 		viewNameText =
@@ -107,7 +108,7 @@ public class InterfacePage extends AbstractWizardPage {
 		viewNameText.setText("view1");
 		viewNameText.setLayoutData(gridData2);
 
-		Label viewLevelLabel =
+		final Label viewLevelLabel =
 			new Label(configGroup, 0);
 		viewLevelLabel.setText("View Level: ");
 		viewLevelText =
@@ -133,7 +134,7 @@ public class InterfacePage extends AbstractWizardPage {
 				Integer.valueOf(viewLevelText.getText());
 			configLimit =
 				Integer.valueOf(configLimitText.getText());
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return ENTER_A_NUMBER;
 		}
 		return null;

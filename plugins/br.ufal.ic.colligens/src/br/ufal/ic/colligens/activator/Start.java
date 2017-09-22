@@ -5,7 +5,7 @@ import java.io.IOException;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class Start {
 
@@ -13,12 +13,12 @@ public class Start {
 	 * Clear the cache files
 	 */
 	public void SystemClear() {
-		File file =
+		final File file =
 			new File(Colligens.getDefault().getConfigDir()
 					.getAbsolutePath());
 		try {
 			delete(file);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 
 			e.printStackTrace();
 		}
@@ -36,12 +36,12 @@ public class Start {
 			} else {
 
 				// list all the directory contents
-				String files[] =
+				final String files[] =
 					file.list();
 
-				for (String temp : files) {
+				for (final String temp : files) {
 					// construct the file structure
-					File fileDelete =
+					final File fileDelete =
 						new File(file, temp);
 
 					// recursive delete

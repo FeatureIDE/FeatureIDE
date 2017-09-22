@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,7 +38,7 @@ import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
  * Sorts Configurations by interactions they cover.
- * 
+ *
  * @author Jens Meinicke
  */
 public class InteractionSorter extends AbstractConfigurationSorter {
@@ -65,7 +65,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 
 	/**
 	 * Sorts Configurations by interactions they cover.
-	 * 
+	 *
 	 * @return number of configurations
 	 */
 	@Override
@@ -73,7 +73,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 		for (final BuilderConfiguration c : configurations) {
 			try {
 				monitor.checkCancel();
-			} catch (MethodCancelException e) {
+			} catch (final MethodCancelException e) {
 				configurations.clear();
 				return 0;
 			}
@@ -89,7 +89,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 		while (!interactions.isEmpty()) {
 			try {
 				monitor.checkCancel();
-			} catch (MethodCancelException e) {
+			} catch (final MethodCancelException e) {
 				configurations.clear();
 				return 0;
 			}
@@ -154,7 +154,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 
 	/**
 	 * Calculate the interactions of one configuration.
-	 * 
+	 *
 	 * @param interactions The set where the interactions are stored
 	 * @param configSelectedFeatures The selected feature of the current configuration
 	 * @param selectedFeatures The selected features of the current interaction
@@ -228,14 +228,14 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 				0;
 			for (final String feature : selectedFeatures) {
 				hash =
-					hash
-						* 3
+					(hash
+						* 3)
 						+ feature.hashCode();
 			}
 			for (final String feature : unselectedFeatures) {
 				hash +=
-					hash
-						* 7
+					(hash
+						* 7)
 						+ feature.hashCode();
 			}
 			hashCode =

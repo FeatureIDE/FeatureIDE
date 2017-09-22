@@ -3,17 +3,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -272,10 +272,12 @@ public class VelvetParser extends Parser {
 		return adaptor;
 	}
 
+	@Override
 	public String[] getTokenNames() {
 		return VelvetParser.tokenNames;
 	}
 
+	@Override
 	public String getGrammarFileName() {
 		return "Velvet.g";
 	}
@@ -308,6 +310,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -316,7 +319,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "velvetModel"
 	// Velvet.g:93:1: velvetModel : ( imp )? ( concept | cinterface ) EOF ;
 	public final VelvetParser.velvetModel_return velvetModel() throws RecognitionException {
-		VelvetParser.velvetModel_return retval =
+		final VelvetParser.velvetModel_return retval =
 			new VelvetParser.velvetModel_return();
 		retval.start =
 			input.LT(1);
@@ -348,7 +351,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:94:4: ( imp )?
 				int alt1 =
 					2;
-				int LA1_0 =
+				final int LA1_0 =
 					input.LA(1);
 
 				if ((LA1_0 == IMPORT)) {
@@ -375,7 +378,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:94:9: ( concept | cinterface )
 				int alt2 =
 					2;
-				int LA2_0 =
+				final int LA2_0 =
 					input.LA(1);
 
 				if ((LA2_0 == CONCEPT)) {
@@ -385,7 +388,7 @@ public class VelvetParser extends Parser {
 					alt2 =
 						2;
 				} else {
-					NoViableAltException nvae =
+					final NoViableAltException nvae =
 						new NoViableAltException("", 2, 0, input);
 
 					throw nvae;
@@ -436,7 +439,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -455,6 +458,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -463,7 +467,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "imp"
 	// Velvet.g:97:1: imp : ( IMPORT name SEMI )+ -> ^( IMPORT ( name )+ ) ;
 	public final VelvetParser.imp_return imp() throws RecognitionException {
-		VelvetParser.imp_return retval =
+		final VelvetParser.imp_return retval =
 			new VelvetParser.imp_return();
 		retval.start =
 			input.LT(1);
@@ -478,15 +482,15 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name6 =
 			null;
 
-		Tree IMPORT5_tree =
+		final Tree IMPORT5_tree =
 			null;
-		Tree SEMI7_tree =
+		final Tree SEMI7_tree =
 			null;
-		RewriteRuleTokenStream stream_IMPORT =
+		final RewriteRuleTokenStream stream_IMPORT =
 			new RewriteRuleTokenStream(adaptor, "token IMPORT");
-		RewriteRuleTokenStream stream_SEMI =
+		final RewriteRuleTokenStream stream_SEMI =
 			new RewriteRuleTokenStream(adaptor, "token SEMI");
-		RewriteRuleSubtreeStream stream_name =
+		final RewriteRuleSubtreeStream stream_name =
 			new RewriteRuleSubtreeStream(adaptor, "rule name");
 		try {
 			// Velvet.g:98:2: ( ( IMPORT name SEMI )+ -> ^( IMPORT ( name )+ ) )
@@ -498,7 +502,7 @@ public class VelvetParser extends Parser {
 				loop3: do {
 					int alt3 =
 						2;
-					int LA3_0 =
+					final int LA3_0 =
 						input.LA(1);
 
 					if ((LA3_0 == IMPORT)) {
@@ -530,8 +534,10 @@ public class VelvetParser extends Parser {
 						break;
 
 					default:
-						if (cnt3 >= 1) break loop3;
-						EarlyExitException eee =
+						if (cnt3 >= 1) {
+							break loop3;
+						}
+						final EarlyExitException eee =
 							new EarlyExitException(3, input);
 						throw eee;
 					}
@@ -547,7 +553,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -590,7 +596,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -609,6 +615,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -618,7 +625,7 @@ public class VelvetParser extends Parser {
 	// Velvet.g:102:1: concept : CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports |
 	// instanceImports )? ( definitions )? -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? ) ;
 	public final VelvetParser.concept_return concept() throws RecognitionException {
-		VelvetParser.concept_return retval =
+		final VelvetParser.concept_return retval =
 			new VelvetParser.concept_return();
 		retval.start =
 			input.LT(1);
@@ -656,25 +663,25 @@ public class VelvetParser extends Parser {
 		VelvetParser.definitions_return definitions18 =
 			null;
 
-		Tree CONCEPT8_tree =
+		final Tree CONCEPT8_tree =
 			null;
-		Tree ID9_tree =
+		final Tree ID9_tree =
 			null;
-		Tree COLON10_tree =
+		final Tree COLON10_tree =
 			null;
-		RewriteRuleTokenStream stream_COLON =
+		final RewriteRuleTokenStream stream_COLON =
 			new RewriteRuleTokenStream(adaptor, "token COLON");
-		RewriteRuleTokenStream stream_ID =
+		final RewriteRuleTokenStream stream_ID =
 			new RewriteRuleTokenStream(adaptor, "token ID");
-		RewriteRuleTokenStream stream_CONCEPT =
+		final RewriteRuleTokenStream stream_CONCEPT =
 			new RewriteRuleTokenStream(adaptor, "token CONCEPT");
-		RewriteRuleSubtreeStream stream_conceptBaseExt =
+		final RewriteRuleSubtreeStream stream_conceptBaseExt =
 			new RewriteRuleSubtreeStream(adaptor, "rule conceptBaseExt");
-		RewriteRuleSubtreeStream stream_instanceImports =
+		final RewriteRuleSubtreeStream stream_instanceImports =
 			new RewriteRuleSubtreeStream(adaptor, "rule instanceImports");
-		RewriteRuleSubtreeStream stream_interfaceImports =
+		final RewriteRuleSubtreeStream stream_interfaceImports =
 			new RewriteRuleSubtreeStream(adaptor, "rule interfaceImports");
-		RewriteRuleSubtreeStream stream_definitions =
+		final RewriteRuleSubtreeStream stream_definitions =
 			new RewriteRuleSubtreeStream(adaptor, "rule definitions");
 		try {
 			// Velvet.g:103:2: ( CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports |
@@ -693,7 +700,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:104:3: ( COLON conceptBaseExt )?
 				int alt4 =
 					2;
-				int LA4_0 =
+				final int LA4_0 =
 					input.LA(1);
 
 				if ((LA4_0 == COLON)) {
@@ -801,7 +808,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:105:3: ( definitions )?
 				int alt6 =
 					2;
-				int LA6_0 =
+				final int LA6_0 =
 					input.LA(1);
 
 				if ((LA6_0 == START_C)) {
@@ -834,7 +841,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -899,7 +906,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -918,6 +925,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -926,7 +934,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "cinterface"
 	// Velvet.g:109:1: cinterface : CINTERFACE ID ( COLON conceptBaseExt )? definitions -> ^( CINTERFACE ID ( conceptBaseExt )? definitions ) ;
 	public final VelvetParser.cinterface_return cinterface() throws RecognitionException {
-		VelvetParser.cinterface_return retval =
+		final VelvetParser.cinterface_return retval =
 			new VelvetParser.cinterface_return();
 		retval.start =
 			input.LT(1);
@@ -946,21 +954,21 @@ public class VelvetParser extends Parser {
 		VelvetParser.definitions_return definitions23 =
 			null;
 
-		Tree CINTERFACE19_tree =
+		final Tree CINTERFACE19_tree =
 			null;
-		Tree ID20_tree =
+		final Tree ID20_tree =
 			null;
-		Tree COLON21_tree =
+		final Tree COLON21_tree =
 			null;
-		RewriteRuleTokenStream stream_COLON =
+		final RewriteRuleTokenStream stream_COLON =
 			new RewriteRuleTokenStream(adaptor, "token COLON");
-		RewriteRuleTokenStream stream_ID =
+		final RewriteRuleTokenStream stream_ID =
 			new RewriteRuleTokenStream(adaptor, "token ID");
-		RewriteRuleTokenStream stream_CINTERFACE =
+		final RewriteRuleTokenStream stream_CINTERFACE =
 			new RewriteRuleTokenStream(adaptor, "token CINTERFACE");
-		RewriteRuleSubtreeStream stream_conceptBaseExt =
+		final RewriteRuleSubtreeStream stream_conceptBaseExt =
 			new RewriteRuleSubtreeStream(adaptor, "rule conceptBaseExt");
-		RewriteRuleSubtreeStream stream_definitions =
+		final RewriteRuleSubtreeStream stream_definitions =
 			new RewriteRuleSubtreeStream(adaptor, "rule definitions");
 		try {
 			// Velvet.g:109:12: ( CINTERFACE ID ( COLON conceptBaseExt )? definitions -> ^( CINTERFACE ID ( conceptBaseExt )? definitions ) )
@@ -977,7 +985,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:109:29: ( COLON conceptBaseExt )?
 				int alt7 =
 					2;
-				int LA7_0 =
+				final int LA7_0 =
 					input.LA(1);
 
 				if ((LA7_0 == COLON)) {
@@ -1022,7 +1030,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -1068,7 +1076,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -1087,6 +1095,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -1095,7 +1104,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "conceptBaseExt"
 	// Velvet.g:113:1: conceptBaseExt : ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) ;
 	public final VelvetParser.conceptBaseExt_return conceptBaseExt() throws RecognitionException {
-		VelvetParser.conceptBaseExt_return retval =
+		final VelvetParser.conceptBaseExt_return retval =
 			new VelvetParser.conceptBaseExt_return();
 		retval.start =
 			input.LT(1);
@@ -1110,15 +1119,15 @@ public class VelvetParser extends Parser {
 		Token ID26 =
 			null;
 
-		Tree ID24_tree =
+		final Tree ID24_tree =
 			null;
-		Tree COMMA25_tree =
+		final Tree COMMA25_tree =
 			null;
-		Tree ID26_tree =
+		final Tree ID26_tree =
 			null;
-		RewriteRuleTokenStream stream_ID =
+		final RewriteRuleTokenStream stream_ID =
 			new RewriteRuleTokenStream(adaptor, "token ID");
-		RewriteRuleTokenStream stream_COMMA =
+		final RewriteRuleTokenStream stream_COMMA =
 			new RewriteRuleTokenStream(adaptor, "token COMMA");
 
 		try {
@@ -1133,7 +1142,7 @@ public class VelvetParser extends Parser {
 				loop8: do {
 					int alt8 =
 						2;
-					int LA8_0 =
+					final int LA8_0 =
 						input.LA(1);
 
 					if ((LA8_0 == COMMA)) {
@@ -1170,7 +1179,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -1185,7 +1194,7 @@ public class VelvetParser extends Parser {
 							(Tree) adaptor.nil();
 						root_1 =
 							(Tree) adaptor.becomeRoot(
-									(Tree) adaptor.create(BASEEXT, "BASEEXT"), root_1);
+									adaptor.create(BASEEXT, "BASEEXT"), root_1);
 
 						if (!(stream_ID.hasNext())) {
 							throw new RewriteEarlyExitException();
@@ -1214,7 +1223,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -1233,6 +1242,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -1241,7 +1251,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "instanceImports"
 	// Velvet.g:118:1: instanceImports : IMPORTINSTANCE ID name ( COMMA ID name )* -> ^( IMPORTINSTANCE ( ID name )+ ) ;
 	public final VelvetParser.instanceImports_return instanceImports() throws RecognitionException {
-		VelvetParser.instanceImports_return retval =
+		final VelvetParser.instanceImports_return retval =
 			new VelvetParser.instanceImports_return();
 		retval.start =
 			input.LT(1);
@@ -1263,21 +1273,21 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name32 =
 			null;
 
-		Tree IMPORTINSTANCE27_tree =
+		final Tree IMPORTINSTANCE27_tree =
 			null;
-		Tree ID28_tree =
+		final Tree ID28_tree =
 			null;
-		Tree COMMA30_tree =
+		final Tree COMMA30_tree =
 			null;
-		Tree ID31_tree =
+		final Tree ID31_tree =
 			null;
-		RewriteRuleTokenStream stream_ID =
+		final RewriteRuleTokenStream stream_ID =
 			new RewriteRuleTokenStream(adaptor, "token ID");
-		RewriteRuleTokenStream stream_COMMA =
+		final RewriteRuleTokenStream stream_COMMA =
 			new RewriteRuleTokenStream(adaptor, "token COMMA");
-		RewriteRuleTokenStream stream_IMPORTINSTANCE =
+		final RewriteRuleTokenStream stream_IMPORTINSTANCE =
 			new RewriteRuleTokenStream(adaptor, "token IMPORTINSTANCE");
-		RewriteRuleSubtreeStream stream_name =
+		final RewriteRuleSubtreeStream stream_name =
 			new RewriteRuleSubtreeStream(adaptor, "rule name");
 		try {
 			// Velvet.g:119:2: ( IMPORTINSTANCE ID name ( COMMA ID name )* -> ^( IMPORTINSTANCE ( ID name )+ ) )
@@ -1303,7 +1313,7 @@ public class VelvetParser extends Parser {
 				loop9: do {
 					int alt9 =
 						2;
-					int LA9_0 =
+					final int LA9_0 =
 						input.LA(1);
 
 					if ((LA9_0 == COMMA)) {
@@ -1348,7 +1358,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -1397,7 +1407,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -1416,6 +1426,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -1424,7 +1435,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "interfaceImports"
 	// Velvet.g:123:1: interfaceImports : IMPORTINTERFACE ID name ( COMMA ID name )* -> ^( IMPORTINTERFACE ( ID name )+ ) ;
 	public final VelvetParser.interfaceImports_return interfaceImports() throws RecognitionException {
-		VelvetParser.interfaceImports_return retval =
+		final VelvetParser.interfaceImports_return retval =
 			new VelvetParser.interfaceImports_return();
 		retval.start =
 			input.LT(1);
@@ -1446,21 +1457,21 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name38 =
 			null;
 
-		Tree IMPORTINTERFACE33_tree =
+		final Tree IMPORTINTERFACE33_tree =
 			null;
-		Tree ID34_tree =
+		final Tree ID34_tree =
 			null;
-		Tree COMMA36_tree =
+		final Tree COMMA36_tree =
 			null;
-		Tree ID37_tree =
+		final Tree ID37_tree =
 			null;
-		RewriteRuleTokenStream stream_ID =
+		final RewriteRuleTokenStream stream_ID =
 			new RewriteRuleTokenStream(adaptor, "token ID");
-		RewriteRuleTokenStream stream_COMMA =
+		final RewriteRuleTokenStream stream_COMMA =
 			new RewriteRuleTokenStream(adaptor, "token COMMA");
-		RewriteRuleTokenStream stream_IMPORTINTERFACE =
+		final RewriteRuleTokenStream stream_IMPORTINTERFACE =
 			new RewriteRuleTokenStream(adaptor, "token IMPORTINTERFACE");
-		RewriteRuleSubtreeStream stream_name =
+		final RewriteRuleSubtreeStream stream_name =
 			new RewriteRuleSubtreeStream(adaptor, "rule name");
 		try {
 			// Velvet.g:124:2: ( IMPORTINTERFACE ID name ( COMMA ID name )* -> ^( IMPORTINTERFACE ( ID name )+ ) )
@@ -1486,7 +1497,7 @@ public class VelvetParser extends Parser {
 				loop10: do {
 					int alt10 =
 						2;
-					int LA10_0 =
+					final int LA10_0 =
 						input.LA(1);
 
 					if ((LA10_0 == COMMA)) {
@@ -1531,7 +1542,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -1580,7 +1591,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -1599,6 +1610,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -1607,7 +1619,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "name"
 	// Velvet.g:128:1: name : ( ID | IDPath );
 	public final VelvetParser.name_return name() throws RecognitionException {
-		VelvetParser.name_return retval =
+		final VelvetParser.name_return retval =
 			new VelvetParser.name_return();
 		retval.start =
 			input.LT(1);
@@ -1618,7 +1630,7 @@ public class VelvetParser extends Parser {
 		Token set39 =
 			null;
 
-		Tree set39_tree =
+		final Tree set39_tree =
 			null;
 
 		try {
@@ -1629,17 +1641,17 @@ public class VelvetParser extends Parser {
 					(Tree) adaptor.nil();
 
 				set39 =
-					(Token) input.LT(1);
+					input.LT(1);
 
-				if ((input.LA(1) >= ID
-					&& input.LA(1) <= IDPath)) {
+				if (((input.LA(1) >= ID)
+					&& (input.LA(1) <= IDPath))) {
 					input.consume();
 					adaptor.addChild(root_0,
-							(Tree) adaptor.create(set39));
+							adaptor.create(set39));
 					state.errorRecovery =
 						false;
 				} else {
-					MismatchedSetException mse =
+					final MismatchedSetException mse =
 						new MismatchedSetException(null, input);
 					throw mse;
 				}
@@ -1653,7 +1665,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -1672,6 +1684,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -1680,7 +1693,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "definitions"
 	// Velvet.g:132:1: definitions : START_C definition END_C -> ^( DEF ( definition )? EMPTY ) ;
 	public final VelvetParser.definitions_return definitions() throws RecognitionException {
-		VelvetParser.definitions_return retval =
+		final VelvetParser.definitions_return retval =
 			new VelvetParser.definitions_return();
 		retval.start =
 			input.LT(1);
@@ -1695,15 +1708,15 @@ public class VelvetParser extends Parser {
 		VelvetParser.definition_return definition41 =
 			null;
 
-		Tree START_C40_tree =
+		final Tree START_C40_tree =
 			null;
-		Tree END_C42_tree =
+		final Tree END_C42_tree =
 			null;
-		RewriteRuleTokenStream stream_END_C =
+		final RewriteRuleTokenStream stream_END_C =
 			new RewriteRuleTokenStream(adaptor, "token END_C");
-		RewriteRuleTokenStream stream_START_C =
+		final RewriteRuleTokenStream stream_START_C =
 			new RewriteRuleTokenStream(adaptor, "token START_C");
-		RewriteRuleSubtreeStream stream_definition =
+		final RewriteRuleSubtreeStream stream_definition =
 			new RewriteRuleSubtreeStream(adaptor, "rule definition");
 		try {
 			// Velvet.g:133:2: ( START_C definition END_C -> ^( DEF ( definition )? EMPTY ) )
@@ -1734,7 +1747,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -1749,7 +1762,7 @@ public class VelvetParser extends Parser {
 							(Tree) adaptor.nil();
 						root_1 =
 							(Tree) adaptor.becomeRoot(
-									(Tree) adaptor.create(DEF, "DEF"), root_1);
+									adaptor.create(DEF, "DEF"), root_1);
 
 						// Velvet.g:134:11: ( definition )?
 						if (stream_definition.hasNext()) {
@@ -1759,7 +1772,7 @@ public class VelvetParser extends Parser {
 						stream_definition.reset();
 
 						adaptor.addChild(root_1,
-								(Tree) adaptor.create(EMPTY, "EMPTY"));
+								adaptor.create(EMPTY, "EMPTY"));
 
 						adaptor.addChild(root_0, root_1);
 					}
@@ -1778,7 +1791,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -1797,6 +1810,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -1806,7 +1820,7 @@ public class VelvetParser extends Parser {
 	// Velvet.g:137:1: definition : ( nonFeatureDefinition )* ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )?
 	// ;
 	public final VelvetParser.definition_return definition() throws RecognitionException {
-		VelvetParser.definition_return retval =
+		final VelvetParser.definition_return retval =
 			new VelvetParser.definition_return();
 		retval.start =
 			input.LT(1);
@@ -1843,13 +1857,13 @@ public class VelvetParser extends Parser {
 				loop11: do {
 					int alt11 =
 						2;
-					int LA11_0 =
+					final int LA11_0 =
 						input.LA(1);
 
-					if ((LA11_0 == CONSTRAINT
-						|| LA11_0 == DESCRIPTION
-						|| (LA11_0 >= USE
-							&& LA11_0 <= VAR_STRING))) {
+					if (((LA11_0 == CONSTRAINT)
+						|| (LA11_0 == DESCRIPTION)
+						|| ((LA11_0 >= USE)
+							&& (LA11_0 <= VAR_STRING)))) {
 						alt11 =
 							1;
 					}
@@ -1877,16 +1891,16 @@ public class VelvetParser extends Parser {
 				// Velvet.g:138:26: ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )?
 				int alt14 =
 					3;
-				int LA14_0 =
+				final int LA14_0 =
 					input.LA(1);
 
-				if ((LA14_0 == ONEOF
-					|| LA14_0 == SOMEOF)) {
+				if (((LA14_0 == ONEOF)
+					|| (LA14_0 == SOMEOF))) {
 					alt14 =
 						1;
-				} else if ((LA14_0 == ABSTRACT
-					|| LA14_0 == FEATURE
-					|| LA14_0 == MANDATORY)) {
+				} else if (((LA14_0 == ABSTRACT)
+					|| (LA14_0 == FEATURE)
+					|| (LA14_0 == MANDATORY))) {
 					alt14 =
 						2;
 				}
@@ -1909,13 +1923,13 @@ public class VelvetParser extends Parser {
 						loop12: do {
 							int alt12 =
 								2;
-							int LA12_0 =
+							final int LA12_0 =
 								input.LA(1);
 
-							if ((LA12_0 == CONSTRAINT
-								|| LA12_0 == DESCRIPTION
-								|| (LA12_0 >= USE
-									&& LA12_0 <= VAR_STRING))) {
+							if (((LA12_0 == CONSTRAINT)
+								|| (LA12_0 == DESCRIPTION)
+								|| ((LA12_0 >= USE)
+									&& (LA12_0 <= VAR_STRING)))) {
 								alt12 =
 									1;
 							}
@@ -1962,18 +1976,18 @@ public class VelvetParser extends Parser {
 						loop13: do {
 							int alt13 =
 								3;
-							int LA13_0 =
+							final int LA13_0 =
 								input.LA(1);
 
-							if ((LA13_0 == ABSTRACT
-								|| LA13_0 == FEATURE
-								|| LA13_0 == MANDATORY)) {
+							if (((LA13_0 == ABSTRACT)
+								|| (LA13_0 == FEATURE)
+								|| (LA13_0 == MANDATORY))) {
 								alt13 =
 									1;
-							} else if ((LA13_0 == CONSTRAINT
-								|| LA13_0 == DESCRIPTION
-								|| (LA13_0 >= USE
-									&& LA13_0 <= VAR_STRING))) {
+							} else if (((LA13_0 == CONSTRAINT)
+								|| (LA13_0 == DESCRIPTION)
+								|| ((LA13_0 >= USE)
+									&& (LA13_0 <= VAR_STRING)))) {
 								alt13 =
 									2;
 							}
@@ -2027,7 +2041,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -2046,6 +2060,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -2054,7 +2069,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "nonFeatureDefinition"
 	// Velvet.g:143:1: nonFeatureDefinition : ( constraint | use | attribute | description );
 	public final VelvetParser.nonFeatureDefinition_return nonFeatureDefinition() throws RecognitionException {
-		VelvetParser.nonFeatureDefinition_return retval =
+		final VelvetParser.nonFeatureDefinition_return retval =
 			new VelvetParser.nonFeatureDefinition_return();
 		retval.start =
 			input.LT(1);
@@ -2103,7 +2118,7 @@ public class VelvetParser extends Parser {
 			}
 				break;
 			default:
-				NoViableAltException nvae =
+				final NoViableAltException nvae =
 					new NoViableAltException("", 15, 0, input);
 
 				throw nvae;
@@ -2184,7 +2199,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -2203,6 +2218,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -2211,7 +2227,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "use"
 	// Velvet.g:150:1: use : USE name SEMI -> ^( USE name ) ;
 	public final VelvetParser.use_return use() throws RecognitionException {
-		VelvetParser.use_return retval =
+		final VelvetParser.use_return retval =
 			new VelvetParser.use_return();
 		retval.start =
 			input.LT(1);
@@ -2226,15 +2242,15 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name54 =
 			null;
 
-		Tree USE53_tree =
+		final Tree USE53_tree =
 			null;
-		Tree SEMI55_tree =
+		final Tree SEMI55_tree =
 			null;
-		RewriteRuleTokenStream stream_USE =
+		final RewriteRuleTokenStream stream_USE =
 			new RewriteRuleTokenStream(adaptor, "token USE");
-		RewriteRuleTokenStream stream_SEMI =
+		final RewriteRuleTokenStream stream_SEMI =
 			new RewriteRuleTokenStream(adaptor, "token SEMI");
-		RewriteRuleSubtreeStream stream_name =
+		final RewriteRuleSubtreeStream stream_name =
 			new RewriteRuleSubtreeStream(adaptor, "rule name");
 		try {
 			// Velvet.g:150:5: ( USE name SEMI -> ^( USE name ) )
@@ -2265,7 +2281,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -2301,7 +2317,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -2320,6 +2336,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -2329,7 +2346,7 @@ public class VelvetParser extends Parser {
 	// Velvet.g:154:1: feature : ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI ) -> ^( FEATURE name (
 	// MANDATORY )? ( ABSTRACT )? ( definitions )? ) ;
 	public final VelvetParser.feature_return feature() throws RecognitionException {
-		VelvetParser.feature_return retval =
+		final VelvetParser.feature_return retval =
 			new VelvetParser.feature_return();
 		retval.start =
 			input.LT(1);
@@ -2359,33 +2376,33 @@ public class VelvetParser extends Parser {
 		VelvetParser.definitions_return definitions64 =
 			null;
 
-		Tree MANDATORY56_tree =
+		final Tree MANDATORY56_tree =
 			null;
-		Tree ABSTRACT57_tree =
+		final Tree ABSTRACT57_tree =
 			null;
-		Tree ABSTRACT58_tree =
+		final Tree ABSTRACT58_tree =
 			null;
-		Tree MANDATORY59_tree =
+		final Tree MANDATORY59_tree =
 			null;
-		Tree MANDATORY60_tree =
+		final Tree MANDATORY60_tree =
 			null;
-		Tree ABSTRACT61_tree =
+		final Tree ABSTRACT61_tree =
 			null;
-		Tree FEATURE62_tree =
+		final Tree FEATURE62_tree =
 			null;
-		Tree SEMI65_tree =
+		final Tree SEMI65_tree =
 			null;
-		RewriteRuleTokenStream stream_ABSTRACT =
+		final RewriteRuleTokenStream stream_ABSTRACT =
 			new RewriteRuleTokenStream(adaptor, "token ABSTRACT");
-		RewriteRuleTokenStream stream_MANDATORY =
+		final RewriteRuleTokenStream stream_MANDATORY =
 			new RewriteRuleTokenStream(adaptor, "token MANDATORY");
-		RewriteRuleTokenStream stream_SEMI =
+		final RewriteRuleTokenStream stream_SEMI =
 			new RewriteRuleTokenStream(adaptor, "token SEMI");
-		RewriteRuleTokenStream stream_FEATURE =
+		final RewriteRuleTokenStream stream_FEATURE =
 			new RewriteRuleTokenStream(adaptor, "token FEATURE");
-		RewriteRuleSubtreeStream stream_name =
+		final RewriteRuleSubtreeStream stream_name =
 			new RewriteRuleSubtreeStream(adaptor, "rule name");
-		RewriteRuleSubtreeStream stream_definitions =
+		final RewriteRuleSubtreeStream stream_definitions =
 			new RewriteRuleSubtreeStream(adaptor, "rule definitions");
 		try {
 			// Velvet.g:155:2: ( ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI ) -> ^( FEATURE name (
@@ -2395,11 +2412,11 @@ public class VelvetParser extends Parser {
 				// Velvet.g:155:4: ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )?
 				int alt16 =
 					5;
-				int LA16_0 =
+				final int LA16_0 =
 					input.LA(1);
 
 				if ((LA16_0 == MANDATORY)) {
-					int LA16_1 =
+					final int LA16_1 =
 						input.LA(2);
 
 					if ((LA16_1 == ABSTRACT)) {
@@ -2410,7 +2427,7 @@ public class VelvetParser extends Parser {
 							3;
 					}
 				} else if ((LA16_0 == ABSTRACT)) {
-					int LA16_2 =
+					final int LA16_2 =
 						input.LA(2);
 
 					if ((LA16_2 == MANDATORY)) {
@@ -2484,7 +2501,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:156:17: ( definitions | SEMI )
 				int alt17 =
 					2;
-				int LA17_0 =
+				final int LA17_0 =
 					input.LA(1);
 
 				if ((LA17_0 == START_C)) {
@@ -2494,7 +2511,7 @@ public class VelvetParser extends Parser {
 					alt17 =
 						2;
 				} else {
-					NoViableAltException nvae =
+					final NoViableAltException nvae =
 						new NoViableAltException("", 17, 0, input);
 
 					throw nvae;
@@ -2535,7 +2552,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -2594,7 +2611,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -2613,6 +2630,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -2621,7 +2639,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "featureGroup"
 	// Velvet.g:160:1: featureGroup : groupType START_C ( feature )+ END_C -> ^( GROUP groupType ( feature )+ ) ;
 	public final VelvetParser.featureGroup_return featureGroup() throws RecognitionException {
-		VelvetParser.featureGroup_return retval =
+		final VelvetParser.featureGroup_return retval =
 			new VelvetParser.featureGroup_return();
 		retval.start =
 			input.LT(1);
@@ -2639,17 +2657,17 @@ public class VelvetParser extends Parser {
 		VelvetParser.feature_return feature68 =
 			null;
 
-		Tree START_C67_tree =
+		final Tree START_C67_tree =
 			null;
-		Tree END_C69_tree =
+		final Tree END_C69_tree =
 			null;
-		RewriteRuleTokenStream stream_END_C =
+		final RewriteRuleTokenStream stream_END_C =
 			new RewriteRuleTokenStream(adaptor, "token END_C");
-		RewriteRuleTokenStream stream_START_C =
+		final RewriteRuleTokenStream stream_START_C =
 			new RewriteRuleTokenStream(adaptor, "token START_C");
-		RewriteRuleSubtreeStream stream_groupType =
+		final RewriteRuleSubtreeStream stream_groupType =
 			new RewriteRuleSubtreeStream(adaptor, "rule groupType");
-		RewriteRuleSubtreeStream stream_feature =
+		final RewriteRuleSubtreeStream stream_feature =
 			new RewriteRuleSubtreeStream(adaptor, "rule feature");
 		try {
 			// Velvet.g:161:2: ( groupType START_C ( feature )+ END_C -> ^( GROUP groupType ( feature )+ ) )
@@ -2673,12 +2691,12 @@ public class VelvetParser extends Parser {
 				loop18: do {
 					int alt18 =
 						2;
-					int LA18_0 =
+					final int LA18_0 =
 						input.LA(1);
 
-					if ((LA18_0 == ABSTRACT
-						|| LA18_0 == FEATURE
-						|| LA18_0 == MANDATORY)) {
+					if (((LA18_0 == ABSTRACT)
+						|| (LA18_0 == FEATURE)
+						|| (LA18_0 == MANDATORY))) {
 						alt18 =
 							1;
 					}
@@ -2699,8 +2717,10 @@ public class VelvetParser extends Parser {
 						break;
 
 					default:
-						if (cnt18 >= 1) break loop18;
-						EarlyExitException eee =
+						if (cnt18 >= 1) {
+							break loop18;
+						}
+						final EarlyExitException eee =
 							new EarlyExitException(18, input);
 						throw eee;
 					}
@@ -2720,7 +2740,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -2735,7 +2755,7 @@ public class VelvetParser extends Parser {
 							(Tree) adaptor.nil();
 						root_1 =
 							(Tree) adaptor.becomeRoot(
-									(Tree) adaptor.create(GROUP, "GROUP"), root_1);
+									adaptor.create(GROUP, "GROUP"), root_1);
 
 						adaptor.addChild(root_1, stream_groupType.nextTree());
 
@@ -2765,7 +2785,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -2784,6 +2804,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -2792,7 +2813,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "groupType"
 	// Velvet.g:165:1: groupType : ( SOMEOF | ONEOF );
 	public final VelvetParser.groupType_return groupType() throws RecognitionException {
-		VelvetParser.groupType_return retval =
+		final VelvetParser.groupType_return retval =
 			new VelvetParser.groupType_return();
 		retval.start =
 			input.LT(1);
@@ -2803,7 +2824,7 @@ public class VelvetParser extends Parser {
 		Token set70 =
 			null;
 
-		Tree set70_tree =
+		final Tree set70_tree =
 			null;
 
 		try {
@@ -2814,17 +2835,17 @@ public class VelvetParser extends Parser {
 					(Tree) adaptor.nil();
 
 				set70 =
-					(Token) input.LT(1);
+					input.LT(1);
 
-				if (input.LA(1) == ONEOF
-					|| input.LA(1) == SOMEOF) {
+				if ((input.LA(1) == ONEOF)
+					|| (input.LA(1) == SOMEOF)) {
 					input.consume();
 					adaptor.addChild(root_0,
-							(Tree) adaptor.create(set70));
+							adaptor.create(set70));
 					state.errorRecovery =
 						false;
 				} else {
-					MismatchedSetException mse =
+					final MismatchedSetException mse =
 						new MismatchedSetException(null, input);
 					throw mse;
 				}
@@ -2838,7 +2859,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -2857,6 +2878,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -2865,7 +2887,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "description"
 	// Velvet.g:170:1: description : DESCRIPTION STRING SEMI -> ^( DESCRIPTION STRING ) ;
 	public final VelvetParser.description_return description() throws RecognitionException {
-		VelvetParser.description_return retval =
+		final VelvetParser.description_return retval =
 			new VelvetParser.description_return();
 		retval.start =
 			input.LT(1);
@@ -2880,17 +2902,17 @@ public class VelvetParser extends Parser {
 		Token SEMI73 =
 			null;
 
-		Tree DESCRIPTION71_tree =
+		final Tree DESCRIPTION71_tree =
 			null;
-		Tree STRING72_tree =
+		final Tree STRING72_tree =
 			null;
-		Tree SEMI73_tree =
+		final Tree SEMI73_tree =
 			null;
-		RewriteRuleTokenStream stream_DESCRIPTION =
+		final RewriteRuleTokenStream stream_DESCRIPTION =
 			new RewriteRuleTokenStream(adaptor, "token DESCRIPTION");
-		RewriteRuleTokenStream stream_SEMI =
+		final RewriteRuleTokenStream stream_SEMI =
 			new RewriteRuleTokenStream(adaptor, "token SEMI");
-		RewriteRuleTokenStream stream_STRING =
+		final RewriteRuleTokenStream stream_STRING =
 			new RewriteRuleTokenStream(adaptor, "token STRING");
 
 		try {
@@ -2918,7 +2940,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -2955,7 +2977,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -2974,6 +2996,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -2982,7 +3005,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "constraint"
 	// Velvet.g:175:1: constraint : CONSTRAINT ^ ( ID EQ !)? ( constraintDefinition | attributeConstraint ) SEMI !;
 	public final VelvetParser.constraint_return constraint() throws RecognitionException {
-		VelvetParser.constraint_return retval =
+		final VelvetParser.constraint_return retval =
 			new VelvetParser.constraint_return();
 		retval.start =
 			input.LT(1);
@@ -3008,9 +3031,9 @@ public class VelvetParser extends Parser {
 			null;
 		Tree ID75_tree =
 			null;
-		Tree EQ76_tree =
+		final Tree EQ76_tree =
 			null;
-		Tree SEMI79_tree =
+		final Tree SEMI79_tree =
 			null;
 
 		try {
@@ -3030,11 +3053,11 @@ public class VelvetParser extends Parser {
 				// Velvet.g:176:16: ( ID EQ !)?
 				int alt19 =
 					2;
-				int LA19_0 =
+				final int LA19_0 =
 					input.LA(1);
 
 				if ((LA19_0 == ID)) {
-					int LA19_1 =
+					final int LA19_1 =
 						input.LA(2);
 
 					if ((LA19_1 == EQ)) {
@@ -3072,25 +3095,25 @@ public class VelvetParser extends Parser {
 					break;
 				case ID:
 				case IDPath: {
-					int LA20_2 =
+					final int LA20_2 =
 						input.LA(2);
 
-					if (((LA20_2 >= OP_AND
-						&& LA20_2 <= OP_IMPLIES)
-						|| (LA20_2 >= OP_OR
-							&& LA20_2 <= OP_XOR)
-						|| LA20_2 == SEMI)) {
+					if ((((LA20_2 >= OP_AND)
+						&& (LA20_2 <= OP_IMPLIES))
+						|| ((LA20_2 >= OP_OR)
+							&& (LA20_2 <= OP_XOR))
+						|| (LA20_2 == SEMI))) {
 						alt20 =
 							1;
-					} else if ((LA20_2 == ATTR_OP_EQUALS
-						|| LA20_2 == ATTR_OP_GREATER_EQ
-						|| LA20_2 == ATTR_OP_LESS_EQ
-						|| LA20_2 == MINUS
-						|| LA20_2 == PLUS)) {
+					} else if (((LA20_2 == ATTR_OP_EQUALS)
+						|| (LA20_2 == ATTR_OP_GREATER_EQ)
+						|| (LA20_2 == ATTR_OP_LESS_EQ)
+						|| (LA20_2 == MINUS)
+						|| (LA20_2 == PLUS))) {
 						alt20 =
 							2;
 					} else {
-						NoViableAltException nvae =
+						final NoViableAltException nvae =
 							new NoViableAltException("", 20, 2, input);
 
 						throw nvae;
@@ -3104,7 +3127,7 @@ public class VelvetParser extends Parser {
 				}
 					break;
 				default:
-					NoViableAltException nvae =
+					final NoViableAltException nvae =
 						new NoViableAltException("", 20, 0, input);
 
 					throw nvae;
@@ -3153,7 +3176,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -3172,6 +3195,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -3180,7 +3204,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "constraintDefinition"
 	// Velvet.g:179:1: constraintDefinition : constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) ;
 	public final VelvetParser.constraintDefinition_return constraintDefinition() throws RecognitionException {
-		VelvetParser.constraintDefinition_return retval =
+		final VelvetParser.constraintDefinition_return retval =
 			new VelvetParser.constraintDefinition_return();
 		retval.start =
 			input.LT(1);
@@ -3197,9 +3221,9 @@ public class VelvetParser extends Parser {
 		VelvetParser.constraintOperand_return constraintOperand82 =
 			null;
 
-		RewriteRuleSubtreeStream stream_constraintOperand =
+		final RewriteRuleSubtreeStream stream_constraintOperand =
 			new RewriteRuleSubtreeStream(adaptor, "rule constraintOperand");
-		RewriteRuleSubtreeStream stream_binaryOp =
+		final RewriteRuleSubtreeStream stream_binaryOp =
 			new RewriteRuleSubtreeStream(adaptor, "rule binaryOp");
 		try {
 			// Velvet.g:180:2: ( constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) )
@@ -3217,13 +3241,13 @@ public class VelvetParser extends Parser {
 				loop21: do {
 					int alt21 =
 						2;
-					int LA21_0 =
+					final int LA21_0 =
 						input.LA(1);
 
-					if (((LA21_0 >= OP_AND
-						&& LA21_0 <= OP_IMPLIES)
-						|| (LA21_0 >= OP_OR
-							&& LA21_0 <= OP_XOR))) {
+					if ((((LA21_0 >= OP_AND)
+						&& (LA21_0 <= OP_IMPLIES))
+						|| ((LA21_0 >= OP_OR)
+							&& (LA21_0 <= OP_XOR)))) {
 						alt21 =
 							1;
 					}
@@ -3265,7 +3289,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -3280,7 +3304,7 @@ public class VelvetParser extends Parser {
 							(Tree) adaptor.nil();
 						root_1 =
 							(Tree) adaptor.becomeRoot(
-									(Tree) adaptor.create(CONSTR, "CONSTR"), root_1);
+									adaptor.create(CONSTR, "CONSTR"), root_1);
 
 						if (!(stream_constraintOperand.hasNext())) {
 							throw new RewriteEarlyExitException();
@@ -3315,7 +3339,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -3334,6 +3358,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -3343,7 +3368,7 @@ public class VelvetParser extends Parser {
 	// Velvet.g:184:1: constraintOperand : ( unaryOp )* ( START_R constraintDefinition END_R | name ) -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* (
 	// ^( OPERAND name ) )? ;
 	public final VelvetParser.constraintOperand_return constraintOperand() throws RecognitionException {
-		VelvetParser.constraintOperand_return retval =
+		final VelvetParser.constraintOperand_return retval =
 			new VelvetParser.constraintOperand_return();
 		retval.start =
 			input.LT(1);
@@ -3364,19 +3389,19 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name87 =
 			null;
 
-		Tree START_R84_tree =
+		final Tree START_R84_tree =
 			null;
-		Tree END_R86_tree =
+		final Tree END_R86_tree =
 			null;
-		RewriteRuleTokenStream stream_END_R =
+		final RewriteRuleTokenStream stream_END_R =
 			new RewriteRuleTokenStream(adaptor, "token END_R");
-		RewriteRuleTokenStream stream_START_R =
+		final RewriteRuleTokenStream stream_START_R =
 			new RewriteRuleTokenStream(adaptor, "token START_R");
-		RewriteRuleSubtreeStream stream_name =
+		final RewriteRuleSubtreeStream stream_name =
 			new RewriteRuleSubtreeStream(adaptor, "rule name");
-		RewriteRuleSubtreeStream stream_unaryOp =
+		final RewriteRuleSubtreeStream stream_unaryOp =
 			new RewriteRuleSubtreeStream(adaptor, "rule unaryOp");
-		RewriteRuleSubtreeStream stream_constraintDefinition =
+		final RewriteRuleSubtreeStream stream_constraintDefinition =
 			new RewriteRuleSubtreeStream(adaptor, "rule constraintDefinition");
 		try {
 			// Velvet.g:184:19: ( ( unaryOp )* ( START_R constraintDefinition END_R | name ) -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND
@@ -3387,7 +3412,7 @@ public class VelvetParser extends Parser {
 				loop22: do {
 					int alt22 =
 						2;
-					int LA22_0 =
+					final int LA22_0 =
 						input.LA(1);
 
 					if ((LA22_0 == OP_NOT)) {
@@ -3418,18 +3443,18 @@ public class VelvetParser extends Parser {
 				// Velvet.g:184:30: ( START_R constraintDefinition END_R | name )
 				int alt23 =
 					2;
-				int LA23_0 =
+				final int LA23_0 =
 					input.LA(1);
 
 				if ((LA23_0 == START_R)) {
 					alt23 =
 						1;
-				} else if (((LA23_0 >= ID
-					&& LA23_0 <= IDPath))) {
+				} else if ((((LA23_0 >= ID)
+					&& (LA23_0 <= IDPath)))) {
 					alt23 =
 						2;
 				} else {
-					NoViableAltException nvae =
+					final NoViableAltException nvae =
 						new NoViableAltException("", 23, 0, input);
 
 					throw nvae;
@@ -3482,7 +3507,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -3506,7 +3531,7 @@ public class VelvetParser extends Parser {
 								(Tree) adaptor.nil();
 							root_1 =
 								(Tree) adaptor.becomeRoot(
-										(Tree) adaptor.create(UNARYOP, "UNARYOP"), root_1);
+										adaptor.create(UNARYOP, "UNARYOP"), root_1);
 
 							adaptor.addChild(root_1, stream_unaryOp.nextTree());
 
@@ -3524,7 +3549,7 @@ public class VelvetParser extends Parser {
 								(Tree) adaptor.nil();
 							root_1 =
 								(Tree) adaptor.becomeRoot(
-										(Tree) adaptor.create(OPERAND, "OPERAND"), root_1);
+										adaptor.create(OPERAND, "OPERAND"), root_1);
 
 							adaptor.addChild(root_1, stream_name.nextTree());
 
@@ -3548,7 +3573,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -3567,6 +3592,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -3576,7 +3602,7 @@ public class VelvetParser extends Parser {
 	// Velvet.g:188:1: attribute : ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI -> ^( ATTR ( intAttribute )? ( floatAttribute )? (
 	// stringAttribute )? ( boolAttribute )? ) ;
 	public final VelvetParser.attribute_return attribute() throws RecognitionException {
-		VelvetParser.attribute_return retval =
+		final VelvetParser.attribute_return retval =
 			new VelvetParser.attribute_return();
 		retval.start =
 			input.LT(1);
@@ -3598,17 +3624,17 @@ public class VelvetParser extends Parser {
 		VelvetParser.boolAttribute_return boolAttribute91 =
 			null;
 
-		Tree SEMI92_tree =
+		final Tree SEMI92_tree =
 			null;
-		RewriteRuleTokenStream stream_SEMI =
+		final RewriteRuleTokenStream stream_SEMI =
 			new RewriteRuleTokenStream(adaptor, "token SEMI");
-		RewriteRuleSubtreeStream stream_intAttribute =
+		final RewriteRuleSubtreeStream stream_intAttribute =
 			new RewriteRuleSubtreeStream(adaptor, "rule intAttribute");
-		RewriteRuleSubtreeStream stream_stringAttribute =
+		final RewriteRuleSubtreeStream stream_stringAttribute =
 			new RewriteRuleSubtreeStream(adaptor, "rule stringAttribute");
-		RewriteRuleSubtreeStream stream_floatAttribute =
+		final RewriteRuleSubtreeStream stream_floatAttribute =
 			new RewriteRuleSubtreeStream(adaptor, "rule floatAttribute");
-		RewriteRuleSubtreeStream stream_boolAttribute =
+		final RewriteRuleSubtreeStream stream_boolAttribute =
 			new RewriteRuleSubtreeStream(adaptor, "rule boolAttribute");
 		try {
 			// Velvet.g:189:2: ( ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI -> ^( ATTR ( intAttribute )? ( floatAttribute )? (
@@ -3640,7 +3666,7 @@ public class VelvetParser extends Parser {
 				}
 					break;
 				default:
-					NoViableAltException nvae =
+					final NoViableAltException nvae =
 						new NoViableAltException("", 24, 0, input);
 
 					throw nvae;
@@ -3716,7 +3742,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -3731,7 +3757,7 @@ public class VelvetParser extends Parser {
 							(Tree) adaptor.nil();
 						root_1 =
 							(Tree) adaptor.becomeRoot(
-									(Tree) adaptor.create(ATTR, "ATTR"), root_1);
+									adaptor.create(ATTR, "ATTR"), root_1);
 
 						// Velvet.g:190:12: ( intAttribute )?
 						if (stream_intAttribute.hasNext()) {
@@ -3778,7 +3804,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -3797,6 +3823,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -3805,7 +3832,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "attributeConstraint"
 	// Velvet.g:193:1: attributeConstraint : attribConstraint -> ^( ACONSTR attribConstraint ) ;
 	public final VelvetParser.attributeConstraint_return attributeConstraint() throws RecognitionException {
-		VelvetParser.attributeConstraint_return retval =
+		final VelvetParser.attributeConstraint_return retval =
 			new VelvetParser.attributeConstraint_return();
 		retval.start =
 			input.LT(1);
@@ -3816,7 +3843,7 @@ public class VelvetParser extends Parser {
 		VelvetParser.attribConstraint_return attribConstraint93 =
 			null;
 
-		RewriteRuleSubtreeStream stream_attribConstraint =
+		final RewriteRuleSubtreeStream stream_attribConstraint =
 			new RewriteRuleSubtreeStream(adaptor, "rule attribConstraint");
 		try {
 			// Velvet.g:194:2: ( attribConstraint -> ^( ACONSTR attribConstraint ) )
@@ -3839,7 +3866,7 @@ public class VelvetParser extends Parser {
 				// wildcard labels:
 				retval.tree =
 					root_0;
-				RewriteRuleSubtreeStream stream_retval =
+				final RewriteRuleSubtreeStream stream_retval =
 					new RewriteRuleSubtreeStream(adaptor, "rule retval", retval != null
 						? retval.tree
 						: null);
@@ -3854,7 +3881,7 @@ public class VelvetParser extends Parser {
 							(Tree) adaptor.nil();
 						root_1 =
 							(Tree) adaptor.becomeRoot(
-									(Tree) adaptor.create(ACONSTR, "ACONSTR"), root_1);
+									adaptor.create(ACONSTR, "ACONSTR"), root_1);
 
 						adaptor.addChild(root_1, stream_attribConstraint.nextTree());
 
@@ -3875,7 +3902,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -3894,6 +3921,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -3903,7 +3931,7 @@ public class VelvetParser extends Parser {
 	// Velvet.g:198:1: attribConstraint : attribNumInstance ( attribOperator attribNumInstance )* attribRelation attribNumInstance ( attribOperator
 	// attribNumInstance )* ;
 	public final VelvetParser.attribConstraint_return attribConstraint() throws RecognitionException {
-		VelvetParser.attribConstraint_return retval =
+		final VelvetParser.attribConstraint_return retval =
 			new VelvetParser.attribConstraint_return();
 		retval.start =
 			input.LT(1);
@@ -3952,11 +3980,11 @@ public class VelvetParser extends Parser {
 				loop25: do {
 					int alt25 =
 						2;
-					int LA25_0 =
+					final int LA25_0 =
 						input.LA(1);
 
-					if ((LA25_0 == MINUS
-						|| LA25_0 == PLUS)) {
+					if (((LA25_0 == MINUS)
+						|| (LA25_0 == PLUS))) {
 						alt25 =
 							1;
 					}
@@ -4009,11 +4037,11 @@ public class VelvetParser extends Parser {
 				loop26: do {
 					int alt26 =
 						2;
-					int LA26_0 =
+					final int LA26_0 =
 						input.LA(1);
 
-					if ((LA26_0 == MINUS
-						|| LA26_0 == PLUS)) {
+					if (((LA26_0 == MINUS)
+						|| (LA26_0 == PLUS))) {
 						alt26 =
 							1;
 					}
@@ -4055,7 +4083,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4074,6 +4102,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4082,7 +4111,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "attribOperator"
 	// Velvet.g:204:1: attribOperator : ( PLUS | MINUS );
 	public final VelvetParser.attribOperator_return attribOperator() throws RecognitionException {
-		VelvetParser.attribOperator_return retval =
+		final VelvetParser.attribOperator_return retval =
 			new VelvetParser.attribOperator_return();
 		retval.start =
 			input.LT(1);
@@ -4093,7 +4122,7 @@ public class VelvetParser extends Parser {
 		Token set101 =
 			null;
 
-		Tree set101_tree =
+		final Tree set101_tree =
 			null;
 
 		try {
@@ -4104,17 +4133,17 @@ public class VelvetParser extends Parser {
 					(Tree) adaptor.nil();
 
 				set101 =
-					(Token) input.LT(1);
+					input.LT(1);
 
-				if (input.LA(1) == MINUS
-					|| input.LA(1) == PLUS) {
+				if ((input.LA(1) == MINUS)
+					|| (input.LA(1) == PLUS)) {
 					input.consume();
 					adaptor.addChild(root_0,
-							(Tree) adaptor.create(set101));
+							adaptor.create(set101));
 					state.errorRecovery =
 						false;
 				} else {
-					MismatchedSetException mse =
+					final MismatchedSetException mse =
 						new MismatchedSetException(null, input);
 					throw mse;
 				}
@@ -4128,7 +4157,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4147,6 +4176,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4155,7 +4185,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "attribNumInstance"
 	// Velvet.g:209:1: attribNumInstance : ( INT | name );
 	public final VelvetParser.attribNumInstance_return attribNumInstance() throws RecognitionException {
-		VelvetParser.attribNumInstance_return retval =
+		final VelvetParser.attribNumInstance_return retval =
 			new VelvetParser.attribNumInstance_return();
 		retval.start =
 			input.LT(1);
@@ -4175,18 +4205,18 @@ public class VelvetParser extends Parser {
 			// Velvet.g:210:2: ( INT | name )
 			int alt27 =
 				2;
-			int LA27_0 =
+			final int LA27_0 =
 				input.LA(1);
 
 			if ((LA27_0 == INT)) {
 				alt27 =
 					1;
-			} else if (((LA27_0 >= ID
-				&& LA27_0 <= IDPath))) {
+			} else if ((((LA27_0 >= ID)
+				&& (LA27_0 <= IDPath)))) {
 				alt27 =
 					2;
 			} else {
-				NoViableAltException nvae =
+				final NoViableAltException nvae =
 					new NoViableAltException("", 27, 0, input);
 
 				throw nvae;
@@ -4232,7 +4262,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4251,6 +4281,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4259,7 +4290,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "intAttribute"
 	// Velvet.g:215:1: intAttribute : VAR_INT ! name ( EQ ! INT )? ;
 	public final VelvetParser.intAttribute_return intAttribute() throws RecognitionException {
-		VelvetParser.intAttribute_return retval =
+		final VelvetParser.intAttribute_return retval =
 			new VelvetParser.intAttribute_return();
 		retval.start =
 			input.LT(1);
@@ -4276,9 +4307,9 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name105 =
 			null;
 
-		Tree VAR_INT104_tree =
+		final Tree VAR_INT104_tree =
 			null;
-		Tree EQ106_tree =
+		final Tree EQ106_tree =
 			null;
 		Tree INT107_tree =
 			null;
@@ -4304,7 +4335,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:215:30: ( EQ ! INT )?
 				int alt28 =
 					2;
-				int LA28_0 =
+				final int LA28_0 =
 					input.LA(1);
 
 				if ((LA28_0 == EQ)) {
@@ -4338,7 +4369,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4357,6 +4388,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4365,7 +4397,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "floatAttribute"
 	// Velvet.g:216:1: floatAttribute : VAR_FLOAT ! name ( EQ ! FLOAT )? ;
 	public final VelvetParser.floatAttribute_return floatAttribute() throws RecognitionException {
-		VelvetParser.floatAttribute_return retval =
+		final VelvetParser.floatAttribute_return retval =
 			new VelvetParser.floatAttribute_return();
 		retval.start =
 			input.LT(1);
@@ -4382,9 +4414,9 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name109 =
 			null;
 
-		Tree VAR_FLOAT108_tree =
+		final Tree VAR_FLOAT108_tree =
 			null;
-		Tree EQ110_tree =
+		final Tree EQ110_tree =
 			null;
 		Tree FLOAT111_tree =
 			null;
@@ -4410,7 +4442,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:216:34: ( EQ ! FLOAT )?
 				int alt29 =
 					2;
-				int LA29_0 =
+				final int LA29_0 =
 					input.LA(1);
 
 				if ((LA29_0 == EQ)) {
@@ -4444,7 +4476,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4463,6 +4495,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4471,7 +4504,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "stringAttribute"
 	// Velvet.g:217:1: stringAttribute : VAR_STRING ! name ( EQ ! STRING )? ;
 	public final VelvetParser.stringAttribute_return stringAttribute() throws RecognitionException {
-		VelvetParser.stringAttribute_return retval =
+		final VelvetParser.stringAttribute_return retval =
 			new VelvetParser.stringAttribute_return();
 		retval.start =
 			input.LT(1);
@@ -4488,9 +4521,9 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name113 =
 			null;
 
-		Tree VAR_STRING112_tree =
+		final Tree VAR_STRING112_tree =
 			null;
-		Tree EQ114_tree =
+		final Tree EQ114_tree =
 			null;
 		Tree STRING115_tree =
 			null;
@@ -4516,7 +4549,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:217:35: ( EQ ! STRING )?
 				int alt30 =
 					2;
-				int LA30_0 =
+				final int LA30_0 =
 					input.LA(1);
 
 				if ((LA30_0 == EQ)) {
@@ -4550,7 +4583,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4569,6 +4602,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4577,7 +4611,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "boolAttribute"
 	// Velvet.g:218:1: boolAttribute : VAR_BOOL ! name ( EQ ! BOOLEAN )? ;
 	public final VelvetParser.boolAttribute_return boolAttribute() throws RecognitionException {
-		VelvetParser.boolAttribute_return retval =
+		final VelvetParser.boolAttribute_return retval =
 			new VelvetParser.boolAttribute_return();
 		retval.start =
 			input.LT(1);
@@ -4594,9 +4628,9 @@ public class VelvetParser extends Parser {
 		VelvetParser.name_return name117 =
 			null;
 
-		Tree VAR_BOOL116_tree =
+		final Tree VAR_BOOL116_tree =
 			null;
-		Tree EQ118_tree =
+		final Tree EQ118_tree =
 			null;
 		Tree BOOLEAN119_tree =
 			null;
@@ -4622,7 +4656,7 @@ public class VelvetParser extends Parser {
 				// Velvet.g:218:32: ( EQ ! BOOLEAN )?
 				int alt31 =
 					2;
-				int LA31_0 =
+				final int LA31_0 =
 					input.LA(1);
 
 				if ((LA31_0 == EQ)) {
@@ -4656,7 +4690,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4675,6 +4709,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4683,7 +4718,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "unaryOp"
 	// Velvet.g:220:1: unaryOp : OP_NOT ;
 	public final VelvetParser.unaryOp_return unaryOp() throws RecognitionException {
-		VelvetParser.unaryOp_return retval =
+		final VelvetParser.unaryOp_return retval =
 			new VelvetParser.unaryOp_return();
 		retval.start =
 			input.LT(1);
@@ -4719,7 +4754,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4738,6 +4773,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4746,7 +4782,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "binaryOp"
 	// Velvet.g:224:1: binaryOp : ( OP_AND | OP_OR | OP_XOR | OP_IMPLIES | OP_EQUIVALENT );
 	public final VelvetParser.binaryOp_return binaryOp() throws RecognitionException {
-		VelvetParser.binaryOp_return retval =
+		final VelvetParser.binaryOp_return retval =
 			new VelvetParser.binaryOp_return();
 		retval.start =
 			input.LT(1);
@@ -4757,7 +4793,7 @@ public class VelvetParser extends Parser {
 		Token set121 =
 			null;
 
-		Tree set121_tree =
+		final Tree set121_tree =
 			null;
 
 		try {
@@ -4768,19 +4804,19 @@ public class VelvetParser extends Parser {
 					(Tree) adaptor.nil();
 
 				set121 =
-					(Token) input.LT(1);
+					input.LT(1);
 
-				if ((input.LA(1) >= OP_AND
-					&& input.LA(1) <= OP_IMPLIES)
-					|| (input.LA(1) >= OP_OR
-						&& input.LA(1) <= OP_XOR)) {
+				if (((input.LA(1) >= OP_AND)
+					&& (input.LA(1) <= OP_IMPLIES))
+					|| ((input.LA(1) >= OP_OR)
+						&& (input.LA(1) <= OP_XOR))) {
 					input.consume();
 					adaptor.addChild(root_0,
-							(Tree) adaptor.create(set121));
+							adaptor.create(set121));
 					state.errorRecovery =
 						false;
 				} else {
-					MismatchedSetException mse =
+					final MismatchedSetException mse =
 						new MismatchedSetException(null, input);
 					throw mse;
 				}
@@ -4794,7 +4830,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4813,6 +4849,7 @@ public class VelvetParser extends Parser {
 
 		Tree tree;
 
+		@Override
 		public Object getTree() {
 			return tree;
 		}
@@ -4821,7 +4858,7 @@ public class VelvetParser extends Parser {
 	// $ANTLR start "attribRelation"
 	// Velvet.g:232:1: attribRelation : ( ATTR_OP_EQUALS | ATTR_OP_GREATER_EQ | ATTR_OP_LESS_EQ );
 	public final VelvetParser.attribRelation_return attribRelation() throws RecognitionException {
-		VelvetParser.attribRelation_return retval =
+		final VelvetParser.attribRelation_return retval =
 			new VelvetParser.attribRelation_return();
 		retval.start =
 			input.LT(1);
@@ -4832,7 +4869,7 @@ public class VelvetParser extends Parser {
 		Token set122 =
 			null;
 
-		Tree set122_tree =
+		final Tree set122_tree =
 			null;
 
 		try {
@@ -4843,18 +4880,18 @@ public class VelvetParser extends Parser {
 					(Tree) adaptor.nil();
 
 				set122 =
-					(Token) input.LT(1);
+					input.LT(1);
 
-				if (input.LA(1) == ATTR_OP_EQUALS
-					|| input.LA(1) == ATTR_OP_GREATER_EQ
-					|| input.LA(1) == ATTR_OP_LESS_EQ) {
+				if ((input.LA(1) == ATTR_OP_EQUALS)
+					|| (input.LA(1) == ATTR_OP_GREATER_EQ)
+					|| (input.LA(1) == ATTR_OP_LESS_EQ)) {
 					input.consume();
 					adaptor.addChild(root_0,
-							(Tree) adaptor.create(set122));
+							adaptor.create(set122));
 					state.errorRecovery =
 						false;
 				} else {
-					MismatchedSetException mse =
+					final MismatchedSetException mse =
 						new MismatchedSetException(null, input);
 					throw mse;
 				}
@@ -4868,7 +4905,7 @@ public class VelvetParser extends Parser {
 				(Tree) adaptor.rulePostProcessing(root_0);
 			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			reportError(re);
 			recover(input, re);
 			retval.tree =
@@ -4936,7 +4973,7 @@ public class VelvetParser extends Parser {
 	static final short[][] DFA5_transition;
 
 	static {
-		int numStates =
+		final int numStates =
 			DFA5_transitionS.length;
 		DFA5_transition =
 			new short[numStates][];
@@ -4952,24 +4989,25 @@ public class VelvetParser extends Parser {
 		public DFA5(BaseRecognizer recognizer) {
 			this.recognizer =
 				recognizer;
-			this.decisionNumber =
+			decisionNumber =
 				5;
-			this.eot =
+			eot =
 				DFA5_eot;
-			this.eof =
+			eof =
 				DFA5_eof;
-			this.min =
+			min =
 				DFA5_min;
-			this.max =
+			max =
 				DFA5_max;
-			this.accept =
+			accept =
 				DFA5_accept;
-			this.special =
+			special =
 				DFA5_special;
-			this.transition =
+			transition =
 				DFA5_transition;
 		}
 
+		@Override
 		public String getDescription() {
 			return "104:27: ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )?";
 		}

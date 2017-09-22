@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,16 +44,16 @@ public class AsmetaLClassBuilder extends ClassBuilder {
 
 	@Override
 	public void caseInvariant(FSTTerminal terminal) {
-		String[] type =
+		final String[] type =
 			terminal.getBody().substring(terminal.getBody().indexOf("over")
 				+ 4, terminal.getBody().indexOf(":")).trim().split(",");
 
-		boolean hasProperIdentifier =
+		final boolean hasProperIdentifier =
 			terminal.getBody().substring(terminal.getBody().indexOf("invariant")
 				+ 4, terminal.getBody().indexOf("over"))
 					.contains("inv_");
 
-		FSTInvariant invariant =
+		final FSTInvariant invariant =
 			new FSTInvariant(terminal.getName(), terminal.getBody(), new LinkedList<String>(Arrays.asList(type)), terminal.beginLine,
 					terminal.endLine, hasProperIdentifier, true);
 		modelBuilder.getCurrentClassFragment().add(invariant);
@@ -65,32 +65,32 @@ public class AsmetaLClassBuilder extends ClassBuilder {
 
 		if (terminal.getType().equals("Domain")) {
 
-			String startTokens =
+			final String startTokens =
 				"";
-			String type =
+			final String type =
 				"";
 
-			FSTAsmetaLDomain field =
+			final FSTAsmetaLDomain field =
 				new FSTAsmetaLDomain(terminal.getName(), type, startTokens, terminal.getBody(), terminal.beginLine, terminal.endLine);
 			modelBuilder.getCurrentClassFragment().add(field);
 		} else if (terminal.getType().equals("Function")) {
-			String begin =
+			final String begin =
 				terminal.getBody().substring(0, terminal.getBody().indexOf(":"));
-			String end =
+			final String end =
 				terminal.getBody().substring(terminal.getBody().indexOf(":")
 					+ 1);
-			String[] startTokens =
+			final String[] startTokens =
 				begin.split(" ");
-			String name =
+			final String name =
 				startTokens[startTokens.length
 					- 1];
-			String[] endTokens =
+			final String[] endTokens =
 				end.split("->");
-			String type =
+			final String type =
 				endTokens[endTokens.length
 					- 1];
 
-			FSTAstemaLFunction field =
+			final FSTAstemaLFunction field =
 				new FSTAstemaLFunction(name, type, startTokens[0], terminal.getBody(), terminal.beginLine, terminal.endLine);
 			modelBuilder.getCurrentClassFragment().add(field);
 		}
@@ -98,19 +98,19 @@ public class AsmetaLClassBuilder extends ClassBuilder {
 
 	@Override
 	public void caseInitialization(FSTNode node) {
-		FSTAsmetaLInitialization field =
+		final FSTAsmetaLInitialization field =
 			new FSTAsmetaLInitialization(node.getName(), "Initialization", "", "", 0, 0);
 		modelBuilder.getCurrentClassFragment().add(field);
 	}
 
 	@Override
 	public void caseSignatureDeclaration(FSTNonTerminal node) {
-		List<FSTNode> children =
+		final List<FSTNode> children =
 			node.getChildren();
-		for (FSTNode child : children) {
-			FSTTerminal terminal =
+		for (final FSTNode child : children) {
+			final FSTTerminal terminal =
 				(FSTTerminal) child;
-			String type =
+			final String type =
 				child.getType();
 			if (FHNodeTypes.ASMETAL_FUNCTION.equals(type)) {
 				caseFieldDeclaration(terminal);
@@ -123,7 +123,7 @@ public class AsmetaLClassBuilder extends ClassBuilder {
 	}
 
 	private LinkedList<String> getRuleParameter(FSTTerminal terminal) {
-		String prefix =
+		final String prefix =
 			terminal.getBody().substring(0, terminal.getBody().indexOf("="));
 		if (prefix.contains("(")) {
 			return new LinkedList<String>(Arrays.asList(prefix.substring(prefix.indexOf("(")
@@ -143,7 +143,7 @@ public class AsmetaLClassBuilder extends ClassBuilder {
 			name.contains("(")
 				? name.substring(0, name.indexOf("(")).trim()
 				: name.trim();
-		String returnType =
+		final String returnType =
 			terminal.getBody().indexOf("rule") == -1
 				? ""
 				: terminal.getBody().substring(0, terminal.getBody().indexOf("rule"));

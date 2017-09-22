@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package br.ufal.ic.colligens.handler;
 
@@ -25,7 +25,7 @@ import core.RefactoringType;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class RefactorSelectionHandler extends ColligensAbstractHandler {
 
@@ -40,11 +40,11 @@ public class RefactorSelectionHandler extends ColligensAbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		if (event.getParameter(RefactorSelectionHandler.PARM_ID) != null) {
-			IWorkbenchWindow window =
+			final IWorkbenchWindow window =
 				HandlerUtil
 						.getActiveWorkbenchWindow(event);
 
-			this.run(window,
+			run(window,
 					event.getParameter(RefactorSelectionHandler.PARM_ID));
 
 		}
@@ -54,7 +54,7 @@ public class RefactorSelectionHandler extends ColligensAbstractHandler {
 
 	private void run(IWorkbenchWindow window, String type) {
 
-		RefactoringType refactoringType =
+		final RefactoringType refactoringType =
 			RefactoringType.valueOf(type);
 
 		ISelection selection =
@@ -64,36 +64,36 @@ public class RefactorSelectionHandler extends ColligensAbstractHandler {
 
 		if (selection instanceof TextSelection) {
 
-			TextSelection textSelection =
+			final TextSelection textSelection =
 				(TextSelection) selection;
 
-			Shell shell =
+			final Shell shell =
 				window.getShell();
 
-			RefactorSelectionController refactoringController =
+			final RefactorSelectionController refactoringController =
 				new RefactorSelectionController();
 
-			FileEditorInput fileEditorInput =
+			final FileEditorInput fileEditorInput =
 				(FileEditorInput) window
 						.getActivePage().getActiveEditor().getEditorInput();
 
-			IFile file =
+			final IFile file =
 				fileEditorInput.getFile();
 
 			refactoringController.setSelection(file, textSelection,
 					refactoringType);
 
-			RefactorDataWizard wizard =
+			final RefactorDataWizard wizard =
 				new RefactorDataWizard(
 						refactoringController, WIZARD_NAME);
 			try {
-				RefactoringWizardOpenOperation operation =
+				final RefactoringWizardOpenOperation operation =
 					new RefactoringWizardOpenOperation(
 							wizard);
 				operation.run(shell, WIZARD_NAME);
-			} catch (InterruptedException exception) {
+			} catch (final InterruptedException exception) {
 				// Do nothing
-			} catch (NullPointerException exception) {
+			} catch (final NullPointerException exception) {
 				// Do nothing
 			}
 		}
@@ -109,20 +109,20 @@ public class RefactorSelectionHandler extends ColligensAbstractHandler {
 			editorPart =
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 						.getActivePage().getActiveEditor();
-		} catch (NullPointerException e) {
+		} catch (final NullPointerException e) {
 			return false;
 		}
 
 		if (editorPart instanceof ITextEditor) {
 			if (super.isEnabled()) {
 
-				ITextEditor editor =
+				final ITextEditor editor =
 					(ITextEditor) editorPart;
 				textSelection =
 					(TextSelection) editor.getSelectionProvider()
 							.getSelection();
 
-				String line =
+				final String line =
 					textSelection.getText();
 				if (line.contains("#")) {
 					if (line.contains("#if ")

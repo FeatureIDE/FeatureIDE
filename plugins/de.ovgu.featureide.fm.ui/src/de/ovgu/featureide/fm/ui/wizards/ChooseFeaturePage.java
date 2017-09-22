@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * A dialog page to specify a feature name.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ChooseFeaturePage extends AbstractWizardPage {
@@ -46,8 +46,9 @@ public class ChooseFeaturePage extends AbstractWizardPage {
 		setDescription(CHOOSE_A_FEATURE);
 	}
 
+	@Override
 	public void createControl(Composite parent) {
-		Composite container =
+		final Composite container =
 			new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout =
 			new GridLayout();
@@ -56,15 +57,15 @@ public class ChooseFeaturePage extends AbstractWizardPage {
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		GridLayout projGridLayout =
+		final GridLayout projGridLayout =
 			new GridLayout();
 		projGridLayout.numColumns =
 			2;
 
-		Group configGroup =
+		final Group configGroup =
 			new Group(container, SWT.NONE);
 		configGroup.setText("");
-		GridData gridData =
+		final GridData gridData =
 			new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan =
 			2;
@@ -74,14 +75,14 @@ public class ChooseFeaturePage extends AbstractWizardPage {
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
 
-		GridData gridData2 =
+		final GridData gridData2 =
 			new GridData(GridData.FILL_HORIZONTAL);
 		gridData2.horizontalSpan =
 			1;
 		gridData2.verticalSpan =
 			1;
 
-		Label featureLabel =
+		final Label featureLabel =
 			new Label(configGroup, 0);
 		featureLabel.setText("Name of Feature: ");
 		featureName =

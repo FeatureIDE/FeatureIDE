@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 /**
  * The CREATE_CONSTRAINT action for a selected feature inside the feature diagram. Calling this action the constraint dialog will automatically contains the
  * selected feature inside the input control.
- * 
+ *
  * @author Marcus Pinnecke
  */
 public class CreateConstraintWithAction extends CreateConstraintAction {
@@ -49,22 +49,24 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	public CreateConstraintWithAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel);
 
-		if (viewer instanceof GraphicalViewerImpl)
+		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+		}
 	}
 
-	private ISelectionChangedListener listener =
+	private final ISelectionChangedListener listener =
 		new ISelectionChangedListener() {
 
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection =
+				final IStructuredSelection selection =
 					(IStructuredSelection) event.getSelection();
 
 				if (selection.size() == 1) {
-					Object editPart =
+					final Object editPart =
 						selection.getFirstElement();
 
-					IFeature feature =
+					final IFeature feature =
 						editPart instanceof FeatureEditPart
 							? ((FeatureEditPart) editPart).getModel().getObject()
 							: null;
@@ -80,9 +82,9 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	 * @param featureName
 	 */
 	protected void updateConstraintActionText(String featureName) {
-		this.selectedFeature =
+		selectedFeature =
 			featureName;
-		this.setText(CREATE_CONSTRAINT
+		setText(CREATE_CONSTRAINT
 			+ (featureName.isEmpty()
 				? ""
 				: " starting with \""
@@ -96,9 +98,9 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	 */
 	@Override
 	public void run() {
-		ConstraintDialog dialog =
+		final ConstraintDialog dialog =
 			new ConstraintDialog(super.featuremodel, null);
-		dialog.setInputText(this.selectedFeature);
+		dialog.setInputText(selectedFeature);
 	}
 
 }

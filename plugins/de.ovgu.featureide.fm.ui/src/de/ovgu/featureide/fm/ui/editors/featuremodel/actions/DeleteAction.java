@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOpe
 
 /**
  * Deletes the selected features and moves their unselected children upwards. Also deletes the selected propositional constraint.
- * 
+ *
  * @author Thomas Thuem
  * @author Christian Becker
  * @author Marcus Pinnecke (Feature Interface)
@@ -62,11 +62,12 @@ public class DeleteAction extends Action {
 
 	private final IFeatureModel featureModel;
 
-	private ISelectionChangedListener listener =
+	private final ISelectionChangedListener listener =
 		new ISelectionChangedListener() {
 
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection =
+				final IStructuredSelection selection =
 					(IStructuredSelection) event.getSelection();
 				setEnabled(isValidSelection(selection));
 			}
@@ -79,20 +80,21 @@ public class DeleteAction extends Action {
 		this.featureModel =
 			featureModel;
 		setEnabled(false);
-		if (viewer instanceof GraphicalViewerImpl)
+		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
-		else
+		} else {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
+		}
 	}
 
 	@Override
 	public void run() {
-		ElementDeleteOperation op =
+		final ElementDeleteOperation op =
 			new ElementDeleteOperation(viewer, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
 		}
@@ -101,44 +103,49 @@ public class DeleteAction extends Action {
 
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
-		if (selection.size() == 1
-			&& selection.getFirstElement() instanceof ModelEditPart)
+		if ((selection.size() == 1)
+			&& (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
+		}
 
 		// check that a possibly new root can be determined unique
-		IFeature root =
+		final IFeature root =
 			featureModel.getStructure().getRoot().getFeature();
 		IFeature newRoot =
 			root;
-		LinkedList<IFeature> features =
+		final LinkedList<IFeature> features =
 			new LinkedList<IFeature>(Functional.toList(featureModel.getFeatures()));
-		Iterator<?> iter =
+		final Iterator<?> iter =
 			selection.iterator();
 		while (iter.hasNext()) {
-			Object editPart =
+			final Object editPart =
 				iter.next();
 			if (!(editPart instanceof FeatureEditPart)
-				&& !(editPart instanceof IFeature))
+				&& !(editPart instanceof IFeature)) {
 				continue;
-			IFeature feature =
+			}
+			final IFeature feature =
 				editPart instanceof FeatureEditPart
 					? ((FeatureEditPart) editPart).getModel().getObject()
 					: (IFeature) editPart;
 			if (feature == root) {
-				if (root.getStructure().getChildrenCount() != 1)
+				if (root.getStructure().getChildrenCount() != 1) {
 					return false;
+				}
 				newRoot =
 					root.getStructure().getFirstChild().getFeature();
-				if (!newRoot.getStructure().hasChildren())
+				if (!newRoot.getStructure().hasChildren()) {
 					return false;
+				}
 			}
 			features.remove(feature);
 		}
 
 		// check that the only child of a deleted root is not deleted too
-		if (root != newRoot
-			&& !features.contains(newRoot))
+		if ((root != newRoot)
+			&& !features.contains(newRoot)) {
 			return false;
+		}
 
 		return true;
 	}

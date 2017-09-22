@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,11 +36,11 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Default reader to be extended for each feature model format.
- * 
+ *
  * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
- * 
+ *
  * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
@@ -60,33 +60,36 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 
 	/**
 	 * The source of the textual representation of the feature model.<br/><br/>
-	 * 
+	 *
 	 * <strong>Caution:</strong> This field can be null and is maybe not up to date.
 	 */
 	protected File featureModelFile;
 
+	@Override
 	public void setFeatureModel(IFeatureModel featureModel) {
 		this.featureModel =
 			featureModel;
 	}
 
+	@Override
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
 	/**
 	 * Reads a feature model from a file.
-	 * 
+	 *
 	 * @param file the file which contains the textual representation of the feature model
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
+	@Override
 	public void readFromFile(File file) throws UnsupportedModelException,
 			FileNotFoundException {
 		warnings.clear();
-		this.featureModelFile =
+		featureModelFile =
 			file;
-		String fileName =
+		final String fileName =
 			file.getPath();
 		InputStream inputStream =
 			null;
@@ -102,7 +105,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 			if (inputStream != null) {
 				try {
 					inputStream.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					Logger.logError(e);
 				}
 			}
@@ -111,27 +114,29 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 
 	/**
 	 * Reads a feature model from a string.<br/><br/>
-	 * 
+	 *
 	 * Please use {@link #setFile(File)} if you know the source of the feature model.
-	 * 
+	 *
 	 * @param text the textual representation of the feature model
 	 * @throws UnsupportedModelException
 	 */
+	@Override
 	public void readFromString(String text) throws UnsupportedModelException {
 		warnings.clear();
-		InputStream inputStream =
+		final InputStream inputStream =
 			new ByteArrayInputStream(
 					text.getBytes(Charset.availableCharsets().get("UTF-8")));
 		parseInputStream(inputStream);
 	}
 
+	@Override
 	public List<Problem> getWarnings() {
 		return warnings;
 	}
 
 	/**
 	 * Reads a feature model from an input stream.
-	 * 
+	 *
 	 * @param inputStream the textual representation of the feature model
 	 * @throws UnsupportedModelException
 	 */
@@ -140,15 +145,16 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 
 	/**
 	 * Set the source file of the textual representation of the feature model.
-	 * 
+	 *
 	 * @param featureModelFile the source file
 	 */
+	@Override
 	public void setFile(File featureModelFile) {
 		this.featureModelFile =
 			featureModelFile;
 	}
 
 	public File getFile() {
-		return this.featureModelFile;
+		return featureModelFile;
 	}
 }

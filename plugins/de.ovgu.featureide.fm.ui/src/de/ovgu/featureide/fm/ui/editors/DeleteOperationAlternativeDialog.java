@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -71,7 +71,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOpe
 
 /**
  * Provides a dialog for choosing an alternative {@link IFeature} for the Feature to delete.
- * 
+ *
  * @author Florian Proksch
  * @author Stefan Krueger
  * @author Marcus Pinnecke (Feature Interface)
@@ -80,17 +80,17 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 	Shell shell;
 
-	private IFeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	Table alternativefeatureTable;
 	Table featureTable;
 	Map<IFeature, List<IFeature>> featureMap;
 
-	private ElementDeleteOperation parent;
+	private final ElementDeleteOperation parent;
 
 	/**
 	 * Opens a dialog to choose alternative features the given feature should be replaced with.
-	 * 
+	 *
 	 * @param featureModel
 	 * @param featureMap
 	 * @param deleteOperation
@@ -103,17 +103,18 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		this.parent =
 			parent;
 
-		List<IFeature> toBeDeleted =
+		final List<IFeature> toBeDeleted =
 			new LinkedList<IFeature>();
-		for (IFeature f : featureMap.keySet()) {
-			if (featureMap.get(f).isEmpty())
+		for (final IFeature f : featureMap.keySet()) {
+			if (featureMap.get(f).isEmpty()) {
 				toBeDeleted.add(f);
+			}
 		}
 
 		String labeltext =
 			" ";
 
-		for (IFeature f : toBeDeleted) {
+		for (final IFeature f : toBeDeleted) {
 			labeltext +=
 				f.getName()
 					+ ", ";
@@ -137,7 +138,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		shell.setText(FEATURE_DELETION_AND_REPLACEMENT_IN_CONSTRAINTS);
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(520, 450);
-		GridLayout shellLayout =
+		final GridLayout shellLayout =
 			new GridLayout();
 		shellLayout.marginWidth =
 			0;
@@ -147,25 +148,26 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			1;
 		shell.setLayout(shellLayout);
 
-		Monitor primary =
+		final Monitor primary =
 			shell.getDisplay().getPrimaryMonitor();
-		Rectangle bounds =
+		final Rectangle bounds =
 			primary.getBounds();
-		Rectangle rect =
+		final Rectangle rect =
 			shell.getBounds();
-		int x =
+		final int x =
 			bounds.x
-				+ (bounds.width
+				+ ((bounds.width
 					- rect.width)
-					/ 2;
-		int y =
+					/ 2);
+		final int y =
 			bounds.y
-				+ (bounds.height
+				+ ((bounds.height
 					- rect.height)
-					/ 2;
+					/ 2);
 		shell.setLocation(x, y);
 		shell.addListener(SWT.Traverse, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
 				if (event.detail == SWT.TRAVERSE_ESCAPE) {
 					shell.close();
@@ -176,14 +178,14 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 	/**
 	 * initializes the bottom part of the dialog
-	 * 
+	 *
 	 * @param featuremodel
 	 * @param constraint
 	 */
 	private void initBottom(String labeltext) {
-		Composite tableComposite =
+		final Composite tableComposite =
 			new Composite(shell, SWT.NONE);
-		GridData gridData =
+		final GridData gridData =
 			new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessVerticalSpace =
 			true;
@@ -195,16 +197,17 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			new Label(shell, 0);
 		final int textLength =
 			labeltext.length();
-		if ((textLength > 1))
+		if ((textLength > 1)) {
 			label.setText("  The following features do not have any equivalents and cannot be deleted:\n  "
 				+ labeltext.substring(0, textLength
 					- 2));
+		}
 		label.setLayoutData(gridData);
-		Composite lastComposite =
+		final Composite lastComposite =
 			new Composite(shell, SWT.NONE);
 		lastComposite.setLayoutData(gridData);
 
-		FormLayout lastCompositeLayout =
+		final FormLayout lastCompositeLayout =
 			new FormLayout();
 		lastCompositeLayout.marginHeight =
 			5;
@@ -216,10 +219,10 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			15;
 		lastComposite.setLayout(lastCompositeLayout);
 
-		Button okButton =
+		final Button okButton =
 			new Button(lastComposite, SWT.NONE);
 		okButton.setText(CLOSE);
-		FormData formDataCancel =
+		final FormData formDataCancel =
 			new FormData();
 		formDataCancel.width =
 			70;
@@ -233,6 +236,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			okButton });
 		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				shell.dispose();
 			}
@@ -244,14 +248,14 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * initializes the upper part of the dialog
 	 */
 	private void initHead() {
-		Composite headComposite =
+		final Composite headComposite =
 			new Composite(shell, SWT.NONE);
 		headComposite.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		GridData gridData =
 			new GridData(GridData.FILL_HORIZONTAL);
 		headComposite.setLayoutData(gridData);
 
-		GridLayout headLayout =
+		final GridLayout headLayout =
 			new GridLayout();
 		headLayout.numColumns =
 			3;
@@ -259,9 +263,9 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 		final Label capture =
 			new Label(headComposite, SWT.NONE);
-		FontData fontData =
+		final FontData fontData =
 			capture.getFont().getFontData()[0];
-		Font font =
+		final Font font =
 			new Font(shell.getDisplay(), new FontData(fontData.getName(), 10, SWT.NONE));
 		capture.setFont(font);
 		capture.setText("One or more features could not be deleted, because they are contained within one or\n"
@@ -277,7 +281,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		gridData.horizontalSpan =
 			2;
 		capture.setLayoutData(gridData);
-		Label imageLabel =
+		final Label imageLabel =
 			new Label(headComposite, SWT.RIGHT
 				| SWT.DOWN);
 		imageLabel.setImage(BANNER_IMAGE);
@@ -313,11 +317,11 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 	/**
 	 * initializes the group containing the searchText and featureTable
-	 * 
+	 *
 	 * @param featuremodel
 	 */
 	private void initFeatureGroup() {
-		Group featureGroup =
+		final Group featureGroup =
 			new Group(shell, SWT.NONE);
 		featureGroup.setText("Features");
 		GridData gridData =
@@ -325,7 +329,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		gridData.grabExcessHorizontalSpace =
 			true;
 		featureGroup.setLayoutData(gridData);
-		GridLayout featureGroupLayout =
+		final GridLayout featureGroupLayout =
 			new GridLayout();
 		featureGroupLayout.numColumns =
 			2;
@@ -350,7 +354,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			tableViewer.getTable();
 		alternativefeatureTable.setLayoutData(gridData);
 		alternativefeatureTable.setToolTipText(FEATURES_SUPPOSED_TO_BE_DELETED);
-		TableViewerColumn viewerNameColumn =
+		final TableViewerColumn viewerNameColumn =
 			new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumnLayout tableColumnLayout =
 			new TableColumnLayout();
@@ -374,7 +378,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 			}
 		});
-		Collection<IFeature> l =
+		final Collection<IFeature> l =
 			new ArrayList<IFeature>();
 		l.addAll(featureMap.keySet());
 		tableViewer.setContentProvider(new ArrayContentProvider());
@@ -399,7 +403,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			tableViewer2.getTable();
 		featureTable.setLayoutData(gridData);
 		featureTable.setToolTipText(ALTERNATIVE_FEATURES);
-		TableViewerColumn viewerNameColumn2 =
+		final TableViewerColumn viewerNameColumn2 =
 			new TableViewerColumn(tableViewer2, SWT.NONE);
 		tableColumnLayout =
 			new TableColumnLayout();
@@ -461,6 +465,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 		button.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				execute();
 			}
@@ -470,7 +475,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	void execute() {
 		IFeature toBeDeleted;
 		IFeature alternative;
-		List<IFeature> delFeatures =
+		final List<IFeature> delFeatures =
 			new LinkedList<IFeature>();
 
 		if (featureTable.getSelectionCount() > 0) {
@@ -488,9 +493,9 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			delFeatures.add(toBeDeleted);
 		}
 
-		List<Integer> removableIndices =
+		final List<Integer> removableIndices =
 			new LinkedList<Integer>();
-		for (IFeature f : delFeatures) {
+		for (final IFeature f : delFeatures) {
 			for (int j =
 				0; j < alternativefeatureTable.getItemCount(); j++) {
 				if (f.getName().equals(((IFeature) alternativefeatureTable.getItem(j).getData()).getName())) {
@@ -499,11 +504,11 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			}
 		}
 
-		int rem[] =
+		final int rem[] =
 			new int[removableIndices.size()];
 		int i =
 			0;
-		for (int index : removableIndices) {
+		for (final int index : removableIndices) {
 			rem[i] =
 				index;
 			i++;

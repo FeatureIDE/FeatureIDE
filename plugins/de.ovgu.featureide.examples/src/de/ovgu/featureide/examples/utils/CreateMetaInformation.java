@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,11 +43,11 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProjectDescription;
 
 import de.ovgu.featureide.examples.ExamplePlugin;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Creates Metadata that is used as input for the ExampleWizard
- * 
+ *
  * @author Reimar Schroeter
  */
 public class CreateMetaInformation {
@@ -62,18 +62,18 @@ public class CreateMetaInformation {
 
 		private final static Pattern names;
 		static {
-			List<String> lines =
+			final List<String> lines =
 				new ArrayList<>(
 						Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
 			try {
 				lines.addAll(Files.readAllLines(Paths.get(".gitignore"), Charset.forName("UTF-8")));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 			final StringBuilder sb =
 				new StringBuilder();
 			if (!lines.isEmpty()) {
-				for (String line : lines) {
+				for (final String line : lines) {
 					sb.append("|");
 					// TODO implement full support for .gitignore syntax
 					if (line.startsWith("*")) {
@@ -105,7 +105,7 @@ public class CreateMetaInformation {
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 			final Path dirName =
 				dir.getFileName();
-			return dirName != null
+			return (dirName != null)
 				&& names.matcher(dirName.toString()).matches()
 					? FileVisitResult.SKIP_SUBTREE
 					: FileVisitResult.CONTINUE;
@@ -115,7 +115,7 @@ public class CreateMetaInformation {
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			final Path fileName =
 				file.getFileName();
-			if (fileName != null
+			if ((fileName != null)
 				&& !names.matcher(fileName.toString()).matches()) {
 				listOfFiles.add(projectDir.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "));
 			}
@@ -140,7 +140,7 @@ public class CreateMetaInformation {
 
 		private final List<ProjectRecord> projects;
 
-		private LinkedList<ProjectRecord> lastProjects =
+		private final LinkedList<ProjectRecord> lastProjects =
 			new LinkedList<>();
 
 		private ProjectWalker(List<ProjectRecord> projects) {
@@ -152,7 +152,7 @@ public class CreateMetaInformation {
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 			final Path dirName =
 				dir.getFileName();
-			if (dirName != null
+			if ((dirName != null)
 				&& names.contains(dirName.toString())) {
 				return FileVisitResult.SKIP_SUBTREE;
 			} else {
@@ -165,7 +165,7 @@ public class CreateMetaInformation {
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			final Path fileName =
 				file.getFileName();
-			if (fileName != null
+			if ((fileName != null)
 				&& IProjectDescription.DESCRIPTION_FILE_NAME.equals(fileName.toString())) {
 				final Path parent =
 					file.getParent();
@@ -245,7 +245,7 @@ public class CreateMetaInformation {
 		Collections.sort(projectFiles);
 
 		System.out.println("Updating Index Files...");
-		for (ProjectRecord projectRecord : projectFiles) {
+		for (final ProjectRecord projectRecord : projectFiles) {
 			if (projectRecord.updated()) {
 				System.out.printf("New index file for project %s was created. \n", projectRecord.getProjectName());
 			}
@@ -257,7 +257,7 @@ public class CreateMetaInformation {
 		final ProjectRecordCollection oldProjectFiles =
 			new ProjectRecordCollection();
 		if (Files.exists(indexFile)) {
-			FileHandler.load(indexFile, oldProjectFiles, format);
+			SimpleFileHandler.load(indexFile, oldProjectFiles, format);
 			Collections.sort(oldProjectFiles);
 			System.out.println("Updating Project List...");
 		} else {
@@ -265,14 +265,14 @@ public class CreateMetaInformation {
 		}
 
 		if (!oldProjectFiles.equals(projectFiles)) {
-			FileHandler.save(indexFile, projectFiles, format);
+			SimpleFileHandler.save(indexFile, projectFiles, format);
 
-			for (ProjectRecord projectRecord : projectFiles) {
+			for (final ProjectRecord projectRecord : projectFiles) {
 				if (!oldProjectFiles.contains(projectRecord)) {
 					System.out.printf("\tAdded Project: %s \n", projectRecord.getProjectName());
 					try {
 						Files.copy(pluginRoot.resolve(TEMPLATE_PROJECT_INFORMATION_XML), Paths.get(projectRecord.getInformationDocumentPath()));
-					} catch (FileAlreadyExistsException e) {} catch (IOException | UnsupportedOperationException e) {
+					} catch (final FileAlreadyExistsException e) {} catch (IOException | UnsupportedOperationException e) {
 						System.err.println("\t\tWARNING: Could not create "
 							+ ProjectRecord.PROJECT_INFORMATION_XML
 							+ " file.");
@@ -280,7 +280,7 @@ public class CreateMetaInformation {
 					}
 				}
 			}
-			for (ProjectRecord projectRecord : oldProjectFiles) {
+			for (final ProjectRecord projectRecord : oldProjectFiles) {
 				if (!projectFiles.contains(projectRecord)) {
 					System.out.printf("\tRemoved Project: %s \n", projectRecord.getProjectName());
 				}
@@ -301,12 +301,12 @@ public class CreateMetaInformation {
 				force
 					? null
 					: readFile(indexFile);
-			if (listOfFilesOld == null
-				|| listOfFilesOld.hashCode() != listOfFiles.hashCode()
+			if ((listOfFilesOld == null)
+				|| (listOfFilesOld.hashCode() != listOfFiles.hashCode())
 				|| !listOfFiles.equals(listOfFilesOld)) {
-				StringBuilder sb =
+				final StringBuilder sb =
 					new StringBuilder();
-				for (String filePath : listOfFiles) {
+				for (final String filePath : listOfFiles) {
 					sb.append(filePath);
 					sb.append("\n"); // always use Unix file separator to keep file lists line endings uniform across different platforms
 				}
@@ -314,7 +314,7 @@ public class CreateMetaInformation {
 						StandardOpenOption.WRITE);
 				return true;
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return false;

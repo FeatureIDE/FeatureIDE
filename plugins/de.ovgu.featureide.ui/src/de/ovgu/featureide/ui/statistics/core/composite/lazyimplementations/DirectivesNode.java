@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
 /**
  * TreeNode who stores the number of used preprocessor directives, directives per class and features per directives.<br> This node should only be used for a
  * preprocessor project.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -55,7 +55,7 @@ public class DirectivesNode extends LazyParent {
 
 	/**
 	 * Constructor for a {@code DirectivesNode}.
-	 * 
+	 *
 	 * @param description description of the node shown in the view
 	 * @param fstModel FSTModel for the calculation
 	 */
@@ -68,7 +68,7 @@ public class DirectivesNode extends LazyParent {
 	@Override
 	protected void initChildren() {
 
-		Parent project =
+		final Parent project =
 			new Parent(PROJECT_STATISTICS);
 		final Aggregator aggProject =
 			new Aggregator();
@@ -76,7 +76,7 @@ public class DirectivesNode extends LazyParent {
 
 		// 1.1 Project statistics
 		// 1.1.1 Number of Directives Node
-		Parent directives =
+		final Parent directives =
 			new Parent(NUMBER_OF_DIRECTIVES);
 		directives.setValue(aggProject.getDirectiveCount());
 		project.addChild(directives);
@@ -140,12 +140,12 @@ public class DirectivesNode extends LazyParent {
 		addChild(project);
 
 		// 1.2 Class Statistics Node
-		Parent classes =
+		final Parent classes =
 			new AbstractSortModeNode(CLASS_STATISTICS) {
 
 				@Override
 				protected void initChildren() {
-					for (FSTClass c : fstModel.getClasses()) {
+					for (final FSTClass c : fstModel.getClasses()) {
 						String className =
 							c.getName();
 						final int pIndex =
@@ -157,7 +157,7 @@ public class DirectivesNode extends LazyParent {
 								: "(default package).")
 								+ className.substring(pIndex
 									+ 1);
-						Parent p =
+						final Parent p =
 							new Parent(className, aggProject.getDirectiveCountForClass(c.getName()));
 						p.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, aggProject.getNestingCountForClass(c.getName())));
 						addChild(p);

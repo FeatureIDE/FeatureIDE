@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to set all features to collapsed. Enables undo/redo functionality.
- * 
+ *
  * @author Joshua Sprey
  * @author Enis Belli
  * @author Maximilian Kühl
@@ -44,12 +44,12 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 	Iterable<IGraphicalFeature> features;
 	boolean collapse;
 
-	private LinkedList<IGraphicalFeature> affectedFeatureList =
+	private final LinkedList<IGraphicalFeature> affectedFeatureList =
 		new LinkedList<IGraphicalFeature>();
 
 	public CollapseAllOperation(IGraphicalFeatureModel graphicalFeatureModel, boolean collapse) {
 		super(graphicalFeatureModel.getFeatureModel(), COLLAPSE_ALL);
-		this.features =
+		features =
 			graphicalFeatureModel.getFeatures();
 		this.collapse =
 			collapse;
@@ -57,12 +57,12 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		Iterator<IGraphicalFeature> feautureModelIterator =
+		final Iterator<IGraphicalFeature> feautureModelIterator =
 			features.iterator();
 		while (feautureModelIterator.hasNext()) {
-			IGraphicalFeature gFeature =
+			final IGraphicalFeature gFeature =
 				feautureModelIterator.next();
-			IFeature feature =
+			final IFeature feature =
 				gFeature.getObject();
 			if (!feature.getStructure().isRoot()
 				|| !collapse) {
@@ -79,9 +79,9 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		Iterator<IGraphicalFeature> feautureModelIterator =
+		final Iterator<IGraphicalFeature> feautureModelIterator =
 			features.iterator();
-		for (IGraphicalFeature f : affectedFeatureList) {
+		for (final IGraphicalFeature f : affectedFeatureList) {
 			f.setCollapsed(!collapse);
 		}
 		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);

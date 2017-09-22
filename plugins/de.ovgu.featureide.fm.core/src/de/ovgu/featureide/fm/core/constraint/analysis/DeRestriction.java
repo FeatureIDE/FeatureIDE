@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 
 /**
  * Implementation of the {@link Restriction} class.
- * 
+ *
  * @author Sebastian Henneberg
  */
 public class DeRestriction extends Restriction {
@@ -36,6 +36,7 @@ public class DeRestriction extends Restriction {
 		super(terms, op, degree);
 	}
 
+	@Override
 	protected void init(List<Term> terms, RelationOperator op, int degree) {
 		this.terms =
 			makeDefensiveCopy(terms);
@@ -55,7 +56,7 @@ public class DeRestriction extends Restriction {
 	}
 
 	public List<DeRestriction> getInverse(UniqueId idGen) {
-		List<DeRestriction> inverseConjunction =
+		final List<DeRestriction> inverseConjunction =
 			new ArrayList<DeRestriction>();
 
 		if (op == Op.GEQ) {
@@ -64,9 +65,9 @@ public class DeRestriction extends Restriction {
 			// <=> +a_1*x_1 +a_2*x_2 ... < d
 			// <=> -a_1*x_1 -a_2*x_2 ... > -d
 			// <=> -a_1*x_1 -a_2*x_2 ... >= -d+1
-			List<Term> newTerms =
+			final List<Term> newTerms =
 				new ArrayList<Term>();
-			for (Term term : terms) {
+			for (final Term term : terms) {
 				newTerms.add(term.flipCoefficientSign());
 			}
 			inverseConjunction.add(new DeRestriction(
@@ -85,28 +86,28 @@ public class DeRestriction extends Restriction {
 			// <=> (+e y +a_1*x_1 +a_2*x_2 ... >= e)
 			// && (+f~y +a_1*x_1 +a_2*x_2 ... >= f)
 			// where e=d+1 and f=(-d+1+a_1+a_2 ...)
-			List<Term> newTerms1 =
+			final List<Term> newTerms1 =
 				new ArrayList<Term>();
-			List<Term> newTerms2 =
+			final List<Term> newTerms2 =
 				new ArrayList<Term>();
 			int coefficientSum =
 				0;
-			for (Term term : terms) {
+			for (final Term term : terms) {
 				coefficientSum +=
 					term.getCoefficient();
 
 				newTerms1.add(new Term(term));
 				newTerms2.add(term.flipPositive());
 			}
-			int e =
+			final int e =
 				degree
 					+ 1;
-			int f =
+			final int f =
 				-degree
 					+ 1
 					+ coefficientSum;
 
-			int auxiliaryId =
+			final int auxiliaryId =
 				idGen.getNext();
 
 			newTerms1.add(new Term(auxiliaryId, e, true));
@@ -124,20 +125,27 @@ public class DeRestriction extends Restriction {
 	@Override
 	public boolean equals(Object object) {
 		// same instance?
-		if (this == object) return true;
+		if (this == object) {
+			return true;
+		}
 		// different type?
-		if (!(object instanceof DeRestriction)) return false;
+		if (!(object instanceof DeRestriction)) {
+			return false;
+		}
 		// depth equality check
-		DeRestriction restriction =
+		final DeRestriction restriction =
 			(DeRestriction) object;
 
-		if (restriction.getDegree() != degree
-			|| restriction.getOp() != op
-			|| restriction.getTerms().size() != terms.size()) return false;
+		if ((restriction.getDegree() != degree)
+			|| (restriction.getOp() != op)
+			|| (restriction.getTerms().size() != terms.size())) {
+			return false;
+		}
 
-		for (Term term : restriction.getTerms()) {
-			if (!terms.contains(term))
+		for (final Term term : restriction.getTerms()) {
+			if (!terms.contains(term)) {
 				return false;
+			}
 		}
 
 		return true;
@@ -149,7 +157,7 @@ public class DeRestriction extends Restriction {
 			7
 				* degree;
 
-		for (Term term : terms) {
+		for (final Term term : terms) {
 			hashCode ^=
 				term.hashCode();
 		}

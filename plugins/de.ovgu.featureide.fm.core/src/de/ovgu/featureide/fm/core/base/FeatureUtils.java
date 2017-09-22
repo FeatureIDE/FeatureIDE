@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -59,7 +59,7 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 
 /**
  * Several convenience methods for handling feature models, features and constraints.
- * 
+ *
  * @author Marcus Pinnecke
  */
 public final class FeatureUtils {
@@ -294,7 +294,7 @@ public final class FeatureUtils {
 
 	/**
 	 * Extracts all concrete features from a feature model by calling {@link #extractConcreteFeatures(Iterable)} on <code>model.getFeatures()</code>.
-	 * 
+	 *
 	 * @since 3.0
 	 * @param model A feature model
 	 * @author Marcus Pinnecke
@@ -310,10 +310,10 @@ public final class FeatureUtils {
 	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable
 	 * object that yields a feature <i>f</i> from <b>features</b> if and only if <i>f</i> is concrete. Since the implementation based on iterators, it is a lazy
 	 * filtering without modification of <b>features</b>.
-	 * 
+	 *
 	 * <br/> <br/> The extraction is done via
 	 * {@link de.ovgu.featureide.fm.core.functional.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
-	 * 
+	 *
 	 * @since 3.0
 	 * @param features An iterable object providing features
 	 * @author Marcus Pinnecke
@@ -329,7 +329,7 @@ public final class FeatureUtils {
 	 * Extracts all concrete features from a feature model as a list of strings by calling
 	 * {@link de.ovgu.featureide.fm.core.functional.Functional#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)} using
 	 * <code>model.getFeatures()</code>.
-	 * 
+	 *
 	 * @since 3.0
 	 * @param model A feature model
 	 * @author Marcus Pinnecke
@@ -450,9 +450,11 @@ public final class FeatureUtils {
 		final List<IConstraint> constraints =
 			featureModel.getConstraints();
 		for (int i =
-			0; i < constraints.size(); i++)
-			if (constraints.get(i).equals(constraint))
+			0; i < constraints.size(); i++) {
+			if (constraints.get(i).equals(constraint)) {
 				return i;
+			}
+		}
 		throw new NoSuchElementException();
 	}
 
@@ -496,7 +498,7 @@ public final class FeatureUtils {
 			final IFeature feature =
 				fm.getFeature(f.getName());
 			// XXX why can the given feature not be found?
-			if (feature != null
+			if ((feature != null)
 				&& !deadFeaturesBefore.contains(feature)) {
 				deadFeaturesAfter.add(f);
 			}
@@ -650,7 +652,7 @@ public final class FeatureUtils {
 	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
 		if (feature != null) {
-			IFeatureStructure parent =
+			final IFeatureStructure parent =
 				feature.getStructure().getParent();
 			if (parent != null) {
 				return parent.getFeature();
@@ -687,11 +689,11 @@ public final class FeatureUtils {
 		requireNonNull(feature);
 		requireNonNull(constraints);
 
-		StringBuilder relevant =
+		final StringBuilder relevant =
 			new StringBuilder();
-		for (IConstraint constraint : constraints) {
-			for (IFeature f : constraint.getContainedFeatures()) {
-				if (f != null
+		for (final IConstraint constraint : constraints) {
+			for (final IFeature f : constraint.getContainedFeatures()) {
+				if ((f != null)
 					&& f.getName().equals(feature.getName())) {
 					relevant.append((relevant.length() == 0
 						? ""
@@ -715,7 +717,7 @@ public final class FeatureUtils {
 	public static final IFeature getRoot(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		IFeatureStructure root =
+		final IFeatureStructure root =
 			featureModel.getStructure().getRoot();
 		if (root != null) {
 			return root.getFeature();
@@ -927,9 +929,11 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(featureName);
 
-		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureModel))
-			if (feature.getName().equals(featureName))
+		for (final IFeature feature : FeatureUtils.extractConcreteFeatures(featureModel)) {
+			if (feature.getName().equals(featureName)) {
 				return true;
+			}
+		}
 		return false;
 	}
 
@@ -1009,7 +1013,7 @@ public final class FeatureUtils {
 			+ FeatureUtils.isMandatory(feature));
 		final List<IFeatureStructure> struct =
 			feature.getStructure().getChildren();
-		boolean isLeaf =
+		final boolean isLeaf =
 			struct.isEmpty();
 		if (!isLeaf) {
 			final String prop =
@@ -1024,9 +1028,10 @@ public final class FeatureUtils {
 			for (int i =
 				0; i < struct.size(); i++) {
 				print(struct.get(i).getFeature(), string);
-				if (i
-					+ 1 < struct.size())
+				if ((i
+					+ 1) < struct.size()) {
 					string.append(", ");
+				}
 			}
 			string.append("]");
 		}
@@ -1058,9 +1063,9 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(constraint);
 
-		List<IConstraint> constraints =
+		final List<IConstraint> constraints =
 			featureModel.getConstraints();
-		int index =
+		final int index =
 			getConstraintIndex(featureModel, constraint);
 		tryRemoveConstraint(featureModel, constraints, index);
 	}
@@ -1093,7 +1098,7 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(node);
 
-		List<IConstraint> constraints =
+		final List<IConstraint> constraints =
 			featureModel.getConstraints();
 		int index =
 			-1;
@@ -1254,7 +1259,7 @@ public final class FeatureUtils {
 		clonedModel.removeConstraint(constraint);
 		final Collection<IFeature> foFeatures =
 			clonedModel.getAnalyser().getFalseOptionalFeatures();
-		for (IFeature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
+		for (final IFeature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
 			if (!foFeatures.contains(clonedModel.getFeature(feature.getName()))
 				&& !falseOptionalFeatures.contains(feature)) {
 				falseOptionalFeatures.add(feature);
@@ -1345,10 +1350,10 @@ public final class FeatureUtils {
 	public static void setRelevantConstraints(IFeature bone) {
 		requireNonNull(bone);
 
-		List<Constraint> constraintList =
+		final List<Constraint> constraintList =
 			new LinkedList<Constraint>();
-		for (IConstraint constraint : bone.getFeatureModel().getConstraints()) {
-			for (IFeature f : constraint.getContainedFeatures()) {
+		for (final IConstraint constraint : bone.getFeatureModel().getConstraints()) {
+			for (final IFeature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(bone.getName())) {
 					constraintList.add((Constraint) constraint.clone(bone.getFeatureModel()));
 					break;
@@ -1412,10 +1417,10 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(constraints);
 
-		if (index == -1
-			|| index >= constraints.size())
+		if ((index == -1)
+			|| (index >= constraints.size())) {
 			throw new NoSuchElementException();
-		else {
+		} else {
 			constraints.remove(index);
 			featureModel.setConstraints(constraints);
 		}
@@ -1426,7 +1431,7 @@ public final class FeatureUtils {
 	public CharSequence createValidJavaIdentifierFromString(CharSequence s) {
 		requireNonNull(s);
 
-		StringBuilder stringBuilder =
+		final StringBuilder stringBuilder =
 			new StringBuilder();
 		int i =
 			0;
@@ -1448,7 +1453,7 @@ public final class FeatureUtils {
 	public static String[] getFeaturesFromFeatureGraph(IFeatureGraph featureGraph) {
 		final SatInstance satInstance =
 			featureGraph.getSatInstance();
-		String[] featureNames =
+		final String[] featureNames =
 			new String[satInstance.getNumberOfVariables()];
 
 		for (int i =

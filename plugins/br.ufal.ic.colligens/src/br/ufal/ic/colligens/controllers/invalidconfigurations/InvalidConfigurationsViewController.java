@@ -37,7 +37,7 @@ import br.ufal.ic.colligens.views.InvalidConfigurationsView;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class InvalidConfigurationsViewController extends ViewController {
 
@@ -48,7 +48,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 
 	private InvalidConfigurationsViewController() {
 		super(InvalidConfigurationsView.ID);
-		this.viewContentProvider =
+		viewContentProvider =
 			new ViewContentProvider();
 	}
 
@@ -62,7 +62,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 
 	/**
 	 * Update view
-	 * 
+	 *
 	 * @param fileProxies
 	 */
 	public void setInput(List<FileProxy> fileProxies) {
@@ -75,14 +75,14 @@ public class InvalidConfigurationsViewController extends ViewController {
 			return;
 		}
 
-		Object object =
+		final Object object =
 			treeViewer.getInput();
-		if (object != null
-			&& object instanceof List) {
+		if ((object != null)
+			&& (object instanceof List)) {
 			@SuppressWarnings("unchecked")
-			List<FileProxy> fileProxies =
+			final List<FileProxy> fileProxies =
 				(List<FileProxy>) object;
-			for (FileProxy fileProxy : fileProxies) {
+			for (final FileProxy fileProxy : fileProxies) {
 				fileProxy.deleteMarkers();
 			}
 
@@ -116,7 +116,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 	 */
 	public void createPartControl(Composite parent) {
 
-		Tree tree =
+		final Tree tree =
 			new Tree(parent, SWT.H_SCROLL
 				| SWT.V_SCROLL
 				| SWT.FULL_SELECTION
@@ -127,9 +127,9 @@ public class InvalidConfigurationsViewController extends ViewController {
 		treeViewer =
 			new TreeViewer(tree);
 
-		this.createColumns(tree);
+		createColumns(tree);
 
-		treeViewer.setContentProvider(this.viewContentProvider);
+		treeViewer.setContentProvider(viewContentProvider);
 		treeViewer.setInput(getView().getViewSite());
 		treeViewer.setLabelProvider(new ViewLabelProvider());
 
@@ -137,58 +137,58 @@ public class InvalidConfigurationsViewController extends ViewController {
 
 			@Override
 			public void handleEvent(Event event) {
-				Point point =
+				final Point point =
 					new Point(event.x, event.y);
-				TreeItem clickedItem =
+				final TreeItem clickedItem =
 					treeViewer.getTree().getItem(point);
 				if (clickedItem != null) {
-					Object data =
+					final Object data =
 						clickedItem.getData();
 					if (data instanceof Log) {
-						if (event.button == MouseEvent.BUTTON1
-							&& event.count == 2) {
+						if ((event.button == MouseEvent.BUTTON1)
+							&& (event.count == 2)) {
 							final Log log =
 								(Log) data;
 							try {
 
-								IEditorPart editor =
+								final IEditorPart editor =
 									IDE.openEditor(getView()
 											.getSite().getPage(), log.getFile());
 								editor.getSite().getSelectionProvider()
 										.setSelection(log.selection());
 
-							} catch (PartInitException e) {
+							} catch (final PartInitException e) {
 
 								e.printStackTrace();
-							} catch (IOException e) {
+							} catch (final IOException e) {
 
 								e.printStackTrace();
-							} catch (CoreException e) {
+							} catch (final CoreException e) {
 
 								e.printStackTrace();
-							} catch (BadLocationException e) {
+							} catch (final BadLocationException e) {
 
 								e.printStackTrace();
 							}
 						}
-						if (event.button == MouseEvent.BUTTON3
-							&& event.count == 2) {
+						if ((event.button == MouseEvent.BUTTON3)
+							&& (event.count == 2)) {
 							final Log log =
 								(Log) data;
-							String textData =
+							final String textData =
 								log.getFullPath()
 									+ "\n"
 									+ log.getMessage()
 									+ "\n"
 									+ log.getFeature();
-							TextTransfer textTransfer =
+							final TextTransfer textTransfer =
 								TextTransfer
 										.getInstance();
 
-							Display display =
+							final Display display =
 								getView().getSite().getShell()
 										.getDisplay();
-							Clipboard cb =
+							final Clipboard cb =
 								new Clipboard(display);
 							cb.setContents(new Object[] {
 								textData },
@@ -197,8 +197,8 @@ public class InvalidConfigurationsViewController extends ViewController {
 						}
 					}
 					if (data instanceof FileProxy) {
-						if (event.button == MouseEvent.BUTTON1
-							&& event.count == 2) {
+						if ((event.button == MouseEvent.BUTTON1)
+							&& (event.count == 2)) {
 
 							final FileProxy fileProxy =
 								(FileProxy) data;
@@ -207,7 +207,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 								IDE.openEditor(getView().getSite().getPage(),
 										(IFile) fileProxy.getResource());
 
-							} catch (PartInitException e) {
+							} catch (final PartInitException e) {
 
 								e.printStackTrace();
 							}
@@ -228,14 +228,14 @@ public class InvalidConfigurationsViewController extends ViewController {
 	}
 
 	public void createColumns(Tree tree) {
-		String[] titles =
+		final String[] titles =
 			{
 				DESCRIPTION,
 				"Resource",
 				"Path",
 				FEATURE_CONFIGURATION,
 				SEVERITY };
-		int[] bounds =
+		final int[] bounds =
 			{
 				300,
 				100,
@@ -245,14 +245,14 @@ public class InvalidConfigurationsViewController extends ViewController {
 
 		for (int i =
 			0; i < bounds.length; i++) {
-			this.createTreeViewerColumn(tree, titles[i], bounds[i], i);
+			createTreeViewerColumn(tree, titles[i], bounds[i], i);
 		}
 	}
 
 	private void createTreeViewerColumn(Tree tree, String title, int bound,
 			final int ColumnNumber) {
 
-		int style =
+		final int style =
 			(ColumnNumber == 0)
 				? SWT.RIGHT
 				: SWT.LEFT;
@@ -264,19 +264,19 @@ public class InvalidConfigurationsViewController extends ViewController {
 		treeColumn.setWidth(bound);
 		treeColumn.setResizable(true);
 		treeColumn.setMoveable(false);
-		treeColumn.addSelectionListener(this.getSelectionAdapter(treeColumn,
+		treeColumn.addSelectionListener(getSelectionAdapter(treeColumn,
 				ColumnNumber));
 	}
 
 	private SelectionAdapter getSelectionAdapter(final TreeColumn column,
 			final int index) {
-		SelectionAdapter selectionAdapter =
+		final SelectionAdapter selectionAdapter =
 			new SelectionAdapter() {
 
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					comparator.setColumn(index);
-					int direction =
+					final int direction =
 						comparator.getDirection();
 					treeViewer.getTree().setSortDirection(direction);
 					treeViewer.getTree().setSortColumn(column);

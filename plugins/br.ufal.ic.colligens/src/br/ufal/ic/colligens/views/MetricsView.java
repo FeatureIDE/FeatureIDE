@@ -14,7 +14,7 @@ public class MetricsView extends ViewPart {
 	public static final String ID =
 		Colligens.PLUGIN_ID
 			+ ".views.MetricsView";
-	private MetricsViewController viewController;
+	private final MetricsViewController viewController;
 
 	public MetricsView() {
 		viewController =

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistributedeadFeatures/or modify
  * it under the terms of the GNU LdeadFeatureseneral PudeadFeaturescense as published by
  * the FredeadFeaturesare Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,12 +47,12 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
-		IFeatureModel featureModel =
+		final IFeatureModel featureModel =
 			configurationMap.getFeatureProject().getFeatureModel();
 		if (featureModel != featureModelFilterIsInitializedFor) {
-			FeatureModelAnalyzer analyser =
+			final FeatureModelAnalyzer analyser =
 				featureModel.getAnalyser();
-			this.deadFeatures =
+			deadFeatures =
 				analyser.getDeadFeatures();
 			featureModelFilterIsInitializedFor =
 				featureModel;
@@ -66,7 +66,7 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		return this.deadFeatures.contains(feature);
+		return deadFeatures.contains(feature);
 	}
 
 }

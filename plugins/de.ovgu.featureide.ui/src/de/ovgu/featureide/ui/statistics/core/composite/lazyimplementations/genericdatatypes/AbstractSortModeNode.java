@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
 /**
  * Implements a second sorting-order. If {@link AbstractSortModeNode#sortByValue} is true, the imminent child nodes are sorted by their value instead of being
  * sorted alphabetically. In this implementation the {@link TreeClickListener} is responsible for changing this.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -70,14 +70,14 @@ public abstract class AbstractSortModeNode extends LazyParent implements IToolTi
 				@Override
 				public int compare(Parent o1, Parent o2) {
 					if (o1.getValue() == null) {
-						if (o1.getDescription() != null
-							&& o2.getDescription() != null) {
+						if ((o1.getDescription() != null)
+							&& (o2.getDescription() != null)) {
 							final int i1 =
 								o1.getDescription().lastIndexOf(": ");
 							final int i2 =
 								o2.getDescription().lastIndexOf(": ");
-							if (i1 > -1
-								&& i2 > -1) {
+							if ((i1 > -1)
+								&& (i2 > -1)) {
 								return o2.getDescription().substring(i2).compareTo(o1.getDescription().substring(i1));
 							}
 						}

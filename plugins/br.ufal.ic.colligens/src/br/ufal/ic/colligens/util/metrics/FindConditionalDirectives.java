@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class FindConditionalDirectives {
 
-	private List<String> directives =
+	private final List<String> directives =
 		new ArrayList<String>();
 	private int files =
 		0;
@@ -26,7 +26,7 @@ public class FindConditionalDirectives {
 				getFiles(fileEntry);
 			} else {
 				if (fileEntry.getName().endsWith(".c")) {
-					this.readFile(fileEntry);
+					readFile(fileEntry);
 				}
 			}
 		}
@@ -37,11 +37,11 @@ public class FindConditionalDirectives {
 			false;
 		files++;
 
-		FileInputStream fstream =
+		final FileInputStream fstream =
 			new FileInputStream(file);
-		DataInputStream in =
+		final DataInputStream in =
 			new DataInputStream(fstream);
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(new InputStreamReader(in));
 		String strLine;
 		while ((strLine =
@@ -52,13 +52,13 @@ public class FindConditionalDirectives {
 				directives =
 					true;
 
-				String pattern =
+				final String pattern =
 					"(?://.*)|(/\\*(?:.|[\\n\\r])*?\\*/)";
-				Pattern r =
+				final Pattern r =
 					Pattern.compile(pattern);
 
 				// Now create matcher object.
-				Matcher m =
+				final Matcher m =
 					r.matcher(strLine);
 				if (m.find()) {
 					strLine =
@@ -79,10 +79,10 @@ public class FindConditionalDirectives {
 	}
 
 	public static void main(String[] args) throws IOException {
-		FindConditionalDirectives findConditionalDirectives =
+		final FindConditionalDirectives findConditionalDirectives =
 			new FindConditionalDirectives();
 		findConditionalDirectives.getFiles(new File("projects/lighttpd/src"));
-		List<String> directives =
+		final List<String> directives =
 			findConditionalDirectives.directives;
 
 		for (int i =

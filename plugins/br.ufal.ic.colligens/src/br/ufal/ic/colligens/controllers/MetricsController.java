@@ -20,7 +20,7 @@ import br.ufal.ic.colligens.util.metrics.MetricsException;
 
 public class MetricsController {
 
-	private ProjectExplorerController pkgExplorerController;
+	private final ProjectExplorerController pkgExplorerController;
 
 	public MetricsController() {
 		pkgExplorerController =
@@ -43,7 +43,7 @@ public class MetricsController {
 		try {
 			pkgExplorerController.run();
 
-			List<String> listFiles =
+			final List<String> listFiles =
 				pkgExplorerController.getListToString();
 
 			if (listFiles.isEmpty()) {
@@ -59,19 +59,19 @@ public class MetricsController {
 			int LinesOfCode =
 				0;
 
-			CountDirectives countDirectives =
+			final CountDirectives countDirectives =
 				new CountDirectives();
 
-			for (Iterator<String> iterator =
+			for (final Iterator<String> iterator =
 				listFiles.iterator(); iterator
 						.hasNext();) {
-				String file =
-					(String) iterator.next();
+				final String file =
+					iterator.next();
 				numberFiles++;
 				try {
-					CountDirectives countDirective =
+					final CountDirectives countDirective =
 						new CountDirectives();
-					int count =
+					final int count =
 						countDirective.count(file);
 					LinesOfCode =
 						LinesOfCode
@@ -90,12 +90,12 @@ public class MetricsController {
 						countDirectives.directives
 								.addAll(countDirective.directives);
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 
 				}
 			}
 
-			LinkedList<Metrics> list =
+			final LinkedList<Metrics> list =
 				new LinkedList<Metrics>();
 
 			Metrics statistics =
@@ -126,13 +126,13 @@ public class MetricsController {
 					+ LOC);
 			list.add(statistics);
 
-			MetricsViewController statisticsViewController =
+			final MetricsViewController statisticsViewController =
 				MetricsViewController
 						.getInstance();
 
 			statisticsViewController.setInput(list);
 
-		} catch (ProjectExplorerException e) {
+		} catch (final ProjectExplorerException e) {
 
 		}
 

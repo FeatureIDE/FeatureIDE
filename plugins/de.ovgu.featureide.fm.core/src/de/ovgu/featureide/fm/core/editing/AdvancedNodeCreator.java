@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class AdvancedNodeCreator implements LongRunningMethod<Node> {
@@ -63,14 +63,14 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public static Node createCNF(IFeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator =
+		final AdvancedNodeCreator nodeCreator =
 			new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
 	}
 
 	public static Node createRegularCNF(IFeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator =
+		final AdvancedNodeCreator nodeCreator =
 			new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
@@ -160,7 +160,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * Creates the nodes for all constraints of the feature model.
-	 * 
+	 *
 	 * @return the transformed nodes
 	 */
 	private And createConstraintNodes() {
@@ -174,7 +174,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * Creates the node for a single constraint of the feature model.
-	 * 
+	 *
 	 * @param constraint constraint to transform
 	 * @return the transformed node
 	 */
@@ -184,7 +184,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * Creates the node for a single constraint of the feature model.
-	 * 
+	 *
 	 * @param constraint constraint to transform
 	 * @param positive false to negate the node of the constraint before adding
 	 * @return the transformed node
@@ -192,8 +192,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	public Node createConstraintNode(IConstraint constraint, boolean positive) {
 		final List<Node> clauses =
 			createConstraintNodes(constraint, new LinkedList<Node>(), positive);
-		if (cnfType != CNFType.Regular
-			&& clauses.size() == 1) {
+		if ((cnfType != CNFType.Regular)
+			&& (clauses.size() == 1)) {
 			return clauses.get(0);
 		}
 		return new And(clauses.toArray(new Node[clauses.size()]));
@@ -201,7 +201,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * Creates the clauses for the given constraint. Adds them to the given list of clauses.
-	 * 
+	 *
 	 * @param constraint constraint to transform
 	 * @param clauses clauses to add to; out variable
 	 * @param positive false to negate the node of the constraint before adding
@@ -237,10 +237,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			final Node cnfNode =
 				Node.buildCNF(clause);
 			if (cnfNode instanceof And) {
-				for (Node andChild : cnfNode.getChildren()) {
+				for (final Node andChild : cnfNode.getChildren()) {
 					clause =
 						compact
-							|| andChild instanceof Or
+							|| (andChild instanceof Or)
 								? andChild
 								: new Or(andChild);
 					clauses.add(clause);
@@ -251,7 +251,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			} else {
 				clause =
 					compact
-						|| cnfNode instanceof Or
+						|| (cnfNode instanceof Or)
 							? cnfNode
 							: new Or(cnfNode);
 				clauses.add(clause);
@@ -368,7 +368,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	private Node removeFeatures(final Node[] nodeArray, IMonitor monitor) {
-		if (excludedFeatureNames != null
+		if ((excludedFeatureNames != null)
 			&& !excludedFeatureNames.isEmpty()) {
 			final FeatureRemover remover =
 				new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular);
@@ -407,8 +407,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 			final Iterable<IFeature> features =
 				featureModel.getFeatures();
-			for (IFeature feature : features) {
-				for (IFeatureStructure child : feature.getStructure().getChildren()) {
+			for (final IFeature feature : features) {
+				for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 					final IFeature childFeature =
 						child.getFeature();
 					clause =
@@ -421,7 +421,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 				if (feature.getStructure().hasChildren()) {
 					if (feature.getStructure().isAnd()) {
-						for (IFeatureStructure child : feature.getStructure().getChildren()) {
+						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							if (child.isMandatory()) {
 								final IFeature childFeature =
 									child.getFeature();
@@ -441,7 +441,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 								+ 1];
 						int i =
 							0;
-						for (IFeatureStructure child : feature.getStructure().getChildren()) {
+						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							final IFeature childFeature =
 								child.getFeature();
 							orLiterals[i++] =
@@ -464,7 +464,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 								+ 1];
 						int i =
 							0;
-						for (IFeatureStructure child : feature.getStructure().getChildren()) {
+						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							final IFeature childFeature =
 								child.getFeature();
 							alternativeLiterals[i++] =
@@ -480,13 +480,13 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 							traceModel.addTraceChildDown(feature, children);
 						}
 
-						for (ListIterator<IFeatureStructure> it1 =
+						for (final ListIterator<IFeatureStructure> it1 =
 							feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
 							final IFeatureStructure fs =
 								it1.next();
 							final IFeature sibling1 =
 								fs.getFeature();
-							for (ListIterator<IFeatureStructure> it2 =
+							for (final ListIterator<IFeatureStructure> it2 =
 								feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
 								final IFeature sibling2 =
 									it2.next().getFeature();
@@ -540,7 +540,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * {@link #includeBooleanValues}
-	 * 
+	 *
 	 * @return the currently set value
 	 */
 	public boolean includeBooleanValues() {
@@ -570,7 +570,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			featureModel;
 		this.excludedFeatureNames =
 			excludedFeatureNames;
-		this.traceModel =
+		traceModel =
 			isRecordingTraceModel()
 				? new FeatureModelToNodeTraceModel()
 				: null; // Reset the trace model.
@@ -578,7 +578,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * {@link #includeBooleanValues}
-	 * 
+	 *
 	 * @param includeBooleanValues the value to set
 	 */
 	public void setIncludeBooleanValues(boolean includeBooleanValues) {
@@ -602,10 +602,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * <p> Returns the trace model. The trace model keeps track of the origin of transformed elements. </p>
-	 * 
+	 *
 	 * <p> Building the trace model must have been {@link #setRecordTraceModel(boolean) enabled} prior to creating the nodes. As a performance concern, this is
 	 * disabled by default. </p>
-	 * 
+	 *
 	 * @return the trace model
 	 */
 	public FeatureModelToNodeTraceModel getTraceModel() {
@@ -614,7 +614,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * Returns true iff this creates a trace model while creating nodes. Defaults to false.
-	 * 
+	 *
 	 * @return true iff this creates a trace model while creating nodes
 	 */
 	public boolean isRecordingTraceModel() {
@@ -623,16 +623,16 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	/**
 	 * Sets whether this should create a trace model while creating nodes.
-	 * 
+	 *
 	 * @param recordTraceModel whether to create a trace model while creating nodes
 	 */
 	public void setRecordTraceModel(boolean recordTraceModel) {
-		boolean old =
+		final boolean old =
 			this.recordTraceModel;
 		this.recordTraceModel =
 			recordTraceModel;
 		if (old != recordTraceModel) {
-			this.traceModel =
+			traceModel =
 				isRecordingTraceModel()
 					? new FeatureModelToNodeTraceModel()
 					: null; // Reset the trace model.

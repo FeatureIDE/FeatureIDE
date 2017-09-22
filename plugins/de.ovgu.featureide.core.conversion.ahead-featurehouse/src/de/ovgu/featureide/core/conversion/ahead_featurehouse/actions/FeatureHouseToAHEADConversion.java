@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -54,7 +54,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
  * Changes the composer of an feature project project to <code>AHEAD</code>.
- * 
+ *
  * @author Jens Meinicke
  */
 @SuppressWarnings(RESTRICTION)
@@ -64,7 +64,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 
 	/**
 	 * Changes the composer of the given feature project to <code>AHEAD</code>.
-	 * 
+	 *
 	 * @param featureProject
 	 */
 	public FeatureHouseToAHEADConversion(final IFeatureProject featureProject) {
@@ -77,9 +77,10 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 			+ featureProject.getProjectName()
 			+
 			FROM_FEATUREHOUSE_TO_AHEAD_);
-		Job job =
+		final Job job =
 			new Job(CHANGE_COMPOSER_) {
 
+				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
 						setJavaBuildPath(featureProject);
@@ -104,7 +105,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void buildFullFSTModel() {
 		featureProject.getComposer().buildFSTModel();
@@ -112,14 +113,14 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 
 	/**
 	 * Sets the java build path to the build folder of the given feature project.
-	 * 
+	 *
 	 * @param featureProject
 	 */
 	private void setJavaBuildPath(IFeatureProject featureProject) {
 		try {
-			JavaProject javaProject =
+			final JavaProject javaProject =
 				new JavaProject(featureProject.getProject(), null);
-			IClasspathEntry[] classpathEntries =
+			final IClasspathEntry[] classpathEntries =
 				javaProject.getRawClasspath();
 			for (int i =
 				0; i < classpathEntries.length; i++) {
@@ -133,7 +134,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 			}
 
 			/** case: no source entry **/
-			IClasspathEntry[] newEntries =
+			final IClasspathEntry[] newEntries =
 				new IClasspathEntry[classpathEntries.length
 					+ 1];
 			System.arraycopy(classpathEntries, 0, newEntries, 0, classpathEntries.length);
@@ -141,14 +142,14 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 				- 1] =
 					getSourceEntry();
 			javaProject.setRawClasspath(classpathEntries, null);
-		} catch (JavaModelException e) {
+		} catch (final JavaModelException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
 	 * Set the source path of given <code>ClasspathEntry</code> to the current build path
-	 * 
+	 *
 	 * @param e The entry to set
 	 * @return The entry with the new source path
 	 */
@@ -170,7 +171,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 
 	/**
 	 * Replaces the composer of the given feature project by <code>AHEAD</code>.
-	 * 
+	 *
 	 * @param project
 	 */
 	@Override
@@ -230,14 +231,14 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 			final String name =
 				model.getAbsoluteClassName(file);
 			if (model.getClass(name) != null) {
-				LinkedList<FSTMethod> methods =
+				final LinkedList<FSTMethod> methods =
 					new LinkedList<FSTMethod>();
-				for (FSTRole role : model.getClass(name).getRoles()) {
+				for (final FSTRole role : model.getClass(name).getRoles()) {
 					methods.addAll(role.getClassFragment().getMethods());
 				}
-				for (FSTMethod method : methods) {
-					if (method.getLine() <= line
-						&& method.getEndLine() >= line) {
+				for (final FSTMethod method : methods) {
+					if ((method.getLine() <= line)
+						&& (method.getEndLine() >= line)) {
 						return method.getName();
 					}
 				}
@@ -248,14 +249,14 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 
 	/**
 	 * Replaces the file extension <code>.java</code> by <code>.jak</code> of the given file
-	 * 
+	 *
 	 * @param file
 	 */
 	@Override
 	void replaceFileExtension(IFile file) {
 		try {
 			file.move(((IFolder) file.getParent()).getFile(file.getName().replace(".java", ".jak")).getFullPath(), true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			ConversionPlugin.getDefault().logError(e);
 		}
 	}

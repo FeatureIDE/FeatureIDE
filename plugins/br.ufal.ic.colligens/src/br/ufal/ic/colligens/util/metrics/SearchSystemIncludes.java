@@ -11,15 +11,15 @@ import java.util.List;
 
 public class SearchSystemIncludes {
 
-	private List<String> systemIncludes =
+	private final List<String> systemIncludes =
 		new ArrayList<String>();
 
 	public void readFile(File file) throws IOException {
-		FileInputStream fstream =
+		final FileInputStream fstream =
 			new FileInputStream(file);
-		DataInputStream in =
+		final DataInputStream in =
 			new DataInputStream(fstream);
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(new InputStreamReader(in));
 		String strLine;
 		while ((strLine =
@@ -50,7 +50,7 @@ public class SearchSystemIncludes {
 	}
 
 	public int count(String path) throws IOException {
-		File file =
+		final File file =
 			new File(path);
 		if (file.isDirectory()) {
 			listFilesForFolder(file);

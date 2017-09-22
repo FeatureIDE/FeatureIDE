@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * Convenience methods for traversing the feature tree structure.
- * 
+ *
  * @author Sebastian Krieter
  */
 public final class Features {
@@ -89,13 +89,14 @@ public final class Features {
 	}
 
 	public static final Collection<String> extractOperatorNamesFromFeatuers(final Set<String> features) {
-		List<String> result =
+		final List<String> result =
 			new ArrayList<>();
-		for (String feature : features) {
+		for (final String feature : features) {
 			final String str =
 				feature.toLowerCase().trim();
-			if (Operator.isOperatorName(str))
+			if (Operator.isOperatorName(str)) {
 				result.add(str);
+			}
 		}
 		return result;
 	}
@@ -103,7 +104,7 @@ public final class Features {
 	public static IFeature getCommonAncestor(Collection<IFeature> features) {
 		List<IFeature> commonAncestorList =
 			null;
-		for (IFeature feature : features) {
+		for (final IFeature feature : features) {
 			commonAncestorList =
 				Features.getCommonAncestor(commonAncestorList, FeatureUtils.getParent(feature));
 		}
@@ -121,7 +122,7 @@ public final class Features {
 					FeatureUtils.getParent(parent);
 			}
 		} else if (parent != null) {
-			LinkedList<IFeature> parentList =
+			final LinkedList<IFeature> parentList =
 				new LinkedList<>();
 			while (parent != null) {
 				parentList.addFirst(parent);

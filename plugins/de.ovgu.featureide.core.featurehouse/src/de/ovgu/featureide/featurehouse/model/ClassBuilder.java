@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -52,35 +52,35 @@ public class ClassBuilder {
 
 	/**
 	 * Creates the entry for the given field.
-	 * 
+	 *
 	 * @param terminal FSTTerminal containing the field
 	 */
 	void caseFieldDeclaration(FSTTerminal terminal) {}
 
 	/**
 	 * Creates the entry for the given method.
-	 * 
+	 *
 	 * @param terminal FSTTerminal containing the method
 	 */
 	void caseMethodDeclaration(FSTTerminal terminal) {}
 
 	/**
 	 * Creates the entry for the given constructor.
-	 * 
+	 *
 	 * @param terminal FSTTerminal containing the constructor
 	 */
 	void caseConstructorDeclaration(FSTTerminal terminal) {}
 
 	/**
 	 * Creates the entry for the given constructor.
-	 * 
+	 *
 	 * @param terminal FSTTerminal containing the constructor
 	 */
 	void caseInnerClassDeclaration(FSTTerminal terminal) {}
 
 	/**
 	 * Locks for the correct {@link ClassBuilder} of the given file.
-	 * 
+	 *
 	 * @return <code>ClassBuilder</code> for the given file
 	 */
 	public static ClassBuilder getClassBuilder(IFile file, FeatureHouseModelBuilder builder) {
@@ -113,7 +113,7 @@ public class ClassBuilder {
 
 	/**
 	 * Adds the method with the given parameters to the {@link FSTModel}.
-	 * 
+	 *
 	 * @param name Name of the method
 	 * @param parameterTypes Types of the parameters
 	 * @param returnType Return type
@@ -126,7 +126,7 @@ public class ClassBuilder {
 	 */
 	IRoleElement addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine,
 			boolean isConstructor, String contract, String compKey, int contractLine) {
-		FSTMethod method =
+		final FSTMethod method =
 			new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract, compKey, contractLine);
 		method.setConstructor(isConstructor);
 		if (body.contains("original")) {
@@ -140,7 +140,7 @@ public class ClassBuilder {
 
 	protected IRoleElement addField(String fieldName, String typeName, String modifiers,
 			String body, int beginLine, int endLine) {
-		FSTField field =
+		final FSTField field =
 			new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
 		modelBuilder.getCurrentClassFragment().add(field);
 		return field;

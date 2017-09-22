@@ -28,20 +28,20 @@ public class CountDirectives {
 
 	public void listFile(File file) throws Exception {
 		if (file.isDirectory()) {
-			this.listFiles(file);
+			listFiles(file);
 		} else {
-			this.getDirectives(file);
+			getDirectives(file);
 		}
 	}
 
 	public void listFiles(File path) throws Exception {
-		File[] files =
+		final File[] files =
 			path.listFiles();
-		for (File file : files) {
+		for (final File file : files) {
 			if (file.isDirectory()) {
-				this.listFiles(file);
+				listFiles(file);
 			} else {
-				this.getDirectives(file);
+				getDirectives(file);
 			}
 		}
 	}
@@ -49,11 +49,11 @@ public class CountDirectives {
 	public Set<String> getDirectives(File file) throws Exception {
 		// Set<String> directives = new HashSet<String>();
 
-		FileInputStream fstream =
+		final FileInputStream fstream =
 			new FileInputStream(file);
-		DataInputStream in =
+		final DataInputStream in =
 			new DataInputStream(fstream);
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(new InputStreamReader(in));
 		String strLine;
 
@@ -112,7 +112,7 @@ public class CountDirectives {
 							.replace("!", "").replace("<", "").replace(">", "")
 							.replace("=", "");
 
-				String[] directivesStr =
+				final String[] directivesStr =
 					directive.split(" ");
 
 				for (int i =

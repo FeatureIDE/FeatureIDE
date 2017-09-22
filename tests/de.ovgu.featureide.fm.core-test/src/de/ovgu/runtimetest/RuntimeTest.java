@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -54,28 +54,28 @@ import de.ovgu.runtimetest.RuntimeTest.Logger.Level;
  * abstract base class <code>RuntimeTest</code> but there is no need to specify additional <code>@Test</code> annotations of JUnit. To invoke runtime
  * constraints on certain methods, a <b>@Constraint</b> annotation is required. Inside this annotation, it is required to specify a maximum sample count
  * (<b>samples</b>) and the optional minimum and maximum ranges.
- * 
+ *
  * <br/><br/> <b>Note</b>: Since JUnit invokes a starter method inside this class, the entire test will stop if at least one method under test fail by
  * constraint violation or regular exceptions or assertions. An additional JUnit <code>@Test</code> annotation will lead to an additional test drive by JUnit
  * but with regular behavior.
- * 
+ *
  * <br/><br/> <b>Example</b> <pre><code> import java.util.Random;
- * 
+ *
  * public class MyTest extends RuntimeTest {
- * 
+ *
  * static { disableThisTest = false; historyLength = HistoryLength.FIVE_ENTRIES; logger = Logger.LOG_NOTHING; }
- * 
+ *
  * @Annotations.WarmUp public void methodBeforeTesting() { // Add code here }
- * 
- * 
+ *
+ *
  * @Annotations.CoolDown public void methodAfterTesting() { // Add code here }
- * 
- * 
+ *
+ *
  * @Annotations.Constraint(samples=5,allowedPlus=3) public void foo1() throws InterruptedException { Thread.sleep(new Random().nextInt(20)); }
- * 
+ *
  * @Annotations.Constraint(samples=5,allowedPlus=10,allowedMinus=1) public void foo2() throws InterruptedException { Thread.sleep(new Random().nextInt(10)); } }
  *                                                                  </code></pre>
- * 
+ *
  * @author Marcus Pinnecke (pinnecke@ovgu.de)
  *
  */
@@ -89,17 +89,17 @@ public abstract class RuntimeTest {
 
 	/**
 	 * Annotation namespace
-	 * 
+	 *
 	 * @author Marcus Pinnecke (pinnecke@ovgu.de)
 	 */
 	public static class Annotations {
 
 		/**
 		 * Specifies that a user-defined method should be automatically invoked and tested in terms of regular JUnit/Java behavior and runtime behavior.
-		 * 
+		 *
 		 * @see WarmUp
 		 * @see CoolDown
-		 * 
+		 *
 		 * @author Marcus Pinnecke (pinnecke@ovgu.de)
 		 */
 		@Target(value = ElementType.METHOD)
@@ -115,10 +115,10 @@ public abstract class RuntimeTest {
 
 		/**
 		 * Methods annotated with this annotation will be executed before the first invocation of <code>@Constraint</code> methods.
-		 * 
+		 *
 		 * @see WarmUp
 		 * @see Constraint
-		 * 
+		 *
 		 * @author Marcus Pinnecke (pinnecke@ovgu.de)
 		 */
 		@Target(value = ElementType.METHOD)
@@ -127,10 +127,10 @@ public abstract class RuntimeTest {
 
 		/**
 		 * Methods annotated with this annotation will be executed after the last invocation of <code>@Constraint</code> methods.
-		 * 
+		 *
 		 * @see CoolDown
 		 * @see Constraint
-		 * 
+		 *
 		 * @author Marcus Pinnecke (pinnecke@ovgu.de)
 		 */
 		@Target(value = ElementType.METHOD)
@@ -199,8 +199,9 @@ public abstract class RuntimeTest {
 			private File clear(File file) {
 				assert (file != null);
 
-				if (file.exists())
+				if (file.exists()) {
 					file.delete();
+				}
 
 				assert (!file.exists());
 				return file;
@@ -208,9 +209,9 @@ public abstract class RuntimeTest {
 
 			@Override
 			protected void clearHistory(final String clazz, final String method) {
-				assert (clazz != null
+				assert ((clazz != null)
 					&& !clazz.isEmpty());
-				assert (method != null
+				assert ((method != null)
 					&& !method.isEmpty());
 
 				clear(new File(autoName(clazz, method)));
@@ -220,9 +221,9 @@ public abstract class RuntimeTest {
 
 			@Override
 			protected boolean hasHistory(final String clazz, final String method) {
-				assert (clazz != null
+				assert ((clazz != null)
 					&& !clazz.isEmpty());
-				assert (method != null
+				assert ((method != null)
 					&& !method.isEmpty());
 
 				return new File(autoName(clazz, method)).exists();
@@ -230,17 +231,18 @@ public abstract class RuntimeTest {
 
 			@Override
 			protected Queue<Double> loadHistory(final String clazz, final String method) {
-				assert (clazz != null
+				assert ((clazz != null)
 					&& !clazz.isEmpty());
-				assert (method != null
+				assert ((method != null)
 					&& !method.isEmpty());
 
 				final Queue<Double> retval =
 					new LinkedList<>();
 				try {
-					for (String s : readAllLines(Paths.get(autoName(clazz, method))))
+					for (final String s : readAllLines(Paths.get(autoName(clazz, method)))) {
 						retval.add(Double.valueOf(s));
-				} catch (Exception e) {
+					}
+				} catch (final Exception e) {
 					Assert.fail("Unable to load: "
 						+ autoName(clazz, method));
 				}
@@ -249,9 +251,9 @@ public abstract class RuntimeTest {
 			}
 
 			private String autoName(final String clazz, final String method) {
-				assert (clazz != null
+				assert ((clazz != null)
 					&& !clazz.isEmpty());
-				assert (method != null
+				assert ((method != null)
 					&& !method.isEmpty());
 				return clazz
 					+ "_"
@@ -262,9 +264,9 @@ public abstract class RuntimeTest {
 
 			@Override
 			protected void storeHistory(String clazz, String method, Collection<Double> runtimes) {
-				assert (clazz != null
+				assert ((clazz != null)
 					&& !clazz.isEmpty());
-				assert (method != null
+				assert ((method != null)
 					&& !method.isEmpty());
 				assert (runtimes != null);
 
@@ -272,8 +274,9 @@ public abstract class RuntimeTest {
 					clear(new File(autoName(clazz, method)));
 				try (final PrintStream ps =
 					new PrintStream(file)) {
-					for (final Double d : runtimes)
+					for (final Double d : runtimes) {
 						ps.println(d);
+					}
 				} catch (final FileNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -312,7 +315,7 @@ public abstract class RuntimeTest {
 				final Annotations.Constraint constraint, final double avgRuntime) {
 			assert (clazz != null);
 			assert (method != null);
-			assert (runtimes != null
+			assert ((runtimes != null)
 				&& !runtimes.isEmpty());
 			assert (constraint != null);
 
@@ -334,10 +337,10 @@ public abstract class RuntimeTest {
 			assert (min <= recordedAvg);
 
 			final boolean pass =
-				(min == Double.NEGATIVE_INFINITY
-					|| avgRuntime >= min)
-					&& (max == Double.POSITIVE_INFINITY
-						|| avgRuntime <= max);
+				((min == Double.NEGATIVE_INFINITY)
+					|| (avgRuntime >= min))
+					&& ((max == Double.POSITIVE_INFINITY)
+						|| (avgRuntime <= max));
 
 			logger.logLn(Level.DEBUG, method.getName()
 				+ " average from history: "
@@ -369,9 +372,9 @@ public abstract class RuntimeTest {
 			assert (avgRuntime >= 0);
 
 			final Map<String, Queue<Double>> methodRuntimes =
-				(Map<String, Queue<Double>>) getOrDefault(history, clazz.getName(), new HashMap<String, Queue<Double>>());
+				getOrDefault(history, clazz.getName(), new HashMap<String, Queue<Double>>());
 			final Queue<Double> runtimes =
-				(Queue<Double>) getOrDefault(methodRuntimes, method.getName(),
+				getOrDefault(methodRuntimes, method.getName(),
 						hasHistory(clazz.getName(), method.getName())
 							? loadHistory(clazz.getName(), method.getName())
 							: new LinkedList<Double>());
@@ -387,7 +390,9 @@ public abstract class RuntimeTest {
 						recordedAvg
 							- constraint.allowedMinus();
 					return new Result(false, makeMessage(avgRuntime, min, max, clazz, method));
-				} else runtimes.add(avgRuntime);
+				} else {
+					runtimes.add(avgRuntime);
+				}
 			}
 			cleanUp(runtimes, historyConfig);
 			clearHistory(clazz.getName(), method.getName());
@@ -398,9 +403,13 @@ public abstract class RuntimeTest {
 		}
 
 		private String makeMessage(final double avg, final double min, final double max, final Class<?> clazz, Method method) {
-			if (avg < min) return format(avg, min, clazz, method, "at least");
-			else if (avg > max) return format(avg, max, clazz, method, "at most");
-			else throw new RuntimeException();
+			if (avg < min) {
+				return format(avg, min, clazz, method, "at least");
+			} else if (avg > max) {
+				return format(avg, max, clazz, method, "at most");
+			} else {
+				throw new RuntimeException();
+			}
 		}
 
 		private String format(final double avg, final double min, final Class<?> clazz, final Method method, final String bound) {
@@ -419,8 +428,9 @@ public abstract class RuntimeTest {
 		protected abstract Queue<Double> loadHistory(final String clazz, final String method);
 
 		private void cleanUp(final Queue<Double> runtimes, final HistoryLength historyConfig) {
-			while (runtimes.size() > historyConfig.maximumEntries)
+			while (runtimes.size() > historyConfig.maximumEntries) {
 				runtimes.poll();
+			}
 		}
 
 		protected abstract void storeHistory(final String clazz, final String method, final Collection<Double> runtimes);
@@ -504,11 +514,15 @@ public abstract class RuntimeTest {
 
 		public final void log(final Level level, final String message) {
 			if (logInfo
-				&& level == Level.INFO) printerInfo.print(message);
-			else if (logDebug
-				&& level == Level.DEBUG) printerDebug.print(message);
-			else if (logError
-				&& level == Level.ERROR) printerError.print(message);
+				&& (level == Level.INFO)) {
+				printerInfo.print(message);
+			} else if (logDebug
+				&& (level == Level.DEBUG)) {
+				printerDebug.print(message);
+			} else if (logError
+				&& (level == Level.ERROR)) {
+				printerError.print(message);
+			}
 		}
 
 		public final void logLn(final Level level, final String message) {
@@ -530,21 +544,23 @@ public abstract class RuntimeTest {
 	protected static double avg(final Collection<Double> list) {
 		double retval =
 			0;
-		for (double l : list)
+		for (final double l : list) {
 			retval +=
 				l;
+		}
 		return retval
-			/ (double) list.size();
+			/ list.size();
 	}
 
 	protected static double avg(final long[] list) {
 		double retval =
 			0;
-		for (long l : list)
+		for (final long l : list) {
 			retval +=
 				l;
+		}
 		return retval
-			/ (double) list.length;
+			/ list.length;
 	}
 
 	protected static Collection<String> readAllLines(final Path path) {
@@ -561,10 +577,10 @@ public abstract class RuntimeTest {
 					bufferedReader.readLine()) != null) {
 					lines.add(line);
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return lines;
@@ -624,25 +640,28 @@ public abstract class RuntimeTest {
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	protected void checkConstraintRanges(final Annotations.Constraint constraint) {
-		if ((constraint.allowedMinus() != Double.NEGATIVE_INFINITY
-			&& constraint.allowedMinus() < 0)
-			|| (constraint.allowedPlus() != Double.POSITIVE_INFINITY
-				&& constraint.allowedPlus() < 0))
+		if (((constraint.allowedMinus() != Double.NEGATIVE_INFINITY)
+			&& (constraint.allowedMinus() < 0))
+			|| ((constraint.allowedPlus() != Double.POSITIVE_INFINITY)
+				&& (constraint.allowedPlus() < 0))) {
 			throw new RangeException(constraint);
+		}
 	}
 
 	protected List<Method> extractConstaintedMethods(final Class<? extends Annotation> annotation) throws SecurityException {
 		final List<Method> result =
 			new ArrayList<>();
-		for (final Method method : this.getClass().getMethods())
-			if (method.isAnnotationPresent(annotation))
+		for (final Method method : this.getClass().getMethods()) {
+			if (method.isAnnotationPresent(annotation)) {
 				result.add(method);
+			}
+		}
 		return result;
 	}
 
 	protected String formatException(final Throwable e, final String headerMessage) {
-		assert (e != null
-			&& headerMessage != null) : "Argument is null";
+		assert ((e != null)
+			&& (headerMessage != null)) : "Argument is null";
 
 		final StackTraceElement[] st =
 			e.getStackTrace();
@@ -664,8 +683,8 @@ public abstract class RuntimeTest {
 			trace.append("\n\t");
 		}
 
-		assert (trace != null
-			&& trace.length() > 0);
+		assert ((trace != null)
+			&& (trace.length() > 0));
 		return trace.toString();
 	}
 
@@ -673,9 +692,9 @@ public abstract class RuntimeTest {
 			IllegalArgumentException, InvocationTargetException {
 		final List<Method> constraintedMethods =
 			extractConstaintedMethods(annotation);
-		if (constraintedMethods.isEmpty())
+		if (constraintedMethods.isEmpty()) {
 			logger.logLn(Level.DEBUG, STR_NO_METHODS);
-		else {
+		} else {
 			for (final Method m : constraintedMethods) {
 				logger.log(Level.DEBUG, ".");
 				m.invoke(instance);
@@ -686,18 +705,18 @@ public abstract class RuntimeTest {
 
 	protected long measureMethodRuntime(final Method m, final Object instance) throws IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
-		assert (m != null
-			&& instance != null) : "Argument is null";
+		assert ((m != null)
+			&& (instance != null)) : "Argument is null";
 
 		final long startTime =
 			System.currentTimeMillis();
 		try {
 			m.invoke(instance);
 		} catch (final Throwable e) {
-			if (e instanceof InvocationTargetException
-				&& e.getCause() instanceof AssertionError) {
+			if ((e instanceof InvocationTargetException)
+				&& (e.getCause() instanceof AssertionError)) {
 				((AssertionError) e.getCause()).printStackTrace();
-				Assert.fail(formatException(((AssertionError) e.getCause()), STR_EXCEPTION_JUNIT));
+				Assert.fail(formatException((e.getCause()), STR_EXCEPTION_JUNIT));
 			} else {
 				e.printStackTrace();
 				Assert.fail(formatException(e.getCause(), STR_EXCEPTION_IN_METHOD));
@@ -719,7 +738,7 @@ public abstract class RuntimeTest {
 	protected void runTestPhase(final Object instance) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		assert (instance != null) : "Instance is null";
 
-		for (Method m : extractConstaintedMethods(Annotations.Constraint.class)) {
+		for (final Method m : extractConstaintedMethods(Annotations.Constraint.class)) {
 			final Annotations.Constraint constraint =
 				m.getAnnotation(Annotations.Constraint.class);
 			checkConstraintRanges(constraint);
@@ -733,11 +752,13 @@ public abstract class RuntimeTest {
 					measureMethodRuntime(m, instance);
 				passesTest =
 					history.addRun(historyLength, this.getClass(), m, constraint, avgRuntime);
-				if (passesTest.testPass)
+				if (passesTest.testPass) {
 					break;
+				}
 			}
-			if (!passesTest.testPass)
+			if (!passesTest.testPass) {
 				Assert.fail(formatException(new ViolationException(passesTest.message), STR_EXCEPTION_CONSTRAINT_VIOLATION));
+			}
 		}
 	}
 
@@ -767,7 +788,9 @@ public abstract class RuntimeTest {
 				e.printStackTrace();
 				Assert.fail(e.toString());
 			}
-		} else logger.logLn(Level.DEBUG, STR_SKIP_CONSTRAINT_TEST
-			+ this.getClass().getName());
+		} else {
+			logger.logLn(Level.DEBUG, STR_SKIP_CONSTRAINT_TEST
+				+ this.getClass().getName());
+		}
 	}
 }

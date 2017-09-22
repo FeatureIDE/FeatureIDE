@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,7 +41,7 @@ import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * Wrapper for KeY
- * 
+ *
  * @author Stefan Krueger
  * @author Sebastian Krieter
  */
@@ -53,7 +53,7 @@ public class KeYWrapper {
 	static {
 		Bundle bundleKeYStarter =
 			null;
-		for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
+		for (final Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
 			if (b.getSymbolicName().equals("org.key_project.key4eclipse")) {
 				bundleKeYStarter =
 					b;
@@ -65,7 +65,7 @@ public class KeYWrapper {
 
 		try {
 			if (bundleKeYStarter != null) {
-				org.osgi.framework.BundleActivator act =
+				final org.osgi.framework.BundleActivator act =
 					((org.osgi.framework.BundleActivator) bundleKeYStarter.loadClass(
 							"org.key_project.key4eclipse.Activator").newInstance());
 				act.start(InternalPlatform.getDefault().getBundleContext());
@@ -80,14 +80,14 @@ public class KeYWrapper {
 					bundleKeYStarter.loadClass("de.uka.ilkd.key.ui.UserInterface");
 
 				isKeYLoadedtmp =
-					mainClass != null
-						&& keYMediatorClass != null
-						&& guilClass != null
-						&& uiClass != null;
+					(mainClass != null)
+						&& (keYMediatorClass != null)
+						&& (guilClass != null)
+						&& (uiClass != null);
 			}
-		} catch (RuntimeException e) {
+		} catch (final RuntimeException e) {
 			throw e;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		} finally {
 			isKeYLoaded =
@@ -133,19 +133,19 @@ public class KeYWrapper {
 
 	public void runKeY(File file) throws IOException {
 		try {
-			Constructor<?> mainC =
+			final Constructor<?> mainC =
 				mainClass.getConstructor(String[].class);
-			Object key =
+			final Object key =
 				mainC.newInstance((Object) (new String[] {
 					file.getCanonicalPath() }));
-			Method getGui =
+			final Method getGui =
 				mainClass.getMethod("getUi");
-			Object ui =
+			final Object ui =
 				getGui.invoke(key);
 			if (ui != null) {
-				Method getMediator =
+				final Method getMediator =
 					uiClass.getMethod("getMediator");
-				Method addGuiListener =
+				final Method addGuiListener =
 					keYMediatorClass.getMethod("addGUIListener", guilClass);
 				addGuiListener.invoke(getMediator.invoke(ui), guiL);
 			} else {

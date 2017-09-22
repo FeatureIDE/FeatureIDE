@@ -19,7 +19,7 @@ import br.ufal.ic.colligens.util.Log;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class FileProxy {
 
@@ -27,8 +27,8 @@ public class FileProxy {
 	// temporary path defined by the user.
 	private String newFilepath =
 		null;
-	private IResource iResource;
-	private List<Log> logs;
+	private final IResource iResource;
+	private final List<Log> logs;
 
 	public FileProxy(IResource iResource) {
 		this.iResource =
@@ -48,16 +48,16 @@ public class FileProxy {
 				.getBoolean("USE_INCLUDES")) {
 			try {
 				// Create temporary file.
-				this.generate();
-			} catch (IOException e) {
+				generate();
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		this.logs =
+		logs =
 			new LinkedList<Log>();
 
-		this.deleteMarkers();
+		deleteMarkers();
 	}
 
 	public String getFileName() {
@@ -114,7 +114,7 @@ public class FileProxy {
 				+ "projects"
 				+ path
 				+ getFileName();
-		this.generate();
+		generate();
 		return newFilepath;
 	}
 
@@ -128,7 +128,7 @@ public class FileProxy {
 	 */
 	private void generate() throws IOException {
 
-		File filePath =
+		final File filePath =
 			new File(Colligens.getDefault().getConfigDir()
 					.getAbsolutePath()
 				+ System.getProperty("file.separator")
@@ -137,7 +137,7 @@ public class FileProxy {
 
 		filePath.mkdirs();
 
-		File temp =
+		final File temp =
 			new File(Colligens.getDefault().getConfigDir()
 					.getAbsolutePath()
 				+ System.getProperty("file.separator")
@@ -146,22 +146,22 @@ public class FileProxy {
 				+ "temp.c");
 		temp.createNewFile();
 
-		FileWriter fstreamout =
+		final FileWriter fstreamout =
 			new FileWriter(Colligens.getDefault()
 					.getConfigDir().getAbsolutePath()
 				+ System.getProperty("file.separator")
 				+ "projects"
 				+ System.getProperty("file.separator")
 				+ "temp.c");
-		BufferedWriter out =
+		final BufferedWriter out =
 			new BufferedWriter(fstreamout);
 
-		FileInputStream fstream =
+		final FileInputStream fstream =
 			new FileInputStream(getFileReal());
 		// Get the object of DataInputStream
-		DataInputStream in =
+		final DataInputStream in =
 			new DataInputStream(fstream);
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(new InputStreamReader(in));
 		String strLine;
 		// Read File Line By Line
@@ -185,7 +185,7 @@ public class FileProxy {
 		in.close();
 		out.close();
 
-		File tempFile =
+		final File tempFile =
 			new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
 				+ System.getProperty("file.separator")
 				+ "projects"
@@ -200,16 +200,16 @@ public class FileProxy {
 		}
 		temp.renameTo(tempFile);
 
-		this.deleteMarkers();
+		deleteMarkers();
 
 	}
 
 	public void deleteMarkers() {
 		// remove markers
 		try {
-			this.getResource().deleteMarkers(Log.MARKER_TYPE, false,
+			getResource().deleteMarkers(Log.MARKER_TYPE, false,
 					IResource.DEPTH_ZERO);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			// nothing
 		}
 	}

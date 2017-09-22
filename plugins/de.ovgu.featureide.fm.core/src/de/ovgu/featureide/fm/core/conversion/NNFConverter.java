@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
  * @brief Converter using negation normal form.
- * 
+ *
  * @author Alexander Knueppel
  */
 public class NNFConverter implements IConverterStrategy {
@@ -85,20 +85,22 @@ public class NNFConverter implements IConverterStrategy {
 
 	/**
 	 * Generates new name if feature name is already taken
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
 	private String getName(String name) {
-		if (fm.getFeature(name) == null)
+		if (fm.getFeature(name) == null) {
 			return name;
+		}
 
 		int i =
 			0;
 		while (fm.getFeature(name
 			+ "_"
-			+ i) != null)
+			+ i) != null) {
 			i++;
+		}
 
 		return name
 			+ "_"
@@ -107,16 +109,16 @@ public class NNFConverter implements IConverterStrategy {
 
 	/**
 	 * Returns an appropriate name for feature
-	 * 
+	 *
 	 * @param node
 	 * @param level
 	 * @return
 	 */
 	private String getName(Node node, int level) {
-		List<Object> args =
+		final List<Object> args =
 			new ArrayList<Object>();
-		if (node instanceof Literal
-			|| node instanceof Not) {
+		if ((node instanceof Literal)
+			|| (node instanceof Not)) {
 			args.add(node.getContainedFeatures().get(0));
 		}
 		args.addAll(Arrays.asList(new Object[] {
@@ -127,13 +129,13 @@ public class NNFConverter implements IConverterStrategy {
 
 	/**
 	 * Restructures root if needed.
-	 * 
+	 *
 	 * @param fm Feature model
 	 * @param name Name of new root
 	 */
 	protected void restructureRoot(String name) {
 		if (!fm.getStructure().getRoot().isAnd()) {
-			IFeature newRoot =
+			final IFeature newRoot =
 				factory.createFeature(fm, name);
 			newRoot.getStructure().addChild(fm.getStructure().getRoot());
 			newRoot.getStructure().setMandatory(true);
@@ -144,13 +146,13 @@ public class NNFConverter implements IConverterStrategy {
 
 	/**
 	 * Adds a new element under root.
-	 * 
+	 *
 	 * @param fm Feature model
 	 * @param name Name of element
 	 * @return The top element for further actions
 	 */
 	protected IFeature prepareTopElement(String name) {
-		IFeature top =
+		final IFeature top =
 			factory.createFeature(fm, name);
 		fm.getStructure().getRoot().addChild(top.getStructure());
 		top.getStructure().changeToAnd();
@@ -162,31 +164,31 @@ public class NNFConverter implements IConverterStrategy {
 
 	/**
 	 * Adds a requires-constraint between two feature.
-	 * 
+	 *
 	 * @param f1
 	 * @param f2
 	 */
 	protected void addRequires(String f1, String f2) {
-		Node requires =
+		final Node requires =
 			new Implies(new Literal(f1), new Literal(f2));
 		fm.addConstraint(factory.createConstraint(fm, requires));
 	}
 
 	/**
 	 * Adds an excludes-constraint between two features.
-	 * 
+	 *
 	 * @param f1
 	 * @param f2
 	 */
 	protected void addExcludes(String f1, String f2) {
-		Node excludes =
+		final Node excludes =
 			new Implies(new Literal(f1), new Not(new Literal(f2)));
 		fm.addConstraint(factory.createConstraint(fm, excludes));
 	}
 
 	/**
 	 * Adds an equivalent structure and constraints to a feature model according to a given set of propositional formulas.
-	 * 
+	 *
 	 * @param top
 	 * @param nodes
 	 */
@@ -195,7 +197,7 @@ public class NNFConverter implements IConverterStrategy {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param top
 	 * @param nodes
 	 * @param level
@@ -205,18 +207,19 @@ public class NNFConverter implements IConverterStrategy {
 //		if(level == 1) {
 //			System.out.println("Next subtree: " + (++subtree));
 //		}
-		for (Node node : nodes) {
-			if (level == 1)
+		for (final Node node : nodes) {
+			if (level == 1) {
 				suffix++;
+			}
 
-			String name =
+			final String name =
 				getName(node, level);
 
 			// Terminal feature
-			if (node.getContainedFeatures().size() == 1
+			if ((node.getContainedFeatures().size() == 1)
 				&& !(node instanceof And)
 				&& !(node instanceof Or)) {
-				IFeature feature =
+				final IFeature feature =
 					factory.createFeature(top.getFeatureModel(), name);
 				feature.getStructure().setAbstract(true);
 				feature.getStructure().setMandatory(true);
@@ -236,7 +239,7 @@ public class NNFConverter implements IConverterStrategy {
 			}
 
 			// Non-Terminal feature: either And or Or
-			IFeature feature =
+			final IFeature feature =
 				factory.createFeature(top.getFeatureModel(), name);// "c_" + (suffix++));
 			feature.getStructure().setAbstract(true);
 			feature.getStructure().setMandatory(true);
@@ -259,16 +262,17 @@ public class NNFConverter implements IConverterStrategy {
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
 		this.fm =
 			fm.clone();
-		this.factory =
+		factory =
 			FMFactoryManager.getFactory(fm);
 		this.preserve =
 			preserve;
 
-		if (nodes.isEmpty())
+		if (nodes.isEmpty()) {
 			return this.fm;
+		}
 
 		restructureRoot(getName(newRootName));
-		IFeature top =
+		final IFeature top =
 			prepareTopElement(getName(topName));
 		createAbstractSubtree(top, nodes);
 
@@ -279,12 +283,12 @@ public class NNFConverter implements IConverterStrategy {
 
 	@Override
 	public List<Node> preprocess(IConstraint constraint) {
-		List<Node> elements =
+		final List<Node> elements =
 			new LinkedList<Node>();
 		Node node =
 			constraint.getNode().clone();
 
-		String[] supported =
+		final String[] supported =
 			new String[] {
 				"!",
 				" && ",
@@ -307,7 +311,7 @@ public class NNFConverter implements IConverterStrategy {
 
 	/**
 	 * Decrease size of subtree through merging abstract features
-	 * 
+	 *
 	 * @param top
 	 */
 	protected void simplify(IFeature top) {
@@ -317,7 +321,7 @@ public class NNFConverter implements IConverterStrategy {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param node
 	 * @param negated
 	 * @return
@@ -327,32 +331,33 @@ public class NNFConverter implements IConverterStrategy {
 			negated =
 				!negated;
 			return propagateNegation(node.getChildren()[0], negated);
-		} else if (node instanceof And
-			|| node instanceof Or) {
-			List<Node> nodelist =
+		} else if ((node instanceof And)
+			|| (node instanceof Or)) {
+			final List<Node> nodelist =
 				new ArrayList<Node>();
-			for (Node tmp : node.getChildren()) {
+			for (final Node tmp : node.getChildren()) {
 				nodelist.add(propagateNegation(tmp, negated));
 			}
 
 			if (node instanceof And) {
 				if (negated) {
-					return new Or((Object[]) nodelist.toArray());
+					return new Or(nodelist.toArray());
 				} else {
-					return new And((Object[]) nodelist.toArray());
+					return new And(nodelist.toArray());
 				}
 			} else {
 				if (negated) {
-					return new And((Object[]) nodelist.toArray());
+					return new And(nodelist.toArray());
 				} else {
-					return new Or((Object[]) nodelist.toArray());
+					return new Or(nodelist.toArray());
 				}
 			}
 		}
 
 		// node is an atom
-		if (negated)
+		if (negated) {
 			return new Not(node);
+		}
 
 		return node;
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -48,7 +48,7 @@ import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
 
 /**
  * Build the FSTModel for munge projects.
- * 
+ *
  * @author Jens Meinicke
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
@@ -80,7 +80,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 		if (MungePreprocessor.COMPOSER_ID.equals(composer.getId())) {
 			mungePreprocessor =
 				(MungePreprocessor) composer;
-			if (mungePreprocessor != null
+			if ((mungePreprocessor != null)
 				&& mungePreprocessor.getCreateSignature()) {
 				signatures =
 					MungeSignatureBuilder.build(featureProject);
@@ -108,7 +108,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			new StringBuilder();
 		int startLine =
 			0;
-		for (Iterator<FSTDirective> it =
+		for (final Iterator<FSTDirective> it =
 			directivesStack.descendingIterator(); it.hasNext();) {
 			final FSTDirective fstDirective =
 				it.next();
@@ -152,16 +152,16 @@ public class MungeModelBuilder extends PPModelBuilder {
 	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		// for preprocessor outline
-		Deque<FSTDirective> directivesStack =
+		final Deque<FSTDirective> directivesStack =
 			new LinkedList<FSTDirective>();
-		LinkedList<FSTDirective> directivesList =
+		final LinkedList<FSTDirective> directivesList =
 			new LinkedList<FSTDirective>();
 
 		boolean commentSection =
 			false;
 
 		final String fileName;
-		String tempFileName =
+		final String tempFileName =
 			model.getAbsoluteClassName(currentFile);
 		final int extIndex =
 			tempFileName.lastIndexOf('.');
@@ -178,7 +178,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			null;
 		ArrayList<Integer> sigLineNumber =
 			null;
-		if (mungePreprocessor != null
+		if ((mungePreprocessor != null)
 			&& mungePreprocessor.getCreateSignature()) {
 			if (signatures == null) {
 				signatures =
@@ -220,7 +220,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 				0;
 
 		while (linesIt.hasNext()) {
-			String line =
+			final String line =
 				linesIt.next();
 
 			// if line is preprocessor directive
@@ -229,15 +229,15 @@ public class MungeModelBuilder extends PPModelBuilder {
 				line.contains(MungePreprocessor.COMMENT_END)
 				||
 				commentSection) {
-				Matcher m =
+				final Matcher m =
 					MungePreprocessor.OP_COM_PATTERN.matcher(line);
 
 				while (m.find()) {
-					String completeElement =
+					final String completeElement =
 						m.group(0);
-					String singleElement =
+					final String singleElement =
 						m.group(2);
-					String expression =
+					final String expression =
 						m.group(4);
 
 					if (singleElement == null) {
@@ -249,7 +249,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 								false;
 						}
 					} else {
-						FSTDirective directive =
+						final FSTDirective directive =
 							new FSTDirective();
 						FSTDirectiveCommand command =
 							null;
@@ -266,13 +266,13 @@ public class MungeModelBuilder extends PPModelBuilder {
 								(directivesStack.peek().getCommand() == FSTDirectiveCommand.IF)
 									? FSTDirectiveCommand.ELSE
 									: FSTDirectiveCommand.ELSE_NOT;
-							if (mungePreprocessor != null
+							if ((mungePreprocessor != null)
 								&& mungePreprocessor.getCreateSignature()) {
 								updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
 							}
 							directivesStack.pop();
 						} else if (singleElement.equals("end")) {
-							if (mungePreprocessor != null
+							if ((mungePreprocessor != null)
 								&& mungePreprocessor.getCreateSignature()) {
 								updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
 							}
@@ -297,7 +297,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 						directive.setId(id++);
 
 						if (!directivesStack.isEmpty()) {
-							FSTDirective top =
+							final FSTDirective top =
 								directivesStack.peek();
 							top.addChild(directive);
 						} else {
@@ -310,7 +310,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			}
 			lineCount++;
 		}
-		if (mungePreprocessor != null
+		if ((mungePreprocessor != null)
 			&& mungePreprocessor.getCreateSignature()) {
 			sigIt.reset();
 			updateDirectives(directivesList, sigIt);
@@ -319,11 +319,11 @@ public class MungeModelBuilder extends PPModelBuilder {
 	}
 
 	private void updateDirectives(LinkedList<FSTDirective> directivesList, SignatureIterator sigIt) {
-		for (FSTDirective fstDirective : directivesList) {
+		for (final FSTDirective fstDirective : directivesList) {
 			updateDirectives(fstDirective.getChildrenList(), sigIt);
 			sigIt.reset();
 		}
-		for (FSTDirective fstDirective : directivesList) {
+		for (final FSTDirective fstDirective : directivesList) {
 			int startLine =
 				fstDirective.getStartLine();
 			startLine++;
@@ -331,28 +331,28 @@ public class MungeModelBuilder extends PPModelBuilder {
 				fstDirective.getEndLine();
 			endLine++;
 			while (sigIt.hasNext()) {
-				AbstractSignature next =
+				final AbstractSignature next =
 					sigIt.next();
-				AFeatureData[] featureData =
+				final AFeatureData[] featureData =
 					next.getFeatureData();
-				int startLineSig =
+				final int startLineSig =
 					featureData[0].getStartLineNumber();
-				int endLineSig =
+				final int endLineSig =
 					featureData[0].getEndLineNumber();
-				if (startLineSig < startLine
-					&& endLineSig > endLine) {
+				if ((startLineSig < startLine)
+					&& (endLineSig > endLine)) {
 					fstDirective.addSig_insideOf(next);
 				}
 
-				if (startLineSig >= startLine
-					&& endLineSig <= endLine) {
+				if ((startLineSig >= startLine)
+					&& (endLineSig <= endLine)) {
 					// if a children has the method already included, do nothing
-					FSTDirective[] children =
+					final FSTDirective[] children =
 						fstDirective.getChildren();
 					boolean alreadIncluded =
 						false;
-					for (FSTDirective fstDirective2 : children) {
-						if (fstDirective2.getIncludedSig() != null
+					for (final FSTDirective fstDirective2 : children) {
+						if ((fstDirective2.getIncludedSig() != null)
 							&& fstDirective2.getIncludedSig().contains(next)) {
 							alreadIncluded =
 								true;

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
 /**
  * An editpart to display cross-tree constraints below the feature diagram.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -49,12 +49,12 @@ public class ConstraintEditPart extends ModelElementEditPart {
 	}
 
 	public IGraphicalConstraint getConstraintModel() {
-		return (IGraphicalConstraint) getModel();
+		return getModel();
 	}
 
 	@Override
 	public ModelEditPart getParent() {
-		return (ModelEditPart) super.getParent();
+		return super.getParent();
 	}
 
 	@Override
@@ -77,6 +77,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, new NonResizableEditPolicy());
 	}
 
+	@Override
 	public void performRequest(Request request) {
 		final IGraphicalConstraint constraintModel =
 			getModel();
@@ -84,10 +85,10 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			new ConstraintDialog(constraintModel.getObject().getFeatureModel(), constraintModel.getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
-				for (IFeature containedFeature : constraintModel.getObject().getContainedFeatures()) {
+				for (final IFeature containedFeature : constraintModel.getObject().getContainedFeatures()) {
 					FeatureUIHelper.getGraphicalFeature(containedFeature, constraintModel.getGraphicalModel()).setConstraintSelected(true);
 				}
-			} catch (NullPointerException e) {
+			} catch (final NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);
 			}
 		}
@@ -138,9 +139,9 @@ public class ConstraintEditPart extends ModelElementEditPart {
 
 	/**
 	 * <p> Sets the currently active reason. </p>
-	 * 
+	 *
 	 * <p> Propagates into the figure. Refreshes accordingly. </p>
-	 * 
+	 *
 	 * @param activeReason the new active reason; null to reset
 	 */
 	protected void setActiveReason(FeatureModelReason activeReason) {

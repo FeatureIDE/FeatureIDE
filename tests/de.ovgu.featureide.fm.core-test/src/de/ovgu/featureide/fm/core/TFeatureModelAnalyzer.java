@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Tests for {@link FeatureModelAnalyzer}
- * 
+ *
  * @author Jens Meinicke
  * @author Stefan Krueger
  * @author Florian Proksch
@@ -56,86 +56,86 @@ public class TFeatureModelAnalyzer {
 			}
 		};
 
-	private IFeatureModel FM_test_1 =
+	private final IFeatureModel FM_test_1 =
 		init("test_1.xml");
-	private IFeature FM1_F1 =
+	private final IFeature FM1_F1 =
 		FM_test_1.getFeature("F1");
-	private IFeature FM1_F2 =
+	private final IFeature FM1_F2 =
 		FM_test_1.getFeature("F2");
-	private IConstraint FM1_C1 =
+	private final IConstraint FM1_C1 =
 		FM_test_1.getConstraints().get(0);
-	private HashMap<Object, Object> FM1_DATA =
+	private final HashMap<Object, Object> FM1_DATA =
 		FM_test_1.getAnalyser().analyzeFeatureModel(null);
 
-	private IFeatureModel FM_test_2 =
+	private final IFeatureModel FM_test_2 =
 		init("test_2.xml");
-	private IFeature FM2_F1 =
+	private final IFeature FM2_F1 =
 		FM_test_2.getFeature("F1");
-	private IFeature FM2_F2 =
+	private final IFeature FM2_F2 =
 		FM_test_2.getFeature("F2");
-	private IFeature FM2_F3 =
+	private final IFeature FM2_F3 =
 		FM_test_2.getFeature("F3");
-	private IConstraint FM2_C1 =
+	private final IConstraint FM2_C1 =
 		FM_test_2.getConstraints().get(0);
-	private IConstraint FM2_C2 =
+	private final IConstraint FM2_C2 =
 		FM_test_2.getConstraints().get(1);
-	private IConstraint FM2_C3 =
+	private final IConstraint FM2_C3 =
 		FM_test_2.getConstraints().get(2);
-	private HashMap<Object, Object> FM2_DATA =
+	private final HashMap<Object, Object> FM2_DATA =
 		FM_test_2.getAnalyser().analyzeFeatureModel(null);
 
-	private IFeatureModel FM_test_3 =
+	private final IFeatureModel FM_test_3 =
 		init("test_3.xml");
-	private IFeature FM3_F2 =
+	private final IFeature FM3_F2 =
 		FM_test_3.getFeature("F2");
-	private IFeature FM3_F3 =
+	private final IFeature FM3_F3 =
 		FM_test_3.getFeature("F3");
-	private IConstraint FM3_C1 =
+	private final IConstraint FM3_C1 =
 		FM_test_3.getConstraints().get(0);
-	private HashMap<Object, Object> FM3_DATA =
+	private final HashMap<Object, Object> FM3_DATA =
 		FM_test_3.getAnalyser().analyzeFeatureModel(null);
 
-	private IFeatureModel FM_test_4 =
+	private final IFeatureModel FM_test_4 =
 		init("test_4.xml");
-	private IFeature FM4_F1 =
+	private final IFeature FM4_F1 =
 		FM_test_4.getFeature("I");
-	private IFeature FM4_F2 =
+	private final IFeature FM4_F2 =
 		FM_test_4.getFeature("D");
-	private IFeature FM4_F3 =
+	private final IFeature FM4_F3 =
 		FM_test_4.getFeature("E");
-	private IFeature FM4_F4 =
+	private final IFeature FM4_F4 =
 		FM_test_4.getFeature("K");
-	private IFeature FM4_F5 =
+	private final IFeature FM4_F5 =
 		FM_test_4.getFeature("L");
-	private IFeature FM4_F6 =
+	private final IFeature FM4_F6 =
 		FM_test_4.getFeature("N");
-	private IFeature FM4_F7 =
+	private final IFeature FM4_F7 =
 		FM_test_4.getFeature("P");
-	private IFeature FM4_F8 =
+	private final IFeature FM4_F8 =
 		FM_test_4.getFeature("M");
-	private IFeature FM4_F9 =
+	private final IFeature FM4_F9 =
 		FM_test_4.getFeature("C");
-	private IFeature FM4_F10 =
+	private final IFeature FM4_F10 =
 		FM_test_4.getFeature("J");
-	private HashMap<Object, Object> FM4_DATA =
+	private final HashMap<Object, Object> FM4_DATA =
 		FM_test_4.getAnalyser().analyzeFeatureModel(null);
 
-	private IFeatureModel FM_test_7 =
+	private final IFeatureModel FM_test_7 =
 		init("test_7.xml");
-	private IFeature FM7_F1 =
+	private final IFeature FM7_F1 =
 		FM_test_7.getFeature("H");
-	private IConstraint FM7_C1 =
+	private final IConstraint FM7_C1 =
 		FM_test_7.getConstraints().get(0);
-	private HashMap<Object, Object> FM7_DATA =
+	private final HashMap<Object, Object> FM7_DATA =
 		FM_test_7.getAnalyser().analyzeFeatureModel(null);
 
-	private IFeatureModel FM_test_8 =
+	private final IFeatureModel FM_test_8 =
 		init("test_8.xml");
-	private IFeature FM8_F1 =
+	private final IFeature FM8_F1 =
 		FM_test_8.getFeature("B");
-	private IFeature FM8_F2 =
+	private final IFeature FM8_F2 =
 		FM_test_8.getFeature("C");
-	private HashMap<Object, Object> FM8_DATA =
+	private final HashMap<Object, Object> FM8_DATA =
 		FM_test_8.getAnalyser().analyzeFeatureModel(null);
 
 	/**
@@ -154,7 +154,7 @@ public class TFeatureModelAnalyzer {
 	private final IFeatureModel init(String name) {
 		IFeatureModel fm =
 			null;
-		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
+		for (final File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				fm =
 					FeatureModelManager.load(f.toPath()).getObject();

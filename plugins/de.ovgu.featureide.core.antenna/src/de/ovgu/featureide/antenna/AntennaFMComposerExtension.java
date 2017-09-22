@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * Antenna specific feature model extensions.
- * 
+ *
  * @author Christoph Giesel
  * @author Marcus Kamieth
  * @author Marcus Pinnecke
@@ -76,32 +76,33 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
-		IFeatureProject featureProject =
+		final IFeatureProject featureProject =
 			CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			return false;
 		}
 
-		IFolder sourceFolder =
+		final IFolder sourceFolder =
 			featureProject.getSourceFolder();
-		if (!sourceFolder.exists())
+		if (!sourceFolder.exists()) {
 			return true;
+		}
 
 		try {
 			performRenamings(oldName, newName, sourceFolder);
 			sourceFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return true;
 	}
 
 	private void performRenamings(String oldName, String newName, IFolder folder) throws CoreException {
-		for (IResource res : folder.members()) {
+		for (final IResource res : folder.members()) {
 			if (res instanceof IFolder) {
 				performRenamings(oldName, newName, (IFolder) res);
 			} else if (res instanceof IFile) {
-				IFile file =
+				final IFile file =
 					(IFile) res;
 				performRenamings(oldName, newName, file);
 			}
@@ -115,10 +116,10 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 		FileWriter fw =
 			null;
 		try {
-			File file =
+			final File file =
 				iFile.getRawLocation().toFile();
 
-			StringBuilder fileText =
+			final StringBuilder fileText =
 				new StringBuilder();
 			scanner =
 				new Scanner(file, "UTF-8");
@@ -127,9 +128,9 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 				fileText.append(System.getProperty("line.separator"));
 			}
 
-			String string =
+			final String string =
 				fileText.toString();
-			String newText =
+			final String newText =
 				replaceFeatureInText(string, oldName, newName);
 
 			if (string.equals(newText)) {
@@ -140,30 +141,32 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 				new FileWriter(file);
 			fw.write(newText);
 
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			AntennaCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		} finally {
-			if (scanner != null)
+			if (scanner != null) {
 				scanner.close();
-			if (fw != null)
+			}
+			if (fw != null) {
 				try {
-				fw.close();
-				} catch (IOException e) {
-				AntennaCorePlugin.getDefault().logError(e);
+					fw.close();
+				} catch (final IOException e) {
+					AntennaCorePlugin.getDefault().logError(e);
 				}
+			}
 		}
 	}
 
 	private String replaceFeatureInText(String text, String oldName, String newName) {
-		Pattern pattern =
+		final Pattern pattern =
 			Pattern.compile(String.format(AntennaModelBuilder.REGEX, oldName));
-		Matcher matcher =
+		final Matcher matcher =
 			pattern.matcher(text);
 
 		while (matcher.find()) {
-			String newText =
+			final String newText =
 				matcher.group(1)
 					+ newName
 					+ matcher.group(3);

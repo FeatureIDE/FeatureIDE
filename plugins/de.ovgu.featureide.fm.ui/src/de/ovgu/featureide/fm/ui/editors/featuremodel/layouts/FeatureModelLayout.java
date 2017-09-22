@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -24,7 +24,7 @@ import org.eclipse.draw2d.geometry.Point;
 
 /**
  * Encapsulates layout functionality for the feature model.
- * 
+ *
  * @author soenke
  */
 public class FeatureModelLayout implements IExtendedFeatureModelLayout {
@@ -39,32 +39,32 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private boolean showShortNames;
 
 	public FeatureModelLayout() {
-		this.autoLayoutLegend =
+		autoLayoutLegend =
 			true;
-		this.showHiddenFeatures =
+		showHiddenFeatures =
 			true;
-		this.showCollapsedConstraints =
+		showCollapsedConstraints =
 			true;
-		this.hasVerticalLayout =
+		hasVerticalLayout =
 			true;
-		this.legendPos =
+		legendPos =
 			new Point(0, 0);
-		this.selectedLayoutAlgorithm =
+		selectedLayoutAlgorithm =
 			1;
 	}
 
 	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
-		this.autoLayoutLegend =
+		autoLayoutLegend =
 			featureModelLayout.autoLayoutLegend;
-		this.showHiddenFeatures =
+		showHiddenFeatures =
 			featureModelLayout.showHiddenFeatures;
-		this.showCollapsedConstraints =
+		showCollapsedConstraints =
 			featureModelLayout.showCollapsedConstraints;
-		this.hasVerticalLayout =
+		hasVerticalLayout =
 			featureModelLayout.hasVerticalLayout;
-		this.legendPos =
+		legendPos =
 			featureModelLayout.legendPos.getCopy();
-		this.selectedLayoutAlgorithm =
+		selectedLayoutAlgorithm =
 			featureModelLayout.selectedLayoutAlgorithm;
 	}
 
@@ -130,7 +130,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
 	@Override
 	public void setLegendPos(int x, int y) {
-		this.legendPos =
+		legendPos =
 			new Point(x, y);
 	}
 

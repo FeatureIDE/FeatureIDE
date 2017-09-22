@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,19 +33,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
  * Switches auto-layout function for the feature model legend.
- * 
+ *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
 public class LegendLayoutAction extends Action {
 
-	private IGraphicalFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
-	private ISelectionChangedListener listener =
+	private final ISelectionChangedListener listener =
 		new ISelectionChangedListener() {
 
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection =
+				final IStructuredSelection selection =
 					(IStructuredSelection) event.getSelection();
 				setEnabled(isValidSelection(selection));
 			}
@@ -53,21 +54,22 @@ public class LegendLayoutAction extends Action {
 
 	public LegendLayoutAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featuremodel) {
 		super(AUTO_LAYOUT_LEGEND);
-		this.featureModel =
+		featureModel =
 			featuremodel;
-		this.setEnabled(false);
-		this.setChecked(true);
+		setEnabled(false);
+		setChecked(true);
 		viewer.addSelectionChangedListener(listener);
 	}
 
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if (selection.size() != 1)
+		if (selection.size() != 1) {
 			return false;
-		if (selection.getFirstElement() instanceof LegendEditPart)
+		}
+		if (selection.getFirstElement() instanceof LegendEditPart) {
 			return true;
-
-		else
+		} else {
 			return false;
+		}
 	}
 
 	@Override
@@ -75,10 +77,10 @@ public class LegendLayoutAction extends Action {
 		super.run();
 		if (featureModel.getLayout().hasLegendAutoLayout()) {
 			featureModel.getLayout().setLegendAutoLayout(false);
-			this.setChecked(false);
+			setChecked(false);
 		} else {
 			featureModel.getLayout().setLegendAutoLayout(true);
-			this.setChecked(true);
+			setChecked(true);
 			featureModel.getFeatureModel().handleModelDataChanged();
 		}
 
@@ -86,9 +88,9 @@ public class LegendLayoutAction extends Action {
 
 	public void refresh() {
 		if (featureModel.getLayout().hasLegendAutoLayout()) {
-			this.setChecked(true);
+			setChecked(true);
 		} else {
-			this.setChecked(false);
+			setChecked(false);
 
 		}
 	}

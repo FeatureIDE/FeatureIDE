@@ -27,14 +27,14 @@ public class SemanticBugsHandler extends ColligensAbstractHandler {
 			HandlerUtil
 					.getActiveWorkbenchWindow(event);
 
-		ISelection selection =
+		final ISelection selection =
 			window.getActivePage().getSelection();
 
-		String cppCheckerPath =
+		final String cppCheckerPath =
 			Colligens.getDefault().getPreferenceStore()
 					.getString("CppCheck");
 
-		if (cppCheckerPath != null
+		if ((cppCheckerPath != null)
 			&& !(new File(cppCheckerPath).isFile())) {
 			MessageDialog
 					.openError(
@@ -55,11 +55,11 @@ public class SemanticBugsHandler extends ColligensAbstractHandler {
 
 		if (super.saveAll()) {
 			// Open and active the Analyzer view
-			IWorkbenchPage page =
+			final IWorkbenchPage page =
 				window.getActivePage();
 			try {
 				page.showView(SemanticBugsView.ID);
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 
 				e.printStackTrace();
 			}

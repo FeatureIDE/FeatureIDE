@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 
 /**
  * A reason of an explanation involving a feature model.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class FeatureModelReason extends Reason {
@@ -35,7 +35,7 @@ public class FeatureModelReason extends Reason {
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param trace the trace of this reason; not null
 	 */
 	public FeatureModelReason(FeatureModelElementTrace trace) {
@@ -45,18 +45,18 @@ public class FeatureModelReason extends Reason {
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param reason reason to clone; not null
 	 */
 	protected FeatureModelReason(FeatureModelReason reason) {
 		super(reason);
-		this.trace =
+		trace =
 			reason.trace;
 	}
 
 	/**
 	 * Returns the trace of this reason.
-	 * 
+	 *
 	 * @return the trace of this reason; not null
 	 */
 	public FeatureModelElementTrace getTrace() {
@@ -87,8 +87,8 @@ public class FeatureModelReason extends Reason {
 		int result =
 			1;
 		result =
-			prime
-				* result
+			(prime
+				* result)
 				+ ((trace == null)
 					? 0
 					: trace.hashCode());
@@ -97,19 +97,24 @@ public class FeatureModelReason extends Reason {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		FeatureModelReason other =
+		}
+		final FeatureModelReason other =
 			(FeatureModelReason) obj;
 		if (trace == null) {
-			if (other.trace != null)
+			if (other.trace != null) {
 				return false;
-		} else if (!trace.equals(other.trace))
+			}
+		} else if (!trace.equals(other.trace)) {
 			return false;
+		}
 		return true;
 	}
 }

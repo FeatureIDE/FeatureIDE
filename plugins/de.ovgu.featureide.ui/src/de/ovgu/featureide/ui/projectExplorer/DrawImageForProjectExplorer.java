@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,8 +41,8 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * draws the images for the ProjectExplorer. The image includes the file-, folder- or package - image and the color of the feature.
- * 
- * 
+ *
+ *
  * @author Jonas Weigt
  */
 
@@ -71,8 +71,8 @@ public class DrawImageForProjectExplorer {
 	 * constant for the width of the single colorImage
 	 */
 	private final static int COLOR_IMAGE_WIDTH =
-		FOLDER_IMAGE.getBounds().width
-			/ 4
+		(FOLDER_IMAGE.getBounds().width
+			/ 4)
 			+ 1;
 	private static Image WHITESPACE_IMAGE;
 
@@ -143,8 +143,9 @@ public class DrawImageForProjectExplorer {
 	 */
 	public static Image drawExplorerImage(ExplorerObject explorerObject, List<Integer> colors, List<Integer> parentColors, Image superImage) {
 
-		if (WHITESPACE_IMAGE == null)
+		if (WHITESPACE_IMAGE == null) {
 			init();
+		}
 
 		Collections.sort(colors, new Comparator<Integer>() {
 
@@ -160,7 +161,7 @@ public class DrawImageForProjectExplorer {
 		} else {
 			colors.add(superImage.getImageData().hashCode());
 		}
-		Integer hashCode =
+		final Integer hashCode =
 			colors.hashCode();
 		if (images.containsKey(hashCode)) {
 			return images.get(hashCode);
@@ -199,10 +200,10 @@ public class DrawImageForProjectExplorer {
 
 		if (parentColors != null) {
 			image =
-				new Image(DEVICE, icon.getBounds().width
+				new Image(DEVICE, (icon.getBounds().width
 					+ 2
-					+ parentColors.size()
-						* COLOR_IMAGE_WIDTH
+					+ (parentColors.size()
+						* COLOR_IMAGE_WIDTH))
 					- parentColors.size(), ICON_HEIGHT);
 			gc =
 				new GC(image);
@@ -210,25 +211,27 @@ public class DrawImageForProjectExplorer {
 			gc.drawImage(icon, 0, 0);
 
 			for (int i =
-				0; i < parentColors.size(); i++)
-				if (colors.contains(parentColors.get(i)))
-					gc.drawImage(getColorImage(parentColors.get(i)), icon.getBounds().width
+				0; i < parentColors.size(); i++) {
+				if (colors.contains(parentColors.get(i))) {
+					gc.drawImage(getColorImage(parentColors.get(i)), (icon.getBounds().width
 						+ 1
-						+ COLOR_IMAGE_WIDTH
-							* i
+						+ (COLOR_IMAGE_WIDTH
+							* i))
 						- i, 0);
-				else
-					gc.drawImage(WHITESPACE_IMAGE, icon.getBounds().width
+				} else {
+					gc.drawImage(WHITESPACE_IMAGE, (icon.getBounds().width
 						+ 1
-						+ COLOR_IMAGE_WIDTH
-							* i
+						+ (COLOR_IMAGE_WIDTH
+							* i))
 						- i, 0);
+				}
+			}
 		} else {
 			image =
-				new Image(DEVICE, icon.getBounds().width
+				new Image(DEVICE, (icon.getBounds().width
 					+ 2
-					+ colors.size()
-						* COLOR_IMAGE_WIDTH
+					+ (colors.size()
+						* COLOR_IMAGE_WIDTH))
 					- colors.size(), ICON_HEIGHT);
 			gc =
 				new GC(image);
@@ -236,21 +239,22 @@ public class DrawImageForProjectExplorer {
 			gc.drawImage(icon, 0, 0);
 
 			for (int i =
-				0; i < colors.size(); i++)
-				gc.drawImage(getColorImage(colors.get(i)), icon.getBounds().width
+				0; i < colors.size(); i++) {
+				gc.drawImage(getColorImage(colors.get(i)), (icon.getBounds().width
 					+ 1
-					+ COLOR_IMAGE_WIDTH
-						* i
+					+ (COLOR_IMAGE_WIDTH
+						* i))
 					- i, 0);
+			}
 		}
 
-		ImageData data =
+		final ImageData data =
 			image.getImageData();
 		data.transparentPixel =
 			data.palette.getPixel(new RGB(255, 255, 255));
 		gc.dispose();
 
-		Image finalImage =
+		final Image finalImage =
 			new Image(DEVICE, data);
 		images.put(hashCode, finalImage);
 		return finalImage;
@@ -270,14 +274,16 @@ public class DrawImageForProjectExplorer {
 		colors.remove(colors.size()
 			- 1);
 
-		Image finalImage =
+		final Image finalImage =
 			new Image(DEVICE, FOLDER_IMAGE.getImageData().width
 				+ COLOR_IMAGE_WIDTH
 				+ 3, FOLDER_IMAGE.getImageData().height);
-		GC gc =
+		final GC gc =
 			new GC(finalImage);
 		gc.drawImage(FOLDER_IMAGE, 0, 0);
-		if (WHITESPACE_IMAGE == null) init();
+		if (WHITESPACE_IMAGE == null) {
+			init();
+		}
 		if (colors.get(0).equals(-1)) {
 			gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH
 				+ 2, 0);
@@ -285,12 +291,12 @@ public class DrawImageForProjectExplorer {
 			gc.drawImage(getColorImage(colors.get(0)), ICON_WIDTH
 				+ 2, 0);
 		}
-		ImageData data =
+		final ImageData data =
 			finalImage.getImageData();
 		data.transparentPixel =
 			data.palette.getPixel(new RGB(255, 255, 255));
 		gc.dispose();
-		Image image =
+		final Image image =
 			new Image(DEVICE, data);
 		images.put(hashCode, image);
 		return image;

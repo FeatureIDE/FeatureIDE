@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_OUTLINE
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -64,6 +65,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
+
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.ChangeOutlineProviderAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.CollapseAllAction;
@@ -75,7 +77,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.providers.NotAvailableOutli
 
 /**
  * Another outline view displaying the same information as the collaboration diagram
- * 
+ *
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Reimar Schroeter
@@ -96,56 +98,65 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	private IFile curFile;
 	private UIJob updateOutlineJob;
 
-	private List<OutlineProvider> providers =
+	private final List<OutlineProvider> providers =
 		new ArrayList<>();
-	private OutlineProvider defaultProvider =
+	private final OutlineProvider defaultProvider =
 		new NotAvailableOutlineProvider();
 	private OutlineProvider provider =
 		defaultProvider;
 
-	private IPartListener editorListener =
+	private final IPartListener editorListener =
 		new IPartListener() {
 
+			@Override
 			public void partOpened(IWorkbenchPart part) {
-				if (part instanceof IEditorPart)
+				if (part instanceof IEditorPart) {
 					setEditorActions(part);
+				}
 			}
 
+			@Override
 			public void partDeactivated(IWorkbenchPart part) {}
 
+			@Override
 			public void partClosed(IWorkbenchPart part) {
-				if (part instanceof IEditorPart)
+				if (part instanceof IEditorPart) {
 					setEditorActions(part);
+				}
 			}
 
+			@Override
 			public void partBroughtToTop(IWorkbenchPart part) {
-				if (part instanceof IEditorPart)
+				if (part instanceof IEditorPart) {
 					setEditorActions(part);
+				}
 			}
 
+			@Override
 			public void partActivated(IWorkbenchPart part) {
-				if (part instanceof IEditorPart
-					|| part instanceof ViewPart)
+				if ((part instanceof IEditorPart)
+					|| (part instanceof ViewPart)) {
 					setEditorActions(part);
+				}
 			}
 
 		};
 
 	private void checkForExtensions() {
-		IConfigurationElement[] config =
+		final IConfigurationElement[] config =
 			Platform.getExtensionRegistry().getConfigurationElementsFor(OUTLINE_ID);
 
-		for (IConfigurationElement e : config) {
+		for (final IConfigurationElement e : config) {
 			try {
 				final Object outlineProvider =
 					e.createExecutableExtension("OutlineProvider");
 				if (outlineProvider instanceof OutlineProvider) {
-					OutlineProvider provider =
+					final OutlineProvider provider =
 						(OutlineProvider) outlineProvider;
-					provider.getLabelProvider().initTreeViewer(this.viewer);
+					provider.getLabelProvider().initTreeViewer(viewer);
 					providers.add(provider);
 				}
-			} catch (CoreException ex) {
+			} catch (final CoreException ex) {
 				FMUIPlugin.getDefault().logError(ex);
 			}
 		}
@@ -157,7 +168,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 	/**
 	 * handles all the editorActions
-	 * 
+	 *
 	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
 		OutlineProvider newProvider =
@@ -169,34 +180,34 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 			null;
 
 		if (activeEditor != null) {
-			IWorkbenchPage page =
+			final IWorkbenchPage page =
 				activeEditor.getSite().getPage();
 			if (page != null) {
 				part =
 					page.getActiveEditor();
 				if (part != null) {
-					IEditorInput editorInput =
+					final IEditorInput editorInput =
 						part.getEditorInput();
 					if (editorInput instanceof FileEditorInput) {
 
 						// case: open editor
-						FileEditorInput inputFile =
+						final FileEditorInput inputFile =
 							(FileEditorInput) part.getEditorInput();
 						file =
 							inputFile.getFile();
 						part.addPropertyListener(this);
 
-						Control control =
+						final Control control =
 							viewer.getControl();
-						if (control != null
+						if ((control != null)
 							&& !control.isDisposed()) {
 
 							if (file != null) {
 								// Check whether we must change the actual provider
 								if (!provider.isSupported(file)
-									|| provider == defaultProvider) {
+									|| (provider == defaultProvider)) {
 									// Get the first provider that supports the resource
-									for (OutlineProvider p : providers) {
+									for (final OutlineProvider p : providers) {
 										if (p.isSupported(file)) {
 											newProvider =
 												p;
@@ -212,8 +223,8 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 					}
 				}
 			}
-			if (file != curFile
-				|| provider != newProvider) {
+			if ((file != curFile)
+				|| (provider != newProvider)) {
 				// Fallback when no provider is found -> NotAvailable
 				if (newProvider == null) {
 					newProvider =
@@ -242,11 +253,11 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 		checkForExtensions();
 
-		IWorkbenchPage page =
+		final IWorkbenchPage page =
 			getSite().getPage();
 		page.addPartListener(editorListener);
 
-		IEditorPart activeEditor =
+		final IEditorPart activeEditor =
 			page.getActiveEditor();
 		if (activeEditor != null) {
 			setEditorActions(activeEditor);
@@ -267,7 +278,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 		manager.removeAll();
 		provider.initToolbarActions(manager);
 
-		CollapseAllAction collapseAllAction =
+		final CollapseAllAction collapseAllAction =
 			new CollapseAllAction(viewer);
 		collapseAllAction.addPropertyChangeListener(new IPropertyChangeListener() {
 
@@ -276,7 +287,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 				handleCollapseAll(event);
 			}
 		});
-		ExpandAllAction expandAllAction =
+		final ExpandAllAction expandAllAction =
 			new ExpandAllAction(viewer);
 		expandAllAction.addPropertyChangeListener(new IPropertyChangeListener() {
 
@@ -290,7 +301,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 		manager.add(expandAllAction);
 
 		if (provider.getFilters() != null) {
-			IAction filterSelection =
+			final IAction filterSelection =
 				new Action("", SWT.DROP_DOWN) {};
 			filterSelection.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/filter_history.gif"));
 			filterSelection.setMenuCreator(new IMenuCreator() {
@@ -308,13 +319,13 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 					fMenu =
 						new Menu(parent);
 					if (curFile != null) {
-						for (IOutlineFilter filter : provider.getFilters()) {
-							IAction filterSelectionSpecific =
+						for (final IOutlineFilter filter : provider.getFilters()) {
+							final IAction filterSelectionSpecific =
 								new FilterOutlineAction(filter) {
 
 									@Override
 									public void run() {
-										OutlineTreeContentProvider treeProvider =
+										final OutlineTreeContentProvider treeProvider =
 											provider.getTreeProvider();
 										if (!treeProvider.hasFilter(getFilter())) {
 											treeProvider.addFilter(getFilter());
@@ -326,14 +337,14 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 								};
 
-							ActionContributionItem item =
+							final ActionContributionItem item =
 								new ActionContributionItem(filterSelectionSpecific);
 							item.fill(fMenu, -1);
 						}
-						Separator sep =
+						final Separator sep =
 							new Separator(IWorkbenchActionConstants.MB_ADDITIONS);
 						sep.fill(fMenu, -1);
-						IAction providerSelectionSpecific =
+						final IAction providerSelectionSpecific =
 							new RemoveAllFiltersAction(provider) {
 
 								@Override
@@ -344,7 +355,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 							};
 
-						ActionContributionItem item =
+						final ActionContributionItem item =
 							new ActionContributionItem(providerSelectionSpecific);
 						item.fill(fMenu, -1);
 					}
@@ -362,7 +373,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 			manager.add(filterSelection);
 		}
 
-		IAction providerSelection =
+		final IAction providerSelection =
 			new Action("", SWT.DROP_DOWN) {};
 		providerSelection.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		providerSelection.setMenuCreator(new IMenuCreator() {
@@ -381,10 +392,10 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 					new Menu(parent);
 
 				if (curFile != null) {
-					for (OutlineProvider p : providers) {
+					for (final OutlineProvider p : providers) {
 						if (p.isSupported(curFile)
 							&& !p.getProviderName().isEmpty()) {
-							IAction providerSelectionSpecific =
+							final IAction providerSelectionSpecific =
 								new ChangeOutlineProviderAction(p, provider == p) {
 
 									@Override
@@ -396,7 +407,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 								};
 
-							ActionContributionItem item =
+							final ActionContributionItem item =
 								new ActionContributionItem(providerSelectionSpecific);
 							item.fill(fMenu, -1);
 
@@ -433,23 +444,25 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	}
 
 	private void fillContextMenu() {
-		MenuManager menuMgr =
+		final MenuManager menuMgr =
 			new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				provider.initContextMenuActions(manager);
 			}
 		});
-		Menu menu =
+		final Menu menu =
 			menuMgr.createContextMenu(viewer.getControl());
 		viewer.getControl().setMenu(menu);
 
-		if (getSite() instanceof IWorkbenchPartSite)
-			((IWorkbenchPartSite) getSite()).registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
-		else
+		if (getSite() instanceof IWorkbenchPartSite) {
+			getSite().registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
+		} else {
 			((IPageSite) getSite()).registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
+		}
 	}
 
 	@Override
@@ -459,24 +472,25 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 	/**
 	 * Sets the new input or disables the viewer in case no editor is open
-	 * 
+	 *
 	 */
 	private void update(final IFile iFile) {
 		if (viewer != null) {
-			Control control =
+			final Control control =
 				viewer.getControl();
-			if (control != null
+			if ((control != null)
 				&& !control.isDisposed()) {
 
-				if (updateOutlineJob == null
-					|| updateOutlineJob.getState() == Job.NONE) {
+				if ((updateOutlineJob == null)
+					|| (updateOutlineJob.getState() == Job.NONE)) {
 					updateOutlineJob =
 						new UIJob(UPDATE_OUTLINE_VIEW) {
 
+							@Override
 							public IStatus runInUIThread(IProgressMonitor monitor) {
 
 								if (viewer != null) {
-									if (viewer.getControl() != null
+									if ((viewer.getControl() != null)
 										&& !viewer.getControl().isDisposed()) {
 										viewer.getControl().setRedraw(false);
 

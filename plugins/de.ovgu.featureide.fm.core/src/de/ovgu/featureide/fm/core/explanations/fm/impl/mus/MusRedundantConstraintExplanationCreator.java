@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
 
 /**
  * Implementation of {@link RedundantConstraintExplanationCreator} using a {@link MusExtractor MUS extractor}.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
@@ -49,7 +49,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if (subject != null
+		if ((subject != null)
 			&& !(subject instanceof IConstraint)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
@@ -58,7 +58,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * <p> Does not include any of the constraints. The constraints are only added later during explaining. This is faster than creating the complete CNF and
 	 * repeatedly removing the redundant constraints from it. </p>
 	 */
@@ -72,7 +72,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 
 	/**
 	 * Adds the given constraint to the oracle. Makes sure that the trace model properly ignores clauses that were ignored by the solver for being duplicates.
-	 * 
+	 *
 	 * @param constraint constraint to add
 	 * @param negated whether the constraint should be negated before being added
 	 * @return amount of clauses added
@@ -146,8 +146,8 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 
 	@Override
 	protected Reason getReason(int clauseIndex) {
-		if (clauseIndex >= getTraceModel().getTraceCount()
-			- redundantConstraintClauseCount) {
+		if (clauseIndex >= (getTraceModel().getTraceCount()
+			- redundantConstraintClauseCount)) {
 			return null; // Ignore the redundant constraint clauses.
 		}
 		return super.getReason(clauseIndex);

@@ -14,12 +14,12 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
  * The activator class controls the plug-in life cycle
  */
 /**
- * 
- * 
+ *
+ *
  * @author Dalton
- * 
- * 
- * 
+ *
+ *
+ *
  **/
 
 public class Colligens extends AbstractUIPlugin {
@@ -43,7 +43,7 @@ public class Colligens extends AbstractUIPlugin {
 		plugin =
 			this;
 
-		Start inicialize =
+		final Start inicialize =
 			new Start();
 		inicialize.SystemClear();
 	}
@@ -54,7 +54,7 @@ public class Colligens extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		Start inicialize =
+		final Start inicialize =
 			new Start();
 		inicialize.SystemClear();
 
@@ -65,7 +65,7 @@ public class Colligens extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 * 
+	 *
 	 * @return the shared instance
 	 */
 	public static Colligens getDefault() {
@@ -74,7 +74,7 @@ public class Colligens extends AbstractUIPlugin {
 
 	/**
 	 * Returns an image descriptor for the image file at the given plug-in relative path
-	 * 
+	 *
 	 * @param path the path
 	 * @return the image descriptor
 	 */
@@ -90,19 +90,19 @@ public class Colligens extends AbstractUIPlugin {
 
 	/**
 	 * Returns the configuration directory
-	 * 
-	 * 
+	 *
+	 *
 	 * @return directory configuration
 	 */
 	public File getConfigDir() {
-		Location location =
+		final Location location =
 			Platform.getConfigurationLocation();
 		File file =
 			null;
 		if (location != null) {
-			URL configURL =
+			final URL configURL =
 				location.getURL();
-			if (configURL != null
+			if ((configURL != null)
 				&& configURL.getProtocol().startsWith("file")) {
 				file =
 					new File(configURL.getFile(), PLUGIN_ID);

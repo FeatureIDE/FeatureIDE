@@ -14,7 +14,7 @@ import core.RefactoringType;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class RefactorContributionItems extends CompoundContributionItem {
 
@@ -31,19 +31,19 @@ public class RefactorContributionItems extends CompoundContributionItem {
 
 	@Override
 	protected IContributionItem[] getContributionItems() {
-		ArrayList<IContributionItem> citems =
+		final ArrayList<IContributionItem> citems =
 			new ArrayList<IContributionItem>();
 
-		for (RefactoringType type : RefactoringType.values()) {
+		for (final RefactoringType type : RefactoringType.values()) {
 
-			CommandContributionItemParameter parameters =
+			final CommandContributionItemParameter parameters =
 				new CommandContributionItemParameter(
 						PlatformUI.getWorkbench().getActiveWorkbenchWindow(),
 						RefactorContributionItems.ID,
 						RefactorSelectionHandler.COMMAND_ID,
 						CommandContributionItem.STYLE_PUSH);
 
-			Map<String, String> params =
+			final Map<String, String> params =
 				new HashMap<String, String>();
 
 			params.put(RefactorSelectionHandler.PARM_ID,
@@ -55,7 +55,7 @@ public class RefactorContributionItems extends CompoundContributionItem {
 			parameters.label =
 				type.getLabel();
 
-			CommandContributionItem item =
+			final CommandContributionItem item =
 				new CommandContributionItem(
 						parameters);
 

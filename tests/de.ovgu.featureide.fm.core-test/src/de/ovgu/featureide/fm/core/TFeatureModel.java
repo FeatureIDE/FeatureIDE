@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
  * Tests for the {@link IFeatureModel}.
- * 
+ *
  * @author Jens Meinicke
  */
 public class TFeatureModel {
@@ -46,19 +46,19 @@ public class TFeatureModel {
 
 	@Test
 	public void recordGetFeatureName() {
-		IFeatureModel fm =
+		final IFeatureModel fm =
 			factory.createFeatureModel();
-		IFeature feature =
+		final IFeature feature =
 			factory.createFeature(fm, "test_root");
 		fm.addFeature(feature);
 		fm.getStructure().setRoot(feature.getStructure());
-		IFeature root =
+		final IFeature root =
 			fm.getFeature("test_root");
 		assertSame(root.getStructure(), fm.getStructure().getRoot());
 
-		IFeatureModel clonedModel =
+		final IFeatureModel clonedModel =
 			fm.clone(null);
-		IFeature root2 =
+		final IFeature root2 =
 			clonedModel.getFeature("test_root");
 
 		assertSame(root2.getStructure(), clonedModel.getStructure().getRoot());
@@ -66,7 +66,7 @@ public class TFeatureModel {
 
 	@Test
 	public void getFeatureOrderListTest() {
-		IFeatureModel fm =
+		final IFeatureModel fm =
 			factory.createFeatureModel();
 		final Collection<String> expectedOrder =
 			new LinkedList<String>();
@@ -74,7 +74,7 @@ public class TFeatureModel {
 			fm.getFeatureOrderList();
 		assertEquals(expectedOrder, actualOrder);
 
-		IFeature root =
+		final IFeature root =
 			factory.createFeature(fm, "root");
 		fm.addFeature(root);
 		fm.getStructure().setRoot(root.getStructure());
@@ -83,7 +83,7 @@ public class TFeatureModel {
 			fm.getFeatureOrderList();
 		assertEquals(expectedOrder, actualOrder);
 
-		IFeature A =
+		final IFeature A =
 			factory.createFeature(fm, "A");
 		FeatureUtils.addChild(root, A);
 		expectedOrder.add(A.getName());
@@ -91,7 +91,7 @@ public class TFeatureModel {
 			fm.getFeatureOrderList();
 		assertEquals(expectedOrder, actualOrder);
 
-		IFeature B =
+		final IFeature B =
 			factory.createFeature(fm, "B");
 		FeatureUtils.addChild(root, B);
 		expectedOrder.add(B.getName());
@@ -99,7 +99,7 @@ public class TFeatureModel {
 			fm.getFeatureOrderList();
 		assertEquals(expectedOrder, actualOrder);
 
-		IFeature C =
+		final IFeature C =
 			factory.createFeature(fm, "C");
 		FeatureUtils.addChild(B, C);
 		expectedOrder.add(C.getName());

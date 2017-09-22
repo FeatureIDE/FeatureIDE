@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -56,7 +56,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Propagates error markers for composed files to sources files.
- * 
+ *
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
@@ -82,13 +82,15 @@ public abstract class ErrorPropagation {
 	/**
 	 * Propagates error markers for composed files to sources files.<br> Call {@link #addFile(IFile)} to propagate the markers of the given source file, to the
 	 * corresponding file at the features folder.
-	 * 
+	 *
 	 * @param sourceFile initial source file for determine project and language. </br>(must still be added by calling {@link #addFile(IFile)})
 	 */
 	public static ErrorPropagation createErrorPropagation(IFile sourceFile) {
 		final IFeatureProject featureProject =
 			CorePlugin.getFeatureProject(sourceFile);
-		if (featureProject == null) return null;
+		if (featureProject == null) {
+			return null;
+		}
 		final String fileExtension =
 			sourceFile.getFileExtension();
 		if ("java".equals(fileExtension)) {
@@ -124,7 +126,7 @@ public abstract class ErrorPropagation {
 		if (composedFiles.isEmpty()) {
 			return null;
 		}
-		IFile file =
+		final IFile file =
 			composedFiles.iterator().next();
 		composedFiles.remove(file);
 		return file;
@@ -132,7 +134,7 @@ public abstract class ErrorPropagation {
 
 	/**
 	 * Propagates the markers of the given source file, to the corresponding file at the features folder.
-	 * 
+	 *
 	 * @param sourceFile The composed file
 	 */
 	public void addFile(IFile sourceFile) {
@@ -192,16 +194,16 @@ public abstract class ErrorPropagation {
 			return;
 		}
 		try {
-			IMarker[] markers =
+			final IMarker[] markers =
 				file.findMarkers(null, true, IResource.DEPTH_INFINITE);
 			if (force
-				|| markers.length != 0) {
-				LinkedList<IMarker> marker =
+				|| (markers.length != 0)) {
+				final LinkedList<IMarker> marker =
 					new LinkedList<IMarker>();
-				for (IMarker m : markers) {
-					String message =
+				for (final IMarker m : markers) {
+					final String message =
 						m.getAttribute(IMarker.MESSAGE, null);
-					if (message == null
+					if ((message == null)
 						|| deleteMarker(message)) {
 						m.delete();
 					} else if (propagateMarker(m)) {
@@ -213,14 +215,14 @@ public abstract class ErrorPropagation {
 					propagateMarkers(marker, file);
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
 	 * Necessary if a marker should not be removed but also should not be propagated. <br> <code>Needs to be implemented by the Subclass.</code>
-	 * 
+	 *
 	 * @param marker
 	 * @return <code>false</code> if the marker should not be propagated.
 	 */
@@ -230,7 +232,7 @@ public abstract class ErrorPropagation {
 
 	/**
 	 * Necessary if a marker should be removed and also should not be propagated. <br> <code>Needs to be implemented by the Subclass.</code>
-	 * 
+	 *
 	 * @param message
 	 * @return <code>true</code> if the marker should not be removed.
 	 */
@@ -240,7 +242,7 @@ public abstract class ErrorPropagation {
 
 	/**
 	 * Propagates all markers of the given file
-	 * 
+	 *
 	 * @param markers
 	 * @param file
 	 */
@@ -249,45 +251,45 @@ public abstract class ErrorPropagation {
 			return;
 		}
 
-		String content =
+		final String content =
 			getFileContent(file);
-		LinkedList<FSTField> fields =
+		final LinkedList<FSTField> fields =
 			new LinkedList<FSTField>();
-		LinkedList<FSTMethod> methods =
+		final LinkedList<FSTMethod> methods =
 			new LinkedList<FSTMethod>();
-		IFeatureProject project =
+		final IFeatureProject project =
 			CorePlugin.getFeatureProject(file);
 		if (project == null) {
 			return;
 		}
-		FSTModel model =
+		final FSTModel model =
 			project.getFSTModel();
 		if (model == null) {
 			return;
 		}
-		FSTClass fstClass =
+		final FSTClass fstClass =
 			model.getClass(model.getAbsoluteClassName(file));
 		if (fstClass == null) {
 			return;
 		}
 
-		LinkedList<String> selectedFeatures =
+		final LinkedList<String> selectedFeatures =
 			getSelectedFeatures(CorePlugin.getFeatureProject(file));
-		for (FSTRole role : fstClass.getRoles()) {
+		for (final FSTRole role : fstClass.getRoles()) {
 			if (!selectedFeatures.contains(role.getFeature().getName())) {
 				continue;
 			}
-			for (FSTField field : role.getClassFragment().getFields()) {
+			for (final FSTField field : role.getClassFragment().getFields()) {
 				fields.add(field);
 			}
-			for (FSTMethod method : role.getClassFragment().getMethods()) {
+			for (final FSTMethod method : role.getClassFragment().getMethods()) {
 				methods.add(method);
 			}
 		}
 
 		setElementLines(content, fields, methods);
 
-		for (IMarker marker : markers) {
+		for (final IMarker marker : markers) {
 			if (!marker.exists()) {
 				continue;
 			}
@@ -296,7 +298,7 @@ public abstract class ErrorPropagation {
 				propagateUnsupportedMarker(marker, file);
 				continue;
 			}
-			int markerLine =
+			final int markerLine =
 				marker.getAttribute(IMarker.LINE_NUMBER, -1);
 			if (markerLine == -1) {
 				continue;
@@ -304,18 +306,18 @@ public abstract class ErrorPropagation {
 
 			boolean propagated =
 				false;
-			for (FSTField f : fields) {
+			for (final FSTField f : fields) {
 				if (f.getEndLine() == -1) {
 					continue;
 				}
-				int composedLine =
+				final int composedLine =
 					f.getComposedLine();
-				if (markerLine >= composedLine
-					&& markerLine <= composedLine
+				if ((markerLine >= composedLine)
+					&& (markerLine <= (composedLine
 						+ (f.getEndLine()
-							- f.getLine())) {
-					propagateMarker(marker, f.getFile(), f.getLine()
-						+ markerLine
+							- f.getLine())))) {
+					propagateMarker(marker, f.getFile(), (f.getLine()
+						+ markerLine)
 						- composedLine);
 					propagated =
 						true;
@@ -327,17 +329,17 @@ public abstract class ErrorPropagation {
 				continue;
 			}
 
-			for (FSTMethod m : methods) {
+			for (final FSTMethod m : methods) {
 				if (m.getEndLine() == -1) {
 					continue;
 				}
-				int composedLine =
+				final int composedLine =
 					m.getComposedLine();
-				if (markerLine >= composedLine
-					&& markerLine <= composedLine
-						+ m.getMethodLength()) {
-					propagateMarker(marker, m.getFile(), m.getLine()
-						+ markerLine
+				if ((markerLine >= composedLine)
+					&& (markerLine <= (composedLine
+						+ m.getMethodLength()))) {
+					propagateMarker(marker, m.getFile(), (m.getLine()
+						+ markerLine)
 						- m.getComposedLine());
 					propagated =
 						true;
@@ -360,28 +362,28 @@ public abstract class ErrorPropagation {
 		}
 
 		final IFile iFile;
-		LinkedList<String> list =
+		final LinkedList<String> list =
 			new LinkedList<String>();
 		iFile =
 			featureProject.getCurrentConfiguration();
 
-		if (iFile == null
+		if ((iFile == null)
 			|| !iFile.exists()) {
 			return null;
 		}
 
-		File file =
+		final File file =
 			iFile.getRawLocation().toFile();
-		LinkedList<String> configurationFeatures =
+		final LinkedList<String> configurationFeatures =
 			readFeaturesfromConfigurationFile(file);
 		if (configurationFeatures == null) {
 			return null;
 		}
 
-		Collection<IFeature> features =
+		final Collection<IFeature> features =
 			Functional.toList(featureProject.getFeatureModel().getFeatures());
-		for (String confFeature : configurationFeatures) {
-			for (IFeature feature : features) {
+		for (final String confFeature : configurationFeatures) {
+			for (final IFeature feature : features) {
 				if (feature.getName().equals(confFeature)) {
 					list.add(feature.getName());
 				}
@@ -394,13 +396,14 @@ public abstract class ErrorPropagation {
 		LinkedList<String> list;
 		Scanner scanner =
 			null;
-		if (!file.exists())
+		if (!file.exists()) {
 			return null;
+		}
 
 		try {
 			scanner =
 				new Scanner(file, "UTF-8");
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 
@@ -428,24 +431,24 @@ public abstract class ErrorPropagation {
 
 	/**
 	 * Sets the composed lines of the given fields and methods. <br> <code>Needs to be implemented by the Subclass.</code>
-	 * 
+	 *
 	 * @param content The content of the composed file
 	 */
 	protected abstract void setElementLines(String content, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods);
 
 	/**
 	 * Propagates the given marker to the given source line
-	 * 
+	 *
 	 * @param marker The marker to propagate
 	 * @param file The features file
 	 * @param line The marker line at the features file
 	 */
 	protected void propagateMarker(IMarker marker, IFile file, int line) {
-		if (file != null
+		if ((file != null)
 			&& file.exists()) {
 			Object severity =
 				null;
-			String message =
+			final String message =
 				marker.getAttribute(IMarker.MESSAGE, NO_ATTRIBUTE);
 			if (NO_ATTRIBUTE.equals(message)) {
 				return;
@@ -453,18 +456,18 @@ public abstract class ErrorPropagation {
 			try {
 				severity =
 					marker.getAttribute(IMarker.SEVERITY);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				severity =
 					IMarker.SEVERITY_ERROR;
 			}
 			if (!hasSameMarker(message, line, file)) {
 				try {
-					IMarker newMarker =
+					final IMarker newMarker =
 						file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
 					newMarker.setAttribute(IMarker.MESSAGE, message);
 					newMarker.setAttribute(IMarker.SEVERITY, severity);
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					FeatureHouseCorePlugin.getDefault().logError(e);
 				}
 			}
@@ -476,16 +479,16 @@ public abstract class ErrorPropagation {
 	 */
 	private boolean hasSameMarker(String message, int line, IFile file) {
 		try {
-			IMarker[] markers =
+			final IMarker[] markers =
 				file.findMarkers(null, true, IResource.DEPTH_INFINITE);
-			for (IMarker m : markers) {
+			for (final IMarker m : markers) {
 				if (m.getAttribute(IMarker.LINE_NUMBER, -1) == line) {
 					if (m.getAttribute(IMarker.MESSAGE, "xxx").equals(message)) {
 						return true;
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 
 		}
 		return false;
@@ -508,7 +511,7 @@ public abstract class ErrorPropagation {
 		try {
 			scanner =
 				new Scanner(file.getRawLocation().toFile(), "UTF-8");
-			StringBuffer buffer =
+			final StringBuffer buffer =
 				new StringBuffer();
 			if (scanner.hasNext()) {
 				while (scanner.hasNext()) {
@@ -517,11 +520,12 @@ public abstract class ErrorPropagation {
 				}
 			}
 			return buffer.toString();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			CorePlugin.getDefault().logError(e);
 		} finally {
-			if (scanner != null)
+			if (scanner != null) {
 				scanner.close();
+			}
 		}
 		return "";
 	}

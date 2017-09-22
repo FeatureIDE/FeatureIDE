@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.ui.views.collaboration.figures.UnderlayerFigure;
 
 /**
  * An EditPart for the collaboration.
- * 
+ *
  * @author Constanze Adler
  */
 public class CollaborationEditPart extends AbstractGraphicalEditPart implements GUIDefaults {
@@ -72,36 +72,38 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	 */
 	@Override
 	protected void refreshVisuals() {
-		this.getFigure().getBounds().x =
+		getFigure().getBounds().x =
 			GUIDefaults.DEFAULT_INSET_TO_EDGE;
-		this.getFigure().getBounds().y =
-			this.getFigure().getBounds().y
+		getFigure().getBounds().y =
+			getFigure().getBounds().y
 				+ GUIDefaults.DEFAULT_INSET_TO_EDGE;
 	}
 
 	/**
 	 * Opens the configuration editor if the element is a configuration.
 	 */
+	@Override
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
 			if (getCollaborationModel() instanceof FSTConfiguration) {
-				IFile file =
+				final IFile file =
 					((FSTConfiguration) getCollaborationModel()).getFile();
 
-				if (file == null)
+				if (file == null) {
 					return;
+				}
 
-				IWorkbenchWindow dw =
+				final IWorkbenchWindow dw =
 					UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
 				try {
-					IWorkbenchPage page =
+					final IWorkbenchPage page =
 						dw.getActivePage();
 					if (page != null) {
-						FileEditorInput fileEditorInput =
+						final FileEditorInput fileEditorInput =
 							new FileEditorInput(file);
 						page.openEditor(fileEditorInput, "de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor");
 					}
-				} catch (PartInitException e) {
+				} catch (final PartInitException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 			}

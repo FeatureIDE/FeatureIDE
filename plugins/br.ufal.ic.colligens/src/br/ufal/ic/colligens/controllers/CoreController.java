@@ -53,7 +53,7 @@ public class CoreController {
 		typeChef =
 			new TypeChef();
 
-		Job job =
+		final Job job =
 			new Job(ANALYZING_FILES) {
 
 				/*
@@ -65,17 +65,19 @@ public class CoreController {
 
 					typeChef.setMonitor(monitor);
 
-					if (monitor.isCanceled())
+					if (monitor.isCanceled()) {
 						return Status.CANCEL_STATUS;
+					}
 
 					try {
 						// checks files in ProjectExplorer or PackageExplorer
 						projectExplorerController.run();
 
-						if (monitor.isCanceled())
+						if (monitor.isCanceled()) {
 							return Status.CANCEL_STATUS;
+						}
 
-						List<IResource> list =
+						final List<IResource> list =
 							projectExplorerController.getList();
 
 						// get files to analyze e run;
@@ -84,13 +86,14 @@ public class CoreController {
 						// returns the result to view
 						syncWithPluginView();
 
-						if (monitor.isCanceled())
+						if (monitor.isCanceled()) {
 							return Status.CANCEL_STATUS;
+						}
 
-					} catch (TypeChefException e) {
+					} catch (final TypeChefException e) {
 						e.printStackTrace();
 						return Status.CANCEL_STATUS;
-					} catch (ProjectExplorerException e) {
+					} catch (final ProjectExplorerException e) {
 						e.printStackTrace();
 						return Status.CANCEL_STATUS;
 					} finally {
@@ -117,7 +120,7 @@ public class CoreController {
 			@Override
 			public void run() {
 
-				IViewPart view =
+				final IViewPart view =
 					window.getActivePage().findView(
 							InvalidConfigurationsView.ID);
 				if (view instanceof InvalidConfigurationsView) {

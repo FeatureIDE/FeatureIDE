@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,6 +28,7 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.XYLayout;
@@ -57,7 +58,7 @@ import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 
 /**
  * Represents a legend for the feature model.
- * 
+ *
  * @author Fabian Benduhn
  * @author Florian Proksch
  * @author Stefan Krueger
@@ -223,7 +224,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		createRows();
 		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
 		setBackgroundColor(FMPropertyManager.getLegendBackgroundColor());
-		this.setOpaque(true);
+		setOpaque(true);
 	}
 
 	private void refreshProperties(IFeatureModel featureModel) {
@@ -279,7 +280,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				: false;
 
 		if (featureModel instanceof ExtendedFeatureModel) {
-			ExtendedFeatureModel extendedFeatureModel =
+			final ExtendedFeatureModel extendedFeatureModel =
 				(ExtendedFeatureModel) featureModel;
 			interfaced =
 				extendedFeatureModel.hasInterface();
@@ -410,7 +411,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void setWidth(String string) {
-		int widthInPixels =
+		final int widthInPixels =
 			createLabel(1, string, FMPropertyManager.getFeatureForgroundColor(), "").getPreferredSize().width
 				+ 40;
 		if (widthInPixels > width) {
@@ -420,9 +421,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private boolean isImplicit(IGraphicalFeatureModel fm) {
-		List<IGraphicalConstraint> consts =
+		final List<IGraphicalConstraint> consts =
 			fm.getConstraints();
-		for (IGraphicalConstraint c : consts) {
+		for (final IGraphicalConstraint c : consts) {
 			if (c.isImplicit()) {
 				return true;
 			}
@@ -500,54 +501,54 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowRedundantConst(int row) {
 		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
-		Label labelIndetHidden =
+		final Label labelIndetHidden =
 			createLabel(row, language.getRedundantConst(), FMPropertyManager.getFeatureForgroundColor(), REDUNDANT_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
 	private void createRowImplicitConst(int row) {
 		createSymbol(row, IMPLICIT, false, IMPLICIT_TOOLTIP);
-		Label labelIndetHidden =
+		final Label labelIndetHidden =
 			createLabel(row, language.getImplicitConst(), FMPropertyManager.getFeatureForgroundColor(), IMPLICIT_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
 	private void createRowTautologyConst(int row) {
 		createSymbol(row, FALSE_OPT, false, TAUTOLOGY_CONST_TOOLTIP);
-		Label labelIndetHidden =
+		final Label labelIndetHidden =
 			createLabel(row, language.getTautologyConst(), FMPropertyManager.getFeatureForgroundColor(), TAUTOLOGY_CONST_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
 	private void createRowIndetHidden(int row) {
 		createSymbol(row, FALSE_OPT, true, INDET_HIDDEN_TOOLTIP);
-		Label labelIndetHidden =
+		final Label labelIndetHidden =
 			createLabel(row, language.getIndetHidden(), FMPropertyManager.getFeatureForgroundColor(), INDET_HIDDEN_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
 	private void createRowFalseOpt(int row) {
 		createSymbol(row, FALSE_OPT, true, FALSE_OPT_TOOLTIP);
-		Label labelFalseOpt =
+		final Label labelFalseOpt =
 			createLabel(row, language.getFalseOptional(), FMPropertyManager.getFeatureForgroundColor(), FALSE_OPT_TOOLTIP);
 		add(labelFalseOpt);
 
 	}
 
 	private void createRowTitle() {
-		Label labelTitle =
+		final Label labelTitle =
 			new Label();
 		labelTitle.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelTitle.setFont(DEFAULT_FONT);
 		labelTitle.setText(language.getLagendTitle());
-		labelTitle.setLabelAlignment(Label.LEFT);
+		labelTitle.setLabelAlignment(PositionConstants.LEFT);
 		layout.setConstraint(labelTitle, new Rectangle(3, 0, width, ROW_HEIGHT));
 		add(labelTitle);
 	}
 
 	private void createRowAlternative(int row) {
 		createGroupTypeSymbol(row, ALTERNATIVE);
-		Label labelOr =
+		final Label labelOr =
 			createLabel(row, language.getAlternative(), FMPropertyManager.getFeatureForgroundColor(), ALTERNATIVE_TOOLTIP);
 
 		add(labelOr);
@@ -555,92 +556,92 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowOr(int row) {
 		createGroupTypeSymbol(row, OR);
-		Label labelOr =
+		final Label labelOr =
 			createLabel(row, language.getOr(), FMPropertyManager.getFeatureForgroundColor(), OR_TOOLTIP);
 		add(labelOr);
 	}
 
 	private void createRowOptional(int row) {
-		PolylineConnection p =
+		final PolylineConnection p =
 			createConnectionTypeSymbol(row, false);
 		add(p);
-		Label labelMandatory =
+		final Label labelMandatory =
 			createLabel(row, language.getOptional(), FMPropertyManager.getFeatureForgroundColor(), OPTIONAL_TOOLTIP);
 		add(labelMandatory);
 	}
 
 	private void createRowMandatory(int row) {
-		PolylineConnection p =
+		final PolylineConnection p =
 			createConnectionTypeSymbol(row, true);
 		add(p);
-		Label labelMandatory =
+		final Label labelMandatory =
 			createLabel(row, language.getMandatory(), FMPropertyManager.getFeatureForgroundColor(), MANDATORY_TOOLTIP);
 		add(labelMandatory);
 	}
 
 	private void createRowAbstract(int row) {
 		createSymbol(row, ABSTRACT, true, ABSTRACT_TOOLTIP);
-		Label labelAbstract =
+		final Label labelAbstract =
 			createLabel(row, language.getAbstract(), FMPropertyManager.getFeatureForgroundColor(), ABSTRACT_TOOLTIP);
 		add(labelAbstract);
 	}
 
 	private void createRowImported(int row) {
 		createSymbol(row, IMPORTED, true, IMPORTED_TOOLTIP);
-		Label labelImported =
+		final Label labelImported =
 			createLabel(row, language.getImported(), FMPropertyManager.getFeatureForgroundColor(), IMPORTED_TOOLTIP);
 		add(labelImported);
 	}
 
 	private void createRowInherited(int row) {
 		createSymbol(row, INHERITED, true, INHERITED_TOOLTIP);
-		Label labelInherited =
+		final Label labelInherited =
 			createLabel(row, language.getInherited(), FMPropertyManager.getFeatureForgroundColor(), INHERITED_TOOLTIP);
 		add(labelInherited);
 	}
 
 	private void createRowInterfaced(int row) {
 		createSymbol(row, INTERFACED, true, INTERFACED_TOOLTIP);
-		Label labelInterfaced =
+		final Label labelInterfaced =
 			createLabel(row, language.getInterfaced(), FMPropertyManager.getFeatureForgroundColor(), INTERFACED_TOOLTIP);
 		add(labelInterfaced);
 	}
 
 	private void createRowConcrete(int row) {
 		createSymbol(row, CONCRETE, true, CONCRETE_TOOLTIP);
-		Label labelConcrete =
+		final Label labelConcrete =
 			createLabel(row, language.getConcrete(), FMPropertyManager.getFeatureForgroundColor(), CONCRETE_TOOLTIP);
 		add(labelConcrete);
 	}
 
 	private void createRowHidden(int row) {
 		createSymbol(row, HIDDEN, true, HIDDEN_TOOLTIP);
-		Label labelHidden =
+		final Label labelHidden =
 			createLabel(row, language.getHidden(), HIDDEN_FOREGROUND, HIDDEN_TOOLTIP);
 		add(labelHidden);
 	}
 
 	private void createRowCollapsed(int row) {
 		createCollapsedSymbol(row, COLLAPSED_TOOLTIP);
-		Label labelCollapsed =
+		final Label labelCollapsed =
 			createLabel(row, language.getCollapsed(), FMPropertyManager.getFeatureForgroundColor(), COLLAPSED_TOOLTIP);
 		add(labelCollapsed);
 	}
 
 	private void createRowDead(int row) {
 		createSymbol(row, DEAD, true, DEAD_TOOLTIP);
-		Label labelDead =
+		final Label labelDead =
 			createLabel(row, language.getDead(), FMPropertyManager.getFeatureForgroundColor(), DEAD_TOOLTIP);
 		add(labelDead);
 
 	}
 
 	private Label createLabel(int row, String text, Color foreground, String tooltip) {
-		Label label =
+		final Label label =
 			new Label(text);
-		label.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(label, new Rectangle(LABEL_PADDING, ROW_HEIGHT
-			* row
+		label.setLabelAlignment(PositionConstants.LEFT);
+		layout.setConstraint(label, new Rectangle(LABEL_PADDING, (ROW_HEIGHT
+			* row)
 			- LIFT,
 				width
 					- LABEL_PADDING,
@@ -657,7 +658,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 * @return
 	 */
 	private Figure createToolTipContent(String text) {
-		Figure toolTipContent =
+		final Figure toolTipContent =
 			new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
 		toolTipContent.add(new Label(text));
@@ -665,7 +666,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param row the row in which the group type symbol shall appear
 	 * @param type AND, OR, ALTERNATIVE
 	 */
@@ -697,43 +698,43 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		}
 		// otherwise type must be ALTERNATIVE and decoration = false;
 
-		Point p1 =
+		final Point p1 =
 			new Point(GROUPTYPE_PADDING
 				+ SYMBOL_SIZE,
-					ROW_HEIGHT
-						* row
-						+ SYMBOL_SIZE
+					((ROW_HEIGHT
+						* row)
+						+ SYMBOL_SIZE)
 						- LIFT);
-		Point p2 =
+		final Point p2 =
 			new Point((GROUPTYPE_PADDING
-				+ SYMBOL_SIZE
-					/ 2), ROW_HEIGHT
-						* row
+				+ (SYMBOL_SIZE
+					/ 2)), (ROW_HEIGHT
+						* row)
 						- LIFT);
-		Point p3 =
-			new Point(GROUPTYPE_PADDING, ROW_HEIGHT
-				* row
-				+ SYMBOL_SIZE
+		final Point p3 =
+			new Point(GROUPTYPE_PADDING, ((ROW_HEIGHT
+				* row)
+				+ SYMBOL_SIZE)
 				- LIFT);
 
-		PolylineConnection line =
+		final PolylineConnection line =
 			new PolylineConnection();
 		line.setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 
 		line.setEndpoints(p2, p3);
 		if (decoration) {
-			RotatableDecoration sourceDecoration =
+			final RotatableDecoration sourceDecoration =
 				new LegendRelationDecoration(fill, p1);
 			line.setSourceDecoration(sourceDecoration);
 		}
-		PolylineConnection line2 =
+		final PolylineConnection line2 =
 			new PolylineConnection();
 		line2.setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 
 		line2.setEndpoints(p2, p1);
 		this.add(line);
 		this.add(line2);
-		Figure toolTipContent =
+		final Figure toolTipContent =
 			createToolTipContent(toolTipText);
 		line.setToolTip(toolTipContent);
 		line2.setToolTip(toolTipContent);
@@ -743,35 +744,36 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private PolylineConnection createConnectionTypeSymbol(int row, boolean mandatory) {
 
-		PolylineConnection p =
+		final PolylineConnection p =
 			new PolylineConnection();
 		p.setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 		final CircleDecoration circleDecoration =
 			new CircleDecoration(mandatory);
 		p.setSourceDecoration(circleDecoration);
-		Point source =
-			new Point(MANDATORY_PADDING, ROW_HEIGHT
-				* row
-				- LIFT
-				+ SYMBOL_SIZE
-					/ 2);
-		Point target =
+		final Point source =
+			new Point(MANDATORY_PADDING, ((ROW_HEIGHT
+				* row)
+				- LIFT)
+				+ (SYMBOL_SIZE
+					/ 2));
+		final Point target =
 			new Point(MANDATORY_PADDING
-				+ SYMBOL_SIZE
-					/ 2,
-					row
-						* ROW_HEIGHT
+				+ (SYMBOL_SIZE
+					/ 2),
+					(row
+						* ROW_HEIGHT)
 						- LIFT);
 
 		p.setEndpoints(source, target);
 		p.setBounds(new Rectangle(getBounds()).shrink(-1, -1));
 		String toolTipText;
-		if (mandatory)
+		if (mandatory) {
 			toolTipText =
 				MANDATORY_TOOLTIP;
-		else
+		} else {
 			toolTipText =
 				OPTIONAL_TOOLTIP;
+		}
 		p.setToolTip(createToolTipContent(toolTipText));
 		return p;
 	}
@@ -780,25 +782,25 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		final CollapsedDecoration collapsedDecoration =
 			new CollapsedDecoration();
 
-		int x1 =
-			(SYMBOL_SIZE
-				/ 2
+		final int x1 =
+			((SYMBOL_SIZE
+				/ 2)
 				- 2);
-		int y1 =
-			(ROW_HEIGHT
-				* row
-				- LIFT_2
-					/ 2);
-		int x2 =
+		final int y1 =
+			((ROW_HEIGHT
+				* row)
+				- (LIFT_2
+					/ 2));
+		final int x2 =
 			SYMBOL_SIZE
-				+ SYMBOL_SIZE
-					/ 2;
-		int y2 =
-			(ROW_HEIGHT
-				* row
-				+ SYMBOL_SIZE
+				+ (SYMBOL_SIZE
+					/ 2);
+		final int y2 =
+			(((ROW_HEIGHT
+				* row)
+				+ SYMBOL_SIZE)
 				- LIFT_2);
-		Point p1 =
+		final Point p1 =
 			new Point(x1, y1);
 		collapsedDecoration.isLegendEntry =
 			true;
@@ -812,28 +814,28 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createSymbol(int row, int type, boolean feature, String toolTip) {
-		int x1 =
-			(SYMBOL_SIZE
-				/ 2
+		final int x1 =
+			((SYMBOL_SIZE
+				/ 2)
 				- 2);
-		int y1 =
-			(ROW_HEIGHT
-				* row
-				- LIFT_2
-					/ 2);
-		int x2 =
+		final int y1 =
+			((ROW_HEIGHT
+				* row)
+				- (LIFT_2
+					/ 2));
+		final int x2 =
 			SYMBOL_SIZE
-				+ SYMBOL_SIZE
-					/ 2;
-		int y2 =
-			(ROW_HEIGHT
-				* row
-				+ SYMBOL_SIZE
+				+ (SYMBOL_SIZE
+					/ 2);
+		final int y2 =
+			(((ROW_HEIGHT
+				* row)
+				+ SYMBOL_SIZE)
 				- LIFT_2);
-		Point p1 =
+		final Point p1 =
 			new Point(x1, y1);
 
-		Figure rect =
+		final Figure rect =
 			new RectangleFigure();
 		switch (type) {
 
@@ -892,53 +894,53 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	public void recreateLegend() {
-		this.removeAll();
-		this.setLocation(graphicalFeatureModel.getLayout().getLegendPos());
+		removeAll();
+		setLocation(graphicalFeatureModel.getLayout().getLegendPos());
 		refreshProperties(graphicalFeatureModel.getFeatureModel());
 		setLegendSize();
 		createRows();
 	}
 
 	private void createExplanationEntry() {
-		Explanation explanation =
+		final Explanation explanation =
 			graphicalFeatureModel.getActiveExplanation();
 
-		XYLayout layout =
+		final XYLayout layout =
 			new XYLayout();
-		Figure explanationFigure =
+		final Figure explanationFigure =
 			new Figure();
 		explanationFigure.setLayoutManager(layout);
 		explanationFigure.setToolTip(createToolTipContent(EXPLANATION_TOOLTIP));
 
-		Point target =
-			new Point(0, ROW_HEIGHT
-				* row
-				- LIFT
-				+ SYMBOL_SIZE
-					/ 5);
+		final Point target =
+			new Point(0, ((ROW_HEIGHT
+				* row)
+				- LIFT)
+				+ (SYMBOL_SIZE
+					/ 5));
 		explanationFigure.setLocation(target);
 
-		int x_SymbolStart =
+		final int x_SymbolStart =
 			SYMBOL_SIZE
 				/ 2;
 		int y_Entry =
 			explanationFigure.getLocation().y;
 
 		// Label left
-		Label labelExplanation =
+		final Label labelExplanation =
 			new Label();
 		final String circumstanceString =
 			explanation.getWriter().getCircumstanceString();
 		labelExplanation.setText(String.format("%s because of the highlighted dependencies:", circumstanceString));
 		explanationFigure.setToolTip(createToolTipContent(String.format("%s%nbecause of the highlighted dependencies.", circumstanceString)));
-		int widthInPixels =
+		final int widthInPixels =
 			createLabel(1, labelExplanation.getText(), FMPropertyManager.getFeatureForgroundColor(), "").getPreferredSize().width
 				+ 25;
 
 		// SetWidth depending of string
 		explanationFigure.setSize(widthInPixels, 18
-			+ 2
-				* ROW_HEIGHT
+			+ (2
+				* ROW_HEIGHT)
 			+ 5);
 		setSize(getSize().width < widthInPixels
 			? widthInPixels
@@ -946,7 +948,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				getSize().height
 					+ explanationFigure.getSize().height);
 
-		labelExplanation.setLabelAlignment(Label.LEFT);
+		labelExplanation.setLabelAlignment(PositionConstants.LEFT);
 		labelExplanation.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelExplanation.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelExplanation.setFont(DEFAULT_FONT);
@@ -959,16 +961,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				+ 5;
 
 		// Add Red to dark red Gradient
-		TwoColorGradientLine redToBlack =
+		final TwoColorGradientLine redToBlack =
 			new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0, 0, 0), labelExplanation.getPreferredSize().width, 6);
 		redToBlack.setLocation(new Point(x_SymbolStart, y_Entry));
 		y_Entry +=
 			redToBlack.getSize().height;
 
 		// Label left
-		Label labelLeft =
+		final Label labelLeft =
 			new Label("likely cause");
-		labelLeft.setLabelAlignment(Label.LEFT);
+		labelLeft.setLabelAlignment(PositionConstants.LEFT);
 		labelLeft.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelLeft.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelLeft.setFont(DEFAULT_FONT);
@@ -977,9 +979,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelLeft.setLocation(new Point(redToBlack.getLocation().x, y_Entry));
 
 		// label right
-		Label labelRight =
+		final Label labelRight =
 			new Label("unlikely cause");
-		labelRight.setLabelAlignment(Label.RIGHT);
+		labelRight.setLabelAlignment(PositionConstants.RIGHT);
 		labelRight.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelRight.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelRight.setFont(DEFAULT_FONT);

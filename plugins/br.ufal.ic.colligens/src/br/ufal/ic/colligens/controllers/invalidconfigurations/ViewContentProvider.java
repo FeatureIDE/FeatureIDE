@@ -23,10 +23,11 @@ class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof List)
+		if (parentElement instanceof List) {
 			return ((List<?>) parentElement).toArray();
+		}
 		if (parentElement instanceof FileProxy) {
-			List<Log> logs =
+			final List<Log> logs =
 				((FileProxy) parentElement).getLogs();
 			return logs.toArray();
 		}
@@ -43,8 +44,9 @@ class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof List)
+		if (element instanceof List) {
 			return ((List<?>) element).size() > 0;
+		}
 		if (element instanceof FileProxy) {
 			return (!((FileProxy) element).getLogs().isEmpty());
 		}

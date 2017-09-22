@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,9 +39,9 @@ public class MSPLNature implements IProjectNature {
 
 	@Override
 	public void configure() throws CoreException {
-		IProjectDescription desc =
+		final IProjectDescription desc =
 			project.getDescription();
-		ICommand[] commands =
+		final ICommand[] commands =
 			desc.getBuildSpec();
 
 		for (int i =
@@ -57,14 +57,14 @@ public class MSPLNature implements IProjectNature {
 
 	@Override
 	public void deconfigure() throws CoreException {
-		IProjectDescription description =
+		final IProjectDescription description =
 			getProject().getDescription();
-		ICommand[] commands =
+		final ICommand[] commands =
 			description.getBuildSpec();
 		for (int i =
 			0; i < commands.length; ++i) {
 			if (commands[i].getBuilderName().equals(MSPLBuilder.BUILDER_ID)) {
-				ICommand[] newCommands =
+				final ICommand[] newCommands =
 					new ICommand[commands.length
 						- 1];
 				System.arraycopy(commands, 0, newCommands, 0, i);

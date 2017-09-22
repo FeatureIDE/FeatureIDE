@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -55,12 +55,13 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManagerDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
 import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 
 /**
  * At this property page, feature model specific settings can be specified
- * 
+ *
  * @author Jens Meinicke
  */
 public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUIDefaults {
@@ -87,9 +88,9 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite composite =
+		final Composite composite =
 			new Composite(parent, SWT.NULL);
-		GridLayout layout =
+		final GridLayout layout =
 			new GridLayout();
 		layout.numColumns =
 			1;
@@ -108,7 +109,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	 * Creates the group to specify legend specific settings.
 	 */
 	private void addLegendGroup(Composite composite) {
-		Group group =
+		final Group group =
 			createGroup(composite, LEGEND_GROUP_TEXT);
 		getLanguageExtensions();
 
@@ -117,7 +118,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		label.setText(LEGEND_HIDE_LABEL);
 		buttonHideLegend =
 			new Button(group, SWT.CHECK);
-		GridData gd =
+		final GridData gd =
 			new GridData(GridData.BEGINNING);
 		buttonHideLegend.setLayoutData(gd);
 		buttonHideLegend.setSelection(FMPropertyManager.isLegendHidden());
@@ -130,13 +131,13 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 				| SWT.DROP_DOWN);
 		languageCombo.setLayoutData(new GridData(GridData.FILL));
 
-		for (ILanguage l : languages) {
+		for (final ILanguage l : languages) {
 			languageCombo.add(l.getName());
 		}
 		languageCombo.setText(English.NAME);
 		int i =
 			0;
-		for (String language : languageCombo.getItems()) {
+		for (final String language : languageCombo.getItems()) {
 			if (language.equals(FMPropertyManager.getLanguage().getName())) {
 				languageCombo.select(i);
 				break;
@@ -153,11 +154,11 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	/**
 	 * Creates the group to specify model specific spaces.
-	 * 
+	 *
 	 * @param composite
 	 */
 	private void addSpacesGroup(Composite composite) {
-		Group group =
+		final Group group =
 			createGroup(composite, SPACES_GROUP_TEXT);
 
 		textMarginX =
@@ -176,11 +177,11 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	/**
 	 * Creates the group to specify model specific colors.
-	 * 
+	 *
 	 * @param composite
 	 */
 	private void addColorGroup(Composite composite) {
-		Group colorGroup =
+		final Group colorGroup =
 			createGroup(composite, COLOR_GROUP_TEXT);
 
 		selectorDiagramBackground =
@@ -193,13 +194,13 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 			createSelectorEntry(colorGroup, COLOR_ABSTRACT_LABEL, FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB(),
 					COLOR_ABSTRACT_TIP);
 
-		Label label =
+		final Label label =
 			new Label(colorGroup, SWT.NULL);
 		label.setText(HIDE_BORDER_COLOR);
 		label.setToolTipText(COLOR_CHECKBOX_TIP);
 		buttonHideBorderColor =
 			new Button(colorGroup, SWT.CHECK);
-		GridData gd =
+		final GridData gd =
 			new GridData(GridData.BEGINNING);
 		buttonHideBorderColor.setLayoutData(gd);
 		buttonHideBorderColor.setSelection(FMPropertyManager.isBorderColorHidden());
@@ -251,7 +252,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	 */
 	@Override
 	protected void contributeButtons(Composite buttonBar) {
-		GridLayout layout =
+		final GridLayout layout =
 			new GridLayout();
 		layout.numColumns =
 			4;
@@ -263,9 +264,9 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 			false;
 		buttonBar.setLayout(layout);
 
-		int widthHint =
+		final int widthHint =
 			convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
-		Button importButton =
+		final Button importButton =
 			new Button(buttonBar, SWT.PUSH);
 		importButton.setText(IMPORT);
 		GridData data =
@@ -277,12 +278,13 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		importButton.setLayoutData(data);
 		importButton.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				performImport();
 			}
 		});
 
-		Button exportButton =
+		final Button exportButton =
 			new Button(buttonBar, SWT.PUSH);
 		exportButton.setText(EXPORT);
 		data =
@@ -294,6 +296,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		exportButton.setLayoutData(data);
 		exportButton.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				performExport();
 			}
@@ -302,7 +305,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	}
 
 	private void performImport() {
-		FileDialog importDialog =
+		final FileDialog importDialog =
 			new FileDialog(new Shell(), SWT.OPEN);
 		if (importDialog.open() != null) {
 			new SettingsImport(new File(importDialog.getFilterPath()
@@ -314,9 +317,9 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	private void performExport() {
 		applySettings();
-		FileDialog exportDialog =
+		final FileDialog exportDialog =
 			new FileDialog(new Shell(), SWT.SAVE);
-		exportDialog.setFilterPath(FMPropertyManager.workspaceRoot.getLocation().toOSString());
+		exportDialog.setFilterPath(FMPropertyManagerDefaults.workspaceRoot.getLocation().toOSString());
 		exportDialog.setFilterIndex(0);
 		if (exportDialog.open() != null) {
 			new SettingsExport(new File(exportDialog.getFilterPath()
@@ -327,17 +330,17 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	/**
 	 * Creates a new {@link Group}
-	 * 
+	 *
 	 * @param composite The composite of the group
 	 * @param text The label of the group
 	 * @return The created group
 	 */
 	private Group createGroup(Composite composite, String text) {
-		Group group =
+		final Group group =
 			new Group(composite, SWT.NONE);
 		group.setText(text);
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layout =
+		final GridLayout layout =
 			new GridLayout();
 		layout.numColumns =
 			2;
@@ -347,7 +350,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	/**
 	 * Creates a label and a {@link Text} with the given parameters.
-	 * 
+	 *
 	 * @param group The group containing the text field
 	 * @param labelText The text of the label
 	 * @param value The numerical entry of the text filed
@@ -355,11 +358,11 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	 * @return The created text field
 	 */
 	private Text createTextEntry(Group group, String labelText, int value, String toolTipText) {
-		Label label =
+		final Label label =
 			new Label(group, SWT.NULL);
 		label.setText(labelText);
 		label.setToolTipText(toolTipText);
-		Text text =
+		final Text text =
 			new Text(group, SWT.BORDER
 				| SWT.SINGLE);
 		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -369,18 +372,18 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	/**
 	 * Creates a label and a {@link ColorSelector} with the given parameters.
-	 * 
+	 *
 	 * @param group The group containing the ColorSelecotr
 	 * @param labelText The text of the label
 	 * @param rgb The value of the color selector
 	 * @return The created ColorSelector
 	 */
 	private ColorSelector createSelectorEntry(Group group, String labelText, RGB rgb, String toolTipText) {
-		Label label =
+		final Label label =
 			new Label(group, SWT.NULL);
 		label.setText(labelText);
 		label.setToolTipText(toolTipText);
-		ColorSelector selector =
+		final ColorSelector selector =
 			new ColorSelector(group);
 		selector.setColorValue(rgb);
 		return selector;
@@ -502,18 +505,18 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	 * Fills the List LANGUAGES with all defines languages at the extension point "de.ovgu.featureide.fm.core.language".
 	 */
 	private void getLanguageExtensions() {
-		IConfigurationElement[] config =
+		final IConfigurationElement[] config =
 			Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID
 				+ ".language");
 		try {
-			for (IConfigurationElement e : config) {
+			for (final IConfigurationElement e : config) {
 				final Object o =
 					e.createExecutableExtension("class");
 				if (o instanceof ILanguage) {
 					languages.add(((ILanguage) o));
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -532,7 +535,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		languageCombo.setText(English.NAME);
 		int i =
 			0;
-		for (String language : languageCombo.getItems()) {
+		for (final String language : languageCombo.getItems()) {
 			if (language.equals(FMPropertyManager.getLanguage().getName())) {
 				languageCombo.select(i);
 				break;

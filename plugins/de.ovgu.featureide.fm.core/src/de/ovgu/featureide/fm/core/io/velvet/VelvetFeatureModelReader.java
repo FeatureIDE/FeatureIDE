@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -86,9 +86,9 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Parses a feature model in Velvet syntax.
- * 
+ *
  * @deprecated Use {@link VelvetFeatureModelFormat} and {@link FileHandler} instead.
- * 
+ *
  * @author Sebastian Krieter
  * @author Matthias Strauss
  * @author Marcus Pinnecke (Feature Interface)
@@ -139,14 +139,14 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	private final boolean velvetImport;
 
 	private ModelMarkerHandler<IResource> modelMarkerHandler;
-	private ExtendedFeatureModel extFeatureModel;
+	private final ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
 	private boolean localSearch =
 		false;
 
 	/**
 	 * Reads external model with the right FeatureModelReader.
-	 * 
+	 *
 	 * @param file file of feature model
 	 * @return the feature model or null if error occurred
 	 */
@@ -198,7 +198,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 						+ "."
 						+ child.getFeature().getName());
 			}
-			IFeatureStructure featureStructure =
+			final IFeatureStructure featureStructure =
 				feature.getStructure();
 			featureStructure.setMandatory(child.isMandatory());
 			featureStructure.setAbstract(child.isAbstract());
@@ -248,7 +248,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 	private static void updateConstraintNode(Node curNode, String parentModelname, String rootName) {
 		if (curNode instanceof Literal) {
-			Literal literal =
+			final Literal literal =
 				(Literal) curNode;
 			if (literal.var.equals(rootName)) {
 				literal.var =
@@ -260,7 +260,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 						+ literal.var.toString();
 			}
 		} else {
-			for (Node child : curNode.getChildren()) {
+			for (final Node child : curNode.getChildren()) {
 				updateConstraintNode(child, parentModelname, rootName);
 			}
 		}
@@ -321,10 +321,10 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		newFeature.getStructure().setAbstract(isAbstract);
 		newFeature.getStructure().setHidden(isHidden);
 
-		IFeature orgFeature =
+		final IFeature orgFeature =
 			extFeatureModel.getFeature(featureName);
-		if (orgFeature != null
-			&& orgFeature instanceof ExtendedFeature) {
+		if ((orgFeature != null)
+			&& (orgFeature instanceof ExtendedFeature)) {
 			return (ExtendedFeature) orgFeature;
 		} else {
 			extFeatureModel.addFeature(newFeature);
@@ -336,16 +336,16 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 	private String checkNode(Node curNode) {
 		if (curNode instanceof Literal) {
-			Literal literal =
+			final Literal literal =
 				(Literal) curNode;
-			String varString =
+			final String varString =
 				literal.var.toString();
 			if (extFeatureModel.getFeature(varString) == null) {
 				return literal.var.toString();
 			}
 		} else {
-			for (Node child : curNode.getChildren()) {
-				String childRet =
+			for (final Node child : curNode.getChildren()) {
+				final String childRet =
 					checkNode(child);
 				if (childRet != null) {
 					return childRet;
@@ -396,7 +396,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	/**
 	 * Search for the right File to include etc. The following search path is used: <ol> <li>./NAME.velvet</li> <li>./NAME.xml</li> <li>./MPL/NAME.velvet</li>
 	 * <li>/NAME_AS_PROJECT/model.xml</li> </ol>
-	 * 
+	 *
 	 * @param name the name of file or project
 	 * @return File object if found else null
 	 */
@@ -446,7 +446,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 		}
 
-		if (returnFile == null
+		if ((returnFile == null)
 			|| !returnFile.exists()
 			|| !returnFile.canRead()) {
 			return null;
@@ -460,7 +460,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 		File returnFile =
 			null;
-		IProject project =
+		final IProject project =
 			getProject();
 		if (project != null) {
 			final IResource res =
@@ -477,21 +477,21 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		final File searchDir =
 			featureModelFile.getParentFile();
 		if (searchDir != null) {
-			File[] files =
+			final File[] files =
 				searchDir.listFiles(new FilenameFilter() {
 
 					@Override
 					public boolean accept(File dir, String fileName) {
-						int index =
+						final int index =
 							fileName.lastIndexOf('.');
-						return index > 0
+						return (index > 0)
 							&& fileName.substring(0, index).equals(name)
 							&& fileName.substring(index
 								+ 1).matches("xml|velvet");
 					}
 				});
-			if (files != null
-				&& files.length > 0) {
+			if ((files != null)
+				&& (files.length > 0)) {
 				return files[0];
 			}
 		}
@@ -500,7 +500,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 	/**
 	 * Returns the eclipse project of the file with the textual representation of the feature model
-	 * 
+	 *
 	 * @return the project of the file or null if not known
 	 */
 	private IProject getProject() {
@@ -508,20 +508,20 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			return null;
 		}
 
-		IWorkspace workspace =
+		final IWorkspace workspace =
 			ResourcesPlugin.getWorkspace();
 		IPath filePath;
 		try {
 			filePath =
 				Path.fromOSString(featureModelFile.getCanonicalPath());
-			IFile file =
+			final IFile file =
 				workspace.getRoot().getFileForLocation(filePath);
-			if (null == file
+			if ((null == file)
 				|| !file.exists()) {
 				return workspace.getRoot().getFile(filePath).getProject();
 			}
 			return file.getProject();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Logger.logError(e);
 			return null;
 		}
@@ -552,8 +552,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 		// TODO MPL: Hack for local search
 		localSearch =
-			featureModelFile != null
-				&& featureModelFile.getParentFile() != null
+			(featureModelFile != null)
+				&& (featureModelFile.getParentFile() != null)
 				&& featureModelFile.getParentFile().getName().equals("velvet");
 	}
 
@@ -570,17 +570,17 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		case VelvetParser.FLOAT:
 			break;
 		case VelvetParser.INT:
-			this.extFeatureModel.addAttribute(parent.getName(), name,
+			extFeatureModel.addAttribute(parent.getName(), name,
 					Integer.parseInt(valueNode.getText()));
 			break;
 		case VelvetParser.BOOLEAN:
-			this.extFeatureModel.addAttribute(parent.getName(), name,
+			extFeatureModel.addAttribute(parent.getName(), name,
 					Boolean.parseBoolean(valueNode.getText()));
 			break;
 		case VelvetParser.STRING:
 			final String valueNodeText =
 				valueNode.getText();
-			this.extFeatureModel.addAttribute(parent.getName(), name,
+			extFeatureModel.addAttribute(parent.getName(), name,
 					valueNodeText.substring(1, valueNodeText.length()
 						- 1));
 			break;
@@ -590,9 +590,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	}
 
 	private void parseAttributeConstraints() throws UnsupportedModelException, RecognitionException {
-		while (!this.atrributeConstraintNodes.isEmpty()) {
+		while (!atrributeConstraintNodes.isEmpty()) {
 			final LinkedList<Tree> nodeList =
-				getChildren(this.atrributeConstraintNodes.poll());
+				getChildren(atrributeConstraintNodes.poll());
 
 			final LinkedList<WeightedTerm> weightedTerms =
 				new LinkedList<WeightedTerm>();
@@ -614,7 +614,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 						curNode.getText();
 
 					final Collection<FeatureAttribute<Integer>> attributes =
-						this.extFeatureModel
+						extFeatureModel
 								.getIntegerAttributes().getAttributes(attributeName);
 
 					if (attributes == null) {
@@ -637,7 +637,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				case VelvetParser.INT:
 					final int value =
 						Integer.parseInt(curNode.getText());
-					if (relationOperator == null
+					if ((relationOperator == null)
 						^ minus) {
 						degree -=
 							value;
@@ -728,8 +728,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 		}
 
-		for (ConstraintNode constraintNode : constraintNodeList) {
-			String nameError =
+		for (final ConstraintNode constraintNode : constraintNodeList) {
+			final String nameError =
 				checkNode(constraintNode.computedNode);
 			if (nameError == null) {
 				extFeatureModel.addConstraint(factory.createConstraint(extFeatureModel, constraintNode.computedNode));
@@ -759,7 +759,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				constraintNodeList.add(new ConstraintNode(newNode, curNode));
 				break;
 			case VelvetParser.ACONSTR:
-				this.atrributeConstraintNodes.add(curNode);
+				atrributeConstraintNodes.add(curNode);
 				break;
 			default:
 				reportSyntaxError(curNode);
@@ -1028,12 +1028,12 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 	private void addExternalFeatures(IFeatureModel sourceModel, String sourceModelName, IFeatureStructure targetParentFeature, int type) {
 		if (sourceModel instanceof ExtendedFeatureModel) {
-			for (UsedModel usedModel : ((ExtendedFeatureModel) sourceModel).getExternalModels().values()) {
+			for (final UsedModel usedModel : ((ExtendedFeatureModel) sourceModel).getExternalModels().values()) {
 				extFeatureModel.addExternalModel(new UsedModel(usedModel, sourceModelName));
 			}
 		}
 
-		UsedModel usedModel =
+		final UsedModel usedModel =
 			extFeatureModel.getExternalModel(sourceModelName);
 		if (usedModel != null) {
 			usedModel.setPrefix(targetParentFeature.getFeature().getName()
@@ -1063,10 +1063,10 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		copyChildnodes(extFeatureModel, connector.getStructure(), instanceRoot, sourceModelName, connectorName, type);
 
 		for (final IConstraint constraint : sourceModel.getConstraints()) {
-			Node constraintNode =
+			final Node constraintNode =
 				constraint.getNode();
 			updateConstraintNode(constraintNode, connectorName, instanceRoot.getFeature().getName());
-			ExtendedConstraint newConstraint =
+			final ExtendedConstraint newConstraint =
 				factory.createConstraint(extFeatureModel, constraintNode);
 			newConstraint.setType(type);
 			newConstraint.setContainedFeatures();
@@ -1146,38 +1146,38 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 		final IFeatureModelFactory mappingModelFactory =
 			FMFactoryManager.getDefaultFactory();
-		IFeatureModel mappingModel =
+		final IFeatureModel mappingModel =
 			mappingModelFactory.createFeatureModel();
-		IFeatureStructure rootFeature =
+		final IFeatureStructure rootFeature =
 			mappingModelFactory.createFeature(mappingModel, "MPL").getStructure();
 		rootFeature.setAnd();
 		rootFeature.setAbstract(true);
 		rootFeature.setMandatory(true);
 
-		LinkedList<String> possibleProjects =
+		final LinkedList<String> possibleProjects =
 			new LinkedList<String>();
-		IProject[] projects =
+		final IProject[] projects =
 			ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (int i =
 			0; i < projects.length; i++) {
-			IProject project =
+			final IProject project =
 				projects[i];
 			if (project.isAccessible()) {
 				possibleProjects.add(project.getName());
 			}
 		}
 
-		for (Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
+		for (final Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
 			if (parameter.getValue().getType() == ExtendedFeature.TYPE_INTERFACE) {
-				IFeatureStructure parameterFeature =
+				final IFeatureStructure parameterFeature =
 					mappingModelFactory.createFeature(mappingModel, parameter.getKey()).getStructure();
 				parameterFeature.setOr();
 				parameterFeature.setAbstract(true);
 				parameterFeature.setMandatory(true);
 				rootFeature.addChild(parameterFeature);
 
-				for (String projectName : possibleProjects) {
-					IFeatureStructure projectFeature =
+				for (final String projectName : possibleProjects) {
+					final IFeatureStructure projectFeature =
 						mappingModelFactory.createFeature(mappingModel, parameterFeature.getFeature().getName()
 							+ "."
 							+ projectName).getStructure();
@@ -1206,7 +1206,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			return;
 		}
 
-		UsedModel usedModel =
+		final UsedModel usedModel =
 			extFeatureModel.getExternalModel(varName);
 		if (usedModel == null) {
 			reportWarning(useNameNode, format("No variable with the name %s found.", varName));

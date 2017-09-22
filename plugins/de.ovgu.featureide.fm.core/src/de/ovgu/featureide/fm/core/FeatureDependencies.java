@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Calculates dependencies of features
- * 
+ *
  * @author Soenke Holthusen
  * @author Marcus Pinnecke (Feature Interface) *
  */
@@ -54,14 +54,14 @@ public class FeatureDependencies {
 			+ "X NEVER  Y := If X is selected then Y cannot be selected in any valid configuration."
 			+ "\n";
 
-	private IFeatureModel fm;
-	private Node rootNode;
+	private final IFeatureModel fm;
+	private final Node rootNode;
 
-	private Map<IFeature, Set<IFeature>> always =
+	private final Map<IFeature, Set<IFeature>> always =
 		new HashMap<IFeature, Set<IFeature>>();
-	private Map<IFeature, Set<IFeature>> never =
+	private final Map<IFeature, Set<IFeature>> never =
 		new HashMap<IFeature, Set<IFeature>>();
-	private Map<IFeature, Set<IFeature>> maybe =
+	private final Map<IFeature, Set<IFeature>> maybe =
 		new HashMap<IFeature, Set<IFeature>>();
 
 	/**
@@ -73,14 +73,14 @@ public class FeatureDependencies {
 
 	/**
 	 * This constructor has the option to not calculate all dependencies automatically.
-	 * 
+	 *
 	 * @param fm The feature model
 	 * @param calculateDependencies <code>true</code> if dependencies should be calculated
 	 */
 	public FeatureDependencies(IFeatureModel fm, boolean calculateDependencies) {
 		this.fm =
 			fm;
-		this.rootNode =
+		rootNode =
 			createRootNode(fm);
 		if (calculateDependencies) {
 			calculateDependencies();
@@ -91,15 +91,15 @@ public class FeatureDependencies {
 	 * calculates feature dependencies
 	 */
 	private void calculateDependencies() {
-		for (IFeature feature : fm.getFeatures()) {
+		for (final IFeature feature : fm.getFeatures()) {
 			always.put(feature, new HashSet<IFeature>());
 			never.put(feature, new HashSet<IFeature>());
 			maybe.put(feature, new HashSet<IFeature>());
 
-			Node nodeSel =
+			final Node nodeSel =
 				new And(rootNode, new Literal(feature.getName()));
 
-			for (IFeature current_feature : fm.getFeatures()) {
+			for (final IFeature current_feature : fm.getFeatures()) {
 				if (!current_feature.equals(feature)) {
 					try {
 						if (nodeImpliesFeature(nodeSel, current_feature.getName(), true)) {
@@ -109,7 +109,7 @@ public class FeatureDependencies {
 						} else {
 							maybe.get(feature).add(current_feature);
 						}
-					} catch (TimeoutException e) {
+					} catch (final TimeoutException e) {
 						Logger.logError(e);
 					}
 				}
@@ -119,7 +119,7 @@ public class FeatureDependencies {
 
 	/**
 	 * Gets all implied features of the given feature
-	 * 
+	 *
 	 * @param feature
 	 * @return all implied features
 	 */
@@ -128,19 +128,19 @@ public class FeatureDependencies {
 			return always.get(feature);
 		}
 		always.put(feature, new HashSet<IFeature>());
-		Node nodeSel =
+		final Node nodeSel =
 			new And(rootNode, new Literal(feature.getName()));
-		Collection<IFeature> impliedFeatures =
+		final Collection<IFeature> impliedFeatures =
 			always.get(feature);
 		try {
-			for (IFeature f : fm.getFeatures()) {
+			for (final IFeature f : fm.getFeatures()) {
 				if (!f.equals(feature)) {
 					if (nodeImpliesFeature(nodeSel, f.getName(), true)) {
 						impliedFeatures.add(f);
 					}
 				}
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			Logger.logError(e);
 		}
 		return impliedFeatures;
@@ -155,11 +155,11 @@ public class FeatureDependencies {
 		if (always.containsKey(A)) {
 			return always.get(A).contains(B);
 		}
-		Node nodeSel =
+		final Node nodeSel =
 			new And(rootNode, new Literal(A.getName()));
 		try {
 			return nodeImpliesFeature(nodeSel, B.getName(), true);
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			Logger.logError(e);
 		}
 		return false;
@@ -167,7 +167,7 @@ public class FeatureDependencies {
 
 	/**
 	 * creates the Node representation of the featureModel
-	 * 
+	 *
 	 * @param fm featureModel
 	 * @return Node representing the featureModel
 	 */
@@ -219,24 +219,25 @@ public class FeatureDependencies {
 		return maybe.get(feature);
 	}
 
+	@Override
 	public String toString() {
-		StringBuilder builder =
+		final StringBuilder builder =
 			new StringBuilder();
-		for (IFeature feature : fm.getFeatures()) {
+		for (final IFeature feature : fm.getFeatures()) {
 			builder.append("\n");
-			for (IFeature f : always.get(feature)) {
+			for (final IFeature f : always.get(feature)) {
 				builder.append(feature.getName()
 					+ " ALWAYS "
 					+ f.getName()
 					+ "\n");
 			}
-			for (IFeature f : never.get(feature)) {
+			for (final IFeature f : never.get(feature)) {
 				builder.append(feature.getName()
 					+ " NEVER "
 					+ f.getName()
 					+ "\n");
 			}
-			for (IFeature f : maybe.get(feature)) {
+			for (final IFeature f : maybe.get(feature)) {
 				builder.append(feature.getName()
 					+ " MAYBE "
 					+ f.getName()

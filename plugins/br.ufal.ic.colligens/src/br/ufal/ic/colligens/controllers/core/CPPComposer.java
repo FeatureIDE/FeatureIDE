@@ -58,13 +58,13 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * A featureIDE composer to compose C files.
- * 
+ *
  * @author Dalton thanks to
  * @author Tom Brosch
  * @author Jens Meinicke
  * @author Christoph Giesel
  * @author Marcus Kamieth
- * 
+ *
  */
 public class CPPComposer extends PPComposerExtensionClass {
 
@@ -104,7 +104,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 	@Override
 	public boolean initialize(IFeatureProject project) {
-		boolean supSuccess =
+		final boolean supSuccess =
 			super.initialize(project);
 		cppModelBuilder =
 			new CPPModelBuilder(project);
@@ -115,8 +115,8 @@ public class CPPComposer extends PPComposerExtensionClass {
 		prepareFullBuild(null);
 		annotationChecking();
 
-		if (supSuccess == false
-			|| cppModelBuilder == null) {
+		if ((supSuccess == false)
+			|| (cppModelBuilder == null)) {
 			return false;
 		} else {
 			return true;
@@ -127,7 +127,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 		createExtensions();
 
 	private static LinkedHashSet<String> createExtensions() {
-		LinkedHashSet<String> extensions =
+		final LinkedHashSet<String> extensions =
 			new LinkedHashSet<String>();
 		extensions.add("h");
 		extensions.add("c");
@@ -148,14 +148,15 @@ public class CPPComposer extends PPComposerExtensionClass {
 	private void addNature(IProject project) {
 		try {
 			if (!project.isAccessible()
-				|| project.hasNature(C_NATURE))
+				|| project.hasNature(C_NATURE)) {
 				return;
+			}
 
-			IProjectDescription description =
+			final IProjectDescription description =
 				project.getDescription();
-			String[] natures =
+			final String[] natures =
 				description.getNatureIds();
-			String[] newNatures =
+			final String[] newNatures =
 				new String[natures.length
 					+ 1];
 			System.arraycopy(natures, 0, newNatures, 0, natures.length);
@@ -164,7 +165,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
 
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 
@@ -177,10 +178,11 @@ public class CPPComposer extends PPComposerExtensionClass {
 			generateWarning(PLUGIN_WARNING);
 		}
 
-		if (!prepareFullBuild(config))
+		if (!prepareFullBuild(config)) {
 			return;
+		}
 
-		Job job =
+		final Job job =
 			new Job("Analyzing!") {
 
 				@Override
@@ -226,7 +228,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 	private void annotationChecking() {
 		deleteAllPreprocessorAnotationMarkers();
-		Job job =
+		final Job job =
 			new Job(PREPROCESSOR_ANNOTATION_CHECKING) {
 
 				@Override
@@ -252,7 +254,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 					processLinesOfFile(lines, (IFile) res);
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			Colligens.getDefault().logError(e);
 		}
 	}
@@ -291,7 +293,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 					if (line.contains("#elif ")
 						|| line.contains("#else")) {
 						if (!expressionStack.isEmpty()) {
-							Node lastElement =
+							final Node lastElement =
 								new Not(expressionStack.pop()
 										.clone());
 							expressionStack.push(lastElement);
@@ -303,9 +305,10 @@ public class CPPComposer extends PPComposerExtensionClass {
 					}
 
 					if (!ifelseCountStack.empty()
-						&& !line.contains("#else"))
+						&& !line.contains("#else")) {
 						ifelseCountStack.push(ifelseCountStack.pop()
 							+ 1);
+					}
 
 					setMarkersContradictionalFeatures(line, res, j
 						+ 1);
@@ -314,18 +317,21 @@ public class CPPComposer extends PPComposerExtensionClass {
 						+ 1);
 				} else if (line.contains("#endif")) {
 					while (!ifelseCountStack.empty()) {
-						if (ifelseCountStack.peek() == 0)
+						if (ifelseCountStack.peek() == 0) {
 							break;
+						}
 
-						if (!expressionStack.isEmpty())
+						if (!expressionStack.isEmpty()) {
 							expressionStack.pop();
+						}
 
 						ifelseCountStack.push(ifelseCountStack.pop()
 							- 1);
 					}
 
-					if (!ifelseCountStack.empty())
+					if (!ifelseCountStack.empty()) {
 						ifelseCountStack.pop();
+					}
 				}
 			}
 		}
@@ -333,14 +339,14 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 	/**
 	 * Checks given line if it contains not existing or abstract features.
-	 * 
+	 *
 	 * @param line content of line
 	 * @param res file containing given line
 	 * @param lineNumber line number of given line
 	 */
 	private void setMarkersNotConcreteFeatures(String line, IFile res,
 			int lineNumber) {
-		String[] splitted =
+		final String[] splitted =
 			line.split(CPPModelBuilder.OPERATORS, 0);
 
 		for (int i =
@@ -355,10 +361,10 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 	/**
 	 * Checks given line if it contains expressions which are always <code>true</code> or <code>false</code>.<br /> <br />
-	 * 
+	 *
 	 * Check in three steps: <ol> <li>just the given line</li> <li>the given line and the feature model</li> <li>the given line, the surrounding lines and the
 	 * feature model</li> </ol>
-	 * 
+	 *
 	 * @param line content of line
 	 * @param res file containing given line
 	 * @param lineNumber line number of given line
@@ -373,7 +379,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 			return;
 		}
 
-		boolean negative =
+		final boolean negative =
 			line.contains("#ifndef ");
 
 		// remove "//#if ", "//ifdef", ...
@@ -402,9 +408,10 @@ public class CPPComposer extends PPComposerExtensionClass {
 			nodereader.stringToNode(line, featureList);
 
 		if (ppExpression != null) {
-			if (negative)
+			if (negative) {
 				ppExpression =
 					new Not(ppExpression.clone());
+			}
 
 			expressionStack.push(ppExpression);
 
@@ -415,15 +422,15 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 	/**
 	 * Prepare the directives to C PreProcessor adding -D arg for each feature
-	 * 
+	 *
 	 * @param myActivatedFeatures list of all activated features for one build
 	 * @return list in the form -D FEATUREA -D FEATUREB -D FEATUREC
 	 */
 	private LinkedList<String> getActivatedFeatureArgs(
 			List<String> myActivatedFeatures) {
-		LinkedList<String> args =
+		final LinkedList<String> args =
 			new LinkedList<String>();
-		for (String feature : myActivatedFeatures) {
+		for (final String feature : myActivatedFeatures) {
 			args.add("-D"
 				+ feature);
 		}
@@ -433,30 +440,30 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 	/**
 	 * Execute preprocessment and compilation
-	 * 
+	 *
 	 * @param featureArgs list of features active for this build
 	 * @param sourceFolder root folder from sources
 	 * @param buildFolder folder that the result will be placed
 	 */
 	private void runBuild(LinkedList<String> featureArgs, IFolder sourceFolder,
 			IFolder buildFolder) {
-		CPPWrapper cpp =
+		final CPPWrapper cpp =
 			new CPPWrapper();
 
-		LinkedList<String> compilerArgs =
+		final LinkedList<String> compilerArgs =
 			new LinkedList<String>(featureArgs);
-		LinkedList<String> fileList =
+		final LinkedList<String> fileList =
 			new LinkedList<String>();
 
 		// find includes
-		String projectName =
+		final String projectName =
 			sourceFolder.getProject().getName();
 
-		ICProject project =
+		final ICProject project =
 			CoreModel.getDefault().getCModel()
 					.getCProject(projectName);
 		try {
-			IIncludeReference includes[] =
+			final IIncludeReference includes[] =
 				project.getIncludeReferences();
 			for (int i =
 				0; i < includes.length; i++) {
@@ -468,7 +475,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 				compilerArgs.add(Colligens.getDefault().getPreferenceStore()
 						.getString("LIBS"));
 			}
-		} catch (CModelException e) {
+		} catch (final CModelException e) {
 			e.printStackTrace();
 		}
 
@@ -489,20 +496,20 @@ public class CPPComposer extends PPComposerExtensionClass {
 				+ buildFolder.getName());
 			cpp.runCompiler(compilerArgs);
 			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			Colligens.getDefault().logError(e);
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * Execute typeChef analyzes and in case of error, ask to user if he wants to continue the compilation.
-	 * 
+	 *
 	 * @param folder containing the sources
 	 * @return true if the project can be compiled, false in otherwise
 	 */
 	private void runTypeChefAnalyzes(IFolder folder) {
-		ProjectExplorerController prjController =
+		final ProjectExplorerController prjController =
 			new ProjectExplorerController();
 
 		prjController.addResource(folder);
@@ -510,10 +517,10 @@ public class CPPComposer extends PPComposerExtensionClass {
 		final TypeChef typeChef =
 			new TypeChef();
 		try {
-			for (Iterator<IResource> iterator =
+			for (final Iterator<IResource> iterator =
 				prjController.getList()
 						.iterator(); iterator.hasNext();) {
-				IResource type =
+				final IResource type =
 					iterator.next();
 			}
 			typeChef.run(prjController.getList());
@@ -528,12 +535,12 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 				@Override
 				public void run() {
-					InvalidConfigurationsViewController viewController =
+					final InvalidConfigurationsViewController viewController =
 						InvalidConfigurationsViewController
 								.getInstance();
 					if (typeChef.isFinish()) {
 
-						List<FileProxy> logs =
+						final List<FileProxy> logs =
 							typeChef.getFilesLog();
 
 						if (!logs.isEmpty()) {
@@ -551,7 +558,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 				}
 			});
 
-		} catch (TypeChefException e) {
+		} catch (final TypeChefException e) {
 
 			e.printStackTrace();
 		}
@@ -559,7 +566,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 	/**
 	 * In this method, all files in a given source folder are preprocessed by CPP
-	 * 
+	 *
 	 * @param featureArgs arguments to CPP preprocessor and compiler
 	 * @param fileList list of all files found in folders and subfolders
 	 * @param sourceFolder the origin of files
@@ -591,7 +598,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 					&& !res.getFileExtension().equals("h")) {
 					continue;
 				}
-				String[] name =
+				final String[] name =
 					res.getName().split("\\.");
 				fullFilePath =
 					res.getLocation().toOSString();
@@ -630,7 +637,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 		createTempltes();
 
 	private static ArrayList<String[]> createTempltes() {
-		ArrayList<String[]> list =
+		final ArrayList<String[]> list =
 			new ArrayList<String[]>();
 		list.add(new String[] {
 			"C Source File",
@@ -711,7 +718,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 				@Override
 				public void run() {
-					InvalidProductsViewController invalidProductViewController =
+					final InvalidProductsViewController invalidProductViewController =
 						InvalidProductsViewController
 								.getInstance();
 
@@ -719,9 +726,9 @@ public class CPPComposer extends PPComposerExtensionClass {
 							.getProjectsList().isEmpty()) {
 						invalidProductViewController.showView();
 
-						List<InvalidProductViewLog> logs =
+						final List<InvalidProductViewLog> logs =
 							new LinkedList<InvalidProductViewLog>();
-						for (String s : ProjectConfigurationErrorLogger
+						for (final String s : ProjectConfigurationErrorLogger
 								.getInstance().getProjectsList()) {
 							logs.add(new InvalidProductViewLog(s));
 						}
@@ -750,10 +757,10 @@ public class CPPComposer extends PPComposerExtensionClass {
 		// do the typeChef analysis before the products compilation
 		syncTypeChefAnalyzes();
 
-		List<String> myActivatedFeatures =
+		final List<String> myActivatedFeatures =
 			new LinkedList<String>();
 
-		for (IFeature feature : configuration.getSelectedFeatures()) {
+		for (final IFeature feature : configuration.getSelectedFeatures()) {
 			myActivatedFeatures.add(feature.getName());
 		}
 

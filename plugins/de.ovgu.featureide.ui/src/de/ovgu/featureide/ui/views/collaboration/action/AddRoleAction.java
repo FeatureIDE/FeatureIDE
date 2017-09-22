@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,29 +40,30 @@ import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 
 /**
  * Add a role to the CollaborationDiagramm.
- * 
+ *
  * @author Constanze Adler
  * @author Stephan Besecke
  * @author Jens Meinicke
  */
 public class AddRoleAction extends Action {
 
-	private GraphicalViewerImpl viewer;
-	private CollaborationView collaborationView;
+	private final GraphicalViewerImpl viewer;
+	private final CollaborationView collaborationView;
 
 	public AddRoleAction(String text, GraphicalViewerImpl view, CollaborationView collcaborationView) {
 		super(text);
 		viewer =
 			view;
-		this.collaborationView =
+		collaborationView =
 			collcaborationView;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
+	@Override
 	public void run() {
-		IStructuredSelection selection =
+		final IStructuredSelection selection =
 			(IStructuredSelection) viewer.getSelection();
-		Object selectedItem =
+		final Object selectedItem =
 			selection.getFirstElement();
 
 		String feature =
@@ -83,13 +84,15 @@ public class AddRoleAction extends Action {
 					((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getName();
 				pack =
 					((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getPackage();
-				if (clss.contains("."))
+				if (clss.contains(".")) {
 					clss =
 						clss.substring(0, clss.lastIndexOf('.'));
-				if (clss.contains("/"))
+				}
+				if (clss.contains("/")) {
 					clss =
 						clss.substring(clss.lastIndexOf("/")
 							+ 1, clss.length());
+				}
 			} else if (selectedItem instanceof ClassEditPart) {
 				clss =
 					((ClassEditPart) selectedItem).getClassModel().getName();
@@ -104,21 +107,23 @@ public class AddRoleAction extends Action {
 					pack =
 						"";
 				}
-				if (clss.contains("."))
+				if (clss.contains(".")) {
 					clss =
 						clss.substring(0, clss.lastIndexOf('.'));
-				if (clss.contains("/"))
+				}
+				if (clss.contains("/")) {
 					clss =
 						clss.substring(clss.lastIndexOf("/")
 							+ 1, clss.length());
+				}
 			}
 		}
 
-		NewFeatureIDEFileWizard wizard =
+		final NewFeatureIDEFileWizard wizard =
 			new NewFeatureIDEFileWizard();
 		wizard.init(PlatformUI.getWorkbench(), selection, feature, clss, pack);
 
-		WizardDialog dialog =
+		final WizardDialog dialog =
 			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
@@ -131,23 +136,24 @@ public class AddRoleAction extends Action {
 		String feature =
 			"";
 
-		List<?> list =
+		final List<?> list =
 			viewer.getContents().getChildren();
-		int cursorY =
+		final int cursorY =
 			collaborationView.getCursorPosition().y;
 
-		for (Object object : list) {
+		for (final Object object : list) {
 			if (object instanceof CollaborationEditPart) {
-				CollaborationFigure collFigure =
+				final CollaborationFigure collFigure =
 					((UnderlayerFigure) ((CollaborationEditPart) object).getFigure()).getCollaborationFigure();
 
-				if (collFigure.isConfiguration)
+				if (collFigure.isConfiguration) {
 					continue;
+				}
 
-				int index =
+				final int index =
 					list.indexOf(object);
 
-				int min =
+				final int min =
 					collFigure.getBounds().y
 						- 4;
 				int max =
@@ -155,29 +161,29 @@ public class AddRoleAction extends Action {
 						+ collFigure.getBounds().height
 						+ 4;
 
-				if (list.size() > index
-					+ 1) {
-					Object edit =
+				if (list.size() > (index
+					+ 1)) {
+					final Object edit =
 						list.get(index
 							+ 1);
 					if (edit instanceof CollaborationEditPart) {
 
-						CollaborationFigure nextCollFigure =
+						final CollaborationFigure nextCollFigure =
 							((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure()).getCollaborationFigure();
 
 						max =
 							nextCollFigure.getBounds().y
 								- 4;
 					} else if (edit instanceof ClassEditPart) {
-						ClassFigure nextCollFigure =
+						final ClassFigure nextCollFigure =
 							((ClassFigure) ((ClassEditPart) edit).getFigure());
 						max =
 							nextCollFigure.getBounds().height
 								- 4;
 					}
 				}
-				if (cursorY >= min
-					&& cursorY <= max) {
+				if ((cursorY >= min)
+					&& (cursorY <= max)) {
 					feature =
 						((CollaborationEditPart) object).getCollaborationModel().getName();
 					break;

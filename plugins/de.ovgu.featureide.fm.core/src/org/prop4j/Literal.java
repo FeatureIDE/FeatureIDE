@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A variable or negated variable.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
@@ -40,7 +40,7 @@ public class Literal extends Node implements Cloneable {
 
 	/**
 	 * Creates a new positive literal.
-	 * 
+	 *
 	 * @param var contained variable
 	 */
 	public Literal(Object var) {
@@ -49,7 +49,7 @@ public class Literal extends Node implements Cloneable {
 
 	/**
 	 * Creates a new literal.
-	 * 
+	 *
 	 * @param var contained variable
 	 * @param positive whether the variable is positive or negated
 	 */
@@ -61,9 +61,9 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	protected Literal(Literal oldLiteral) {
-		this.var =
+		var =
 			oldLiteral.var;
-		this.positive =
+		positive =
 			oldLiteral.positive;
 	}
 
@@ -112,8 +112,8 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
-		if (this.var.equals(feature.getName())) {
-			this.var =
+		if (var.equals(feature.getName())) {
+			var =
 				replaceWithFeature.getName();
 			list.add(this);
 		}
@@ -149,12 +149,12 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		return this.positive == map.get(this.var);
+		return positive == map.get(var);
 	}
 
 	@Override
 	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
-		containedFeatures.add(String.valueOf(this.var));
+		containedFeatures.add(String.valueOf(var));
 		return containedFeatures;
 	}
 
@@ -166,7 +166,7 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	protected Collection<Object> getVariables(Collection<Object> variables) {
-		variables.add(this.var);
+		variables.add(var);
 		return variables;
 	}
 }

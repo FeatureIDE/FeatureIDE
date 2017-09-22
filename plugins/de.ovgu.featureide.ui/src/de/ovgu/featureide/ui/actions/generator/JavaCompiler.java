@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -46,7 +46,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * This {@link Job} compiles all configurations of the corresponding {@link Generator}
- * 
+ *
  * @author Jens Meinicke
  */
 public class JavaCompiler implements IConfigurationBuilderBasics {
@@ -59,7 +59,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	final IFolder tmp;
 
 	/**
-	 * 
+	 *
 	 * @param nr The number of the compiler
 	 * @param generator The generator holding this compiler
 	 */
@@ -73,7 +73,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 		if (!tmp.exists()) {
 			try {
 				tmp.create(true, true, null);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
 		}
@@ -82,17 +82,17 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 
 	/**
 	 * Compiles the given configuration.
-	 * 
+	 *
 	 * @param configuration The configuration to build
 	 * @throws CoreException
 	 */
 	protected void compile(BuilderConfiguration configuration) throws CoreException {
 		try {
 			generator.builder.folder.getFolder(configuration.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		for (IResource file : tmp.members()) {
+		for (final IResource file : tmp.members()) {
 			file.delete(true, null);
 		}
 		compile(configuration.getName());
@@ -100,15 +100,15 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 
 	/**
 	 * Compiles the built configuration to create error markers. The binary files will be placed into an temporary folder.
-	 * 
+	 *
 	 * @param confName
 	 */
 	private void compile(String confName) {
-		LinkedList<IFile> files =
+		final LinkedList<IFile> files =
 			getJavaFiles(generator.builder.folder.getFolder(confName));
 		final LinkedList<String> options =
 			new LinkedList<>();
-		for (IFile file : files) {
+		for (final IFile file : files) {
 			options.add(setupPath(file));
 		}
 		options.add("-g");
@@ -120,11 +120,11 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 		options.add("-classpath");
 		options.add(generator.builder.classpath);
 
-		String output =
+		final String output =
 			process(options);
-		LinkedList<IFile> errorFiles =
+		final LinkedList<IFile> errorFiles =
 			parseJavacOutput(output, files, confName);
-		for (IFile file : errorFiles) {
+		for (final IFile file : errorFiles) {
 			generator.builder.featureProject.getComposer().postCompile(null, file);
 		}
 	}
@@ -150,7 +150,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	private String process(AbstractList<String> command) {
 		final StringBuilder sb =
 			new StringBuilder();
-		for (String string : command) {
+		for (final String string : command) {
 			sb.append(string);
 			sb.append(' ');
 		}
@@ -165,7 +165,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 			BatchCompiler.compile(params, new PrintWriter(System.out), new PrintWriter(writer), null);
 			output =
 				writer.toString();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 		return output;
@@ -173,22 +173,23 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 
 	/**
 	 * Generates the problem markers from the given compiler output.
-	 * 
+	 *
 	 * @param output The output from the compiler
 	 * @param files The compiled files
 	 * @param configurationName Name of the actual configuration
 	 * @return
 	 */
 	public LinkedList<IFile> parseJavacOutput(String output, LinkedList<IFile> files, String configurationName) {
-		LinkedList<IFile> errorFiles =
+		final LinkedList<IFile> errorFiles =
 			new LinkedList<IFile>();
 		if (output.isEmpty()) {
 			return errorFiles;
 		}
-		TreeMap<String, IFile> sourcePaths =
+		final TreeMap<String, IFile> sourcePaths =
 			new TreeMap<>();
-		for (IFile file : files)
+		for (final IFile file : files) {
 			sourcePaths.put(file.getLocation().toOSString(), file);
+		}
 
 		try (Scanner scanner =
 			new Scanner(output)) {
@@ -197,45 +198,45 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 				currentLine =
 					scanner.nextLine();
 				// \S*\s(\w+)\sin\s(\w:[\w,\\,.,\s]*.java)\s[(]at line (\d+)[)]
-				Pattern pattern =
+				final Pattern pattern =
 					Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S.*[.]java)\\s[(]at line (\\d+)[)]");
-				Matcher matcher =
+				final Matcher matcher =
 					pattern.matcher(currentLine);
 				if (!matcher.find()) {
 					continue;
 				}
 				try {
-					boolean contains =
+					final boolean contains =
 						sourcePaths.containsKey(matcher.group(2));
 					if (!contains) {
 						continue;
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					UIPlugin.getDefault().logError(e);
 					continue;
 				}
 				final boolean warning =
 					"WARNING".equals(matcher.group(1));
-				IFile currentFile =
+				final IFile currentFile =
 					sourcePaths.get(matcher.group(2));
-				int line =
+				final int line =
 					Integer.parseInt(matcher.group(3));
 				// get error message in from the next lines
 				while (scanner.hasNextLine()) {
 					currentLine =
 						scanner.nextLine();
-					Pattern messagePattern =
+					final Pattern messagePattern =
 						Pattern.compile("\\w.*");
-					Matcher m =
+					final Matcher m =
 						messagePattern.matcher(currentLine);
-					boolean found =
+					final boolean found =
 						m.matches();
 					if (found) {
 						break;
 					}
 				}
 
-				String errorMessage =
+				final String errorMessage =
 					currentLine;
 				// if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
 				// errorMessage = parseCannotFindSymbolMessage(scanner);
@@ -264,7 +265,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 						: IMarker.SEVERITY_ERROR);
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 
@@ -274,15 +275,16 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	@SuppressWarnings("unused")
 	private String parseCannotFindSymbolMessage(Scanner scanner) {
 		while (scanner.hasNextLine()) {
-			String currentLine =
+			final String currentLine =
 				scanner.nextLine();
 			if (currentLine.startsWith(SYMBOL)) {
-				String[] tokens =
+				final String[] tokens =
 					currentLine.split(": ");
-				if (tokens.length == 2)
+				if (tokens.length == 2) {
 					return CANNOT_FIND_SYMBOL
 						+ ": "
 						+ tokens[1];
+				}
 				break;
 			}
 		}
@@ -291,22 +293,22 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 
 	/**
 	 * Looks for all java files at the given folder.
-	 * 
+	 *
 	 * @param folder The folder containing the java files
 	 * @return A list with all java files at the folder
 	 */
 	private LinkedList<IFile> getJavaFiles(IFolder folder) {
-		LinkedList<IFile> files =
+		final LinkedList<IFile> files =
 			new LinkedList<IFile>();
 		try {
-			for (IResource res : folder.members()) {
+			for (final IResource res : folder.members()) {
 				if (res instanceof IFolder) {
 					files.addAll(getJavaFiles((IFolder) res));
 				} else if ("java".equals(res.getFileExtension())) {
 					files.add((IFile) res);
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 		return files;

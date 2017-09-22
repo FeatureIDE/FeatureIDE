@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -62,7 +62,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 /**
  * The NEW wizard page allows setting the container for the new file as well as the file name. The page will only accept file name without the extension OR with
  * the extension that matches the expected one (.config).
- * 
+ *
  * @author Christian Becker
  * @author Jens Meinicke
  */
@@ -81,7 +81,7 @@ public class NewConfigurationFilePage extends WizardPage {
 	private IFeatureProject featureProject =
 		null;
 
-	private Collection<IFeatureProject> featureProjects =
+	private final Collection<IFeatureProject> featureProjects =
 		CorePlugin.getFeatureProjects();
 
 	private String text;
@@ -95,7 +95,7 @@ public class NewConfigurationFilePage extends WizardPage {
 
 	/**
 	 * Constructor for SampleNewWizardPage.
-	 * 
+	 *
 	 * @param pageName
 	 */
 	public NewConfigurationFilePage(IFolder configFolder) {
@@ -110,12 +110,13 @@ public class NewConfigurationFilePage extends WizardPage {
 	/**
 	 * @see IDialogPage#createControl(Composite)
 	 */
+	@Override
 	public void createControl(Composite parent) {
-		GridData gd =
+		final GridData gd =
 			new GridData(GridData.FILL_HORIZONTAL);
-		Composite composite =
+		final Composite composite =
 			new Composite(parent, SWT.NULL);
-		GridLayout layout =
+		final GridLayout layout =
 			new GridLayout();
 		layout.numColumns =
 			3;
@@ -164,12 +165,13 @@ public class NewConfigurationFilePage extends WizardPage {
 	private void addListeners() {
 		featureComboProject.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				featureProject =
 					null;
 				text =
 					featureComboProject.getText();
-				for (IFeatureProject feature : featureProjects) {
+				for (final IFeatureProject feature : featureProjects) {
 					if (text.equalsIgnoreCase(feature.getProjectName())) {
 						featureProject =
 							feature;
@@ -177,33 +179,36 @@ public class NewConfigurationFilePage extends WizardPage {
 				}
 				if (featureProject != null) {
 					try {
-						for (IResource configFile : featureProject.getConfigFolder().members()) {
+						for (final IResource configFile : featureProject.getConfigFolder().members()) {
 							if (configFile instanceof IFile) {
 								configNames.add(configFile.getName());// .split("[.]")[0]);
 							}
 						}
-					} catch (CoreException e2) {
+					} catch (final CoreException e2) {
 						UIPlugin.getDefault().logError(e2);
 					}
-					IResource res =
+					final IResource res =
 						ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName());
-					IFeatureProject data =
+					final IFeatureProject data =
 						CorePlugin.getFeatureProject(res);
-					if (data != null)
+					if (data != null) {
 						configFolder =
 							data.getConfigFolder();
+					}
 				}
 				dialogChanged();
 			}
 		});
 		fileText.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
 		});
 		formatCombo.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
@@ -211,13 +216,13 @@ public class NewConfigurationFilePage extends WizardPage {
 	}
 
 	private void initialize() {
-		for (IFeatureProject feature : featureProjects) {
+		for (final IFeatureProject feature : featureProjects) {
 			featureComboProject.add(feature.getProjectName());
 		}
 		if (configFolder != null) {
 			featureComboProject.setText(configFolder.getProject().getName());
 		}
-		for (IConfigurationFormat format : formatExtensions) {
+		for (final IConfigurationFormat format : formatExtensions) {
 			formatCombo.add(format.getName()
 				+ " (*."
 				+ format.getSuffix()
@@ -225,15 +230,15 @@ public class NewConfigurationFilePage extends WizardPage {
 		}
 		try {
 			formatCombo.select(formatExtensions.indexOf(ConfigFormatManager.getInstance().getExtension(XMLConfFormat.ID)));
-		} catch (NoSuchExtensionException e) {
+		} catch (final NoSuchExtensionException e) {
 			formatCombo.select(0);
 		}
 	}
 
 	private void dialogChanged() {
-		String fileName =
+		final String fileName =
 			getFileName();
-		if (featureComboProject.getText().length() == 0
+		if ((featureComboProject.getText().length() == 0)
 			&& !projectbool) {
 			setErrorMessage(null);
 			setPageComplete(false);
@@ -255,7 +260,7 @@ public class NewConfigurationFilePage extends WizardPage {
 		if (fileName.length() != 0) {
 			configbool =
 				true;
-			String fullFileName =
+			final String fullFileName =
 				fileName
 					+ "."
 					+ featureProject.getComposer().getConfigurationExtension();
@@ -278,7 +283,7 @@ public class NewConfigurationFilePage extends WizardPage {
 			return;
 		}
 
-		int dotLoc =
+		final int dotLoc =
 			fileName.lastIndexOf('.');
 		if (dotLoc != -1) {
 			updateStatus("Configuration name must not contain \".\"");
@@ -307,7 +312,7 @@ public class NewConfigurationFilePage extends WizardPage {
 	public boolean isFeatureProject(String text) {
 		boolean isFP =
 			false;
-		for (IFeatureProject feature : featureProjects) {
+		for (final IFeatureProject feature : featureProjects) {
 			if (text.equalsIgnoreCase(feature.getProjectName())) {
 				isFP =
 					true;
@@ -316,12 +321,12 @@ public class NewConfigurationFilePage extends WizardPage {
 				try {
 					configNames =
 						new LinkedList<String>();
-					for (IResource configurationFile : featureProject.getConfigFolder().members()) {
+					for (final IResource configurationFile : featureProject.getConfigFolder().members()) {
 						if (configurationFile instanceof IFile) {
 							configNames.add(configurationFile.getName().split("[.]")[0]);
 						}
 					}
-				} catch (CoreException e2) {
+				} catch (final CoreException e2) {
 					UIPlugin.getDefault().logError(e2);
 				}
 			}

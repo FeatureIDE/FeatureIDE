@@ -43,15 +43,15 @@ public class CppCheckerLog implements ITextSelection {
 			config;
 
 		try {
-			int startline =
-				this.getStartLine()
+			final int startline =
+				getStartLine()
 					+ 1;
-			IMarker marker =
+			final IMarker marker =
 				this.file.getFile().createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, msg);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			marker.setAttribute(IMarker.LINE_NUMBER, startline);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 
@@ -92,11 +92,11 @@ public class CppCheckerLog implements ITextSelection {
 		IDocument document;
 		try {
 			document =
-				this.getDocument();
+				getDocument();
 			return document.getLineOffset(getStartLine());
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			return 0;
-		} catch (BadLocationException e) {
+		} catch (final BadLocationException e) {
 			return 0;
 		}
 	}
@@ -106,11 +106,11 @@ public class CppCheckerLog implements ITextSelection {
 		IDocument document;
 		try {
 			document =
-				this.getDocument();
+				getDocument();
 			return document.getLineLength(getStartLine());
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			return 0;
-		} catch (BadLocationException e) {
+		} catch (final BadLocationException e) {
 			return 0;
 		}
 	}
@@ -138,11 +138,11 @@ public class CppCheckerLog implements ITextSelection {
 		if (document != null) {
 			return document;
 		}
-		ITextFileBufferManager.DEFAULT.connect(this.getFileLogs().getFile()
+		ITextFileBufferManager.DEFAULT.connect(getFileLogs().getFile()
 				.getFullPath(), LocationKind.IFILE, null);
 		return FileBuffers
 				.getTextFileBufferManager()
-				.getTextFileBuffer(this.getFileLogs().getFile().getFullPath(),
+				.getTextFileBuffer(getFileLogs().getFile().getFullPath(),
 						LocationKind.IFILE)
 				.getDocument();
 	}

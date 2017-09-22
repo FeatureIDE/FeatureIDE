@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Operation to delete a feature from the model.
- * 
+ *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
@@ -51,13 +51,13 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		false;
 	private boolean alternative =
 		false;
-	private IFeature replacement;
+	private final IFeature replacement;
 
 	public DeleteFeatureOperation(IFeatureModel featureModel, IFeature feature) {
 		super(featureModel, DELETE);
 		this.feature =
 			feature;
-		this.replacement =
+		replacement =
 			null;
 	}
 
@@ -87,12 +87,12 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			oldParent =
 				featureModel.getFeature(oldParent.getName());
 		}
-		LinkedList<IFeature> oldChildrenCopy =
+		final LinkedList<IFeature> oldChildrenCopy =
 			new LinkedList<IFeature>();
 
-		for (IFeature f : oldChildren) {
+		for (final IFeature f : oldChildren) {
 			if (!f.getName().equals(feature.getName())) {
-				IFeature oldChild =
+				final IFeature oldChild =
 					featureModel.getFeature(f.getName());
 				oldChildrenCopy.add(oldChild);
 			}
@@ -111,7 +111,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 		// Replace feature name in constraints
 		if (replacement != null) {
-			for (IConstraint c : featureModel.getConstraints()) {
+			for (final IConstraint c : featureModel.getConstraints()) {
 				if (c.getContainedFeatures().contains(feature)) {
 					c.getNode().replaceFeature(feature, replacement);
 				}
@@ -142,15 +142,15 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				oldParent =
 					featureModel.getFeature(oldParent.getName());
 			}
-			LinkedList<IFeature> oldChildrenCopy =
+			final LinkedList<IFeature> oldChildrenCopy =
 				new LinkedList<IFeature>();
 
-			for (IFeature f : oldChildren) {
+			for (final IFeature f : oldChildren) {
 				if (!f.getName().equals(feature.getName())) {
-					IFeature child =
+					final IFeature child =
 						featureModel.getFeature(f.getName());
-					if (child != null
-						&& child.getStructure().getParent() != null) {
+					if ((child != null)
+						&& (child.getStructure().getParent() != null)) {
 						child.getStructure().getParent().removeChild(child.getStructure());
 					}
 					oldChildrenCopy.add(child);
@@ -170,7 +170,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 			// Replace feature name in Constraints
 			if (replacement != null) {
-				for (IConstraint c : featureModel.getConstraints()) {
+				for (final IConstraint c : featureModel.getConstraints()) {
 					if (c.getContainedFeatures().contains(replacement)) {
 						c.getNode().replaceFeature(replacement, feature);
 					}
@@ -178,15 +178,15 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			}
 
 			// When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
-			if (oldParent != null
+			if ((oldParent != null)
 				&& or) {
 				oldParent.getStructure().changeToOr();
-			} else if (oldParent != null
+			} else if ((oldParent != null)
 				&& alternative) {
 				oldParent.getStructure().changeToAlternative();
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, feature, feature);
@@ -194,7 +194,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	public boolean canUndo() {
-		return oldParent == null
-			|| featureModel.getFeature(oldParent.getName()) != null;
+		return (oldParent == null)
+			|| (featureModel.getFeature(oldParent.getName()) != null);
 	}
 }

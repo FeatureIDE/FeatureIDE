@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -58,13 +58,13 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 /**
  * Handles the export of information from {@link TreeViewer}. Consists of a {@link FileDialog} following by an export to a *.csv-file. If the export fails the
  * user gets the chance to repeat it, so his selection isn't lost.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public class CsvExporter {
 
-	private Shell shell;
+	private final Shell shell;
 	public static final String SEPARATOR =
 		";";
 
@@ -80,7 +80,7 @@ public class CsvExporter {
 
 	public void export(final Object[] export) {
 
-		UIJob uiJob =
+		final UIJob uiJob =
 			new UIJob("") {
 
 				@Override
@@ -150,10 +150,10 @@ public class CsvExporter {
 
 	/**
 	 * Puts the description of each selected node in the first row as header and it's value in the second row.
-	 * 
+	 *
 	 */
 	private void exportToCSV() {
-		Job job =
+		final Job job =
 			new Job(EXPORT_STATISTICS_INTO_CSV) {
 
 				private StringBuilder firstBuffer;
@@ -162,9 +162,9 @@ public class CsvExporter {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 
-					List<String> descs =
+					final List<String> descs =
 						new LinkedList<String>();
-					List<String> vals =
+					final List<String> vals =
 						new LinkedList<String>();
 					getExportData(descs, vals);
 					firstBuffer =
@@ -183,7 +183,7 @@ public class CsvExporter {
 						returnVal +=
 							".csv";
 					}
-					File file =
+					final File file =
 						new File(returnVal);
 					try {
 						if (!file.exists()) {
@@ -194,16 +194,16 @@ public class CsvExporter {
 						writer.write(firstBuffer.toString());
 						writer.newLine();
 						writer.write(secondBuffer.toString());
-					} catch (FileNotFoundException e) {
+					} catch (final FileNotFoundException e) {
 						giveUserFeedback(true);
 						return Status.CANCEL_STATUS;
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						UIPlugin.getDefault().logError(e);
 					} finally {
 						if (writer != null) {
 							try {
 								writer.close();
-							} catch (IOException e) {
+							} catch (final IOException e) {
 								UIPlugin.getDefault().logError(e);
 							}
 						}
@@ -213,17 +213,17 @@ public class CsvExporter {
 				}
 
 				private void giveUserFeedback(final boolean error) {
-					UIJob errorJob =
+					final UIJob errorJob =
 						new UIJob(error
 							? SHOW_ERRORDIALOG
 							: SHOW_DIALOG) {
 
 							@Override
 							public IStatus runInUIThread(IProgressMonitor monitor) {
-								Shell shell =
+								final Shell shell =
 									Display.getDefault().getActiveShell();
 								if (error) {
-									MessageDialog dial =
+									final MessageDialog dial =
 										new MessageDialog(shell, "Error", GUIDefaults.FEATURE_SYMBOL, "The file cannot be accessed!\nTry again?",
 												MessageDialog.ERROR, new String[] {
 													OK,
@@ -247,11 +247,11 @@ public class CsvExporter {
 				}
 
 				private void prepareDataForExport(List<String> descs, List<String> vals, StringBuilder buffer, StringBuilder secBuf) {
-					for (String desc : descs) {
+					for (final String desc : descs) {
 						buffer.append(desc);
 						buffer.append(SEPARATOR);
 					}
-					for (String val : vals) {
+					for (final String val : vals) {
 						secBuf.append(val);
 						secBuf.append(SEPARATOR);
 					}
@@ -262,12 +262,12 @@ public class CsvExporter {
 					vals.add("Value: ");
 					Parent last =
 						null;
-					for (Object o : visibleExpandedElements) {
+					for (final Object o : visibleExpandedElements) {
 						if (o instanceof Parent) {
-							Parent parent =
+							final Parent parent =
 								((Parent) o);
 							if (parent.getParent().equals(last)) {
-								int end =
+								final int end =
 									descs.size()
 										- 1;
 								descs.set(end, descs.get(end)

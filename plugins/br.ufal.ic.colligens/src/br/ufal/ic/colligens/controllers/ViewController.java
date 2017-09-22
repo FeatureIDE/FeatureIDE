@@ -13,7 +13,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class ViewController {
 
-	private String ID;
+	private final String ID;
 	private ViewPart view;
 
 	/**
@@ -39,6 +39,7 @@ public abstract class ViewController {
 	public void showView() {
 		Display.getDefault().syncExec(new Runnable() {
 
+			@Override
 			public void run() {
 				IWorkbenchWindow activeWindow;
 				IWorkbenchPage activePage;
@@ -51,7 +52,7 @@ public abstract class ViewController {
 					if (activePage != null) {
 						try {
 							activePage.showView(ID);
-						} catch (PartInitException e) {
+						} catch (final PartInitException e) {
 							e.printStackTrace();
 						}
 					}

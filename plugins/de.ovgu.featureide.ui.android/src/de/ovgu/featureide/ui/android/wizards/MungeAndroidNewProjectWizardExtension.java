@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -62,25 +62,25 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 			return false;
 		}
 
-		IWizardDescriptor wizDesc =
+		final IWizardDescriptor wizDesc =
 			PlatformUI.getWorkbench().getNewWizardRegistry()
 					.findWizard("com.android.ide.eclipse.adt.project.NewProjectWizard");
 		if (wizDesc != null) {
 			try {
-				IWizard wizard =
+				final IWizard wizard =
 					wizDesc.createWizard();
 				if (wizard instanceof INewWizard) {
 					// save all projects before Android project wizard runs
-					Set<IProject> projectsBefore =
+					final Set<IProject> projectsBefore =
 						new HashSet<IProject>();
 					Collections.addAll(projectsBefore, ResourcesPlugin.getWorkspace().getRoot().getProjects());
 
 					// call Android project wizard
-					INewWizard newWizard =
+					final INewWizard newWizard =
 						(INewWizard) wizard;
 					newWizard.init(PlatformUI.getWorkbench(), this.wizard.getSelection());
 
-					WizardDialog dialog =
+					final WizardDialog dialog =
 						new WizardDialog(null, wizard);
 
 					if (dialog.open() != Window.OK) {
@@ -89,7 +89,7 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 
 					// compare with projects after Android project creation to
 					// find new project
-					Set<IProject> projectsAfter =
+					final Set<IProject> projectsAfter =
 						new HashSet<IProject>();
 					Collections.addAll(projectsAfter, ResourcesPlugin.getWorkspace().getRoot().getProjects());
 					projectsAfter.removeAll(projectsBefore);
@@ -104,7 +104,7 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 						// library project if needed.
 						// Therefore the right project must be searched if
 						// multiple projects were created.
-						for (Object proj : projectsAfter) {
+						for (final Object proj : projectsAfter) {
 							if (!isAndroidSupportLibraryProject((IProject) proj)) {
 								project =
 									(IProject) proj;
@@ -116,15 +116,15 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 					}
 					final NewFeatureProjectPage featurePage =
 						(NewFeatureProjectPage) page;
-					AndroidProjectConversion.convertAndroidProject(this.project, featurePage.getCompositionTool().getId(),
+					AndroidProjectConversion.convertAndroidProject(project, featurePage.getCompositionTool().getId(),
 							featurePage.getSourcePath(), featurePage.getConfigPath(), featurePage.getBuildPath());
 				}
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				UIPlugin.getDefault().logError(e);
 				return false;
 			}
 		} else {
-			IStatus status =
+			final IStatus status =
 				new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID,
 						THE_ANDROID_DEVELOPMENT_TOOLS_MUST_BE_INSTALLED_TO_CREATE_AN_ANDROID_PROJECT_);
 			StatusManager.getManager().handle(status, StatusManager.SHOW);
@@ -144,22 +144,22 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 	 * Check whether the given newly created Android project is an support library project.
 	 */
 	private boolean isAndroidSupportLibraryProject(IProject project) {
-		IFile propertiesFile =
+		final IFile propertiesFile =
 			project.getFile("project.properties");
 		if (propertiesFile.exists()) {
-			Properties properties =
+			final Properties properties =
 				new Properties();
 			try {
 				properties.load(propertiesFile.getContents());
-				String isLibrary =
+				final String isLibrary =
 					properties.getProperty("android.library");
-				if (isLibrary == null
+				if ((isLibrary == null)
 					|| isLibrary.equals("false")) {
 					return false;
 				}
-				for (Object key : properties.keySet()) {
+				for (final Object key : properties.keySet()) {
 					if (key instanceof String) {
-						String strKey =
+						final String strKey =
 							(String) key;
 						final String ref =
 							"android.library.reference";
@@ -168,9 +168,9 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 						}
 					}
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				return false;
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				return false;
 			}
 		}

@@ -63,14 +63,14 @@ public class TypeChef {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void prepareFeatureModel() {
-		File inputFile =
+		final File inputFile =
 			new File(project.getLocation().toOSString()
 				+ System.getProperty("file.separator")
 				+ "model.xml");
-		File outputFile =
+		final File outputFile =
 			new File(Colligens.getDefault().getConfigDir()
 					.getAbsolutePath()
 				+ System.getProperty("file.separator")
@@ -84,21 +84,21 @@ public class TypeChef {
 			final IFeatureModel fm =
 				FeatureModelManager.load(inputFile.toPath()).getObject();
 
-			Node nodes =
+			final Node nodes =
 				AdvancedNodeCreator.createCNF(fm);
-			StringBuilder cnf =
+			final StringBuilder cnf =
 				new StringBuilder();
 			cnf.append(nodes.toString(NodeWriter.javaSymbols));
 			print.write(cnf.toString());
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			Colligens.getDefault().logError(e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Colligens.getDefault().logError(e);
 		} finally {
 			if (print != null) {
 				try {
 					print.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			}
@@ -111,7 +111,7 @@ public class TypeChef {
 	 */
 	private FrontendOptions getOptions(FileProxy fileProxy) throws OptionException {
 
-		ArrayList<String> paramters =
+		final ArrayList<String> paramters =
 			new ArrayList<String>();
 
 		// paramters.add("--parserstatistics");
@@ -133,7 +133,7 @@ public class TypeChef {
 				+ "cnf.fm");
 		}
 
-		String typeChefPreference =
+		final String typeChefPreference =
 			Colligens.getDefault().getPreferenceStore()
 					.getString("TypeChefPreference");
 
@@ -142,33 +142,33 @@ public class TypeChef {
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("USE_INCLUDES")) {
 			// Project C includes
-			ICProject project =
+			final ICProject project =
 				CoreModel
 						.getDefault()
 						.getCModel()
 						.getCProject(
-								PlatformHeader.getFile(fileProxy.getFileReal())
+								AbstractHeader.getFile(fileProxy.getFileReal())
 										.getProject().getName());
 
 			try {
-				IIncludeReference includes[] =
+				final IIncludeReference includes[] =
 					project.getIncludeReferences();
 				for (int i =
 					0; i < includes.length; i++) {
 					paramters.add("-I");
 					paramters.add(includes[i].getElementName());
 				}
-			} catch (CModelException e) {
+			} catch (final CModelException e) {
 
 				e.printStackTrace();
 			}
 
 		}
 
-		Collection<String> headersPath =
+		final Collection<String> headersPath =
 			header.getIncludes();
 
-		for (Iterator<String> iterator =
+		for (final Iterator<String> iterator =
 			headersPath.iterator(); iterator
 					.hasNext();) {
 			paramters.add("-h");
@@ -181,10 +181,10 @@ public class TypeChef {
 		Options.maxOptionId =
 			0;
 
-		FrontendOptionsWithConfigFiles frontendOptions =
+		final FrontendOptionsWithConfigFiles frontendOptions =
 			new FrontendOptionsWithConfigFiles();
 
-		String[] paramterArray =
+		final String[] paramterArray =
 			paramters
 					.toArray(new String[paramters.size()]);
 
@@ -208,7 +208,7 @@ public class TypeChef {
 	 * @throws TypeChefException
 	 */
 	public void run(List<IResource> resourceList) throws TypeChefException {
-		this.isFinish =
+		isFinish =
 			false;
 
 		fileProxies =
@@ -230,46 +230,46 @@ public class TypeChef {
 
 			monitorbeginTask(ANALYZING_SELECTED_FILES, fileProxies.size());
 
-			for (FileProxy fileProxy : fileProxies) {
+			for (final FileProxy fileProxy : fileProxies) {
 				// Monitor Update
 				monitorWorked(1);
 				monitorSubTask(fileProxy.getFullPath());
 				// end Monitor
 				if (monitorIsCanceled()) {
-					this.isFinish =
+					isFinish =
 						true;
 					break;
 				}
 
 				try {
 
-					TypeChefFrontend typeChefFrontend =
+					final TypeChefFrontend typeChefFrontend =
 						new TypeChefFrontend();
 
-					typeChefFrontend.processFile(this.getOptions(fileProxy), fileProxy);
+					typeChefFrontend.processFile(getOptions(fileProxy), fileProxy);
 
-					this.isFinish =
+					isFinish =
 						true;
-				} catch (OptionException e) {
+				} catch (final OptionException e) {
 					e.printStackTrace();
 					// If the analysis is not performed correctly,
 					// and the analysis made ​​from the command line
-					this.startCommandLineMode(fileProxy);
+					startCommandLineMode(fileProxy);
 
-					this.isFinish =
+					isFinish =
 						true;
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 					// If the analysis is not performed correctly,
 					// and the analysis made ​​from the command line
-					this.startCommandLineMode(fileProxy);
+					startCommandLineMode(fileProxy);
 
-					this.isFinish =
+					isFinish =
 						true;
 				}
 
 			}
-		} catch (PlatformException e1) {
+		} catch (final PlatformException e1) {
 			monitor =
 				null;
 			e1.printStackTrace();
@@ -284,18 +284,18 @@ public class TypeChef {
 	 * @return
 	 */
 	private List<FileProxy> resourceToFileProxy(List<IResource> list) {
-		List<FileProxy> fileProxies =
+		final List<FileProxy> fileProxies =
 			new LinkedList<FileProxy>();
 		// pega um dos arquivos para descobrir qual projeto esta sendo
 		// verificado...
-		if (project == null
+		if ((project == null)
 			&& !list.isEmpty()) {
 			project =
 				list.get(0).getProject();
 			// System.err.println(project.toString());
 		}
-		for (IResource resouce : list) {
-			FileProxy fileProxy =
+		for (final IResource resouce : list) {
+			final FileProxy fileProxy =
 				new FileProxy(resouce);
 			fileProxies.add(fileProxy);
 		}
@@ -307,10 +307,10 @@ public class TypeChef {
 	 * @return
 	 */
 	public List<FileProxy> getFilesLog() {
-		List<FileProxy> list =
+		final List<FileProxy> list =
 			new LinkedList<FileProxy>();
 
-		for (FileProxy fileProxy : fileProxies) {
+		for (final FileProxy fileProxy : fileProxies) {
 			if (!fileProxy.getLogs().isEmpty()) {
 				list.add(fileProxy);
 			}
@@ -325,14 +325,14 @@ public class TypeChef {
 	 */
 	private void startCommandLineMode(FileProxy fileProxy)
 			throws TypeChefException {
-		XMLParserTypeChef xmlParser =
+		final XMLParserTypeChef xmlParser =
 			new XMLParserTypeChef();
 
-		ArrayList<String> args =
+		final ArrayList<String> args =
 			new ArrayList<String>();
 		args.add(fileProxy.getFileToAnalyse());
 
-		String typeChefPreference =
+		final String typeChefPreference =
 			Colligens.getDefault().getPreferenceStore()
 					.getString("TypeChefPreference");
 
@@ -342,10 +342,10 @@ public class TypeChef {
 		try {
 			url =
 				FileLocator.toFileURL(url);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Colligens.getDefault().logError(e);
 		}
-		Path pathToTypeChef =
+		final Path pathToTypeChef =
 			new Path(url.getFile());
 
 		if (Colligens.getDefault().getPreferenceStore()
@@ -360,33 +360,33 @@ public class TypeChef {
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("USE_INCLUDES")) {
 			// // Project C includes
-			ICProject project =
+			final ICProject project =
 				CoreModel
 						.getDefault()
 						.getCModel()
 						.getCProject(
-								PlatformHeader.getFile(fileProxy.getFileReal())
+								AbstractHeader.getFile(fileProxy.getFileReal())
 										.getProject().getName());
 
 			try {
-				IIncludeReference includes[] =
+				final IIncludeReference includes[] =
 					project.getIncludeReferences();
 				for (int i =
 					0; i < includes.length; i++) {
 					args.add(0, includes[i].getElementName());
 					args.add(0, "-I");
 				}
-			} catch (CModelException e) {
+			} catch (final CModelException e) {
 
 				e.printStackTrace();
 			}
 
 		}
 
-		Collection<String> headersPath =
+		final Collection<String> headersPath =
 			header.getIncludes();
 
-		for (Iterator<String> iterator =
+		for (final Iterator<String> iterator =
 			headersPath.iterator(); iterator
 					.hasNext();) {
 
@@ -397,7 +397,7 @@ public class TypeChef {
 		args.add(0, typeChefPreference);
 
 		// saved in the' temp directory
-		String outputFilePath =
+		final String outputFilePath =
 			Colligens.getDefault().getConfigDir()
 					.getAbsolutePath()
 				+ System.getProperty("file.separator")
@@ -411,7 +411,7 @@ public class TypeChef {
 				new RandomAccessFile(outputFilePath
 					+ ".xml", "rw");
 			arq.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
@@ -429,12 +429,12 @@ public class TypeChef {
 		args.add(0, "-jar");
 		args.add(0, "java");
 
-		for (String s : args) {
+		for (final String s : args) {
 			System.err.print(s
 				+ " ");
 		}
 
-		ProcessBuilder processBuilder =
+		final ProcessBuilder processBuilder =
 			new ProcessBuilder(args);
 
 		BufferedReader input =
@@ -442,7 +442,7 @@ public class TypeChef {
 		BufferedReader error =
 			null;
 		try {
-			Process process =
+			final Process process =
 				processBuilder.start();
 			input =
 				new BufferedReader(new InputStreamReader(
@@ -464,11 +464,11 @@ public class TypeChef {
 					}
 					try {
 						process.waitFor();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						System.out.println(e.toString());
 						Colligens.getDefault().logError(e);
 					}
-					int exitValue =
+					final int exitValue =
 						process.exitValue();
 					if (exitValue != 0) {
 						throw new TypeChefException(
@@ -476,28 +476,30 @@ public class TypeChef {
 					}
 					x =
 						false;
-				} catch (IllegalThreadStateException e) {
+				} catch (final IllegalThreadStateException e) {
 					System.out.println(e.toString());
 					Colligens.getDefault().logError(e);
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			System.out.println(e.toString());
 			Colligens.getDefault().logError(e);
 			throw new TypeChefException(TYPECHEF_DID_NOT_RUN_CORRECTLY_);
 		} finally {
 			try {
-				if (input != null)
+				if (input != null) {
 					input.close();
-			} catch (IOException e) {
+				}
+			} catch (final IOException e) {
 				Colligens.getDefault().logError(e);
 			} finally {
-				if (error != null)
+				if (error != null) {
 					try {
-					error.close();
-					} catch (IOException e) {
-					Colligens.getDefault().logError(e);
+						error.close();
+					} catch (final IOException e) {
+						Colligens.getDefault().logError(e);
 					}
+				}
 			}
 		}
 		xmlParser.setFile(fileProxy);
@@ -516,20 +518,23 @@ public class TypeChef {
 	}
 
 	private void monitorWorked(int value) {
-		if (monitor == null)
+		if (monitor == null) {
 			return;
+		}
 		monitor.worked(value);
 	}
 
 	private void monitorSubTask(String label) {
-		if (monitor == null)
+		if (monitor == null) {
 			return;
+		}
 		monitor.subTask(label);
 	}
 
 	private void monitorbeginTask(String label, int size) {
-		if (monitor == null)
+		if (monitor == null) {
 			return;
+		}
 		monitor.beginTask(label, size);
 	}
 }

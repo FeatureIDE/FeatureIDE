@@ -46,14 +46,14 @@ public class SemanticBugsController {
 
 				@Override
 				public void run() {
-					CppCheckAnalyzer analyser =
+					final CppCheckAnalyzer analyser =
 						new CppCheckAnalyzer();
 
-					for (Iterator<IResource> iterator =
+					for (final Iterator<IResource> iterator =
 						resources.iterator(); iterator
 								.hasNext();) {
 
-						IResource iResource =
+						final IResource iResource =
 							iterator.next();
 
 						// System.out.println(iResource);
@@ -62,11 +62,11 @@ public class SemanticBugsController {
 
 					}
 
-					List<CppCheckerFileLogs> fileLogs =
+					final List<CppCheckerFileLogs> fileLogs =
 						analyser.getFiles();
 
 					// returns the list to view
-					SemanticBugsViewController statisticsViewController =
+					final SemanticBugsViewController statisticsViewController =
 						SemanticBugsViewController
 								.getInstance();
 
@@ -76,7 +76,7 @@ public class SemanticBugsController {
 
 			});
 
-		} catch (ProjectExplorerException e1) {
+		} catch (final ProjectExplorerException e1) {
 
 		}
 	}

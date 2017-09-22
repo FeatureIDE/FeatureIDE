@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds certain solutions of propositional formulas.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
@@ -71,7 +71,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 		// Math.min(solver.getSatInstance().getNumberOfVariables(),
 		// ISatSolver.MAX_SOLUTION_BUFFER));
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		int[] model1 =
+		final int[] model1 =
 			solver.findModel();
 
 		// satisfiable?
@@ -151,9 +151,9 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 			featureGraph =
 				new MatrixFeatureGraph(satInstance, index);
 
-			Node cnf =
+			final Node cnf =
 				satInstance.getCnf();
-			outer: for (Node clause : cnf.getChildren()) {
+			outer: for (final Node clause : cnf.getChildren()) {
 				final Node[] literals =
 					clause.getChildren();
 				int childrenCount =
@@ -190,8 +190,8 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					addRelation(x, y);
 				} else {
 					for (int i =
-						0; i < childrenCount
-							- 1; i++) {
+						0; i < (childrenCount
+							- 1); i++) {
 						final int x =
 							satInstance.getSignedVariable((Literal) literals[i]);
 						final int indexX =
@@ -287,10 +287,10 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 	}
 
 	private void addRelation(final int x, final int y) {
-		int indexX =
+		final int indexX =
 			index[Math.abs(x)
 				- 1];
-		int indexY =
+		final int indexY =
 			index[Math.abs(y)
 				- 1];
 
@@ -326,15 +326,15 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 				? 1
 				: 2);
 
-		if (core[i] == 0
-			&& (recArray[i]
-				& compareB) == 0) {
+		if ((core[i] == 0)
+			&& ((recArray[i]
+				& compareB) == 0)) {
 			recArray[i] |=
 				compareB;
 
 			int[] xModel1 =
 				null;
-			for (int[] solution : solver.getSolutionList()) {
+			for (final int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
 					xModel1 =
 						solution;
@@ -373,7 +373,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 
 					final int my1 =
 						xModel1[j];
-					for (int[] solution : solver.getSolutionList()) {
+					for (final int[] solution : solver.getSolutionList()) {
 						final int mxI =
 							solution[i];
 						final int myI =
@@ -386,14 +386,14 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 
 					solver.assignmentPush(-my1);
 					solver.setSelectionStrategy(
-							(c++
-								% 2 != 0)
+							((c++
+								% 2) != 0)
 									? SelectionStrategy.POSITIVE
 									: SelectionStrategy.NEGATIVE);
 
 					switch (solver.isSatisfiable()) {
 					case FALSE:
-						for (int mx0 : parentStack) {
+						for (final int mx0 : parentStack) {
 							addRelation(-mx0, my1);
 						}
 						parentStack.push(my1);
@@ -1274,7 +1274,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 			}
 
 			if (incomplete
-				&& childSelected >= 0) {
+				&& (childSelected >= 0)) {
 				dfs_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
 			}
 		}

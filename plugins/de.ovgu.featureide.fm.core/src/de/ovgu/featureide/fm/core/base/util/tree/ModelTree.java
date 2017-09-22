@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,11 +30,11 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Tree element.
- * 
+ *
  * TODO remove this class as it seems to be redundant to the feature structure and needs to be updated all the time.S
- * 
+ *
  * @author Sebastian Krieter
- * 
+ *
  */
 public class ModelTree<M, E> implements Iterable<E> {
 
@@ -44,6 +44,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 			super(root);
 		}
 
+		@Override
 		public ModelTree<M, E> getNext() {
 			final ModelTree<M, E> next =
 				iteratorList.removeFirst();
@@ -59,6 +60,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 			super(root);
 		}
 
+		@Override
 		public ModelTree<M, E> getNext() {
 			final ModelTree<M, E> next =
 				iteratorList.removeFirst();
@@ -116,6 +118,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 		return parent.object;
 	}
 
+	@Override
 	public TreeIterator<E> iterator() {
 		return new PreOrderIterator<M, E>(this);
 	}
@@ -129,7 +132,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public void addNode(E newChildObject) {
-		ModelTree<M, E> newChild =
+		final ModelTree<M, E> newChild =
 			new ModelTree<>(newChildObject, this.treeModel);
 		newChild.parent =
 			this;
@@ -137,7 +140,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public void addNodeAtIndex(E newChildObject, int index) {
-		ModelTree<M, E> newChild =
+		final ModelTree<M, E> newChild =
 			new ModelTree<>(newChildObject, this.treeModel);
 		newChild.parent =
 			this;
@@ -157,7 +160,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public void removeSubTree(ModelTree<M, E> child) {
-		for (Iterator<ModelTree<M, E>> it =
+		for (final Iterator<ModelTree<M, E>> it =
 			children.iterator(); it.hasNext();) {
 			final ModelTree<M, E> next =
 				it.next();
@@ -169,7 +172,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public void removeNode(E child) {
-		for (TreeIterator<E> it =
+		for (final TreeIterator<E> it =
 			iterator(); it.hasNext();) {
 			if (it.next().equals(child)) {
 				it.remove();
@@ -233,7 +236,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	public String toString() {
 		final StringBuilder sb =
 			new StringBuilder();
-		for (TreeIterator<E> it =
+		for (final TreeIterator<E> it =
 			this.iterator(); it.hasNext();) {
 			final E element =
 				it.next();

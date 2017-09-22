@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * TODO description
- * 
+ *
  * @author Sebastian Krieter
  */
 public class SatCalcThread extends AWorkerThread<Integer> {
@@ -56,7 +56,7 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 				variableConfiguration;
 			this.fmNode =
 				fmNode;
-			this.featureNames =
+			featureNames =
 				FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
 		}
 	}
@@ -66,17 +66,17 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 
 	public SatCalcThread(IFeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
 		super(new NullMonitor());
-		this.sharedObjects =
+		sharedObjects =
 			new SharedObjects(featureGraph, variableConfiguration, fmNode);
-		this.solver =
+		solver =
 			new SimpleSatSolver(fmNode, 1000);
 	}
 
 	private SatCalcThread(SatCalcThread oldThread) {
 		super(oldThread);
-		this.sharedObjects =
+		sharedObjects =
 			oldThread.sharedObjects;
-		this.solver =
+		solver =
 			new SimpleSatSolver(oldThread.sharedObjects.fmNode, 1000);
 	}
 
@@ -89,7 +89,7 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 
 	@Override
 	protected boolean beforeWork() {
-		this.solver.setBackbone(sharedObjects.knownLiterals, sharedObjects.l);
+		solver.setBackbone(sharedObjects.knownLiterals, sharedObjects.l);
 		return super.beforeWork();
 	}
 

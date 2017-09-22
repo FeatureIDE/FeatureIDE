@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,10 +30,10 @@ import de.ovgu.featureide.core.CorePlugin;
 
 /**
  * @brief The nature for feature projects
- * 
+ *
  * @remarks - Every feature project has the same nature and builder independent from the used composition tool. - The composition tool in use depends on the
  *          project settings and not on the nature or builder
- * 
+ *
  * @author Tom Brosch
  */
 public class FeatureProjectNature implements IProjectNature {
@@ -47,13 +47,14 @@ public class FeatureProjectNature implements IProjectNature {
 
 	private IProject project;
 
+	@Override
 	public void configure() throws CoreException {
 		if (project == null) {
 			return;
 		}
-		IProjectDescription desc =
+		final IProjectDescription desc =
 			project.getDescription();
-		ICommand[] commands =
+		final ICommand[] commands =
 			desc.getBuildSpec();
 
 		for (int i =
@@ -63,11 +64,11 @@ public class FeatureProjectNature implements IProjectNature {
 			}
 		}
 
-		ICommand[] newCommands =
+		final ICommand[] newCommands =
 			new ICommand[commands.length
 				+ 1];
 		System.arraycopy(commands, 0, newCommands, 1, commands.length);
-		ICommand command =
+		final ICommand command =
 			desc.newCommand();
 		command.setBuilderName(ExtensibleFeatureProjectBuilder.BUILDER_ID);
 		newCommands[0] =
@@ -76,15 +77,16 @@ public class FeatureProjectNature implements IProjectNature {
 		project.setDescription(desc, null);
 	}
 
+	@Override
 	public void deconfigure() throws CoreException {
-		IProjectDescription description =
+		final IProjectDescription description =
 			getProject().getDescription();
-		ICommand[] commands =
+		final ICommand[] commands =
 			description.getBuildSpec();
 		for (int i =
 			0; i < commands.length; ++i) {
 			if (commands[i].getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-				ICommand[] newCommands =
+				final ICommand[] newCommands =
 					new ICommand[commands.length
 						- 1];
 				System.arraycopy(commands, 0, newCommands, 0, i);
@@ -100,10 +102,12 @@ public class FeatureProjectNature implements IProjectNature {
 		}
 	}
 
+	@Override
 	public IProject getProject() {
 		return project;
 	}
 
+	@Override
 	public void setProject(IProject project) {
 		this.project =
 			project;

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.DialogPage;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -74,7 +74,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * This class represents one page of the Example Wizard.
- * 
+ *
  * @author Christian Becker
  * @author Reimar Schroeter
  */
@@ -113,11 +113,11 @@ public class ExampleNewWizardPage extends WizardPage {
 	private abstract class ComposedViewerFilter extends ViewerFilter {
 
 		public boolean selectComposer(Viewer viewer, Object parentElement, Object element) {
-			ViewerFilter[] filters =
+			final ViewerFilter[] filters =
 				((StructuredViewer) viewer).getFilters();
 			Object[] filterRes =
 				((ITreeContentProvider) ((StructuredViewer) viewer).getContentProvider()).getChildren(element);
-			for (ViewerFilter viewerFilter : filters) {
+			for (final ViewerFilter viewerFilter : filters) {
 				filterRes =
 					viewerFilter.filter(viewer, element, filterRes);
 			}
@@ -136,7 +136,7 @@ public class ExampleNewWizardPage extends WizardPage {
 				element =
 					((ProjectRecord.TreeItem) element).getRecord();
 			}
-			if (searchText == null
+			if ((searchText == null)
 				|| searchText.isEmpty()
 				|| TYPE_FILTER_TEXT.equals(searchFeatureText.getText())) {
 				return true;
@@ -179,6 +179,7 @@ public class ExampleNewWizardPage extends WizardPage {
 
 	private class MyCheckStateListener implements ICheckStateListener {
 
+		@Override
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			if (event instanceof ContainerTreeViewerWrapper.ParentCheckStateChangedEvent) {
 				CheckboxTreeViewer viewer =
@@ -189,7 +190,7 @@ public class ExampleNewWizardPage extends WizardPage {
 				}
 
 				if (event.getElement() instanceof ProjectRecord.TreeItem) {
-					ProjectRecord.TreeItem item =
+					final ProjectRecord.TreeItem item =
 						(ProjectRecord.TreeItem) event.getElement();
 					if (viewer != null) {
 						if (!viewer.getChecked(event.getElement())
@@ -201,13 +202,13 @@ public class ExampleNewWizardPage extends WizardPage {
 				}
 			}
 			if (event.getElement() instanceof ProjectRecord.TreeItem) {
-				ProjectRecord.TreeItem item =
+				final ProjectRecord.TreeItem item =
 					(ProjectRecord.TreeItem) event.getElement();
 				if (item.getRecord().hasErrors()) {
 					wrapper.setChecked(item, false);
 				} else {
 					if (event instanceof ContainerTreeViewerWrapper.ParentCheckStateChangedEvent) {
-						ContainerTreeViewerWrapper.ParentCheckStateChangedEvent newName =
+						final ContainerTreeViewerWrapper.ParentCheckStateChangedEvent newName =
 							(ContainerTreeViewerWrapper.ParentCheckStateChangedEvent) event;
 						if (newName.isOnlyRefresh()) {
 							wrapper.setChecked(item, event.getChecked());
@@ -233,23 +234,23 @@ public class ExampleNewWizardPage extends WizardPage {
 				viewer =
 					(CheckboxTreeViewer) event.getSource();
 			}
-			if (viewer != null
-				&& viewer.getContentProvider() instanceof ITreeContentProvider) {
+			if ((viewer != null)
+				&& (viewer.getContentProvider() instanceof ITreeContentProvider)) {
 				contProv =
 					(ITreeContentProvider) viewer.getContentProvider();
 			}
 
 			if (event.getSelection() instanceof IStructuredSelection) {
-				IStructuredSelection iss =
+				final IStructuredSelection iss =
 					(IStructuredSelection) event.getSelection();
 
 				if (iss != null) {
-					Object selectedElement =
+					final Object selectedElement =
 						iss.getFirstElement();
 					if (selectedElement instanceof ProjectRecord.TreeItem) {
-						ProjectRecord.TreeItem treeItem =
+						final ProjectRecord.TreeItem treeItem =
 							(ProjectRecord.TreeItem) selectedElement;
-						ProjectRecord tmpRecord =
+						final ProjectRecord tmpRecord =
 							treeItem.getRecord();
 						if (tmpRecord != null) {
 							descBox.setText(tmpRecord.getDescription());
@@ -262,11 +263,11 @@ public class ExampleNewWizardPage extends WizardPage {
 							}
 						}
 					} else if (selectedElement instanceof IPath) {
-						Object[] checkedProjectItems =
+						final Object[] checkedProjectItems =
 							wrapper.getCheckedProjectItems(wrapper.getSelectedViewer());
 						setMessage("");
-						for (Object object : checkedProjectItems) {
-							ProjectRecord.TreeItem item =
+						for (final Object object : checkedProjectItems) {
+							final ProjectRecord.TreeItem item =
 								(ProjectRecord.TreeItem) object;
 							if (item.getRecord().hasWarnings()) {
 								Object parent =
@@ -294,28 +295,28 @@ public class ExampleNewWizardPage extends WizardPage {
 
 		public DynamicComposite(Composite parent, int style, String contentProviderName) {
 			super(parent, style);
-			GridLayout layout =
+			final GridLayout layout =
 				new GridLayout();
-			this.setLayout(layout);
-			this.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
+			setLayout(layout);
+			setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
 				| GridData.GRAB_VERTICAL
 				| GridData.FILL_BOTH));
 
-			ContainerCheckedTreeViewer contCheckTreeV =
+			final ContainerCheckedTreeViewer contCheckTreeV =
 				wrapper.getNewContainerViewer(this, SWT.BORDER);
-			GridData listData =
+			final GridData listData =
 				new GridData(GridData.GRAB_HORIZONTAL
 					| GridData.GRAB_VERTICAL
 					| GridData.FILL_BOTH);
 			contCheckTreeV.getControl().setLayoutData(listData);
 
-			IContentProvider contProv =
+			final IContentProvider contProv =
 				new DynamicContentProvider(contentProviderName);
 			contCheckTreeV.setContentProvider(contProv);
 			contCheckTreeV.setLabelProvider(new ExampleLabelProvider());
 			contCheckTreeV.addCheckStateListener(checkStateList);
 
-			ViewerSorter viewerSorter =
+			final ViewerSorter viewerSorter =
 				new ViewerSorter(new Collator() {
 
 					@Override
@@ -344,7 +345,7 @@ public class ExampleNewWizardPage extends WizardPage {
 
 	/**
 	 * Constructor for SampleNewWizardPage.
-	 * 
+	 *
 	 * @param pageName
 	 */
 	public ExampleNewWizardPage() {
@@ -352,13 +353,14 @@ public class ExampleNewWizardPage extends WizardPage {
 		setTitle("Select FeatureIDE example(s) which you would like to explore");
 	}
 
+	@Override
 	public void createControl(Composite parent) {
 		ProjectProvider.resetProjectItems();
 		initializeDialogUnits(parent);
 		wrapper =
 			new ContainerTreeViewerWrapper();
 
-		Composite workArea =
+		final Composite workArea =
 			new Composite(parent, SWT.NONE);
 		setControl(workArea);
 
@@ -438,6 +440,7 @@ public class ExampleNewWizardPage extends WizardPage {
 		item.setToolTipText("Collapse all projects");
 		item.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				wrapper.getSelectedViewer().collapseAll();
 			}
@@ -448,6 +451,7 @@ public class ExampleNewWizardPage extends WizardPage {
 		item.setToolTipText("Expand all projects");
 		item.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				wrapper.getSelectedViewer().expandAll();
 			}
@@ -460,6 +464,7 @@ public class ExampleNewWizardPage extends WizardPage {
 		item.setToolTipText("Select All Projects");
 		item.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				selectAllElementsWithoutWarningsAndErrors();
 				determineAndSetPageComplete();
@@ -471,6 +476,7 @@ public class ExampleNewWizardPage extends WizardPage {
 		item.setToolTipText("Deselect All Projects");
 		item.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				deselectAllProjects();
 				setMessage("");
@@ -487,7 +493,7 @@ public class ExampleNewWizardPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				Object[] checkedProjects =
+				final Object[] checkedProjects =
 					wrapper.getCheckedProjectItems(wrapper.getSelectedViewer());
 				searchFilter.searchText =
 					searchFeatureText.getText().toLowerCase(Locale.ENGLISH);
@@ -528,26 +534,26 @@ public class ExampleNewWizardPage extends WizardPage {
 
 	/**
 	 * Create the checkbox list for the found projects.
-	 * 
+	 *
 	 * @param workArea
 	 */
 	private void createProjectSelectionArea(final Composite workArea) {
-		CTabFolder tabFolder =
+		final CTabFolder tabFolder =
 			new CTabFolder(workArea, SWT.BORDER);
 		tabFolder.addListener(SWT.MouseExit, new Listener() {
 
 			@Override
 			public void handleEvent(Event event) {
-				Object[] checkedProjects =
+				final Object[] checkedProjects =
 					wrapper.getCheckedProjects();
 				boolean warningsExists =
 					false;
-				for (Object object : checkedProjects) {
-					ProjectRecord rec =
+				for (final Object object : checkedProjects) {
+					final ProjectRecord rec =
 						(ProjectRecord) object;
 					if (rec.hasErrors()
 						|| rec.hasWarnings()) {
-						setMessage(PROJECTS_WITH_WARNINGS_ARE_SELECTED_, DialogPage.WARNING);
+						setMessage(PROJECTS_WITH_WARNINGS_ARE_SELECTED_, IMessageProvider.WARNING);
 						warningsExists =
 							true;
 						break;
@@ -559,7 +565,7 @@ public class ExampleNewWizardPage extends WizardPage {
 			}
 		});
 		tabFolder.setSimple(false);
-		GridLayout gridLayout =
+		final GridLayout gridLayout =
 			new GridLayout();
 
 		tabFolder.setLayout(gridLayout);
@@ -572,14 +578,14 @@ public class ExampleNewWizardPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.getSource() instanceof CTabFolder) {
-					CTabFolder tabFolder =
+					final CTabFolder tabFolder =
 						(CTabFolder) e.getSource();
-					CTabItem selection =
+					final CTabItem selection =
 						tabFolder.getSelection();
-					Control contr =
+					final Control contr =
 						selection.getControl();
 					wrapper.setSelectedViewer(contr);
-					Object[] checkedProjects =
+					final Object[] checkedProjects =
 						wrapper.getCheckedProjectItems(wrapper.getSelectedViewer());
 					wrapper.refreshCheckOfSelectedViewer(checkedProjects);
 				}
@@ -589,11 +595,11 @@ public class ExampleNewWizardPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
-		Set<String> tabItems =
+		final Set<String> tabItems =
 			ProjectProvider.getViewersNamesForProjects();
 		CTabItem item =
 			null;
-		for (String name : tabItems) {
+		for (final String name : tabItems) {
 			item =
 				new CTabItem(tabFolder, workArea.getStyle());
 			item.setText(name);
@@ -609,7 +615,7 @@ public class ExampleNewWizardPage extends WizardPage {
 	}
 
 	private void createDescriptionArea(Composite workArea) {
-		Label title =
+		final Label title =
 			new Label(workArea, SWT.NONE);
 		title.setText("Description:");
 
@@ -621,7 +627,7 @@ public class ExampleNewWizardPage extends WizardPage {
 				| SWT.V_SCROLL);
 		descBox.setText("");
 
-		GridData dbDG =
+		final GridData dbDG =
 			new GridData(GridData.FILL_BOTH);
 		dbDG.minimumHeight =
 			75;
@@ -633,11 +639,11 @@ public class ExampleNewWizardPage extends WizardPage {
 	}
 
 	private void selectAllElementsWithoutWarningsAndErrors() {
-		Object[] allProjectItems =
+		final Object[] allProjectItems =
 			wrapper.getAllProjectItems(wrapper.getSelectedViewer());
-		for (Object object : allProjectItems) {
+		for (final Object object : allProjectItems) {
 			if (object instanceof ProjectRecord.TreeItem) {
-				ProjectRecord.TreeItem treeItem =
+				final ProjectRecord.TreeItem treeItem =
 					(ProjectRecord.TreeItem) object;
 				if (!(treeItem.getRecord().hasErrors()
 					|| treeItem.getRecord().hasWarnings())) {
@@ -648,9 +654,9 @@ public class ExampleNewWizardPage extends WizardPage {
 	}
 
 	private void deselectAllProjects() {
-		Object[] checkedProjectItems =
+		final Object[] checkedProjectItems =
 			wrapper.getCheckedProjectItems(wrapper.getSelectedViewer());
-		for (Object object : checkedProjectItems) {
+		for (final Object object : checkedProjectItems) {
 			wrapper.setChecked(object, false);
 		}
 	}

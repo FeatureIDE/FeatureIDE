@@ -40,7 +40,7 @@ public abstract class AbstractHeader {
 		null;
 
 	public AbstractHeader() {
-		IPreferenceStore store =
+		final IPreferenceStore store =
 			Colligens.getDefault().getPreferenceStore();
 		if (!store.getBoolean("USE_INCLUDES")
 			&& !store.getBoolean("USE_STUBS")) {
@@ -49,7 +49,7 @@ public abstract class AbstractHeader {
 	}
 
 	public static AbstractHeader getInstance() {
-		IPreferenceStore store =
+		final IPreferenceStore store =
 			Colligens.getDefault().getPreferenceStore();
 		if (!store.getBoolean("USE_INCLUDES")
 			&& !store.getBoolean("USE_STUBS")) {
@@ -88,8 +88,8 @@ public abstract class AbstractHeader {
 	}
 
 	protected List<String> filesAllProject() throws PlatformException {
-		if (listAllFiles != null
-			&& listAllFiles.size() > 0) {
+		if ((listAllFiles != null)
+			&& (listAllFiles.size() > 0)) {
 			return listAllFiles;
 		}
 
@@ -98,13 +98,13 @@ public abstract class AbstractHeader {
 
 		try {
 
-			ISourceRoot sourceRoots[] =
+			final ISourceRoot sourceRoots[] =
 				project.getSourceRoots();
 			for (int i =
 				0; i < sourceRoots.length; i++) {
 				if (!sourceRoots[i].getPath().toOSString()
 						.equals(project.getProject().getName())) {
-					ProjectExplorerController explorerController =
+					final ProjectExplorerController explorerController =
 						new ProjectExplorerController();
 					explorerController
 							.addResource(sourceRoots[i].getResource());
@@ -116,7 +116,7 @@ public abstract class AbstractHeader {
 				throw new PlatformException(
 						"Your project does not have a source folder (ex.: /src).");
 			}
-		} catch (CModelException e1) {
+		} catch (final CModelException e1) {
 			throw new PlatformException(
 					"Your project does not have a source folder (ex.: /src).");
 		}
@@ -126,14 +126,14 @@ public abstract class AbstractHeader {
 
 		countDirectives.directives.add("COLLIGENS");
 
-		for (Iterator<String> iterator =
+		for (final Iterator<String> iterator =
 			listAllFiles.iterator(); iterator
 					.hasNext();) {
-			String file =
+			final String file =
 				iterator.next();
 			try {
 				countDirectives.count(file);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 
 				e.printStackTrace();
 				throw new PlatformException("unexpected error!");
@@ -144,9 +144,9 @@ public abstract class AbstractHeader {
 	}
 
 	public static IFile getFile(String fileName) {
-		IWorkspace workspace =
+		final IWorkspace workspace =
 			ResourcesPlugin.getWorkspace();
-		IPath location =
+		final IPath location =
 			Path.fromOSString(fileName);
 		return workspace.getRoot().getFileForLocation(location);
 	}
@@ -163,20 +163,23 @@ public abstract class AbstractHeader {
 	}
 
 	protected void monitorWorked(int value) {
-		if (monitor == null)
+		if (monitor == null) {
 			return;
+		}
 		monitor.worked(value);
 	}
 
 	protected void monitorSubTask(String label) {
-		if (monitor == null)
+		if (monitor == null) {
 			return;
+		}
 		monitor.subTask(label);
 	}
 
 	protected void monitorbeginTask(String label, int size) {
-		if (monitor == null)
+		if (monitor == null) {
 			return;
+		}
 		monitor.beginTask(label, size);
 	}
 
@@ -184,7 +187,7 @@ public abstract class AbstractHeader {
 		try {
 			getProject().getProject().refreshLocal(IResource.DEPTH_INFINITE,
 					new NullProgressMonitor());
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

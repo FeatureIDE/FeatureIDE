@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.QualifiedName;
 
 /**
  * Manages the composer specific feature models extensions
- * 
+ *
  * @author Jens Meinicke
  */
 public class FMComposerManager implements IFMComposerExtension {
@@ -54,10 +54,10 @@ public class FMComposerManager implements IFMComposerExtension {
 	private final static String BUILDER_ID =
 		"de.ovgu.featureide.core"
 			+ ".extensibleFeatureProjectBuilder";
-	private IProject project;
+	private final IProject project;
 
 	/**
-	 * 
+	 *
 	 */
 	public FMComposerManager(IProject project) {
 		this.project =
@@ -78,15 +78,17 @@ public class FMComposerManager implements IFMComposerExtension {
 		try {
 			String path =
 				project.getPersistentProperty(SOURCE_FOLDER_CONFIG_ID);
-			if (path != null)
+			if (path != null) {
 				return path;
+			}
 
 			path =
 				getPath(project, SOURCE_ARGUMENT);
-			if (path == null)
+			if (path == null) {
 				return DEFAULT_SOURCE_PATH;
+			}
 			return path;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Logger.logError(e);
 		}
 		return DEFAULT_SOURCE_PATH;
@@ -94,20 +96,21 @@ public class FMComposerManager implements IFMComposerExtension {
 
 	private String getPath(IProject project, String argument) {
 		try {
-			for (ICommand command : project.getDescription().getBuildSpec()) {
+			for (final ICommand command : project.getDescription().getBuildSpec()) {
 				if (BUILDER_ID.equals(command.getBuilderName())) {
 					return command.getArguments().get(argument);
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			Logger.logError(e);
 		}
 		return null;
 	}
 
 	private void setComposerID() {
-		if (project == null)
+		if (project == null) {
 			return;
+		}
 		try {
 			String id =
 				project.getPersistentProperty(COMPOSER_CONFIG_ID);
@@ -117,7 +120,7 @@ public class FMComposerManager implements IFMComposerExtension {
 				return;
 			}
 
-			for (ICommand command : project.getDescription().getBuildSpec()) {
+			for (final ICommand command : project.getDescription().getBuildSpec()) {
 				if (BUILDER_ID.equals(command.getBuilderName())) {
 					id =
 						command.getArguments().get(COMPOSER_KEY);
@@ -129,7 +132,7 @@ public class FMComposerManager implements IFMComposerExtension {
 				}
 			}
 
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			Logger.logError(e);
 		}
 		composerId =
@@ -141,11 +144,11 @@ public class FMComposerManager implements IFMComposerExtension {
 			return;
 		}
 
-		IConfigurationElement[] config =
+		final IConfigurationElement[] config =
 			Platform.getExtensionRegistry().getConfigurationElementsFor(PluginID.PLUGIN_ID
 				+ ".FMComposer");
 		try {
-			for (IConfigurationElement e : config) {
+			for (final IConfigurationElement e : config) {
 				if (e.getAttribute("composer").equals(composerId)) {
 					final Object o =
 						e.createExecutableExtension("class");
@@ -156,7 +159,7 @@ public class FMComposerManager implements IFMComposerExtension {
 				}
 			}
 			fmComposerExtension.hasComposer(true);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Logger.logError(e);
 		}
 	}
@@ -167,7 +170,7 @@ public class FMComposerManager implements IFMComposerExtension {
 
 	/**
 	 * for unit testing purposes only
-	 * 
+	 *
 	 * @param s
 	 */
 	public void setComposerID(String s, Object o) {

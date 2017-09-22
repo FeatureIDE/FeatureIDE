@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Paolo Vavassori - initial API and implementation
  *   Angelo Gargantini - utils and architecture
@@ -21,20 +21,20 @@ import org.junit.Assert;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 //import org.junit.runner.RunWith;
 //import org.junit.runners.Parameterized;
 //import org.junit.runners.Parameterized.Parameters;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * convert all the splot models using the double conversion of FeatureIDE (read an write). All the resulting models will be read by FeatureIDE
- * 
- * 
+ *
+ *
  * @author garganti
- * 
+ *
  */
 // TODO currently splot models support different attributes then featureIDE model.
-// 		replace System.err.println by assertions if a correct conversion is possible. 
+// 		replace System.err.println by assertions if a correct conversion is possible.
 //@RunWith(Parameterized.class)
 public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 
@@ -43,7 +43,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 	private static File DESTINATION =
 		new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels_new/");
 
-	private File modelFile;
+	private final File modelFile;
 
 	public Experiment_ConvertSPLOTmodels(File modelFile) {
 		this.modelFile =
@@ -62,7 +62,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 		}
 
 		Assert.assertTrue(MODEL_FILE_FOLDER.isDirectory());
-		File[] children =
+		final File[] children =
 			MODEL_FILE_FOLDER.listFiles(new FilenameFilter() {
 
 				@Override
@@ -71,9 +71,9 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 				}
 			});
 		assert children != null;
-		Collection<Object[]> params =
+		final Collection<Object[]> params =
 			new ArrayList<Object[]>();
-		for (File f : children) {
+		for (final File f : children) {
 			params.add(new Object[] {
 				f });
 		}
@@ -82,17 +82,17 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 
 	/**
 	 * Tests if conversion is equivalent.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 //	@Test
 	public void convertSPLOTmodel()
 			throws Exception {
-		String origin =
+		final String origin =
 			modelFile.getAbsolutePath();
 
 		// preconditions
-		File modelFileOrigin =
+		final File modelFileOrigin =
 			new File(origin);
 		assert modelFileOrigin.exists()
 			&& modelFileOrigin.isFile();
@@ -100,12 +100,12 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 
 		//
 		// read the same SPLOT file using the FeatureiDE reader
-		IFeatureModel fm_original =
+		final IFeatureModel fm_original =
 			FMFactoryManager.getDefaultFactory().createFeatureModel();
-		SXFMFormat format =
+		final SXFMFormat format =
 			new SXFMFormat();
 		final ProblemList problems =
-			FileHandler.load(modelFileOrigin.toPath(), fm_original, format);
+			SimpleFileHandler.load(modelFileOrigin.toPath(), fm_original, format);
 		if (problems.containsError()) {
 			System.err.println("SKIPPING "
 				+ modelFile
@@ -114,26 +114,26 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 		}
 		// save with the same name in the other directory (same format sxfm)
 		// using the featureidewriter
-		String newPath =
+		final String newPath =
 			DESTINATION
 				+ File.separator
 				+ modelFileOrigin.getName();
-		File newFile =
+		final File newFile =
 			new File(newPath);
 
-		if (FileHandler.save(newFile.toPath(), fm_original, format).containsError()) {
+		if (SimpleFileHandler.save(newFile.toPath(), fm_original, format).containsError()) {
 			newFile.delete();
 		} else {
 			// perform the analysis using the SPLAR reader and analyzer
 			// take the two models
-			splar.core.fm.FeatureModel originalSplotModel =
+			final splar.core.fm.FeatureModel originalSplotModel =
 				getSplotModel(origin);
-			splar.core.fm.FeatureModel newSplotModel =
+			final splar.core.fm.FeatureModel newSplotModel =
 				getSplotModel(newPath);
 			// number of nodes (should be the same)
-			int nNodes =
+			final int nNodes =
 				originalSplotModel.getNodes().size();
-			int nNodesP =
+			final int nNodesP =
 				newSplotModel.getNodes().size();
 			if (nNodes != nNodesP) {
 				System.err.println("Nodes are not equivalent @ "
@@ -145,9 +145,9 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 				return;
 			}
 			// number of valid products
-			long splotModelNproducts =
+			final long splotModelNproducts =
 				getNumberOfValidProducts(originalSplotModel);
-			long splotModelNproductsP =
+			final long splotModelNproductsP =
 				getNumberOfValidProducts(newSplotModel);
 			if (splotModelNproducts != splotModelNproductsP) {
 				System.err.println("Number of products are not equivalent @ "

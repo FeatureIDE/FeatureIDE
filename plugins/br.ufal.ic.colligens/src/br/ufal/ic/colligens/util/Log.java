@@ -17,7 +17,7 @@ import br.ufal.ic.colligens.models.FileProxy;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class Log {
 
@@ -58,12 +58,12 @@ public class Log {
 			message.trim();
 
 		try {
-			IMarker marker =
-				this.getFile().createMarker(MARKER_TYPE);
+			final IMarker marker =
+				getFile().createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, this.message);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			// e.printStackTrace();
 		}
 	}
@@ -105,20 +105,20 @@ public class Log {
 
 		if (iTextSelection == null) {
 
-			IDocument document =
-				this.getDocument();
+			final IDocument document =
+				getDocument();
 
-			int offset =
-				document.getLineOffset(this.line
+			final int offset =
+				document.getLineOffset(line
 					- 1);
 
-			int length =
-				document.getLineOffset(this.line)
-					- document.getLineOffset(this.line
+			final int length =
+				document.getLineOffset(line)
+					- document.getLineOffset(line
 						- 1);
 
 			iTextSelection =
-				new LogSelection(this.line, length
+				new LogSelection(line, length
 					- column,
 						offset
 							+ column);
@@ -133,11 +133,11 @@ public class Log {
 	}
 
 	private IDocument getDocument() throws CoreException {
-		ITextFileBufferManager.DEFAULT.connect(this.getFile().getFullPath(),
+		ITextFileBufferManager.DEFAULT.connect(getFile().getFullPath(),
 				LocationKind.IFILE, null);
 		return FileBuffers
 				.getTextFileBufferManager()
-				.getTextFileBuffer(this.getFile().getFullPath(),
+				.getTextFileBuffer(getFile().getFullPath(),
 						LocationKind.IFILE)
 				.getDocument();
 	}

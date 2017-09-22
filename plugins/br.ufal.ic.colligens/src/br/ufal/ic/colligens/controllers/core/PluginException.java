@@ -10,7 +10,7 @@ import br.ufal.ic.colligens.controllers.CoreController;
 public class PluginException extends Exception {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID =
 		1L;
@@ -19,6 +19,7 @@ public class PluginException extends Exception {
 		super(message);
 		Display.getDefault().asyncExec(new Runnable() {
 
+			@Override
 			public void run() {
 				Shell shell;
 				if (CoreController.getWindow() != null) {

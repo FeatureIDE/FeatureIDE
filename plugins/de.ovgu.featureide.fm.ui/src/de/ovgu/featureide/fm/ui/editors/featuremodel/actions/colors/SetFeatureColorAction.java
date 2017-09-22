@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -58,7 +57,7 @@ import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
 
 /**
  * ColorSelectedFeatureAction is the action that opens the ColorSelectedFeatureDialog with the selected features in the feature diagram.
- * 
+ *
  * @author Christian Elzholz
  * @author Marcus Schmelz
  * @author Marcus Pinnecke
@@ -78,15 +77,17 @@ public class SetFeatureColorAction extends Action {
 	private boolean undoRedoEnabled =
 		false;
 
-	private ISelectionChangedListener selectionListener =
+	private final ISelectionChangedListener selectionListener =
 		new ISelectionChangedListener() {
 
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection =
+				final IStructuredSelection selection =
 					(IStructuredSelection) event.getSelection();
 				setEnabled(isSelectionValid(selection));
-				if (isEnabled())
+				if (isEnabled()) {
 					updateFeatureList(selection);
+				}
 			}
 		};
 
@@ -137,24 +138,26 @@ public class SetFeatureColorAction extends Action {
 	}
 
 	public void setEnableUndoRedo(boolean set) {
-		this.undoRedoEnabled =
+		undoRedoEnabled =
 			set;
 	}
 
 	protected boolean isSelectionValid(IStructuredSelection selection) {
-		for (Object object : selection.toList()) {
+		for (final Object object : selection.toList()) {
 			if (object instanceof IFeature) {
 				continue;
 			} else if (object instanceof AbstractGraphicalEditPart) {
-				AbstractGraphicalEditPart agep =
+				final AbstractGraphicalEditPart agep =
 					(AbstractGraphicalEditPart) object;
 				IFeature feature =
 					null;
-				if (agep.getModel() != null)
+				if (agep.getModel() != null) {
 					feature =
 						featureModel.getFeature(agep.getModel().toString());
-				if (feature != null)
+				}
+				if (feature != null) {
 					continue;
+				}
 			} else if (object instanceof FeatureEditPart) {
 				continue;
 			} else {
@@ -166,33 +169,33 @@ public class SetFeatureColorAction extends Action {
 
 	/**
 	 * Creates a featureList with the selected features of the feature diagram.
-	 * 
+	 *
 	 * @param selection
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {
 			featureList.clear();
 
-			Object[] editPartArray =
+			final Object[] editPartArray =
 				selection.toArray();
 
 			for (int i =
 				0; i < selection.size(); i++) {
-				Object editPart =
+				final Object editPart =
 					editPartArray[i];
 
 				if (editPart instanceof IFeature) {
 					featureList.add((IFeature) editPart);
 				} else if (editPart instanceof FeatureEditPart) {
-					FeatureEditPart editP =
+					final FeatureEditPart editP =
 						(FeatureEditPart) editPart;
-					IGraphicalFeature feature =
+					final IGraphicalFeature feature =
 						editP.getModel();
 					featureList.add(feature.getObject());
 				} else if (editPart instanceof AbstractGraphicalEditPart) {
-					AbstractGraphicalEditPart agep =
+					final AbstractGraphicalEditPart agep =
 						(AbstractGraphicalEditPart) editPart;
-					IFeature feature =
+					final IFeature feature =
 						featureModel.getFeature(agep.getModel().toString());
 					featureList.add(feature);
 				}
@@ -206,30 +209,31 @@ public class SetFeatureColorAction extends Action {
 			featureModel;
 	}
 
+	@Override
 	public void run() {
 		FeatureColor selectedColor =
 			null;
-		Shell shell =
+		final Shell shell =
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		List<IFeature> features =
+		final List<IFeature> features =
 			new ArrayList<>(featureList);
 
 		if (!features.isEmpty()) {
 			if (featureModel != null) {
 				// only allow coloration if the active profile is not the default profile
 				if (FeatureColorManager.isDefault(featureModel)) {
-					Wizard colorSchemeWizard =
+					final Wizard colorSchemeWizard =
 						new ColorSchemeWizard(featureModel);
 
-					WizardDialog dialog =
+					final WizardDialog dialog =
 						new WizardDialog(shell, colorSchemeWizard);
 					dialog.create();
 
-					int dialogExitCode =
+					final int dialogExitCode =
 						dialog.open();
-					if (dialogExitCode == Dialog.CANCEL) {
+					if (dialogExitCode == Window.CANCEL) {
 						return;
-					} else if (dialogExitCode == Dialog.OK
+					} else if ((dialogExitCode == Window.OK)
 						&& FeatureColorManager.getCurrentColorScheme(featureModel).isDefault()) {
 						MessageDialog.openError(shell, StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED,
 								StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG);
@@ -241,13 +245,13 @@ public class SetFeatureColorAction extends Action {
 
 			// If the color of only one object should be changed, its color is selected in the dialog initially.
 			if (features.size() == 1) {
-				IFeature selectedFeature =
+				final IFeature selectedFeature =
 					features.get(0);
 				selectedColor =
 					FeatureColorManager.getColor(selectedFeature);
 			}
 
-			SetFeatureColorDialog dialog =
+			final SetFeatureColorDialog dialog =
 				new SetFeatureColorDialog(shell, features, selectedColor, undoRedoEnabled);
 
 			// inform ui to update
@@ -257,7 +261,7 @@ public class SetFeatureColorAction extends Action {
 				try {
 					project.touch(null);
 					project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			}

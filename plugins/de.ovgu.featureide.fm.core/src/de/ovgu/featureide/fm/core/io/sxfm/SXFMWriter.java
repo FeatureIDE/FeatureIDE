@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -62,7 +62,7 @@ import de.ovgu.featureide.fm.core.io.AbstractObjectWriter;
 
 /**
  * Prints feature models in the SXFM format.
- * 
+ *
  * @author Fabian Wielgorz
  */
 @Deprecated
@@ -80,11 +80,11 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 			"",
 			"" };
 
-	private IFeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	/**
 	 * Creates a new writer and sets the feature model to write out.
-	 * 
+	 *
 	 * @param featureModel the structure to write
 	 */
 	public SXFMWriter(de.ovgu.featureide.fm.core.FeatureModel featureModel) {
@@ -93,9 +93,10 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 		setObject(featureModel);
 	}
 
+	@Override
 	public String writeToString() {
 		// Create Empty DOM Document
-		DocumentBuilderFactory dbf =
+		final DocumentBuilderFactory dbf =
 			DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
@@ -107,10 +108,10 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 		try {
 			db =
 				dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException pce) {
+		} catch (final ParserConfigurationException pce) {
 			Logger.logError(pce);
 		}
-		Document doc =
+		final Document doc =
 			db.newDocument();
 		// Create the Xml Representation
 		createXmlDoc(doc);
@@ -121,21 +122,21 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 		try {
 			transfo =
 				TransformerFactory.newInstance().newTransformer();
-		} catch (TransformerConfigurationException e) {
+		} catch (final TransformerConfigurationException e) {
 			Logger.logError(e);
-		} catch (TransformerFactoryConfigurationError e) {
+		} catch (final TransformerFactoryConfigurationError e) {
 			Logger.logError(e);
 		}
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
 		transfo.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, YES);
-		StreamResult result =
+		final StreamResult result =
 			new StreamResult(new StringWriter());
-		DOMSource source =
+		final DOMSource source =
 			new DOMSource(doc);
 		try {
 			transfo.transform(source, result);
-		} catch (TransformerException e) {
+		} catch (final TransformerException e) {
 			Logger.logError(e);
 		}
 		return result.getWriter().toString();
@@ -143,15 +144,15 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 
 	/**
 	 * Creates the DOM Document Representation from the feature model fmodel by using createXmlDocRec
-	 * 
+	 *
 	 * @param doc Document where the feature model is put
 	 */
 	private void createXmlDoc(Document doc) {
-		Element elem =
+		final Element elem =
 			doc.createElement("feature_model");
 		elem.setAttribute("name", "FeatureIDE model");
 		doc.appendChild(elem);
-		Node featTree =
+		final Node featTree =
 			doc.createElement("feature_tree");
 		elem.appendChild(featTree);
 		featTree.appendChild(doc.createTextNode("\n"));
@@ -161,7 +162,7 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 
 	/**
 	 * Creates the DOM Document Representation from the feature model fmodel by recursively building the Nodes
-	 * 
+	 *
 	 * @param doc Document where the feature model is put
 	 * @param nod Current Node in the Document Tree
 	 * @param feat Current Feature in the feature model Tree
@@ -174,9 +175,10 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 		LinkedList<IFeature> children;
 		boolean nextAndMode =
 			false;
-		if (feat == null)
+		if (feat == null) {
 			return;
-		String fName =
+		}
+		final String fName =
 			feat.getName();
 		if (feat.getStructure().isRoot()) {
 			textNode =
@@ -217,8 +219,9 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 		nod.appendChild(textNode);
 		children =
 			new LinkedList<>(Functional.toList(FeatureUtils.convertToFeatureList(feat.getStructure().getChildren())));
-		if (children.isEmpty())
+		if (children.isEmpty()) {
 			return;
+		}
 		if (feat.getStructure().isAnd()) {
 			nextAndMode =
 				true;
@@ -245,11 +248,12 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 					+ "\t\t";
 			nextAndMode =
 				false;
-		} else
+		} else {
 			throw new IllegalStateException(CANT_DETERMINE
 				+ CONNECTIONTYPE_OF_ROOTFEATURE);
+		}
 
-		Iterator<IFeature> i =
+		final Iterator<IFeature> i =
 			children.iterator();
 		while (i.hasNext()) {
 			createXmlDocRec(doc, nod, i.next(), nextAndMode, newIndent);
@@ -258,34 +262,35 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 
 	/**
 	 * Inserts the tags concerning propositional constraints into the DOM document representation
-	 * 
+	 *
 	 * @param doc
 	 * @param FeatMod Parent node for the propositional nodes
 	 */
 	private void createPropositionalConstraints(Document doc, Node FeatMod) {
 		// add a node for constraints in any case
-		Node propConstr =
+		final Node propConstr =
 			doc.createElement("constraints");
 		FeatMod.appendChild(propConstr);
-		Node newNode =
+		final Node newNode =
 			doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
-		if (featureModel.getConstraints().isEmpty())
+		if (featureModel.getConstraints().isEmpty()) {
 			return;
+		}
 		// as before
 		int i =
 			1;
-		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(featureModel.getConstraints())) {
+		for (final org.prop4j.Node node : FeatureUtils.getPropositionalNodes(featureModel.getConstraints())) {
 			// avoid use of parenthesis from the beginning
 			// org.prop4j.Node cnf = node.clone().toCNF();
 
-			org.prop4j.Node cnf =
+			final org.prop4j.Node cnf =
 				node.toCNF();
 
 			final ArrayList<org.prop4j.Node> literalList =
 				new ArrayList<>();
 			if (cnf instanceof And) {
-				for (org.prop4j.Node child : cnf.getChildren()) {
+				for (final org.prop4j.Node child : cnf.getChildren()) {
 					if (child instanceof Or) {
 						literalList.addAll(Arrays.asList(child.getChildren()));
 					} else {
@@ -302,7 +307,7 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 				new HashSet<>(literalList.size());
 			boolean invalid =
 				false;
-			for (org.prop4j.Node literal : literalList) {
+			for (final org.prop4j.Node literal : literalList) {
 				final Literal negativeliteral =
 					((Literal) literal).clone();
 				negativeliteral.flip();
@@ -317,7 +322,7 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 
 			if (!invalid) {
 				if (cnf instanceof And) {
-					for (org.prop4j.Node child : cnf.getChildren()) {
+					for (final org.prop4j.Node child : cnf.getChildren()) {
 						i =
 							createConstraint(doc, propConstr, i, child);
 					}
@@ -362,7 +367,7 @@ public class SXFMWriter extends AbstractObjectWriter<FeatureModel> {
 	}
 
 	public void setFeatureModel(FeatureModel featureModel) {
-		this.object =
+		object =
 			featureModel;
 	}
 

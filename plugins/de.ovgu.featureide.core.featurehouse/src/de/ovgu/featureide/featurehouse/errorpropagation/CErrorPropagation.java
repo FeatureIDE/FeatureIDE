@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,7 +31,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
 /**
  * Propagates errors for <code>FeatureHouse</code> C files.
- * 
+ *
  * @author Jens Meinicke
  */
 public class CErrorPropagation extends ErrorPropagation {
@@ -48,16 +48,16 @@ public class CErrorPropagation extends ErrorPropagation {
 	 */
 	@Override
 	protected void setElementLines(String content, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
-		for (FSTField f : fields) {
+		for (final FSTField f : fields) {
 			if (f.getBody() == null) {
 				continue;
 			}
-			int i =
+			final int i =
 				content.indexOf(f.getBody());
 			if (i == -1) {
 				continue;
 			}
-			int line =
+			final int line =
 				countLines(content.substring(0, i));
 			f.setComposedLine(line);
 		}
@@ -79,7 +79,7 @@ public class CErrorPropagation extends ErrorPropagation {
 				content.replaceAll(" \n", "\n");
 		}
 
-		for (FSTMethod m : methods) {
+		for (final FSTMethod m : methods) {
 			if (m.getBody() == null) {
 				continue;
 			}
@@ -138,7 +138,7 @@ public class CErrorPropagation extends ErrorPropagation {
 					content.indexOf(body);
 			}
 			if (i != -1) {
-				int line =
+				final int line =
 					countLines(content.substring(0, i));
 				m.setComposedLine(line);
 			}
@@ -149,7 +149,7 @@ public class CErrorPropagation extends ErrorPropagation {
 	protected boolean propagateMarker(IMarker m) {
 		try {
 			return !(TASK.equals(m.getType()));
-		} catch (CoreException e) {}
+		} catch (final CoreException e) {}
 		return super.propagateMarker(m);
 	}
 

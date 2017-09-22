@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -72,7 +72,7 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace the corresponding methods in {@link IFeatureModel}
- * 
+ *
  * @author Soenke Holthusen
  * @author Florian Proksch
  * @author Stefan Krueger
@@ -186,7 +186,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns the value calculated during the last call of updateFeatureModel().
-	 * 
+	 *
 	 * @return cached value
 	 */
 	public boolean valid() {
@@ -203,7 +203,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * Returns the feature dependencies of the feature model. If the has model changed call {@link FeatureModelAnalyzer#setDependencies()} to calculate current
 	 * dependencies.
-	 * 
+	 *
 	 * @return
 	 */
 	public FeatureDependencies getDependencies() {
@@ -216,7 +216,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Calculates new dependencies.
-	 * 
+	 *
 	 * @return
 	 */
 	public void setDependencies() {
@@ -230,12 +230,12 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * <p> Returns whether the conjunction of A always implies the disjunction of B in the current feature model. </p>
-	 * 
+	 *
 	 * <p> In other words, the following satisfiability query is checked: <pre>TAUT(FM &rArr; ((&and;<sub>a&in;A</sub> a) &rArr; (&or;<sub>b&in;B</sub>
 	 * b)))</pre> </p>
-	 * 
+	 *
 	 * <p> Note that this formula is always true if B is empty. </p>
-	 * 
+	 *
 	 * @param a set of features that form a conjunction
 	 * @param b set of features that form a disjunction
 	 * @return whether the conjunction of A always implies the disjunction of B in the current feature model
@@ -267,15 +267,16 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public boolean checkIfFeatureCombinationNotPossible(IFeature a, Collection<IFeature> b) throws TimeoutException {
-		if (b.isEmpty())
+		if (b.isEmpty()) {
 			return true;
+		}
 
 		/*
 		 * -SAT(FM & A & B1) | ... | -SAT(FM & A & Bn)
 		 */
 		final SatSolver solver =
 			new SatSolver(getCnf(), 1000);
-		for (IFeature f : b) {
+		for (final IFeature f : b) {
 			final Node featureCombination =
 				new And(
 						NodeCreator.getVariable(a, fm),
@@ -289,14 +290,14 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * checks some condition against the feature model. use only if you know what you are doing!
-	 * 
+	 *
 	 * @return
 	 * @throws TimeoutException
 	 */
 	public boolean checkCondition(Node condition) {
 		try {
 			return isImpliedTautology(condition);
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			Logger.logError(e);
 			return false;
 		}
@@ -304,9 +305,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * <p> Returns whether the given condition is always implied by the feature model. </p>
-	 * 
+	 *
 	 * <p> In other words, the following satisfiability query is checked: <pre>TAUT(FM &rArr; C)</pre> </p>
-	 * 
+	 *
 	 * @param condition implied condition
 	 * @return whether the given condition is always implied by the feature model
 	 * @throws TimeoutException
@@ -320,57 +321,60 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Checks whether the given featureSets are mutually exclusive in the given context and for the current feature model.
-	 * 
+	 *
 	 * In detail it is checked whether FM => (context => (at most one of the featureSets are present)) is a tautology.
-	 * 
+	 *
 	 * Here is an example for a truth table of AT_MOST_ONE_THE_FEATURESETS_ARE_PRESENT for three feature sets A, B and C:
-	 * 
+	 *
 	 * A B C result ------------------------ T T T F T T F F T F T F T F F T F T T F F T F T F F T T F F F T
-	 * 
+	 *
 	 * If you want to check XOR(featureSet_1, ..., featureSet_n) you can call areMutualExclusive() && !mayBeMissing().
-	 * 
+	 *
 	 * @param context context in which everything is checked
 	 * @param featureSets list of feature sets that are checked to be mutually exclusive in the given context and for the current feature model
-	 * 
+	 *
 	 * @return true, if the feature sets are mutually exclusive || false, otherwise
 	 * @throws TimeoutException
 	 */
 	@Deprecated
 	public boolean areMutualExclusive(Collection<IFeature> context, Collection<Set<IFeature>> featureSets) throws TimeoutException {
 		if ((featureSets == null)
-			|| (featureSets.size() < 2))
+			|| (featureSets.size() < 2)) {
 			return true;
+		}
 
-		ArrayList<Node> conjunctions =
+		final ArrayList<Node> conjunctions =
 			new ArrayList<Node>(featureSets.size());
-		for (Collection<IFeature> features : featureSets) {
+		for (final Collection<IFeature> features : featureSets) {
 			if ((features != null)
-				&& !features.isEmpty())
+				&& !features.isEmpty()) {
 				conjunctions.add(conjunct(features));
-			else
+			} else {
 				// If one feature set is empty (i.e. the code-fragment is always
 				// present) than it cannot be
 				// mutually exclusive to the other ones.
 				return false;
+			}
 		}
 
 		// We build the conjunctive normal form of the formula to check
-		Collection<Object> forOr =
+		final Collection<Object> forOr =
 			new LinkedList<Object>();
-		Collection<Object> allNot =
+		final Collection<Object> allNot =
 			new LinkedList<Object>();
 		for (int i =
 			0; i < conjunctions.size(); ++i) {
 			allNot.add(new Not(conjunctions.get(i).clone()));
 
-			Collection<Object> forAnd =
+			final Collection<Object> forAnd =
 				new LinkedList<Object>();
 			for (int j =
 				0; j < conjunctions.size(); ++j) {
-				if (j == i)
+				if (j == i) {
 					forAnd.add(conjunctions.get(j).clone());
-				else
+				} else {
 					forAnd.add(new Not(conjunctions.get(j).clone()));
+				}
 			}
 			forOr.add(new And(forAnd));
 		}
@@ -379,9 +383,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 		Node condition =
 			new Or(forOr);
 		if ((context != null)
-			&& !context.isEmpty())
+			&& !context.isEmpty()) {
 			condition =
 				new Implies(conjunct(context), condition);
+		}
 
 		return isImpliedTautology(condition);
 	}
@@ -389,60 +394,64 @@ public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * Checks whether there exists a set of features that is valid within the feature model and the given context, so that none of the given feature sets are
 	 * present, i.e. evaluate to true.
-	 * 
+	 *
 	 * In detail it is checked whether there exists a set F of features so that eval(FM, F) AND eval(context, F) AND NOT(eval(featureSet_1, F)) AND ... AND
 	 * NOT(eval(featureSet_n, F)) is true.
-	 * 
+	 *
 	 * If you want to check XOR(featureSet_1, ..., featureSet_n) you can call areMutualExclusive() && !mayBeMissing().
-	 * 
+	 *
 	 * @param context context in which everything is checked
 	 * @param featureSets list of feature sets
-	 * 
+	 *
 	 * @return true, if there exists such a set of features, i.e. if the code-fragment may be missing || false, otherwise
 	 * @throws TimeoutException
 	 */
 	@Deprecated
 	public boolean mayBeMissing(Collection<IFeature> context, Collection<Set<IFeature>> featureSets) throws TimeoutException {
 		if ((featureSets == null)
-			|| featureSets.isEmpty())
+			|| featureSets.isEmpty()) {
 			return false;
+		}
 
-		Collection<Object> forAnd =
+		final Collection<Object> forAnd =
 			new LinkedList<Object>();
 
-		for (Collection<IFeature> features : featureSets) {
+		for (final Collection<IFeature> features : featureSets) {
 			if ((features != null)
-				&& !features.isEmpty())
+				&& !features.isEmpty()) {
 				forAnd.add(new Not(conjunct(features)));
-			else
+			} else {
 				return false;
+			}
 		}
 
 		Node condition =
 			new And(forAnd);
 		if ((context != null)
-			&& !context.isEmpty())
+			&& !context.isEmpty()) {
 			condition =
 				new And(conjunct(context), condition);
+		}
 
 		return new SatSolver(getCnf(), 1000).isSatisfiable(condition);
 	}
 
 	/**
 	 * Checks whether there exists a set of features that is valid within the feature model, so that all given features are present.
-	 * 
+	 *
 	 * In detail it is checked whether there exists a set F of features so that eval(FM, F) AND eval(feature_1, F) AND eval(feature_n, F) is true.
-	 * 
+	 *
 	 * @param features
-	 * 
+	 *
 	 * @return true if there exists such a set of features || false, otherwise
 	 * @throws TimeoutException
 	 */
 	@Deprecated
 	public boolean exists(Collection<IFeature> features) throws TimeoutException {
-		if (features == null
-			|| features.isEmpty())
+		if ((features == null)
+			|| features.isEmpty()) {
 			return true;
+		}
 		return new SatSolver(getCnf(), 1000).isSatisfiable(conjunct(features));
 	}
 
@@ -460,13 +469,14 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	@Deprecated
 	public Node disjunct(Collection<IFeature> b) {
-		Iterator<IFeature> iterator =
+		final Iterator<IFeature> iterator =
 			b.iterator();
 		Node result =
 			new Literal(NodeCreator.getVariable(iterator.next(), fm));
-		while (iterator.hasNext())
+		while (iterator.hasNext()) {
 			result =
 				new Or(result, new Literal(NodeCreator.getVariable(iterator.next(), fm)));
+		}
 
 		return result;
 	}
@@ -474,7 +484,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * Returns the list of features that occur in all variants, where one of the given features is selected. If the given list of features is empty, this method
 	 * will calculate the features that are present in all variants specified by the feature model.
-	 * 
+	 *
 	 * @param timeout in milliseconds
 	 * @param selectedFeatures a list of feature names for which
 	 * @return a list of features that is common to all variants
@@ -491,7 +501,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			new ArrayList<>();
 		final SatSolver solver =
 			new SatSolver(formula, timeout);
-		for (Literal literal : solver.knownValues(SatSolver.ValueType.TRUE)) {
+		for (final Literal literal : solver.knownValues(SatSolver.ValueType.TRUE)) {
 			common.add(literal.var.toString());
 		}
 		return common;
@@ -506,7 +516,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			new ArrayList<>();
 		deadFeatures.clear();
 
-		for (Literal e : solver.knownValues(SatSolver.ValueType.FALSE)) {
+		for (final Literal e : solver.knownValues(SatSolver.ValueType.FALSE)) {
 			final String var =
 				e.var.toString();
 			if (!FALSE.equals(var)
@@ -568,7 +578,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		final SatSolver solver =
 			new SatSolver(formula, timeout, false);
 
-		for (Literal literal : solver.knownValues(vt)) {
+		for (final Literal literal : solver.knownValues(vt)) {
 			final String var =
 				literal.var.toString();
 			if (!FALSE.equals(var)
@@ -605,11 +615,11 @@ public class FeatureModelAnalyzer implements IEventListener {
 		final SatSolver solver =
 			new SatSolver(getCnf(), 1000, false);
 
-		for (List<Literal> literalList : solver.atomicSets()) {
+		for (final List<Literal> literalList : solver.atomicSets()) {
 			final List<IFeature> setList =
 				new ArrayList<>();
 			result.add(setList);
-			for (Literal literal : literalList) {
+			for (final Literal literal : literalList) {
 				final String var =
 					literal.var.toString();
 				if (!FALSE.equals(var)
@@ -708,7 +718,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Calculations for indeterminate hidden features
-	 * 
+	 *
 	 * @param changedAttributes
 	 */
 	public void calculateHidden(Map<Object, Object> changedAttributes) {
@@ -722,24 +732,24 @@ public class FeatureModelAnalyzer implements IEventListener {
 		 */
 		final IFeatureModelFactory factory =
 			FMFactoryManager.getFactory(fm);
-		Collection<IFeature> list =
+		final Collection<IFeature> list =
 			new LinkedList<IFeature>();
-		Collection<IFeature> hiddenFeatures =
+		final Collection<IFeature> hiddenFeatures =
 			getHiddenFeatures();
-		for (IFeature feature : hiddenFeatures) {
-			for (IConstraint constraint : feature.getStructure().getRelevantConstraints()) {
-				Node node =
+		for (final IFeature feature : hiddenFeatures) {
+			for (final IConstraint constraint : feature.getStructure().getRelevantConstraints()) {
+				final Node node =
 					constraint.getNode();
 				if (node instanceof Equals) {
-					Node[] children =
+					final Node[] children =
 						node.getChildren();
-					Node leftChild =
+					final Node leftChild =
 						children[0];
-					Node rightChild =
+					final Node rightChild =
 						children[1];
-					if (leftChild instanceof Literal
+					if ((leftChild instanceof Literal)
 						&& ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint rightConstraint =
+						final IConstraint rightConstraint =
 							factory.createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
@@ -747,9 +757,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 							break;
 						}
 					}
-					if (rightChild instanceof Literal
+					if ((rightChild instanceof Literal)
 						&& ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint leftConstraint =
+						final IConstraint leftConstraint =
 							factory.createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
@@ -766,24 +776,24 @@ public class FeatureModelAnalyzer implements IEventListener {
 		 * indeterminate. A node is therefore not marked indeterminate if it either - has a non-hidden Node in its atomic set defining its state or - if a Node
 		 * of its atomic set is determined by a constraint of the above form.
 		 */
-		FeatureDependencies featureDependencies =
+		final FeatureDependencies featureDependencies =
 			new FeatureDependencies(fm, false);
 		beginTask(fm.getConstraintCount()
 			+ hiddenFeatures.size());
-		for (IFeature feature : hiddenFeatures) {
+		for (final IFeature feature : hiddenFeatures) {
 			if (canceled()) {
 				return;
 			}
 			monitor.setTaskName(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR
 				+ feature.getName());
 			if (!list.contains(feature)) {
-				Collection<IFeature> set =
+				final Collection<IFeature> set =
 					featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden =
 					false;
-				for (IFeature f : set) {
-					if (!f.getStructure().isHidden()
-						&& !f.getStructure().hasHiddenParent()
+				for (final IFeature f : set) {
+					if ((!f.getStructure().isHidden()
+						&& !f.getStructure().hasHiddenParent())
 						|| list.contains(f)) {
 						if (featureDependencies.isAlways(f, feature)) {
 							noHidden =
@@ -805,13 +815,13 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Gets all hidden features their children
-	 * 
+	 *
 	 * @return
 	 */
 	public Collection<IFeature> getHiddenFeatures() {
-		Collection<IFeature> hiddenFeatures =
+		final Collection<IFeature> hiddenFeatures =
 			new LinkedList<IFeature>();
-		for (IFeature f : fm.getFeatures()) {
+		for (final IFeature f : fm.getFeatures()) {
 			if (f.getStructure().isHidden()
 				|| f.getStructure().hasHiddenParent()) {
 				hiddenFeatures.add(f);
@@ -830,14 +840,14 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 		final SatSolver solver =
 			new SatSolver(getCnf(), 1000);
-		for (IFeature feature : fmFalseOptionals) {
+		for (final IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure =
 				feature.getStructure();
 			if (!FeatureUtils.getRoot(fm).getName().equals(feature.getName())) { // this might be indeed the case within the analysis for subtree dependencies
 				final IFeature parent =
 					FeatureUtils.getParent(feature);
 				if (!structure.isMandatory()
-					&& parent != null
+					&& (parent != null)
 					&& solver.isImplied(new Literal(parent.getName(), false), new Literal(feature.getName()))) {
 					falseOptionalFeatures.add(feature);
 				}
@@ -849,16 +859,18 @@ public class FeatureModelAnalyzer implements IEventListener {
 	public int countConcreteFeatures() {
 		int number =
 			0;
-		for (IFeature feature : fm.getFeatures())
-			if (feature.getStructure().isConcrete())
+		for (final IFeature feature : fm.getFeatures()) {
+			if (feature.getStructure().isConcrete()) {
 				number++;
+			}
+		}
 		return number;
 	}
 
 	public int countHiddenFeatures() {
 		int number =
 			0;
-		for (IFeature feature : fm.getFeatures()) {
+		for (final IFeature feature : fm.getFeatures()) {
 			final IFeatureStructure structure =
 				feature.getStructure();
 			if (structure.isHidden()
@@ -872,9 +884,11 @@ public class FeatureModelAnalyzer implements IEventListener {
 	public int countTerminalFeatures() {
 		int number =
 			0;
-		for (IFeature feature : fm.getFeatures())
-			if (!feature.getStructure().hasChildren())
+		for (final IFeature feature : fm.getFeatures()) {
+			if (!feature.getStructure().hasChildren()) {
 				number++;
+			}
+		}
 		return number;
 	}
 
@@ -932,10 +946,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * <p> Returns the feature model as a formula in conjunctive normal form. Creates it first if necessary. </p>
-	 * 
+	 *
 	 * <p> As this is a cached mutable object, care must be taken not to modify the returned object or any of its children. If changes are necessary, the
 	 * returned object must be cloned first. </p>
-	 * 
+	 *
 	 * @return the feature model as a formula in conjunctive normal form; not null
 	 * @see {@link #getNode()} if the formula does not have to be in conjunctive normal form
 	 */
@@ -949,7 +963,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Creates the feature model as a formula in conjunctive normal form.
-	 * 
+	 *
 	 * @return the feature model as a formula in conjunctive normal form; not null
 	 */
 	private Node createCnf() {
@@ -958,7 +972,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the given feature model element is defect.
-	 * 
+	 *
 	 * @param modelElement potentially defect feature model element; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
@@ -968,7 +982,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the given feature model element is defect.
-	 * 
+	 *
 	 * @param fm feature model containing the feature model element; not null
 	 * @param modelElement potentially defect feature model element; not null
 	 * @return an explanation; null if it cannot be explained
@@ -1010,7 +1024,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the feature model is void. That is the same explanation for why its root feature is dead.
-	 * 
+	 *
 	 * @return an explanation; null if it cannot be explained
 	 */
 	public Explanation getVoidFeatureModelExplanation() {
@@ -1019,7 +1033,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the given feature model is void. That is the same explanation for why its root feature is dead.
-	 * 
+	 *
 	 * @param fm potentially void feature model; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
@@ -1029,7 +1043,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the given feature is dead.
-	 * 
+	 *
 	 * @param feature potentially dead feature; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
@@ -1039,7 +1053,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Adds an explanation why the given feature is dead.
-	 * 
+	 *
 	 * @param fm feature model containing the feature; not null
 	 * @param feature potentially dead feature; not null
 	 * @return an explanation; null if it cannot be explained
@@ -1053,7 +1067,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Adds an explanation why the given feature is dead.
-	 * 
+	 *
 	 * @param fm feature model containing the feature; not null
 	 * @param feature potentially dead feature; not null
 	 */
@@ -1073,7 +1087,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the given feature is false-optional.
-	 * 
+	 *
 	 * @param feature potentially false-optional feature; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
@@ -1083,7 +1097,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the given feature is false-optional.
-	 * 
+	 *
 	 * @param fm feature model containing the feature; not null
 	 * @param feature potentially false-optional feature; not null
 	 * @return an explanation; null if it cannot be explained
@@ -1097,7 +1111,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Adds an explanation why the given feature is false-optional.
-	 * 
+	 *
 	 * @param fm feature model containing the feature; not null
 	 * @param feature potentially false-optional feature; not null
 	 */
@@ -1117,7 +1131,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the given constraint is redundant.
-	 * 
+	 *
 	 * @param constraint potentially redundant constraint; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
@@ -1127,7 +1141,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Returns an explanation why the given constraint is redundant.
-	 * 
+	 *
 	 * @param constraint potentially redundant constraint; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
@@ -1140,10 +1154,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * <p> Adds an explanation why the given constraint is redundant. </p>
-	 * 
+	 *
 	 * <p> Uses the given feature model, which may differ from the default feature model stored in this instance. This is for example the case when explaining
 	 * implicit constraints in subtree models. </p>
-	 * 
+	 *
 	 * @param fm feature model containing the constraint; not null
 	 * @param constraint potentially redundant constraint; not null
 	 */

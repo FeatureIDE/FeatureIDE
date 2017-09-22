@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,7 +47,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 /**
  * TreeNode who stores the number of classes, roles, fields and methods of a given {@link FSTModel}.<br> This node should only be used for a feature oriented
  * project.
- * 
+ *
  * @author Schleicher Miro
  */
 public class StatisticsProgramSizeNew extends LazyParent {
@@ -101,7 +101,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int numberOfUniMethods =
 			0;
 
-		for (FSTClass fstClass : fstModel.getClasses()) {
+		for (final FSTClass fstClass : fstModel.getClasses()) {
 			final List<List<FSTClassFragment>> allFrag =
 				fstClass.getAllFSTFragments();
 			final HashSet<FSTMethod> methHelper =
@@ -109,11 +109,11 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			final HashSet<FSTField> fieldHelper =
 				new HashSet<FSTField>();
 
-			for (List<FSTClassFragment> linkedList : allFrag) {
+			for (final List<FSTClassFragment> linkedList : allFrag) {
 				numberOfRoles +=
 					linkedList.size();
 
-				for (FSTClassFragment fstClassFragment : linkedList) {
+				for (final FSTClassFragment fstClassFragment : linkedList) {
 					methHelper.addAll(fstClassFragment.getMethods());
 					fieldHelper.addAll(fstClassFragment.getFields());
 
@@ -135,7 +135,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
 			try {
 				checkLOC();
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
 		}
@@ -170,7 +170,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {
-		for (String extension : ignoredExtensions) {
+		for (final String extension : ignoredExtensions) {
 			if (extension.equals(fileExtension)) {
 				return true;
 			}
@@ -242,13 +242,13 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							numberOfLinesInThisFile =
 								countLOC(file, oneLineComment, moreLineStart, moreLineEnd/* , nested, nestedCounter */);
 
-						} catch (FileNotFoundException e) {
+						} catch (final FileNotFoundException e) {
 							e.printStackTrace();
-						} catch (IOException e) {
+						} catch (final IOException e) {
 							e.printStackTrace();
 						}
 
-						String feat =
+						final String feat =
 							(file.getFullPath().toString().substring(file.getFullPath().toString().indexOf(FEATURES)
 								+ 9, file.getFullPath()
 										.toString().length()
@@ -281,9 +281,9 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	}
 
 	public static int countLOC(final IFile file, String oneLineComment, String moreLineStart, String moreLineEnd) throws FileNotFoundException, IOException {
-		FileReader fr =
+		final FileReader fr =
 			new FileReader(file.getLocation().toString());
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(fr);
 		return countLineNumber(oneLineComment, moreLineStart, moreLineEnd, br);
 	}
@@ -304,22 +304,25 @@ public class StatisticsProgramSizeNew extends LazyParent {
 				if (s.startsWith(moreLineStart)) {
 					isInComment =
 						true;
-				} else
+				} else {
 					numberOfLinesInThisFile++;
+				}
 			}
 
 			if (s.contains(moreLineEnd)) {
 
 				isInComment =
 					false;
-				if (!s.endsWith(moreLineEnd))
+				if (!s.endsWith(moreLineEnd)) {
 					numberOfLinesInThisFile++;
+				}
 			}
 
 			if (s.contains(moreLineStart)
-				&& !s.startsWith("/*"))
+				&& !s.startsWith("/*")) {
 				isInComment =
 					true;
+			}
 		}
 		br.close();
 		return numberOfLinesInThisFile;

@@ -15,7 +15,7 @@ class ViewSorter extends ViewerSorter {
 		DESCENDING;
 
 	public ViewSorter() {
-		this.propertyIndex =
+		propertyIndex =
 			0;
 		direction =
 			DESCENDING;
@@ -28,14 +28,14 @@ class ViewSorter extends ViewerSorter {
 	}
 
 	public void setColumn(int column) {
-		if (column == this.propertyIndex) {
+		if (column == propertyIndex) {
 			// Same column as last sort; toggle the direction
 			direction =
 				1
 					- direction;
 		} else {
 			// New column; do an ascending sort
-			this.propertyIndex =
+			propertyIndex =
 				column;
 			direction =
 				DESCENDING;
@@ -44,9 +44,9 @@ class ViewSorter extends ViewerSorter {
 
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		InvalidProductViewLog log1 =
+		final InvalidProductViewLog log1 =
 			(InvalidProductViewLog) e1;
-		InvalidProductViewLog log2 =
+		final InvalidProductViewLog log2 =
 			(InvalidProductViewLog) e2;
 		int rc =
 			0;

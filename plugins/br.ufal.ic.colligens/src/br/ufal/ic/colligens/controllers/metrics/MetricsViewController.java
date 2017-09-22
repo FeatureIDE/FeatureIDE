@@ -21,7 +21,7 @@ public class MetricsViewController extends ViewController {
 
 	private TableViewer tableViewer;
 	private MetricsView view;
-	private ViewContentProvider viewContentProvider;
+	private final ViewContentProvider viewContentProvider;
 
 	private static MetricsViewController INSTANCE;
 
@@ -48,6 +48,7 @@ public class MetricsViewController extends ViewController {
 			tableViewer;
 	}
 
+	@Override
 	public MetricsView getView() {
 		return view;
 	}
@@ -77,8 +78,8 @@ public class MetricsViewController extends ViewController {
 		final Table table =
 			tableViewer.getTable();
 
-		tableViewer.setContentProvider(this.viewContentProvider);
-		tableViewer.setInput(this.view.getViewSite());
+		tableViewer.setContentProvider(viewContentProvider);
+		tableViewer.setInput(view.getViewSite());
 		tableViewer.setLabelProvider(new ViewLabelProvider());
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
@@ -89,11 +90,11 @@ public class MetricsViewController extends ViewController {
 	}
 
 	public void createColumns(Composite parent) {
-		String[] titles =
+		final String[] titles =
 			{
 				METRICS,
 				VALUE };
-		int[] bounds =
+		final int[] bounds =
 			{
 				300,
 				400 };

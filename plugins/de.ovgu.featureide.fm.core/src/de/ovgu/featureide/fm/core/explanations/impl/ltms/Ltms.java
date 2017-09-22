@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
  * <p> The class LTMS (logic truth maintenance system) records proofs for implications and constructs explanations. Uses BCP (boolean constraint propagation)
  * for managing logical implications. BCP expects two parameters: initial truth values (premises) and a propositional formula in CNF (conjunctive normal form).
  * </p>
- * 
+ *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  * @see {@link FeatureModelExplanationCreator} for using the LTMS with feature models
@@ -101,7 +101,7 @@ public class Ltms {
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param cnf the conjunctive normal form of the feature model
 	 */
 	public Ltms(Node cnf) {
@@ -140,7 +140,7 @@ public class Ltms {
 
 	/**
 	 * Sets the premises to the given ones.
-	 * 
+	 *
 	 * @param premises premises to set
 	 */
 	public void setPremises(Map<Object, Boolean> premises) {
@@ -157,7 +157,7 @@ public class Ltms {
 
 	/**
 	 * Adds the given variable as a premise with the given truth value. This premise is used later to arrive at the contradiction.
-	 * 
+	 *
 	 * @param variable variable to be added as a premise
 	 * @param value truth value of the variable
 	 */
@@ -167,7 +167,7 @@ public class Ltms {
 
 	/**
 	 * Adds all the given premises.
-	 * 
+	 *
 	 * @param premises premises to add
 	 */
 	public void addPremises(Map<Object, Boolean> premises) {
@@ -178,7 +178,7 @@ public class Ltms {
 	 * Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form. This is done by propagating the truth values until
 	 * a contradiction is found. Then, the proofs for the implications are recalled. This is repeated several times to find multiple explanations, some of which
 	 * might be shorter than others.
-	 * 
+	 *
 	 * @return multiple explanations why the premises lead to a contradiction in the conjunctive normal form
 	 */
 	public List<Set<Integer>> getExplanations() {
@@ -233,7 +233,7 @@ public class Ltms {
 
 	/**
 	 * Returns the unit-open clauses.
-	 * 
+	 *
 	 * @return the unit-open clauses
 	 */
 	private Set<Node> getUnitOpenClauses() {
@@ -253,7 +253,7 @@ public class Ltms {
 
 	/**
 	 * Returns true iff the given clause is unit-open. A CNF clause is unit-open iff one of the contained literals evaluates to unknown and all others to false.
-	 * 
+	 *
 	 * @param cnfClause clause in conjunctive normal form
 	 * @return true iff the given clause is unit-open
 	 */
@@ -264,7 +264,7 @@ public class Ltms {
 	/**
 	 * Returns the unbound literal in the given clause or null if no such literal exists. A literal is unbound iff it evaluates to unknown while all other
 	 * literals in the same CNF clause evaluate to false. Such a literal is critical for the satisfiability of the clause and as such the entire CNF.
-	 * 
+	 *
 	 * @param cnfClause clause in conjunctive normal form
 	 * @return the unbound literal in the given clause or null if no such literal exists
 	 */
@@ -290,7 +290,7 @@ public class Ltms {
 
 	/**
 	 * Returns true iff the conjunctive normal form evaluates to false. A CNF evaluates to false iff any of its clauses evaluates to false.
-	 * 
+	 *
 	 * @return true iff the conjunctive normal form evaluates to false
 	 */
 	private boolean isContradicted() {
@@ -310,7 +310,7 @@ public class Ltms {
 
 	/**
 	 * Returns true iff the given CNF clause evaluates to false. A CNF clause evaluates to false iff all of its literals evaluate to false.
-	 * 
+	 *
 	 * @param cnfClause clause in conjunctive normal form
 	 * @return true iff the given CNF clause evaluates to false
 	 */
@@ -345,7 +345,7 @@ public class Ltms {
 
 	/**
 	 * Sets a variable's reason and antecedents.
-	 * 
+	 *
 	 * @param variable variable to set
 	 * @param cnfClause clause containing the literal
 	 */
@@ -355,7 +355,7 @@ public class Ltms {
 
 	/**
 	 * Returns an explanation why the premises lead to a contradiction.
-	 * 
+	 *
 	 * @return indexes of clauses that serve as an explanation
 	 */
 	private Set<Integer> getContradictionExplanation() {
@@ -399,7 +399,7 @@ public class Ltms {
 
 	/**
 	 * Returns all antecedents of the given variable recursively.
-	 * 
+	 *
 	 * @param literal literal with possible antecedents
 	 * @return all antecedents of the given variable recursively
 	 */
@@ -430,7 +430,7 @@ public class Ltms {
 
 	/**
 	 * Returns the index of the given CNF clause.
-	 * 
+	 *
 	 * @param cnfClause CNF clause to look up
 	 * @return the index of the given CNF clause
 	 * @throws IllegalStateException if the CNF clause is not contained in the CNF

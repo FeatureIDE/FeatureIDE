@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 
 /**
  * Maps a {@link FeatureAttribute} to its name and feature.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FeatureAttributeMap<T> {
@@ -44,13 +44,13 @@ public class FeatureAttributeMap<T> {
 			new HashMap<>((int) (1.5
 				* oldMap.attrs.size()));
 
-		for (Entry<String, Map<String, FeatureAttribute<T>>> mapEntry : oldMap.attrs.entrySet()) {
+		for (final Entry<String, Map<String, FeatureAttribute<T>>> mapEntry : oldMap.attrs.entrySet()) {
 			final Map<String, FeatureAttribute<T>> value =
 				mapEntry.getValue();
 			final Map<String, FeatureAttribute<T>> newFeatureMap =
 				new HashMap<>((int) (1.5
 					* value.size()));
-			for (Entry<String, FeatureAttribute<T>> attributeEntry : value.entrySet()) {
+			for (final Entry<String, FeatureAttribute<T>> attributeEntry : value.entrySet()) {
 				final FeatureAttribute<T> v =
 					attributeEntry.getValue();
 				newFeatureMap.put(attributeEntry.getKey(), new FeatureAttribute<>(v.getAttributeName(), v.getFeatureName(), v.getValue()));
@@ -75,15 +75,17 @@ public class FeatureAttributeMap<T> {
 	}
 
 	public void setAttribute(String featureName, String attributeName, T value) {
-		if (!attrs.containsKey(attributeName))
+		if (!attrs.containsKey(attributeName)) {
 			attrs.put(attributeName, new HashMap<String, FeatureAttribute<T>>());
+		}
 
 		attrs.get(attributeName).put(featureName, new FeatureAttribute<T>(attributeName, featureName, value));
 	}
 
 	public void setAttribute(FeatureAttribute<T> fa) {
-		if (!attrs.containsKey(fa.getAttributeName()))
+		if (!attrs.containsKey(fa.getAttributeName())) {
 			attrs.put(fa.getAttributeName(), new HashMap<String, FeatureAttribute<T>>());
+		}
 
 		attrs.get(fa.getAttributeName()).put(fa.getFeatureName(), fa);
 	}

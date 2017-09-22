@@ -17,7 +17,7 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 	public String getColumnText(Object obj, int index) {
 		switch (index) {
 		case 0:
-			if (obj instanceof FileProxy)
+			if (obj instanceof FileProxy) {
 				return ((FileProxy) obj).getFileName()
 					+ " ("
 					+ ((FileProxy) obj).getLogs().size()
@@ -26,20 +26,26 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 						? ""
 						: "s")
 					+ ")";
-			if (obj instanceof Log)
+			}
+			if (obj instanceof Log) {
 				return ((Log) obj).getMessage();
+			}
 		case 1:
-			if (obj instanceof Log)
+			if (obj instanceof Log) {
 				return ((Log) obj).getFileName();
+			}
 		case 2:
-			if (obj instanceof Log)
+			if (obj instanceof Log) {
 				return ((Log) obj).getPath();
+			}
 		case 3:
-			if (obj instanceof Log)
+			if (obj instanceof Log) {
 				return ((Log) obj).getFeature();
+			}
 		case 4:
-			if (obj instanceof Log)
+			if (obj instanceof Log) {
 				return ((Log) obj).getSeverity();
+			}
 		default:
 			return "";
 		}
@@ -52,13 +58,15 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 			return PlatformUI.getWorkbench().getSharedImages()
 					.getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 		case 1:
-			if (obj instanceof Log)
+			if (obj instanceof Log) {
 				return PlatformUI.getWorkbench().getSharedImages()
 						.getImage(ISharedImages.IMG_OBJ_FILE);
+			}
 		case 2:
-			if (obj instanceof Log)
+			if (obj instanceof Log) {
 				return PlatformUI.getWorkbench().getSharedImages()
 						.getImage(ISharedImages.IMG_OBJ_FOLDER);
+			}
 		default:
 			return null;
 		}

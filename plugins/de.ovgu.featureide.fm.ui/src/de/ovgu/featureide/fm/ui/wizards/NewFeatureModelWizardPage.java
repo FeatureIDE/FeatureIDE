@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * A dialog page for creating a new Feature Model file.
- * 
+ *
  * @author Jens Meinicke
  */
 public class NewFeatureModelWizardPage extends WizardPage {
@@ -65,18 +65,18 @@ public class NewFeatureModelWizardPage extends WizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		GridData gd =
+		final GridData gd =
 			new GridData(GridData.FILL_HORIZONTAL);
-		Composite composite =
+		final Composite composite =
 			new Composite(parent, SWT.NULL);
-		GridLayout layout =
+		final GridLayout layout =
 			new GridLayout();
 		layout.numColumns =
 			3;
 		layout.verticalSpacing =
 			9;
 		composite.setLayout(layout);
-		Label label =
+		final Label label =
 			new Label(composite, SWT.NULL);
 		label.setText("&File name:");
 		fileName =
@@ -89,17 +89,18 @@ public class NewFeatureModelWizardPage extends WizardPage {
 			fileName.setText(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
 		}
 
-		Button browseButton =
+		final Button browseButton =
 			new Button(composite, SWT.NONE);
 		browseButton.setText(BROWSE___);
 		browseButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				String selectedPath =
+				final String selectedPath =
 					openFileDialog();
 				if (selectedPath != null) {
 					fileName.setText(selectedPath);
-					IPath path =
+					final IPath path =
 						new Path(selectedPath);
 					if (path.getFileExtension() == null) {
 						fileName.setText(selectedPath
@@ -111,6 +112,7 @@ public class NewFeatureModelWizardPage extends WizardPage {
 
 		fileName.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				checkFileName();
 			}
@@ -121,9 +123,9 @@ public class NewFeatureModelWizardPage extends WizardPage {
 	}
 
 	protected void checkFileName() {
-		String text =
+		final String text =
 			fileName.getText();
-		IPath path =
+		final IPath path =
 			new Path(text);
 		if (path.isEmpty()) {
 			updateStatus(FILE_NAME_MUST_BE_SPECIFIED_);
@@ -134,9 +136,9 @@ public class NewFeatureModelWizardPage extends WizardPage {
 				+ " is no valid path.");
 			return;
 		}
-		String fileExtension =
+		final String fileExtension =
 			path.getFileExtension();
-		if (fileExtension == null
+		if ((fileExtension == null)
 			|| !fileExtension.equals("xml")) {
 			updateStatus(NEW_MODEL_FILE_MUST_HAVE_XML_AS_FILE_EXTENSION_);
 			return;
@@ -154,7 +156,7 @@ public class NewFeatureModelWizardPage extends WizardPage {
 	}
 
 	private String openFileDialog() {
-		FileDialog dialog =
+		final FileDialog dialog =
 			new FileDialog(getShell(), SWT.MULTI);
 		dialog.setText(NEW_FEATURE_MODEL);
 		dialog.setFilterExtensions(new String[] {

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -50,7 +50,7 @@ import de.ovgu.featureide.ui.mpl.wizards.NewMultiFeatureProjectWizard;
 
 /**
  * A dialog page for the {@link NewMultiFeatureProjectWizard}.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class NewMultiFeatureProjectPage extends AbstractWizardPage {
@@ -67,8 +67,9 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 		setDescription(CREATES_A_MULTI_FEATUREIDE_PROJECT);
 	}
 
+	@Override
 	public void createControl(Composite parent) {
-		Composite container =
+		final Composite container =
 			new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout =
 			new GridLayout();
@@ -77,11 +78,11 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		Group toolGroup =
+		final Group toolGroup =
 			new Group(container, SWT.NONE);
 		toolGroup.setText("Feature Project Selection:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout projGridLayout =
+		final GridLayout projGridLayout =
 			new GridLayout();
 		projGridLayout.numColumns =
 			2;
@@ -89,7 +90,7 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 
 		final Label helloLabel =
 			new Label(toolGroup, SWT.NONE);
-		GridData gridData =
+		final GridData gridData =
 			new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan =
 			2;
@@ -105,14 +106,14 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 
 		projectTable.setHeaderVisible(true);
 		projectTable.setLinesVisible(true);
-		TableColumn column =
+		final TableColumn column =
 			new TableColumn(projectTable, SWT.NONE);
 		column.setText(PROJECTS);
 		column.setResizable(true);
 		column.setMoveable(false);
 
-		for (IFeatureProject p : CorePlugin.getFeatureProjects()) {
-			TableItem item =
+		for (final IFeatureProject p : CorePlugin.getFeatureProjects()) {
+			final TableItem item =
 				new TableItem(projectTable, SWT.NONE);
 			item.setText(p.getProjectName());
 			item.setText(0, p.getProjectName());
@@ -134,7 +135,7 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.detail == SWT.CHECK) {
-					IFeatureProject p =
+					final IFeatureProject p =
 						map.get(e.item);
 					if (sel.contains(p)) {
 						sel.remove(p);

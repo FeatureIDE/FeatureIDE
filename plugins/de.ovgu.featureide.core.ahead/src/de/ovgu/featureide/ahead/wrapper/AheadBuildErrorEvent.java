@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,7 +41,7 @@ import de.ovgu.featureide.ahead.AheadCorePlugin;
 /**
  * The AheadBuildErrorEvent is dispatched when ever a syntax error was found during the compilation step. The Event contains all needed information to set an
  * error marker
- * 
+ *
  * @author Tom Brosch
  * @author Thomas Thuem
  *
@@ -70,7 +70,7 @@ public class AheadBuildErrorEvent {
 	public AheadBuildErrorEvent(IResource source, String message, AheadBuildErrorType type, int line) {
 		this.type =
 			type;
-		this.file =
+		file =
 			source;
 		this.line =
 			line;
@@ -97,7 +97,7 @@ public class AheadBuildErrorEvent {
 			if (file.exists()) {
 				calculateJakLine();
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// if calculation fails the error will be at the old position
 			AheadCorePlugin.getDefault().logError(e);
 		}
@@ -108,24 +108,24 @@ public class AheadBuildErrorEvent {
 	 * @throws IOException
 	 */
 	private void convertToComposedJak() throws CoreException, IOException {
-		IFile javaFile =
-			(IFile) this.file;
-		int javaLine =
-			this.line;
+		final IFile javaFile =
+			(IFile) file;
+		final int javaLine =
+			line;
 
-		String javaName =
+		final String javaName =
 			javaFile.getName();
-		String jakName =
+		final String jakName =
 			javaName.substring(0, javaName.lastIndexOf('.'))
 				+ JAK;
-		IFile composedJakFile =
+		final IFile composedJakFile =
 			((IFolder) javaFile.getParent()).getFile(jakName);
 
 		javaFile.refreshLocal(IResource.DEPTH_ZERO, null);
 
-		this.file =
+		file =
 			composedJakFile;
-		this.line =
+		line =
 			calculateComposedJakLine(javaLine, getString(javaFile));
 	}
 
@@ -146,15 +146,16 @@ public class AheadBuildErrorEvent {
 	public int calculateComposedJakLine(int javaLine, String contentString) {
 		int composedJakLine =
 			javaLine;
-		PosString content =
+		final PosString content =
 			new PosString(contentString);
-		Matcher matcher =
+		final Matcher matcher =
 			inheritedPattern.matcher(content.string);
 		while (matcher.find()) {
 			content.pos =
 				matcher.end(1);
-			if (content.lineNumber() >= javaLine)
+			if (content.lineNumber() >= javaLine) {
 				break;
+			}
 			composedJakLine -=
 				new PosString(matcher.group(1), matcher.end(1)).lineNumber();
 		}
@@ -166,35 +167,35 @@ public class AheadBuildErrorEvent {
 
 	/**
 	 * Calculates the line at the jak source files and searches the right feature
-	 * 
+	 *
 	 * @throws CoreException
 	 * @throws IOException
 	 */
 	private void calculateJakLine() throws CoreException, IOException {
-		IFile composedJakFile =
-			(IFile) this.file;
-		int composedJakLine =
-			this.line;
+		final IFile composedJakFile =
+			(IFile) file;
+		final int composedJakLine =
+			line;
 
 		composedJakFile.refreshLocal(IResource.DEPTH_ZERO, null);
 
-		String contentString =
+		final String contentString =
 			getString(composedJakFile);
-		int line =
+		final int line =
 			setSourceFile(contentString, composedJakLine);
 
 		if (fileName == null) {
 			this.line =
 				lookupImportInAllJakFiles(contentString, matcher);
 		} else {
-			IFile jakFile =
+			final IFile jakFile =
 				getJakFile(fileName);
 			if (jakFile != null) {
 				jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
-				String jakContent =
+				final String jakContent =
 					getString(jakFile);
 
-				this.file =
+				file =
 					jakFile;
 				this.line =
 					setSourceLine(composedJakLine, line, jakContent);
@@ -204,10 +205,10 @@ public class AheadBuildErrorEvent {
 
 	/**
 	 * Initializes {@link AheadBuildErrorEvent#matcher} and {@link AheadBuildErrorEvent#fileName}.
-	 * 
+	 *
 	 */
 	public int setSourceFile(String contentString, int composedJakLine) {
-		PosString content =
+		final PosString content =
 			new PosString(contentString);
 		matcher =
 			jakPattern.matcher(content.string);
@@ -216,10 +217,11 @@ public class AheadBuildErrorEvent {
 		while (matcher.find(content.pos)) {
 			content.pos =
 				matcher.end(1);
-			int newLine =
+			final int newLine =
 				content.lineNumber();
-			if (newLine >= composedJakLine)
+			if (newLine >= composedJakLine) {
 				break;
+			}
 			line =
 				newLine;
 			fileName =
@@ -230,15 +232,15 @@ public class AheadBuildErrorEvent {
 
 	public int setSourceLine(int composedJakLine, int line, String jakContent) {
 		int jakLine =
-			composedJakLine
-				- line
+			(composedJakLine
+				- line)
 				+ 1;
 		try {
 			jakLine +=
 				numberOfImportLines(jakContent);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			AheadCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 
@@ -256,8 +258,9 @@ public class AheadBuildErrorEvent {
 			0;
 		for (int i =
 			0; i < line; i++) {
-			if (b < 0)
+			if (b < 0) {
 				return line;
+			}
 			a =
 				b;
 			b =
@@ -268,19 +271,19 @@ public class AheadBuildErrorEvent {
 			b < 0
 				? composedJakContent.length()
 				: b;
-		String importString =
+		final String importString =
 			composedJakContent.substring(a, b).trim();
 
 		do {
-			IFile jakFile =
+			final IFile jakFile =
 				getJakFile(matcher.group(1));
 			if (jakFile != null) {
-				String text =
+				final String text =
 					getString(jakFile);
-				int pos =
+				final int pos =
 					text.indexOf(importString);
 				if (pos >= 0) {
-					this.file =
+					file =
 						jakFile;
 					return new PosString(text, pos).lineNumber();
 				}
@@ -290,14 +293,15 @@ public class AheadBuildErrorEvent {
 	}
 
 	private IFile getJakFile(String filename) {
-		String relativeFilename =
+		final String relativeFilename =
 			filename;
-		IProject project =
+		final IProject project =
 			file.getProject();
-		IFile newFile =
+		final IFile newFile =
 			project.getFile(relativeFilename.substring(2));
-		if (newFile.exists())
+		if (newFile.exists()) {
 			return newFile;
+		}
 
 //		AheadCorePlugin.getDefault().logWarning(WAS_NOT_ABLE_TO_LOCATE_AN_ERROR_IN_THE_SOURCE_JAK_FILE_ + filename + "'");
 		return null;
@@ -307,17 +311,18 @@ public class AheadBuildErrorEvent {
 		Pattern.compile("(import)\\s[^;\\(\\)\\{\\}\\[\\]]+;");
 
 	private int numberOfImportLines(String contentString) throws CoreException, IOException {
-		PosString content =
+		final PosString content =
 			new PosString(contentString);
 
-		Matcher matcher =
+		final Matcher matcher =
 			importPattern.matcher(content.string);
 		while (matcher.find(content.pos)) {
 			content.pos =
 				matcher.end(1);
 		}
-		if (content.pos <= 0)
+		if (content.pos <= 0) {
 			return 0;
+		}
 
 		return content.lineNumber()
 			- 1;
@@ -349,7 +354,7 @@ public class AheadBuildErrorEvent {
 
 	/**
 	 * Returns a string containing the contents of the given file.
-	 * 
+	 *
 	 * @throws CoreException
 	 * @throws IOException
 	 */
@@ -360,17 +365,17 @@ public class AheadBuildErrorEvent {
 		}
 		Reader in =
 			null;
-		StringBuilder buffer =
+		final StringBuilder buffer =
 			new StringBuilder();
 		try {
-			InputStream contentStream =
+			final InputStream contentStream =
 				file.getContents();
 			in =
 				new InputStreamReader(contentStream, Charset.availableCharsets().get("UTF-8"));
 
-			int chunkSize =
+			final int chunkSize =
 				contentStream.available();
-			char[] readBuffer =
+			final char[] readBuffer =
 				new char[chunkSize];
 
 			int n =

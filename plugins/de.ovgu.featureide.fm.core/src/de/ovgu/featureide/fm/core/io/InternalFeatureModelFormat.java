@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * Writes feature models in an internal, simplified format.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class InternalFeatureModelFormat implements IFeatureModelFormat {
@@ -65,7 +65,7 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel object) {
-		IFeatureStructure root =
+		final IFeatureStructure root =
 			object.getStructure().getRoot();
 		if (root == null) {
 			return "";
@@ -78,7 +78,7 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 
 		writeFeatureGroup(root);
 
-		for (IConstraint constraint : object.getConstraints()) {
+		for (final IConstraint constraint : object.getConstraints()) {
 			sb.append(constraint.getNode().toString(SYMBOLS));
 			sb.append(NEWLINE);
 		}
@@ -90,13 +90,13 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 
 	private void writeFeatureGroup(IFeatureStructure root) {
 		if (root.isAnd()) {
-			for (IFeatureStructure feature : root.getChildren()) {
+			for (final IFeatureStructure feature : root.getChildren()) {
 				writeFeature(feature);
 			}
 		} else if (root.isOr()) {
 			sb.append("o{");
 			sb.append(NEWLINE);
-			for (IFeatureStructure feature : root.getChildren()) {
+			for (final IFeatureStructure feature : root.getChildren()) {
 				writeFeature(feature);
 			}
 			sb.append("}");
@@ -104,7 +104,7 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 		} else if (root.isAlternative()) {
 			sb.append("x{");
 			sb.append(NEWLINE);
-			for (IFeatureStructure f : root.getChildren()) {
+			for (final IFeatureStructure f : root.getChildren()) {
 				writeFeature(f);
 			}
 			sb.append("}");
@@ -117,7 +117,7 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 			sb.append("a ");
 		}
 		if (feature.isMandatory()
-			&& (feature.getParent() == null
+			&& ((feature.getParent() == null)
 				|| feature.getParent().isAnd())) {
 			sb.append("m ");
 		}
@@ -125,10 +125,10 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 		final String description =
 			feature.getFeature().getProperty().getDescription();
 		final boolean hasDescription =
-			description != null
+			(description != null)
 				&& !description.isEmpty();
 
-		if (feature.getChildrenCount() != 0
+		if ((feature.getChildrenCount() != 0)
 			|| hasDescription) {
 			sb.append(" {");
 			sb.append(NEWLINE);

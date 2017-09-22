@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -51,7 +51,7 @@ import de.ovgu.featureide.examples.ExamplePlugin;
 
 /**
  * Handles meta data of a project that is represented in the ExmampleWizard.
- * 
+ *
  * @author Reimar Schroeter
  */
 public class ProjectRecord implements Comparable<ProjectRecord> {
@@ -82,7 +82,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	/**
 	 * Create a record for a project based on the info given in the file.
-	 * 
+	 *
 	 * @param file
 	 */
 	public ProjectRecord(String projectDescriptionRelativePath, String projectName) {
@@ -95,7 +95,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	/**
 	 * Deserialization
-	 * 
+	 *
 	 * @param in
 	 * @throws ClassNotFoundException
 	 * @throws IOException
@@ -124,7 +124,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	public class TreeItem {
 
-		private IContentProvider contProv;
+		private final IContentProvider contProv;
 
 		public TreeItem(IContentProvider contProv) {
 			this.contProv =
@@ -178,7 +178,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 			performAlreadyExistsCheck();
 			performRequirementCheck();
 
-			for (ProjectRecord projectRecord : getSubProjects()) {
+			for (final ProjectRecord projectRecord : getSubProjects()) {
 				if (!projectRecord.init()) {
 					return false;
 				}
@@ -207,12 +207,12 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 			false;
 		warning =
 			"";
-		String[] natures =
+		final String[] natures =
 			projectDescription.getNatureIds();
 		IStatus status =
 			ResourcesPlugin.getWorkspace().validateNatureSet(natures);
 
-		if (natures.length == 1
+		if ((natures.length == 1)
 			&& natures[0].equals("org.eclipse.jdt.core.javanature")) {
 			needsComposer =
 				false;
@@ -228,14 +228,14 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 			warning =
 				status.getMessage();
 			if (status instanceof MultiStatus) {
-				MultiStatus multi =
+				final MultiStatus multi =
 					(MultiStatus) status;
 				if (multi.getChildren().length > 0) {
 					warning +=
 						" (";
 					for (int j =
-						0; j < multi.getChildren().length
-							- 1; j++) {
+						0; j < (multi.getChildren().length
+							- 1); j++) {
 						warning +=
 							multi.getChildren()[j].getMessage()
 								+ " ;";
@@ -260,7 +260,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	}
 
 	public boolean hasSubProjects() {
-		return !(subProjects == null
+		return !((subProjects == null)
 			|| subProjects.isEmpty());
 	}
 
@@ -273,7 +273,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	/**
 	 * Get the name of the project
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getProjectName() {
@@ -282,7 +282,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	/**
 	 * Get the description of the project
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getDescription() {
@@ -313,7 +313,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	/**
 	 * Gets the label to be used when rendering this project record in the UI.
-	 * 
+	 *
 	 * @return String the label
 	 * @since 3.4
 	 */
@@ -328,24 +328,27 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 		int result =
 			1;
 		result =
-			prime
-				* result
+			(prime
+				* result)
 				+ projectDescriptionRelativePath.hashCode();
 		result =
-			prime
-				* result
+			(prime
+				* result)
 				+ projectName.hashCode();
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final ProjectRecord other =
 			(ProjectRecord) obj;
 		return projectDescriptionRelativePath.equals(other.projectDescriptionRelativePath)
@@ -359,7 +362,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	/**
 	 * Determine if the project with the given name is in the current workspace.
-	 * 
+	 *
 	 * @param projectName String the project name to check
 	 * @return boolean true if the project with the given name is in this workspace
 	 */
@@ -367,7 +370,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 		if (projectName == null) {
 			return false;
 		}
-		IProject[] workspaceProjects =
+		final IProject[] workspaceProjects =
 			getProjectsInWorkspace();
 		for (int i =
 			0; i < workspaceProjects.length; i++) {
@@ -380,7 +383,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	/**
 	 * Retrieve all the projects in the current workspace.
-	 * 
+	 *
 	 * @return IProject[] array of IProject in the current workspace
 	 */
 	private static IProject[] getProjectsInWorkspace() {
@@ -408,12 +411,12 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 		final DocumentBuilderFactory dbFactory =
 			DocumentBuilderFactory.newInstance();
 		try {
-			InputStream inputStream =
+			final InputStream inputStream =
 				new URL("platform:/plugin/de.ovgu.featureide.examples/"
 					+ getInformationDocumentPath()).openConnection().getInputStream();
-			DocumentBuilder dBuilder =
+			final DocumentBuilder dBuilder =
 				dbFactory.newDocumentBuilder();
-			Document doc =
+			final Document doc =
 				dBuilder.parse(inputStream);
 			return doc;
 		} catch (IOException | ParserConfigurationException | SAXException e) {

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -97,7 +97,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
 /**
  * A multi page editor to edit feature models. If the model file contains errors, markers will be created on save.
- * 
+ *
  * @author Thomas Thuem
  * @author Christian Becker
  */
@@ -146,18 +146,18 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		try {
 			manager =
 				FMFactoryManager.getFactory(markerHandler.getModelFile().getLocation().toString(), fmManager.getFormat());
-		} catch (NoSuchExtensionException e) {
+		} catch (final NoSuchExtensionException e) {
 			FMUIPlugin.getDefault().logError(e);
 			manager =
 				FMFactoryManager.getDefaultFactory();
 		}
-		IFeatureModel model =
+		final IFeatureModel model =
 			manager.createFeatureModel();
 
 		if (getEditorInput() instanceof IFileEditorInput) {
-			IFileEditorInput input =
+			final IFileEditorInput input =
 				(IFileEditorInput) getEditorInput();
-			IFile sourceFile =
+			final IFile sourceFile =
 				input.getFile();
 			model.setSourceFile(sourceFile.getRawLocation().toFile().toPath());
 		}
@@ -198,7 +198,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		final IFeatureModel featureModel =
 			getFeatureModel();
 		featureModel.getRenamingsManager().performRenamings(featureModel.getSourceFile());
-		for (IFeatureModelEditorPage page : extensionPages) {
+		for (final IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
 
@@ -237,29 +237,37 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			}
 			return getOutlinePage();
 		}
-		if (IGotoMarker.class.equals(adapter))
-			if (getActivePage() != getDiagramEditorIndex())
+		if (IGotoMarker.class.equals(adapter)) {
+			if (getActivePage() != getDiagramEditorIndex()) {
 				setActivePage(getDiagramEditorIndex());
-		Object o =
+			}
+		}
+		final Object o =
 			diagramEditor.getAdapter(adapter);
-		if (o != null)
+		if (o != null) {
 			return o;
+		}
 		return super.getAdapter(adapter);
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		if (ActionFactory.PRINT.getId().equals(workbenchActionID))
+		if (ActionFactory.PRINT.getId().equals(workbenchActionID)) {
 			return printAction;
-		if (ActionFactory.SELECT_ALL.getId().equals(workbenchActionID))
+		}
+		if (ActionFactory.SELECT_ALL.getId().equals(workbenchActionID)) {
 			return selectAllAction;
-		if (ActionFactory.UNDO.getId().equals(workbenchActionID))
+		}
+		if (ActionFactory.UNDO.getId().equals(workbenchActionID)) {
 			return undoAction;
-		if (ActionFactory.REDO.getId().equals(workbenchActionID))
+		}
+		if (ActionFactory.REDO.getId().equals(workbenchActionID)) {
 			return redoAction;
-		IAction action =
+		}
+		final IAction action =
 			diagramEditor.getDiagramAction(workbenchActionID);
-		if (action != null)
+		if (action != null) {
 			return action;
+		}
 		FMCorePlugin.getDefault().logInfo("The following workbench action is not registered at the feature diagram editor: "
 			+ workbenchActionID);
 		return null;
@@ -296,16 +304,20 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		return true;
 	}
 
+	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getResource() == null)
+		if (event.getResource() == null) {
 			return;
-		if (event.getResource().getType() == IResource.PROJECT)
+		}
+		if (event.getResource().getType() == IResource.PROJECT) {
 			closeEditor =
 				true;
+		}
 		final IEditorInput input =
 			getEditorInput();
-		if (!(input instanceof IFileEditorInput))
+		if (!(input instanceof IFileEditorInput)) {
 			return;
+		}
 		final IFile inputFile =
 			((IFileEditorInput) input).getFile();
 
@@ -319,9 +331,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			final IResourceDelta inputFileDelta =
 				event.getDelta().findMember(inputFile.getFullPath());
 			if (inputFileDelta != null) {
-				IResourceDeltaVisitor visitor =
+				final IResourceDeltaVisitor visitor =
 					new IResourceDeltaVisitor() {
 
+						@Override
 						public boolean visit(IResourceDelta delta) {
 							// only interested in removal changes
 							if (((delta.getFlags()
@@ -334,24 +347,27 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 					};
 				try {
 					inputFileDelta.accept(visitor);
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			}
-			if (deletedlist.size() > 0
+			if ((deletedlist.size() > 0)
 				&& deletedlist.contains(inputFile)) {
 				Display.getDefault().asyncExec(new Runnable() {
 
+					@Override
 					public void run() {
-						if (getSite() == null)
+						if (getSite() == null) {
 							return;
-						if (getSite().getWorkbenchWindow() == null)
+						}
+						if (getSite().getWorkbenchWindow() == null) {
 							return;
-						IWorkbenchPage[] pages =
+						}
+						final IWorkbenchPage[] pages =
 							getSite().getWorkbenchWindow().getPages();
 						for (int i =
 							0; i < pages.length; i++) {
-							IEditorPart editorPart =
+							final IEditorPart editorPart =
 								pages[i].findEditor(input);
 							pages[i].closeEditor(editorPart, true);
 						}
@@ -369,23 +385,24 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			|| closeEditor) {
 			Display.getDefault().asyncExec(new Runnable() {
 
+				@Override
 				public void run() {
-					IWorkbenchPartSite site =
+					final IWorkbenchPartSite site =
 						getSite();
 					if (site == null) {
 						return;
 					}
-					IWorkbenchWindow workbenchWindow =
+					final IWorkbenchWindow workbenchWindow =
 						site.getWorkbenchWindow();
 					if (workbenchWindow == null) {
 						return;
 					}
-					IWorkbenchPage[] pages =
+					final IWorkbenchPage[] pages =
 						workbenchWindow.getPages();
 					for (int i =
 						0; i < pages.length; i++) {
 						if (inputFile.getProject().equals(res)) {
-							IEditorPart editorPart =
+							final IEditorPart editorPart =
 								pages[i].findEditor(input);
 							pages[i].closeEditor(editorPart, true);
 						}
@@ -399,11 +416,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	 * Open a dialog to save the model.
 	 */
 	public void saveModelForConsistentRenamings() {
-		LinkedList<String> editor =
+		final LinkedList<String> editor =
 			new LinkedList<String>();
 		editor.add(getModelFile().getName());
 
-		ListDialog dialog =
+		final ListDialog dialog =
 			new ListDialog(getSite().getWorkbenchWindow().getShell());
 		dialog.setAddCancelButton(true);
 		dialog.setContentProvider(new ArrayContentProvider());
@@ -422,7 +439,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	/**
 	 * This is just a call to the private method {@link #setActivePage(int)}.
-	 * 
+	 *
 	 * @param index
 	 */
 	public void setActiveEditorPage(int index) {
@@ -463,6 +480,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		} else {
 			diagramEditor.getControl().getDisplay().asyncExec(new Runnable() {
 
+				@Override
 				public void run() {
 					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
@@ -485,7 +503,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void pageChange(int newPageIndex) {
 		if (getPage(currentPageIndex).allowPageChange(newPageIndex)) {
-			IEditorActionBarContributor contributor =
+			final IEditorActionBarContributor contributor =
 				getEditorSite().getActionBarContributor();
 			if (contributor instanceof FeatureModelEditorContributor) {
 				((FeatureModelEditorContributor) contributor).setActivePage(this, newPageIndex);
@@ -503,7 +521,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void setInput(IEditorInput input) {
 		markerHandler =
-			new ModelMarkerHandler<>((IFile) input.getAdapter(IFile.class));
+			new ModelMarkerHandler<>(input.getAdapter(IFile.class));
 		setPartName(getModelFile().getProject().getName()
 			+ MODEL);
 		setTitleToolTip(input.getToolTipText());
@@ -545,22 +563,23 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		try {
 			textEditor.setIndex(addPage(textEditor, getEditorInput()));
 			setPageText(textEditor.getIndex(), textEditor.getPageText());
-		} catch (PartInitException e) {
+		} catch (final PartInitException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
 	private void createActions() {
-		IOperationHistory history =
+		final IOperationHistory history =
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
 		history.addOperationHistoryListener(new IOperationHistoryListener() {
 
 			@Override
 			public void historyNotification(OperationHistoryEvent event) {
-				if (!hasFMUndoContext(event))
+				if (!hasFMUndoContext(event)) {
 					return;
-				if (event.getEventType() == OperationHistoryEvent.DONE
-					|| event.getEventType() == OperationHistoryEvent.REDONE) {
+				}
+				if ((event.getEventType() == OperationHistoryEvent.DONE)
+					|| (event.getEventType() == OperationHistoryEvent.REDONE)) {
 					operationCounter++;
 				}
 				if (event.getEventType() == OperationHistoryEvent.UNDONE) {
@@ -573,12 +592,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 			/**
 			 * returns true if the event matches the FMUndoContext
-			 * 
+			 *
 			 * @param event
 			 * @param hasFMContext
 			 */
 			private boolean hasFMUndoContext(OperationHistoryEvent event) {
-				for (IUndoContext c : event.getOperation().getContexts()) {
+				for (final IUndoContext c : event.getOperation().getContexts()) {
 					if (c.matches((IUndoContext) getFeatureModel().getUndoContext())) {
 						return true;
 					}
@@ -587,7 +606,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			}
 
 		});
-		ObjectUndoContext undoContext =
+		final ObjectUndoContext undoContext =
 			new ObjectUndoContext(this);
 		getFeatureModel().setUndoContext(undoContext);
 
@@ -596,8 +615,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		selectAllAction =
 			new SelectAllAction(this);
 
-		IWorkbenchPartSite site =
-			this.getSite();
+		final IWorkbenchPartSite site =
+			getSite();
 		undoAction =
 			new UndoActionHandler(site, undoContext);
 		redoAction =
@@ -617,7 +636,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 				}
 				setPageText(page.getIndex(), page.getPageText());
 				page.initEditor();
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
@@ -630,14 +649,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			featureOrderEditor.setIndex(addPage(featureOrderEditor, getEditorInput()));
 			setPageText(featureOrderEditor.getIndex(), featureOrderEditor.getPageText());
 			featureOrderEditor.initEditor();
-		} catch (PartInitException e) {
+		} catch (final PartInitException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
 	private void createModelFileMarkers(ProblemList warnings) {
 		markerHandler.deleteAllModelMarkers();
-		for (Problem warning : warnings) {
+		for (final Problem warning : warnings) {
 			markerHandler.createModelMarker(warning.message, warning.severity.getLevel(), warning.line);
 		}
 		if (!warnings.containsError()) {
@@ -645,7 +664,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 				if (!getFeatureModel().getAnalyser().isValid()) {
 					markerHandler.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
 				}
-			} catch (TimeoutException e) {
+			} catch (final TimeoutException e) {
 				// do nothing, assume the model is correct
 			}
 		}
@@ -656,18 +675,18 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	}
 
 	private void getExtensions() {
-		IConfigurationElement[] config =
+		final IConfigurationElement[] config =
 			Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID
 				+ ".FeatureModelEditor");
 		try {
-			for (IConfigurationElement e : config) {
+			for (final IConfigurationElement e : config) {
 				final Object o =
 					e.createExecutableExtension("class");
 				if (o instanceof IFeatureModelEditorPage) {
 					extensionPages.add(((IFeatureModelEditorPage) o));
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -678,7 +697,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	/**
 	 * Gets the corresponding page for the given index.
-	 * 
+	 *
 	 * @param index The index of the page
 	 * @return The page
 	 */
@@ -693,7 +712,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return textEditor;
 		}
 
-		for (IFeatureModelEditorPage page : extensionPages) {
+		for (final IFeatureModelEditorPage page : extensionPages) {
 			if (page.getIndex() == index) {
 				return page;
 			}
@@ -718,23 +737,23 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	private boolean saveEditors() {
 		if (getFeatureModel().getRenamingsManager().isRenamed()) {
-			IProject project =
+			final IProject project =
 				getModelFile().getProject();
-			ArrayList<String> dirtyEditors =
+			final ArrayList<String> dirtyEditors =
 				new ArrayList<String>();
-			ArrayList<IEditorPart> dirtyEditors2 =
+			final ArrayList<IEditorPart> dirtyEditors2 =
 				new ArrayList<IEditorPart>();
-			for (IWorkbenchWindow window : getSite().getWorkbenchWindow().getWorkbench().getWorkbenchWindows()) {
-				for (IWorkbenchPage page : window.getPages()) {
-					for (IEditorReference editorRef : page.getEditorReferences()) {
+			for (final IWorkbenchWindow window : getSite().getWorkbenchWindow().getWorkbench().getWorkbenchWindows()) {
+				for (final IWorkbenchPage page : window.getPages()) {
+					for (final IEditorReference editorRef : page.getEditorReferences()) {
 						if (ConfigurationEditor.ID.equals(editorRef.getId())) {
 							final IEditorPart editor =
 								editorRef.getEditor(true);
 							if (editor.isDirty()) {
-								IEditorInput editorInput =
+								final IEditorInput editorInput =
 									editor.getEditorInput();
-								IFile editorFile =
-									(IFile) editorInput.getAdapter(IFile.class);
+								final IFile editorFile =
+									editorInput.getAdapter(IFile.class);
 								if (editorFile.getProject().equals(project)) {
 									dirtyEditors.add(editorFile.getName());
 									dirtyEditors2.add(editor);
@@ -746,7 +765,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			}
 
 			if (dirtyEditors.size() != 0) {
-				ListDialog dialog =
+				final ListDialog dialog =
 					new ListDialog(getSite().getWorkbenchWindow().getShell());
 				dialog.setAddCancelButton(true);
 				dialog.setContentProvider(new ArrayContentProvider());
@@ -759,7 +778,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 				dialog.open();
 
 				if (dialog.getResult() != null) {
-					for (IEditorPart editor : dirtyEditors2) {
+					for (final IEditorPart editor : dirtyEditors2) {
 						editor.doSave(null);
 					}
 				} else {

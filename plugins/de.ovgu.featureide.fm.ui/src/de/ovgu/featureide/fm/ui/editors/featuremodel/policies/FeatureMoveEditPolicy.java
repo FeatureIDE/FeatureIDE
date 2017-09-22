@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,15 +40,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * Allows feature to be moved at the feature diagram and provides a feedback figure.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
 public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUIDefaults {
 
-	private FeatureEditPart editPart;
+	private final FeatureEditPart editPart;
 
-	private ModelLayoutEditPolicy superPolicy;
+	private final ModelLayoutEditPolicy superPolicy;
 
 	private FeatureDragAndDropCommand cmd;
 
@@ -76,7 +76,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 
 		s =
 			FeatureUIHelper.getSourceLocation(editPart.getModel());
-		Point s2 =
+		final Point s2 =
 			s.getCopy();
 		getHostFigure().translateToAbsolute(s2);
 
@@ -86,7 +86,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		c.setSourceAnchor(new XYAnchor(s2));
 		c.setTargetAnchor(new XYAnchor(s2));
 
-		FreeformLayer l =
+		final FreeformLayer l =
 			new FreeformLayer();
 		l.add(r);
 		l.add(c);
@@ -101,7 +101,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		// call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
 
-		PrecisionRectangle rect =
+		final PrecisionRectangle rect =
 			new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
@@ -109,7 +109,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		r.translateToRelative(rect);
 		r.setBounds(rect);
 
-		Point s2 =
+		final Point s2 =
 			s.getCopy();
 		getHostFigure().translateToAbsolute(s2);
 		s2.translate(request.getMoveDelta());
@@ -119,17 +119,18 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 			cmd =
 				(FeatureDragAndDropCommand) superPolicy.getConstraintCommand();
 			Point location;
-			if (cmd != null
-				&& cmd.getNewParent() != null) {
+			if ((cmd != null)
+				&& (cmd.getNewParent() != null)) {
 				location =
 					FeatureUIHelper.getTargetLocation(cmd.getNewParent());
 				getHostFigure().translateToAbsolute(location);
 				c.setForegroundColor(cmd.canExecute()
 					? NEW_CONNECTION_FOREGROUND
 					: VOID_CONNECTION_FOREGROUND);
-			} else
+			} else {
 				location =
 					s2;
+			}
 			c.setTargetAnchor(new XYAnchor(location));
 
 		}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,13 +43,13 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
 /**
  * Opens the currently selected feature model with GUIDSL.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -59,9 +59,9 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 	@Override
 	protected void singleAction(IFile modelfile) {
 		try {
-			String jakarta =
+			final String jakarta =
 				getFileFromPlugin(PluginID.PLUGIN_ID, "lib/jakarta.jar");
-			String guidsl =
+			final String guidsl =
 				getFileFromPlugin(PluginID.PLUGIN_ID, "lib/guidsl.jar");
 			String command =
 				"java -cp \""
@@ -72,22 +72,22 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 					+ guidsl
 					+ "\"";
 
-			IFeatureModel fm =
+			final IFeatureModel fm =
 				FeatureModelManager.load(Paths.get(modelfile.getLocationURI())).getObject();
 
 			// Parse XML to GUIDSL and save file as model.m
-			String loc =
+			final String loc =
 				modelfile.getLocation().toOSString();
-			String dirpath =
+			final String dirpath =
 				loc.substring(0, loc.length()
 					- 10);
-			String filepath =
+			final String filepath =
 				loc.substring(0, loc.length()
 					- 4)
 					+ ".m";
-			File outputfile =
+			final File outputfile =
 				new File(filepath);
-			FileHandler.save(outputfile.toPath(), fm, new GuidslFormat());
+			SimpleFileHandler.save(outputfile.toPath(), fm, new GuidslFormat());
 
 			command +=
 				" \""
@@ -99,19 +99,19 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 
 			execProcess(command, new File(dirpath));
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			FMUIPlugin.getDefault().logError(UNABLE_TO_START_GUIDSL, e);
 		}
 	}
 
 	public static String getFileFromPlugin(String pluginId, String localPath) throws IOException {
-		if (pluginId == null
-			|| localPath == null) {
+		if ((pluginId == null)
+			|| (localPath == null)) {
 			throw new IllegalArgumentException();
 		}
 
 		// if the bundle is not ready then there is no file
-		Bundle bundle =
+		final Bundle bundle =
 			Platform.getBundle(pluginId);
 		if (!BundleUtility.isReady(bundle)) {
 			return null;
@@ -130,12 +130,12 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 			+ command);
 		Process process =
 			Runtime.getRuntime().exec(command, null, dir);
-		String sys =
+		final String sys =
 			System.getProperty("os.name");
 		// #58 ,OS dependent Code for excuting commands, Linux does not execute
 		// without a shell
 		if (LINUX.equals(sys)) {
-			String[] cmd =
+			final String[] cmd =
 				new String[3];
 			cmd[0] =
 				"/bin/bash";
@@ -158,7 +158,7 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 
 			long start =
 				System.currentTimeMillis();
-			int diff =
+			final int diff =
 				250;
 			while (true) {
 				try {
@@ -173,13 +173,13 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 						System.err.println(">>>"
 							+ line);
 					}
-					if (System.currentTimeMillis()
-						- start > diff) {
+					if ((System.currentTimeMillis()
+						- start) > diff) {
 						start +=
 							diff;
 						System.out.print('.');
 					}
-					int exitValue =
+					final int exitValue =
 						process.exitValue();
 					System.out.println("...finished (exit="
 						+ exitValue
@@ -190,15 +190,17 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 							+ ")!");
 					}
 					return;
-				} catch (IllegalThreadStateException e) {}
+				} catch (final IllegalThreadStateException e) {}
 			}
 		} finally {
 			try {
-				if (input != null)
+				if (input != null) {
 					input.close();
+				}
 			} finally {
-				if (error != null)
+				if (error != null) {
 					error.close();
+				}
 			}
 		}
 	}

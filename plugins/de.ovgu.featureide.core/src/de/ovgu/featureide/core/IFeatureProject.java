@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -107,7 +107,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	String getProjectName();
 
 	/**
-	 * 
+	 *
 	 * @return The current configuration file or <code>null</code> if there is none.
 	 */
 	IFile getCurrentConfiguration();
@@ -144,7 +144,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	/**
 	 * Gets the java class path without the default paths
-	 * 
+	 *
 	 * @return The java class path without default paths
 	 */
 	String[] getAdditionalJavaClassPath();
@@ -177,20 +177,20 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	/**
 	 * Returns the ID of the assigned composer
-	 * 
+	 *
 	 * @return The ID of the assigned composer or @code null if no composer has been assigned.
 	 */
 	String getComposerID();
 
 	/**
 	 * Sets the ID of the assigned composer
-	 * 
+	 *
 	 */
 	void setComposerID(String composerID);
 
 	/**
 	 * Gets the current composer.
-	 * 
+	 *
 	 * @return The composer, specified for this project or <code>null</code> if the composerID is unknown <br> - The composer is now a property of the project
 	 *         and not specified by the nature or builder (every project has the same nature and builder, which can be extended by other eclipse plug-ins)
 	 */
@@ -199,7 +199,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	/**
 	 * Sets the JAVA class path that is in order to build the project
-	 * 
+	 *
 	 * @param paths An array of paths that will be added to the JAVA class path
 	 */
 	void setAdditionalJavaClassPath(String[] paths);
@@ -211,21 +211,21 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	/**
 	 * sets the contract composition mechanism
-	 * 
+	 *
 	 * @param model
 	 */
 	void setContractComposition(String contractComposition);
 
 	/**
 	 * sets the meta product generation mechanism.
-	 * 
+	 *
 	 * @param model
 	 */
 	void setMetaProductGeneration(String metaProductGeneration);
 
 	/**
 	 * sets the composition mechanism
-	 * 
+	 *
 	 * @param compositionMechanism
 	 */
 	void setCompositionMechanism(String compositionMechanism);

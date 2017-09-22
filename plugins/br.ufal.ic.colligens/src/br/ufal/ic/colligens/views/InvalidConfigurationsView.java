@@ -16,13 +16,13 @@ public class InvalidConfigurationsView extends ViewPart {
 	public static final String ID =
 		Colligens.PLUGIN_ID
 			+ ".views.InvalidConfigurationsView";
-	private InvalidConfigurationsViewController viewController;
+	private final InvalidConfigurationsViewController viewController;
 
 	public InvalidConfigurationsView() {
 		viewController =
 			InvalidConfigurationsViewController.getInstance();
 		viewController.setView(this);
-		this.setTitleToolTip(INVALID_CONFIGURATIONS___COLLIGENS);
+		setTitleToolTip(INVALID_CONFIGURATIONS___COLLIGENS);
 	}
 
 	@Override

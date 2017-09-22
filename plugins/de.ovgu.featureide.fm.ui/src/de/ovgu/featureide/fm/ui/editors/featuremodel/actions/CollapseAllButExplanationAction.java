@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllButEx
 
 /**
  * Action for collapsing all features but those affected by the active explanation.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class CollapseAllButExplanationAction extends Action {
@@ -53,7 +53,7 @@ public class CollapseAllButExplanationAction extends Action {
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param fm the graphical feature model context
 	 */
 	public CollapseAllButExplanationAction(IGraphicalFeatureModel fm) {
@@ -81,7 +81,7 @@ public class CollapseAllButExplanationAction extends Action {
 
 	/**
 	 * Returns the graphical feature model context.
-	 * 
+	 *
 	 * @return the graphical feature model context
 	 */
 	public IGraphicalFeatureModel getGraphicalFeatureModel() {
@@ -90,7 +90,7 @@ public class CollapseAllButExplanationAction extends Action {
 
 	/**
 	 * Returns the currently active explanation.
-	 * 
+	 *
 	 * @return the currently active explanation.
 	 */
 	public FeatureModelExplanation getExplanation() {
@@ -99,7 +99,7 @@ public class CollapseAllButExplanationAction extends Action {
 
 	/**
 	 * Sets the currently active explanation.
-	 * 
+	 *
 	 * @param explanation the new active explanation
 	 */
 	public void setExplanation(FeatureModelExplanation explanation) {
@@ -114,7 +114,7 @@ public class CollapseAllButExplanationAction extends Action {
 			new CollapseAllButExplanationOperation(getGraphicalFeatureModel(), getExplanation());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}

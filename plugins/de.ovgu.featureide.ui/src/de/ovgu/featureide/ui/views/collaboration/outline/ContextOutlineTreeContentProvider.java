@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 
 /**
  * Provides the content for the collaboration outline.
- * 
+ *
  * @author Reimar Schr�ter
  * @author Sebastian Krieter
  */
@@ -54,16 +54,16 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if (inputElement == null
+		if ((inputElement == null)
 			|| !(inputElement instanceof IFile)) {
 			return new String[] {
 				"no file found" };
 		}
 
-		IFile inputFile =
+		final IFile inputFile =
 			(IFile) inputElement;
 
-		IFeatureProject featureProject =
+		final IFeatureProject featureProject =
 			CorePlugin.getFeatureProject(inputFile);
 		this.featureProject =
 			featureProject;
@@ -73,9 +73,9 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 				return new String[] {
 					"No signature found - Use Fuji typecheck" };
 			}
-			String featureName =
+			final String featureName =
 				featureProject.getFeatureName(inputFile);
-			String filename =
+			final String filename =
 				(inputFile).getName();
 			String classname;
 			if (filename.endsWith(".java")) {
@@ -90,11 +90,11 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 			projectStructure =
 				CorePlugin.getDefault().extendedModules_getStruct(featureProject, featureName);
 			if (projectStructure != null) {
-				AbstractClassFragment[] ar =
+				final AbstractClassFragment[] ar =
 					new AbstractClassFragment[projectStructure.getClasses().size()];
 				int i =
 					0;
-				for (AbstractClassFragment frag : projectStructure.getClasses()) {
+				for (final AbstractClassFragment frag : projectStructure.getClasses()) {
 					ar[i++] =
 						frag;
 				}
@@ -111,13 +111,14 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 		}
 	}
 
+	@Override
 	public void dispose() {}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput != null
+		if ((newInput != null)
 			&& (newInput instanceof IFile)) {
-			IFeatureProject featureProject =
+			final IFeatureProject featureProject =
 				CorePlugin.getFeatureProject((IFile) newInput);
 			if (featureProject != null) {
 				final String featureName =
@@ -155,7 +156,7 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 
 				final AFeatureData[] featureDataArray =
 					sig.getFeatureData();
-				for (AFeatureData featureData : featureDataArray) {
+				for (final AFeatureData featureData : featureDataArray) {
 					final String featureName =
 						signatures.getFeatureName(featureData.getID());
 					final IFeature feature =
@@ -180,11 +181,11 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof AbstractClassFragment) {
-			AbstractClassFragment frag =
+			final AbstractClassFragment frag =
 				(AbstractClassFragment) element;
 			return frag.getMemberCount() > 0;
 		} else if (element instanceof AbstractSignature) {
-			AbstractSignature sig =
+			final AbstractSignature sig =
 				(AbstractSignature) element;
 			return sig.getFeatureData().length > 0;
 		}

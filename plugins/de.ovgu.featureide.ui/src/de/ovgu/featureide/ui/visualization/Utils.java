@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,38 +37,38 @@ import org.osgi.framework.Bundle;
 
 /**
  * Utils for visualizations
- * 
+ *
  * @author Jabier Martinez
  */
 public class Utils {
 
 	public static File getFileFromPlugin(String pluginId, String relativePath) {
-		Bundle bundle =
+		final Bundle bundle =
 			Platform.getBundle(pluginId);
-		URL fileURL =
+		final URL fileURL =
 			bundle.getEntry(relativePath);
 		File file =
 			null;
 		try {
 			file =
 				new File(FileLocator.resolve(fileURL).toURI());
-		} catch (URISyntaxException e1) {
+		} catch (final URISyntaxException e1) {
 			e1.printStackTrace();
-		} catch (IOException e1) {
+		} catch (final IOException e1) {
 			e1.printStackTrace();
 		}
 		return file;
 	}
 
 	public static List<String> getLinesOfFile(File file) {
-		List<String> lines =
+		final List<String> lines =
 			new ArrayList<String>();
 		try {
-			FileInputStream fstream =
+			final FileInputStream fstream =
 				new FileInputStream(file);
-			DataInputStream in =
+			final DataInputStream in =
 				new DataInputStream(fstream);
-			BufferedReader br =
+			final BufferedReader br =
 				new BufferedReader(new InputStreamReader(in));
 			String strLine;
 			while ((strLine =
@@ -76,16 +76,16 @@ public class Utils {
 				lines.add(strLine);
 			}
 			in.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return lines;
 	}
 
 	public static String getStringOfFile(File file) {
-		StringBuilder string =
+		final StringBuilder string =
 			new StringBuilder();
-		for (String line : getLinesOfFile(file)) {
+		for (final String line : getLinesOfFile(file)) {
 			string.append(line
 				+ "\n");
 		}

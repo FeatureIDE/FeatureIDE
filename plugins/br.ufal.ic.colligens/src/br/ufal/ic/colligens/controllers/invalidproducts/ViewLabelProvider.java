@@ -14,11 +14,13 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 	public String getColumnText(Object obj, int index) {
 		switch (index) {
 		case 0:
-			if (obj instanceof InvalidProductViewLog)
+			if (obj instanceof InvalidProductViewLog) {
 				return ((InvalidProductViewLog) obj).getProductName();
+			}
 		case 1:
-			if (obj instanceof InvalidProductViewLog)
+			if (obj instanceof InvalidProductViewLog) {
 				return ((InvalidProductViewLog) obj).getRelativePath();
+			}
 		default:
 			return "";
 		}

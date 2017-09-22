@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -68,7 +68,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * A wizard page sampling.
- * 
+ *
  * @author Jens Meinicke
  */
 public class BuildProductsPage extends WizardPage implements IConfigurationBuilderBasics {
@@ -107,7 +107,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		Platform.getBundle("org.junit") != null;
 
 	@CheckForNull
-	private IFeatureProject project;
+	private final IFeatureProject project;
 
 	Text fileName;
 
@@ -118,12 +118,12 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private Label labelTWise;
 	private Label labelOrderInteraction;
 
-	private boolean buildProjects;
+	private final boolean buildProjects;
 
-	private int t;
-	private int t_Interaction;
+	private final int t;
+	private final int t_Interaction;
 
-	private String algorithm;
+	private final String algorithm;
 
 	private Combo comboOrder;
 
@@ -132,10 +132,10 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private Button buttonTest;
 	private final String generate;
 	private final String order;
-	private boolean test;
+	private final boolean test;
 	private Text textField;
 	private Label labelMax;
-	private String maxConfs;
+	private final String maxConfs;
 
 	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, int t_Interaction,
 			String order, boolean test, String maxConfs) {
@@ -170,7 +170,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 	@Override
 	public void createControl(Composite parent) {
-		ArrayList<Label> labels =
+		final ArrayList<Label> labels =
 			new ArrayList<Label>();
 
 		final ScrolledComposite scrlcomp =
@@ -180,27 +180,27 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		scrlcomp.setExpandHorizontal(true);
 		scrlcomp.setContent(container);
 
-		GridLayout layout =
+		final GridLayout layout =
 			new GridLayout();
 		layout.numColumns =
 			1;
 		layout.marginBottom =
 			10;
 		container.setLayout(layout);
-		GridData gridData =
+		final GridData gridData =
 			new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan =
 			1;
 		container.setLayoutData(gridData);
 
-		GridData gd_Fill_H =
+		final GridData gd_Fill_H =
 			new GridData(GridData.FILL_HORIZONTAL);
-		GridData gd_LeftColumnInsideGroup =
+		final GridData gd_LeftColumnInsideGroup =
 			new GridData();
-		GridData gd_LeftColumn =
+		final GridData gd_LeftColumn =
 			new GridData();
 
-		Group groupDeriveConf =
+		final Group groupDeriveConf =
 			new Group(container, SWT.SHADOW_ETCHED_IN);
 		groupDeriveConf.setText("Derive configurations");
 		GridLayout groupLayout =
@@ -229,7 +229,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				| SWT.SINGLE
 				| SWT.READ_ONLY);
 		comboGenerate.setLayoutData(gd_Fill_H);
-		for (BuildType type : BuildType.values()) {
+		for (final BuildType type : BuildType.values()) {
 			if (type == BuildType.INTEGRATION) {
 				continue;
 			}
@@ -249,7 +249,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				| SWT.READ_ONLY);
 		comboAlgorithm.setLayoutData(gd_Fill_H);
 
-		for (TWise tWise : TWise.values()) {
+		for (final TWise tWise : TWise.values()) {
 			final String tWiseText =
 				getTWiseText(tWise);
 			if (tWiseText != null) {
@@ -290,7 +290,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		textField.setLayoutData(gridDataWidth);
 		textField.setText(maxConfs);
 
-		Group groupOrder =
+		final Group groupOrder =
 			new Group(container, SWT.SHADOW_ETCHED_IN);
 		groupOrder.setText("Order configurations");
 		groupLayout =
@@ -308,7 +308,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			GridData.FILL;
 		groupOrder.setLayoutData(gridDataGroup);
 
-		Label labelOrder =
+		final Label labelOrder =
 			new Label(groupOrder, SWT.NULL);
 		labelOrder.setText(LABEL_ORDER);
 		labelOrder.setToolTipText(TOOL_TIP_ORDER);
@@ -319,7 +319,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				| SWT.SINGLE
 				| SWT.READ_ONLY);
 		comboOrder.setLayoutData(gd_Fill_H);
-		for (BuildOrder order : BuildOrder.values()) {
+		for (final BuildOrder order : BuildOrder.values()) {
 			comboOrder.add(getOrderText(order));
 		}
 		comboOrder.setText(order);
@@ -338,7 +338,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		scaleInteraction.setSelection(t_Interaction);
 		setScaleInteraction();
 
-		Composite jUnitContainer =
+		final Composite jUnitContainer =
 			new Composite(container, SWT.NONE);
 		final Label labelProject =
 			new Label(jUnitContainer, SWT.NULL);
@@ -365,7 +365,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			GridData.FILL;
 		jUnitContainer.setLayoutData(gridDataGroup);
 
-		Label labelTest =
+		final Label labelTest =
 			new Label(jUnitContainer, SWT.NULL);
 		labelTest.setText(LABEL_TEST);
 		labelTest.setToolTipText(TOOL_TIP_TEST);
@@ -380,7 +380,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 		int widthOfLabel =
 			0;
-		for (Label label : labels) {
+		for (final Label label : labels) {
 			if (label.getSize().x > widthOfLabel) {
 				widthOfLabel =
 					label.getSize().x;
@@ -466,7 +466,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	}
 
 	private void setScaleInteraction() {
-		int lastSelection =
+		final int lastSelection =
 			scaleInteraction.getSelection();
 		scaleInteraction.setMinimum(1);
 		if (comboOrder.getText().equals(INTERACTIONS)) {
@@ -490,12 +490,12 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		 * (-noAllZeros) [Inexact: (-sizelimit <rows>) (-limit <coverage limit>)] (for 3-wise, -eights <1-8>) -t t_wise -a CASA -fm <feature_model> -s
 		 * <strength, 1-6>
 		 **/
-		int lastSelection =
+		final int lastSelection =
 			scaleTWise.getSelection();
 		scaleTWise.setMinimum(1);
 		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
 			scaleTWise.setEnabled(true);
-			String selection =
+			final String selection =
 				comboAlgorithm.getText();
 			if (!comboAlgorithm.isEnabled()) {
 				scaleTWise.setMaximum(3);
@@ -549,19 +549,19 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			if (textField.getText().isEmpty()) {
 				return true;
 			}
-			int value =
+			final int value =
 				Integer.parseInt(textField.getText());
 			if (value == 0) {
 				setErrorMessage("Number of configurations must be larger than 0 or empty to create all configuraitons.");
 				return false;
 			}
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			long longValue =
 				0;
 			try {
 				longValue =
 					Long.parseLong(textField.getText());
-			} catch (NumberFormatException e2) {
+			} catch (final NumberFormatException e2) {
 				setErrorMessage("NumberFormatException: "
 					+ e.getMessage());
 				return false;
@@ -577,6 +577,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private void addListeners() {
 		comboAlgorithm.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				setScaleTWise();
 				dialogChanged();
@@ -585,8 +586,9 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 		scaleTWise.addListener(SWT.Selection, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
-				int selection =
+				final int selection =
 					scaleTWise.getSelection();
 				labelTWise.setText(LABEL_INTERACTIONS
 					+ selection);
@@ -596,8 +598,9 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 		scaleInteraction.addListener(SWT.Selection, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
-				int selection =
+				final int selection =
 					scaleInteraction.getSelection();
 				labelOrderInteraction.setText(LABEL_INTERACTIONS
 					+ selection);
@@ -607,6 +610,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 		comboGenerate.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				final String text =
 					comboGenerate.getText();
@@ -620,6 +624,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 		comboOrder.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				setScaleInteraction();
 				dialogChanged();
@@ -658,7 +663,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	}
 
 	String getAlgorithm() {
-		String text =
+		final String text =
 			comboAlgorithm.getText();
 		if (text.contains(" ")) {
 			return text.substring(0, text.indexOf(" "));
@@ -714,7 +719,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				return Integer.MAX_VALUE;
 			}
 			return Math.max(0, Integer.parseInt(textField.getText()));
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return 0;
 		}
 	}

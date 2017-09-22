@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -58,13 +58,13 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
 /**
  * Operation with functionality to delete multiple elements from the {@link FeatureModelEditor} and the {@link FmOutlinePage}. Enables Undo/Redo.
- * 
+ *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
 public class ElementDeleteOperation extends MultiFeatureModelOperation implements GUIDefaults {
 
-	private Object viewer;
+	private final Object viewer;
 
 	public ElementDeleteOperation(Object viewer, IFeatureModel featureModel) {
 		super(featureModel, DELETE);
@@ -75,22 +75,23 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	/**
 	 * Executes the requested delete operation.
 	 */
+	@Override
 	public void createSingleOperations() {
 		/**
 		 * The key of the Map is the feature which could be replaced by their equivalents given at the corresponding List.
 		 */
-		Map<IFeature, List<IFeature>> removalMap =
+		final Map<IFeature, List<IFeature>> removalMap =
 			new HashMap<>();
-		List<IFeature> alreadyDeleted =
+		final List<IFeature> alreadyDeleted =
 			new LinkedList<>();
 		List<IFeature> commonAncestorList =
 			null;
 
-		for (Object element : getSelection().toArray()) {
+		for (final Object element : getSelection().toArray()) {
 			if (removeConstraint(element)) {
 				continue;
 			}
-			IFeature parent =
+			final IFeature parent =
 				removeFeature(element, removalMap, alreadyDeleted);
 
 			commonAncestorList =
@@ -103,7 +104,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			final GraphicalViewerImpl viewer2 =
 				(GraphicalViewerImpl) viewer;
 			final IFeature parent =
-				(commonAncestorList != null
+				((commonAncestorList != null)
 					&& !commonAncestorList.isEmpty())
 						? commonAncestorList.get(commonAncestorList.size()
 							- 1)
@@ -129,18 +130,18 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 
 	/**
 	 * If the given element is a {@link Constraint} it will be removed instantly.
-	 * 
+	 *
 	 * @param element The constraint to remove.
 	 * @return <code>true</code> if the given element was a constraint.
 	 */
 	private boolean removeConstraint(Object element) {
 		if (element instanceof ConstraintEditPart) {
-			IConstraint constraint =
+			final IConstraint constraint =
 				((ConstraintEditPart) element).getModel().getObject();
 			operations.add(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
 		} else if (element instanceof IConstraint) {
-			IConstraint constraint =
+			final IConstraint constraint =
 				((IConstraint) element);
 			operations.add(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
@@ -150,7 +151,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 
 	/**
 	 * Tries to remove the given {@link Feature} else there will be an dialog for exception handling.
-	 * 
+	 *
 	 * @param element The feature to remove.
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
@@ -174,11 +175,11 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 				alreadyDeleted.add(feature);
 			} else {
 				// check for all equivalent features
-				FeatureDependencies featureDependencies =
+				final FeatureDependencies featureDependencies =
 					new FeatureDependencies(featureModel, false);
-				List<IFeature> equivalent =
+				final List<IFeature> equivalent =
 					new LinkedList<IFeature>();
-				for (IFeature f2 : featureDependencies.getImpliedFeatures(feature)) {
+				for (final IFeature f2 : featureDependencies.getImpliedFeatures(feature)) {
 					if (featureDependencies.isAlways(f2, feature)) {
 						equivalent.add(f2);
 					}
@@ -194,7 +195,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 * Exception handling if the {@link Feature} to remove is contained in {@link Constraint}s.<br> If the feature could be removed a
 	 * {@link DeleteOperationAlternativeDialog} will be opened to select the features to replace with.<br> If the feature has no equivalent an error message
 	 * will be displayed.
-	 * 
+	 *
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
@@ -202,13 +203,13 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 		if (!removalMap.isEmpty()) {
 			boolean hasDeletableFeature =
 				false;
-			List<IFeature> toBeDeleted =
+			final List<IFeature> toBeDeleted =
 				new ArrayList<IFeature>(removalMap.keySet());
 
-			List<IFeature> notDeletable =
+			final List<IFeature> notDeletable =
 				new LinkedList<IFeature>();
-			for (Entry<IFeature, List<IFeature>> entry : removalMap.entrySet()) {
-				List<IFeature> featureList =
+			for (final Entry<IFeature, List<IFeature>> entry : removalMap.entrySet()) {
+				final List<IFeature> featureList =
 					entry.getValue();
 				featureList.removeAll(toBeDeleted);
 				featureList.removeAll(alreadyDeleted);
@@ -232,13 +233,13 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 
 	/**
 	 * Opens an error dialog displaying the {@link Feature}s which could not be replaced by alternatives.
-	 * 
+	 *
 	 * @param notDeletable The not deletable features
 	 */
 	private void openErrorDialog(List<IFeature> notDeletable) {
 		String notDeletedFeatures =
 			null;
-		for (IFeature f : notDeletable) {
+		for (final IFeature f : notDeletable) {
 			if (notDeletedFeatures == null) {
 				notDeletedFeatures =
 					"\""
@@ -252,7 +253,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			}
 		}
 
-		MessageDialog dialog =
+		final MessageDialog dialog =
 			new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
 					((notDeletable.size() != 1)
 						? "The following features are contained in constraints:"

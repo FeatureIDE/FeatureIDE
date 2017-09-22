@@ -623,20 +623,23 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 						((FileEditorInput) newInput).getFile();
 					final IFeatureProject newProject =
 						CorePlugin.getFeatureProject(projectFile);
-					if (newProject != null
+					if ((newProject != null)
 						&& !newProject.equals(featureProject)) {
 						setFeatureProject(newProject);
 						isNew =
 							true;
 					}
 				}
-				Object[] expandedElements =
+				final Object[] expandedElements =
 					tree.getExpandedElements();
 				tree.setInput(newInput);
 				updateTree();
-				if (expandedElements.length > 0
-					&& !isNew) tree.setExpandedElements(expandedElements);
-				else tree.expandAll();
+				if ((expandedElements.length > 0)
+					&& !isNew) {
+					tree.setExpandedElements(expandedElements);
+				} else {
+					tree.expandAll();
+				}
 			}
 		}
 

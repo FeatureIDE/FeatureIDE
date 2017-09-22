@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,7 +27,7 @@ import org.prop4j.Or;
 
 /**
  * Abstract signature for a class member.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class AbstractSignature implements IConstrainedObject {
@@ -77,40 +77,40 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		this.name =
 			name;
 		if (parent != null) {
-			this.fullName =
+			fullName =
 				parent.fullName
 					+ '.'
 					+ name;
 		} else {
-			this.fullName =
+			fullName =
 				'.'
 					+ name;
 		}
 
 		if (modifierString == null) {
-			this.modifiers =
+			modifiers =
 				new String[0];
 		} else {
-			this.modifiers =
+			modifiers =
 				modifierString.trim().split("\\s+");
 		}
-		Arrays.sort(this.modifiers);
-		if (Arrays.binarySearch(this.modifiers, "private") >= 0) {
-			this.visibility =
+		Arrays.sort(modifiers);
+		if (Arrays.binarySearch(modifiers, "private") >= 0) {
+			visibility =
 				VISIBILITY_PRIVATE;
-		} else if (Arrays.binarySearch(this.modifiers, "protected") >= 0) {
-			this.visibility =
+		} else if (Arrays.binarySearch(modifiers, "protected") >= 0) {
+			visibility =
 				VISIBILITY_PROTECTED;
-		} else if (Arrays.binarySearch(this.modifiers, "public") >= 0) {
-			this.visibility =
+		} else if (Arrays.binarySearch(modifiers, "public") >= 0) {
+			visibility =
 				VISIBILITY_PUBLIC;
 		} else {
-			this.visibility =
+			visibility =
 				VISIBILITY_DEFAULT;
 		}
 
-		this.finalSignature =
-			Arrays.binarySearch(this.modifiers, "final") >= 0;
+		finalSignature =
+			Arrays.binarySearch(modifiers, "final") >= 0;
 		if (type == null) {
 			this.type =
 				"void";
@@ -147,7 +147,7 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	}
 
 	protected void setFullName(String perfixName) {
-		this.fullName =
+		fullName =
 			perfixName
 				+ '.'
 				+ name;
@@ -186,8 +186,8 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	}
 
 	public AFeatureData getFirstFeatureData() {
-		return (featureData == null
-			|| featureData.length == 0)
+		return ((featureData == null)
+			|| (featureData.length == 0))
 				? null
 				: featureData[0];
 	}
@@ -278,8 +278,8 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		hashCode =
 			1;
 		hashCode =
-			hashCodePrime
-				* hashCode
+			(hashCodePrime
+				* hashCode)
 				+ fullName.hashCode();
 //		hashCode = hashCodePrime * hashCode + type.hashCode();
 //		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
@@ -287,11 +287,13 @@ public abstract class AbstractSignature implements IConstrainedObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null
-			|| getClass() != obj.getClass())
+		}
+		if ((obj == null)
+			|| (getClass() != obj.getClass())) {
 			return false;
+		}
 
 		return sigEquals((AbstractSignature) obj);
 	}

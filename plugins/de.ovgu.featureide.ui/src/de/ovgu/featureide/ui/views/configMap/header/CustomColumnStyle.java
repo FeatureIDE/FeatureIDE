@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,23 +41,23 @@ public class CustomColumnStyle {
 			title;
 		this.width =
 			width;
-		this.backgroundColor =
-			this.foregroundColor =
+		backgroundColor =
+			foregroundColor =
 				null;
-		this.verticalAlignment =
+		verticalAlignment =
 			SWT.TOP;
-		this.horizontalAlignment =
+		horizontalAlignment =
 			SWT.CENTER;
-		this.isRotated =
+		isRotated =
 			true;
-		this.isSelectable =
+		isSelectable =
 			true;
-		this.drawLine =
+		drawLine =
 			true;
 	}
 
 	public int getWidth() {
-		return this.width;
+		return width;
 	}
 
 	public void setWidth(int width) {
@@ -66,21 +66,21 @@ public class CustomColumnStyle {
 	}
 
 	public void setVerticalAlignment(int alignment) {
-		this.verticalAlignment =
+		verticalAlignment =
 			alignment;
 	}
 
 	public int getVerticalAlignment() {
-		return this.verticalAlignment;
+		return verticalAlignment;
 	}
 
 	public void setHorizontalAlignment(int alignment) {
-		this.horizontalAlignment =
+		horizontalAlignment =
 			alignment;
 	}
 
 	public int getHorizontalAlignment() {
-		return this.horizontalAlignment;
+		return horizontalAlignment;
 	}
 
 	public void setRotated(boolean isRotated) {
@@ -111,7 +111,7 @@ public class CustomColumnStyle {
 	}
 
 	public String getTitle() {
-		return this.title;
+		return title;
 	}
 
 	public void setTitle(String title) {
@@ -120,7 +120,7 @@ public class CustomColumnStyle {
 	}
 
 	public Color getForeground() {
-		return this.foregroundColor;
+		return foregroundColor;
 	}
 
 	public void setForeground(Color foregroundColor) {
@@ -129,7 +129,7 @@ public class CustomColumnStyle {
 	}
 
 	public Color getBackground() {
-		return this.backgroundColor;
+		return backgroundColor;
 	}
 
 	public void setBackground(Color backgroundColor) {

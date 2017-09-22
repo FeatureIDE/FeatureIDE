@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -57,7 +57,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * Plug-in activator with miscellaneous function for an interface project.
- * 
+ *
  * @author Sebastian Krieter
  * @author Reimar Schroeter
  */
@@ -100,11 +100,11 @@ public class MPLPlugin extends AbstractCorePlugin {
 		final IProject project =
 			curFeatureProject.getProject();
 		try {
-			IProjectDescription description =
+			final IProjectDescription description =
 				project.getDescription();
-			String[] natures =
+			final String[] natures =
 				description.getNatureIds();
-			String[] newNatures =
+			final String[] newNatures =
 				new String[natures.length
 					+ 1];
 			System.arraycopy(natures, 0, newNatures, 0, natures.length);
@@ -114,22 +114,25 @@ public class MPLPlugin extends AbstractCorePlugin {
 			project.setDescription(description, null);
 
 			// create directories for MPL
-			IFolder mplFolder =
+			final IFolder mplFolder =
 				project.getFolder(INTERFACES);
-			if (!mplFolder.exists())
+			if (!mplFolder.exists()) {
 				mplFolder.create(true, true, null);
+			}
 
-			IFolder importFolder =
+			final IFolder importFolder =
 				project.getFolder("MPL");
-			if (!importFolder.exists())
+			if (!importFolder.exists()) {
 				importFolder.create(true, true, null);
+			}
 
-			IFolder mappingFolder =
+			final IFolder mappingFolder =
 				project.getFolder("InterfaceMapping");
-			if (!mappingFolder.exists())
+			if (!mappingFolder.exists()) {
 				mappingFolder.create(true, true, null);
+			}
 
-			IFile mappingFile =
+			final IFile mappingFile =
 				mappingFolder.getFile("default.config");
 			if (!mappingFile.exists()) {
 				mappingFile.create(new ByteArrayInputStream(new byte[0]), true, null);
@@ -137,20 +140,20 @@ public class MPLPlugin extends AbstractCorePlugin {
 			project.setPersistentProperty(mappingConfigID, "default.config");
 
 			// create interfaces mapping file
-			IFile mplVelvet =
+			final IFile mplVelvet =
 				project.getFile("mpl.velvet");
 			if (!mplVelvet.exists()) {
 				// IFile.create() needs an source
-				byte[] bytes =
+				final byte[] bytes =
 					("concept "
 						+ project.getName()
 						+ " : "
 						+ project.getName()).getBytes();
-				InputStream source =
+				final InputStream source =
 					new ByteArrayInputStream(bytes);
 				mplVelvet.create(source, true, null);
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			logError(e);
 		}
 	}
@@ -159,11 +162,11 @@ public class MPLPlugin extends AbstractCorePlugin {
 		// TODO MPL: workaround: only for feature house projects
 		if ("de.ovgu.featureide.composer.featurehouse".equals(curFeatureProject.getComposerID())) {
 			try {
-				IProjectDescription description =
+				final IProjectDescription description =
 					curFeatureProject.getProject().getDescription();
-				String[] natures =
+				final String[] natures =
 					description.getNatureIds();
-				String[] newNatures =
+				final String[] newNatures =
 					new String[natures.length
 						+ 1];
 				System.arraycopy(natures, 0, newNatures, 0, natures.length);
@@ -171,7 +174,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 					InterfaceProjectNature.NATURE_ID;
 				description.setNatureIds(newNatures);
 				curFeatureProject.getProject().setDescription(description, null);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				logError(e);
 			}
 		}
@@ -179,16 +182,16 @@ public class MPLPlugin extends AbstractCorePlugin {
 
 	public void removeInterfaceNature(IProject project) {
 		try {
-			IProjectDescription description =
+			final IProjectDescription description =
 				project.getDescription();
-			String[] natures =
+			final String[] natures =
 				description.getNatureIds();
-			String[] newNatures =
+			final String[] newNatures =
 				new String[natures.length
 					- 1];
 			int i =
 				0;
-			for (String nature : natures) {
+			for (final String nature : natures) {
 				if (!nature.equals(InterfaceProjectNature.NATURE_ID)) {
 					newNatures[i++] =
 						nature;
@@ -196,7 +199,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 			}
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			logError(e);
 		}
 	}
@@ -210,7 +213,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 					CorePlugin.getFeatureProject(project);
 			}
 			if (curFeatureProject == null) {
-				for (IFeatureProject fp : CorePlugin.getFeatureProjects()) {
+				for (final IFeatureProject fp : CorePlugin.getFeatureProjects()) {
 					if (constructInterfaceProjectName(fp.getProjectName()).equals(project.getName())) {
 						curFeatureProject =
 							fp;
@@ -218,7 +221,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			logError(e);
 		}
 		final InterfaceProject interfaceProject =
@@ -243,7 +246,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 		InterfaceProject interfaceProject =
 			projectMap.get(projectName);
 		if (interfaceProject == null) {
-			IProject project =
+			final IProject project =
 				ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 			if (isInterfaceProject(project)) {
 				interfaceProject =
@@ -256,7 +259,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	public InterfaceProject getInterfaceProject(IProject project) {
 		InterfaceProject interfaceProject =
 			projectMap.get(project.getName());
-		if (interfaceProject == null
+		if ((interfaceProject == null)
 			&& isInterfaceProject(project)) {
 			interfaceProject =
 				addProject(project);
@@ -268,7 +271,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 		try {
 			return project.isAccessible()
 				&& project.hasNature(InterfaceProjectNature.NATURE_ID);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			logError(e);
 			return false;
 		}
@@ -281,13 +284,13 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void setupMultiFeatureProject(Collection<IFeatureProject> featureProjects) {
-		for (IFeatureProject featureProject : featureProjects) {
-			String projectName =
+		for (final IFeatureProject featureProject : featureProjects) {
+			final String projectName =
 				constructInterfaceProjectName(featureProject.getProjectName());
 
-			IProject newProject =
+			final IProject newProject =
 				ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			IProjectDescription description =
+			final IProjectDescription description =
 				ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
 			description.setNatureIds(new String[] {
 				InterfaceProjectNature.NATURE_ID });
@@ -297,16 +300,16 @@ public class MPLPlugin extends AbstractCorePlugin {
 
 				newProject.getFile(new Path("model.xml")).create(featureProject.getModelFile().getContents(), true, null);
 
-				InputStream stream =
+				final InputStream stream =
 					new ByteArrayInputStream("".getBytes());
 				newProject.getFile(new Path("configuration.config")).create(stream, true, null);
 				newProject.getFile(new Path(".xconf")).create(stream, true, null);
 				stream.close();
 
-				InterfaceProject interfaceProject =
+				final InterfaceProject interfaceProject =
 					new InterfaceProject(newProject, featureProject);
 				projectMap.put(projectName, interfaceProject);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				logError(e);
 			}
 		}
@@ -319,13 +322,13 @@ public class MPLPlugin extends AbstractCorePlugin {
 	public void setCurrentMapping(IProject project, String name) {
 		try {
 			project.setPersistentProperty(mappingConfigID, name);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			logError(e);
 		}
 	}
 
 	public void addViewTag(IProject project, String name) {
-		InterfaceProject interfaceProject =
+		final InterfaceProject interfaceProject =
 			getInterfaceProject(project);
 		if (interfaceProject != null) {
 //			interfaceProject.getRoleMap().addDefaultViewTag(name);
@@ -334,7 +337,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void scaleUpViewTag(IProject project, String name, int level) {
-		InterfaceProject interfaceProject =
+		final InterfaceProject interfaceProject =
 			getInterfaceProject(project);
 		if (interfaceProject != null) {
 //			interfaceProject.scaleUpViewTag(name, level);
@@ -343,7 +346,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void deleteViewTag(IProject project, String name) {
-		InterfaceProject interfaceProject =
+		final InterfaceProject interfaceProject =
 			getInterfaceProject(project);
 		if (interfaceProject != null) {
 //			interfaceProject.removeViewTag(name);
@@ -352,13 +355,13 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void refresh(IProject project) {
-		InterfaceProject interfaceProject =
+		final InterfaceProject interfaceProject =
 			getInterfaceProject(project);
 		if (interfaceProject != null) {
 //			interfaceProject.loadSignatures(true);
 			try {
 				project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				logError(e);
 			}
 
@@ -366,9 +369,9 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void buildFeatureInterfaces(LinkedList<IProject> projects, String folder, String viewName, int viewLevel, int configLimit) {
-		ArrayList<JobArguments> arguments =
+		final ArrayList<JobArguments> arguments =
 			new ArrayList<>(projects.size());
-		for (IProject iProject : projects) {
+		for (final IProject iProject : projects) {
 			arguments.add(new PrintFeatureInterfacesJob.Arguments(folder, iProject));
 		}
 		FMCorePlugin.getDefault().startJobs(arguments, true);
@@ -407,7 +410,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {
-		ArrayList<JobArguments> arguments =
+		final ArrayList<JobArguments> arguments =
 			new ArrayList<>(1);
 		arguments.add(new CreateInterfaceJob.Arguments(featureProject.getProjectName(), featureProject.getFeatureModel(), featureNames));
 		FMCorePlugin.getDefault().startJobs(arguments, true);

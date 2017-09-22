@@ -27,7 +27,7 @@ public class RenderTypeError implements Function1<TypeChefError, Object> {
 			boolean isNew =
 				true;
 			if (fileProxy.getLogs().size() > 0) {
-				for (Log log : fileProxy.getLogs()) {
+				for (final Log log : fileProxy.getLogs()) {
 					if (log.getFeature().equals(
 							typeError.condition().toString())
 						&& log.getMessage().equals(typeError.msg())
@@ -41,8 +41,8 @@ public class RenderTypeError implements Function1<TypeChefError, Object> {
 			}
 
 			if (isNew
-				|| fileProxy.getLogs().size() == 0) {
-				Log newlog =
+				|| (fileProxy.getLogs().size() == 0)) {
+				final Log newlog =
 					new Log(fileProxy, typeError.where()
 							.getPositionFrom().getLine(),
 							typeError.where()

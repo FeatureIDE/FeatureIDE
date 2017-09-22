@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,7 +39,7 @@ import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
  * Sorts configurations before they are generated based on their difference.
- * 
+ *
  * @author Mustafa Alhajjaj
  */
 public class PriorizationSorter extends AbstractConfigurationSorter {
@@ -51,7 +51,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	HashMap<String, Double> configsDistancesResult =
 		new HashMap<String, Double>();
 
-	private IFeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	public PriorizationSorter(IFeatureModel featureModel) {
 		super(featureModel);
@@ -129,9 +129,9 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 			for (int j =
 				i
 					+ 1; j < allConfig.size(); j++) {
-				int xHashCode =
+				final int xHashCode =
 					allConfig.get(i).hashCode();
-				int yHashCode =
+				final int yHashCode =
 					allConfig.get(j).hashCode();
 
 				mapKey =
@@ -156,8 +156,8 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		int index =
 			0;
 
-		for (List<String> x : allconfigs) {
-			int tempAllYes =
+		for (final List<String> x : allconfigs) {
+			final int tempAllYes =
 				x.size();
 			if (tempAllYes > allYes) {
 				allYes =
@@ -187,11 +187,11 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		String mapKeyXY;
 		String mapKeyYX;
 
-		for (List<String> x : allconfigs) {
+		for (final List<String> x : allconfigs) {
 
 			double tempDistance =
 				0.0;
-			for (List<String> y : allsortedconfigs) {
+			for (final List<String> y : allsortedconfigs) {
 				xHashCode =
 					x.hashCode();
 				yHashCode =
@@ -236,9 +236,9 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	}
 
 	private double clacDistance(List<String> x, List<String> y) {
-		Collection<String> similar =
+		final Collection<String> similar =
 			new HashSet<String>(x);
-		Collection<String> different =
+		final Collection<String> different =
 			new HashSet<String>();
 
 		different.addAll(x);
@@ -247,11 +247,11 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 
 		different.removeAll(similar);
 
-		double s =
+		final double s =
 			similar.size();
-		double d =
+		final double d =
 			different.size();
-		double t =
+		final double t =
 			concreteFeatures.size();
 
 		return (s

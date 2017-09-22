@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
 /**
  * TreeNode who stores the number of classes, roles, fields and methods of a given {@link FSTModel}.<br> This node should only be used for a feature oriented
  * project.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -44,7 +44,7 @@ public class StatisticsProgramSize extends LazyParent {
 
 	/**
 	 * Constructor for a {@code ProgrammSizeNode}.
-	 * 
+	 *
 	 * @param description description of the node shown in the view
 	 * @param fstModel FSTModel for the calculation
 	 */
@@ -56,44 +56,46 @@ public class StatisticsProgramSize extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		HashMap<String, Integer> methodMap =
+		final HashMap<String, Integer> methodMap =
 			new HashMap<String, Integer>();
-		HashMap<String, Integer> fieldMap =
+		final HashMap<String, Integer> fieldMap =
 			new HashMap<String, Integer>();
-		HashMap<String, Integer> classMap =
+		final HashMap<String, Integer> classMap =
 			new HashMap<String, Integer>();
 
-		for (FSTClass class_ : fstModel.getClasses()) {
-			for (FSTRole role : class_.getRoles()) {
-				FSTClassFragment classFragment =
+		for (final FSTClass class_ : fstModel.getClasses()) {
+			for (final FSTRole role : class_.getRoles()) {
+				final FSTClassFragment classFragment =
 					role.getClassFragment();
-				String packageName =
+				final String packageName =
 					classFragment.getPackage();
-				String qualifiedPackageName =
+				final String qualifiedPackageName =
 					(packageName == null)
 						? "(default package)"
 						: packageName;
 
-				String roleName =
+				final String roleName =
 					classFragment.getName().endsWith(".java")
 						? classFragment.getName().substring(0, classFragment.getName().length()
 							- 5)
 						: classFragment.getName();
-				String qualifiedRoleName =
+				final String qualifiedRoleName =
 					qualifiedPackageName
 						+ "."
 						+ roleName;
 
-				String qualifier =
+				final String qualifier =
 					qualifiedRoleName
 						+ ".";
 
-				for (FSTMethod method : classFragment.getMethods())
+				for (final FSTMethod method : classFragment.getMethods()) {
 					addToMap(qualifier
 						+ method.getFullName(), methodMap);
-				for (FSTField field : classFragment.getFields())
+				}
+				for (final FSTField field : classFragment.getFields()) {
 					addToMap(qualifier
 						+ field.getFullName(), fieldMap);
+				}
 				addToMap(qualifiedRoleName, classMap);
 			}
 		}
@@ -131,7 +133,7 @@ public class StatisticsProgramSize extends LazyParent {
 	private Integer sum(HashMap<String, Integer> input) {
 		Integer sum =
 			0;
-		for (Integer value : input.values()) {
+		for (final Integer value : input.values()) {
 			sum +=
 				value;
 		}

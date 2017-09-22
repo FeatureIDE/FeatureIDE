@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,7 +28,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 /**
  * Default implementation of {@link FSTMethod} and {@link FSTField}.
- * 
+ *
  * @author Jens Meinicke
  */
 public abstract class RoleElement<T extends RoleElement<T>> implements Comparable<T>, IRoleElement {
@@ -92,15 +92,18 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 			endLine;
 	}
 
+	@Override
 	public FSTRole getRole() {
 		return role;
 	}
 
+	@Override
 	public void setRole(FSTRole parent) {
 		this.role =
 			parent;
 	}
 
+	@Override
 	public IRoleElement getParent() {
 		return parent;
 	}
@@ -113,6 +116,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 			: name;
 	}
 
+	@Override
 	public String getFullIdentifier() {
 		final StringBuilder sb =
 			new StringBuilder(removeExtension(name));
@@ -144,6 +148,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 				+ 1);
 	}
 
+	@Override
 	public void setParent(IRoleElement parent) {
 		this.parent =
 			parent;
@@ -213,6 +218,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 		return type;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -236,8 +242,8 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 		int result =
 			1;
 		result =
-			prime
-				* result
+			(prime
+				* result)
 				+ ((getFullName() == null)
 					? 0
 					: getFullName().hashCode());
@@ -246,19 +252,23 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null
-			|| !obj.getClass().equals(this.getClass()))
+		}
+		if ((obj == null)
+			|| !obj.getClass().equals(this.getClass())) {
 			return false;
+		}
 		final IRoleElement other =
 			(IRoleElement) obj;
-		if (!other.getFullName().equals(this.getFullName()))
+		if (!other.getFullName().equals(getFullName())) {
 			return false;
+		}
 
 		return true;
 	}
 
+	@Override
 	public String getJavaDocComment() {
 		return javaDocComment;
 	}
@@ -274,7 +284,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 		if (this == element) {
 			return 0;
 		}
-		return this.getFullName().compareToIgnoreCase(element.getFullName());
+		return getFullName().compareToIgnoreCase(element.getFullName());
 	}
 
 }

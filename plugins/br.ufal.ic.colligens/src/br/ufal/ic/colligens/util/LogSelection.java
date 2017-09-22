@@ -4,9 +4,9 @@ import org.eclipse.jface.text.ITextSelection;
 
 public class LogSelection implements ITextSelection {
 
-	private int line;
-	private int length;
-	private int offset;
+	private final int line;
+	private final int length;
+	private final int offset;
 
 	public LogSelection(int line, int length, int offset) {
 		this.line =

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,7 +31,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 /**
  * A role is a implementation unit representing a class at a corresponding feature.
- * 
+ *
  * @author Jens Meinicke
  * @author Dominic Labsch
  * @author Daniel P�sche
@@ -42,8 +42,8 @@ public class FSTRole {
 		new TreeSet<FSTDirective>();
 	private final FSTClassFragment classFragment;
 
-	private FSTFeature feature;
-	private FSTClass fstClass;
+	private final FSTFeature feature;
+	private final FSTClass fstClass;
 	private IFile file;
 
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
@@ -53,9 +53,9 @@ public class FSTRole {
 			fstClass;
 		this.file =
 			file;
-		this.classFragment =
+		classFragment =
 			new FSTClassFragment(fstClass.getName());
-		this.classFragment.setRole(this);
+		classFragment.setRole(this);
 	}
 
 	public void add(FSTDirective directive) {
@@ -111,32 +111,32 @@ public class FSTRole {
 
 	// get all fields of all nested classes
 	public LinkedList<FSTField> getAllFields() {
-		LinkedList<FSTField> allFields =
+		final LinkedList<FSTField> allFields =
 			new LinkedList<FSTField>();
-		getAllFieldsRec(allFields, this.getClassFragment());
+		getAllFieldsRec(allFields, getClassFragment());
 		return allFields;
 
 	}
 
 	private void getAllFieldsRec(LinkedList<FSTField> fields, FSTClassFragment innerClass) {
 		fields.addAll(innerClass.getFields());
-		for (FSTClassFragment i : innerClass.getInnerClasses()) {
+		for (final FSTClassFragment i : innerClass.getInnerClasses()) {
 			getAllFieldsRec(fields, i);
 		}
 	}
 
 	// get all methods of all nested classes
 	public LinkedList<FSTMethod> getAllMethods() {
-		LinkedList<FSTMethod> allMethods =
+		final LinkedList<FSTMethod> allMethods =
 			new LinkedList<FSTMethod>();
-		getAllMethodsRec(allMethods, this.getClassFragment());
+		getAllMethodsRec(allMethods, getClassFragment());
 		return allMethods;
 
 	}
 
 	private void getAllMethodsRec(LinkedList<FSTMethod> methods, FSTClassFragment innerClass) {
 		methods.addAll(innerClass.getMethods());
-		for (FSTClassFragment i : innerClass.getInnerClasses()) {
+		for (final FSTClassFragment i : innerClass.getInnerClasses()) {
 			getAllMethodsRec(methods, i);
 		}
 
@@ -144,16 +144,16 @@ public class FSTRole {
 
 	// get all nested classes of all nested classes
 	public LinkedList<FSTClassFragment> getAllInnerClasses() {
-		LinkedList<FSTClassFragment> allInnerClasses =
+		final LinkedList<FSTClassFragment> allInnerClasses =
 			new LinkedList<FSTClassFragment>();
-		getAllInnerClassesRec(allInnerClasses, this.getClassFragment());
+		getAllInnerClassesRec(allInnerClasses, getClassFragment());
 		return allInnerClasses;
 
 	}
 
 	private void getAllInnerClassesRec(LinkedList<FSTClassFragment> fragment, FSTClassFragment innerClass) {
 		fragment.addAll(innerClass.getInnerClasses());
-		for (FSTClassFragment i : innerClass.getInnerClasses()) {
+		for (final FSTClassFragment i : innerClass.getInnerClasses()) {
 			getAllInnerClassesRec(fragment, i);
 		}
 	}
@@ -163,8 +163,8 @@ public class FSTRole {
 		final LinkedList<FSTClassFragment> frag =
 			new LinkedList<FSTClassFragment>();
 
-		for (FSTRole role : fstClass.getRoles()) {
-			for (FSTClassFragment currFrag : role.getAllInnerClasses()) {
+		for (final FSTRole role : fstClass.getRoles()) {
+			for (final FSTClassFragment currFrag : role.getAllInnerClasses()) {
 				if (currFrag.equals(fragment)) {
 					frag.add(currFrag);
 					break;
@@ -177,17 +177,17 @@ public class FSTRole {
 
 	@Override
 	public String toString() {
-		StringBuilder builder =
+		final StringBuilder builder =
 			new StringBuilder();
 		builder.append(fstClass.getName());
 		builder.append(" @ ");
 		builder.append(feature.getName());
 		builder.append("\n");
-		for (FSTField f : classFragment.fields) {
+		for (final FSTField f : classFragment.fields) {
 			builder.append(f.getName());
 			builder.append("\n");
 		}
-		for (FSTMethod m : classFragment.methods) {
+		for (final FSTMethod m : classFragment.methods) {
 			builder.append(m.getName());
 			builder.append("\n");
 		}

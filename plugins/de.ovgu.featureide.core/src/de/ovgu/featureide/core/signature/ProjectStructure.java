@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.core.signature.java.JavaClassCreator;
 
 /**
  * Representation of {@link ProjectSignatures} as a list of classes.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ProjectStructure {
@@ -53,11 +53,11 @@ public class ProjectStructure {
 
 	public void construct(SignatureIterator allMembers, AClassCreator aClassCreator) {
 		classList.clear();
-		LinkedList<AbstractClassSignature> parents =
+		final LinkedList<AbstractClassSignature> parents =
 			new LinkedList<AbstractClassSignature>();
 		allMembers.reset();
 		while (allMembers.hasNext()) {
-			AbstractSignature sig =
+			final AbstractSignature sig =
 				allMembers.next();
 			AbstractClassSignature parent =
 				sig.getParent();
@@ -87,15 +87,15 @@ public class ProjectStructure {
 				addClass(parentClass);
 			} else {
 				if (sig instanceof AbstractClassSignature) {
-					AbstractClassSignature parentSig =
+					final AbstractClassSignature parentSig =
 						parentClass.getSignature();
-					for (String newImport : ((AbstractClassSignature) sig).getImportList()) {
+					for (final String newImport : ((AbstractClassSignature) sig).getImportList()) {
 						parentSig.addImport(newImport);
 					}
 				}
 			}
 
-			for (AbstractClassSignature child : parents) {
+			for (final AbstractClassSignature child : parents) {
 				AbstractClassFragment childClass =
 					parentClass.getInnerClass(child.getFullName());
 
@@ -125,6 +125,7 @@ public class ProjectStructure {
 		classList.put(classSig.getSignature().getFullName(), classSig);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -134,16 +135,16 @@ public class ProjectStructure {
 			return false;
 		}
 
-		ProjectStructure otherSig =
+		final ProjectStructure otherSig =
 			(ProjectStructure) obj;
 
 		if (classList.size() != otherSig.classList.size()) {
 			return false;
 		}
-		for (Entry<String, AbstractClassFragment> entrySet : classList.entrySet()) {
-			AbstractClassFragment otherClassSig =
+		for (final Entry<String, AbstractClassFragment> entrySet : classList.entrySet()) {
+			final AbstractClassFragment otherClassSig =
 				otherSig.classList.get(entrySet.getKey());
-			if (otherClassSig == null
+			if ((otherClassSig == null)
 				|| !otherClassSig.equals(entrySet.getValue())) {
 				return false;
 			}
@@ -156,7 +157,7 @@ public class ProjectStructure {
 		if (!hasHashCode) {
 			hashCode =
 				1;
-			for (AbstractClassFragment cls : classList.values()) {
+			for (final AbstractClassFragment cls : classList.values()) {
 				hashCode =
 					hashCode
 						+ cls.hashCode();
@@ -169,9 +170,9 @@ public class ProjectStructure {
 
 	@Override
 	public String toString() {
-		StringBuilder sb =
+		final StringBuilder sb =
 			new StringBuilder();
-		for (AbstractClassFragment cls : classList.values()) {
+		for (final AbstractClassFragment cls : classList.values()) {
 			sb.append(cls.toString());
 		}
 		return sb.toString();

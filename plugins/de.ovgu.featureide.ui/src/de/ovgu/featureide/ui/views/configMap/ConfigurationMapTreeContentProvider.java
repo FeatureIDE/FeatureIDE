@@ -2,16 +2,16 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistributefiltersRoots/or modify
  * it under the terms of the filtersatureRootfilters PufeatureRootscense as publishefilters the FrefeatureRootsare Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * ContentProvider for the tree ConfigurationMap
- * 
+ *
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
@@ -47,7 +47,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	private Object[] featureRoots =
 		emptyRoot;
 
-	private ConfigurationMap configurationMap;
+	private final ConfigurationMap configurationMap;
 
 	public ConfigurationMapTreeContentProvider(ConfigurationMap configurationMap) {
 		this.configurationMap =
@@ -58,7 +58,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	public boolean addFilter(IConfigurationMapFilter filter) {
 		if (featureProject != null) {
 			if (configurationMap.getFilters().add(filter)) {
-				filter.initialize(this.configurationMap);
+				filter.initialize(configurationMap);
 				updateElements();
 				return true;
 			}
@@ -88,8 +88,8 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 			this.featureProject =
 				featureProject;
 			if (featureProject != null) {
-				for (IConfigurationMapFilter filter : configurationMap.getFilters()) {
-					filter.initialize(this.configurationMap);
+				for (final IConfigurationMapFilter filter : configurationMap.getFilters()) {
+					filter.initialize(configurationMap);
 				}
 			}
 			updateElements();
@@ -103,21 +103,23 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 			return;
 		}
 
-		List<Object> featureRootList =
+		final List<Object> featureRootList =
 			new ArrayList<>();
 
 		// add Features
-		for (IFeature feature : featureProject.getFeatureModel().getFeatures())
+		for (final IFeature feature : featureProject.getFeatureModel().getFeatures()) {
 			// getParent(feature) == null <=> With the used filter, this feature is a root (although originally it may be not).
 			if (filter(feature)
 				&& (feature.getStructure().isRoot()
-					|| getParent(feature) == null))
+					|| (getParent(feature) == null))) {
 				featureRootList.add(feature);
+			}
+		}
 
 		featureRoots =
 			featureRootList.toArray();
 
-		this.configurationMap.updateTree();
+		configurationMap.updateTree();
 	}
 
 	/**
@@ -137,20 +139,22 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	 * @param parentElement the parent element
 	 * @return an array of child elements
 	 */
+	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IFeature) {
-			IFeature f =
+			final IFeature f =
 				(IFeature) parentElement;
-			List<IFeatureStructure> childStructures =
+			final List<IFeatureStructure> childStructures =
 				f.getStructure().getChildren();
 
-			List<Object> children =
+			final List<Object> children =
 				new ArrayList<>();
-			for (IFeatureStructure struct : childStructures) {
-				IFeature child =
+			for (final IFeatureStructure struct : childStructures) {
+				final IFeature child =
 					struct.getFeature();
-				if (filter(child))
+				if (filter(child)) {
 					children.add(child);
+				}
 			}
 
 			return children.toArray();
@@ -166,11 +170,12 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	 * @param element the element
 	 * @return the parent element, or <code>null</code> if it has none or if the parent cannot be computed
 	 */
+	@Override
 	public Object getParent(Object element) {
 		if (element instanceof IFeature) {
-			IFeature feature =
+			final IFeature feature =
 				(IFeature) element;
-			IFeatureStructure parentStructure =
+			final IFeatureStructure parentStructure =
 				feature.getStructure().getParent();
 			if (parentStructure != null) {
 				return filter(parentStructure.getFeature());
@@ -186,12 +191,13 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	 * @param element the element
 	 * @return <code>true</code> if the given element has children, and <code>false</code> if it has no children
 	 */
+	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof IFeature) {
-			IFeature f =
+			final IFeature f =
 				(IFeature) element;
 
-			for (IFeatureStructure childStruct : f.getStructure().getChildren()) {
+			for (final IFeatureStructure childStruct : f.getStructure().getChildren()) {
 				// If at least one child is valid, the feature has children.
 				return filter(childStruct.getFeature());
 			}
@@ -202,9 +208,10 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 
 	private boolean filter(IFeature feature) {
 		// OR
-		for (IConfigurationMapFilter filter : configurationMap.getFilters()) {
-			if (filter.test(this.configurationMap, feature))
+		for (final IConfigurationMapFilter filter : configurationMap.getFilters()) {
+			if (filter.test(configurationMap, feature)) {
 				return true;
+			}
 		}
 
 		return false;

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,13 +47,13 @@ import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * Create mpl interfaces.
- * 
+ *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
@@ -113,9 +113,9 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 
 	private static boolean checkOr(final SatSolver solver, Node clause) throws TimeoutException {
 		if (clause instanceof Or) {
-			Node[] clauseChildren =
+			final Node[] clauseChildren =
 				clause.getChildren();
-			Literal[] literals =
+			final Literal[] literals =
 				new Literal[clauseChildren.length];
 			for (int k =
 				0; k < literals.length; k++) {
@@ -137,32 +137,32 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 	private static boolean cut(final IFeature curFeature) {
 		final IFeatureStructure structure =
 			curFeature.getStructure();
-		boolean notSelected =
+		final boolean notSelected =
 			curFeature.getName().equals(MARK1);
 
-		List<IFeature> list =
+		final List<IFeature> list =
 			FeatureUtils.convertToFeatureList(structure.getChildren());
 		if (list.isEmpty()) {
 			return notSelected;
 		} else {
-			boolean[] remove =
+			final boolean[] remove =
 				new boolean[list.size()];
 			int removeCount =
 				0;
 
 			int i =
 				0;
-			for (IFeature child : list) {
+			for (final IFeature child : list) {
 				remove[i++] =
 					cut(child);
 			}
 
 			// remove children
-			Iterator<IFeature> it =
+			final Iterator<IFeature> it =
 				list.iterator();
 			for (i =
 				0; i < remove.length; i++) {
-				IFeature feat =
+				final IFeature feat =
 					it.next();
 				if (remove[i]) {
 					it.remove();
@@ -180,12 +180,12 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 				case GROUP_OR:
 					if (removeCount > 0) {
 						structure.setAnd();
-						for (IFeature child : list) {
+						for (final IFeature child : list) {
 							child.getStructure().setMandatory(false);
 						}
 					} else if (list.size() == 1) {
 						structure.setAnd();
-						for (IFeature child : list) {
+						for (final IFeature child : list) {
 							child.getStructure().setMandatory(true);
 						}
 					}
@@ -194,17 +194,17 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 					if (removeCount > 0) {
 						if (list.size() == 1) {
 							structure.setAnd();
-							for (IFeature child : list) {
+							for (final IFeature child : list) {
 								child.getStructure().setMandatory(false);
 							}
 						} else {
 							final IFeatureModel featureModel =
 								curFeature.getFeatureModel();
-							IFeature pseudoAlternative =
+							final IFeature pseudoAlternative =
 								FMFactoryManager.getFactory(featureModel).createFeature(featureModel, MARK2);
 							pseudoAlternative.getStructure().setMandatory(false);
 							pseudoAlternative.getStructure().setAlternative();
-							for (IFeature child : list) {
+							for (final IFeature child : list) {
 								pseudoAlternative.getStructure().addChild(child.getStructure());
 								structure.removeChild(child.getStructure());
 							}
@@ -214,7 +214,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 						}
 					} else if (list.size() == 1) {
 						structure.setAnd();
-						for (IFeature child : list) {
+						for (final IFeature child : list) {
 							child.getStructure().setMandatory(true);
 						}
 					}
@@ -269,14 +269,14 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 	}
 
 	private void deleteFeature(IFeatureStructure curFeature) {
-		IFeatureStructure parent =
+		final IFeatureStructure parent =
 			curFeature.getParent();
-		List<IFeatureStructure> children =
+		final List<IFeatureStructure> children =
 			curFeature.getChildren();
 		parent.removeChild(curFeature);
 		changed =
 			true;
-		for (IFeatureStructure child : children) {
+		for (final IFeatureStructure child : children) {
 			parent.addChild(child);
 		}
 		children.clear();// XXX code smell
@@ -302,7 +302,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 					if (checkOr(modelSatSolver, child)) {
 						m.addConstraint(factory.createConstraint(m, child));
 					}
-				} catch (TimeoutException e) {
+				} catch (final TimeoutException e) {
 					Logger.logError(e);
 				} finally {
 					monitor.step();
@@ -320,23 +320,23 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		}
 		int curFeatureGroup =
 			getGroup(curFeature);
-		LinkedList<IFeatureStructure> list =
+		final LinkedList<IFeatureStructure> list =
 			new LinkedList<>(curFeature.getChildren());
 		try {
-			for (IFeatureStructure child : list) {
+			for (final IFeatureStructure child : list) {
 				merge(child, curFeatureGroup);
 				curFeatureGroup =
 					getGroup(curFeature);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
 		if (curFeature.getFeature().getName().equals(MARK1)) {
 			if (parentGroup == curFeatureGroup) {
-				if (parentGroup == GROUP_AND
+				if ((parentGroup == GROUP_AND)
 					&& !curFeature.isMandatory()) {
-					for (IFeatureStructure feature : curFeature.getChildren()) {
+					for (final IFeatureStructure feature : curFeature.getChildren()) {
 						feature.setMandatory(false);
 					}
 				}
@@ -344,7 +344,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			} else {
 				switch (parentGroup) {
 				case GROUP_AND:
-					IFeatureStructure parent =
+					final IFeatureStructure parent =
 						curFeature.getParent();
 					if (parent.getChildrenCount() == 1) {
 						switch (curFeatureGroup) {
@@ -362,7 +362,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 					if (curFeatureGroup == GROUP_AND) {
 						boolean allOptional =
 							true;
-						for (IFeatureStructure child : list) {
+						for (final IFeatureStructure child : list) {
 							if (child.isMandatory()) {
 								allOptional =
 									false;
@@ -375,8 +375,8 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 					}
 					break;
 				case GROUP_ALT:
-					if (curFeatureGroup == GROUP_AND
-						&& list.size() == 1) {
+					if ((curFeatureGroup == GROUP_AND)
+						&& (list.size() == 1)) {
 						deleteFeature(curFeature);
 					}
 					break;
@@ -390,8 +390,8 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			arguments.modelFile.getFileName();
 		final Path root =
 			arguments.modelFile.getRoot();
-		if (filePath != null
-			&& root != null) {
+		if ((filePath != null)
+			&& (root != null)) {
 			String fileName =
 				filePath.toString();
 			final int extIndex =
@@ -410,7 +410,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 				root.resolve(arguments.modelFile.subpath(0, arguments.modelFile.getNameCount()
 					- 1)).resolve(fileName);
 
-			FileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
+			SimpleFileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
 		}
 	}
 
@@ -432,20 +432,20 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		final IFeatureModel m =
 			orgFeatureModel.clone();
 		// mark features
-		for (IFeature feat : m.getFeatures()) {
+		for (final IFeature feat : m.getFeatures()) {
 			if (!selectedFeatureNames.contains(feat.getName())) {
 				feat.setName(MARK1);
 			}
 		}
 
-		IFeature root =
+		final IFeature root =
 			m.getStructure().getRoot().getFeature();
 
 		m.getStructure().setRoot(null);
 		m.reset();
 
 		// set new abstract root
-		IFeature nroot =
+		final IFeature nroot =
 			factory.createFeature(m, "__root__");
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
@@ -463,15 +463,15 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 
 		int count =
 			0;
-		Hashtable<String, IFeature> featureTable =
+		final Hashtable<String, IFeature> featureTable =
 			new Hashtable<String, IFeature>();
-		LinkedList<IFeature> featureStack =
+		final LinkedList<IFeature> featureStack =
 			new LinkedList<IFeature>();
 		featureStack.push(nroot);
 		while (!featureStack.isEmpty()) {
-			IFeature curFeature =
+			final IFeature curFeature =
 				featureStack.pop();
-			for (IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
+			for (final IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
 				featureStack.push(feature);
 			}
 			if (curFeature.getName().startsWith(MARK1)) {
@@ -487,12 +487,12 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		if (arguments.considerConstraints) {
 			final ArrayList<IConstraint> innerConstraintList =
 				new ArrayList<>();
-			for (IConstraint constaint : orgFeatureModel.getConstraints()) {
+			for (final IConstraint constaint : orgFeatureModel.getConstraints()) {
 				final Collection<IFeature> containedFeatures =
 					constaint.getContainedFeatures();
 				boolean containsAllfeatures =
 					!containedFeatures.isEmpty();
-				for (IFeature feature : containedFeatures) {
+				for (final IFeature feature : containedFeatures) {
 					if (!selectedFeatureNames.contains(feature.getName())) {
 						containsAllfeatures =
 							false;
@@ -503,7 +503,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 					innerConstraintList.add(constaint);
 				}
 			}
-			for (IConstraint constraint : innerConstraintList) {
+			for (final IConstraint constraint : innerConstraintList) {
 				m.addConstraint(constraint.clone(m));
 			}
 		}

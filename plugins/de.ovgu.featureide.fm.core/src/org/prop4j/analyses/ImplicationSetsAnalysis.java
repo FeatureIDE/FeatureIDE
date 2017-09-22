@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Creates a complete implication graph.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>> {
@@ -75,7 +75,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 				featureID1;
 			this.featureID2 =
 				featureID2;
-			this.relation =
+			relation =
 				0;
 		}
 
@@ -114,27 +114,29 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			int result =
 				1;
 			result =
-				prime
-					* result
+				(prime
+					* result)
 					+ featureID1;
 			result =
-				prime
-					* result
+				(prime
+					* result)
 					+ featureID2;
 			return result;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null
-				|| getClass() != obj.getClass())
+			}
+			if ((obj == null)
+				|| (getClass() != obj.getClass())) {
 				return false;
+			}
 			final Relationship other =
 				(Relationship) obj;
-			return featureID1 == other.featureID1
-				&& featureID2 == other.featureID2;
+			return (featureID1 == other.featureID1)
+				&& (featureID2 == other.featureID2);
 		}
 
 		@Override
@@ -180,13 +182,13 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 
 		solver.initSolutionList(Math.min(solver.getSatInstance().getNumberOfVariables(), ISatSolver.MAX_SOLUTION_BUFFER));
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		int[] model1 =
+		final int[] model1 =
 			solver.findModel();
 
 		// satisfiable?
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			int[] model2 =
+			final int[] model2 =
 				solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
@@ -230,7 +232,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 				new byte[numVariables
 					* numVariables];
 
-			outer: for (Node clause : solver.getSatInstance().getCnf().getChildren()) {
+			outer: for (final Node clause : solver.getSatInstance().getCnf().getChildren()) {
 				final Node[] literals =
 					clause.getChildren();
 				int childrenCount =
@@ -271,8 +273,8 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 					}
 				}
 				for (int i =
-					0; i < childrenCount
-						- 1; i++) {
+					0; i < (childrenCount
+						- 1); i++) {
 					final int x =
 						solver.getSatInstance().getVariable((Literal) literals[i])
 							- 1;
@@ -282,12 +284,12 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 						final int y =
 							solver.getSatInstance().getVariable((Literal) literals[j])
 								- 1;
-						combinations[x
-							* numVariables
+						combinations[(x
+							* numVariables)
 							+ y] |=
 								BIT_CHECK;
-						combinations[y
-							* numVariables
+						combinations[(y
+							* numVariables)
 							+ x] |=
 								BIT_CHECK;
 					}
@@ -304,22 +306,22 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 					for (int y1 =
 						0; y1 < model1Copy.length; y1++) {
 						final int combinationIndexX1Y1 =
-							x1
-								* numVariables
+							(x1
+								* numVariables)
 								+ y1;
 						if ((combinations[combinationIndexX1Y1]
 							& BIT_CHECK) != 0) {
 							for (int x2 =
 								0; x2 < model1Copy.length; x2++) {
 								final int combinationIndexY1X2 =
-									y1
-										* numVariables
+									(y1
+										* numVariables)
 										+ x2;
 								if ((combinations[combinationIndexY1X2]
 									& BIT_CHECK) != 0) {
 									final int combinationIndexX1X2 =
-										x1
-											* numVariables
+										(x1
+											* numVariables)
 											+ x2;
 									if ((combinations[combinationIndexX1X2]
 										& BIT_CHECK) == 0) {
@@ -384,9 +386,9 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 				? 1
 				: 2);
 
-		if (core[i] == 0
-			&& (recArray[i]
-				& compareB) == 0) {
+		if ((core[i] == 0)
+			&& ((recArray[i]
+				& compareB) == 0)) {
 			recArray[i] |=
 				compareB;
 
@@ -396,8 +398,8 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 
 			for (int j =
 				0; j < numVariables; j++) {
-				if (i != j
-					&& core[j] == 0) {
+				if ((i != j)
+					&& (core[j] == 0)) {
 					final byte b =
 						combinations[rowIndex
 							+ j];
@@ -429,7 +431,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 						}
 					}
 					if (my1 != 0) {
-						for (int mx0 : parentStack) {
+						for (final int mx0 : parentStack) {
 							if (addRelation2(mx0, my1)) {
 								changed =
 									true;
@@ -461,15 +463,15 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 				? 1
 				: 2);
 
-		if (core[i] == 0
-			&& (recArray[i]
-				& compareB) == 0) {
+		if ((core[i] == 0)
+			&& ((recArray[i]
+				& compareB) == 0)) {
 			recArray[i] |=
 				compareB;
 
 			int[] xModel1 =
 				null;
-			for (int[] solution : solver.getSolutionList()) {
+			for (final int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
 					xModel1 =
 						solution;
@@ -494,19 +496,19 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 				final byte b =
 					combinations[rowIndex
 						+ j];
-				if (core[j] == 0
-					&& (b
-						& BIT_CHECK) != 0
+				if ((core[j] == 0)
+					&& ((b
+						& BIT_CHECK) != 0)
 					&& ((positive
-						&& (b
-							& BITS_POSITIVE_IMPLY) == 0)
+						&& ((b
+							& BITS_POSITIVE_IMPLY) == 0))
 						|| (!positive
-							&& (b
-								& BITS_NEGATIVE_IMPLY) == 0))) {
+							&& ((b
+								& BITS_NEGATIVE_IMPLY) == 0)))) {
 
 					final int my1 =
 						xModel1[j];
-					for (int[] solution : solver.getSolutionList()) {
+					for (final int[] solution : solver.getSolutionList()) {
 						final int mxI =
 							solution[i];
 						final int myI =
@@ -518,14 +520,14 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 					}
 
 					solver.assignmentPush(-my1);
-					solver.setSelectionStrategy((c++
-						% 2 != 0)
+					solver.setSelectionStrategy(((c++
+						% 2) != 0)
 							? SelectionStrategy.POSITIVE
 							: SelectionStrategy.NEGATIVE);
 
 					switch (solver.isSatisfiable()) {
 					case FALSE:
-						for (int mx0 : parentStack) {
+						for (final int mx0 : parentStack) {
 							addRelation(mx0, my1);
 						}
 						parentStack.push(my1);
@@ -568,12 +570,12 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			Math.abs(my0)
 				- 1;
 		final int combinationIndexXY =
-			indexX
-				* numVariables
+			(indexX
+				* numVariables)
 				+ indexY;
 		final int combinationIndexYX =
-			indexY
-				* numVariables
+			(indexY
+				* numVariables)
 				+ indexX;
 
 		if (mx0 > 0) {
@@ -618,12 +620,12 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			return false;
 		}
 		final int combinationIndexXY =
-			indexX
-				* numVariables
+			(indexX
+				* numVariables)
 				+ indexY;
 		final int combinationIndexYX =
-			indexY
-				* numVariables
+			(indexY
+				* numVariables)
 				+ indexX;
 
 		final Relationship newRelationship;
@@ -693,8 +695,8 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			}
 		}
 
-		return oldXY != combinations[combinationIndexXY]
-			|| oldYX != combinations[combinationIndexYX];
+		return (oldXY != combinations[combinationIndexXY])
+			|| (oldYX != combinations[combinationIndexYX]);
 	}
 
 }

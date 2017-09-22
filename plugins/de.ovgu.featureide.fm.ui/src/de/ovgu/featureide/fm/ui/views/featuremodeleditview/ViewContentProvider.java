@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -63,7 +63,7 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
 
 /**
  * Calculates the edit category and provides as a content to the view.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -171,34 +171,44 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			view;
 	}
 
+	@Override
 	public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
 
+	@Override
 	public void dispose() {
 		invisibleRoot =
 			null;
 	}
 
+	@Override
 	public Object[] getElements(Object parent) {
-		if (parent.equals(view.getViewSite()))
+		if (parent.equals(view.getViewSite())) {
 			return getChildren(invisibleRoot);
+		}
 		return getChildren(parent);
 	}
 
+	@Override
 	public Object getParent(Object child) {
-		if (child instanceof TreeElement)
+		if (child instanceof TreeElement) {
 			return ((TreeElement) child).getParent();
+		}
 		return null;
 	}
 
+	@Override
 	public Object[] getChildren(Object parent) {
-		if (parent instanceof TreeElement)
+		if (parent instanceof TreeElement) {
 			return ((TreeElement) parent).getChildren();
+		}
 		return new Object[0];
 	}
 
+	@Override
 	public boolean hasChildren(Object parent) {
-		if (parent instanceof TreeElement)
+		if (parent instanceof TreeElement) {
 			return ((TreeElement) parent).hasChildren();
+		}
 		return false;
 	}
 
@@ -226,12 +236,14 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		new ModelComparator(TIMEOUT);
 
 	public void calculateContent(final IFeatureModel oldModel, final IFeatureModel newModel, IProgressMonitor monitor) {
-		if (oldModel.getStructure().getRoot() == null
-			|| newModel.getStructure().getRoot() == null)
+		if ((oldModel.getStructure().getRoot() == null)
+			|| (newModel.getStructure().getRoot() == null)) {
 			return;
+		}
 
-		if (isCanceled())
+		if (isCanceled()) {
 			return;
+		}
 
 		if (invisibleRoot.getChildren().length <= 1) {
 			// case: init
@@ -253,21 +265,23 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			calculateContent(oldModel, newModel, monitor);
 		} else {
 			// case: update
-			if (isCanceled())
+			if (isCanceled()) {
 				return;
+			}
 
 			if (Runtime.getRuntime().availableProcessors() >= PROCESSOR_LIMIT) {
 				// case: running in parallel jobs
 				// TODO it is unnecessary to refresh this every time while nothing has changed
-				Job oldCalculationJob =
+				final Job oldCalculationJob =
 					new Job("Calculate: \""
 						+ STATISTICS_BEFORE
 						+ "\"") {
 
 						@Override
 						protected IStatus run(IProgressMonitor monitor) {
-							if (isCanceled())
+							if (isCanceled()) {
 								return Status.OK_STATUS;
+							}
 							monitor.beginTask("", 2);
 							addStatistics(invisibleRoot, STATISTICS_BEFORE, oldModel, INDEX_STATISTICS_BEFORE, false, monitor);
 							return Status.OK_STATUS;
@@ -276,15 +290,16 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 				oldCalculationJob.setPriority(Job.DECORATE);
 				oldCalculationJob.schedule();
 
-				Job newCalculationJob =
+				final Job newCalculationJob =
 					new Job("Calculate: \""
 						+ STATISTICS_AFTER
 						+ "\"") {
 
 						@Override
 						protected IStatus run(IProgressMonitor monitor) {
-							if (isCanceled())
+							if (isCanceled()) {
 								return Status.OK_STATUS;
+							}
 							monitor.beginTask("", 2);
 							addStatistics(invisibleRoot, STATISTICS_AFTER, newModel, INDEX_STATISTICS_AFTER, false, monitor);
 							return Status.OK_STATUS;
@@ -299,21 +314,23 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 					oldCalculationJob.join();
 					newCalculationJob.join();
 
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			} else {
 				// case: running in one jobs
 				monitor.beginTask(CALCULATE_CONTENT, 5);
 				setHeadAndExamples(monitor, oldModel, newModel);
-				if (isCanceled())
+				if (isCanceled()) {
 					return;
+				}
 				monitor.worked(1);
 
 				// TODO it is unnecessary to refresh this every time while nothing has changed
 				addStatistics(invisibleRoot, STATISTICS_BEFORE, oldModel, INDEX_STATISTICS_BEFORE, false, monitor);
-				if (isCanceled())
+				if (isCanceled()) {
 					return;
+				}
 				addStatistics(invisibleRoot, STATISTICS_AFTER, newModel, INDEX_STATISTICS_AFTER, false, monitor);
 			}
 		}
@@ -321,16 +338,16 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	/**
 	 * Sets the comparing entry and calculates some examples
-	 * 
+	 *
 	 * @param monitor
 	 * @param oldModel
 	 * @param newModel
 	 */
 	private void setHeadAndExamples(IProgressMonitor monitor, IFeatureModel oldModel, IFeatureModel newModel) {
 		monitor.setTaskName(COMPARE_MODELS);
-		TreeObject head =
+		final TreeObject head =
 			calculateHead(oldModel, newModel, comparator);
-		TreeElement[] children =
+		final TreeElement[] children =
 			invisibleRoot.getChildren();
 		((TreeObject) children[INDEX_HEAD]).setContents(head.getName(), head.getImage());
 		((TreeObject) children[INDEX_ADDED]).set(new ExampleParent(true, comparator, 1, null));
@@ -342,10 +359,10 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * Calculates the content of the first line Compares the old with the new model
 	 */
 	private TreeObject calculateHead(IFeatureModel oldModel, IFeatureModel newModel, ModelComparator comparator) {
-		long start =
+		final long start =
 			System.currentTimeMillis();
 
-		Comparison comparison =
+		final Comparison comparison =
 			comparator.compare(oldModel, newModel);
 
 		String message;
@@ -397,7 +414,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	/**
 	 * Sets the statistics entries and counts the numbers of program variants and configurations
-	 * 
+	 *
 	 * @param root The root of the tree
 	 * @param text The text of the statistics
 	 * @param model The corresponding model
@@ -426,7 +443,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		if (init) {
 			// case: init
 			// does not count configurations and program variants
-			TreeParent statistics =
+			final TreeParent statistics =
 				new TreeParent(text, null, true) {
 
 					@Override
@@ -434,7 +451,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 						try {
 							addChild(MODEL_VOID
 								+ model.getAnalyser().isValid());
-						} catch (TimeoutException e) {
+						} catch (final TimeoutException e) {
 							addChild(MODEL_TIMEOUT);
 						}
 						addChild(NUMBER_FEATURES
@@ -461,7 +478,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		} else {
 			// case: update
 			// calculates the statistics
-			TreeObject statistics =
+			final TreeObject statistics =
 				(TreeObject) root.getChildren()[position];
 			final TreeElement[] children =
 				statistics.getChildren();
@@ -473,13 +490,13 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID
 						+ model.getAnalyser().isValid());
 				}
-			} catch (TimeoutException e) {
+			} catch (final TimeoutException e) {
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
 					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_TIMEOUT);
 				} else {
 					((TreeObject) children[INDEX_VALID]).setName(MODEL_TIMEOUT);
 				}
-			} catch (ConcurrentModificationException e) {
+			} catch (final ConcurrentModificationException e) {
 
 			}
 			((TreeObject) children[INDEX_FEATURES]).setName(NUMBER_FEATURES
@@ -499,11 +516,12 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			((TreeObject) children[INDEX_CONSTRAINTS]).setName(NUMBER_CONSTRAINTS
 				+ constraints);
 
-			if (isCanceled())
+			if (isCanceled()) {
 				return;
+			}
 
 			if (Runtime.getRuntime().availableProcessors() >= PROCESSOR_LIMIT) {
-				Job job =
+				final Job job =
 					new Job("Calculate: \""
 						+ text
 						+ "\"") {
@@ -529,15 +547,16 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 					job.join();
 					monitor.worked(1);
 					monitor.done();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			} else {
 				((TreeObject) children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
 				refresh();
 				monitor.worked(1);
-				if (isCanceled())
+				if (isCanceled()) {
 					return;
+				}
 				((TreeObject) children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
 				refresh();
 				monitor.worked(1);
@@ -547,11 +566,11 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	private TreeParent calculateNumberOfVariants(IFeatureModel model, boolean ignoreAbstractFeatures) {
 
-		String variants =
+		final String variants =
 			ignoreAbstractFeatures
 				? CONFIGURATIONS
 				: PROGRAM_VARIANTS;
-		TreeParent p =
+		final TreeParent p =
 			new TreeParent(NUMBER_OF
 				+ variants, null, true) {
 
@@ -560,7 +579,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			};
 
 		if (!ignoreAbstractFeatures
-			&& model.getAnalyser().countConcreteFeatures() == 0) {
+			&& (model.getAnalyser().countConcreteFeatures() == 0)) {
 			// case: there is no concrete feature so there is only one program variant,
 			// without this the calculation least much to long
 			p.addChild("1 "
@@ -571,14 +590,15 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
 		String s =
 			"";
-		if (number < 0)
+		if (number < 0) {
 			s +=
 				MORE_THAN
 					+ (-1
 						- number);
-		else
+		} else {
 			s +=
 				number;
+		}
 		s +=
 			" "
 				+ variants;
@@ -590,7 +610,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * Refreshes the tree in a fast running job with highest priority
 	 */
 	protected void refresh() {
-		UIJob job_setColor =
+		final UIJob job_setColor =
 			new UIJob(REFRESH_EDIT_VIEW) {
 
 				@Override
@@ -607,7 +627,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	/**
 	 * Stops the calculation and the running job
-	 * 
+	 *
 	 * @param value
 	 */
 	public void setCanceled(boolean value) {

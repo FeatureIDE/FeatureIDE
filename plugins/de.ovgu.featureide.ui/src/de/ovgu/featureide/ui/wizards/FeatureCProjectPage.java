@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,14 +34,14 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * A dialog page for adding a FeatureC Project
- * 
+ *
  * @author Christopher Kruczek
  * @author Andy Kenner
  */
 @SuppressWarnings(RESTRICTION)
 public class FeatureCProjectPage extends NewFeatureProjectPage {
 
-	private IProject project;
+	private final IProject project;
 	private static final String JAVA_NATURE =
 		"org.eclipse.jdt.core.javanature";
 	private static final String MESSAGE =
@@ -68,23 +68,25 @@ public class FeatureCProjectPage extends NewFeatureProjectPage {
 	private void setBuildPath() {
 		try {
 			if (project.hasNature(JAVA_NATURE)) {
-				JavaProject javaProject =
+				final JavaProject javaProject =
 					new JavaProject(project, null);
-				for (IClasspathEntry entry : javaProject.getRawClasspath()) {
+				for (final IClasspathEntry entry : javaProject.getRawClasspath()) {
 					if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 						String path =
 							entry.getPath().toOSString();
-						String fileSeparator =
+						final String fileSeparator =
 							System.getProperty("file.separator");
 
-						if (path.contains(fileSeparator))
+						if (path.contains(fileSeparator)) {
 							path =
 								path.substring(path.indexOf(fileSeparator)
 									+ 1);
-						if (path.contains(fileSeparator))
+						}
+						if (path.contains(fileSeparator)) {
 							path =
 								path.substring(path.indexOf(fileSeparator)
 									+ 1);
+						}
 
 						buildPath.setText(path);
 						buildPath.setEnabled(false);
@@ -93,7 +95,7 @@ public class FeatureCProjectPage extends NewFeatureProjectPage {
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -53,7 +53,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 
 /**
  * Defines the actions for the feature model editor and contributes them.
- * 
+ *
  * @author Thomas Thuem
  */
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
@@ -95,13 +95,13 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
-		FeatureModelEditor editor =
+		final FeatureModelEditor editor =
 			(FeatureModelEditor) targetEditor;
 		setActivePage(editor, editor.getActivePage());
 	}
 
 	public void setActivePage(FeatureModelEditor editor, int pageIndex) {
-		IActionBars actionBars =
+		final IActionBars actionBars =
 			getActionBars();
 		if (actionBars != null) {
 			switch (pageIndex) {
@@ -124,7 +124,7 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 	}
 
 	private void hookGlobalTextActions(FeatureModelEditor editor, IActionBars actionBars) {
-		ITextEditor textEditor =
+		final ITextEditor textEditor =
 			editor.getSourceEditor();
 		for (int i =
 			0; i < TEXTEDITOR_ACTION_IDS.length; i++) {
@@ -147,9 +147,9 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
 				@Override
 				public void fill(ToolBar parent, int index) {
-					if (widget == null
-						&& parent != null) {
-						int flags =
+					if ((widget == null)
+						&& (parent != null)) {
+						final int flags =
 							SWT.PUSH;
 
 						ToolItem ti =
@@ -166,13 +166,14 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 						// create an image the height of the text field
 						final Image image =
 							new Image(Display.getCurrent(), 1, size.y);
-						GC gc =
+						final GC gc =
 							new GC(image);
 						gc.setBackground(parent.getBackground());
 						gc.fillRectangle(image.getBounds());
 						gc.dispose();
 						ti.addDisposeListener(new DisposeListener() {
 
+							@Override
 							public void widgetDisposed(DisposeEvent e) {
 								image.dispose();
 							}

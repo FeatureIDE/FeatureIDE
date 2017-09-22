@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 /**
  * A factory workspace maps feature model {@link IFeatureModelFormat formats} to a feature model {@link IFeatureModelFactory factory}. This way it can be
  * ensured that a specific factory is used when reading from a certain file type.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FactoryWorkspace {
@@ -42,16 +42,16 @@ public class FactoryWorkspace {
 	private String defaultFactoryID;
 
 	public FactoryWorkspace(FactoryWorkspace oldWorkspace) {
-		this.defaultFactoryID =
+		defaultFactoryID =
 			oldWorkspace.defaultFactoryID;
-		this.map =
+		map =
 			new HashMap<>(oldWorkspace.map);
 	}
 
 	public FactoryWorkspace() {
-		this.defaultFactoryID =
+		defaultFactoryID =
 			DefaultFeatureModelFactory.ID;
-		this.map =
+		map =
 			new HashMap<>();
 	}
 

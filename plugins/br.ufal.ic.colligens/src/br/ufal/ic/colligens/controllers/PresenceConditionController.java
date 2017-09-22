@@ -11,7 +11,6 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import br.ufal.ic.colligens.activator.Colligens;
@@ -23,12 +22,9 @@ import br.ufal.ic.colligens.models.StubsHeader;
 import core.GeneralFrontend;
 import core.RefactoringFrontend;
 import core.presence.condition.PresenceConditionVisitor;
-import de.fosd.typechef.error.Position;
-import de.fosd.typechef.featureexpr.FeatureExpr;
 import de.fosd.typechef.options.FrontendOptions;
 import de.fosd.typechef.options.FrontendOptionsWithConfigFiles;
 import de.fosd.typechef.options.OptionException;
-import scala.Function3;
 import tree.Node;
 import tree.visitor.VisitorPrinter;
 
@@ -55,29 +51,29 @@ public class PresenceConditionController {
 	}
 
 	public void run() throws PluginException, OptionException, IOException {
-		StubsHeader stubsHeader =
+		final StubsHeader stubsHeader =
 			new StubsHeader();
 		try {
 			stubsHeader.setProject(file.getProject().getName());
 			stubsHeader.run();
-		} catch (PlatformException e) {
+		} catch (final PlatformException e) {
 			e.printStackTrace();
 			throw new PluginException("");
 		}
 
 		fileProxy =
-			new FileProxy((IResource) file);
+			new FileProxy(file);
 
-		FrontendOptions opt =
+		final FrontendOptions opt =
 			new FrontendOptionsWithConfigFiles();
-		ArrayList<String> paramters =
+		final ArrayList<String> paramters =
 			new ArrayList<String>();
 
 		paramters.add("--lexNoStdout");
 		paramters.add("--parse");
 
 		if (stubsHeader.getIncludes() != null) {
-			for (Iterator<String> iterator =
+			for (final Iterator<String> iterator =
 				stubsHeader.getIncludes()
 						.iterator(); iterator.hasNext();) {
 				paramters.add("-h");
@@ -86,19 +82,19 @@ public class PresenceConditionController {
 		}
 		paramters.add(fileProxy.getNoIncludeFile());
 
-		String[] paramterArray =
+		final String[] paramterArray =
 			paramters
 					.toArray(new String[paramters.size()]);
 
 		opt.parseOptions(paramterArray);
 
-		RenderParserError renderParserError =
+		final RenderParserError renderParserError =
 			new RenderParserError();
 		renderParserError.setFile(fileProxy);
 
-		opt.setRenderParserError((Function3<FeatureExpr, String, Position, Object>) renderParserError);
+		opt.setRenderParserError(renderParserError);
 
-		tree.Node ast =
+		final tree.Node ast =
 			GeneralFrontend.getAST(opt);
 
 		if (ast == null) {
@@ -112,21 +108,21 @@ public class PresenceConditionController {
 
 		ast.accept(new PresenceConditionVisitor());
 
-		this.presenceCondition(ast);
+		presenceCondition(ast);
 
-		if (!this.markerLine(nodes)) {
-			this.markerLine(nodesCondition2);
+		if (!markerLine(nodes)) {
+			markerLine(nodesCondition2);
 		}
 	}
 
 	private void presenceCondition(Node node) {
-		if (node.getPositionFrom() != null
-			&& (node.getPositionFrom().getLine() >= line
-				- 10
-				&& node
-						.getPositionFrom().getLine() <= line
-							+ 10)) {
-			PrintStream out =
+		if ((node.getPositionFrom() != null)
+			&& ((node.getPositionFrom().getLine() >= (line
+				- 10))
+				&& (node
+						.getPositionFrom().getLine() <= (line
+							+ 10)))) {
+			final PrintStream out =
 				System.out;
 			node.accept(new VisitorPrinter(true));
 			System.setOut(out);
@@ -136,12 +132,12 @@ public class PresenceConditionController {
 							+ RefactoringFrontend.outputFilePath
 							+ " -c default.cfg -f "
 							+ RefactoringFrontend.outputFilePath);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 
 			try {
-				String codeNode =
+				final String codeNode =
 					readFile(RefactoringFrontend.outputFilePath)
 							.trim();
 				if (codeNode.contains(code.trim())) {
@@ -155,23 +151,23 @@ public class PresenceConditionController {
 					- line) < 10) {
 					nodesCondition2.add(node);
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
-		for (Node child : node.getChildren()) {
-			this.presenceCondition(child);
+		for (final Node child : node.getChildren()) {
+			presenceCondition(child);
 		}
 	}
 
 	private boolean markerLine(Collection<Node> nodes) {
 		Node nodeMarke =
 			null;
-		for (Iterator<Node> iterator =
+		for (final Iterator<Node> iterator =
 			nodes.iterator(); iterator.hasNext();) {
-			Node node =
+			final Node node =
 				iterator.next();
-			if (nodeMarke == null
+			if ((nodeMarke == null)
 				|| (Math.abs(node.getPositionFrom().getLine()
 					- line) <= Math
 							.abs(nodeMarke.getPositionFrom().getLine()
@@ -192,17 +188,17 @@ public class PresenceConditionController {
 				+ nodeMarke.getPresenceCondition());
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 		return true;
 	}
 
 	private String readFile(String fileName) throws IOException {
-		BufferedReader br =
+		final BufferedReader br =
 			new BufferedReader(new FileReader(fileName));
 		try {
-			StringBuilder sb =
+			final StringBuilder sb =
 				new StringBuilder();
 			String line =
 				br.readLine();

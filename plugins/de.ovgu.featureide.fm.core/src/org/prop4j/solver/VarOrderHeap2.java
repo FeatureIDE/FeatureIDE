@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,7 +27,7 @@ import org.sat4j.specs.ISolver;
 
 /**
  * Modified variable order for {@link ISolver}.</br> Initializes the used heap in a certain order.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class VarOrderHeap2 extends VarOrderHeap {
@@ -45,28 +45,28 @@ public class VarOrderHeap2 extends VarOrderHeap {
 	@Override
 	public void init() {
 		int nlength =
-			this.lits.nVars()
+			lits.nVars()
 				+ 1;
-		if (this.activity == null
-			|| this.activity.length < nlength) {
-			this.activity =
+		if ((activity == null)
+			|| (activity.length < nlength)) {
+			activity =
 				new double[nlength];
 		}
-		this.phaseStrategy.init(nlength);
-		this.activity[0] =
+		phaseStrategy.init(nlength);
+		activity[0] =
 			-1;
-		this.heap =
-			new Heap(this.activity);
-		this.heap.setBounds(nlength);
+		heap =
+			new Heap(activity);
+		heap.setBounds(nlength);
 		nlength--;
 		for (int i =
 			0; i < nlength; i++) {
 			final int x =
 				order[i];
-			this.activity[x] =
+			activity[x] =
 				0.0;
-			if (this.lits.belongsToPool(x)) {
-				this.heap.insert(x);
+			if (lits.belongsToPool(x)) {
+				heap.insert(x);
 			}
 		}
 	}

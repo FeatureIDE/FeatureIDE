@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FeatureRemover implements LongRunningMethod<List<? extends Clause>> {
@@ -119,9 +119,9 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 	}
 
 	public FeatureRemover(Node cnf, Collection<String> dirtyFeatures, boolean includeBooleanValues, boolean regularCNF) {
-		this.fmNode =
+		fmNode =
 			cnf;
-		this.dirtyfeatures =
+		dirtyfeatures =
 			dirtyFeatures;
 		this.includeBooleanValues =
 			includeBooleanValues;
@@ -144,7 +144,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 					+ 1];
 			int i =
 				0;
-			for (String featureName : cleanFeatures) {
+			for (final String featureName : cleanFeatures) {
 				allLiterals[i++] =
 					new Literal(featureName);
 			}
@@ -174,7 +174,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 		}
 		int j =
 			0;
-		for (Clause newClause : clauses) {
+		for (final Clause newClause : clauses) {
 			final int[] newClauseLiterals =
 				newClause.getLiterals();
 			final Literal[] literals =
@@ -194,6 +194,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 		return new And(newClauses);
 	}
 
+	@Override
 	public final List<? extends Clause> execute(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		// Collect all features in the prop node and remove TRUE and FALSE
 		init();
@@ -239,9 +240,9 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 
 	private void collectFeatures() {
 		if (fmNode instanceof And) {
-			for (Node andChild : fmNode.getChildren()) {
+			for (final Node andChild : fmNode.getChildren()) {
 				if (andChild instanceof Or) {
-					for (Node orChild : andChild.getChildren()) {
+					for (final Node orChild : andChild.getChildren()) {
 						addLiteral(cleanFeatures, orChild);
 					}
 				} else {
@@ -249,7 +250,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 				}
 			}
 		} else if (fmNode instanceof Or) {
-			for (Node orChild : fmNode.getChildren()) {
+			for (final Node orChild : fmNode.getChildren()) {
 				addLiteral(cleanFeatures, orChild);
 			}
 		} else {
@@ -302,7 +303,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 			final List<DeprecatedClause> subList =
 				dirtyClauseList.subList(dirtyListPosIndex, dirtyClauseList.size());
 			dirtyClauseSet.removeAll(subList);
-			for (DeprecatedClause deprecatedClause : subList) {
+			for (final DeprecatedClause deprecatedClause : subList) {
 				deleteClause(deprecatedClause);
 			}
 			subList.clear();
@@ -314,7 +315,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 			final List<DeprecatedClause> subList =
 				newDirtyClauseList.subList(newDirtyListDelIndex, newDirtyClauseList.size());
 			dirtyClauseSet.removeAll(subList);
-			for (DeprecatedClause deprecatedClause : subList) {
+			for (final DeprecatedClause deprecatedClause : subList) {
 				deleteClause(deprecatedClause);
 			}
 		}
@@ -361,7 +362,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 					if (children.length == absoluteValueCount) {
 						throw new RuntimeException("Model is void!");
 					}
-					Literal[] newChildren =
+					final Literal[] newChildren =
 						new Literal[children.length
 							- absoluteValueCount];
 					int k =
@@ -406,7 +407,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 		map =
 			new DeprecatedFeature[idMap.size()
 				+ 1];
-		for (String curFeature : dirtyfeatures) {
+		for (final String curFeature : dirtyfeatures) {
 			final Integer id =
 				idMap.get(curFeature);
 			map[id] =
@@ -457,7 +458,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 	}
 
 	private List<? extends Clause> handleSingleClause(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		for (Node clauseChildren : fmNode.getChildren()) {
+		for (final Node clauseChildren : fmNode.getChildren()) {
 			final Literal literal =
 				(Literal) clauseChildren;
 			if (dirtyfeatures.contains(literal.var)) {
@@ -488,7 +489,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 
 		int id =
 			1;
-		for (String name : dirtyfeatures) {
+		for (final String name : dirtyfeatures) {
 			idMap.put(name, id);
 			featureNameArray[id] =
 				name;
@@ -497,7 +498,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 
 		cleanFeatures.removeAll(dirtyfeatures);
 
-		for (String name : cleanFeatures) {
+		for (final String name : cleanFeatures) {
 			idMap.put(name, id);
 			featureNameArray[id] =
 				name;
@@ -537,7 +538,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 			0; i < dirtyListNegIndex; i++) {
 			final Clause clause =
 				dirtyClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
+			for (final int literal : clause.getLiterals()) {
 				if (literal == -curFeatureID) {
 					Collections.swap(dirtyClauseList, i--, --dirtyListNegIndex);
 					break;
@@ -550,7 +551,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 			0; i < dirtyListPosIndex; i++) {
 			final Clause clause =
 				dirtyClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
+			for (final int literal : clause.getLiterals()) {
 				if (literal == curFeatureID) {
 					Collections.swap(dirtyClauseList, i--, --dirtyListPosIndex);
 					break;
@@ -592,7 +593,7 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 		try {
 			remove =
 				!solver.isSatisfiable(literals2);
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 		}
 		return remove;
@@ -643,13 +644,13 @@ public class FeatureRemover implements LongRunningMethod<List<? extends Clause>>
 
 	protected void firstRedundancyCheck(DeprecatedFeature nextFeature) {
 		if (first
-			&& nextFeature.getClauseCount() > 0) {
+			&& (nextFeature.getClauseCount() > 0)) {
 			first =
 				false;
 			Collections.sort(dirtyClauseList, lengthComparator);
 
 			addCleanClauses();
-			CNFSolver solver =
+			final CNFSolver solver =
 				new CNFSolver(cleanClauseList, featureNameArray.length
 					- 1);
 

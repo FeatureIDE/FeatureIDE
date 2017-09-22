@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,7 +32,7 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 
 /**
  * Holds the java signature of a class.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FujiClassSignature extends AbstractClassSignature {
@@ -53,26 +53,26 @@ public class FujiClassSignature extends AbstractClassSignature {
 		implementTypes =
 			new LinkedList<TypeDecl>();
 		if (typeDecl instanceof ClassDecl) {
-			ClassDecl classDecl =
+			final ClassDecl classDecl =
 				(ClassDecl) typeDecl;
 			superTypes.add(classDecl.superclass());
 			addExtend(classDecl.superclass().name());
 			if (!classDecl.name().equals("Object")) {
 				addExtend(classDecl.superclass().name());
 			}
-			Iterator<TypeDecl> implementInterfaceIt =
+			final Iterator<TypeDecl> implementInterfaceIt =
 				classDecl.interfacesIterator();
 			while (implementInterfaceIt.hasNext()) {
-				TypeDecl implementType =
+				final TypeDecl implementType =
 					implementInterfaceIt.next();
 				implementTypes.add(implementType);
 				addImplement(implementType.name());
 			}
 		} else if (typeDecl instanceof InterfaceDecl) {
-			Iterator<TypeDecl> superInterfaceIt =
+			final Iterator<TypeDecl> superInterfaceIt =
 				((InterfaceDecl) typeDecl).superinterfacesIterator();
 			while (superInterfaceIt.hasNext()) {
-				TypeDecl superInterface =
+				final TypeDecl superInterface =
 					superInterfaceIt.next();
 				superTypes.add(superInterface);
 				if (!superInterface.name().equals("Object")) {
@@ -84,7 +84,7 @@ public class FujiClassSignature extends AbstractClassSignature {
 
 	@Override
 	public String toString() {
-		StringBuilder sb =
+		final StringBuilder sb =
 			new StringBuilder();
 
 //		for (ImportDecl importDecl : importList) {
@@ -102,7 +102,7 @@ public class FujiClassSignature extends AbstractClassSignature {
 		}
 
 		if (modifiers.length > 0) {
-			for (String modifier : modifiers) {
+			for (final String modifier : modifiers) {
 				sb.append(modifier);
 				sb.append(' ');
 			}
@@ -125,13 +125,15 @@ public class FujiClassSignature extends AbstractClassSignature {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null
-			|| getClass() != obj.getClass())
+		}
+		if ((obj == null)
+			|| (getClass() != obj.getClass())) {
 			return false;
+		}
 
-		FujiClassSignature otherSig =
+		final FujiClassSignature otherSig =
 			(FujiClassSignature) obj;
 
 		if (!super.sigEquals(otherSig)) {
@@ -142,10 +144,10 @@ public class FujiClassSignature extends AbstractClassSignature {
 			return false;
 		}
 
-		for (TypeDecl thisSuperType : superTypes) {
+		for (final TypeDecl thisSuperType : superTypes) {
 			boolean contains =
 				false;
-			for (TypeDecl otherSuperType : otherSig.superTypes) {
+			for (final TypeDecl otherSuperType : otherSig.superTypes) {
 				if (thisSuperType == otherSuperType) {
 					contains =
 						true;
